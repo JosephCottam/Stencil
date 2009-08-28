@@ -1,0 +1,198 @@
+
+ <project name="Stencil" default="Stencil" basedir=".">
+ 	<property name="src" location="Core" />
+ 	<property name="target" location="bin" />
+ 	<property name="grammars" location ="${src}/stencil/parser/"/>
+ 	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
+ 	<property name="rutimeLibrary" location="../Library/"/>
+ 	
+ 	<target name="CurrentWorkingGrammar">
+ 		<antlr
+ 			target="${grammars}/util/DynamicRule.g"
+			outputdirectory="${grammars}/util/"
+ 			libdirectory="${lib}"
+ 		/> 
+ 	</target>
+ 	
+ 	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, ModuleData, Validators">
+		<javac srcdir="${src}" destdir="${target}" classpath="${antlrClasspath}">
+			<!--compilerarg value="-Xlint"/-->
+		</javac>
+ 	</target>
+
+ 	<target name="Interpreter" depends="StencilGrammar">
+ 		<property name="dest" location="${interpreter}"/>
+ 		<property name="lib" location="${grammars}/string"/>
+
+ 		<antlr
+ 			target="${interpreter}/UpdateGuides.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
+ 		<antlr
+ 			target="${interpreter}/NeedsGuides.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
+ 		<antlr
+ 			target="${interpreter}/DynamicRule.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/> 		
+ 	</target>
+ 	
+
+	<!-- Just the core stencil grammar, not the additional processing.-->
+ 	<target name="StencilGrammar">
+ 		<antlr 
+			target="${grammars}/Stencil.g"
+			outputdirectory="${grammars}/string/"
+		/>
+	</target>
+
+ 	<!--All of the tree manipulations prior to the interpreter-->
+ 	<target name="StencilTransformer" depends="StencilGrammar">
+ 		<antlr
+			target="${grammars}/Imports.g"
+			outputdirectory="${grammars}/string/"
+		/>
+ 		<antlr
+ 			target="${grammars}/Specializers.g"
+ 			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/EnsureOrders.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/AdHocOperators.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/SetOperators.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/EnsureGuideOp.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/AutoGuide.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/GuideSpecializers.g"
+			outputdirectory="${grammars}/string/"
+ 		/>
+	</target>
+ 	
+ 	<target name="Validators" depends="StencilGrammar">
+ 		<property name="validators" location="${grammars}/validators"/>
+ 		<property name="lib" location="${grammars}/string"/>
+ 		
+ 		<antlr
+ 			target="${validators}/RangeValidator.g"
+ 			outputdirectory="${validators}"
+ 			libdirectory="${lib}"
+ 		/>
+ 	</target>
+ 		
+ 	
+ 	<target name="ModuleData">
+ 		<property name="modulesUtil" location="${src}/stencil/legend/module/util/"/>
+ 		<antlr
+ 			target="${modulesUtil}/ModuleData.g"
+			outputdirectory="${modulesUtil}"
+ 		/>
+ 	</target>
+ 	
+
+
+ 	<target name="TreeAdapterGrammar" depends="StencilGrammar">
+ 		<antlr
+ 			target="${grammars}/StencilTreeAdapter.g"
+ 			outputdirectory="${grammars}/tree/"
+ 		/>
+	</target>
+
+ 	<target name="TreeAdapter" depends="TreeAdapterGrammar, StencilBuild">
+		<java classname="stencil.util.build.GenerateTreeAdapter" classpath="${target}:${java.class.path}" fork="true">
+			<arg value="${grammars}/string/Stencil.tokens" />
+			<arg value="${grammars}/StencilTreeAdapter.stg" />
+			<arg value="${grammars}/tree/StencilTreeAdapter.java" />
+		</java>
+ 	</target>
+
+ 	<!--There is occasionally a problem with StencilBuild and TreeAdapter.-->
+ 	<!--It may be related to refresh rates of the file systems.-->
+ 	<!--Doing the build again (no cleaning) has always resolved it!-->
+ 	<target name="StencilBuild">
+ 		<property name="dir" value="/stencil/util/build"/>
+ 		<mkdir dir="${target}${dir}" />
+ 		<javac sourcepath="" srcdir="${src}${dir}" destdir="${target}" classpath="${antlrClasspath}" />
+ 	</target>
+
+ 	<target name="Release_With_Build" depends="Stencil,Release" />
+ 	
+ 	<target name="Release">
+ 		<property name="release" location="./release"/>
+ 		<property name="JarFile" value="Stencil.jar"/>
+ 		<tstamp><format property="today" pattern="ddMMMyyy"/></tstamp>
+ 		<property name="result" value="Stencil_${today}.zip"/>
+
+ 		<!--Clear up prior attempts-->
+ 		<delete dir="${release}"/>
+ 		<delete file="${result}"/>
+ 		<mkdir dir="${release}"/>
+
+ 		
+ 		<!--Create jar file-->
+ 		<delete file="${JarFile}"/>
+ 		 		
+ 		<pathconvert property="jarClasspath" pathsep=" " dirsep="/">
+ 			<map from="${rutimeLibrary}" to="./lib"/>
+ 	 		<path id="library.Classpath">
+ 	 			<fileset dir="${rutimeLibrary}">
+ 	 				<include name="*.jar"/>
+ 	 			</fileset>
+ 	 		</path>
+ 		</pathconvert>
+ 		
+		<jar jarfile="${release}/${JarFile}" includes="*.class" basedir=".">
+			<fileset dir="${target}"/>
+			<manifest>
+				<attribute name="Created-By" value="Joseph A. Cottam"/>
+				<attribute name="Main-Class" value="stencil.explore.Application"/>
+				<attribute name="Class-Path" value="${jarClasspath}"/>
+			</manifest>
+		</jar>
+
+ 		
+ 		<!--create Zip file with jar -->
+ 		 		
+ 		
+		<property name="lib.app.dir" location="${release}/lib"/>
+ 		<mkdir dir="${lib.app.dir}"/>
+ 		<copy todir="${lib.app.dir}">
+ 			<fileset dir="${rutimeLibrary}" includes="*.jar"/>
+ 		</copy>
+
+ 		<copy file="./TestData/Stencil.properties" tofile="${release}/Stencil.properties" overwrite="true"/>
+ 		<copy file="./TestData/Explore.properties" tofile="${release}/Explore.properties" overwrite="true"/>
+ 		<copy todir="${release}/Examples/" overwrite="true">
+ 			<fileset dir="./TestData/RegressionImages/" includes="**"/>
+ 		</copy>
+ 		
+ 		<copy todir="${release}" overwrite="true">
+ 			<fileset dir="./ReleaseIncludes/" includes="**"/>
+ 		</copy>
+ 		
+ 		<!--Create the zip file!-->
+ 		<zip destfile="${result}" basedir="${release}" update="true"/>
+ 		
+ 		<!--Clean up temporaries-->
+ 		<delete dir="${release}"/>
+ 		<delete file="${JarFile}"/>
+	</target> 
+ 
+ </project>

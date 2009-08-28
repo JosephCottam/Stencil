@@ -1,0 +1,45 @@
+STREAM: File
+NAME: Stocks
+HEADER: Date,Open,High,Low,Close,Volume
+SEPARATOR: ,
+SOURCE: ./google_stocks.csv
+CHECKHEADER: true
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: -2147483648
+
+external stream Stocks(Date, Open)
+external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
+
+order (Stocks | Mouse)
+
+layer Ticker[POLY_LINE]
+from Stocks
+	ID : "Google"	
+	X.new: TimeStep(Date) -> VALUE
+	Y.new: Mult(Open, -1) -> VALUE
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @color(BLUE)
+from Stocks
+	view(HEIGHT, Y) :(canvas.HEIGHT, canvas.Y)
+from Stocks
+	filter(VALUE < 50): TimeStep(Date) -> Sub(view.RIGHT, VALUE) -> VALUE
+	filter(VALUE < view.RIGHT): TimeStep(Date) -> VALUE 
+	view(X): Add(3, view.X) -> VALUE
+
+layer Nav
+from Mouse
+	filter(BUTTON = 1): BUTTON
+	filter(SHIFT !~ "true"): SHIFT
+	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, Width) -> VALUE
+from Mouse
+	filter(BUTTON = 1): BUTTON
+	filter(SHIFT =~ "true"): SHIFT
+	view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height,view.Y) -> VALUE
+from Mouse
+	filter(CLICK_COUNT = 3): CLICK_COUNT
+	filter(BUTTON = 1): BUTTON
+	view(X, Y, WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+
+legend TimeStep (Date) -> (VALUE)
+	all => VALUE : Index(Date) -> Mult(3, VALUE) -> VALUE

@@ -1,0 +1,23 @@
+STREAM: File
+NAME: Values
+HEADER: Category
+SEPARATOR: ,
+SOURCE: ./Fruits.txt
+CHECKHEADER: false
+
+external stream Values(Category)
+
+layer Chart
+  sidebar[label.FONT_SIZE=10, example.SIZE=9]: FILL_COLOR
+  axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1,textOffset=6, tickSize=5]: X
+from Values
+  ID : Count("") -> VALUE 				/*Give everything a unique ID.*/
+  X << Rank(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
+  Y : Count(Category) -> Mult(VALUE, -11) -> VALUE
+  SIZE: 10
+  REGISTRATION: "CENTER"
+  FILL_COLOR<< Count(Category) #-> HeatScale[1..n, cold=@color(RED), hot=@color(GRAY90)](VALUE) -> VALUE
+  /*The above line uses two special forms: Dynamic bind and 'reframe' map.*/
+  /*Dyanmic bind '<<' keeps results up to date in a globally changing context.*/
+  /*Reframe map '#->' is used by legend generation to indicate that the results
+	  before the reframe should be used as labels, not the incomming values.*/

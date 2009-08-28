@@ -1,0 +1,42 @@
+           graph_label            | hardware | os_name | bitness | compiler_name | suite_name | pass  | fail
+----------------------------------+----------+---------+---------+---------------+------------+-------+------
+ ompi-nightly-trunk : 1.3a1r18049 | ppc      | Darwin  | 32      | absoft        | trivial    |    18 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Darwin  | 32      | absoft        | trivial    |     0 |   24
+ ompi-nightly-trunk : 1.3a1r18049 | ia32     | Linux   | 32      | absoft        | trivial    |    24 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 32      | gnu           | ibm        |   412 |  122
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 32      | gnu           | intel      |   548 |  388
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 32      | gnu           | trivial    |    27 |    3
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 32      | gnu           | ibm        |  1428 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 32      | gnu           | imb        |     8 |   10
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 32      | gnu           | intel      |  3744 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 32      | gnu           | mpicxx     |    16 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 32      | gnu           | trivial    |    96 |  160
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 32      | sun           | ibm        |   515 |    1
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 32      | sun           | imb        |    27 |   12
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 32      | sun           | intel      |  1147 |   89
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 32      | sun           | mpicxx     |     2 |    4
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 32      | sun           | trivial    |    24 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 64      | gnu           | ibm        |   424 |  110
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 64      | gnu           | intel      |   543 |  393
+ ompi-nightly-trunk : 1.3a1r18049 | ppc64    | Linux   | 64      | gnu           | trivial    |    27 |    3
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | absoft        | trivial    |    24 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | gnu           | ibm        | 14059 |  185
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | gnu           | imb        |    44 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | gnu           | intel      |  3744 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | gnu           | mpicxx     |    40 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | gnu           | trivial    |   669 |    1
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | intel         | ibm        | 12618 |  198
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | intel         | imb        |    36 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | intel         | mpicxx     |    72 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | intel         | trivial    |   575 |    1
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | pgi           | ibm        |  2088 |   36
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | pgi           | imb        |    12 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | pgi           | mpicxx     |    24 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | x86_64   | Linux   | 64      | pgi           | trivial    |   189 |    3
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | ibm        |   516 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | imb        |    38 |    1
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | intel      |  1193 |   43
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | mpicxx     |     6 |    0
+ ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | trivial    |    24 |    0
+(38 rows)
+

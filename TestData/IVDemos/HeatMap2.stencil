@@ -1,0 +1,29 @@
+STREAM: Mouse
+FREQUENCY: -2147483648
+
+LAYER Heat
+	STREAM Mouse(X,Y, META)
+		X --> seq(ID) --> glyph(ID)
+		(X,Y) --> Glyph(X,Y)
+		(META) --> Colorize(C) --> Glyph(FILL_COLOR)
+		10 --> Glyph(SIZE)
+		CLEAR --> Glyph(STROKE_COLOR)
+		BLACK --> Canvas(BACKGROUND_COLOR)
+
+LAYER Nav
+        STREAM Mouse(BUTTON=1, DELTA_X, DELTA_Y, CLICK_COUNT, SHIFT !~'true', TYPE=~'DRAG')
+                (DELTA_X,0) --> screenToCanvas.D(View.X, Width) --> Sub(VALUE) --> View(X)
+                (0,DELTA_Y) --> screenToCanvas.D(View.Y, Height) --> Sub(VALUE) --> View(Y)
+        STREAM Mouse(BUTTON=1, SHIFT=~'true', TYPE=~'DRAG')
+                (DELTA_Y, .01) --> MULT(VALUE, View.ZOOM) --> Add(VALUE) --> View(ZOOM)
+        STREAM Mouse(BUTTON=1, CLICK_COUNT=3)
+		(Canvas.WIDTH, Canvas.HEIGHT, Canvas.X, Canvas.Y) -->
+			View(WIDTH, HEIGHT, X,Y)
+
+LEGEND Colorize(META)
+	(META !~ 'true'): WHITE --> RETURN(C)
+	(META =~ 'true'): GREEN --> RETURN(C)
+
+PYTHON seq (X) --> (ID)
+@init{ID=1}
+@main{ID = ID +1}

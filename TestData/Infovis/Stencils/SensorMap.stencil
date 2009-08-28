@@ -1,0 +1,22 @@
+STREAM: SensorLocations
+HEADER: ID, x1,y1,x2,y2,x3,y3,x4,y4
+SEPARATOR: ,
+SOURCE: /nfs/rontok/xraid/users/jcottam/Desktop/InfoVis 2008 - Contest Data/map.txt
+CHECKHEADER: true
+
+LAYER SensorMap
+	STREAM SensorLocations(ID, x1,y1,x2,y2,x3,y3,x4,y4)
+		ID --> Glyph(ID)
+		POLY --> Glyph(IMPLANTATION)
+		2 --> Glyph(SIZE)
+		BLUE --> Glyph(FILLCOLOR)
+		(x1,y1) --> Glyph(X,Y)
+		(x2,y2) --> Glyph(X2,Y2)
+		(x3,y3) --> Glyph(X3,Y3)
+		(x4,y4) --> Glyph(X4,Y4)
+	STREAM SensorLocations(ID =~ '452')
+		'FloorPlan' --> Glyph(ID)
+		IMAGE --> Glyph(IMPLANTATION)
+		'/u/jcottam/Desktop/InfoVis 2008 - Contest Data/map.png' --> Glyph(File)
+
+

@@ -1,0 +1,47 @@
+group TreeAdapter;
+
+adapter(clauses) ::= <<
+package stencil.parser.tree;
+
+import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.CommonTreeAdaptor;
+
+public class StencilTreeAdapter extends CommonTreeAdaptor {
+
+	@Override
+	public Object create(Token token) {
+		Object t;
+
+		if (token == null) {return new StencilTree(null);}
+
+
+		switch(token.getType()){
+		<clauses>
+		default : t = new StencilTree(token); break;
+		}
+		return t;
+	}
+
+	@Override
+	public Object dupNode(Object t) {
+		// TODO Auto-generated method stub
+		return super.dupNode(t);
+	}
+}
+>>
+
+
+entry(token, val, class) ::= <<
+case <val>	: t = new <class>(token); break;		//Token <token>
+
+>>
+
+defaultEntry(token) ::= <<
+//Default for <token>
+
+>>
+
+errorEntry(token, val) ::= <<
+case <val>	: throw new IllegalArgumentException("Attempted to create tree-node for token on error list: <token>");
+
+>>

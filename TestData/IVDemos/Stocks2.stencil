@@ -1,0 +1,37 @@
+STREAM: File
+NAME: Stokcs
+HEADER: Date,Open,High,Low,Close,Volume
+SEPARATOR: ,
+SOURCE: /nfs/rontok/xraid/users/jcottam/Documents/Presentations/Interaction Model (IV'08)/Demos/google_stocks.csv
+CHECKHEADER: true
+STREAM: Mouse
+FREQUENCY: -2147483648
+
+LAYER Ticker
+STREAM Stocks(Date, High)
+	'Google' --> Glyph(ID)
+	POLY_LINE --> Glyph(Implantation)
+	Date --> TimeStep(VALUE) --> Glyph(X)
+	Open --> Glyph(Y)
+	1 --> Glyph(Stroke_Weight)
+	BLUE --> Glyph(Stroke_Color)
+STREAM Stocks(Date)
+	(Canvas.HEIGHT, Canvas.Y) --> View(HEIGHT, Y)
+STREAM Stocks(Date)
+	Date --> TimeStep(VALUE, 500) --> sub(VALUE) --> FILTER(VALUE > View.X)
+	Date --> TimeStep(VALUE) --> FILTER(VALUE < View.RIGHT)
+	(View.X,3)  --> Add(VALUE) --> View(X)
+	Date --> TimeStep(VALUE, View.X, View.RIGHT) --> Print(VALUE, VALUE1, VALUE2) --> NULL
+
+LAYER Nav
+        STREAM Mouse(BUTTON=1, DELTA_X, DELTA_Y)
+                (DELTA_X,0) --> screenToCanvas.D(View.X, Width) --> Sub(VALUE) --> View(X)
+        STREAM Mouse(BUTTON=1, DELTA_X, DELTA_Y, SHIFT=~'true')
+                (0,DELTA_Y) --> screenToCanvas.D(Height, View.Y) --> Sub(VALUE) --> View(Y)
+        STREAM Mouse(BUTTON=1, CLICK_COUNT=3)
+		(Canvas.X, Canvas.Y) -->
+			View(X,Y)
+
+LEGEND TimeStep(T) BASE Index
+	(T) : (T) --> Base(VALUE, 3) --> Mult(VALUE) --> Return(VALUE)
+

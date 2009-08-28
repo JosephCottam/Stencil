@@ -1,0 +1,23 @@
+STREAM: File
+NAME: LineSource
+HEADER:  graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail
+SEPARATOR: \s+\|\s+
+SOURCE: ./18049-arch-compiler.output.txt
+CHECKHEADER: true
+
+/*Dead simple test.  Just draws some lines.*/
+
+external stream LineSource(axis1A, axis1B)
+ 
+layer GridLines[LINE]
+from LineSource
+	ID: Concatenate(axis1A, axis1B) -> (VALUE)
+	X.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (X)
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (X)
+	Y.1: -5
+	Y.2: 10
+	STROKE_COLOR: @color(GRAY80)
+	STROKE_WEIGHT: 3
+
+legend Spacing (ID) -> (X) 
+	all => X : Index(ID) -> Mult(VALUE, 5) -> (VALUE)

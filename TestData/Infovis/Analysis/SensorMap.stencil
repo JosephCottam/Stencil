@@ -1,0 +1,43 @@
+STREAM: SensorLocations
+HEADER: ID, x1,y1,x2,y2,x3,y3,x4,y4
+SEPARATOR: ,
+SOURCE: ./Infovis/map.txt
+CHECKHEADER: false
+
+LAYER BaseMap
+	STREAM SensorLocations(ID =~ '214')
+		'FloorPlan' --> Glyph(ID)
+		IMAGE --> Glyph(IMPLANTATION)
+		(-81,-.5) --> Glyph(X,Y)
+		(131,69.5) --> Glyph(WIDTH, HEIGHT)
+		'./Infovis/floor_plan.png' --> Glyph(Filename)
+		1 --> Glyph(Z)
+	STREAM SensorLocations(ID =~'214')
+		'Registration' --> Glyph(ID)
+		(0,0) --> Glyph(X,Y)
+		2 --> Glyph(SIZE)
+		RED --> Glyph(FILLCOLOR)
+		0 --> Glyph(Z)
+		RGB(.5,.5,.5,.5) --> Glyph(STROKE_COLOR)
+		.1 --> Glyph(STROKE_WEIGHT)
+
+LAYER SensorMap
+	STREAM SensorLocations(ID, x1,y1,x2,y2,x3,y3,x4,y4)
+		ID --> Glyph(ID)
+		POLY --> Glyph(IMPLANTATION)
+		2 --> Glyph(SIZE)
+		RGB(0,0,1,.2) --> Glyph(FILLCOLOR)
+		RGB(.5,.5,.5,.5) --> Glyph(STROKE_COLOR)
+		.1 --> Glyph(STROKE_WEIGHT)
+		(x1,y1) --> Glyph(X,Y)
+		(x2,y2) --> Glyph(X2,Y2)
+		(x3,y3) --> Glyph(X3,Y3)
+		(x4,y4) --> Glyph(X4,Y4)
+	STREAM SensorLocations(ID, x1,y1)
+		(ID, 'lab') --> Concatenate(VALUE) --> Glyph(ID)
+		TEXT --> Glyph(Implantation)
+		ID --> Glyph(TEXT)
+		(ID) --> SensorMap.Find(X,Y) --> Glyph(X,Y)
+		.5	 --> Glyph(FONT_SIZE)
+		(5,5) --> Glyph(WIDTH, HEIGHT)
+		CLEAR --> Glyph(STROKE_COLOR)

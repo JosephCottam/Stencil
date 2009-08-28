@@ -1,0 +1,23 @@
+STREAM: Twitter
+NAME: Tweets
+FEED_URL: http://twitter.com/statuses/public_timeline.rss
+USERNAME: 
+PASSWORD: 
+
+external stream Tweets(MESSAGE, LINK, TIME)
+
+layer Counts
+	axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6]: X
+from Tweets
+	ID: firstLetter(MESSAGE) -> Letter
+	X<< firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) -> VALUE
+	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE) -> VALUE
+	REGISTRATION: "BOTTOM"
+	SIZE: 10
+from Tweets
+	view(ZOOM) : Zoom(view.WIDTH, view.HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
+	view(X,Y): (canvas.X, canvas.Y)
+	
+
+legend firstLetter(Phrase) -> (Letter)
+	(all) => Letter: Trim(Phrase) -> Substring(VALUE, 0,1)-> VALUE

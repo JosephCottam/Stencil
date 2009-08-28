@@ -1,0 +1,26 @@
+hardware, os, bitness, comp
+i86pc,SunOS,32,absoft
+i86pc,SunOS,32,gnu
+i86pc,SunOS,64,gnu
+i86pc,SunOS,64,absoft
+i86pc,SunOS,64,intel
+i86pc,SunOS,64,pgi
+i86pc,SunOS,64,pgi
+ia32,Linux,64,gnu
+ia32,Linux,64,gnu
+ia32,Linux,64,absoft
+ia32,Linux,64,intel
+ia32,Linux,64,pgi
+ia32,Linux,64,sun
+ppc,Darwin,32,sun
+x86_64,Darwin,32,sun
+ia32,Linux,32,sun
+ppc64,Linux,32,sun
+x86_64,Linux,32,sun
+ppc,Darwin,64,sun
+x86_64,Darwin,64,sun
+ia32,Linux,64,sun
+ppc64,Linux,64,sun
+x86_64,Linux,64,sun
+ppc,Darwin,64,intel
+i86pc,SunOS,64,intel

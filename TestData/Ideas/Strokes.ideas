@@ -1,0 +1,16 @@
+Stroke as a "sigil type"
+
+//dot means plot solid in default color, space means leave blank.  3px on 3px off
+@stroke("...   ...   ...") 		
+
+//Named pattern, should be the same as above
+@stroke(DASH, 3, 3)
+
+//Two-phase stroke.  Top half and bottom half (can build as many layers as desired)
+@stroke("...   ...   ...", ".   ...   ...   ..")
+
+//1 means color from 1st argument, 2 from 2nd argument, 3 from 3rd...
+@stroke(@color(RED), @color(BLUE), @color(GREEN), "111   222   333")
+
+
+

@@ -1,0 +1,6 @@
+Pens and "sigil types"
+
+@gradient(@color(RED), @color(BLUE))			//Gradient from red to blue
+@gradient(@color(RED), @color(BLUE), .95)		//Gradient from red to blue, but only covering 95% of the distance (solid red/blue on the last 2.5% each end)
+@gradient(@color(RED), @color(BLUE), .25, true) //Repeating gradient, will repeat 4 times over the course
+@gradient(@color(RED), @color(BLUE), 20, true)	//Repeating gradient, will repeat ever 20 pixels

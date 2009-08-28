@@ -1,0 +1,99 @@
+STREAM: SensorLocations
+HEADER: ID, x1,y1,x2,y2,x3,y3,x4,y4
+SEPARATOR: ,
+SOURCE: ./Infovis/map.txt
+CHECKHEADER: false
+STREAM: SesnsorTrigger
+HEADER: ID start stop weight
+SEPARATOR: \s+
+SOURCE: ./Infovis/0114.txt
+CHECKHEADER: false
+
+LAYER BaseMap
+	STREAM SensorLocations(ID =~ '214')
+		'FloorPlan' --> Glyph(ID)
+		IMAGE --> Glyph(IMPLANTATION)
+		(-81,-.5) --> Glyph(X,Y)
+		(131,69.5) --> Glyph(WIDTH, HEIGHT)
+		'./Infovis/floor_plan.png' --> Glyph(Filename)
+		1 --> Glyph(Z)
+	STREAM SensorLocations(ID =~'214')
+		'Registration' --> Glyph(ID)
+		(0,0) --> Glyph(X,Y)
+		2 --> Glyph(SIZE)
+		RED --> Glyph(FILLCOLOR)
+		0 --> Glyph(Z)
+		RGB(.5,.5,.5,.5) --> Glyph(STROKE_COLOR)
+		.1 --> Glyph(STROKE_WEIGHT)
+
+LAYER SensorMap
+	STREAM SensorLocations(ID, x1,y1,x2,y2,x3,y3,x4,y4)
+		ID --> Glyph(ID)
+		POLY --> Glyph(IMPLANTATION)
+		RGB(0,0,1,.2) --> Glyph(FILLCOLOR)
+		RGB(.5,.5,.5,.5) --> Glyph(STROKE_COLOR)
+		.1 --> Glyph(STROKE_WEIGHT)
+		(x1,y1) --> Glyph(X1,Y1)
+		(x2,y2) --> Glyph(X2,Y2)
+		(x3,y3) --> Glyph(X3,Y3)
+		(x4,y4) --> Glyph(X4,Y4)
+	STREAM SensorLocations(ID, x1,y1)
+		(ID, 'lab') --> Concatenate(VALUE) --> Glyph(ID)
+		TEXT --> Glyph(Implantation)
+		ID --> Glyph(TEXT)
+		(ID) --> SensorMap.Find(X,Y) --> Glyph(X,Y)
+		.5	 --> Glyph(FONT_SIZE)
+		(5,5) --> Glyph(Width, Height)
+		CLEAR --> Glyph(STROKE_COLOR)
+
+
+LAYER Activity
+	STREAM SesnsorTrigger(ID)
+		ID --> Glyph(ID)
+		POLY --> Glyph(Implantation)
+		ID --> SensorMap.Find(X1,X2,X3,X4,Y1,Y2,Y3,Y4) --> Glyph(X1,X2,X3,X4,Y1,Y2,Y3,Y4)
+		ID --> RelativeOcc(P) --> ColorMap(VALUE) --> Glyph(FILLCOLOR)
+		CLEAR --> Glyph(STROKE_COLOR)
+	STREAM SesnsorTrigger(ID)
+		(ID, 'lab') --> Concatenate(VALUE) --> Glyph(ID)
+		TEXT --> Glyph(Implantation)
+		ID --> RelativeOcc.Value(P) --> Glyph(TEXT)
+		(ID) --> SensorMap.Find(X,Y) --> Glyph(X,Y)
+		.5	 --> Glyph(FONT_SIZE)
+		(5,5) --> Glyph(Width, Height)
+		CLEAR --> Glyph(STROKE_COLOR)
+
+
+		
+LEGEND OccMap(P) BASE HEAT
+
+PYTHON ColorMap(P) --> (VALUE)
+@main {
+P = str(P)
+VALUE = "COLOR(1.0," + P + "," + P + ")"
+}
+
+
+PYTHON RelativeOcc(ID) --> (P)
+@init{
+level = dict()
+def percent(ID):
+  ID = ID.strip()
+  if not level.has_key(ID):
+     level[ID] =0
+
+  v = level[ID]
+  v = v+1
+  level[ID] = v
+
+  P = v/10000.0
+  return P
+}
+@Value{
+P = percent(ID)
+P = "\n\n" + str(P)
+}
+
+@main{
+P = percent(ID)
+}

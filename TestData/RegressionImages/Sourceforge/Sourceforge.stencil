@@ -1,0 +1,41 @@
+STREAM: File
+NAME: NodePositions
+HEADER: ID X Y
+SEPARATOR: \s+
+SOURCE: ./vx_cluster_0_8.6_min_cuts.coord
+CHECKHEADER: false
+STREAM: File
+NAME: Attributes
+HEADER: ID|ATT
+SEPARATOR: \|
+SOURCE: ./project_troves.txt
+CHECKHEADER: true
+
+external stream NodePositions(ID, X,Y)  /*Precomputed layout*/
+external stream Attributes(ID, ATT)		 /*Additional attributes*/
+
+order NodePositions > Attributes 		 /*Load the NodePositions first*/
+
+layer Nodes
+from NodePositions
+	ID: ID
+	(X,Y) : (X,Y)
+	SIZE: 3
+	SHAPE: "RECTANGLE"
+	FILL_COLOR: @color(GRAY)
+
+layer Overlay
+from Attributes
+	filter (ATT =~ "C|Java|Python") : ATT					/*Only continue with specific attributes*/
+	filter (ID !~ "[null]") : Nodes.Find(ID) -> (ID)	/*...and with things in the other layer.*/
+
+	ID : ID
+	(X,Y) : Nodes.Find(ID) -> (X,Y)
+	SHAPE: "CROSS"
+	SIZE: 3.1
+	FILL_COLOR: Coloring(ATT) -> (C)
+
+legend Coloring(ATT) -> (C)
+	(ATT =~ "Python") => C : @color(30,100,50)		/*Sigil colors*/
+	(ATT =~ "Java")   => C : @color(65,70,135)
+	(ATT =~ "C")      => C : @color(120,40,80)

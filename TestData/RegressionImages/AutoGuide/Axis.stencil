@@ -1,0 +1,23 @@
+STREAM: File
+NAME: Values
+HEADER: Category
+SEPARATOR: ,
+SOURCE: ./Numbers.txt
+CHECKHEADER: false
+
+external stream Values(Category)
+
+layer Chart
+  /*Left-hand side defines the leged type.  Right-hand side says what to create it for.*/
+  /*Specializers (things in square brackets) define the graphic design*/
+  axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6]: Y
+  axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="TOP"]: X
+
+from Values
+  ID : Count("") -> VALUE
+  X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
+  Y : Count(Category) #-> Mult(VALUE, -11) -> VALUE
+  FILL_COLOR: @color(BLUE)
+  SIZE: 10
+  REGISTRATION: "CENTER"
+

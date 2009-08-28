@@ -1,0 +1,29 @@
+STREAM: File
+NAME: VertexList
+HEADER: ID1,ID2
+SEPARATOR: ,
+SOURCE: /Users/jcottam/Documents/workspace/TSM/TSM-Test/TestData/RegressionImages/VSM/ws_400_12_0.1.adj
+CHECKHEADER: true
+
+external stream VertexList(ID1, ID2)
+
+layer VSM
+from VertexList
+	ID : Concatenate(ID2, ID1) -> VALUE
+	X : Ordering(ID1) -> (VALUE)
+	Y : Ordering(ID2) -> Mult(VALUE, -1) -> (VALUE)
+	(FILL_COLOR, SIZE, SHAPE) : (@color(RED), 1, "RECTANGLE")
+from VertexList
+	ID : Concatenate(ID1, ID2) -> VALUE
+	X : Ordering(ID2) -> (VALUE)
+	Y : Ordering(ID1) -> Mult(VALUE, -1) -> (VALUE)
+	(FILL_COLOR, SIZE, SHAPE) : (@color(RED), 1, "RECTANGLE")
+
+
+layer Prime
+from BFS
+	() : Ordering(ID) -> ()
+
+legend Ordering (ID) -> (VALUE)
+	(all) => VALUE : Index(ID) -> VALUE
+

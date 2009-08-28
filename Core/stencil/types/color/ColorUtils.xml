@@ -1,0 +1,36 @@
+<ModuleData grammarRev="2" name="Color">
+	<Class name="stencil.types.color.ColorUtils"/>
+	<Description><![CDATA[Modify colors.]]></Description>
+	
+	<Defaults>
+		<Opts>
+			<Opt specializer="[n .. n]" />
+		</Opts>
+		<Facets>
+			<Facet name="Map" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="Query" type="PROJECT" function="true" prototype="VALUE"/>
+		</Facets>
+	</Defaults>
+	
+	
+	<Operator name="Brighter" />
+	<Operator name="Darker" />
+
+	<Operator name="GetRed" />
+	<Operator name="SetRed" />
+	<Operator name="SetIntRed" />
+	
+	<Operator name="GetBlue" />
+	<Operator name="SetBlue" />
+	<Operator name="SetIntBlue" />
+
+	<Operator name="GetGreen" />
+	<Operator name="SetGreen" />
+	<Operator name="SetIntGreen" />
+
+	<Operator name="GetAlpha" />
+	<Operator name="SetAlpha" />
+	<Operator name="SetIntAlpha" />
+	
+	<Operator name="Opaque" />
+</ModuleData>

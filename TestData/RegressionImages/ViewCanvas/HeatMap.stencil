@@ -1,0 +1,36 @@
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: 30
+
+external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
+
+layer Heat
+from Mouse
+	ID : Count(" ") -> VALUE
+	(X,Y) : (X,Y)
+	FILL_COLOR: Colorize(META) -> C
+	SIZE: 10
+	STROKE_COLOR : @color(CLEAR)
+	canvas(BACKGROUND_COLOR): @color(BLACK)
+
+layer Nav
+from Mouse
+	filter(BUTTON=1) : BUTTON
+	filter(TYPE=~"DRAG") : TYPE
+	filter(SHIFT!~"TRUE") : SHIFT
+	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, Width) -> VALUE
+   view(Y) : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view.Y, Height) -> VALUE
+from Mouse
+	filter(BUTTON=1) : BUTTON
+	filter(SHIFT=~"true"): SHIFT
+	filter(TYPE=~"DRAG") : TYPE
+	view(ZOOM) : Mult(DELTA_Y, .01) -> Add(VALUE, view.ZOOM) -> VALUE
+from Mouse
+	filter(BUTTON=1) : BUTTON
+	filter(CLICK_COUNT=3) : CLICK_COUNT
+	view(WIDTH, HEIGHT, X,Y) : (canvas.WIDTH, canvas.HEIGHT, canvas.X, canvas.Y)
+
+legend Colorize(Meta) -> C
+	(Meta !~ "true") => C: @color(WHITE)
+	(Meta =~ "true") => C: @color(GREEN)
+

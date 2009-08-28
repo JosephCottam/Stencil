@@ -1,0 +1,68 @@
+ @members {
+ 	public static boolean validName(String name) {
+		String first = name.subString(0,1);
+		
+		try {Integer.parseInt(first); return false;}
+		catch (Exception e) {} 
+ 		
+		if (name.contains("!")) {return false;} 		
+		if (name.contains("@")) {return false;} 		
+		if (name.contains("#")) {return false;} 		
+		if (name.contains("$")) {return false;} 		
+		if (name.contains("%")) {return false;} 		
+		if (name.contains("^")) {return false;} 		
+		if (name.contains("*")) {return false;} 		
+		if (name.contains("(")) {return false;} 		
+		if (name.contains(")")) {return false;} 		
+		if (name.contains(".")) {return false;} 		
+ 	}
+ 
+ }
+ 
+ 
+ assert ^(MODULE_DATA .*):
+    this instanceof MDTreeAdapter.ModuleData
+    not this.text.equals("MODULE_DATA")		//Must be named
+	contains CLASS 							//^(MODULE_DATA .* CLASS .*)	Has a target class
+	contains OPERATOR+ 						//^(MODULE_DATA .* OPERATOR+)	Has 1 operator
+	warn contains DESC						//^(MODULE_DATA .* DESC .*)....Warn if fails, but not an error 
+	contains ^*(OPERATOR .*)				//Must have an operator in its sub-trees
+	contains ^*(OPERATOR .* ^*(FACET .*)))	//Must have a facet that is the child of an operator in its subtrees
+	
+	
+assert ^(DESC .*):
+ 	not this.text.startsWith("[CDATA[") 	//Remove this XML cruft...
+
+
+assert ^(OPERATOR .*):
+	this instanceof MDTreeAdapter.OperatorData
+	not this.text.equals("OPERATOR")	//Must be named
+	^(MODULE_DATA [this])				//Must be part of a module data
+	contains ^(OPTS OPT+)				//Must have opts
+	contains ^(FACETS FACET+)			//Must have at least one facet
+	warn contains DESC					//^(OPERATOR .* DESC .*)....Warn if fails, but not an error 
+	
+assert ^(OPTS .*):
+	^(OPERATOR [this])						//Must be a child of an operator
+	contains ^(o=OPT .+) where $o.text.equals("specializer") && StencilParse.parseSpecializer($o[0])
+	contains ^(o=OPT .+) where $o.text.equals("target") && validName($o[0])
+
+	
+assert ^(FACET .*):
+	this instanceof MDTreeAdapter.FacetData
+	not this.text.equals("FACET")			//Must be named
+	^(OPERATOR [this])						//Must be a child of an operator
+	^(MODULE_DATA [^*(this)])				//Must be the eventual child of a module data
+	contains ^(d=DEF .+) where $d.text.equals("type")	
+	contains ^(d=DEF .+) where $d.text.equals("function")
+	contains ^(d=DEF .+) where $d.text.equals("prototype")	
+	
+	
+	
+Notes on the format:
+^* -- Any number of levels
+[x,y] - Membership (e.g. ^(X [a]) -> ^(X .* a .*), ^(X [a,b]) -> (^(X .* a .* b .*) || ^(X .* b .* a .*)))
+(x,y) - X and y both, in order with nothing between (e.g. ^(X (a,b) -> ^(X .* a b .*))
+contains A -- ^(this .* A .*)
+warn - Check and print a warning if not present
+A where B - Check A, but do not pass unless B also passes

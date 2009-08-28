@@ -1,0 +1,219 @@
+STREAM: File
+NAME: Region
+HEADER: State  Region  Division
+SEPARATOR: \s\s+
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/regions.txt
+CHECKHEADER: true
+STREAM: File
+NAME: Poverty
+HEADER: State,Children, Adults, Elderly, Total
+SEPARATOR: ,
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/povertyPercent.csv
+CHECKHEADER: true
+STREAM: File
+NAME: Postal
+HEADER: State  ID
+SEPARATOR: \s\s+
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/postal.txt
+CHECKHEADER: false
+STREAM: File
+NAME: Pop
+HEADER: State,Children,Adults,Elderly, Total
+SEPARATOR: ,
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/povertyCounts.csv
+CHECKHEADER: true
+STREAM: File
+NAME: Items
+HEADER: Name
+SEPARATOR: ,
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/items.txt
+CHECKHEADER: false
+
+external stream Items(Name)
+external stream Postal(State, ID)
+external stream Region(State, Region, Division)
+external stream Pop(State,Total,Children,Adults,Elderly)
+external stream Poverty(State,Children)
+
+order (Items | Postal | Region | Pop) > Poverty
+
+layer Labels[TEXT]
+from Items
+	ID : Name
+	TEXT: Name
+	Y: -20
+	X: XLayout(Name) -> (X)
+	FONT_SIZE: 15
+	WIDTH: 60
+	FONT_COLOR: @color(GRAY40)
+
+layer Prime
+from Postal
+	() : Abr.Add(State, ID) -> ()
+from Region
+	() : Reg.Add(State, Region, Division) -> ()
+from Pop
+	() : Pop.Add(State, Total,Children,Adults,Elderly) -> ()
+
+layer Children[TEXT]
+	sidebar[displayOn="FILL_COLOR", example.SHAPE="RECTANGLE", label.FONT_SIZE=10, example.SIZE=12,  X=350, Y=100]: FONT_COLOR
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Children") -> (X)
+	Y<< Rank(Children, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR:  Reg(State) #-> Color(Division) -> C
+
+layer Children2[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Children") -> Add(30, X) -> (VALUE)
+	Y << Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
+					| Children2.Find(State) -> Rename["Y2"](Y) -> Y2
+					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
+					| Reg(State) -> Division
+					--> Color2(Division, VALUE) -> C
+
+
+layer Total[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Total") -> (X)
+	Y << Rank(Total, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR: Reg(State) -> Color(Division) -> C
+
+layer Total2[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Total") -> Add(30, X) -> (VALUE)
+	Y << Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
+					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
+					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
+					| Reg(State) -> Division
+					--> Color2(Division, VALUE) -> C
+
+
+layer Elderly[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Elderly") -> (X)
+	Y << Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR: Reg(State) -> Color(Division) -> C
+
+layer Elderly2[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Elderly") -> Add(30, X) -> (VALUE)
+	Y << Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
+					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
+					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
+					| Reg(State) -> Division
+					--> Color2(Division, VALUE) -> C
+
+
+layer Adults[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Adult") -> (X)
+	Y << Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR: Reg(State) -> Color(Division) -> C
+
+layer Adults2[TEXT]
+from Poverty
+	ID: State
+	TEXT: Abr(State) -> id
+	X: XLayout("Adult") -> Add(30, X) -> (VALUE)
+	Y << Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
+					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
+					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
+					| Reg(State) -> Division
+					--> Color2(Division, VALUE) -> C
+
+
+legend Color2 (State, Alpha) -> (C)
+(all) => (C): Color(State) -> C
+					| Mult(Alpha,.5) -> Add(.25, VALUE) -> VALUE  /*Squish ragne to .25-.75*/
+				  	| SetAlpha(VALUE, C) -> VALUE
+					--> VALUE
+
+legend Color(Division) -> (C)
+(Division =~ "USA") => (C) : @color(GRAY40)
+(Division =~ "New England") => (C) : @color(GREEN, .5)
+(Division =~ "Mid Atlantic") => (C) : @color(DARKGREEN, .5)
+(Division =~ "East North Central") => (C) : @color(TURQUOISE, .75)
+(Division =~ "West North Central") => (C) : @color(SKYBLUE, .75)
+(Division =~ "Atlantic") => (C) : @color(SANDYBROWN, .5)
+(Division =~ "East South Central") => (C) : @color(RED, .5)
+(Division =~ "West South Central") => (C) : @color(DARKORANGE, .5)
+(Division =~ "Mountain") => (C) : @color(PURPLE, .5)
+(Division =~ "Pacific") => (C) : @color(VIOLET, .5)
+(all) => (C) : @color(RED)
+
+legend XLayout (Name) -> (X)
+(Name =~ "Total") => (X) : 0
+(Name =~ "Children") => (X) : 80
+(Name =~ "Adult") => (X) : 160
+(Name =~ "Elderly") => (X) : 240
+
+legend Ordering (ID) -> (VALUE) 
+	all => VAlUE : Index(ID) -> VALUE
+
+python Pop
+facet Init {{
+pop =dict()
+}}
+facet Add(State, Total,Children,Adults,Elderly) -> (State) {{
+pop[State.upper()] = (int(Total), int(Children), int(Adults), int(Elderly))
+}}
+
+facet Map(State) -> (State,Total,Children,Adults,Elderly) {{
+source = pop[State.upper()]
+Total = source[0]
+Children = source[1]
+Adults = source[2]
+Elderly = source[3]
+}}
+
+facet Query(State) -> (State,Total,Children,Adults,Elderly) {{
+source = pop[State.upper()]
+Total = source[0]
+Children = source[1]
+Adults = source[2]
+Elderly = source[3]
+}}
+
+
+python Reg
+facet Init {{
+regions = dict()
+}}
+facet Add (State, Region, Division) -> (Region) {{
+regions[State.upper()] = (Region, Division)
+}}
+
+facet Query (State) -> (Region, Division)  {{
+p = regions[State.upper()]
+Region = p[0]
+Division = p[1]
+}}
+
+facet Map (State) -> (Region, Division)  {{
+p = regions[State.upper()]
+Region = p[0]
+Division = p[1]
+}}
+
+python Abr
+facet Init {{codes= dict()}}
+facet Add(State, id) -> (id) {{codes[State.upper()] = id}}
+facet Map(State) -> (id) {{id = codes[State.upper()]}}

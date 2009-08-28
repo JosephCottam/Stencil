@@ -1,0 +1,53 @@
+Entity							Region			Division
+UNITED STATES					USA				USA
+ALABAMA                         South			East South Central
+ALASKA                          West			Pacific
+ARIZONA                         West			Mountain
+ARKANSAS                        South			West South Central
+CALIFORNIA                      West			Pacific
+COLORADO                        West			Mountain
+CONNECTICUT                     Northeast		New England
+DELAWARE                        South			Atlantic
+DISTRICT OF COLUMBIA            South			Atlantic
+FLORIDA                         South			Atlantic
+GEORGIA                         South			Atlantic
+HAWAII                          West			Pacific
+IDAHO                           West			Mountain
+ILLINOIS                        Midwest			East North Central
+INDIANA                         Midwest			East North Central
+IOWA                            Midwest			West North Central
+KANSAS                          Midwest			West North Central
+KENTUCKY                        South			East South Central
+LOUISIANA                       South			West South Central
+MAINE                           Northeast		New England
+MARYLAND                        South			Atlantic
+MASSACHUSETTS                   Northeast		New England
+MICHIGAN                        Midwest			East North Central
+MINNESOTA                       Midwest			West North Central
+MISSISSIPPI                     South			East South Central
+MISSOURI                        Midwest			West North Central
+MONTANA                         West			Mountain
+NEBRASKA                        Midwest			West North Central
+NEVADA                          West			Mountain
+NEW HAMPSHIRE                   Northeast		New England
+NEW JERSEY                      Northeast		Mid Atlantic
+NEW MEXICO                      West			Mountain
+NEW YORK                        Northeast		Mid Atlantic
+NORTH CAROLINA                  South			Atlantic
+NORTH DAKOTA                    Midwest			West North Central
+OHIO                            Midwest			East North Central
+OKLAHOMA                        South			West South Central
+OREGON                          West			Pacific
+PENNSYLVANIA                    Northeast		Mid Atlantic
+RHODE ISLAND                    Northeast		New England
+SOUTH CAROLINA                  South			Atlantic
+SOUTH DAKOTA                    Midwest			West North Central
+TENNESSEE                       South			East South Central
+TEXAS                           South			West South Central
+UTAH                            West			Mountain
+VERMONT                         Northeast		New England
+VIRGINIA                        South			Atlantic
+WASHINGTON                      West			Pacific
+WEST VIRGINIA                   South			Atlantic
+WISCONSIN                       Midwest			East North Central
+WYOMING                         West			Mountain

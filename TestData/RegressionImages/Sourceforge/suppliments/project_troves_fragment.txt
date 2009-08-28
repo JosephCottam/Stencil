@@ -1,0 +1,3973 @@
+ID|ATT
+"a2ixlibrary"|C
+"a2ixlibrary"|AmigaOS
+"a2ixlibrary"|Developers
+"a2ixlibrary"|Beta
+"a2ixlibrary"|Build Tools
+"a2ixlibrary"|Public Domain
+"a2j"|OS Independent (Written in an interpreted language)
+"a2j"|Java
+"a2j"|Code Generators
+"a2j"|GNU Library or Lesser General Public License (LGPL)
+"a2j"|Developers
+"a2j"|Communications
+"a2j"|Production/Stable
+"a2pix"|Developers
+"a2pix"|Emulators
+"a2pix"|Carbon (Mac OS X)
+"a2pix"|Viewers
+"a2pix"|Classic 8-bit Operating Systems (Apple, Atari, Commodore, etc.)
+"a2pix"|GNU Library or Lesser General Public License (LGPL)
+"a2pix"|OS X
+"a2pix"|C++
+"a2pix"|Project is a graphics toolkit
+"a2pix"|End Users/Desktop
+"a2pix"|Beta
+"a2z"|Database
+"a2z"|Telephony
+"a2z"|OS Independent (Written in an interpreted language)
+"a2z"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a2z"|Production/Stable
+"a2z"|Developers
+"a2z"|System Administrators
+"a2z"|PHP
+"a2z"|End Users/Desktop
+"a2z"|GNU General Public License (GPL)
+"a2z"|Beta
+"a2z"|Office/Business
+"a2z"|Web-based
+"a340gc"|Linux
+"a340gc"|C
+"a340gc"|X Window System (X11)
+"a340gc"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"a340gc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a340gc"|Developers
+"a340gc"|Win32 (MS Windows)
+"a340gc"|Simulation
+"a340gc"|Alpha
+"a340gc"|GNU General Public License (GPL)
+"a340gc"|C++
+"a340gc"|Visualization
+"a340gc"|OS Independent (Written in an interpreted language)
+"a340gc"|End Users/Desktop
+"a340gc"|Planning
+"a3dge"|Planning
+"a3dge"|X Window System (X11)
+"a3dge"|End Users/Desktop
+"a3dge"|Developers
+"a3dge"|Games/Entertainment
+"a3dge"|C
+"a3dge"|OS Portable (Source code to work with many OS platforms)
+"a3dge"|Win32 (MS Windows)
+"a3dge"|C++
+"a3dge"|Other Audience
+"a3dge"|Software Development
+"a3dge"|3D Rendering
+"a3dge"|Public Domain
+"a3dge"|Education
+"a3dpi"|Delphi/Kylix
+"a3dpi"|Editors
+"a3dpi"|32-bit MS Windows (NT/2000/XP)
+"a3dpi"|Developers
+"a3dpi"|Planning
+"a3dpi"|Win32 (MS Windows)
+"a3dpi"|GNU General Public License (GPL)
+"a3dpi"|Win2K
+"a3dpi"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"a3dpi"|WinXP
+"a3dsgl"|C++
+"a3dsgl"|Science/Research
+"a3dsgl"|32-bit MS Windows (NT/2000/XP)
+"a3dsgl"|WinXP
+"a3dsgl"|Win32 (MS Windows)
+"a3dsgl"|C#
+"a3dsgl"|Planning
+"a3dsgl"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"a3dsgl"|Web-based
+"a3dsgl"|GNU General Public License (GPL)
+"a3dsgl"|Win2K
+"a3dsgl"|Graphics Conversion
+"a3dsgl"|Viewers
+"a-4"|System Administrators
+"a-4"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a-4"|GNU General Public License (GPL)
+"a-4"|Perl
+"a-4"|Developers
+"a-4"|Version Control
+"a-4"|Alpha
+"a4codegen"|Code Generators
+"a4codegen"|Science/Research
+"a4codegen"|Command-line
+"a4codegen"|Developers
+"a4codegen"|C
+"a4codegen"|Beta
+"a4codegen"|GNU Library or Lesser General Public License (LGPL)
+"a4codegen"|OS Portable (Source code to work with many OS platforms)
+"a4j"|OS Independent (Written in an interpreted language)
+"a4j"|Developers
+"a4j"|Java
+"a4j"|Software Development
+"a4j"|BSD License
+"a4j"|Beta
+"a4j"|Dynamic Content
+"a4l"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a4l"|C++
+"a4l"|Office/Business
+"a4l"|X Window System (X11)
+"a4l"|End Users/Desktop
+"a4l"|Linux
+"a4l"|GNU General Public License (GPL)
+"a4l"|Planning
+"a4l"|Other/Nonlisted Topic
+"a4xmessage"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a4xmessage"|Tcl
+"a4xmessage"|Beta
+"a4xmessage"|Conferencing
+"a4xmessage"|Artistic License
+"a4xmessage"|Linux
+"a4xmessage"|X Window System (X11)
+"a6fw"|Web-based
+"a6fw"|Developers
+"a6fw"|XSL (XSLT/XPath/XSL-FO)
+"a6fw"|Frameworks
+"a6fw"|OS Independent (Written in an interpreted language)
+"a6fw"|Java
+"a6fw"|JavaScript
+"a6fw"|Beta
+"a6fw"|Java Swing
+"a6fw"|GNU Library or Lesser General Public License (LGPL)
+"a7xpg"|Side-Scrolling/Arcade Games
+"a7xpg"|End Users/Desktop
+"a7xpg"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a7xpg"|Linux
+"a7xpg"|X Window System (X11)
+"a7xpg"|Mature
+"a7xpg"|Production/Stable
+"a7xpg"|OSI-Approved Open Source
+"aa33code"|OS Independent (Written in an interpreted language)
+"aa33code"|Site Management
+"aa33code"|Other Audience
+"aa33code"|End Users/Desktop
+"aa33code"|GNU General Public License (GPL)
+"aa33code"|Web-based
+"aa33code"|Dynamic Content
+"aa33code"|Alpha
+"aa33code"|PHP
+"aa3d"|Pre-Alpha
+"aa3d"|OS X
+"aa3d"|Developers
+"aa3d"|Win32 (MS Windows)
+"aa3d"|GNU General Public License (GPL)
+"aa3d"|Education
+"aa3d"|3D Rendering
+"aa3d"|C
+"aa3d"|Science/Research
+"aa3d"|Curses/Ncurses
+"aa3d"|Games/Entertainment
+"aa3d"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aa3d"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aaa4avalon"|Java
+"aaa4avalon"|Developers
+"aaa4avalon"|Software Development
+"aaa4avalon"|Security
+"aaa4avalon"|Apache Software License
+"aaa4avalon"|Pre-Alpha
+"aaaadmin"|PHP
+"aaaadmin"|Systems Administration
+"aaaadmin"|Planning
+"aaaadmin"|System Administrators
+"aaaadmin"|Perl
+"aaaadmin"|OS Independent (Written in an interpreted language)
+"aaaadmin"|GNU General Public License (GPL)
+"aaaadmin"|Web-based
+"aaaframework"|OS Independent (Written in an interpreted language)
+"aaaframework"|BSD License
+"aaaframework"|Inactive
+"aaaframework"|Java
+"aaaframework"|Security
+"aaaframework"|Non-interactive (Daemon)
+"aaaframework"|Software Development
+"aabrowse"|End Users/Desktop
+"aabrowse"|Alpha
+"aabrowse"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aabrowse"|X Window System (X11)
+"aabrowse"|GNU General Public License (GPL)
+"aabrowse"|C++
+"aabrowse"|Linux
+"aabrowse"|Games/Entertainment
+"aabsdbc"|Frameworks
+"aabsdbc"|Code Generators
+"aabsdbc"|GNU General Public License (GPL)
+"aabsdbc"|C#
+"aabsdbc"|Quality Assurance
+"aabsdbc"|Developers
+"aabsdbc"|Testing
+"aabsdbc"|OS Portable (Source code to work with many OS platforms)
+"aabsdbc"|Alpha
+"aabsnorm"|C#
+"aabsnorm"|.NET/Mono
+"aabsnorm"|GNU General Public License (GPL)
+"aabsnorm"|Information Technology
+"aabsnorm"|Alpha
+"aabsnorm"|Command-line
+"aabsnorm"|OS Independent (Written in an interpreted language)
+"aabsnorm"|Project is a templating system
+"aabsnorm"|Code Generators
+"aabsnorm"|Developers
+"aabsnorm"|Object Oriented
+"aabsnorm"|Frameworks
+"aacls"|Education
+"aacls"|Developers
+"aacls"|LDAP
+"aacls"|Public Domain
+"aacls"|Other Audience
+"aacls"|Telecommunications Industry
+"aacls"|C
+"aacls"|Production/Stable
+"aacls"|OS Independent (Written in an interpreted language)
+"aacls"|Non-interactive (Daemon)
+"aacplayer"|Win2K
+"aacplayer"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aacplayer"|WinXP
+"aacplayer"|C++
+"aacplayer"|GNU General Public License (GPL)
+"aacplayer"|End Users/Desktop
+"aacplayer"|Alpha
+"aacplayer"|Players
+"aacplayer"|32-bit MS Windows (NT/2000/XP)
+"aacplayer"|Win32 (MS Windows)
+"aacplugin"|X Window System (X11)
+"aacplugin"|End Users/Desktop
+"aacplugin"|Alpha
+"aacplugin"|GNU General Public License (GPL)
+"aacplugin"|Inactive
+"aacplugin"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aacplugin"|GNU Library or Lesser General Public License (LGPL)
+"aacplugin"|Players
+"aacplugin"|C
+"aacraid-22"|System Administrators
+"aacraid-22"|Production/Stable
+"aacraid-22"|GNU General Public License (GPL)
+"aacraid-22"|C
+"aacraid-22"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aacraid-22"|Linux
+"aacraid-22"|Linux
+"aacraid-22"|End Users/Desktop
+"aac-xforms"|OS Independent (Written in an interpreted language)
+"aac-xforms"|Web-based
+"aac-xforms"|GNU General Public License (GPL)
+"aac-xforms"|Pre-Alpha
+"aac-xforms"|Developers
+"aac-xforms"|Software Development
+"aac-xforms"|Java
+"aadml"|Python
+"aadml"|OS Independent (Written in an interpreted language)
+"aadml"|Developers
+"aadml"|Science/Research
+"aadml"|MIT License
+"aadml"|Pre-Alpha
+"aadml"|Mathematics
+"a-ads-xml"|OS Independent (Written in an interpreted language)
+"a-ads-xml"|Science/Research
+"a-ads-xml"|Electronic Design Automation (EDA)
+"a-ads-xml"|Developers
+"a-ads-xml"|GNU Library or Lesser General Public License (LGPL)
+"a-ads-xml"|Pre-Alpha
+"aadventures"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aadventures"|C++
+"aadventures"|Pre-Alpha
+"aadventures"|Role-Playing
+"aadventures"|GNU General Public License (GPL)
+"aadventures"|Win32 (MS Windows)
+"aaf"|Production/Stable
+"aaf"|Developers
+"aaf"|Video
+"aaf"|OS Portable (Source code to work with many OS platforms)
+"aaf"|C++
+"aaf"|Graphics
+"aaf"|Sound/Audio
+"aaiibot"|Artificial Intelligence
+"aaiibot"|Python
+"aaiibot"|OS Independent (Written in an interpreted language)
+"aaiibot"|Internet Relay Chat
+"aaiibot"|End Users/Desktop
+"aaiibot"|Developers
+"aaiibot"|Alpha
+"aaiibot"|GNU General Public License (GPL)
+"aaio"|Linux
+"aaio"|C
+"aaio"|Attribution Assurance License
+"aaio"|OS X
+"aaio"|Education
+"aaio"|Production/Stable
+"aaio"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aaio"|Software Development
+"aaio"|Developers
+"aai-portal"|System Administrators
+"aai-portal"|Information Technology
+"aai-portal"|GNU General Public License (GPL)
+"aai-portal"|Production/Stable
+"aai-portal"|Education
+"aai-portal"|PHP
+"aai-portal"|Developers
+"aai-portal"|Web-based
+"aai-portal"|Site Management
+"aai-portal"|Dynamic Content
+"aai-portal"|OS Independent (Written in an interpreted language)
+"aajax"|JavaScript
+"aajax"|Planning
+"aajax"|Console-based Platforms
+"aajax"|Apache License V2.0
+"aajax"|Internet
+"aajax"|Java
+"aajax"|Web-based
+"aajax"|Developers
+"aajguestbook"|Beta
+"aajguestbook"|Developers
+"aajguestbook"|OS Independent (Written in an interpreted language)
+"aajguestbook"|Front-Ends
+"aajguestbook"|BSD License
+"aajguestbook"|Java
+"aajguestbook"|Communications
+"aajguestbook"|Web-based
+"aal"|GNU General Public License (GPL)
+"aal"|System
+"aal"|Multimedia
+"aal"|C
+"aal"|End Users/Desktop
+"aal"|X Window System (X11)
+"aal"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aal"|Beta
+"aal"|Linux
+"aal"|C++
+"aal"|Desktop Environment
+"aalan"|End Users/Desktop
+"aalan"|GNU General Public License (GPL)
+"aalan"|Beta
+"aalan"|OS X
+"aalan"|Cocoa (MacOS X)
+"aalan"|Games/Entertainment
+"aalan"|Internet
+"aalan"|Objective C
+"aalib"|Cygwin (MS Windows)
+"aalib"|WinXP
+"aalib"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aalib-perl"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aalib-perl"|Pre-Alpha
+"aalib-perl"|Terminals
+"aalib-perl"|Games/Entertainment
+"aalib-perl"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aalib-perl"|Artistic License
+"aalib-perl"|C
+"aalib-perl"|Graphics
+"aalib-perl"|X Window System (X11)
+"aalib-perl"|IBM OS/2
+"aalib-perl"|Perl
+"aalib-perl"|Developers
+"aaloha"|Plugins
+"aaloha"|C
+"aaloha"|Other/Proprietary License
+"aaloha"|System Administrators
+"aaloha"|GNU General Public License (GPL)
+"aaloha"|Command-line
+"aaloha"|Production/Stable
+"aaloha"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aaloha"|End Users/Desktop
+"aaloha"|Authentication/Directory
+"aaloha"|Security
+"aaloha"|Solaris
+"aaloha"|Web-based
+"aaloha"|OS Independent (Written in an interpreted language)
+"aaloha"|Console/Terminal
+"aaloha"|Linux
+"aalyreth"|GNU General Public License (GPL)
+"aalyreth"|Pre-Alpha
+"aalyreth"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aalyreth"|Multi-User Dungeons (MUD)
+"aalyreth"|Planning
+"aalyreth"|Linux
+"aalyreth"|Developers
+"aalyreth"|C
+"aam6000ug"|Linux
+"aam6000ug"|GNU General Public License (GPL)
+"aam6000ug"|Developers
+"aam6000ug"|C
+"aam6000ug"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aam6000ug"|Hardware Drivers
+"aam6000ug"|Alpha
+"aam6000ug"|End Users/Desktop
+"aamfetch"|End Users/Desktop
+"aamfetch"|Email
+"aamfetch"|Cryptography
+"aamfetch"|Win32 (MS Windows)
+"aamfetch"|OS Independent (Written in an interpreted language)
+"aamfetch"|Beta
+"aamfetch"|GNU General Public License (GPL)
+"aamfetch"|Developers
+"aamfetch"|Java
+"aamfetch"|X Window System (X11)
+"aamirplayer"|End Users/Desktop
+"aamirplayer"|WinXP
+"aamirplayer"|Win32 (MS Windows)
+"aamirplayer"|C
+"aamirplayer"|32-bit MS Windows (NT/2000/XP)
+"aamirplayer"|32-bit MS Windows (95/98)
+"aamirplayer"|Visual Basic
+"aamirplayer"|C++
+"aamirplayer"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aamirplayer"|CD Playing
+"aamirplayer"|Beta
+"aamirplayer"|MP3
+"aamirplayer"|GNU General Public License (GPL)
+"aamirplayer"|Assembly
+"aamirplayer"|Win2K
+"aamon"|Production/Stable
+"aamon"|Internet
+"aamon"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aamon"|Linux
+"aamon"|Developers
+"aamon"|C++
+"aamon"|GNU Library or Lesser General Public License (LGPL)
+"aamon"|Software Development
+"aams"|Science/Research
+"aams"|Linux
+"aams"|Education
+"aams"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aams"|Scientific/Engineering
+"aams"|Pre-Alpha
+"aams"|Delphi/Kylix
+"aams"|Academic Free License (AFL)
+"aams"|Win32 (MS Windows)
+"aams"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aanthill"|Education
+"aanthill"|Artificial Intelligence
+"aanthill"|Science/Research
+"aanthill"|Planning
+"aanthill"|Java
+"aanthill"|GNU General Public License (GPL)
+"aanthill"|End Users/Desktop
+"aanthill"|OS Independent (Written in an interpreted language)
+"aanthill"|Bio-Informatics
+"aanval"|Healthcare Industry
+"aanval"|Information Technology
+"aanval"|Production/Stable
+"aanval"|PHP
+"aanval"|Web-based
+"aanval"|Other/Proprietary License
+"aanval"|Monitoring
+"aanval"|Firewalls
+"aanval"|Financial and Insurance Industry
+"aanval"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aanval"|Security
+"aanval"|System Administrators
+"aanval"|Perl
+"aaolog"|Perl
+"aaolog"|Linux
+"aaolog"|Planning
+"aaolog"|Dynamic Content
+"aaolog"|FreeBSD
+"aaolog"|GNU General Public License (GPL)
+"aaolog"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aaolog"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"aaolog"|PHP
+"aaolog"|Web-based
+"a-a-p"|Production/Stable
+"a-a-p"|Build Tools
+"a-a-p"|Win32 (MS Windows)
+"a-a-p"|End Users/Desktop
+"a-a-p"|X Window System (X11)
+"a-a-p"|Developers
+"a-a-p"|GNU General Public License (GPL)
+"a-a-p"|Version Control
+"a-a-p"|Alpha
+"a-a-p"|System Administrators
+"a-a-p"|All POSIX (Linux/BSD/UNIX-like OSes)
+"a-a-p"|Python
+"a-a-p"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aap"|Non-interactive (Daemon)
+"aap"|End Users/Desktop
+"aap"|Linux
+"aap"|Web-based
+"aap"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aap"|Production/Stable
+"aap"|Developers
+"aap"|System Administrators
+"aap"|C
+"aap"|Mature
+"aap"|HTTP Servers
+"aap"|SGI IRIX
+"aap"|OS Independent (Written in an interpreted language)
+"aap"|Apache Software License
+"aapbem"|Java
+"aapbem"|Planning
+"aapbem"|Board Games
+"aapje"|C
+"aapje"|X Window System (X11)
+"aapje"|End Users/Desktop
+"aapje"|Chat
+"aapje"|Beta
+"aapje"|GNU General Public License (GPL)
+"aapje"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aa-project"|IBM OS/2
+"aa-project"|Games/Entertainment
+"aa-project"|Developers
+"aa-project"|C
+"aa-project"|Terminals
+"aa-project"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aa-project"|X Window System (X11)
+"aa-project"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aa-project"|End Users/Desktop
+"aa-project"|Mature
+"aa-project"|Graphics
+"aa-project"|GNU General Public License (GPL)
+"aarchitect"|OS Independent (Written in an interpreted language)
+"aarchitect"|X Window System (X11)
+"aarchitect"|GNU General Public License (GPL)
+"aarchitect"|End Users/Desktop
+"aarchitect"|Games/Entertainment
+"aarchitect"|Pre-Alpha
+"aarchitect"|Java
+"aardvark"|Developers
+"aardvark"|Alpha
+"aardvark"|JavaScript
+"aardvark"|Web-based
+"aardvark"|PHP
+"aardvark"|GNU General Public License (GPL)
+"aardvark"|Dynamic Content
+"aardvarkfm"|Linux
+"aardvarkfm"|Planning
+"aardvarkfm"|GNU General Public License (GPL)
+"aardvarkfm"|Gnome
+"aardvarkfm"|End Users/Desktop
+"aardvarkfm"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aardvarkfm"|Gnome
+"aardvarkfm"|C
+"aardvarktool"|Java
+"aardvarktool"|OS Independent (Written in an interpreted language)
+"aardvarktool"|Developers
+"aardvarktool"|Beta
+"aardvarktool"|Software Distribution
+"aardvarktool"|Build Tools
+"aardvarktool"|CVS
+"aardvarktool"|Web-based
+"aardvarktool"|BSD License
+"aareport"|End Users/Desktop
+"aareport"|Linux
+"aareport"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aareport"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aareport"|Perl
+"aareport"|First Person Shooters
+"aarmed"|GNU General Public License (GPL)
+"aarmed"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aarmed"|Apple Mac OS Classic
+"aarmed"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aarmed"|End Users/Desktop
+"aarmed"|Linux
+"aarmed"|Planning
+"aarmed"|Win32 (MS Windows)
+"aarmed"|X Window System (X11)
+"aarmed"|Emulators
+"aarmed"|C++
+"aaron"|C
+"aaron"|Monitoring
+"aaron"|Pre-Alpha
+"aaron"|Ruby
+"aaron"|OS Independent (Written in an interpreted language)
+"aaron"|Planning
+"aaron"|Apache Software License
+"aaron"|Non-interactive (Daemon)
+"aaron"|System Administrators
+"aart"|End Users/Desktop
+"aart"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aart"|Linux
+"aart"|C
+"aart"|Graphics Conversion
+"aart"|Terminals
+"aart"|GNU General Public License (GPL)
+"aart"|Alpha
+"aart"|Beta
+"aartsprojetia"|Alpha
+"aartsprojetia"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aartsprojetia"|KDE
+"aartsprojetia"|Other Audience
+"aartsprojetia"|Cocoa (MacOS X)
+"aartsprojetia"|C++
+"aartsprojetia"|GNU General Public License (GPL)
+"aartsprojetia"|Artificial Intelligence
+"aartsprojetia"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aartsprojetia"|Developers
+"aartsprojetia"|Win32 (MS Windows)
+"aas"|GNU General Public License (GPL)
+"aas"|KDE
+"aas"|PL/SQL
+"aas"|C++
+"aas"|Science/Research
+"aas"|End Users/Desktop
+"aas"|Linux
+"aas"|Email
+"aas"|Developers
+"aas"|Production/Stable
+"aas"|Information Technology
+"aas"|Qt
+"aas"|Speech
+"aasgard"|GNU General Public License (GPL)
+"aasgard"|End Users/Desktop
+"aasgard"|C++
+"aasgard"|Role-Playing
+"aasgard"|OS Portable (Source code to work with many OS platforms)
+"aasgard"|Planning
+"aasgard"|Lua
+"aast"|Serial
+"aast"|Installation/Setup
+"aast"|OS Independent (Written in an interpreted language)
+"aast"|Assembly
+"aast"|Alpha
+"aast"|Communications
+"aast"|System Administrators
+"aast"|GNU General Public License (GPL)
+"aatopendcd"|PHP
+"aatopendcd"|Mature
+"aatopendcd"|Non-interactive (Daemon)
+"aatopendcd"|Production/Stable
+"aatopendcd"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aatopendcd"|Alpha
+"aatopendcd"|OS Independent (Written in an interpreted language)
+"aatopendcd"|Web-based
+"aatopendcd"|Other Audience
+"aatopendcd"|Internet Relay Chat
+"aatopendcd"|Delphi/Kylix
+"aatopendcd"|File Sharing
+"aatopendcd"|Linux
+"aatopendcd"|Perl
+"aatopendcd"|C++
+"aatopendcd"|C
+"aatopendcd"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aatopendcd"|Planning
+"aatrade"|Web-based
+"aatrade"|PL/SQL
+"aatrade"|OS Independent (Written in an interpreted language)
+"aatrade"|Developers
+"aatrade"|Role-Playing
+"aatrade"|End Users/Desktop
+"aatrade"|Multi-User Dungeons (MUD)
+"aatrade"|Beta
+"aatrade"|Unix Shell
+"aatrade"|GNU General Public License (GPL)
+"aatrade"|Turn Based Strategy
+"aatrade"|PHP
+"aatv"|Web-based
+"aatv"|X Window System (X11)
+"aatv"|End Users/Desktop
+"aatv"|GNU General Public License (GPL)
+"aatv"|Video Capture
+"aatv"|C
+"aatv"|Terminals
+"aatv"|Linux
+"aatv"|Capture
+"aatv"|Production/Stable
+"aatv"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aavso-vsr"|End Users/Desktop
+"aavso-vsr"|Enterprise
+"aavso-vsr"|GNU General Public License (GPL)
+"aavso-vsr"|Astronomy
+"aavso-vsr"|Science/Research
+"aavso-vsr"|PHP
+"aavso-vsr"|Data Warehousing
+"aavso-vsr"|Pre-Alpha
+"aavso-vsr"|CRM
+"aavso-vsr"|Web-based
+"aavso-vsr"|Front-Ends
+"aavso-vsr"|JavaScript
+"ab2foaf"|Advanced End Users
+"ab2foaf"|Alpha
+"ab2foaf"|WWW/HTTP
+"ab2foaf"|OS X
+"ab2foaf"|Command-line
+"ab2foaf"|Objective C
+"ab2foaf"|BSD License
+"ab2phpnuke"|Developers
+"ab2phpnuke"|GNU General Public License (GPL)
+"ab2phpnuke"|PHP
+"ab2phpnuke"|Web-based
+"ab2phpnuke"|Dynamic Content
+"ab2phpnuke"|Beta
+"aba"|Pre-Alpha
+"aba"|Developers
+"aba"|Web-based
+"aba"|OS Independent (Written in an interpreted language)
+"aba"|GNU General Public License (GPL)
+"aba"|PHP
+"aba"|Software Development
+"abackgammon"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abackgammon"|Non-interactive (Daemon)
+"abackgammon"|GTK+
+"abackgammon"|End Users/Desktop
+"abackgammon"|C++
+"abackgammon"|GNU General Public License (GPL)
+"abackgammon"|Planning
+"abackgammon"|Board Games
+"abackgammon"|32-bit MS Windows (NT/2000/XP)
+"abackgammon"|Win32 (MS Windows)
+"abackupservice"|Advanced End Users
+"abacom"|End Users/Desktop
+"abacom"|Site Management
+"abacom"|OS Independent (Written in an interpreted language)
+"abacom"|Planning
+"abacom"|Web-based
+"abacom"|GNU General Public License (GPL)
+"abacom"|Java
+"abacom"|PHP
+"abacom"|System Administrators
+"abacom"|JavaScript
+"abacom"|Message Boards
+"aba-curling"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aba-curling"|Beta
+"aba-curling"|Delphi/Kylix
+"aba-curling"|Side-Scrolling/Arcade Games
+"aba-curling"|Win32 (MS Windows)
+"aba-curling"|GNU General Public License (GPL)
+"aba-curling"|Developers
+"aba-curling"|Physics
+"aba-curling"|End Users/Desktop
+"abacuses"|OS Independent (Written in an interpreted language)
+"abacuses"|Education
+"abacuses"|Mathematics
+"abacuses"|Advanced End Users
+"abacuses"|Information Analysis
+"abacuses"|Science/Research
+"abacuses"|GNU General Public License (GPL)
+"abacuses"|Java Swing
+"abacuses"|Java
+"abacuses"|Pre-Alpha
+"abaguibuilder"|OS Independent (Written in an interpreted language)
+"abaguibuilder"|Software Development
+"abaguibuilder"|Production/Stable
+"abaguibuilder"|Java
+"abaguibuilder"|Developers
+"abaguibuilder"|GNU General Public License (GPL)
+"abakus"|Other/Proprietary License
+"abakus"|C++
+"abakus"|GNU General Public License (GPL)
+"abakus"|Database
+"abakus"|Education
+"abakus"|KDE
+"abakus"|Planning
+"abakus"|Linux
+"abakus"|Education
+"abamath"|Computer Aided Instruction (CAI)
+"abamath"|GNU General Public License (GPL)
+"abamath"|Alpha
+"abamath"|Win32 (MS Windows)
+"abamath"|C
+"abamath"|Education
+"abamath"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abaque"|Win32 (MS Windows)
+"abaque"|OS Independent (Written in an interpreted language)
+"abaque"|Developers
+"abaque"|X Window System (X11)
+"abaque"|Inactive
+"abaque"|Object Brokering
+"abaque"|GNU Library or Lesser General Public License (LGPL)
+"abaque"|Build Tools
+"abaque"|Java
+"abat"|Software Development
+"abat"|Other Audience
+"abat"|Perl
+"abat"|Linux
+"abat"|Developers
+"abat"|Beta
+"abat"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abat"|BSD License
+"abbackup"|Backup
+"abbackup"|GNU General Public License (GPL)
+"abbackup"|Advanced End Users
+"abbackup"|Planning
+"abbackup"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abbackup"|Unix Shell
+"abbackup"|System Administrators
+"abbackup"|Command-line
+"abbo"|Web-based
+"abbo"|Message Boards
+"abbo"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abbo"|Action Script
+"abbo"|GNU General Public License (GPL)
+"abbo"|Planning
+"abbo"|Advanced End Users
+"abbot"|OS Independent (Written in an interpreted language)
+"abbot"|Developers
+"abbot"|Common Public License
+"abbot"|Testing
+"abbot"|Quality Engineers
+"abbot"|User Interfaces
+"abbot"|Java
+"abbot"|Production/Stable
+"abbott"|Internet Relay Chat
+"abbott"|Project is a remote control application
+"abbott"|Academic Free License (AFL)
+"abbott"|C
+"abbott"|To-Do Lists
+"abbott"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abbott"|Advanced End Users
+"abbott"|Alpha
+"abbruch"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abbruch"|Alpha
+"abbruch"|Linux
+"abbruch"|GNU General Public License (GPL)
+"abbruch"|Perl
+"abbruch"|System Administrators
+"abbruch"|End Users/Desktop
+"abbruch"|Planning
+"abbruch"|Filters
+"abbruch-web"|GNU General Public License (GPL)
+"abbruch-web"|Planning
+"abbruch-web"|Web-based
+"abbruch-web"|System Administrators
+"abbruch-web"|Linux
+"abbruch-web"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abbruch-web"|End Users/Desktop
+"abbruch-web"|Filters
+"abbruch-web"|Perl
+"abc"|X Window System (X11)
+"abc"|Other/Nonlisted Topic
+"abc"|Advanced End Users
+"abc"|Developers
+"abc"|End Users/Desktop
+"abc"|Editors
+"abc"|Win32 (MS Windows)
+"abc"|OS Independent (Written in an interpreted language)
+"abc"|Education
+"abc"|Production/Stable
+"abc"|Pre-Alpha
+"abc"|C
+"abc"|GNU General Public License (GPL)
+"abc"|Planning
+"abc"|MIDI
+"abc"|Quality Engineers
+"abc"|Science/Research
+"abc"|Players
+"abc"|Web-based
+"abc"|PHP
+"abc-123"|Other Audience
+"abc-123"|Chat
+"abc-123"|PHP
+"abc-123"|GNU General Public License (GPL)
+"abc-123"|Production/Stable
+"abcdoppelganger"|C#
+"abcdoppelganger"|End Users/Desktop
+"abcdoppelganger"|Beta
+"abcdoppelganger"|.NET/Mono
+"abcdoppelganger"|32-bit MS Windows (NT/2000/XP)
+"abcdoppelganger"|BitTorrent
+"abcdoppelganger"|Artistic License
+"abcdp"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abcdp"|C
+"abcdp"|Production/Stable
+"abcdp"|End Users/Desktop
+"abcdp"|Linux
+"abcdp"|GNU General Public License (GPL)
+"abcdp"|CD Playing
+"abcdp"|Curses/Ncurses
+"abchr"|Linux
+"abchr"|Beta
+"abchr"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abchr"|C++
+"abchr"|GNU General Public License (GPL)
+"abchr"|X Window System (X11)
+"abchr"|End Users/Desktop
+"abchr"|Sound/Audio
+"abci"|C++
+"abci"|End Users/Desktop
+"abci"|Advanced End Users
+"abci"|WinXP
+"abci"|Project is a remote control application
+"abci"|Pre-Alpha
+"abci"|GNU General Public License (GPL)
+"abci"|Human Machine Interfaces
+"abcl"|Planning
+"abcl"|System Administrators
+"abcmusiex"|32-bit MS Windows (NT/2000/XP)
+"abcmusiex"|Graphics
+"abcmusiex"|Pre-Alpha
+"abcmusiex"|WinXP
+"abcmusiex"|Linux
+"abcmusiex"|Sound/Audio
+"abcmusiex"|Planning
+"abcmusiex"|Beta
+"abcmusiex"|C
+"abcmusiex"|Education
+"abcmusiex"|GNU General Public License (GPL)
+"abcmusiex"|Computer Aided Instruction (CAI)
+"abcmusiex"|Alpha
+"abcmusiex"|Command-line
+"ab-conv"|Java
+"ab-conv"|Production/Stable
+"ab-conv"|OS Independent (Written in an interpreted language)
+"ab-conv"|End Users/Desktop
+"ab-conv"|Office/Business
+"ab-conv"|Internet
+"ab-conv"|Java Swing
+"ab-conv"|Other/Nonlisted Topic
+"abcp"|Sound/Audio
+"abcp"|Historical Permission Notice and Disclaimer
+"abcp"|Software Development
+"abcp"|Developers
+"abcp"|Alpha
+"abcp"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abcp"|Other Audience
+"abcp"|C
+"abcp"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abcp"|OS X
+"abcp"|Linux
+"abcplus"|GNU General Public License (GPL)
+"abcplus"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abcplus"|Production/Stable
+"abcplus"|Beta
+"abcplus"|End Users/Desktop
+"abcplus"|Linux
+"abcplus"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abcplus"|Editors
+"abcrypt"|WinXP
+"abcrypt"|Cocoa (MacOS X)
+"abcrypt"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abcrypt"|OS X
+"abcrypt"|Win2K
+"abcrypt"|Win32 (MS Windows)
+"abcrypt"|Pre-Alpha
+"abcrypt"|Cryptography
+"abcrypt"|End Users/Desktop
+"abcrypt"|Linux
+"abcrypt"|X Window System (X11)
+"abcrypt"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abcrypt"|32-bit MS Windows (NT/2000/XP)
+"abcrypt"|C++
+"abcrypt"|GNU General Public License (GPL)
+"abc-shell"|Developers
+"abc-shell"|Command-line
+"abc-shell"|Interpreters
+"abc-shell"|Public Domain
+"abc-shell"|C
+"abc-shell"|AmigaOS
+"abc-shell"|Alpha
+"abc-unix"|BitTorrent
+"abc-unix"|Python
+"abc-unix"|Beta
+"abc-unix"|End Users/Desktop
+"abc-unix"|wxWidgets
+"abc-unix"|Python Software Foundation License
+"abc-unix"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abcwebbot"|Inactive
+"abd"|Database Engines/Servers
+"abd"|Advanced End Users
+"abd"|System Administrators
+"abd"|End Users/Desktop
+"abd"|OS Independent (Written in an interpreted language)
+"abd"|wxWidgets
+"abd"|GNU General Public License (GPL)
+"abd"|Python
+"abd"|Telephony
+"abd"|Authentication/Directory
+"abd"|Beta
+"abd"|Internet
+"abd"|Email
+"abdb"|Build Tools
+"abdb"|Java
+"abdb"|System Administrators
+"abdb"|Developers
+"abdb"|OS Independent (Written in an interpreted language)
+"abdb"|Front-Ends
+"abdb"|Information Technology
+"abdb"|GNU General Public License (GPL)
+"abdb"|Database Engines/Servers
+"abdb"|Code Generators
+"abdb"|Beta
+"abdbcommerce"|PHP
+"abdbcommerce"|GNU General Public License (GPL)
+"abdbcommerce"|Developers
+"abdbcommerce"|OS Independent (Written in an interpreted language)
+"abdbcommerce"|End Users/Desktop
+"abdbcommerce"|Web-based
+"abdbcommerce"|Inactive
+"abducted-irc"|Planning
+"abducted-irc"|Education
+"abducted-irc"|Perl
+"abducted-irc"|PHP
+"abducted-irc"|Console/Terminal
+"abducted-irc"|C
+"abducted-irc"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"abducted-irc"|Non-interactive (Daemon)
+"abducted-irc"|GNU General Public License (GPL)
+"abducted-irc"|System Administrators
+"abducted-irc"|Dynamic Content
+"abducted-irc"|OS Independent (Written in an interpreted language)
+"abducted-irc"|Telecommunications Industry
+"abducted-irc"|Beta
+"abducted-irc"|Information Technology
+"abducted-irc"|Pre-Alpha
+"abducted-irc"|Alpha
+"abducted-irc"|Other Audience
+"abducted-irc"|Developers
+"abducted-irc"|Internet Relay Chat
+"abducted-irc"|Linux
+"abducted-irc"|Web-based
+"abducted-irc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abe"|C
+"abe"|Education
+"abe"|BeOS
+"abe"|End Users/Desktop
+"abe"|GNU General Public License (GPL)
+"abe"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abe"|32-bit MS Windows (95/98)
+"abe"|Linux
+"abe"|Side-Scrolling/Arcade Games
+"abe"|Puzzle Games
+"abe"|Cocoa (MacOS X)
+"abe"|Production/Stable
+"abe"|OS X
+"abe"|X Window System (X11)
+"abe"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abe"|Win32 (MS Windows)
+"abele"|Alpha
+"abele"|Software Development
+"abele"|Linux
+"abele"|GNU Library or Lesser General Public License (LGPL)
+"abele"|Communications
+"abele"|C
+"abele"|Developers
+"abele"|End Users/Desktop
+"abele"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abemo"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abemo"|Developers
+"abemo"|WinXP
+"abemo"|32-bit MS Windows (NT/2000/XP)
+"abemo"|Java
+"abemo"|Win2K
+"abemo"|GNU General Public License (GPL)
+"abemo"|Planning
+"abemo"|End Users/Desktop
+"abemo"|Web-based
+"abe-module"|Linux
+"abe-module"|MS-DOS
+"abe-module"|SGI IRIX
+"abe-module"|Python
+"abe-module"|WinXP
+"abe-module"|Education
+"abe-module"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abe-module"|Science/Research
+"abe-module"|Win2K
+"abe-module"|Alpha
+"abe-module"|Healthcare Industry
+"abe-module"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abe-module"|Medical Science Apps.
+"abe-module"|Bio-Informatics
+"abe-module"|Chemistry
+"abe-module"|32-bit MS Windows (NT/2000/XP)
+"abe-module"|GNU General Public License (GPL)
+"abeni"|X Window System (X11)
+"abeni"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abeni"|Build Tools
+"abeni"|Code Generators
+"abeni"|Linux
+"abeni"|C
+"abeni"|GNU General Public License (GPL)
+"abeni"|Developers
+"abeni"|Python
+"abeni"|Integrated Development Environments (IDE)
+"abeni"|Beta
+"aberquest"|End Users/Desktop
+"aberquest"|Multi-User Dungeons (MUD)
+"aberquest"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aberquest"|MIT License
+"aberquest"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aberquest"|C++
+"aberquest"|Alpha
+"aberquest"|Role-Playing
+"aberquest"|OS X
+"aberquest"|Win32 (MS Windows)
+"aberquest"|X Window System (X11)
+"abes"|System Administrators
+"abes"|Python
+"abes"|PHP
+"abes"|Education
+"abes"|Communications
+"abes"|JavaScript
+"abes"|Web-based
+"abes"|Alpha
+"abes"|X Window System (X11)
+"abes"|OS Independent (Written in an interpreted language)
+"abes"|Customer Service
+"abes"|Education
+"abes"|Database Engines/Servers
+"abes"|C++
+"abfields"|Dynamic Content
+"abfields"|Pre-Alpha
+"abfields"|OS Independent (Written in an interpreted language)
+"abfields"|Developers
+"abfields"|PHP
+"abfields"|Open Software License
+"abfields"|Web-based
+"abi2006"|End Users/Desktop
+"abi2006"|GNU General Public License (GPL)
+"abi2006"|Role-Playing
+"abi2006"|OS X
+"abi2006"|SDL
+"abi2006"|Win2K
+"abi2006"|C++
+"abi2006"|OS Portable (Source code to work with many OS platforms)
+"abi2006"|Linux
+"abi2006"|Planning
+"abi2xml"|Science/Research
+"abi2xml"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abi2xml"|Bio-Informatics
+"abi2xml"|Command-line
+"abi2xml"|32-bit MS Windows (NT/2000/XP)
+"abi2xml"|C++
+"abi2xml"|Production/Stable
+"abi2xml"|GNU General Public License (GPL)
+"abicheck"|Developers
+"abicheck"|Linux
+"abicheck"|C
+"abicheck"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abicheck"|Solaris
+"abicheck"|GNU Library or Lesser General Public License (LGPL)
+"abicheck"|Beta
+"abicheck"|Other Audience
+"abicheck"|Build Tools
+"abicheck"|Perl
+"abile-morgan"|Alpha
+"abile-morgan"|Apache License V2.0
+"abile-morgan"|OS Independent (Written in an interpreted language)
+"abile-morgan"|Developers
+"abile-morgan"|HTTP Servers
+"abile-morgan"|Web-based
+"abile-morgan"|Java
+"abile-morgan"|Site Management
+"abill"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abill"|Perl
+"abill"|GNU General Public License (GPL)
+"abill"|Networking
+"abill"|Beta
+"abill"|Web-based
+"abill"|Non-interactive (Daemon)
+"abills"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"abills"|FreeBSD
+"abills"|Perl
+"abills"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abios-rtool"|C
+"abios-rtool"|Science/Research
+"abios-rtool"|Scientific/Engineering
+"abios-rtool"|Boot
+"abios-rtool"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abios-rtool"|Hardware
+"abios-rtool"|VHDL/Verilog
+"abios-rtool"|System Administrators
+"abios-rtool"|Beta
+"abios-rtool"|GNU General Public License (GPL)
+"abios-rtool"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abirom"|Multimedia
+"abirom"|Web-based
+"abirom"|Education
+"abirom"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abirom"|Win32 (MS Windows)
+"abirom"|C++
+"abirom"|Other Audience
+"abits-fipa-mesg"|Developers
+"abits-fipa-mesg"|Intelligent Agents
+"abits-fipa-mesg"|Alpha
+"abiword"|Objective C
+"abiword"|Perl
+"abiword"|Developers
+"abiword"|Information Technology
+"abiword"|Handheld/Mobile/PDA
+"abiword"|Other Audience
+"abiword"|C++
+"abiword"|GNU General Public License (GPL)
+"abiword"|Word Processors
+"abiword"|System Administrators
+"abiword"|BeOS
+"abiword"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abiword"|C
+"abiword"|OS X
+"abiword"|Production/Stable
+"abiword"|Non-interactive (Daemon)
+"abiword"|Gnome
+"abiword"|Win32 (MS Windows)
+"abiword"|Mature
+"abiword"|OS Independent (Written in an interpreted language)
+"abiword"|Office Suites
+"abiword"|End Users/Desktop
+"abiword"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abiword"|Cocoa (MacOS X)
+"abiword"|Gnome
+"abiword"|Beta
+"abiword"|Python
+"abiwordftd"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abiwordftd"|Office/Business
+"abiwordftd"|WinXP
+"abiwordftd"|Beta
+"abiwordftd"|32-bit MS Windows (NT/2000/XP)
+"abiwordftd"|Win2K
+"abiwordftd"|GNU General Public License (GPL)
+"abiwordftd"|System Administrators
+"abiwordftd"|End Users/Desktop
+"abiwordftd"|Win32 (MS Windows)
+"abiwordftd"|Education
+"abiwordftd"|32-bit MS Windows (95/98)
+"abiwordftd"|Advanced End Users
+"abiwordftd"|Word Processors
+"abj"|End Users/Desktop
+"abj"|Board Games
+"abj"|Win32 (MS Windows)
+"abj"|Sound/Audio
+"abj"|Gnome
+"abj"|Turn Based Strategy
+"abj"|Python
+"abj"|Mature
+"abj"|Computer Aided Instruction (CAI)
+"abj"|Developers
+"abj"|Other Audience
+"abj"|Education
+"abj"|OS Independent (Written in an interpreted language)
+"abj"|KDE
+"abj"|Puzzle Games
+"abj"|Graphics
+"abj"|GNU General Public License (GPL)
+"abk"|OS Independent (Written in an interpreted language)
+"abk"|Advanced End Users
+"abk"|End Users/Desktop
+"abk"|Database
+"abk"|Perl
+"abk"|GNU General Public License (GPL)
+"abk"|Pre-Alpha
+"abk"|Command-line
+"abkey"|Plugins
+"abkey"|Artistic License
+"abkey"|Production/Stable
+"abkey"|Cryptography
+"abkey"|OS X
+"abkey"|Objective C
+"abkey"|End Users/Desktop
+"abkit"|Developers
+"abkit"|C++
+"abkit"|End Users/Desktop
+"abkit"|GNU Library or Lesser General Public License (LGPL)
+"abkit"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abkit"|C
+"abkit"|Board Games
+"abkit"|GNU General Public License (GPL)
+"abkit"|Beta
+"abkit"|Software Development
+"ablazespace"|Developers
+"ablazespace"|32-bit MS Windows (95/98)
+"ablazespace"|Games/Entertainment
+"ablazespace"|GNU General Public License (GPL)
+"ablazespace"|C++
+"ablazespace"|Win32 (MS Windows)
+"ablazespace"|Mature
+"ablazespace"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"able"|System Administrators
+"able"|X Window System (X11)
+"able"|Planning
+"able"|AOL Instant Messenger
+"able"|Education
+"able"|Perl
+"able"|Win32 (MS Windows)
+"able"|Dynamic Content
+"able"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"able"|Python
+"able"|End Users/Desktop
+"able"|All POSIX (Linux/BSD/UNIX-like OSes)
+"able"|GNU General Public License (GPL)
+"able"|Linux
+"able"|PHP
+"ablegray"|OS Independent (Written in an interpreted language)
+"ablegray"|Beta
+"ablegray"|Web-based
+"ablegray"|Developers
+"ablegray"|GNU Library or Lesser General Public License (LGPL)
+"ablegray"|Dynamic Content
+"ablegray"|PHP
+"ablog"|All POSIX (Linux/BSD/UNIX-like OSes)
+"ablog"|System Administrators
+"ablog"|Production/Stable
+"ablog"|Systems Administration
+"ablog"|Logging
+"ablog"|GNU General Public License (GPL)
+"ablog"|PHP
+"ablog"|Web-based
+"abnet"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abnet"|Beta
+"abnet"|Developers
+"abnet"|Board Games
+"abnet"|X Window System (X11)
+"abnet"|Linux
+"abnet"|Win32 (MS Windows)
+"abnet"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abnet"|C++
+"abnet"|Communications
+"abnet"|MIT License
+"abnimm"|Site Management
+"abnimm"|System Administrators
+"abnimm"|GNU General Public License (GPL)
+"abnimm"|PHP
+"abnimm"|OS Independent (Written in an interpreted language)
+"abnimm"|Dynamic Content
+"abnimm"|Web-based
+"abnimm"|Alpha
+"aboard"|OS Independent (Written in an interpreted language)
+"aboard"|Web-based
+"aboard"|Message Boards
+"aboard"|PHP
+"aboard"|End Users/Desktop
+"aboard"|Pre-Alpha
+"aboard"|GNU General Public License (GPL)
+"aboframework"|End Users/Desktop
+"aboframework"|Java
+"aboframework"|Win32 (MS Windows)
+"aboframework"|GNU General Public License (GPL)
+"aboframework"|Developers
+"aboframework"|OS Independent (Written in an interpreted language)
+"aboframework"|Alpha
+"aboframework"|Board Games
+"abook"|Curses/Ncurses
+"abook"|C
+"abook"|GNU General Public License (GPL)
+"aboot"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aboot"|GNU General Public License (GPL)
+"aboot"|Linux
+"aboot"|C
+"aboot"|Assembly
+"aboot"|Production/Stable
+"aboot"|Boot
+"abora"|Pre-Alpha
+"abora"|OS Independent (Written in an interpreted language)
+"abora"|Communications
+"abora"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abora"|Win32 (MS Windows)
+"abora"|Smalltalk
+"abora"|Text Editors
+"abora"|MIT License
+"abora"|Version Control
+"abora"|Alpha
+"abora"|End Users/Desktop
+"abora"|Developers
+"abora"|Java
+"abora"|Dynamic Content
+"abort"|Planning
+"abort"|End Users/Desktop
+"abort"|Linux
+"abort"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abort"|C++
+"abort"|BSD License
+"abort"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abort"|Real Time Strategy
+"aboul"|GNU General Public License (GPL)
+"aboul"|Other Audience
+"aboul"|Communications
+"aboul"|System Administrators
+"aboul"|Web-based
+"aboul"|Developers
+"aboul"|End Users/Desktop
+"aboul"|Indexing/Search
+"aboul"|Education
+"aboul"|Production/Stable
+"aboul"|PHP
+"abqs"|Web-based
+"abqs"|Non-interactive (Daemon)
+"abqs"|System Administrators
+"abqs"|Developers
+"abqs"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abqs"|CGI Tools/Libraries
+"abqs"|Distributed Computing
+"abqs"|Perl
+"abqs"|Alpha
+"abqs"|GNU General Public License (GPL)
+"abra"|Java
+"abra"|Production/Stable
+"abra"|OS Independent (Written in an interpreted language)
+"abra"|Developers
+"abra"|BSD License
+"abraham"|GNU General Public License (GPL)
+"abraham"|Pre-Alpha
+"abraham"|Presentation
+"abraham"|End Users/Desktop
+"abraham"|WinXP
+"abraham"|Java Swing
+"abraham"|Java
+"abrain"|Science/Research
+"abrain"|Console/Terminal
+"abrain"|Artificial Intelligence
+"abrain"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abrain"|.NET/Mono
+"abrain"|GNU Library or Lesser General Public License (LGPL)
+"abrain"|Information Technology
+"abrain"|Planning
+"abrain"|C#
+"abrams"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abrams"|C
+"abrams"|Planning
+"abrams"|Other Audience
+"abrams"|Real Time Strategy
+"abrams"|GNU General Public License (GPL)
+"abrams"|Win32 (MS Windows)
+"abrams"|End Users/Desktop
+"abrams"|C++
+"abraxas"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abraxas"|Web-based
+"abraxas"|Perl
+"abraxas"|Site Management
+"abraxas"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abraxas"|Dynamic Content
+"abraxas"|PHP
+"abraxas"|Linux
+"abraxas"|Planning
+"abraxas"|GNU General Public License (GPL)
+"abraxas"|Developers
+"abrick"|Production/Stable
+"abrick"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abrick"|End Users/Desktop
+"abrick"|Games/Entertainment
+"abrick"|X Window System (X11)
+"abrick"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abrick"|C++
+"abrick"|GNU General Public License (GPL)
+"abrick"|Win32 (MS Windows)
+"abridge"|OS X
+"abridge"|Games/Entertainment
+"abridge"|Pre-Alpha
+"abridge"|Win32 (MS Windows)
+"abridge"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abridge"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abridge"|X Window System (X11)
+"abridge"|GNU General Public License (GPL)
+"abridge"|C++
+"abridge"|Linux
+"abrowse"|Beta
+"abrowse"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abrowse"|Planning
+"abrowse"|Conversion
+"abrowse"|PHP
+"abrowse"|Linux
+"abrowse"|Sound/Audio
+"abrowse"|GNU General Public License (GPL)
+"abrowse"|C
+"abrowse"|End Users/Desktop
+"abrowse"|Developers
+"abrowse"|X Window System (X11)
+"abrowse"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abrowse"|Web-based
+"abrowse"|Indexing/Search
+"abrviewer"|GNU General Public License (GPL)
+"abrviewer"|C#
+"abrviewer"|Graphics Conversion
+"abrviewer"|Production/Stable
+"abrviewer"|Beta
+"abrviewer"|End Users/Desktop
+"abrviewer"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abrviewer"|Win32 (MS Windows)
+"abrviewer"|Viewers
+"abrviewer"|.NET/Mono
+"absboat"|Intelligent Agents
+"absboat"|eCos
+"absboat"|Robotics
+"absboat"|GIS
+"absboat"|Science/Research
+"absboat"|GNU General Public License (GPL)
+"absboat"|Console/Terminal
+"absboat"|Planning
+"absboat"|C
+"absboat"|Developers
+"abscnc"|Pre-Alpha
+"abscnc"|Simulation
+"abscnc"|Planning
+"abscnc"|Usenet News
+"abscnc"|OpenGL
+"abscnc"|End Users/Desktop
+"abscnc"|Archiving
+"abscnc"|.NET/Mono
+"abscnc"|C#
+"abscnc"|Other Audience
+"abscnc"|Developers
+"abscnc"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abscnc"|Advanced End Users
+"abscnc"|Beta
+"abscnc"|GNU General Public License (GPL)
+"abscnc"|32-bit MS Windows (95/98)
+"abscnc"|Real Time Strategy
+"abscnc"|Non-interactive (Daemon)
+"abscnc"|File Management
+"abscnc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abscnc"|32-bit MS Windows (NT/2000/XP)
+"abscnc"|Other Operating Systems
+"absearch"|End Users/Desktop
+"absearch"|Indexing/Search
+"absearch"|Other Audience
+"absearch"|OS Independent (Written in an interpreted language)
+"absearch"|Java
+"absearch"|GNU General Public License (GPL)
+"absearch"|Production/Stable
+"absearch"|Scientific/Engineering
+"absinth"|OS X
+"absinth"|Pre-Alpha
+"absinth"|HTTP Servers
+"absinth"|System Administrators
+"absinth"|All POSIX (Linux/BSD/UNIX-like OSes)
+"absinth"|Non-interactive (Daemon)
+"absinth"|Telecommunications Industry
+"absinth"|Other/Proprietary License
+"absinth"|C
+"absinth"|Information Technology
+"absinth"|C++
+"absinth"|Planning
+"absinth"|File Transfer Protocol (FTP)
+"absinth-chat"|All POSIX (Linux/BSD/UNIX-like OSes)
+"absinth-chat"|C++
+"absinth-chat"|Conferencing
+"absinth-chat"|GNU General Public License (GPL)
+"absinth-chat"|Beta
+"absinth-chat"|Web-based
+"absinth-chat"|Chat
+"absmax"|Delphi/Kylix
+"absmax"|Backup
+"absmax"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"absmax"|Developers
+"absmax"|GNU General Public License (GPL)
+"absmax"|Information Technology
+"absmax"|Beta
+"absmax"|System Administrators
+"absmax"|Win32 (MS Windows)
+"absmax"|End Users/Desktop
+"absolutemeeting"|CGI Tools/Libraries
+"absolutemeeting"|All POSIX (Linux/BSD/UNIX-like OSes)
+"absolutemeeting"|Production/Stable
+"absolutemeeting"|GNU General Public License (GPL)
+"absolutemeeting"|PHP
+"absolutewar"|32-bit MS Windows (NT/2000/XP)
+"absolutewar"|Win32 (MS Windows)
+"absolutewar"|Production/Stable
+"absolutewar"|End Users/Desktop
+"absolutewar"|C++
+"absolutewar"|Turn Based Strategy
+"absolutewar"|zlib/libpng License
+"absolutex"|X Window System (X11)
+"absolutex"|All POSIX (Linux/BSD/UNIX-like OSes)
+"absolutex"|C++
+"absolutex"|Inactive
+"absolutex"|Developers
+"absolutex"|GNU Library or Lesser General Public License (LGPL)
+"absolutex"|GNU General Public License (GPL)
+"absolutex"|FreeBSD
+"absolutex"|Software Development
+"absolutex"|Other Audience
+"absolutex"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"absolutex"|Desktop Environment
+"absolutex"|Alpha
+"absolutex"|Multimedia
+"absolutex"|Linux
+"absolut-library"|Planning
+"absolut-library"|GNU General Public License (GPL)
+"absolut-library"|OS Independent (Written in an interpreted language)
+"absolut-library"|PHP
+"absolut-library"|Library
+"absolut-library"|Education
+"absolut-library"|Web-based
+"absolvia"|Pre-Alpha
+"absolvia"|PHP
+"absolvia"|Non-Profit Organizations
+"absolvia"|Web-based
+"absolvia"|Alpha
+"abstract"|Linux
+"abstract"|GNU General Public License (GPL)
+"abstract"|X Window System (X11)
+"abstract"|Unix Shell
+"abstract"|Software Development
+"abstract"|Alpha
+"abstract"|Developers
+"abstract"|C
+"abstract"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abstractadonet"|Database
+"abstractadonet"|C#
+"abstractadonet"|Alpha
+"abstractadonet"|Software Development
+"abstractadonet"|zlib/libpng License
+"abstractadonet"|Developers
+"abstractdb"|PHP
+"abstractdb"|Linux
+"abstractdb"|Database Engines/Servers
+"abstractdb"|Developers
+"abstractdb"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abstractdb"|Web-based
+"abstractdb"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abstractdb"|Beta
+"abstractdb"|GNU Library or Lesser General Public License (LGPL)
+"abstractdb"|Software Development
+"abstractdb-php"|Planning
+"abstractdb-php"|PL/SQL
+"abstractdb-php"|Database
+"abstractdb-php"|System Administrators
+"abstractdb-php"|Software Development
+"abstractdb-php"|Developers
+"abstractdb-php"|Web-based
+"abstractdb-php"|GNU General Public License (GPL)
+"abstractdb-php"|PHP
+"abstractdb-php"|OS Independent (Written in an interpreted language)
+"abstractdb-php"|Pre-Alpha
+"abstraction"|Role-Playing
+"abstraction"|Web-based
+"abstraction"|End Users/Desktop
+"abstraction"|Multi-User Dungeons (MUD)
+"abstraction"|OS Independent (Written in an interpreted language)
+"abstraction"|PHP
+"abstraction"|GNU General Public License (GPL)
+"abstraction"|Alpha
+"abstraction"|JavaScript
+"abstracts"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abstracts"|Win32 (MS Windows)
+"abstracts"|Delphi/Kylix
+"abstracts"|GNU General Public License (GPL)
+"abstracts"|Win2K
+"abstracts"|32-bit MS Windows (95/98)
+"abstracts"|32-bit MS Windows (NT/2000/XP)
+"abstracts"|WinXP
+"abstracts"|Alpha
+"abstracts"|Education
+"abstrivia"|Internet Relay Chat
+"abstrivia"|Text Processing
+"abstrivia"|Planning
+"abstrivia"|PHP
+"abstrivia"|C
+"abstrivia"|Other Audience
+"abstrivia"|GNU General Public License (GPL)
+"abstrivia"|Perl
+"abstrivia"|End Users/Desktop
+"abstrivia"|Puzzle Games
+"abstrivia"|OS Independent (Written in an interpreted language)
+"abstromatic"|Board Games
+"abstromatic"|Artificial Intelligence
+"abstromatic"|C++
+"abstromatic"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abstromatic"|Developers
+"abstromatic"|Advanced End Users
+"abstromatic"|GNU General Public License (GPL)
+"abstromatic"|wxWidgets
+"abstromatic"|Linux
+"abstromatic"|End Users/Desktop
+"abstromatic"|Pre-Alpha
+"absylnia"|Java
+"absylnia"|GNU Library or Lesser General Public License (LGPL)
+"absylnia"|Pre-Alpha
+"absylnia"|Developers
+"absylnia"|End Users/Desktop
+"absylnia"|OS Independent (Written in an interpreted language)
+"absylnia"|Non-interactive (Daemon)
+"absylnia"|Multi-User Dungeons (MUD)
+"absync"|End Users/Desktop
+"absync"|Pre-Alpha
+"absync"|GNU General Public License (GPL)
+"absync"|All POSIX (Linux/BSD/UNIX-like OSes)
+"absync"|Perl
+"absync"|Email
+"absync"|System Administrators
+"absynch"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"absynch"|Office/Business
+"absynch"|Visual Basic
+"absynch"|Front-Ends
+"absynch"|End Users/Desktop
+"absynch"|Developers
+"absynch"|Email Clients (MUA)
+"absynch"|GNU Library or Lesser General Public License (LGPL)
+"absynch"|Pre-Alpha
+"absynch"|Win32 (MS Windows)
+"absynch"|32-bit MS Windows (95/98)
+"absynth"|Sound Synthesis
+"absynth"|32-bit MS Windows (NT/2000/XP)
+"absynth"|Linux
+"absynth"|C++
+"absynth"|GNU General Public License (GPL)
+"absynth"|Planning
+"absynth"|Command-line
+"abtlinux"|Advanced End Users
+"abtlinux"|X Window System (X11)
+"abtlinux"|Systems Administration
+"abtlinux"|Planning
+"abtlinux"|GNU General Public License (GPL)
+"abtlinux"|Ruby
+"abtlinux"|Linux
+"abtpportal"|Public Domain
+"abtpportal"|PHP
+"abtpportal"|Web-based
+"abtpportal"|Developers
+"abtpportal"|OS Independent (Written in an interpreted language)
+"abtpportal"|Site Management
+"abtpportal"|Pre-Alpha
+"abtpportal"|End Users/Desktop
+"abu"|BSD License
+"abu"|Developers
+"abu"|Python
+"abu"|Beta
+"abu"|GTK+
+"abu"|Front-Ends
+"abu"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abuky"|OS Independent (Written in an interpreted language)
+"abuky"|MIT License
+"abuky"|Java
+"abuky"|Beta
+"abuky"|End Users/Desktop
+"abuky"|Software Development
+"abuky"|Developers
+"abuky"|Web-based
+"abuky"|System Administrators
+"aburatan"|Role-Playing
+"aburatan"|Curses/Ncurses
+"aburatan"|C++
+"aburatan"|GNU General Public License (GPL)
+"aburatan"|End Users/Desktop
+"aburatan"|Beta
+"abuse"|Email
+"abuse"|Other/Nonlisted Topic
+"abuse"|System Administrators
+"abuse"|Alpha
+"abuse"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abuse"|End Users/Desktop
+"abuse"|OS Independent (Written in an interpreted language)
+"abuse"|X Window System (X11)
+"abuse"|Developers
+"abuse"|Tcl
+"abuse"|Other/Proprietary License
+"abuse"|Win32 (MS Windows)
+"abuse2"|Alpha
+"abuse2"|Win32 (MS Windows)
+"abuse2"|X Window System (X11)
+"abuse2"|Beta
+"abuse2"|Public Domain
+"abuse2"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abuse2"|Assembly
+"abuse2"|Side-Scrolling/Arcade Games
+"abuse2"|C++
+"abuse2"|Linux
+"abuse2"|End Users/Desktop
+"abuse2"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abuse2"|Lisp
+"abuse2"|32-bit MS Windows (95/98)
+"abvclient"|OS Independent (Written in an interpreted language)
+"abvclient"|WWW/HTTP
+"abvclient"|Java
+"abvclient"|Planning
+"abvclient"|GNU General Public License (GPL)
+"abvclient"|Win32 (MS Windows)
+"abvclient"|End Users/Desktop
+"abvclient"|Email Clients (MUA)
+"abvclient"|X Window System (X11)
+"abw"|Role-Playing
+"abw"|Python
+"abw"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abw"|Win32 (MS Windows)
+"abw"|End Users/Desktop
+"abw"|C++
+"abw"|Planning
+"abw"|GNU General Public License (GPL)
+"abw"|Multi-User Dungeons (MUD)
+"abxlib"|C++
+"abxlib"|Python
+"abxlib"|End Users/Desktop
+"abxlib"|Planning
+"abxlib"|Developers
+"abxlib"|Pre-Alpha
+"abxlib"|Software Development
+"abxlib"|System
+"abxlib"|OS Independent (Written in an interpreted language)
+"abxlib"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abxlib"|MIT License
+"abyss"|Production/Stable
+"abyss"|End Users/Desktop
+"abyss"|Beta
+"abyss"|Delphi/Kylix
+"abyss"|32-bit MS Windows (NT/2000/XP)
+"abyss"|BSD License
+"abyss"|All POSIX (Linux/BSD/UNIX-like OSes)
+"abyss"|C
+"abyss"|System Administrators
+"abyss"|GNU General Public License (GPL)
+"abyss"|Win32 (MS Windows)
+"abyss"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"abyss"|Linux
+"abyss"|WWW/HTTP
+"abyss"|Games/Entertainment
+"abyss"|Developers
+"abyss"|Non-interactive (Daemon)
+"ac2memomaster"|Visual Basic
+"ac2memomaster"|Win32 (MS Windows)
+"ac2memomaster"|32-bit MS Windows (95/98)
+"ac2memomaster"|GNU General Public License (GPL)
+"ac2memomaster"|Beta
+"ac2memomaster"|Role-Playing
+"ac2memomaster"|End Users/Desktop
+"ac2memomaster"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ac2memomaster"|C#
+"ac3"|C++
+"ac3"|Video
+"ac3"|GNU General Public License (GPL)
+"ac3"|Other Audience
+"ac3"|OS Independent (Written in an interpreted language)
+"ac3"|Sound/Audio
+"ac3"|Pre-Alpha
+"ac3"|Developers
+"ac3"|End Users/Desktop
+"ac3encode"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ac3encode"|C++
+"ac3encode"|C
+"ac3encode"|Pre-Alpha
+"ac3encode"|Developers
+"ac3encode"|Conversion
+"ac3encode"|Win32 (MS Windows)
+"ac3encode"|GNU General Public License (GPL)
+"ac3filter"|Win32 (MS Windows)
+"ac3filter"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ac3filter"|Beta
+"ac3filter"|Sound/Audio
+"ac3filter"|GNU General Public License (GPL)
+"ac3filter"|C++
+"ac3filter"|End Users/Desktop
+"ac3filtero"|32-bit MS Windows (NT/2000/XP)
+"ac3filtero"|C++
+"ac3filtero"|Win32 (MS Windows)
+"ac3filtero"|Planning
+"ac3filtero"|Players
+"ac3filtero"|WinXP
+"ac3filtero"|End Users/Desktop
+"ac3filtero"|GNU General Public License (GPL)
+"ac3filtero"|Win2K
+"ac3filtero"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ac97-modem"|End Users/Desktop
+"ac97-modem"|Pre-Alpha
+"ac97-modem"|GNU General Public License (GPL)
+"ac97-modem"|System Administrators
+"ac97-modem"|Hardware Drivers
+"ac97-modem"|C
+"ac97-modem"|All POSIX (Linux/BSD/UNIX-like OSes)
+"ac97-modem"|Linux
+"acaciafirewall"|Production/Stable
+"acaciafirewall"|Firewalls
+"acaciafirewall"|GNU General Public License (GPL)
+"acaciafirewall"|Unix Shell
+"acaciafirewall"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acaciafirewall"|Linux
+"acaciafirewall"|System Administrators
+"acaclick"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acaclick"|Education
+"acaclick"|Science/Research
+"acaclick"|Planning
+"acaclick"|OS Independent (Written in an interpreted language)
+"acaclick"|Java Swing
+"acaclick"|Education
+"acaclick"|Web-based
+"acaclick"|Java
+"acaclick"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acaclick"|Apache License V2.0
+"acaclick"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acad"|Linux
+"acad"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acad"|Systems Administration
+"acad"|Logging
+"acad"|Pre-Alpha
+"acad"|System Administrators
+"acad"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acad"|Unix Shell
+"acad"|GNU Hurd
+"acad"|Security
+"acad"|GNU General Public License (GPL)
+"acad"|Other
+"acade"|Internet
+"acade"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acade"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acade"|Web-based
+"acade"|OS Independent (Written in an interpreted language)
+"acade"|C#
+"acade"|Developers
+"acade"|Planning
+"acade"|Linux
+"acade"|File Sharing
+"acade"|System Administrators
+"acade"|Chat
+"acade"|Email
+"acade"|Java
+"acade"|Education
+"acade"|Education
+"acade"|GNU General Public License (GPL)
+"acadehelp"|GNU General Public License (GPL)
+"acadehelp"|Alpha
+"acadehelp"|Java Swing
+"acadehelp"|OS Independent (Written in an interpreted language)
+"acadehelp"|Education
+"acadehelp"|Console/Terminal
+"acadehelp"|Computer Aided Instruction (CAI)
+"acadehelp"|Java
+"academiceditor"|All POSIX (Linux/BSD/UNIX-like OSes)
+"academiceditor"|Education
+"academiceditor"|Developers
+"academiceditor"|PHP
+"academiceditor"|Education
+"academiceditor"|Linux
+"academiceditor"|Planning
+"academiceditor"|GNU General Public License (GPL)
+"academiceditor"|JavaScript
+"academiceditor"|Web-based
+"academic-games"|OS Independent (Written in an interpreted language)
+"academic-games"|Education
+"academic-games"|Web-based
+"academic-games"|Public Domain
+"academic-games"|Computer Aided Instruction (CAI)
+"academic-games"|Planning
+"academic-games"|Developers
+"academic-games"|Java
+"academic-games"|Puzzle Games
+"academictalk"|Mozilla Public License 1.0 (MPL)
+"academictalk"|Education
+"academictalk"|Apache License V2.0
+"academictalk"|Conferencing
+"academictalk"|Java
+"academictalk"|32-bit MS Windows (NT/2000/XP)
+"academictalk"|Education
+"academictalk"|Beta
+"academictalk"|GNU Library or Lesser General Public License (LGPL)
+"academusnet"|OS Independent (Written in an interpreted language)
+"academusnet"|Computer Aided Instruction (CAI)
+"academusnet"|GNU General Public License (GPL)
+"academusnet"|Education
+"academusnet"|PHP
+"academusnet"|Beta
+"academusnet"|Web-based
+"acadmap2pgsql"|GNU General Public License (GPL)
+"acadmap2pgsql"|GIS
+"acadmap2pgsql"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acadmap2pgsql"|Visual Basic
+"acadmap2pgsql"|Beta
+"acai"|Software Development
+"acai"|Developers
+"acai"|GNU General Public License (GPL)
+"acai"|Java
+"acai"|Planning
+"acai"|Web-based
+"acal"|Beta
+"acal"|C
+"acal"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acal"|Other/Nonlisted Topic
+"acal"|GNU General Public License (GPL)
+"acal"|System Administrators
+"acal"|End Users/Desktop
+"acalproj"|Developers
+"acalproj"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acalproj"|GNU General Public License (GPL)
+"acalproj"|PHP
+"acalproj"|Other Audience
+"acalproj"|PHP License
+"acalproj"|FreeBSD
+"acalproj"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acalproj"|End Users/Desktop
+"acalproj"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acalproj"|Information Technology
+"acalproj"|System Administrators
+"acalproj"|Scheduling
+"acalproj"|Production/Stable
+"acalproj"|OS X
+"acalproj"|WWW/HTTP
+"acalproj"|Web-based
+"acalproj"|Linux
+"acalproj"|OS Independent (Written in an interpreted language)
+"acami"|Beta
+"acami"|Perl
+"acami"|System Administrators
+"acami"|PHP
+"acami"|Internet Phone
+"acami"|Telephony
+"acami"|Web-based
+"acami"|Systems Administration
+"acami"|GNU General Public License (GPL)
+"acami"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acapd"|Internet
+"acapd"|System Administrators
+"acapd"|Non-interactive (Daemon)
+"acapd"|Alpha
+"acapd"|Developers
+"acapd"|GNU General Public License (GPL)
+"acapd"|C
+"acapd"|All POSIX (Linux/BSD/UNIX-like OSes)
+"ac-archive"|BSD License
+"ac-archive"|GNU General Public License (GPL)
+"ac-archive"|Symmetric Multi-processing
+"ac-archive"|Developers
+"ac-archive"|Beta
+"ac-archive"|Unix Shell
+"ac-archive"|Build Tools
+"ac-archive"|OS Independent (Written in an interpreted language)
+"acash"|Accounting
+"acash"|Web-based
+"acash"|BSD License
+"acash"|OS Independent (Written in an interpreted language)
+"acash"|Beta
+"acash"|End Users/Desktop
+"acash"|PHP
+"acat"|PL/SQL
+"acat"|Perl
+"acat"|Scheduling
+"acat"|PHP
+"acat"|Web-based
+"acat"|End Users/Desktop
+"acat"|Telephony
+"acat"|Office Suites
+"acat"|OS Independent (Written in an interpreted language)
+"acat"|GNU General Public License (GPL)
+"acat"|Planning
+"acat"|Linux
+"acat"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acbic"|Multimedia
+"acbic"|Pre-Alpha
+"acbic"|End Users/Desktop
+"acbic"|Planning
+"acbic"|C
+"acbic"|GNU General Public License (GPL)
+"acbic"|Linux
+"acbic"|FreeBSD
+"acbic"|X Window System (X11)
+"acbic"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acbic"|Other/Nonlisted Topic
+"acbic"|OpenBSD
+"acbic"|NetBSD
+"acbic"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acbr"|Pascal
+"acbr"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acbr"|Hardware Drivers
+"acbr"|Communications
+"acbr"|Financial and Insurance Industry
+"acbr"|Win32 (MS Windows)
+"acbr"|X Window System (X11)
+"acbr"|32-bit MS Windows (95/98)
+"acbr"|Frameworks
+"acbr"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acbr"|Manufacturing
+"acbr"|Delphi/Kylix
+"acbr"|Win2K
+"acbr"|GNU Library or Lesser General Public License (LGPL)
+"acbr"|Linux
+"acbr"|Beta
+"acbr"|Interface Engine/Protocol Translator
+"acbr"|32-bit MS Windows (NT/2000/XP)
+"acbr"|WinXP
+"acbr"|Developers
+"acbr"|Office/Business
+"acbr"|Healthcare Industry
+"acbuild"|Linux
+"acc"|System
+"acc"|GNU General Public License (GPL)
+"acc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acc"|Production/Stable
+"acc"|System Administrators
+"acc"|Python
+"accedit"|Beta
+"accedit"|OS Independent (Written in an interpreted language)
+"accedit"|GNU General Public License (GPL)
+"accedit"|Win32 (MS Windows)
+"accedit"|X Window System (X11)
+"accedit"|MIDI
+"accedit"|Java
+"accedit"|End Users/Desktop
+"accela"|Production/Stable
+"accela"|OS X
+"accela"|BSD License
+"accela"|Apple Mac OS Classic
+"accela"|Developers
+"accela"|Beta
+"accela"|Software Development
+"accela"|C++
+"acceleration"|Site Management
+"acceleration"|Command-line
+"acceleration"|OS Independent (Written in an interpreted language)
+"acceleration"|Java
+"acceleration"|Developers
+"acceleration"|Pre-Alpha
+"acceleration"|Eclipse
+"acceleration"|Apache License V2.0
+"accelerator3d"|OpenGL
+"accelerator3d"|32-bit MS Windows (NT/2000/XP)
+"accelerator3d"|End Users/Desktop
+"accelerator3d"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accelerator3d"|Alpha
+"accelerator3d"|Side-Scrolling/Arcade Games
+"accelerator3d"|Python
+"accelerator3d"|Artistic License
+"accelerator-ml"|GNU Library or Lesser General Public License (LGPL)
+"accelerator-ml"|Pre-Alpha
+"accelerator-ml"|XML
+"accelerator-ml"|Developers
+"accelerator-ml"|C++
+"accelerator-ml"|Advanced End Users
+"accelerator-ml"|Physics
+"accelere"|Software Development
+"accelere"|Planning
+"accelere"|OS Independent (Written in an interpreted language)
+"accelere"|Developers
+"accelere"|Web-based
+"accelere"|MIT License
+"accelere"|Java
+"accelere"|Dynamic Content
+"accel-fb"|Planning
+"accel-fb"|3D Rendering
+"accel-fb"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accel-fb"|Assembly
+"accel-fb"|Linux
+"accel-fb"|Display
+"accel-fb"|Developers
+"accel-fb"|GNU General Public License (GPL)
+"accel-fb"|C
+"accel-fb"|Pre-Alpha
+"access2sql"|Delphi/Kylix
+"access2sql"|Code Generators
+"access2sql"|Database Engines/Servers
+"access2sql"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"access2sql"|Win32 (MS Windows)
+"access2sql"|GNU General Public License (GPL)
+"access2sql"|Developers
+"access2sql"|Production/Stable
+"accessbuild"|Developers
+"accessbuild"|Beta
+"accessbuild"|WinXP
+"accessbuild"|Build Tools
+"accessbuild"|Command-line
+"accessbuild"|Visual Basic .NET
+"accessbuild"|GNU General Public License (GPL)
+"accesschecker"|GNU General Public License (GPL)
+"accesschecker"|Developers
+"accesschecker"|OS Independent (Written in an interpreted language)
+"accesschecker"|Alpha
+"accesschecker"|System Administrators
+"accesschecker"|Site Management
+"accesschecker"|Java
+"accesslos"|Financial and Insurance Industry
+"accesslos"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accesslos"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accesslos"|Pre-Alpha
+"accesslos"|C
+"accesslos"|32-bit MS Windows (95/98)
+"accesslos"|Financial
+"accesslos"|GNU General Public License (GPL)
+"accesslos"|Linux
+"accessmodifier"|Software Development
+"accessmodifier"|GNU Library or Lesser General Public License (LGPL)
+"accessmodifier"|Production/Stable
+"accessmodifier"|OS Independent (Written in an interpreted language)
+"accessmodifier"|Java
+"accessmodifier"|Developers
+"accessmusic"|MIDI
+"accessmusic"|Developers
+"accessmusic"|Conversion
+"accessmusic"|Production/Stable
+"accessmusic"|Speech
+"accessmusic"|Plugins
+"accessmusic"|Education
+"accessmusic"|XSL (XSLT/XPath/XSL-FO)
+"accessmusic"|Education
+"accessmusic"|.NET/Mono
+"accessmusic"|GNU General Public License (GPL)
+"accessmusic"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accessmusic"|Modeling
+"accessmusic"|C++
+"accessmusic"|Win32 (MS Windows)
+"accessmusic"|End Users/Desktop
+"accessmysql"|Front-Ends
+"accessmysql"|End Users/Desktop
+"accessmysql"|Win32 (MS Windows)
+"accessmysql"|Planning
+"accessmysql"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accessmysql"|OS Independent (Written in an interpreted language)
+"accessmysql"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accessmysql"|Linux
+"accessmysql"|Java
+"accessmysql"|Developers
+"accessmysql"|X Window System (X11)
+"accessmysql"|GNU General Public License (GPL)
+"accessmysql"|System Administrators
+"accessmysql"|Solaris
+"access-point"|C
+"access-point"|GNU General Public License (GPL)
+"access-point"|Networking
+"access-point"|Developers
+"access-point"|Hardware Drivers
+"access-point"|C++
+"access-point"|Pre-Alpha
+"access-point"|Assembly
+"access-point"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accessreferer"|C
+"accessreferer"|HTTP Servers
+"accessreferer"|Installation/Setup
+"accessreferer"|Production/Stable
+"accessreferer"|Web-based
+"accessreferer"|System Administrators
+"accessroad"|Web-based
+"accessroad"|Developers
+"accessroad"|Pre-Alpha
+"accessroad"|Security
+"accessroad"|Alpha
+"accessroad"|Software Development
+"accessroad"|System Administrators
+"accessroad"|Systems Administration
+"accessroad"|GNU General Public License (GPL)
+"accessroad"|Linux
+"accessroad"|Java
+"accessroad"|Information Technology
+"accessroad"|Perl
+"accessroad"|Advanced End Users
+"accessroad"|Monitoring
+"accessrunner"|Beta
+"accessrunner"|GNU General Public License (GPL)
+"accessrunner"|Hardware Drivers
+"accessrunner"|C
+"accessrunner"|Linux
+"accessrunner"|End Users/Desktop
+"accessrunner"|Developers
+"accessserver"|System Administrators
+"accessserver"|Developers
+"accessserver"|Communications
+"accessserver"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accessserver"|GNU Library or Lesser General Public License (LGPL)
+"accessserver"|C
+"accessserver"|Serial
+"accessserver"|Web-based
+"accessserver"|Alpha
+"accessserver"|Linux
+"accessweb"|WWW/HTTP
+"accessweb"|Web-based
+"accessweb"|Non-interactive (Daemon)
+"accessweb"|Advanced End Users
+"accessweb"|GNU General Public License (GPL)
+"accessweb"|End Users/Desktop
+"accessweb"|OS Independent (Written in an interpreted language)
+"accessweb"|Networking
+"accessweb"|Python
+"accessweb"|Planning
+"accessweb"|Beta
+"accessxml"|Database Engines/Servers
+"accessxml"|Front-Ends
+"accessxml"|C#
+"accessxml"|Win32 (MS Windows)
+"accessxml"|End Users/Desktop
+"accessxml"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accessxml"|32-bit MS Windows (95/98)
+"accessxml"|Developers
+"accessxml"|Planning
+"accessxml"|GNU General Public License (GPL)
+"accgenx"|PHP
+"accgenx"|Planning
+"accgenx"|Java
+"accgenx"|C++
+"accgenx"|Linux
+"accgenx"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accgenx"|Point-Of-Sale
+"accgenx"|Win32 (MS Windows)
+"accgenx"|GNU General Public License (GPL)
+"accgenx"|Scheduling
+"accgenx"|Financial and Insurance Industry
+"accgenx"|X Window System (X11)
+"accgenx"|BSD License
+"accgenx"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accgenx"|Developers
+"accgenx"|Accounting
+"accha"|Java Swing
+"accha"|Computer Aided Instruction (CAI)
+"accha"|Education
+"accha"|Java
+"accha"|GNU General Public License (GPL)
+"accha"|OS X
+"accha"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accha"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accha"|Alpha
+"acchain"|Win32 (MS Windows)
+"acchain"|C++
+"acchain"|Public Domain
+"acchain"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acchain"|Communications
+"acchain"|C#
+"acchain"|System Administrators
+"acchain"|Games/Entertainment
+"acchain"|Developers
+"acchain"|Beta
+"acchain"|Web-based
+"acchain"|End Users/Desktop
+"acchain"|Visual Basic
+"accip"|Alpha
+"accip"|FreeBSD
+"accip"|Logging
+"accip"|Non-interactive (Daemon)
+"accip"|C
+"accip"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accip"|Monitoring
+"accip"|System Administrators
+"accip"|Linux
+"accip"|GNU Library or Lesser General Public License (LGPL)
+"accip"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"accipiter"|Non-interactive (Daemon)
+"accipiter"|C
+"accipiter"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"accipiter"|Mozilla Public License 1.0 (MPL)
+"accipiter"|Planning
+"accipiter"|Pre-Alpha
+"accipiter"|End Users/Desktop
+"accipiter"|Science/Research
+"accipiter"|Scientific/Engineering
+"accipiter"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accipiter"|Linux
+"accipiter"|FreeBSD
+"accolorhelper"|Java
+"accolorhelper"|End Users/Desktop
+"accolorhelper"|Developers
+"accolorhelper"|Java Swing
+"accolorhelper"|GNU General Public License (GPL)
+"accolorhelper"|OS Independent (Written in an interpreted language)
+"accolorhelper"|Graphics
+"accolorhelper"|Beta
+"accompanistbill"|GNU General Public License (GPL)
+"accompanistbill"|C++
+"accompanistbill"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accompanistbill"|Pre-Alpha
+"accompanistbill"|X Window System (X11)
+"accompanistbill"|Financial
+"accompanistbill"|Linux
+"accompanistbill"|End Users/Desktop
+"accordeur"|Analysis
+"accordeur"|OS Portable (Source code to work with many OS platforms)
+"accordeur"|GNU General Public License (GPL)
+"accordeur"|C
+"accordeur"|Qt
+"accordeur"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accordeur"|Win32 (MS Windows)
+"accordeur"|WinXP
+"accordeur"|X Window System (X11)
+"accordeur"|Linux
+"accordeur"|Production/Stable
+"accordeur"|C++
+"accordeur"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accordeur"|End Users/Desktop
+"accordian"|C++
+"accordian"|Solaris
+"accordian"|Beta
+"accordian"|32-bit MS Windows (NT/2000/XP)
+"accordian"|End Users/Desktop
+"accordian"|32-bit MS Windows (95/98)
+"accordian"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accordian"|GNU General Public License (GPL)
+"accordian"|OS Portable (Source code to work with many OS platforms)
+"accordian"|Card Games
+"accordian"|Win32 (MS Windows)
+"accordian"|Qt
+"accountancy"|Linux
+"accountancy"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accountancy"|Accounting
+"accountancy"|Inactive
+"accountancy"|Pascal
+"accountancy"|GNU General Public License (GPL)
+"accountancy"|Financial and Insurance Industry
+"accountancy"|GTK+
+"accountant"|BSD License
+"accountant"|Linux
+"accountant"|Front-Ends
+"accountant"|Java
+"accountant"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accountant"|GNU General Public License (GPL)
+"accountant"|Planning
+"accountant"|OLAP
+"accountant"|Beta
+"accountant"|End Users/Desktop
+"accountant"|C++
+"accountant"|Pre-Alpha
+"accountant"|X Window System (X11)
+"accountant"|Developers
+"accountant"|Accounting
+"accountant"|Other Audience
+"accountant"|Java Swing
+"accountant"|OS Independent (Written in an interpreted language)
+"accountex"|System Administrators
+"accountex"|Artistic License
+"accountex"|Log Analysis
+"accountex"|FreeBSD
+"accountex"|GNU General Public License (GPL)
+"accountex"|PHP
+"accountex"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"accountex"|Database
+"accountex"|Authentication/Directory
+"accountex"|Information Technology
+"accountex"|Non-interactive (Daemon)
+"accountex"|Solaris
+"accountex"|End Users/Desktop
+"accountex"|Monitoring
+"accountex"|Telecommunications Industry
+"accountex"|Customer Service
+"accountex"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accountex"|Java
+"accountex"|JavaScript
+"accountex"|Linux
+"accountex"|C
+"accountex"|Production/Stable
+"accountguard"|OS X
+"accountguard"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accountguard"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accountguard"|Java
+"accountguard"|Software Development
+"accountguard"|GNU General Public License (GPL)
+"accountguard"|Accounting
+"accountguard"|Linux
+"accountguard"|End Users/Desktop
+"accountguard"|Developers
+"accountguard"|Pre-Alpha
+"accounting101"|Accounting
+"accounting101"|Java
+"accounting101"|Point-Of-Sale
+"accounting101"|GNU General Public License (GPL)
+"accounting101"|Web-based
+"accounting101"|Linux
+"accounting101"|Planning
+"accounting101"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accounting101"|End Users/Desktop
+"accounting4me"|End Users/Desktop
+"accounting4me"|Java
+"accounting4me"|GNU General Public License (GPL)
+"accounting4me"|OS Independent (Written in an interpreted language)
+"accounting4me"|Pre-Alpha
+"accounting4me"|Mozilla Public License 1.1 (MPL 1.1)
+"accounting4me"|Accounting
+"accounting4me"|Handheld/Mobile/PDA
+"accountis"|Developers
+"accountis"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accountis"|Web-based
+"accountis"|Zope
+"accountis"|Office/Business
+"accountis"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accountis"|Beta
+"accountis"|Security
+"accountis"|Python
+"accountis"|End Users/Desktop
+"accountis"|OSI-Approved Open Source
+"accountis"|Other/Proprietary License
+"accountis"|Linux
+"accousti-x"|Win32 (MS Windows)
+"accousti-x"|Visual Basic
+"accousti-x"|Players
+"accousti-x"|Capture/Recording
+"accousti-x"|CD Audio
+"accousti-x"|GNU General Public License (GPL)
+"accousti-x"|32-bit MS Windows (NT/2000/XP)
+"accousti-x"|End Users/Desktop
+"accpal"|Monitoring
+"accpal"|32-bit MS Windows (NT/2000/XP)
+"accpal"|Non-interactive (Daemon)
+"accpal"|Advanced End Users
+"accpal"|Linux
+"accpal"|C
+"accpal"|GNU General Public License (GPL)
+"accpal"|Alpha
+"accpal"|System Administrators
+"accpal"|Religion and Philosophy
+"accpal"|C++
+"accre"|GNU General Public License (GPL)
+"accre"|System Administrators
+"accre"|JavaScript
+"accre"|End Users/Desktop
+"accre"|Message Boards
+"accre"|Perl
+"accre"|Web-based
+"accre"|Planning
+"accrete"|C
+"accrete"|Simulation
+"accrete"|Public Domain
+"accrete"|Beta
+"accrete"|Astronomy
+"accrete"|Science/Research
+"accs"|To-Do Lists
+"accs"|GNU General Public License (GPL)
+"accs"|OS Independent (Written in an interpreted language)
+"accs"|Java
+"accs"|Web-based
+"accs"|Production/Stable
+"accs"|Project Management
+"accs"|Database Engines/Servers
+"accs"|Front-Ends
+"accsoft"|OS Independent (Written in an interpreted language)
+"accsoft"|GNU General Public License (GPL)
+"accsoft"|Monitoring
+"accsoft"|Web-based
+"accsoft"|Systems Administration
+"accsoft"|Accounting
+"accsoft"|Planning
+"accsoft"|System Administrators
+"accsoft"|PL/SQL
+"accsoft"|PHP
+"acctmgr"|Perl
+"acctmgr"|GNU General Public License (GPL)
+"acctmgr"|Systems Administration
+"acctmgr"|Alpha
+"acctmgr"|Linux
+"acctmgr"|System Administrators
+"acctmgr"|C++
+"acctmgr"|Other Audience
+"acctmgr"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acctmgr"|Web-based
+"acctmgr"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acctmgr"|Solaris
+"acctsync"|Non-interactive (Daemon)
+"acctsync"|System Administrators
+"acctsync"|C++
+"acctsync"|OSI-Approved Open Source
+"acctsync"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acctsync"|Beta
+"acctsync"|LDAP
+"acctsync"|C
+"acctsync"|Perl
+"acctsync"|Java
+"acctsync"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accttrsh"|Alpha
+"accttrsh"|Communications
+"accttrsh"|System Administrators
+"accttrsh"|GNU General Public License (GPL)
+"accttrsh"|Linux
+"accttrsh"|Perl
+"accttrsh"|Web-based
+"accugps"|Visualization
+"accugps"|Java
+"accugps"|Win32 (MS Windows)
+"accugps"|Developers
+"accugps"|GNU Library or Lesser General Public License (LGPL)
+"accugps"|Planning
+"accugps"|End Users/Desktop
+"accugps"|X Window System (X11)
+"accugps"|OS Independent (Written in an interpreted language)
+"accurev-ant"|Build Tools
+"accurev-ant"|Beta
+"accurev-ant"|Version Control
+"accurev-ant"|Java
+"accurev-ant"|Developers
+"accurev-ant"|OS Independent (Written in an interpreted language)
+"accurev-ant"|GNU General Public License (GPL)
+"accushot"|Handheld/Mobile/PDA
+"accushot"|Java
+"accushot"|Win32 (MS Windows)
+"accushot"|Other/Nonlisted Topic
+"accushot"|GNU General Public License (GPL)
+"accushot"|Pre-Alpha
+"accushot"|Other Audience
+"accushot"|X Window System (X11)
+"accushot"|End Users/Desktop
+"accushot"|OS Independent (Written in an interpreted language)
+"accushot"|Visual Basic
+"accutron2000"|Internet Relay Chat
+"accutron2000"|Python
+"accutron2000"|End Users/Desktop
+"accutron2000"|Non-interactive (Daemon)
+"accutron2000"|Production/Stable
+"accutron2000"|OS Independent (Written in an interpreted language)
+"accutron2000"|GNU General Public License (GPL)
+"accwhizz"|PHP
+"accwhizz"|Pre-Alpha
+"accwhizz"|Developers
+"accwhizz"|Accounting
+"accwhizz"|Linux
+"accwhizz"|System Administrators
+"accwhizz"|Web-based
+"accwhizz"|End Users/Desktop
+"accwhizz"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"accwhizz"|32-bit MS Windows (95/98)
+"accwhizz"|OS Independent (Written in an interpreted language)
+"accwhizz"|All POSIX (Linux/BSD/UNIX-like OSes)
+"accwhizz"|GNU General Public License (GPL)
+"acd"|GNU General Public License (GPL)
+"acd"|Perl
+"acd"|System Administrators
+"acd"|OS Independent (Written in an interpreted language)
+"acd"|Systems Administration
+"acd"|Symmetric Multi-processing
+"acd"|Pre-Alpha
+"acdbase"|PHP
+"acdbase"|Front-Ends
+"acdbase"|Planning
+"acdbase"|Python
+"acdbase"|Linux
+"acdbase"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acdbase"|End Users/Desktop
+"acdbase"|C
+"acdbase"|Gnome
+"acdbase"|CD Audio
+"acdbase"|Web-based
+"acdbase"|GNU General Public License (GPL)
+"acdcdev"|C
+"acdcdev"|MIT License
+"acdcdev"|Assembly
+"acdcdev"|C++
+"acdcdev"|Planning
+"acdcdev"|Win32 (MS Windows)
+"acdcdev"|KDE
+"acdcdev"|Linux
+"acdcdev"|Developers
+"acdcdev"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acdcdev"|Games/Entertainment
+"acdcdev"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acdcdev"|Other Operating Systems
+"acdesigner"|System Administrators
+"acdesigner"|GNU General Public License (GPL)
+"acdesigner"|Installation/Setup
+"acdesigner"|Java
+"acdesigner"|Security
+"acdesigner"|OS Independent (Written in an interpreted language)
+"acdesigner"|Beta
+"acdesigner"|X Window System (X11)
+"acdesigner"|Developers
+"acdesigner"|Win32 (MS Windows)
+"acdesigner"|Systems Administration
+"acdesk"|.NET/Mono
+"acdesk"|Planning
+"acdesk"|C#
+"acdesk"|End Users/Desktop
+"acdesk"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acdesk"|Desktop Environment
+"acdesk"|Advanced End Users
+"acdesk"|Pre-Alpha
+"acdesk"|Win32 (MS Windows)
+"acdesk"|GNU General Public License (GPL)
+"acdesk"|Developers
+"acdesk"|Other/Nonlisted Topic
+"acdev"|32-bit MS Windows (NT/2000/XP)
+"acdev"|MIT License
+"acdev"|32-bit MS Windows (95/98)
+"acdev"|Visual Basic
+"acdev"|Developers
+"acdev"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acdev"|Advanced End Users
+"acdev"|Multi-User Dungeons (MUD)
+"acdev"|Production/Stable
+"acdev"|Role-Playing
+"acdev"|Win32 (MS Windows)
+"acdev"|Visual Basic .NET
+"acdir"|32-bit MS Windows (NT/2000/XP)
+"acdir"|Systems Administration
+"acdir"|Alpha
+"acdir"|GNU General Public License (GPL)
+"acdir"|Visual Basic
+"acdir"|Win32 (MS Windows)
+"acdir"|System Administrators
+"acdk"|Object Brokering
+"acdk"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acdk"|Build Tools
+"acdk"|Interpreters
+"acdk"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acdk"|Perl
+"acdk"|Beta
+"acdk"|User Interfaces
+"acdk"|GNU Library or Lesser General Public License (LGPL)
+"acdk"|Object Oriented
+"acdk"|Frameworks
+"acdk"|Developers
+"acdk"|Planning
+"acdk"|Solaris
+"acdk"|Tcl
+"acdk"|OS Portable (Source code to work with many OS platforms)
+"acdk"|Java
+"acdk"|C#
+"acdk"|BSD License
+"acdk"|XML
+"acdk"|Python
+"acdk"|Lisp
+"acdk"|Linux
+"acdk"|C++
+"acdk"|Production/Stable
+"acdo"|GNU General Public License (GPL)
+"acdo"|C
+"acdo"|X Window System (X11)
+"acdo"|End Users/Desktop
+"acdo"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acdo"|Front-Ends
+"acdo"|Desktop Environment
+"acdo"|Other Audience
+"acdo"|Production/Stable
+"acdo"|Ada
+"acds"|PHP
+"acds"|Pre-Alpha
+"acds"|Office/Business
+"acds"|Web-based
+"acds"|Other/Nonlisted Topic
+"acds"|Healthcare Industry
+"acds"|GNU General Public License (GPL)
+"acds"|OS Independent (Written in an interpreted language)
+"acds"|JavaScript
+"acds"|Financial and Insurance Industry
+"acds"|Legal Industry
+"acdx-c"|Console/Terminal
+"acdx-c"|32-bit MS Windows (NT/2000/XP)
+"acdx-c"|Alpha
+"acdx-c"|Developers
+"acdx-c"|BSD License
+"acdx-c"|Information Technology
+"acdx-c"|C++
+"acdx-c"|Communications
+"ace"|Alpha
+"ace"|Text Editors
+"ace"|OS Independent (Written in an interpreted language)
+"ace"|Java Swing
+"ace"|Java
+"ace"|GNU General Public License (GPL)
+"ace-asn1"|Developers
+"ace-asn1"|Planning
+"ace-asn1"|OS Independent (Written in an interpreted language)
+"ace-asn1"|BSD License
+"ace-asn1"|C++
+"ace-asn1"|Networking
+"aceball"|GNU General Public License (GPL)
+"aceball"|Java
+"aceball"|OS Independent (Written in an interpreted language)
+"aceball"|End Users/Desktop
+"aceball"|Turn Based Strategy
+"aceball"|Developers
+"aceball"|Pre-Alpha
+"acecad"|X Window System (X11)
+"acecad"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acecad"|Non-interactive (Daemon)
+"acecad"|GNU General Public License (GPL)
+"acecad"|End Users/Desktop
+"acecad"|Linux
+"acecad"|Graphics
+"acecad"|Mature
+"acecad"|C
+"ace-freebsd"|Software Development
+"ace-freebsd"|FreeBSD
+"ace-freebsd"|BSD License
+"ace-freebsd"|Developers
+"ace-freebsd"|Inactive
+"ace-freebsd"|All POSIX (Linux/BSD/UNIX-like OSes)
+"ace-freebsd"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acegisecurity"|Interpreters
+"acegisecurity"|Production/Stable
+"acegisecurity"|Apache License V2.0
+"acegisecurity"|Java
+"acegisecurity"|Security
+"acegisecurity"|Authentication/Directory
+"acegisecurity"|Non-interactive (Daemon)
+"acegisecurity"|Developers
+"acegisecurity"|OS Independent (Written in an interpreted language)
+"ace-gmailclient"|Visual Basic
+"ace-gmailclient"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ace-gmailclient"|Email Clients (MUA)
+"ace-gmailclient"|GNU General Public License (GPL)
+"ace-gmailclient"|Win32 (MS Windows)
+"ace-gmailclient"|Beta
+"ace-gmailclient"|Developers
+"acehttp"|Other Audience
+"acehttp"|System Administrators
+"acehttp"|GNU General Public License (GPL)
+"acehttp"|End Users/Desktop
+"acehttp"|Java
+"acehttp"|Planning
+"acehttp"|Developers
+"acehttp"|HTTP Servers
+"acehttp"|OS Independent (Written in an interpreted language)
+"acell"|Physics
+"acell"|Healthcare Industry
+"acell"|OS Independent (Written in an interpreted language)
+"acell"|Python
+"acell"|GNU General Public License (GPL)
+"acell"|Planning
+"acell"|Bio-Informatics
+"acell"|Chemistry
+"acell"|Science/Research
+"acengine"|Visual Basic
+"acengine"|Win32 (MS Windows)
+"acengine"|32-bit MS Windows (95/98)
+"acengine"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acengine"|Other Audience
+"acengine"|End Users/Desktop
+"acengine"|Cryptography
+"acengine"|Planning
+"acengine"|Developers
+"acengine"|GNU Library or Lesser General Public License (LGPL)
+"aceoperator"|Chat
+"aceoperator"|Java
+"aceoperator"|32-bit MS Windows (NT/2000/XP)
+"aceoperator"|Production/Stable
+"aceoperator"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aceoperator"|GNU Library or Lesser General Public License (LGPL)
+"aceoperator"|WinXP
+"aceoperator"|Customer Service
+"aceoperator"|Linux
+"aceoperator"|Telecommunications Industry
+"aceoperator"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aceoperator"|Web-based
+"aceoperator"|Win2K
+"ace-radius"|Beta
+"ace-radius"|WinXP
+"ace-radius"|Internet
+"ace-radius"|Telecommunications Industry
+"ace-radius"|OS Independent (Written in an interpreted language)
+"ace-radius"|Communications
+"ace-radius"|C++
+"ace-radius"|Linux
+"ace-radius"|BSD License
+"ace-radius"|Software Development
+"ace-radius"|Solaris
+"ace-radius"|Developers
+"ace-radius"|32-bit MS Windows (NT/2000/XP)
+"ace-radius"|Networking
+"ace-radius"|Win2K
+"ace-radius"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ace-radius"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acerhk"|C
+"acerhk"|Mature
+"acerhk"|Hardware Drivers
+"acerhk"|End Users/Desktop
+"acerhk"|Advanced End Users
+"acerhk"|Linux
+"acerhk"|GNU General Public License (GPL)
+"acerhk"|Non-interactive (Daemon)
+"aces"|C++
+"aces"|Perl
+"aces"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aces"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aces"|GNU Library or Lesser General Public License (LGPL)
+"aces"|Win32 (MS Windows)
+"aces"|Alpha
+"aces"|Linux
+"aces"|Backup
+"aces"|Planning
+"aces"|GNU General Public License (GPL)
+"aces"|End Users/Desktop
+"aceserv"|System Administrators
+"aceserv"|Developers
+"aceserv"|C
+"aceserv"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aceserv"|PHP License
+"aceserv"|Non-interactive (Daemon)
+"aceserv"|Other Audience
+"aceserv"|Pre-Alpha
+"aceserv"|GNU General Public License (GPL)
+"aceserv"|Internet Relay Chat
+"acexperiment"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acexperiment"|Linux
+"acexperiment"|Developers
+"acexperiment"|C++
+"acexperiment"|Multi-User Dungeons (MUD)
+"acexperiment"|32-bit MS Windows (NT/2000/XP)
+"acexperiment"|GNU General Public License (GPL)
+"acexperiment"|Win2K
+"acexperiment"|Role-Playing
+"acexperiment"|Planning
+"acexperiment"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acexperiment"|WinXP
+"acexperiment"|32-bit MS Windows (95/98)
+"aceyget"|WWW/HTTP
+"aceyget"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aceyget"|End Users/Desktop
+"aceyget"|Mature
+"aceyget"|Public Domain
+"acf"|C++
+"acf"|Developers
+"acf"|Scientific/Engineering
+"acf"|Other Audience
+"acf"|Pre-Alpha
+"acf"|Python
+"acf"|GNU General Public License (GPL)
+"acf"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acf"|Linux
+"acfproj"|Software Development
+"acfproj"|C++
+"acfproj"|Developers
+"acfreeproxy"|Forth
+"acfreeproxy"|Win2K
+"acfreeproxy"|32-bit MS Windows (NT/2000/XP)
+"acfreeproxy"|HTTP Servers
+"acfreeproxy"|WinXP
+"acfreeproxy"|End Users/Desktop
+"acfreeproxy"|Beta
+"acfreeproxy"|GNU General Public License (GPL)
+"acfreeproxy"|Firewalls
+"acfreeproxy"|Non-interactive (Daemon)
+"acfreeproxy"|System Administrators
+"acfreeproxy"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acfreeproxy"|Win32 (MS Windows)
+"acfreeproxy"|WinCE
+"acfreeproxy"|32-bit MS Windows (95/98)
+"acftp"|Forth
+"acftp"|Alpha
+"acftp"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acftp"|Non-interactive (Daemon)
+"acftp"|GNU General Public License (GPL)
+"acftp"|Win32 (MS Windows)
+"acftp"|32-bit MS Windows (95/98)
+"acftp"|WinXP
+"acftp"|End Users/Desktop
+"acftp"|32-bit MS Windows (NT/2000/XP)
+"acftp"|Win2K
+"acftp"|System Administrators
+"acftp"|Developers
+"acftp"|File Transfer Protocol (FTP)
+"acgm"|Role-Playing
+"acgm"|Visual Basic
+"acgm"|Perl
+"acgm"|End Users/Desktop
+"acgm"|Planning
+"ach"|Alpha
+"ach"|X Window System (X11)
+"ach"|Turn Based Strategy
+"ach"|Win32 (MS Windows)
+"ach"|Developers
+"ach"|Web-based
+"ach"|Simulation
+"ach"|OS Independent (Written in an interpreted language)
+"ach"|GNU General Public License (GPL)
+"ach"|Java
+"achaeacure"|Beta
+"achaeacure"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"achaeacure"|Multi-User Dungeons (MUD)
+"achaeacure"|Production/Stable
+"achaeacure"|GNU General Public License (GPL)
+"achanis"|Developers
+"achanis"|OS Independent (Written in an interpreted language)
+"achanis"|Planning
+"achanis"|LPC
+"achanis"|Multi-User Dungeons (MUD)
+"achape"|Alpha
+"achape"|Systems Administration
+"achape"|GNU General Public License (GPL)
+"achape"|Linux
+"achape"|Web-based
+"achape"|PHP
+"achape"|System Administrators
+"achat"|Chat
+"achat"|Delphi/Kylix
+"achat"|Win32 (MS Windows)
+"achat"|GNU General Public License (GPL)
+"achat"|Win2K
+"achat"|WWW/HTTP
+"achat"|Beta
+"achat"|System Administrators
+"achat"|WinXP
+"achat"|End Users/Desktop
+"achat"|File Sharing
+"achat"|32-bit MS Windows (NT/2000/XP)
+"achd"|Chat
+"achd"|Web-based
+"achd"|Linux
+"achd"|WAP
+"achd"|FreeBSD
+"achd"|All POSIX (Linux/BSD/UNIX-like OSes)
+"achd"|Unix Shell
+"achd"|PHP
+"achd"|GNU General Public License (GPL)
+"achd"|Other/Proprietary License
+"achd"|Other Audience
+"achd"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"achd"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"achd"|Planning
+"achelous"|Pre-Alpha
+"achelous"|FreeBSD
+"achelous"|Installation/Setup
+"achelous"|C
+"achelous"|Desktop Environment
+"achelous"|Developers
+"achelous"|Operating System Kernels
+"achelous"|End Users/Desktop
+"achelous"|OS Independent (Written in an interpreted language)
+"achelous"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"achelous"|GNU General Public License (GPL)
+"achelous"|Planning
+"achelous"|System Administrators
+"achelous"|Pascal
+"achelous"|Apple Mac OS Classic
+"achelous"|C++
+"achelous"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acheron-l"|Standard ML
+"acheron-l"|Education
+"acheron-l"|Compilers
+"acheron-l"|C
+"acheron-l"|GNU General Public License (GPL)
+"acheron-l"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acheron-l"|Interpreters
+"acheron-l"|Alpha
+"acheron-l"|Other Operating Systems
+"acheron-l"|Code Generators
+"acheron-l"|GNU Library or Lesser General Public License (LGPL)
+"acheron-l"|Linux
+"acheron-l"|Developers
+"acheron-l"|Information Technology
+"achilles"|Production/Stable
+"achilles"|X Window System (X11)
+"achilles"|GNU General Public License (GPL)
+"achilles"|OS Independent (Written in an interpreted language)
+"achilles"|Other Audience
+"achilles"|Win32 (MS Windows)
+"achilles"|Lisp
+"achilles"|Artificial Intelligence
+"achilles"|C
+"achilles"|C++
+"achimguestbook"|Production/Stable
+"achimguestbook"|Dynamic Content
+"achimguestbook"|PHP
+"achimguestbook"|GNU General Public License (GPL)
+"achimguestbook"|System Administrators
+"achimguestbook"|Developers
+"achimguestbook"|OS Independent (Written in an interpreted language)
+"achimguestbook"|End Users/Desktop
+"achimguestbook"|Web-based
+"acid"|End Users/Desktop
+"acid"|Developers
+"acid"|Software Development
+"acid"|File Sharing
+"acid"|C++
+"acid"|GNU General Public License (GPL)
+"acid"|Chat
+"acid"|Visual Basic
+"acid"|Pre-Alpha
+"acid"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acid"|Win32 (MS Windows)
+"acid3lib"|Sound/Audio
+"acid3lib"|Developers
+"acid3lib"|Alpha
+"acid3lib"|OS Independent (Written in an interpreted language)
+"acid3lib"|Software Development
+"acid3lib"|GNU Library or Lesser General Public License (LGPL)
+"acid3lib"|Java
+"acidblood"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidblood"|Linux
+"acidblood"|Internet Relay Chat
+"acidblood"|Production/Stable
+"acidblood"|Solaris
+"acidblood"|Developers
+"acidblood"|Non-interactive (Daemon)
+"acidblood"|C
+"acidblood"|End Users/Desktop
+"acidblood"|GNU General Public License (GPL)
+"acidcp"|Beta
+"acidcp"|Linux
+"acidcp"|GNU General Public License (GPL)
+"acidcp"|Religion and Philosophy
+"acidcp"|Gnome
+"acidcp"|End Users/Desktop
+"acidcp"|C
+"acidcp"|Apple Mac OS Classic
+"acidcp"|BSD License
+"acidcp"|Command-line
+"acidcp"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidcp"|Win32 (MS Windows)
+"acidcp"|C++
+"acidcp"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acidcp"|Other/Nonlisted Topic
+"acidcp"|Curses/Ncurses
+"acidcp"|Pre-Alpha
+"acidcp"|Hardware Drivers
+"acidcult"|Web-based
+"acidcult"|Developers
+"acidcult"|PHP
+"acidcult"|Message Boards
+"acidcult"|Advanced End Users
+"acidcult"|BBS
+"acidcult"|Pre-Alpha
+"acidcult"|GNU General Public License (GPL)
+"acidcult"|JavaScript
+"acidcult"|Planning
+"acidim"|Education
+"acidim"|OS Independent (Written in an interpreted language)
+"acidim"|Console/Terminal
+"acidim"|Medical Science Apps.
+"acidim"|GNU General Public License (GPL)
+"acidim"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidim"|Healthcare Industry
+"acidim"|Bio-Informatics
+"acidim"|OS Portable (Source code to work with many OS platforms)
+"acidim"|End Users/Desktop
+"acidim"|Web-based
+"acidim"|Chat
+"acidim"|Beta
+"acidim"|C++
+"acidim"|Science/Research
+"acidim"|Conferencing
+"acidim"|Molecular Science
+"acidim"|Perl
+"acidircd"|GNU General Public License (GPL)
+"acidircd"|Internet Relay Chat
+"acidircd"|End Users/Desktop
+"acidircd"|System Administrators
+"acidircd"|Telecommunications Industry
+"acidircd"|Developers
+"acidircd"|Production/Stable
+"acidircd"|C
+"acidircd"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidircd"|Non-interactive (Daemon)
+"acidlab"|Security
+"acidlab"|Web-based
+"acidlab"|PHP
+"acidlab"|Monitoring
+"acidlab"|Beta
+"acidlab"|GNU General Public License (GPL)
+"acidlab"|OS Independent (Written in an interpreted language)
+"acidlab"|System Administrators
+"acidmon"|Telecommunications Industry
+"acidmon"|Advanced End Users
+"acidmon"|Win32 (MS Windows)
+"acidmon"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acidmon"|Non-interactive (Daemon)
+"acidmon"|Monitoring
+"acidmon"|C++
+"acidmon"|Communications
+"acidmon"|GNU General Public License (GPL)
+"acidmon"|System Administrators
+"acidmon"|Planning
+"acidrip"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acidrip"|Gnome
+"acidrip"|Video Capture
+"acidrip"|Perl
+"acidrip"|GNU General Public License (GPL)
+"acidrip"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidrip"|Production/Stable
+"acidrip"|End Users/Desktop
+"acidrip"|Linux
+"acidrip"|Conversion
+"acidsun"|Dynamic Content
+"acidsun"|Planning
+"acidsun"|Developers
+"acidsun"|Archiving
+"acidsun"|System Administrators
+"acidsun"|GNU General Public License (GPL)
+"acidsun"|Site Management
+"acidsun"|PHP
+"acidvat"|Beta
+"acidvat"|Perl
+"acidvat"|Other Audience
+"acidvat"|Filters
+"acidvat"|OS Independent (Written in an interpreted language)
+"acidvat"|System Administrators
+"acidvat"|Non-interactive (Daemon)
+"acidvat"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acidvat"|Artistic License
+"acidview6-win32"|Win2K
+"acidview6-win32"|GNU General Public License (GPL)
+"acidview6-win32"|Win32 (MS Windows)
+"acidview6-win32"|32-bit MS Windows (NT/2000/XP)
+"acidview6-win32"|WinXP
+"acidview6-win32"|Production/Stable
+"acidview6-win32"|32-bit MS Windows (95/98)
+"acidview6-win32"|Presentation
+"acidview6-win32"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acidview6-win32"|BBS
+"acidview6-win32"|Graphics Conversion
+"acidview6-win32"|Viewers
+"acidview6-win32"|End Users/Desktop
+"acip"|Education
+"acip"|Artistic License
+"acip"|Documentation
+"acip"|Developers
+"acip"|Other Audience
+"acip"|Religion and Philosophy
+"acip"|End Users/Desktop
+"acip"|OS Independent (Written in an interpreted language)
+"acirc"|X Window System (X11)
+"acirc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acirc"|Internet Relay Chat
+"acirc"|Python
+"acirc"|End Users/Desktop
+"acirc"|GTK+
+"acirc"|Gnome
+"acirc"|GNU General Public License (GPL)
+"acirc"|Planning
+"acity"|OS Independent (Written in an interpreted language)
+"acity"|Production/Stable
+"acity"|Internet
+"acity"|Web-based
+"acity"|GNU General Public License (GPL)
+"acity"|Developers
+"acity"|Database
+"acity"|PHP
+"acity"|Healthcare Industry
+"ackertodo"|Web-based
+"ackertodo"|OS Independent (Written in an interpreted language)
+"ackertodo"|Handheld/Mobile/PDA
+"ackertodo"|Other Audience
+"ackertodo"|GNU General Public License (GPL)
+"ackertodo"|PHP
+"ackertodo"|Handheld/Embedded Operating Systems
+"ackertodo"|Command-line
+"ackertodo"|Information Technology
+"ackertodo"|Scheduling
+"ackertodo"|Production/Stable
+"ackertodo"|PL/SQL
+"ackertodo"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ackertodo"|Console/Terminal
+"ackertodo"|OS X
+"ackertodo"|Project Management
+"ackertodo"|Education
+"ackertodo"|OS Portable (Source code to work with many OS platforms)
+"ackertodo"|System Administrators
+"ackertodo"|Linux
+"ackertodo"|Front-Ends
+"ackertodo"|Dynamic Content
+"ackertodo"|All POSIX (Linux/BSD/UNIX-like OSes)
+"ackertodo"|End Users/Desktop
+"ackertodo"|Developers
+"ackord"|Analysis
+"ackord"|Win32 (MS Windows)
+"ackord"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"ackord"|GNU General Public License (GPL)
+"ackord"|Delphi/Kylix
+"ackord"|End Users/Desktop
+"ackord"|MIDI
+"ackord"|Beta
+"ackord"|32-bit MS Windows (NT/2000/XP)
+"ackord"|32-bit MS Windows (95/98)
+"ackord"|Other Audience
+"ackterm"|Telnet
+"ackterm"|GNU General Public License (GPL)
+"ackterm"|C#
+"ackterm"|End Users/Desktop
+"ackterm"|Terminal Emulators/X Terminals
+"ackterm"|OS Portable (Source code to work with many OS platforms)
+"ackterm"|Pre-Alpha
+"ackterm"|.NET/Mono
+"aclassutil"|C
+"aclassutil"|GNU Library or Lesser General Public License (LGPL)
+"aclassutil"|Linux
+"aclassutil"|Developers
+"aclassutil"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aclassutil"|Alpha
+"aclassutil"|Gnome
+"aclassutil"|Build Tools
+"aclean"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aclean"|32-bit MS Windows (95/98)
+"aclean"|WinXP
+"aclean"|Delphi/Kylix
+"aclean"|Win32 (MS Windows)
+"aclean"|End Users/Desktop
+"aclean"|Beta
+"aclean"|Other Audience
+"aclean"|Systems Administration
+"aclean"|32-bit MS Windows (NT/2000/XP)
+"aclean"|GNU General Public License (GPL)
+"aclean"|Production/Stable
+"aclean"|Win2K
+"aclean"|System Administrators
+"aclean"|Object Pascal
+"aclean"|Developers
+"aclibexif"|Alpha
+"aclibexif"|Developers
+"aclibexif"|GNU Library or Lesser General Public License (LGPL)
+"aclibexif"|Java
+"aclibexif"|Graphics
+"aclibexif"|OS Independent (Written in an interpreted language)
+"aclibexif"|Java Swing
+"aclibico"|Java
+"aclibico"|Production/Stable
+"aclibico"|OS Independent (Written in an interpreted language)
+"aclibico"|End Users/Desktop
+"aclibico"|Graphics Conversion
+"aclibico"|GNU General Public License (GPL)
+"a-client"|Internet Relay Chat
+"a-client"|Win32 (MS Windows)
+"a-client"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"a-client"|End Users/Desktop
+"a-client"|Planning
+"a-client"|C++
+"a-client"|GNU General Public License (GPL)
+"aclip"|Alpha
+"aclip"|Tcl
+"aclip"|X Window System (X11)
+"aclip"|Developers
+"aclip"|Desktop Environment
+"aclip"|OS Independent (Written in an interpreted language)
+"aclip"|End Users/Desktop
+"aclip"|BSD License
+"aclocator"|GNU General Public License (GPL)
+"aclocator"|Solaris
+"aclocator"|Linux
+"aclocator"|All POSIX (Linux/BSD/UNIX-like OSes)
+"aclocator"|Production/Stable
+"aclocator"|Java
+"aclocator"|32-bit MS Windows (95/98)
+"aclocator"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"aclocator"|Role-Playing
+"aclocator"|Multi-User Dungeons (MUD)
+"aclocator"|End Users/Desktop
+"aclog"|Perl
+"aclog"|Mature
+"aclog"|End Users/Desktop
+"aclog"|Log Analysis
+"aclog"|GNU General Public License (GPL)
+"aclog"|OS Independent (Written in an interpreted language)
+"acloneboard"|End Users/Desktop
+"acloneboard"|Web-based
+"acloneboard"|PHP
+"acloneboard"|Developers
+"acloneboard"|Planning
+"acloneboard"|System Administrators
+"acloneboard"|Message Boards
+"acloneboard"|GNU General Public License (GPL)
+"acloneboard"|OS Independent (Written in an interpreted language)
+"acl-trend"|GNU General Public License (GPL)
+"acl-trend"|PHP
+"acl-trend"|Web-based
+"acl-trend"|Systems Administration
+"acl-trend"|Logging
+"acl-trend"|Information Technology
+"acl-trend"|System Administrators
+"acl-trend"|OS Independent (Written in an interpreted language)
+"acl-trend"|Security
+"acl-trend"|Telecommunications Industry
+"acl-trend"|Production/Stable
+"acl-trend"|Log Analysis
+"acl-trend"|Dynamic Content
+"acl-trend"|Front-Ends
+"acmacros"|C
+"acmacros"|Build Tools
+"acmacros"|OS Independent (Written in an interpreted language)
+"acmacros"|C++
+"acmacros"|Developers
+"acmacros"|Fortran
+"acmacros"|GNU General Public License (GPL)
+"acmacros"|Production/Stable
+"acman"|C
+"acman"|Java
+"acman"|Planning
+"acman"|OS Independent (Written in an interpreted language)
+"acman"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acman"|BSD License
+"acman"|Web-based
+"acman"|Developers
+"acman"|System Administrators
+"acman"|JavaScript
+"acman"|Dynamic Content
+"acmco-kb"|Web-based
+"acmco-kb"|Pre-Alpha
+"acmco-kb"|Office/Business
+"acmco-kb"|System Administrators
+"acmco-kb"|OS Independent (Written in an interpreted language)
+"acmco-kb"|Customer Service
+"acmco-kb"|PHP
+"acmco-kb"|GNU General Public License (GPL)
+"acmco-kb"|Information Technology
+"acmco-kb"|Planning
+"acmdoc"|zlib/libpng License
+"acmdoc"|Planning
+"acmdoc"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acmdoc"|C++
+"acmdoc"|Pre-Alpha
+"acmdoc"|Software Development
+"acmdoc"|Plugins
+"acmdoc"|OS Independent (Written in an interpreted language)
+"acmdoc"|Developers
+"acmdoc"|Games/Entertainment
+"acmdoc"|Java SWT
+"acmdoc"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acmdoc"|Java
+"acme"|OS Independent (Written in an interpreted language)
+"acme"|Beta
+"acme"|Dynamic Content
+"acme"|GNU General Public License (GPL)
+"acme"|Alpha
+"acme"|Developers
+"acme"|Site Management
+"acme"|End Users/Desktop
+"acme"|Perl
+"acme"|Web-based
+"acme"|Advanced End Users
+"acmedupl"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acmedupl"|Pre-Alpha
+"acmedupl"|C++
+"acmedupl"|End Users/Desktop
+"acmedupl"|GNU General Public License (GPL)
+"acmedupl"|Java
+"acmedupl"|Education
+"acmedupl"|System Administrators
+"acmedupl"|JSP
+"acmedupl"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acmedupl"|Advanced End Users
+"acmedupl"|Web-based
+"acmedupl"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acmedupl"|Education
+"acmemail"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acmemail"|Dynamic Content
+"acmemail"|System Administrators
+"acmemail"|Alpha
+"acmemail"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acmemail"|Front-Ends
+"acmemail"|GNU General Public License (GPL)
+"acmemail"|Artistic License
+"acmemail"|Email
+"acmemail"|Perl
+"acmemail"|Beta
+"acmemail"|Monitoring
+"acmemail"|Distributed Computing
+"acmemail"|PHP
+"acmemail"|Web-based
+"acmemail"|Linux
+"acmemail"|OS Independent (Written in an interpreted language)
+"acmemail"|Production/Stable
+"acmemail"|Developers
+"acmemail"|Message Boards
+"acmemail"|Presentation
+"acmengine"|WAP
+"acmengine"|End Users/Desktop
+"acmengine"|Dynamic Content
+"acmengine"|Java
+"acmengine"|PL/SQL
+"acmengine"|Public Domain
+"acmengine"|OS Independent (Written in an interpreted language)
+"acmengine"|Web-based
+"acmengine"|Planning
+"acmengine"|Site Management
+"acmengine"|PHP
+"acmeschool"|Communications
+"acmeschool"|Alpha
+"acmeschool"|Education
+"acmeschool"|GNU General Public License (GPL)
+"acmeschool"|Planning
+"acmeschool"|System Administrators
+"acmeschool"|Linux
+"acmeschool"|OS X
+"acmeschool"|Education
+"acmeschool"|Cocoa (MacOS X)
+"acmeschool"|Pre-Alpha
+"acmeschool"|C++
+"acmeschool"|KDE
+"acmeschool"|Non-interactive (Daemon)
+"acmm"|Public Domain
+"acmm"|End Users/Desktop
+"acmm"|Web-based
+"acmm"|Role-Playing
+"acmm"|CGI Tools/Libraries
+"acmm"|Perl
+"acmm"|Database Engines/Servers
+"acmm"|Developers
+"acmm"|Beta
+"acmm"|Production/Stable
+"acmm"|OS Independent (Written in an interpreted language)
+"acmnes"|C++
+"acmnes"|Emulators
+"acmnes"|End Users/Desktop
+"acmnes"|Pre-Alpha
+"acmnes"|GNU General Public License (GPL)
+"acmosisfr"|Alpha
+"acmosisfr"|Web-based
+"acmosisfr"|PHP
+"acmosisfr"|End Users/Desktop
+"acmosisfr"|OS Independent (Written in an interpreted language)
+"acmosisfr"|GNU General Public License (GPL)
+"acmosisfr"|Sound/Audio
+"acms"|OS Independent (Written in an interpreted language)
+"acms"|Other Audience
+"acms"|Web-based
+"acms"|Developers
+"acms"|GNU Library or Lesser General Public License (LGPL)
+"acms"|Planning
+"acms"|PHP
+"acms"|System Administrators
+"acms"|Dynamic Content
+"acms"|Site Management
+"acmwebsite"|WWW/HTTP
+"acmwebsite"|Education
+"acmwebsite"|Information Technology
+"acmwebsite"|Developers
+"acmwebsite"|Web-based
+"acmwebsite"|ASP
+"acmwebsite"|Visual Basic .NET
+"acmwebsite"|C#
+"acmwebsite"|GNU General Public License (GPL)
+"acmwebsite"|PHP
+"acmwebsite"|Linux
+"acmwebsite"|Planning
+"acmwebsite"|Education
+"acollage"|OS Independent (Written in an interpreted language)
+"acollage"|Viewers
+"acollage"|GNU General Public License (GPL)
+"acollage"|Web-based
+"acollage"|Pre-Alpha
+"acollage"|JavaScript
+"acollage"|End Users/Desktop
+"acollage"|Dynamic Content
+"acollage"|Python
+"acolytemtg"|Planning
+"acolytemtg"|OS Independent (Written in an interpreted language)
+"acolytemtg"|Java
+"acolytemtg"|End Users/Desktop
+"acolytemtg"|GNU General Public License (GPL)
+"acolytemtg"|Win32 (MS Windows)
+"acolytemtg"|Games/Entertainment
+"acolytemtg"|X Window System (X11)
+"acommando"|Gnome
+"acommando"|C
+"acommando"|Capture/Recording
+"acommando"|Developers
+"acommando"|GNU General Public License (GPL)
+"acommando"|End Users/Desktop
+"acommando"|Perl
+"acommando"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acommando"|Pre-Alpha
+"acommando"|Linux
+"aconcorde"|GNU General Public License (GPL)
+"aconcorde"|Science/Research
+"aconcorde"|Alpha
+"aconcorde"|Education
+"aconcorde"|Information Analysis
+"aconcorde"|Java
+"aconcorde"|X Window System (X11)
+"aconcorde"|Other Audience
+"aconcorde"|OS Independent (Written in an interpreted language)
+"aconcorde"|Win32 (MS Windows)
+"acopost"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acopost"|Science/Research
+"acopost"|Beta
+"acopost"|C
+"acopost"|Information Analysis
+"acopost"|Artificial Intelligence
+"acopost"|GNU General Public License (GPL)
+"acopost"|Perl
+"acorn"|Artificial Intelligence
+"acorn"|OS Independent (Written in an interpreted language)
+"acorn"|MIT License
+"acorn"|Human Machine Interfaces
+"acorn"|Planning
+"acorn"|Developers
+"acorn"|C
+"acorncd"|Production/Stable
+"acorncd"|Other Operating Systems
+"acorncd"|CD Audio
+"acorncd"|End Users/Desktop
+"acorncd"|Developers
+"acorncd"|BSD License
+"acorncd"|C
+"acorndrop"|Side-Scrolling/Arcade Games
+"acorndrop"|GNU General Public License (GPL)
+"acorndrop"|Project is a 3D engine
+"acorndrop"|Linux
+"acorndrop"|Alpha
+"acorndrop"|End Users/Desktop
+"acorndrop"|WinXP
+"acorndrop"|OS X
+"acornhunt"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acornhunt"|Real Time Strategy
+"acornhunt"|BeOS
+"acornhunt"|Religion
+"acornhunt"|C
+"acornhunt"|Handheld/Embedded Operating Systems
+"acornhunt"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acornhunt"|Scheme
+"acornhunt"|Cocoa (MacOS X)
+"acornhunt"|GNU General Public License (GPL)
+"acornhunt"|X Window System (X11)
+"acornhunt"|End Users/Desktop
+"acornhunt"|Win32 (MS Windows)
+"acornhunt"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acornhunt"|Multi-User Dungeons (MUD)
+"acornhunt"|Linux
+"acornhunt"|Planning
+"acornhunt"|Role-Playing
+"acornhunt"|Handheld/Mobile/PDA
+"acornhunt"|Simulation
+"acornhunt"|OS X
+"acornicq"|Other Operating Systems
+"acornicq"|C
+"acornicq"|Developers
+"acornicq"|ICQ
+"acornicq"|Production/Stable
+"acornicq"|GNU General Public License (GPL)
+"acos"|Pre-Alpha
+"acos"|GNU General Public License (GPL)
+"acos"|Science/Research
+"acos"|Operating System Kernels
+"acos"|Education
+"acos"|Developers
+"acos"|Assembly
+"acos"|End Users/Desktop
+"acoustic-memory"|End Users/Desktop
+"acoustic-memory"|Beta
+"acoustic-memory"|Java
+"acoustic-memory"|Java SWT
+"acoustic-memory"|Java Swing
+"acoustic-memory"|OS Independent (Written in an interpreted language)
+"acoustic-memory"|GNU General Public License (GPL)
+"acoustic-memory"|Puzzle Games
+"acp"|Code Generators
+"acp"|Linux
+"acp"|Non-interactive (Daemon)
+"acp"|Developers
+"acp"|GNU General Public License (GPL)
+"acp"|Solaris
+"acp"|Web-based
+"acp"|System Administrators
+"acp"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acp"|C
+"acp"|HTTP Servers
+"acp"|Beta
+"acpcontactos"|Planning
+"acpcontactos"|Web-based
+"acpcontactos"|PHP
+"acpcontactos"|OS Independent (Written in an interpreted language)
+"acpi"|Linux
+"acpi"|Developers
+"acpi"|OS Independent (Written in an interpreted language)
+"acpi"|Linux
+"acpi"|GNU General Public License (GPL)
+"acpi"|Beta
+"acpi"|C++
+"acpi"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpi"|Init
+"acpi"|C
+"acpi4asus"|Beta
+"acpi4asus"|C
+"acpi4asus"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpi4asus"|Linux
+"acpi4asus"|GNU General Public License (GPL)
+"acpi4asus"|Linux
+"acpid"|GNU General Public License (GPL)
+"acpid"|End Users/Desktop
+"acpid"|Linux
+"acpid"|Non-interactive (Daemon)
+"acpid"|Linux
+"acpid"|Developers
+"acpid"|C
+"acpid"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpid"|Production/Stable
+"acpid"|System Administrators
+"acpi-dialog"|GNU General Public License (GPL)
+"acpi-dialog"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpi-dialog"|Pre-Alpha
+"acpi-dialog"|Linux
+"acpi-dialog"|Systems Administration
+"acpi-dialog"|Perl
+"acpi-dialog"|X Window System (X11)
+"acpi-dialog"|End Users/Desktop
+"acpi-dialog"|Inactive
+"acpi-docklet"|Linux
+"acpi-docklet"|KDE
+"acpi-docklet"|Gnome
+"acpi-docklet"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpi-docklet"|Alpha
+"acpi-docklet"|Gnome
+"acpi-docklet"|C
+"acpi-docklet"|GNU General Public License (GPL)
+"acpi-docklet"|End Users/Desktop
+"acpi-largesys"|Hardware Drivers
+"acpi-largesys"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpi-largesys"|Planning
+"acpi-largesys"|GNU General Public License (GPL)
+"acpi-largesys"|Linux
+"acpi-largesys"|Developers
+"acpi-largesys"|C
+"acpi-largesys"|Init
+"acpi-largesys"|Linux
+"acpimon"|GNU General Public License (GPL)
+"acpimon"|Python
+"acpimon"|X Window System (X11)
+"acpimon"|End Users/Desktop
+"acpimon"|Desktop Environment
+"acpimon"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpimon"|Alpha
+"acpimon"|Linux
+"acpitool"|Command-line
+"acpitool"|Linux
+"acpitool"|End Users/Desktop
+"acpitool"|Systems Administration
+"acpitool"|C++
+"acpitool"|Production/Stable
+"acpitool"|Console/Terminal
+"acpitool"|GNU General Public License (GPL)
+"acpiw"|Beta
+"acpiw"|Linux
+"acpiw"|System Administrators
+"acpiw"|X Window System (X11)
+"acpiw"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acpiw"|End Users/Desktop
+"acpiw"|Developers
+"acpiw"|C
+"acpiw"|GNU General Public License (GPL)
+"acpiw"|Hardware
+"acqlite"|Gnutella
+"acqlite"|Java
+"acqlite"|Objective C
+"acqlite"|End Users/Desktop
+"acqlite"|Beta
+"acqlite"|Cocoa (MacOS X)
+"acqlite"|OS X
+"acqlite"|GNU General Public License (GPL)
+"acquarius"|Database Engines/Servers
+"acquarius"|Developers
+"acquarius"|Software Development
+"acquarius"|Web-based
+"acquarius"|OS Independent (Written in an interpreted language)
+"acquarius"|GNU General Public License (GPL)
+"acquarius"|Pre-Alpha
+"acquarius"|Java
+"acquire"|GNU General Public License (GPL)
+"acquire"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acquire"|Win32 (MS Windows)
+"acquire"|C
+"acquire"|Science/Research
+"acquire"|Artificial Intelligence
+"acquire"|C++
+"acquire"|Planning
+"acquire"|Mathematics
+"acquire"|32-bit MS Windows (95/98)
+"acquiregame"|Turn Based Strategy
+"acquiregame"|Console/Terminal
+"acquiregame"|C++
+"acquiregame"|All BSD Platforms (FreeBSD/NetBSD/OpenBSD/Apple Mac OS X)
+"acquiregame"|Board Games
+"acquiregame"|OS Portable (Source code to work with many OS platforms)
+"acquiregame"|End Users/Desktop
+"acquiregame"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acquiregame"|GNU General Public License (GPL)
+"acquiregame"|Other Audience
+"acquiregame"|Beta
+"acquiregame"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acquiregame"|Console-based Games
+"acquis"|GNU General Public License (GPL)
+"acquis"|Education
+"acquis"|Web-based
+"acquis"|OS Independent (Written in an interpreted language)
+"acquis"|Linux
+"acquis"|Accounting
+"acquis"|Alpha
+"acquis"|JavaScript
+"acquis"|Front-Ends
+"acquis"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acquis"|Perl
+"acre"|Visualization
+"acre"|OS Portable (Source code to work with many OS platforms)
+"acre"|Command-line
+"acre"|Alpha
+"acre"|Science/Research
+"acre"|Bio-Informatics
+"acre"|C
+"acre"|GNU General Public License (GPL)
+"acroformtool"|C
+"acroformtool"|CGI Tools/Libraries
+"acroformtool"|Linux
+"acroformtool"|Alpha
+"acroformtool"|GNU General Public License (GPL)
+"acroformtool"|Other Audience
+"acroformtool"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acrophobia"|Linux
+"acrophobia"|Python
+"acrophobia"|GNU General Public License (GPL)
+"acrophobia"|System Administrators
+"acrophobia"|Legal Industry
+"acrophobia"|Office/Business
+"acrophobians"|BSD License
+"acrophobians"|Planning
+"acrophobians"|End Users/Desktop
+"acrophobians"|C++
+"acrophobians"|Multi-User Dungeons (MUD)
+"acrophobians"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acrylic"|32-bit MS Windows (NT/2000/XP)
+"acrylic"|Name Service (DNS)
+"acrylic"|Networking
+"acrylic"|Advanced End Users
+"acrylic"|Win32 (MS Windows)
+"acrylic"|WinXP
+"acrylic"|GNU General Public License (GPL)
+"acrylic"|Win2K
+"acrylic"|Developers
+"acrylic"|Delphi/Kylix
+"acrylic"|End Users/Desktop
+"acrylic"|Communications
+"acrylic"|Production/Stable
+"acrypt"|Beta
+"acrypt"|C++
+"acrypt"|Security
+"acrypt"|32-bit MS Windows (NT/2000/XP)
+"acrypt"|Software Development
+"acrypt"|Win32 (MS Windows)
+"acrypt"|GNU General Public License (GPL)
+"acryptohashnet"|GNU Library or Lesser General Public License (LGPL)
+"acryptohashnet"|Developers
+"acryptohashnet"|Information Technology
+"acryptohashnet"|C#
+"acryptohashnet"|Education
+"acryptohashnet"|Pre-Alpha
+"acryptohashnet"|Science/Research
+"acryptohashnet"|Cryptography
+"acryptohashnet"|.NET/Mono
+"acryptohashnet"|OS Independent (Written in an interpreted language)
+"acsci"|GNU General Public License (GPL)
+"acsci"|Message Boards
+"acsci"|Web-based
+"acsci"|End Users/Desktop
+"acsci"|PHP
+"acsci"|OS Independent (Written in an interpreted language)
+"acsci"|Beta
+"acscriptworks"|C++
+"acscriptworks"|32-bit MS Windows (NT/2000/XP)
+"acscriptworks"|Delphi/Kylix
+"acscriptworks"|32-bit MS Windows (95/98)
+"acscriptworks"|Developers
+"acscriptworks"|Build Tools
+"acscriptworks"|Win2K
+"acscriptworks"|GNU General Public License (GPL)
+"acscriptworks"|C#
+"acscriptworks"|Role-Playing
+"acscriptworks"|WinXP
+"acscriptworks"|Visual Basic
+"acscriptworks"|End Users/Desktop
+"acscriptworks"|JavaScript
+"acscriptworks"|Alpha
+"acscriptworks"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acscriptworks"|Win32 (MS Windows)
+"acsdams"|Inactive
+"acsf"|Developers
+"acsf"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acsf"|Public Domain
+"acsf"|Production/Stable
+"acsf"|C++
+"acsf"|Software Development
+"acsf"|Visual Basic
+"acsf"|Delphi/Kylix
+"acsf"|Win32 (MS Windows)
+"acsmtp"|Mail Transport Agents
+"acsmtp"|Beta
+"acsmtp"|Post-Office
+"acsmtp"|Mailing List Servers
+"acsmtp"|32-bit MS Windows (95/98)
+"acsmtp"|Forth
+"acsmtp"|Developers
+"acsmtp"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acsmtp"|WinXP
+"acsmtp"|Science/Research
+"acsmtp"|Non-interactive (Daemon)
+"acsmtp"|System Administrators
+"acsmtp"|Web-based
+"acsmtp"|Information Technology
+"acsmtp"|Win32 (MS Windows)
+"acsmtp"|Telecommunications Industry
+"acsmtp"|Win2K
+"acsmtp"|GNU General Public License (GPL)
+"acsmtp"|32-bit MS Windows (NT/2000/XP)
+"acsp"|GNU General Public License (GPL)
+"acsp"|C
+"acsp"|All POSIX (Linux/BSD/UNIX-like OSes)
+"acsp"|Web-based
+"acsp"|Non-interactive (Daemon)
+"acsp"|Artistic License
+"acsp"|Firewalls
+"acsp"|C++
+"acsp"|Alpha
+"acsp"|Security
+"acsp"|Perl
+"acsp"|System Administrators
+"acsp"|Linux
+"acs-server"|Chat
+"acs-server"|Web-based
+"acs-server"|C
+"acs-server"|GNU General Public License (GPL)
+"acs-server"|Planning
+"acs-server"|Other Audience
+"acs-server"|Linux
+"acta"|BBS
+"acta"|Mozilla Public License 1.1 (MPL 1.1)
+"acta"|Web-based
+"acta"|Pre-Alpha
+"acta"|Message Boards
+"acta"|Planning
+"acta"|Perl
+"acta"|OS Independent (Written in an interpreted language)
+"acta"|End Users/Desktop
+"acta"|Developers
+"acta"|Other Audience
+"actc"|Alpha
+"actc"|GNU General Public License (GPL)
+"actc"|Front-Ends
+"actc"|OS Independent (Written in an interpreted language)
+"actc"|BSD License
+"actc"|Other Audience
+"actc"|C
+"actc"|Graphics Conversion
+"actc"|Information Technology
+"actc"|Java Swing
+"actc"|3D Modeling
+"actc"|Developers
+"actc"|System Administrators
+"actc"|Beta
+"actc"|Java
+"actc"|End Users/Desktop
+"actemit"|Alpha
+"actemit"|MIT License
+"actemit"|OS Independent (Written in an interpreted language)
+"actemit"|Java
+"actemit"|Developers
+"acticount"|32-bit MS Windows (95/98)
+"acticount"|WinXP
+"acticount"|GNU General Public License (GPL)
+"acticount"|Education
+"acticount"|C#
+"acticount"|C++
+"acticount"|Win32 (MS Windows)
+"acticount"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"acticount"|32-bit MS Windows (NT/2000/XP)
+"acticount"|Pre-Alpha
+"acticount"|Win2K
+"acticount"|Communications
+"actinium"|PHP
+"actinium"|GNU General Public License (GPL)
+"actinium"|Dynamic Content
+"actinium"|Developers
+"actinium"|Alpha
+"actinium"|Web-based
+"actinium"|OS Independent (Written in an interpreted language)
+"actioncache"|Developers
+"actioncache"|OS Independent (Written in an interpreted language)
+"actioncache"|Apache Software License
+"actioncache"|Dynamic Content
+"actioncache"|Web-based
+"actioncache"|Java
+"actioncache"|Production/Stable
+"actioncrypt"|Other Audience
+"actioncrypt"|OS Independent (Written in an interpreted language)
+"actioncrypt"|Developers
+"actioncrypt"|Alpha
+"actioncrypt"|Cryptography
+"actioncrypt"|Web-based
+"actioncrypt"|Information Technology
+"actioncrypt"|GNU General Public License (GPL)
+"actioncrypt"|Beta
+"actiondirectory"|Perl
+"actiondirectory"|Alpha
+"actiondirectory"|CGI Tools/Libraries
+"actiondirectory"|GNU General Public License (GPL)
+"actiondirectory"|Web-based
+"actiondirectory"|Other Audience
+"actionfactory"|GNU General Public License (GPL)
+"actionfactory"|Win32 (MS Windows)
+"actionfactory"|All POSIX (Linux/BSD/UNIX-like OSes)
+"actionfactory"|Beta
+"actionfactory"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"actionfactory"|X Window System (X11)
+"actionfactory"|Scientific/Engineering
+"actionfactory"|Developers
+"actionfactory"|Software Development
+"actionfactory"|Python
+"actionfactory"|C++
+"actionframework"|Web-based
+"actionframework"|Production/Stable
+"actionframework"|OS Independent (Written in an interpreted language)
+"actionframework"|Dynamic Content
+"actionframework"|Developers
+"actionframework"|Software Development
+"actionframework"|Java
+"actionframework"|GNU Library or Lesser General Public License (LGPL)
+"actionfusion"|End Users/Desktop
+"actionfusion"|Planning
+"actionfusion"|C
+"actionfusion"|All POSIX (Linux/BSD/UNIX-like OSes)
+"actionfusion"|Win32 (MS Windows)
+"actionfusion"|Desktop Environment
+"actionfusion"|Other/Nonlisted Topic
+"actionfusion"|Java
+"actionfusion"|All 32-bit MS Windows (95/98/NT/2000/XP)
+"actionfusion"|Java Swing
+"actionfusion"|C++
+"actionfusion"|GNU General Public License (GPL)
+"actiongame"|X Window System (X11)
+"actiongame"|Win32 (MS Windows)
+"actiongame"|First Person Shooters
+"actiongame"|zlib/libpng License
+"actiongame"|32-bit MS Windows (95/98)
+"actiongame"|Alpha
+"actiongame"|32-bit MS Windows (NT/2000/XP)
+"actiongame"|All POSIX (Linux/BSD/UNIX-like OSes)
+"actiongame"|C++

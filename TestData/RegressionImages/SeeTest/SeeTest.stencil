@@ -1,0 +1,199 @@
+STREAM: File
+NAME: MTTSource
+HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
+SEPARATOR: \s*\|\s*
+SOURCE: ./18049-arch-compiler.output.txt
+CHECKHEADER: true
+STREAM: File
+NAME: MTTNotApplicable
+HEADER: axis1A, axis1B, axis2A, axis2B
+SEPARATOR: ,\s*
+SOURCE: ./NoData-Comp.txt
+CHECKHEADER: true
+
+external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+
+order MTTSource > MTTNotApplicable
+
+layer Trivial
+from MTTSource
+	filter (suite_name =~ "trivial"): suite_name
+	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE
+	(X,Y): Layout(axis1A, axis1B, axis2A, axis2B) ->(X,Y)
+ 	FILL_COLOR : BasicFails(fail) -> (C)
+	SIZE: 50
+	SHAPE: "RECTANGLE"
+	REGISTRATION: "TOP_LEFT"
+
+layer Others[PIE]
+from MTTSource
+	filter(suite_name !~"trivial"): suite_name
+	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
+	(X,Y): Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
+	SIZE: 10
+	STROKE_WEIGHT: 3
+	STROKE_COLOR: RelativeFails(fail, pass) -> (C)
+	SLICE: fail
+	FIELD: pass
+	SLICE_COLOR: Pallet("FAIL") -> (C)
+	FIELD_COLOR: @color(WHITE)
+
+layer NotApplicable
+from MTTNotApplicable
+	ID: Concatenate(axis1A, axis1B, axis2A, axis2B) -> VALUE
+	(X,Y) : Layout.Query(axis1A, axis1B, axis2A, axis2B) -> (X,Y)
+	FILL_COLOR: Pallet("N/A") -> (C)
+	SIZE: 50
+	SHAPE: "RECTANGLE"
+	REGISTRATION: "TOP_LEFT"
+	PATTERN: "HATCH"
+	PATTERN_WEIGHT: 1.1
+
+layer SubLabels[TEXT]
+from MTTSource
+	filter(suite_name !~"trivial"): suite_name
+	ID: Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> (VALUE)
+	X: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(X, -10) -> (VALUE)
+	Y: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(Y,11) -> (VALUE)
+	TEXT: suite_name
+	FONT_SIZE: 5
+	WIDTH: 30
+	ROTATION: -45
+	JUSTIFY: "CENTER"
+	FONT_STYLE: "BOLD"
+	FONT_COLOR: @color(0,0,0,.65)
+
+layer Labels[TEXT]
+from MTTSource
+	ID: Concatenate(axis1A, axis1B) -> VALUE
+	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12) -> VALUE
+	TEXT: Concatenate(axis1A, "\n", axis1B) -> VALUE
+	(Y, Width): (-5, 50)
+	(ROTATION, JUSTIFY, ALIGN): ("VERTICAL", "LEFT", "CENTER")
+from MTTSource
+	ID: Concatenate(axis2A, axis2B) -> VALUE
+	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12) -> VALUE
+	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(VALUE) -> Label
+	(X, WIDTH) : (-155, 150)
+	(JUSTIFY, ALIGN): ("RIGHT", "CENTER")
+from MTTSource
+	ID: graphLabel
+	Y: NamesIndex(graphLabel) -> VALUE
+	TEXT: graphLabel
+	X: -375
+
+
+layer Legend[IMAGE]
+from MTTSource
+	ID: "LegendImage"
+	FILE: "./SeeTest-Key.png"
+	(X,Y,WIDTH,HEIGHT) : (-375,10,200, 200)
+
+
+layer GridLines[LINE]
+from MTTSource
+	ID : Concatenate(axis1A, axis1B) -> VALUE
+	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
+	Y.1 :-5
+	Y.2 << EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
+	STROKE_COLOR : Pallet("GRID") -> C
+from MTTSource
+	ID : Concatenate(axis2A, axis2B) -> VALUE
+	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
+	X.1 : -5
+	X.2 << EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
+	STROKE_COLOR: Pallet("GRID") -> (C)
+
+legend EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
+	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE) -> VALUE
+
+legend EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
+	all => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[1 .. n](VALUE) -> VALUE
+
+
+legend NamesIndex(ID) -> (VALUE)
+	all => VALUE: Index(ID) -> (VALUE)
+
+legend BasicFails(fails) -> (C)
+	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C) -> (VALUE)
+	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
+
+legend RelativeFails(fails, passes) -> (C)
+	(passes= 0) => C: @color(BLACK)
+	(fails = 0) => C: Pallet("PASS") -> (C)
+	(fails > 0) => C: Pallet("FAIL") -> (C)
+
+legend Pallet(Name) -> (C)
+	(Name =~"FAIL")    => C: @color(200,30,30)
+	(Name =~"PASS")    => C: @color(0,180,0)
+	(Name =~"MISSING") => C: @color(WHITE)
+	(Name =~"N/A")     => C: @color(GRAY90)
+	(Name =~"GRID")    => C: @color(GRAY80)
+
+python Break
+facet Map (Orig) -> (Label)
+{{
+Label=Orig.replace("Absoft: Absoft ", "")
+Label=Label.replace("Absoft: ", "")
+Label=Label.replace(",", "\n")
+}}
+
+
+
+python Layout
+facet Init {{
+XIndex= []
+YIndex = []
+majorOffset = 50
+suites = ["ibm", "imb", "intel", "mpicxx"]
+border = 10
+minorOffset = 18
+
+def queryLayout(X1,X2,Y1,Y2):
+	XBase = X1+X2
+	YBase = Y1+Y2
+	if (XBase not in XIndex): return (-375,300)
+	if (YBase not in YIndex): return (-375,300)
+	X = XIndex.index(XBase) * majorOffset
+	Y = YIndex.index(YBase) * majorOffset
+	return (X,Y)
+
+def baseLayout(X1, X2,Y1,Y2):
+	XBase = X1+X2
+	YBase = Y1+Y2
+	if (XBase not in XIndex): XIndex.append(XBase)
+	if (YBase not in YIndex): YIndex.append(YBase)
+	X = XIndex.index(XBase) * majorOffset
+	Y = YIndex.index(YBase) * majorOffset
+	return (X,Y)
+	
+def suiteLayout(baseX, baseY, suite):
+	if (suite not in suites): suites.append(suite)
+	offset = suites.index(suite)
+	X = baseX + border + (offset%2 * minorOffset)
+	Y = baseY + border+ (offset/2 * minorOffset)
+	return (X,Y)
+
+def suiteLayout(baseX, baseY, suite):
+	if (suite not in suites): suites.append(suite)
+	offset = suites.index(suite)
+	X = baseX + border + (offset%2 * minorOffset)
+	Y = baseY + border+ (offset/2 * minorOffset)
+	return (X,Y)
+	
+}}
+facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
+{{
+(X,Y) = baseLayout(X1,X2,Y1,Y2)
+(X,Y) = suiteLayout(X,Y, suite)
+}}
+facet Map (X1,X2,Y1,Y2) -> (X,Y)
+{{
+(X,Y) = baseLayout(X1,X2,Y1,Y2)
+}}
+facet Query (X1,X2,Y1,Y2) -> (X,Y)
+{{
+(X,Y) = queryLayout(X1,X2,Y1,Y2)
+}}
+

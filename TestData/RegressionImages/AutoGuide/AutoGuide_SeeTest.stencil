@@ -1,0 +1,99 @@
+STREAM: File
+NAME: MTTSource
+HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
+SEPARATOR: \s*\|\s*
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/SeeTest/18049-arch-compiler.output.txt
+CHECKHEADER: true
+STREAM: File
+NAME: MTTNotApplicable
+HEADER: axis1A, axis1B, axis2A, axis2B
+SEPARATOR: ,\s*
+SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/SeeTest/NoData-Comp.txt
+CHECKHEADER: true
+
+external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+
+layer Trivial
+	axis: Y
+	axis: X
+from MTTSource
+	filter (suite_name =~ "trivial"): suite_name
+	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE
+	X: Layout(axis1A, axis1B, axis2A, axis2B) -> X
+	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Y
+ 	FILL_COLOR : BasicFails(fail) -> (C)
+	SIZE: 50
+	SHAPE: "RECTANGLE"
+	REGISTRATION: "TOP_LEFT"
+
+legend BasicFails(fails) -> (C)
+	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C) -> (VALUE)
+	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
+
+legend Pallet(Name) -> (C)
+	(Name =~"FAIL")    => C: @color(200,30,30)
+	(Name =~"PASS")    => C: @color(0,180,0)
+	(Name =~"MISSING") => C: @color(WHITE)
+	(Name =~"N/A")     => C: @color(GRAY90)
+	(Name =~"GRID")    => C: @color(GRAY80)
+
+
+python Layout
+facet Init {{
+XIndex= []
+YIndex = []
+majorOffset = 50
+suites = ["ibm", "imb", "intel", "mpicxx"]
+border = 10
+minorOffset = 18
+size = len(XIndex)
+
+def queryLayout(X1,X2,Y1,Y2):
+	XBase = X1+X2
+	YBase = Y1+Y2
+	if (XBase not in XIndex): return (-375,300)
+	if (YBase not in YIndex): return (-375,300)
+	X = XIndex.index(XBase) * majorOffset
+	Y = YIndex.index(YBase) * majorOffset
+	return (X,Y)
+
+def baseLayout(X1, X2,Y1,Y2):
+	XBase = X1+X2
+	YBase = Y1+Y2
+	if (XBase not in XIndex): XIndex.append(XBase)
+	if (YBase not in YIndex): YIndex.append(YBase)
+	X = XIndex.index(XBase) * majorOffset
+	Y = YIndex.index(YBase) * majorOffset
+	return (X,Y)
+	
+def suiteLayout(baseX, baseY, suite):
+	if (suite not in suites): suites.append(suite)
+	offset = suites.index(suite)
+	X = baseX + border + (offset%2 * minorOffset)
+	Y = baseY + border+ (offset/2 * minorOffset)
+	return (X,Y)
+
+def suiteLayout(baseX, baseY, suite):
+	if (suite not in suites): suites.append(suite)
+	offset = suites.index(suite)
+	X = baseX + border + (offset%2 * minorOffset)
+	Y = baseY + border+ (offset/2 * minorOffset)
+	return (X,Y) 
+}}
+
+@project facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
+{{
+(X,Y) = baseLayout(X1,X2,Y1,Y2)
+(X,Y) = suiteLayout(X,Y, suite)
+}}
+
+@project facet Map (X1,X2,Y1,Y2) -> (X,Y) {{
+(X,Y) = baseLayout(X1,X2,Y1,Y2)
+}}
+
+@project facet Query (X1,X2,Y1,Y2) -> (X,Y) {{(X,Y) = queryLayout(X1,X2,Y1,Y2)}}
+@project facet DoGuide () -> (T) {{T = "FALSE"}}
+
+@project facet Guide (X1,X2,Y1,Y2) -> (X,Y) {{(X,Y) = queryLayout(X1,X2,Y1,Y2)}}
+

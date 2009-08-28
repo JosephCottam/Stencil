@@ -1,0 +1,27 @@
+STREAM: File
+NAME: Elements
+HEADER: Name
+SEPARATOR: ,
+SOURCE: ./RotationData.txt
+CHECKHEADER: true
+
+external stream Elements(Name)
+
+layer Text[TEXT]
+from Elements
+	ID : Name
+	TEXT: Name
+	ROTATION: Count(Name) -> Mult(12.5, VALUE) -> (VALUE)
+	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
+
+layer Shape
+from Elements
+	ID: Name
+	SHAPE: "CROSS"
+	ROTATION: Count(Name) -> Mult(12.5, VALUE) -> (VALUE)
+	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
+	Y : 40
+	SIZE: 30
+
+legend Count(Name) -> (VALUE) 
+	(all) => VALUE : Index(Name) -> VALUE

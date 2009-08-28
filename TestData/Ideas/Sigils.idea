@@ -1,0 +1,21 @@
+How can I make sigils work:
+
+Standard parser captures the @<name>(<args>*) as a single node
+Sigils are imported from modules
+Sigil parser dispatches based on the name to special parsers
+Sigil types associate with one or more external data types
+Sigils rely on the sub-tuple features to be useful
+
+
+All sigil types:
+1) Implement tuple
+2) Have a from-tree constructor or factory method (not sure which)
+3) Have a externalize method to convert to a more efficient external representation
+4) Have an internalize method to take the external representation and convert it to the sigil type
+
+
+Externalize is used to convert the sigil type to a more standard java object (if required).  
+May be used for types that cannot be extended or whose external representation depends on values
+of the tuple.
+
+Interalize is used by Tuples.convert to convert from an external type to the sigil type.

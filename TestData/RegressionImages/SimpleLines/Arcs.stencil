@@ -1,0 +1,44 @@
+STREAM: File
+NAME: LineSource
+HEADER:  graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail
+SEPARATOR: \s+\|\s+
+SOURCE: ./18049-arch-compiler.output.txt
+CHECKHEADER: true
+
+external stream LineSource(axis1A, axis1B)
+
+layer Vertical[ARC]
+from LineSource
+	ID: Concatenate(axis1A, axis1B) -> (VALUE)
+	X.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	Y.1: -5
+	Y.2: 10
+	ARC_HEIGHT: 20
+	STROKE_COLOR: @color(GRAY80)
+	STROKE_WEIGHT: 3
+
+layer Horizontal[ARC]
+from LineSource
+	ID: Concatenate(axis1A, axis1B) -> (VALUE)
+	Y.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	Y.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	X.1: -5
+	X.2: 10
+	ARC_HEIGHT: 50
+	STROKE_COLOR: @color(GRAY80)
+	STROKE_WEIGHT: 3
+
+
+layer Diagonal[ARC]
+from LineSource
+	ID: Concatenate(axis1A, axis1B) -> (VALUE)
+	X.1: 40
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> Mult(V, 2) -> VALUE
+	Y.1: 40
+	Y.2: 50
+	STROKE_COLOR: @color(GRAY80)
+	STROKE_WEIGHT: 3
+
+legend Spacing (ID) -> (V) 
+	all => V : Index(ID) -> Mult(VALUE, 100) -> (VALUE)

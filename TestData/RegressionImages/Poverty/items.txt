@@ -1,0 +1,4 @@
+Adult
+Children
+Elderly
+Total

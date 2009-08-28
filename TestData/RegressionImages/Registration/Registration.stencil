@@ -1,0 +1,54 @@
+STREAM: File
+NAME: Reg
+HEADER: Name
+SEPARATOR: \s+
+SOURCE: ./RegistrationData.txt
+CHECKHEADER: false
+STREAM: File
+NAME: Reg2
+HEADER: Name
+SEPARATOR: \s+
+SOURCE: ./RegistrationData.txt
+CHECKHEADER: false
+
+external stream Reg(Name)
+external stream Reg2(Name)
+
+order Reg > Reg2
+
+layer Points
+from Reg
+	ID: Name
+	SIZE: 4
+	X: Count(Name) -> (VALUE)
+	REGISTRATION: Name
+
+layer Points2
+from Reg
+   ID : Name
+   X: Count(Name) -> (VALUE)
+   Y: 10
+   FILL_COLOR: @color(RED)
+   REGISTRATION:  Name
+   SIZE: 4
+
+layer Marks
+from Reg2
+   ID : Name
+   SIZE: 3
+   (X,Y): Points.Find(Name) -> (X,Y)
+   SHAPE: "CROSS"
+   FILL_COLOR: @color(RED)
+   REGISTRATION: "CENTER"
+
+layer Text[TEXT]
+from Reg
+   ID : Name
+   TEXT: Name
+   X: 5
+   Y: Count(Name) -> Mult(VALUE, 2) -> Add(20, VALUE) -> (VALUE)
+   REGISTRATION:  Name
+
+
+legend Count(C) -> (VALUE)
+   all => VALUE: Index(C) -> Mult(10, VALUE) -> (VALUE)

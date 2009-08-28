@@ -1,0 +1,43 @@
+//Coordinate keyword is a type of merge
+//@math parses the statement in it and executes them
+
+external stream Edges(ID1, ID2)
+
+stream Normalized (ID1, ID2)
+from Edges
+  filter(ID1 >= ID2) : ID1,ID2
+  (ID1, ID2) : (ID1, ID2)
+from Edges
+  filter(ID1 < ID2) :ID1, ID2
+  (ID1, ID2) : (ID2, ID1)
+
+stream NodeNames (ID)
+from Edges
+  ID: Slice[ID](ID1, ID2) >> ID
+
+coordinate Normalized
+filter(Nodes.find(ID1)) and
+filter(Nodes.find(ID2))
+
+
+
+layer Nodes
+from NodeNames
+  ID : ID
+  (X,Y)<< Ordering(ID1) -> Circle(VALUE)
+  (SHAPE, FILL_COLOR, SIZE, REGISTRATION) : (ELLIPSE, @color(MAROON), 2, CENTER)
+
+layer Edges
+from Normalized
+  ID: Concatenate(ID1,ID2)
+  (X1, Y1) << Nodes.Find(ID1) -> (X,Y)
+  (X2, Y2) << Nodes.Find(ID12) -> (X,Y)
+  (STROKE_COLOR, STROKE_WEIGHT) : (@color(GRAY80, .8), .25)
+
+legend Circle (ID) -> (X,Y)
+  all => (X,Y) : Index(ID) -> (seq, max)
+		| @math(sqrt(max) + max/100 *20) -> radius
+		| @math(seq/max*360*.01745) -> offset
+		| @math(radius * cos(offset)) -> X
+		| @math(radius * sin(offset)) -> Y
+		--> (X,Y)
