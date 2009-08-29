@@ -187,8 +187,14 @@
  			<fileset dir="./ReleaseIncludes/" includes="**"/>
  		</copy>
  		
- 		<!--Create the zip file!-->
+ 		<!--Create the zip files-->
  		<zip destfile="${result}" basedir="${release}" update="true"/>
+ 		
+ 		<zip destfile="src_${today}.zip" >
+ 			<fileset dir="Core"/>
+ 			<fileset dir="Explore"/>
+ 			<fileset dir="Test"/>
+ 		</zip>
  		
  		<!--Clean up temporaries-->
  		<delete dir="${release}"/>
