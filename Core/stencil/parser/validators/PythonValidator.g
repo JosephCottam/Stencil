@@ -27,8 +27,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Verifies that each range is properly formed.*/
-tree grammar RangeValidator;
+/* Verifies that python blocks contain valid python code.
+ * Corrects python block indentation for blocks that have are
+ * indented on their first non-blank line. 
+ */
+tree grammar PythonValidator;
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
@@ -39,34 +42,46 @@ options {
   /** Validates that ranges make sense.**/
    
 
-   package stencil.parser.validators;
+  package stencil.parser.validators;
   
-    import static stencil.parser.ParserConstants.RANGE_END_INT;
-    import stencil.parser.tree.Specializer;
-    import stencil.parser.tree.Range;
-    import stencil.parser.tree.StencilTree;
+  import stencil.parser.tree.Facet;
+  import stencil.parser.tree.Python;
+  import org.python.core.*;
 }
 
 @members {
-  private static final class RangeValidationException extends ValidationException {
-    public RangeValidationException(Range range) {
-         super("Invalid range:" + range.rangeString());
-    }    
+  private static final class PythonValidationException extends ValidationException {
+    public PythonValidationException(Facet facet, Exception e) {
+      super(e, "Error parsing \%1\$s.\%2\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName());
+    }
+  }  
+
+  private void stripIndent(Facet facet) {
+    String body = facet.getBody();
+    
+    String[] lines = body.split("\\n");
+    StringBuilder newBody = new StringBuilder();
+    int whiteCount =0;
+    boolean removeIndent=false;
+    boolean pastFirst=false;
+    
+    for (String line: lines) {
+      if (line.trim().equals("")) {continue;}
+      if (!pastFirst) {
+        while(Character.isWhitespace(line.charAt(whiteCount))) {whiteCount++;}
+      }
+      newBody.append(line.substring(whiteCount));
+      newBody.append("\n");
+    } 
+    facet.setBody(newBody.toString().trim());
   }
 
-   private void validate(Range range) {
-      int start = range.getStart();
-      boolean relativeStart = range.relativeStart();
-      int end = range.getEnd();
-      boolean relativeEnd = range.relativeEnd();
-   
-      if ((end == RANGE_END_INT)  //If the end is range-end, any start value can be used
-          || (relativeStart == relativeEnd && relativeStart && start > end)
-          || (relativeStart == relativeEnd && !relativeStart && start < end)
-          || (relativeEnd && !relativeStart)) {return;}
-          
-      throw new RangeValidationException(range);
-   }
+  private void validate(Facet facet) {
+    stripIndent(facet);   
+    try {
+      Py.compile(new java.io.ByteArrayInputStream(facet.getBody().getBytes()), null, CompileMode.exec);      
+    } catch (Exception e) {throw new PythonValidationException(facet, e);}
+  }
 }
 
-topdown: ^(r=RANGE .*) {validate((Range) r);};
+topdown: ^(r=Facet.*) {validate((Facet) r);};

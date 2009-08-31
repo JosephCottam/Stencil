@@ -58,7 +58,8 @@ public class EncapsulationGenerator {
 		registerEnv(pythonSpec.getEnvironment());
 		JythonLegend legend = new JythonLegend(module.getModuleData().getName(), pythonSpec.getName());
 		for (Facet b: pythonSpec.getFacets()) {
-			legend.add(new JythonEncapsulation(pythonSpec,b,this), b);
+			try {legend.add(new JythonEncapsulation(pythonSpec,b,this), b);}
+			catch (Exception e) {throw new RuntimeException(String.format("Error creating encapsulation for facet %1$s (%2$s).", b.getName(), b.getBody()),e);}
 		}
 
 		module.addOperator(legend);

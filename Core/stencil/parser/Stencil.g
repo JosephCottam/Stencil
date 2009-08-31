@@ -407,8 +407,12 @@ DIGITS 	: '0'..'9'+;
 
 
 CODE_BLOCK
-		: '{{' .* '}}'
-			{setText($text.substring(2, $text.length()-2));}; //Strip braces
+		: NESTED_BLOCK {setText($text.substring(1, $text.length()-1));}; //Strip braces
+
+fragment 
+NESTED_BLOCK
+    : '{' (options {greedy=false;k=2;}: NESTED_BLOCK | .)* '}';
+
 
 STRING
     	:  '"' ( ESCAPE_SEQUENCE | ~('\\'|'"') )* '"'

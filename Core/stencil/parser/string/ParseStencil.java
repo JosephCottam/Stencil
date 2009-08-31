@@ -164,6 +164,9 @@ public abstract class ParseStencil {
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
 
+		PythonValidator pyValidator = new PythonValidator(treeTokens);
+		pyValidator.downup(p);
+		
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
@@ -199,11 +202,12 @@ public abstract class ParseStencil {
 		return p;
 	}
 	
-	private static void validate(StencilTree t) {	
+	//Run common validators.
+	private static void validate(StencilTree t) {
+		//Since validators don't permute the tree in any way, one token stream might be enough...
 		CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
 		
 		RangeValidator rangeValidator = new RangeValidator(treeTokens);
 		rangeValidator.downup(t);
-		
 	}
 }

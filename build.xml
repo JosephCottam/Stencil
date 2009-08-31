@@ -4,7 +4,7 @@
  	<property name="target" location="bin" />
  	<property name="grammars" location ="${src}/stencil/parser/"/>
  	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
- 	<property name="rutimeLibrary" location="../Library/"/>
+ 	<property name="runtimeLibrary" location="../Library/"/>
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
@@ -15,7 +15,8 @@
  	</target>
  	
  	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, ModuleData, Validators">
-		<javac srcdir="${src}" destdir="${target}" classpath="${antlrClasspath}">
+		<javac srcdir="${src}" destdir="${target}">
+			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!--compilerarg value="-Xlint"/-->
 		</javac>
  	</target>
@@ -48,8 +49,16 @@
 			target="${grammars}/Stencil.g"
 			outputdirectory="${grammars}/string/"
 		/>
-	</target>
 
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+
+
+ 	<target name="EclipseRefresh" if="eclipse.running">
+ 		<eclipse.refreshLocal resource="Stencil/Core/parser/string/" depth="zero" />
+ 	</target>
+ 			
+ 	
  	<!--All of the tree manipulations prior to the interpreter-->
  	<target name="StencilTransformer" depends="StencilGrammar">
  		<antlr
@@ -84,8 +93,8 @@
  			target="${grammars}/GuideSpecializers.g"
 			outputdirectory="${grammars}/string/"
  		/>
-	</target>
- 	
+ 	</target>
+
  	<target name="Validators" depends="StencilGrammar">
  		<property name="validators" location="${grammars}/validators"/>
  		<property name="lib" location="${grammars}/string"/>
@@ -95,6 +104,12 @@
  			outputdirectory="${validators}"
  			libdirectory="${lib}"
  		/>
+ 		<antlr
+ 			target="${validators}/PythonValidator.g"
+ 			outputdirectory="${validators}"
+ 			libdirectory="${lib}"
+ 		/>
+
  	</target>
  		
  	
@@ -116,20 +131,24 @@
 	</target>
 
  	<target name="TreeAdapter" depends="TreeAdapterGrammar, StencilBuild">
-		<java classname="stencil.util.build.GenerateTreeAdapter" classpath="${target}:${java.class.path}" fork="true">
+		<java classname="stencil.util.build.GenerateTreeAdapter" fork="true">
+			<classpath>
+				<pathelement path="${target}"/>
+				<pathelement path="${java.class.path}"/>
+			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+			</classpath>
 			<arg value="${grammars}/string/Stencil.tokens" />
 			<arg value="${grammars}/StencilTreeAdapter.stg" />
 			<arg value="${grammars}/tree/StencilTreeAdapter.java" />
 		</java>
  	</target>
 
- 	<!--There is occasionally a problem with StencilBuild and TreeAdapter.-->
- 	<!--It may be related to refresh rates of the file systems.-->
- 	<!--Doing the build again (no cleaning) has always resolved it!-->
  	<target name="StencilBuild">
  		<property name="dir" value="/stencil/util/build"/>
  		<mkdir dir="${target}${dir}" />
- 		<javac sourcepath="" srcdir="${src}${dir}" destdir="${target}" classpath="${antlrClasspath}" />
+ 		<javac sourcepath="" srcdir="${src}${dir}" destdir="${target}">
+			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
+ 		</javac>
  	</target>
 
  	<target name="Release_With_Build" depends="Stencil,Release" />
@@ -170,8 +189,7 @@
  		
  		<!--create Zip file with jar -->
  		 		
- 		
-		<property name="lib.app.dir" location="${release}/lib"/>
+ 		<property name="lib.app.dir" location="${release}/lib"/>
  		<mkdir dir="${lib.app.dir}"/>
  		<copy todir="${lib.app.dir}">
  			<fileset dir="${rutimeLibrary}" includes="*.jar"/>

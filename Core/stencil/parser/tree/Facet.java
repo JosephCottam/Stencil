@@ -32,6 +32,9 @@ public class Facet extends StencilTree {
 	/**What is the facet body?  This is the actual executable code.*/
 	public String getBody() {return getChild(2).getText();}
 	
+	/**Should only be used internally, had to be public though because of the package restrictions.*/
+	public void setBody(String newBody) {((StencilTree) getChild(2)).getToken().setText(newBody);}
+	
 	/**What are the incoming arguments?*/
 	public TuplePrototype getArguments() {return getYields().getInput();}
 
