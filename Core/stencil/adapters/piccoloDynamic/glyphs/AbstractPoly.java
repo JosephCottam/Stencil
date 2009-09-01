@@ -36,7 +36,7 @@ import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.ImplicitArgumentException;
 import stencil.adapters.piccoloDynamic.util.Attribute;
 import stencil.adapters.piccoloDynamic.util.Attributes;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 
 import edu.umd.cs.piccolo.util.PBounds;
 import static stencil.parser.ParserConstants.FINAL_VALUE;
@@ -81,7 +81,7 @@ public abstract class AbstractPoly extends Path {
 	public void setYArray(String att, double value) throws ImplicitArgumentException {
 		assert !att.equals(StandardAttribute.Y.name()) : "Recieved simple Y in indexed Y accessor";
 		double idx = index(att, false);
-		double y = (Double) Tuples.convert(value, Double.class);
+		double y = Converter.toDouble(value);
 		updatePoints(INVALID_COORDINATE_VALUE, y, idx);
 	}
 
@@ -103,7 +103,7 @@ public abstract class AbstractPoly extends Path {
 	public void setXArray(String att, double value) throws ImplicitArgumentException {
 		assert !att.equals(StandardAttribute.Y.name()) : "Recieved simple X in indexed X accessor";
 		double idx = index(att, false);
-		double x = (Double) Tuples.convert(value, Double.class);
+		double x = Converter.toDouble(value);
 		updatePoints(x, INVALID_COORDINATE_VALUE, idx);
 	}
 

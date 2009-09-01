@@ -38,8 +38,8 @@ import stencil.legend.util.BasicProject;
 import stencil.legend.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.BasicTuple;
-import stencil.util.Tuples;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -102,7 +102,7 @@ public class Average extends BasicModule {
 
 			Double sum=0d;
 			for (Object value: values) {
-				Double num = (Double) Tuples.convert(value, Double.class);
+				Double num = Converter.toDouble(value);
 				sum += num;
 			}
 

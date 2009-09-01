@@ -34,6 +34,7 @@ import javax.swing.SwingUtilities;
 
 import stencil.adapters.Glyph;
 import stencil.adapters.piccoloDynamic.glyphs.Node;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 import stencil.util.enums.EnumUtils;
 
@@ -55,7 +56,7 @@ public class NodeTuple<T extends Node> implements Glyph {
 
 	public Object get(String name, Class<?> type) {
 		Object value = get(name);
-		return Tuples.convert(value, type);
+		return Converter.convert(value, type);
 	}
 
 	public Object get(String name) {return node.getAttribute(name);}

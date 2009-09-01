@@ -74,7 +74,7 @@ public class LegendRule extends StencilTree {
 		for (Rule rule: getRules()) {
 			Tuple buffer;
 			try {buffer = rule.apply(source);}
-			catch (Exception e) {throw new RuntimeException(String.format("Error invoking sub rule %1$d on legend %2$s.", ruleCount, legendName),e);} //TODO: Get rule number
+			catch (Exception e) {throw new RuntimeException(String.format("Error invoking sub rule %1$d on legend %2$s.", ruleCount, legendName),e);}
 
 			if (buffer == null) {result = null; break;}
 			result= Tuples.merge(result, buffer);

@@ -31,7 +31,8 @@ package stencil.adapters.piccoloDynamic;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Rectangle;
-import stencil.util.Tuples;
+
+import stencil.types.Converter;
 
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -47,7 +48,7 @@ public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
 
 	public void set(String field, Object value) {
 		if (CanvasAttribute.BACKGROUND_COLOR.name().equals(field)) {
-			canvas.setBackground((Color) Tuples.convert(value, Color.class));
+			canvas.setBackground((Color) Converter.convert(value, Color.class));
 		} else {
 			throw new IllegalArgumentException("Cannot modify " + field + " on canvas.");
 		}

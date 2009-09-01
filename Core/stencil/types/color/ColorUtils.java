@@ -31,9 +31,9 @@ package stencil.types.color;
 import stencil.legend.module.ModuleData; 
 import stencil.legend.module.util.BasicModule;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.parser.tree.Value;
 import stencil.util.BasicTuple;
-import stencil.util.Tuples;
 
 public final class ColorUtils extends BasicModule {
 	//TODO: Somehow tie these utilities to the color type instantiated.
@@ -72,7 +72,7 @@ public final class ColorUtils extends BasicModule {
 	private static Tuple mod(Object source, ColorUtils.COMP comp, Object v, String name) {
 		ColorTuple color = validate(source);
 		
-		Number value = (Number) Tuples.convert(v, Number.class);
+		Number value = Converter.toNumber(v);
 		if (value instanceof Float) {value = rangeValue((Float) value);}
 		else if (value instanceof Double) {value = rangeValue(((Double) value).floatValue());}
 		

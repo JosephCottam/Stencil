@@ -32,7 +32,7 @@ package stencil.adapters.java2D.data.glyphs;
 import java.awt.geom.Line2D;
 import java.awt.Graphics2D;
 
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
@@ -70,10 +70,10 @@ public final class Line extends Stroked {
 	}
 	
 	public void set(String name, Object value) {
-		if (name.equals("X.1")) 	 {x1 = (Double) Tuples.convert(value, Double.class);}
-		else if (name.equals("Y.1")) {y1 = (Double) Tuples.convert(value, Double.class);}
-		else if (name.equals("X.2")) {x2 = (Double) Tuples.convert(value, Double.class);}
-		else if (name.equals("Y.2")) {y2 = (Double) Tuples.convert(value, Double.class);}
+		if (name.equals("X.1")) 	 {x1 = Converter.toDouble(value);}
+		else if (name.equals("Y.1")) {y1 = Converter.toDouble(value);}
+		else if (name.equals("X.2")) {x2 = Converter.toDouble(value);}
+		else if (name.equals("Y.2")) {y2 = Converter.toDouble(value);}
 		else{super.set(name, value);}
 	}
 	

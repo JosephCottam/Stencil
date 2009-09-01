@@ -42,7 +42,7 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 
 /**General purpose fill items, covers both textures and solid fills.
@@ -201,10 +201,10 @@ public final class Fills {
 
 		switch(att) {
 			case PATTERN: p = Pattern.valueOf(value.toString()); break;
-			case PATTERN_SCALE: scale = (Integer) Tuples.convert(value, Integer.class); break;
-			case PATTERN_WEIGHT: weight = (Double) Tuples.convert(value, Double.class); break;
-			case PATTERN_BACK: back = (Color) Tuples.convert(value, Color.class); break;
-			case FILL_COLOR: fore = (Color) Tuples.convert(value, Color.class); break;
+			case PATTERN_SCALE: scale = Converter.toInteger(value); break;
+			case PATTERN_WEIGHT: weight = Converter.toDouble(value); break;
+			case PATTERN_BACK: back = (Color) Converter.convert(value, Color.class); break;
+			case FILL_COLOR: fore = (Color) Converter.convert(value, Color.class); break;
 			default: throw new RuntimeException(String.format("Could not find property %1$s on a texture.", att));
 		}
 

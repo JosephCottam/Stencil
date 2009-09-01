@@ -34,7 +34,7 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
 
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.ValueEnum;
 
@@ -142,11 +142,11 @@ public final class Strokes {
 
 	public static ColoredStroke modify(StrokeProperty att, Object value, Stroke style, Paint paint) {
 		switch(att) {
-		case STROKE_WEIGHT: style = modifyStroke(style, (Double) Tuples.convert(value, Double.class), null,null,null,null,null); break;
-		case CAP_STYLE: style = modifyStroke(style, null, (Integer) Tuples.convert(value, Integer.class),null,null,null,null); break;
-		case JOIN_STYLE: style = modifyStroke(style, null, null,(Integer) Tuples.convert(value, Integer.class),null,null,null); break;
-		case MITER_LIMIT: style = modifyStroke(style, null, null,null,(Double) Tuples.convert(value, Double.class),null,null); break;
-		case STROKE_COLOR: paint = (Color) Tuples.convert(value, Color.class); break;
+		case STROKE_WEIGHT: style = modifyStroke(style, Converter.toDouble(value), null,null,null,null,null); break;
+		case CAP_STYLE: style = modifyStroke(style, null, Converter.toInteger(value),null,null,null,null); break;
+		case JOIN_STYLE: style = modifyStroke(style, null, null, Converter.toInteger(value),null,null,null); break;
+		case MITER_LIMIT: style = modifyStroke(style, null, null,null, Converter.toDouble(value),null,null); break;
+		case STROKE_COLOR: paint = (Color) Converter.convert(value, Color.class); break;
 //		case PATTERN: modifyStroke(null, null,null,null,value,null); break;
 //		case PATTERN_PHASE: modifyStroke(null, null,null,null,null,(Double) value); break;
 		default: throw new IllegalArgumentException("Could not handle key " + att.toString() + " in stroke handler.");

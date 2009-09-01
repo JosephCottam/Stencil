@@ -39,7 +39,7 @@ import java.util.List;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.streams.InvalidNameException;
 import stencil.streams.MutableTuple;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 
 /**The CanvasTuple represents an actual drawing surface
@@ -91,7 +91,7 @@ public interface CanvasTuple extends MutableTuple {
 		
 		protected abstract Rectangle getBounds();
 		
-		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Tuples.convert(get(name), type);}
+		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Converter.convert(get(name), type);}
 
 		
 		public Object get(String name) throws InvalidNameException {

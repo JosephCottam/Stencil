@@ -35,7 +35,7 @@ import stencil.adapters.piccoloDynamic.NodeTuple;
 import stencil.adapters.piccoloDynamic.glyphs.Node;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 
@@ -70,7 +70,7 @@ public abstract class GuideUtils {
 			
 			try {
 				Field f = clss.getField(name);
-				f.set(target, Tuples.convert(map.get(name), f.getType()));
+				f.set(target, Converter.convert(map.get(name), f.getType()));
 			} catch (SecurityException e) {System.err.println("Attempt to set value that cannot be securely accessed on " + target.toString());
 			} catch (IllegalAccessException e) {System.err.println("Attempt to set value that cannot be accesssed on " + target.toString());
 			} catch (NoSuchFieldException e) {

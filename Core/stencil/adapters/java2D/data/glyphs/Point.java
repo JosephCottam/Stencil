@@ -36,7 +36,7 @@ import stencil.adapters.Glyph;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.InvalidNameException;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
 public abstract class Point implements Glyph {
@@ -76,10 +76,10 @@ public abstract class Point implements Glyph {
 	
 	
 	public void set(String name, Object value) {
-		if (name.equals(ID.name())) {this.id = (String) Tuples.convert(value, String.class);}
-		else if (name.equals(X.name())) {this.x = (Double) Tuples.convert(value, Double.class);}
-		else if (name.equals(Y.name())) {this.y = (Double) Tuples.convert(value, Double.class);}
-		else if (name.equals(Z.name())) {this.y = (Double) Tuples.convert(value, Double.class);}
+		if (name.equals(ID.name())) {this.id = Converter.toString(value);}
+		else if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
+		else if (name.equals(Y.name())) {this.y = Converter.toDouble(value);}
+		else if (name.equals(Z.name())) {this.y = Converter.toDouble(value);}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
@@ -96,7 +96,7 @@ public abstract class Point implements Glyph {
 	}
 
 	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
-		return Tuples.convert(get(name), type);
+		return Converter.convert(get(name), type);
 	}
 
 	protected abstract AttributeList getAttributes();
@@ -115,6 +115,4 @@ public abstract class Point implements Glyph {
 	}
 	
 	public abstract void render(Graphics2D g);
-	
-	public String toString() {return Tuples.toString(this);}
 }

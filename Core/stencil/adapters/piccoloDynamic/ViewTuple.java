@@ -29,11 +29,10 @@
 package stencil.adapters.piccoloDynamic;
 
 
-import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
 
-import stencil.util.Tuples;
+import stencil.types.Converter;
 import stencil.util.enums.EnumUtils;
 import edu.umd.cs.piccolo.PCamera;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -52,7 +51,7 @@ public class ViewTuple extends stencil.display.ViewTuple.Simple {
 
 
 	public void set(String field, Object value) {
-		double val = (Double) Tuples.convert(value, Double.class);
+		double val = Converter.toDouble(value);
 		PAffineTransform viewTrans = camera.getViewTransformReference();
 
 		double oldx, oldy, scalex, scaley, space;
@@ -118,11 +117,7 @@ public class ViewTuple extends stencil.display.ViewTuple.Simple {
 		throw new IllegalArgumentException("Unknown field, cannot query " + name + " on view.");
 	}
 
-	public Object get(String name, Class<?> type) throws IllegalArgumentException {return Tuples.convert(get(name), type);}
-	public Color getColor(String name) {return (Color) Tuples.convert(get(name), Color.class);}
-	public Double getDouble(String name) {return (Double) Tuples.convert(get(name), Double.class);}
-	public String getString(String name) {return get(name).toString();}
-	public Integer getInteger(String name) {return (Integer) Tuples.convert(get(name), Integer.class);}
+	public Object get(String name, Class<?> type) throws IllegalArgumentException {return Converter.convert(get(name), type);}
 
 
 	public Point2D canvasToView(Point2D p) {return camera.globalToLocal(camera.localToView(p));}

@@ -1,6 +1,6 @@
 package stencil.types.color;
 
-import static stencil.util.Tuples.convert;
+import static stencil.types.Converter.*;
 
 import java.awt.Color;
 import java.util.List;
@@ -60,10 +60,10 @@ final class IntColor {
 	 * All arguments are floats.
 	 */
 	static int HSVA(List<Value> args) {
-		float h = (Float) convert(args.get(0), Float.class);
-		float s = (Float) convert(args.get(1), Float.class);
-		float b = (Float) convert(args.get(2), Float.class);
-		float a = (Float) convert(args.get(3), Float.class);
+		float h = toFloat(args.get(0));
+		float s = toFloat(args.get(1));
+		float b = toFloat(args.get(2));
+		float a = toFloat(args.get(3));
 		
 		int alpha =  ColorUtils.rangeValue(a);
 		

@@ -36,7 +36,6 @@ import java.util.Set;
  * If an attempt to place a null or duplicate item into the list is made, an IllegalArgumentException is thrown.
  * As a convenience, a 'move' method has been provided to support changing an element's position.
  *
- * TODO: Consider throwing exception on null, but ignoring duplicates...
  */
 public class ListSet<T> extends ArrayList<T> implements Set<T> {
 	private static final long serialVersionUID = 1L;

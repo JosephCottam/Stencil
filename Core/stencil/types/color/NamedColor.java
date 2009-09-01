@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import stencil.parser.tree.Value;
-import static stencil.util.Tuples.convert;
+import stencil.types.Converter;
 import static stencil.types.color.IntColor.*;
 import static stencil.types.color.Color.CLEAR_INT;
 
@@ -197,7 +197,7 @@ public final class NamedColor {
 	private NamedColor() {/*Utility class. Not instantiable.*/}
 	
 	static int create(List<Value> args) {
-		String name = (String) convert(args.get(0), String.class);
+		String name = Converter.toString(args.get(0));
 		
 		int c;
 		//Named color

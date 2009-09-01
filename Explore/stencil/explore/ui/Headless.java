@@ -39,7 +39,7 @@ import stencil.explore.model.Model;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 
 
 import stencil.WorkingDirectory;
@@ -146,7 +146,7 @@ public class Headless {
 				if (argClass == null) {
 					model.export(prefix + args[i+1], format, null);
 				} else {
-					Object arg = Tuples.convert(args[i+1], argClass);
+					Object arg = Converter.convert(args[i+1], argClass);
 					model.export(prefix + args[i+2], format,  arg);
 				}
 			}

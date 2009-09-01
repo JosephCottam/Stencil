@@ -34,12 +34,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import static stencil.parser.ParserConstants.INITIATOR;
 import static stencil.parser.ParserConstants.TERMINATOR;
 import static stencil.parser.ParserConstants.SEPARATOR;
 import static stencil.parser.ParserConstants.SIGIL;
 import static stencil.types.color.Color.OPAQUE_INT;
-import stencil.util.Tuples;
 
 public final class ColorTuple extends java.awt.Color implements Tuple {
 	private static final char RED_FIELD = 'R';
@@ -63,7 +63,7 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 
 	public Object get(String name, Class<?> type) throws IllegalArgumentException {
 		Object value = get(name);
-		return Tuples.convert(value, type);
+		return Converter.convert(value, type);
 	}
 	
 	public List<String> getFields() {return FIELDS;}

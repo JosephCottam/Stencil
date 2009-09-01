@@ -31,8 +31,8 @@ package stencil.legend.module.provided;
 import stencil.legend.module.*;
 import stencil.legend.module.util.BasicModule;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.BasicTuple;
-import stencil.util.Tuples;
 
 public class StringUtils extends BasicModule {
 	/**Print the passed tuple. Replaces names with new names.*/
@@ -65,16 +65,16 @@ public class StringUtils extends BasicModule {
 	}
 	
 	public static Tuple substring(Object str, Object s, Object e) {
-		String string = (String) Tuples.convert(str, String.class);
-		int start = (Integer) Tuples.convert(s, Integer.class);
-		int end = (Integer) Tuples.convert(e, Integer.class);
+		String string = Converter.toString(str);
+		int start = Converter.toInteger(s);
+		int end = Converter.toInteger(e);
 		
 		if (end >= 0) {return BasicTuple.singleton(string.substring(start, end));}
 		else {return BasicTuple.singleton(string.substring(start));}
 	}
 	
 	public static Tuple trim(Object str) {
-		String string = (String) Tuples.convert(str, String.class);
+		String string = Converter.toString(str);
 		return BasicTuple.singleton(string.trim());
 	}
 

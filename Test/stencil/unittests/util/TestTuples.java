@@ -4,6 +4,7 @@ import stencil.adapters.piccoloDynamic.NodeTuple;
 import stencil.adapters.piccoloDynamic.glyphs.Pie;
 import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.BasicTuple;
 import stencil.util.Tuples;
 import junit.framework.Assert;
@@ -43,7 +44,7 @@ public class TestTuples extends TestCase {
 	}
 	
 	private void testOneConversion(Object source, Class target, Object reference) {
-		Object result = Tuples.convert(source, target);
+		Object result = Converter.convert(source, target);
 		assertTrue(String.format("Class did not match after conversion (expected %1$s, recieved %2$s).", target.getName(), result.getClass().getName()),
 						target.isAssignableFrom(result.getClass()));
 		

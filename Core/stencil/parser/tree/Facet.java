@@ -5,9 +5,6 @@ import static stencil.parser.ParserConstants.ITERATE_BLOCK_TAG;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import static stencil.parser.ParserConstants.QUERY_BLOCK_TAG;
 
-import org.python.core.Py;
-import org.python.core.PyCode;
-
 import org.antlr.runtime.Token;
 
 import stencil.util.ANTLRTree;
@@ -17,8 +14,6 @@ import stencil.util.ANTLRTree.NameNotFoundException;
  * code.  Each of these is a Facet...captured here!
  */
 public final class Facet extends StencilTree {
-	PyCode codeCache;
-
 	Facet(Token token) {super(token);}
 
 	public String getName() {return token.getText();}

@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 
 import stencil.adapters.piccoloDynamic.Adapter;
 import stencil.adapters.piccoloDynamic.util.*;
+import stencil.types.Converter;
 import stencil.util.ConversionException;
 import stencil.util.Tuples;
 import stencil.streams.Tuple;
@@ -74,9 +75,8 @@ public abstract class Node extends PNode {
 		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.IMPLANTATION, "getImplantation", "setImplantation", Node.class, null, String.class));
 	}
 
-	//TODO: implement a hash function so we can better identify some things in here...
 	//HACK: The whole dynamic rules implementation is a hack... so is this part.
-	public static class DynamicRule {
+	public static final class DynamicRule {
 		public Tuple source;
 		public Rule rule;
 		protected Adapter adapter;
@@ -186,7 +186,7 @@ public abstract class Node extends PNode {
 			String baseName = baseName(fullName);
 			if (attributes.containsKey(baseName)) {
 				Attribute a = attributes.get(baseName);
-				value = Tuples.convert(value, a.type);
+				value = Converter.convert(value, a.type);
 				a.set.invoke(this, fullName, value);
 			} else {
 				super.addAttribute(fullName, value);

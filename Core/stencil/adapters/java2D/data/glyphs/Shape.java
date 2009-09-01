@@ -31,7 +31,8 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
-import stencil.util.Tuples;
+
+import stencil.types.Converter;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.util.AttributeList;
@@ -57,8 +58,8 @@ public final class Shape extends Filled {
 	private Double size;
 	
 	public void set(String name, Object value) {
-		if (SHAPE.is(name)) {this.shape = (StandardShape) Tuples.convert(value, StandardShape.class);}
-		else if (SIZE.is(name)) {this.size = (Double) Tuples.convert(value, Double.class);}
+		if (SHAPE.is(name)) {this.shape = (StandardShape) Converter.convert(value, StandardShape.class);}
+		else if (SIZE.is(name)) {this.size = Converter.toDouble(value);}
 		else {super.set(name,value);}
 	}
 	

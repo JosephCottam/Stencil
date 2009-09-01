@@ -32,7 +32,7 @@ import stencil.legend.StencilLegend;
 import stencil.parser.tree.Range;
 import stencil.parser.tree.Value;
 import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -149,10 +149,10 @@ public abstract class RangeHelper implements StencilLegend {
 		for(Object o:values) {
 			if (o.getClass().isArray()) {
 				for (Object o2: (Object[]) o) {
-					v.add((T) Tuples.convert(o2, prototype.getClass()));
+					v.add((T)Converter.convert(o2, prototype.getClass()));
 				}
 			} else {
-				v.add((T) Tuples.convert(o, prototype.getClass()));
+				v.add((T)Converter.convert(o, prototype.getClass()));
 			}
 		}
 		return v.toArray((T[]) java.lang.reflect.Array.newInstance(prototype.getClass(), 0));

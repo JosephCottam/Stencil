@@ -40,8 +40,6 @@ import stencil.legend.module.*;
 import stencil.legend.util.BasicProject;
 import stencil.legend.StencilLegend;
 
-import stencil.util.ColorConverter;
-
 public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	

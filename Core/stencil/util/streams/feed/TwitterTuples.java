@@ -12,6 +12,7 @@ import com.sun.syndication.io.SyndFeedInput;
 
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.collections.*;
 
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)
@@ -37,7 +38,7 @@ public class TwitterTuples extends CacheFeed<HttpClient> {
 		}
 
 		public Object get(String name, Class<?> type) throws IllegalArgumentException {
-			return stencil.util.Tuples.convert(get(name), type);
+			return Converter.convert(get(name), type);
 		}
 
 		public List<String> getFields() {return java.util.Arrays.asList(FIELDS);}

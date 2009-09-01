@@ -37,7 +37,7 @@ import stencil.adapters.general.Registrations.Registration;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.piccoloDynamic.util.Attribute;
 import stencil.adapters.piccoloDynamic.util.Attributes;
-import stencil.util.Tuples;
+import stencil.types.Converter;
 
 import edu.umd.cs.piccolo.PNode;
 import edu.umd.cs.piccolo.util.PBounds;
@@ -88,7 +88,7 @@ public abstract class CommonNode extends Node {
 
 	/**Set the rotation in degrees.*/
 	public void setRotate(double value) {
-		Double degrees = (Double) Tuples.convert(value, Double.class);
+		Double degrees = Converter.toDouble(value);
 		if (degrees == 360d) {degrees = 0d;}
 		child.setRotation(Math.toRadians(degrees));
 	}

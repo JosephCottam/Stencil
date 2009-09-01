@@ -3,7 +3,8 @@ package stencil.parser.tree;
 import java.util.regex.Pattern;
 
 import stencil.parser.ParserConstants;
-import stencil.util.Tuples;
+import stencil.types.Converter;
+
 import org.antlr.runtime.Token;
 
 public final class BooleanOp extends StencilTree {
@@ -55,11 +56,11 @@ public final class BooleanOp extends StencilTree {
 			double l,r;
 
 			//Must do conversion here, since the tuples do not store types, just values.
-			try {l = (Double) Tuples.convert(lhs.getValue(), Double.class);}
+			try {l = Converter.toDouble(lhs.getValue());}
 			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing LHS of implicit numeric filter " + token.toString() + " with value " + lhs);}
 
 			//Must do conversion here, since the tuples do not store types, just values.
-			try {r = (Double) Tuples.convert(rhs.getValue(), Double.class);}
+			try {r = Converter.toDouble(rhs.getValue());}
 			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing RHS of implicit numeric filter " + token.toString() + " with value " + rhs);}
 
 

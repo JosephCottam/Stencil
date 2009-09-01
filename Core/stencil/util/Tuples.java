@@ -36,11 +36,8 @@ import stencil.adapters.general.Fills;
 import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;
 import stencil.types.SigilType;
+import stencil.types.Converter;
 import stencil.types.TypesCache;
-import stencil.util.enums.ValueEnum;
-import stencil.parser.tree.Id;
-import stencil.parser.tree.StencilNumber;
-import stencil.parser.tree.TupleRef;
 
 /**Utility methods for working with tuples.*/
 //final because it is a collection of utility methods and is not to be instantiated or overridden
@@ -187,7 +184,7 @@ public final class Tuples {
 			public Object get(String name) throws InvalidNameException {return values.get(name);}
 
 			public Object get(String name, Class<?> target) throws IllegalArgumentException {
-				return Tuples.convert(values.get(name), target);
+				return Converter.convert(values.get(name), target);
 			}
 
 			public List<String> getFields() {
@@ -225,80 +222,6 @@ public final class Tuples {
 	}
 
 
-	/**Tries to convert values from the current class to
-	 * the target class.  
-	 * 
-	 * Primitive numeric are handled
-	 * by invoking the toString on the value and then parse
-	 * UNLESS the value is a StencilNumber, then the StencilNumber
-	 * methods are used to extract the value.
-	 *
-	 *  ValueEnums are converted via getValue if the object type
-	 *  returned fromgetValue is instance compatible with the
-	 *  target class.
-	 *
-	 *  Colors are parsed through ColorParser.safeParse.
-	 *  Enumerations are returned through Enum.valueOf
-	 *
-	 *
-	 * @param value
-	 * @param target
-	 * @return
-	 */
-	public static Object convert(Object value, Class target) throws ConversionException {
-		try {
-			if (value == null || target.isInstance(value)) {return value;}
-			
-			if (value instanceof ValueEnum) {
-				Object v = ((ValueEnum) value).getValue();
-				if (target.isInstance(v)) {return v;}
-			}
-			
-			if (TypesCache.hasTypeFor(target)) {return TypesCache.getType(target).convert(value, target);}
-			if (TypesCache.hasTypeFor(value)) {return TypesCache.getType(value).convert(value, target);}
-	
-			if (target.equals(Number.class) && value instanceof StencilNumber) {
-				return ((StencilNumber) value).getNumber();
-			}
-			
-			if (target.equals(Integer.class) || target.equals(int.class)) {
-				if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber().intValue();}
-				return Integer.parseInt(value.toString());}
-			if (target.equals(Long.class) || target.equals(long.class)) {
-				if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber().longValue();}
-				return Long.parseLong(value.toString());
-			}
-	
-			if (target.equals(Double.class) && value.equals("VERTICAL")) {return  -90;} //TODO: Is there a better way to handle special values like this?
-	
-			if (target.equals(Double.class) || target.equals(double.class)) {
-				if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber().doubleValue();}
-				return Double.parseDouble(value.toString());
-			}
-			
-			if (target.equals(Float.class) || target.equals(float.class)) {
-				if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber().floatValue();}
-				return Float.parseFloat(value.toString());
-			}
-			
-			if (target.equals(String.class)) {
-				if (value.getClass().isEnum()) {return Enum.valueOf(target, (String) value).name();}
-				if (value instanceof TupleRef && ((TupleRef) value).isNamedRef()) {return ((Id) ((TupleRef) value).getValue()).getName();}
-				return value.toString();
-			}
-			
-			if (target.equals(boolean.class) || target.equals(Boolean.class)) {
-				String v = value.toString().toUpperCase();
-				return v.equals("TRUE") || v.equals("#T");
-			}
-			
-			if (target.isEnum()) {return Enum.valueOf(target, value.toString());}
-		} catch (Exception e) {
-			throw new ConversionException(value, target, e);
-		}
-		
-		throw new ConversionException(value, target);
-	}
 	
 	/**Produces an array version of a tuple.  Value are in the same order as the original tuple fields.**/
 	public static Object[] toArray(Tuple t) {
