@@ -66,6 +66,7 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 
 	public T make(String ID) throws DuplicateIDException {
 		T glyph = (T) prototypeGlyph.duplicate(ID);
+		glyph.setLayer(this);
 		index.put(ID, glyph);
 		return glyph;
 	}

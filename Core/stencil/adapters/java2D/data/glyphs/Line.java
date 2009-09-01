@@ -33,6 +33,7 @@ import java.awt.geom.Line2D;
 import java.awt.Graphics2D;
 
 import stencil.types.Converter;
+import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
@@ -42,10 +43,13 @@ public final class Line extends Stroked {
 	static {
 		attributes = new AttributeList(Stroked.attributes);
 
-		attributes.add(new Attribute("X1", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Y1", Yn.getDefaultValue(), Yn.getType()));
-		attributes.add(new Attribute("X2", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Y2", Yn.getDefaultValue(), Yn.getType()));
+		attributes.add(new Attribute("X.1", Xn.getDefaultValue(), Xn.getType()));
+		attributes.add(new Attribute("Y.1", Yn.getDefaultValue(), Yn.getType()));
+		attributes.add(new Attribute("X.2", Xn.getDefaultValue(), Xn.getType()));
+		attributes.add(new Attribute("Y.2", Yn.getDefaultValue(), Yn.getType()));
+		
+		attributes.remove(StandardAttribute.HEIGHT);
+		attributes.remove(StandardAttribute.WIDTH);
 	}
 
 	private double x1 = (Double) attributes.get(X.name()).getDefault();
@@ -58,6 +62,8 @@ public final class Line extends Stroked {
 	public Double getHeight() {return Math.abs(y1-y2);}
 
 	public Double getWidth() {return Math.abs(x1-x2);}
+	
+	public String getImplantation() {return "LINE";} 
 
 	protected AttributeList getAttributes() {return attributes;}
 	

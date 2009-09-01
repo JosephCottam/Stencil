@@ -61,8 +61,6 @@ public class NodeTuple<T extends Node> implements Glyph {
 
 	public Object get(String name) {return node.getAttribute(name);}
 
-	public String getSource() {return ((String) node.getAttribute(StandardAttribute.LAYERNAME));}
-
 	public void set(final String name, final Object value) {
 		try {
 			if (SwingUtilities.isEventDispatchThread()) {

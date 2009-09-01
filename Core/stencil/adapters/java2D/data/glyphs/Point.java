@@ -33,10 +33,12 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import stencil.adapters.Glyph;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.InvalidNameException;
 import stencil.types.Converter;
+import stencil.util.Tuples;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
 public abstract class Point implements Glyph {
@@ -49,13 +51,23 @@ public abstract class Point implements Glyph {
 
 		attributes.add(new Attribute(WIDTH));
 		attributes.add(new Attribute(HEIGHT));
+		attributes.add(new Attribute(LAYERNAME));
+		attributes.add(new Attribute(IMPLANTATION));
 	}
+	
+	protected String id = (String) attributes.get(ID.name()).getDefault();
+	protected Double x = (Double) attributes.get(X.name()).getDefault();
+	protected Double y = (Double) attributes.get(Y.name()).getDefault();
+	protected Double z = (Double) attributes.get(Z.name()).getDefault();
+	protected Table layer;
 	
 	protected Point(String id) {this.id = id;}
 	
 	
 	public abstract Double getWidth();
 	public abstract Double getHeight();
+	public abstract String getImplantation();
+	
 	
 	/**Duplicate the current glyph, but give it a new ID.
 	 * 
@@ -68,13 +80,7 @@ public abstract class Point implements Glyph {
 			return g;
 		} catch (Exception e) {throw new Error("Error duplicating tuple:" + this.toString());}
 	}	
-	
-	protected String id = (String) attributes.get(ID.name()).getDefault();
-	protected Double x = (Double) attributes.get(X.name()).getDefault();
-	protected Double y = (Double) attributes.get(Y.name()).getDefault();
-	protected Double z = (Double) attributes.get(Z.name()).getDefault();
-	
-	
+		
 	public void set(String name, Object value) {
 		if (name.equals(ID.name())) {this.id = Converter.toString(value);}
 		else if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
@@ -91,6 +97,8 @@ public abstract class Point implements Glyph {
 
 		if (name.equals(WIDTH.name())) {return getWidth();}
 		if (name.equals(HEIGHT.name())) {return getHeight();}
+		if (name.equals(LAYERNAME.name())) {return layer==null?null:layer.getName();}
+		if (name.equals(IMPLANTATION.name())) {return getImplantation();}
 		
 		throw new InvalidNameException(name, getFields());
 	}
@@ -115,4 +123,8 @@ public abstract class Point implements Glyph {
 	}
 	
 	public abstract void render(Graphics2D g);
+	
+	public String toString() {return Tuples.toString(this);}
+	
+	public void setLayer(Table layer) {this.layer =layer;}
 }

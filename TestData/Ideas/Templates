@@ -1,0 +1,21 @@
+Purpose: Remove repetition by allowing per-compile-time creation of textual blocks.
+
+template dotPlot[Stream ID1,ID2] 
+	from Stream
+		ID : Concatenate(ID2, ID1) -> VALUE
+		X : Ordering(ID1) -> (VALUE)
+		Y : Ordering(ID2) -> Mult(VALUE, -1) -> (VALUE)
+		(FILL_COLOR, SIZE, SHAPE) : (@color(RED), 1, "RECTANGLE")
+
+
+layer VSM
+ dotPlot[VertexList, ID1,ID2]
+ dotPlot[VertexList, ID2,ID1]
+
+layer Prime
+from BFS
+	() : Ordering(ID) -> ()
+
+legend Ordering (ID) -> (VALUE)
+	(all) => VALUE : Index(ID) -> VALUE
+

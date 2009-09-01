@@ -30,6 +30,7 @@ package stencil.adapters.java2D.util;
 
 import java.util.*;
 
+import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.streams.InvalidNameException;
 
 public final class AttributeList implements Iterable<Attribute>{
@@ -45,19 +46,25 @@ public final class AttributeList implements Iterable<Attribute>{
 		}
 	}
 	
+	/**Add a new attribute.  
+	 * Will silently replace an existing attribute of the same name.
+	 */
 	public void add(Attribute att) {
 		attributes.put(att.name, att);
 		names = null;
 	}
 	
+	/**Get the given attribute.*/
 	public Attribute get(String name) {
 		return attributes.get(name);
 	}
 
+	/**Get an iterator over all of the attributes.*/
 	public Iterator<Attribute> iterator() {
 		return attributes.values().iterator();
 	}
 	
+	/**Get a list of all names in this attributes collection.*/
 	public List<String> getNames() {
 		if (names == null) {
 			names = new ArrayList(attributes.keySet());
@@ -65,9 +72,21 @@ public final class AttributeList implements Iterable<Attribute>{
 		return names;
 	}
 	
+	/**Get the default value of the attribute of the given  name
+	 * @throws InvalidNameException Requested name not found in this collection
+	 */
 	public Object getDefault(String name) throws InvalidNameException {
 		Attribute att = attributes.get(name);
 		if (att == null) {throw new InvalidNameException(name);}
 		return att.defaultValue;
 	}
+	
+	/**Ensures that an attribute no longer exists in this collection.*
+	 * If the attribute never existed, no exception is thrown.
+	 */
+	public void remove(String name) {
+		if (attributes.containsKey(name)) {attributes.remove(name);}
+	}
+	
+	public void remove(StandardAttribute att) {remove(att.name());}
 }

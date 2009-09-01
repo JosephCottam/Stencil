@@ -100,7 +100,7 @@ public final class Strokes {
 	/**Stroke attributes supported by this mix-in**/
 	public static enum StrokeProperty implements Attribute {
 		STROKE_WEIGHT (1d, Double.class),
-		CAP_STYLE (CapStyles.ROUND , CapStyles.class),
+		CAP_STYLE (CapStyles.SQUARE, CapStyles.class),
 		JOIN_STYLE (JoinStyles.MITER, JoinStyles.class),
 		MITER_LIMIT (10.0, Double.class),
 		STROKE_COLOR (DEFAULT_PAINT, Paint.class);

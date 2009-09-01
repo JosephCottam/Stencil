@@ -33,6 +33,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 
 import stencil.types.Converter;
+import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.util.AttributeList;
@@ -47,12 +48,13 @@ public final class Shape extends Filled {
 	static {
 		attributes = new AttributeList(Filled.attributes);
 		attributes.add(SHAPE);
-		attributes.add(SIZE);		
+		attributes.add(SIZE);
+		
+		attributes.remove(StandardAttribute.WIDTH);
+		attributes.remove(StandardAttribute.HEIGHT);
 	}
 	
-	public Shape(String id) {
-		super(id);
-	}
+	public Shape(String id) {super(id);}
 	
 	private StandardShape shape;
 	private Double size;
@@ -74,6 +76,7 @@ public final class Shape extends Filled {
 
 	public Double getWidth() {return size;}
 	public Double getHeight() {return size;}
+	public String getImplantation() {return "SHAPE";}
 	
 	public void render(Graphics2D g) {
 		java.awt.Shape s = Shapes.getShape(shape, new Rectangle2D.Double(x,y, size,size));

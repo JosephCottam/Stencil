@@ -59,7 +59,7 @@ public final class GlyphAttributes {
 		WIDTH		(0),
 		ID			(null, String.class),
 		REGISTRATION (Registration.CENTER),
-		IMPLANTATION ("SHAPE"),
+		IMPLANTATION (null, String.class),
 		LAYERNAME	(null, String.class),
 		ROTATION	(0d);
 
