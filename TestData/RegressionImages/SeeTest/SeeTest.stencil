@@ -133,67 +133,61 @@ legend Pallet(Name) -> (C)
 
 python Break
 facet Map (Orig) -> (Label)
-{{
-Label=Orig.replace("Absoft: Absoft ", "")
-Label=Label.replace("Absoft: ", "")
-Label=Label.replace(",", "\n")
-}}
+{
+	Label=Orig.replace("Absoft: Absoft ", "")
+	Label=Label.replace("Absoft: ", "")
+	Label=Label.replace(",", "\n")
+}
 
 
 
 python Layout
-facet Init {{
-XIndex= []
-YIndex = []
-majorOffset = 50
-suites = ["ibm", "imb", "intel", "mpicxx"]
-border = 10
-minorOffset = 18
+facet Init {
+	XIndex= []
+	YIndex = []
+	majorOffset = 50
+	suites = ["ibm", "imb", "intel", "mpicxx"]
+	border = 10
+	minorOffset = 18
 
-def queryLayout(X1,X2,Y1,Y2):
-	XBase = X1+X2
-	YBase = Y1+Y2
-	if (XBase not in XIndex): return (-375,300)
-	if (YBase not in YIndex): return (-375,300)
-	X = XIndex.index(XBase) * majorOffset
-	Y = YIndex.index(YBase) * majorOffset
-	return (X,Y)
-
-def baseLayout(X1, X2,Y1,Y2):
-	XBase = X1+X2
-	YBase = Y1+Y2
-	if (XBase not in XIndex): XIndex.append(XBase)
-	if (YBase not in YIndex): YIndex.append(YBase)
-	X = XIndex.index(XBase) * majorOffset
-	Y = YIndex.index(YBase) * majorOffset
-	return (X,Y)
+	def queryLayout(X1,X2,Y1,Y2):
+		XBase = X1+X2
+		YBase = Y1+Y2
+		if (XBase not in XIndex): return (-375,300)
+		if (YBase not in YIndex): return (-375,300)
+		X = XIndex.index(XBase) * majorOffset
+		Y = YIndex.index(YBase) * majorOffset
+		return (X,Y)
 	
-def suiteLayout(baseX, baseY, suite):
-	if (suite not in suites): suites.append(suite)
-	offset = suites.index(suite)
-	X = baseX + border + (offset%2 * minorOffset)
-	Y = baseY + border+ (offset/2 * minorOffset)
-	return (X,Y)
-
-def suiteLayout(baseX, baseY, suite):
-	if (suite not in suites): suites.append(suite)
-	offset = suites.index(suite)
-	X = baseX + border + (offset%2 * minorOffset)
-	Y = baseY + border+ (offset/2 * minorOffset)
-	return (X,Y)
+	def baseLayout(X1, X2,Y1,Y2):
+		XBase = X1+X2
+		YBase = Y1+Y2
+		if (XBase not in XIndex): XIndex.append(XBase)
+		if (YBase not in YIndex): YIndex.append(YBase)
+		X = XIndex.index(XBase) * majorOffset
+		Y = YIndex.index(YBase) * majorOffset
+		return (X,Y)
+		
+	def suiteLayout(baseX, baseY, suite):
+		if (suite not in suites): suites.append(suite)
+		offset = suites.index(suite)
+		X = baseX + border + (offset%2 * minorOffset)
+		Y = baseY + border+ (offset/2 * minorOffset)
+		return (X,Y)
 	
-}}
+	def suiteLayout(baseX, baseY, suite):
+		if (suite not in suites): suites.append(suite)
+		offset = suites.index(suite)
+		X = baseX + border + (offset%2 * minorOffset)
+		Y = baseY + border+ (offset/2 * minorOffset)
+		return (X,Y)	
+}
+
 facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
-{{
-(X,Y) = baseLayout(X1,X2,Y1,Y2)
-(X,Y) = suiteLayout(X,Y, suite)
-}}
-facet Map (X1,X2,Y1,Y2) -> (X,Y)
-{{
-(X,Y) = baseLayout(X1,X2,Y1,Y2)
-}}
-facet Query (X1,X2,Y1,Y2) -> (X,Y)
-{{
-(X,Y) = queryLayout(X1,X2,Y1,Y2)
-}}
+{
+	(X,Y) = baseLayout(X1,X2,Y1,Y2)
+	(X,Y) = suiteLayout(X,Y, suite)
+}
+facet Map   (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = baseLayout(X1,X2,Y1,Y2)}
+facet Query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
 

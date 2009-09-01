@@ -2,23 +2,22 @@ STREAM: File
 NAME: Edges
 HEADER: ID1  ID2
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Desktop/graph.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/graph.txt
 CHECKHEADER: false
 
 external stream Edges (ID1, ID2)
-
 
 layer Nodes
 from Edges
 	ID: ID1
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y):  Spiral.Query(ID1) -> (X,Y)
+	(X,Y):  Circular.Query(ID1) -> (X,Y)
 from Edges
 	ID: ID2
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y):  Spiral.Query(ID2) -> (X,Y)
+	(X,Y):  Circular.Query(ID2) -> (X,Y)
 
 layer Edges[LINE]
 from Edges 
@@ -32,19 +31,19 @@ from Edges
 legend Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
-python Spiral
-facet Init {{
-from math import *
-max =197
-}}
+python Circular
+facet Init {
+	from math import *
+	max =197
+}
 
-facet Query(Seq) -> (X,Y) {{
-Seq = float(Seq)
-if (Seq > max): max=Seq
+facet Query(Seq) -> (X,Y) {
+	Seq = float(Seq)
+	if (Seq > max): max=Seq
 
-radius = sqrt(max)+ max/100 * 140
-offset = (Seq/max)*360*0.01745   #to radians
+	radius = sqrt(max)+ max/100 * 140
+	offset = (Seq/max)*360*0.01745   #to radians
 
-X = radius * cos(offset)
-Y = radius * sin(offset)
-}}
+	X = radius * cos(offset)
+	Y = radius * sin(offset)
+}

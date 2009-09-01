@@ -31,11 +31,13 @@ package stencil.display;
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
+import stencil.display.CanvasTuple.CanvasAttribute;
 import stencil.streams.MutableTuple;
 import stencil.util.Tuples;
 import stencil.util.enums.Attribute;
@@ -90,14 +92,17 @@ public interface ViewTuple extends MutableTuple {
 	}
 
 	public static abstract class Simple implements ViewTuple {
-		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Tuples.convert(get(name), type);}
-		
-		public List<String> getFields() {
+		protected static final List<String> FIELDS;
+		static {
 			HashSet<String> s = new HashSet<String>();
 			for (ViewAttribute a: EnumSet.allOf(ViewAttribute.class)) {s.add(a.name());}
-			return new ArrayList(s);
+			FIELDS = Collections.unmodifiableList(new ArrayList(s));
 		}
-
+		
+		public List<String> getFields() {return FIELDS;}
+		
+		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Tuples.convert(get(name), type);}
+		
 		public boolean hasField(String name) {return getFields().contains(name);}
 
 		
@@ -108,12 +113,8 @@ public interface ViewTuple extends MutableTuple {
 		 * @return Default value of property.
 		 */
 		public boolean isDefault(String name, Object value) {
-			Object def = null;
-
-			//TODO: Prevent this exception...
-			try {def = StandardAttribute.valueOf(name).getDefaultValue();}
-			catch (Exception e) {return false;}
-			
+			if (!hasField(name)) {return false;}
+			Object def = ViewAttribute.valueOf(name).defaultValue;
 			return def == value || (def != null && def.equals(value));
 		}
 		

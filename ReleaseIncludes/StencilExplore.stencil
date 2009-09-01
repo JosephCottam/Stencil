@@ -43,14 +43,14 @@ legend Ordering (ID)->(VALUE)
 	(all) => VALUE : Index(ID) -> (VALUE)
 
 python Squarify
-facet Init {{
-from math import sqrt
-from math import ceil
-}}
+facet Init {
+	from math import sqrt
+	from math import ceil
+}
 
-facet Map (Seq) -> (X,Y) {{
-seq = int(Seq)+1
-base = int(ceil(sqrt(seq)))
-X = (seq/base) * 10 *base
-Y = (seq%base) * 10 *base
-}}
+facet Map (Seq) -> (X,Y) {
+	seq = int(Seq)+1
+	base = int(ceil(sqrt(seq)))
+	X = (seq/base) * 10 *base
+	Y = (seq%base) * 10 *base
+}

@@ -77,7 +77,7 @@ public class Interpreter {
 	}
 	
 	public void processTuple(Tuple source) throws Exception {
-		layers: for (Layer layer:program.getLayers()) {
+		for (Layer layer:program.getLayers()) {
 			
 			groups: for(Consumes group:layer.getGroups()) {
 				
@@ -92,7 +92,7 @@ public class Interpreter {
 					try {
 						stencil.adapters.Glyph glyph;
 
-						rules: for (Rule rule: group.getRules()) {
+						for (Rule rule: group.getRules()) {
 							boolean created = false;
 							boolean preExisting = false;
 							Tuple result;

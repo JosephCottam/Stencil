@@ -31,6 +31,7 @@ package stencil.display;
 import java.awt.Component;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
@@ -81,6 +82,13 @@ public interface CanvasTuple extends MutableTuple {
 	 * Most canvas tuples need only extend this class and provide the mission (relatively simple) methods.
 	 */
 	public static abstract class SimpleCanvasTuple implements CanvasTuple {
+		public static final List<String> FIELDS;
+		static {
+			HashSet<String> s = new HashSet<String>();
+			for (CanvasAttribute a: EnumSet.allOf(CanvasAttribute.class)) {s.add(a.name());}
+			FIELDS = Collections.unmodifiableList(new ArrayList(s));
+		}
+		
 		protected abstract Rectangle getBounds();
 		
 		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Tuples.convert(get(name), type);}
@@ -109,12 +117,7 @@ public interface CanvasTuple extends MutableTuple {
 		}
 		
 		
-		public List<String> getFields() {
-			//TODO: Cache this listing...
-			HashSet<String> s = new HashSet<String>();
-			for (CanvasAttribute a: EnumSet.allOf(CanvasAttribute.class)) {s.add(a.name());}
-			return new ArrayList(s);
-		}
+		public List<String> getFields() {return FIELDS;}
 		
 		public boolean hasField(String name) {return getFields().contains(name);}
 
@@ -127,12 +130,8 @@ public interface CanvasTuple extends MutableTuple {
 		 * @return Default value of property.
 		 */
 		public boolean isDefault(String name, Object value) {
-			Object def = null;
-
-			//TODO: Prevent this exception...
-			try {def = CanvasAttribute.valueOf(name).defaultValue;}
-			catch (Exception e) {return false;}
-
+			if (!hasField(name)) {return false;}
+			Object def = CanvasAttribute.valueOf(name).defaultValue;
 			return def == value || (def != null && def.equals(value));
 		}
 	}			

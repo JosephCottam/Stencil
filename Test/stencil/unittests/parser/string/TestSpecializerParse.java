@@ -49,7 +49,6 @@ public class TestSpecializerParse extends TestCase {
 				"[1, 2,3]",
 				"[1, \"two\", 3, \"four\"]"};
 		testPasses(specializers);
-		//TODO: validate the results
 	}
 	
 	public void testRangeArgs() throws Exception {
@@ -62,7 +61,6 @@ public class TestSpecializerParse extends TestCase {
 				"[1 .. n, \"one one\", \"two, two\", \" three, three \"]"
 				};
 		testPasses(specializers);
-		//TODO: validate the results
 	}
 	
 	
@@ -78,7 +76,6 @@ public class TestSpecializerParse extends TestCase {
 
 		
 		testPasses(specializers);
-		//TODO: Validate the results
 	}
 
 	

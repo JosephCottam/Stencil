@@ -11,6 +11,7 @@ import stencil.streams.Tuple;
 import junit.framework.TestCase;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
+import static stencil.unittests.rules.TestEncapsulationGenerator.getPython;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,33 +19,11 @@ import java.util.List;
 public class TestJythonEncapsulation extends TestCase {
 	
 	private EncapsulationGenerator g;
+	ModuleCache modules = new ModuleCache();
 	
 	public void setUp() throws Exception {
 		g = new EncapsulationGenerator();	
 	}
-
-	
-	private Python getPython(String env, String facet, List<String> arguments, List<String> results, String body) throws Exception {
-		final String mainFormat = "python %1$s facet %2$s %3$s {{%4$s}}"; 
-		final String yieldsFormat = "(%1$s) -> (%2$s)";
-		
-		String yields ="";
-		if (arguments != null) {
-			StringBuilder args = new StringBuilder();
-			for (String a:arguments) {args.append(a); args.append(",");}
-			args.deleteCharAt(args.length()-1);
-			
-			StringBuilder rslts = new StringBuilder();
-			for (String a:results) {rslts.append(a); rslts.append(",");}
-			rslts.deleteCharAt(rslts.length()-1);
-			yields = String.format(yieldsFormat, args, rslts);
-		}
-		
-		String source = String.format(mainFormat, env, facet, yields, body);	
-		Program p = ParseStencil.parse(source, Adapter.INSTANCE);
-		return p.getPython().get(0);
-	}
-
 	
 	public void testNumericValue() throws Exception {
 		List<String> arguments = Arrays.asList(new String[]{"value"});
@@ -53,7 +32,7 @@ public class TestJythonEncapsulation extends TestCase {
 		JythonEncapsulation e;
 		Tuple t;
 		
-		Python p=getPython("test1", MAIN_BLOCK_TAG, arguments, results, "rv = 1");
+		Python p = getPython("test1", MAIN_BLOCK_TAG, arguments, results, "rv = 1");
 		e = new JythonEncapsulation(p, p.getFacets().get(0), g);
 		assertNotNull("Encapsulation name cannot be null", e.getName());
 		t = e.invoke(100);
@@ -112,7 +91,8 @@ public class TestJythonEncapsulation extends TestCase {
 		Tuple t;
 
 		Python p = getPython("test1", INIT_BLOCK_TAG, null, null, "from java import awt");
-		e = new JythonEncapsulation(p,p.getFacets().get(0), g);
+		g.generate(p, modules.getAdHoc());
+		
 		
 		p = getPython("test1", MAIN_BLOCK_TAG,  arguments, results,"rv = awt.Color(value,value,value)");
 		e = new JythonEncapsulation(p,p.getFacets().get(0), g);
@@ -127,7 +107,7 @@ public class TestJythonEncapsulation extends TestCase {
 		Tuple t;
 
 		Python p1 = getPython("test1", INIT_BLOCK_TAG, null, null, "from java.lang import Integer");
-		new JythonEncapsulation(p1,p1.getFacets().get(0), g);
+		g.generate(p1, modules.getAdHoc());
 		
 		Python p2 = getPython("test1", MAIN_BLOCK_TAG, arguments, results, "rv = Integer(value)");
 		JythonEncapsulation e2 = new JythonEncapsulation(p2,p2.getFacets().get(0), g);
@@ -138,38 +118,5 @@ public class TestJythonEncapsulation extends TestCase {
 		assertEquals(Integer.class, t.get(results.get(0)).getClass());
 		assertEquals(100, t.get(results.get(0)));
 		assertTrue(t.get(results.get(0)).equals(100));
-	}
-	
-	public void testInit() throws Exception {
-		List<String> arguments = Arrays.asList(new String[]{"value"});
-		List<String> results = Arrays.asList(new String[]{"rv"});
-		
-
-		
-		Python p1 = getPython("test1", INIT_BLOCK_TAG, null, null, "sv=500");
-		new JythonEncapsulation(p1,p1.getFacets().get(0), g);
-
-		assertNotNull("Expected value not found after init block creation.", g.getEnvironment(p1.getEnvironment()).get("sv"));
-		assertEquals("Invalid value after init declared", 500, g.getEnvironment(p1.getEnvironment()).get("sv").__tojava__(Object.class));
-
-
-		Python p2 = getPython("test1", MAIN_BLOCK_TAG,  arguments, results,"rv=value");
-		JythonEncapsulation e2 = new JythonEncapsulation(p2,p2.getFacets().get(0), g);
-
-		PythonInterpreter env1 = g.getEnvironment(p1.getEnvironment());
-		PythonInterpreter env2 = g.getEnvironment(p2.getEnvironment());
-
-		assertEquals("Environments not equal when expected", p1.getEnvironment(), p2.getEnvironment());
-		assertEquals("Environments not equal when expected", g.getEnvironment(p1.getEnvironment()), g.getEnvironment(p2.getEnvironment()));
-		assertEquals("Environments not equal when expected", env2, env2);
-		
-		assertNotNull(env1.get("sv"));
-		assertNotNull(env2.get("sv"));
-		assertEquals("Invalid value after Map facet was declared (but not executed).", 500, env1.get("sv").__tojava__(Object.class));
-		assertEquals("Invalid value after Map facet was declared (but not executed).", 500, env2.get("sv").__tojava__(Object.class));
-		
-		e2.invoke(1);
-		assertEquals(1, env2.get("rv").__tojava__(Object.class));
-		assertEquals("Invalid value after Map facet was declared (but not executed).", 500, env2.get("sv").__tojava__(Object.class));
 	}
 }

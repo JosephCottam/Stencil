@@ -46,11 +46,17 @@ options {
   
   import stencil.parser.tree.Facet;
   import stencil.parser.tree.Python;
+  import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
+    
   import org.python.core.*;
 }
 
 @members {
   private static final class PythonValidationException extends ValidationException {
+  	public PythonValidationException(Facet facet, String message) {
+  		super("Error parsing \%1\$s.\%2\$s. \%3\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName(), message);
+  	}
+  	
     public PythonValidationException(Facet facet, Exception e) {
       super(e, "Error parsing \%1\$s.\%2\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName());
     }
@@ -68,6 +74,7 @@ options {
     for (String line: lines) {
       if (line.trim().equals("")) {continue;}
       if (!pastFirst) {
+      	pastFirst = true;
         while(Character.isWhitespace(line.charAt(whiteCount))) {whiteCount++;}
       }
       newBody.append(line.substring(whiteCount));
@@ -77,11 +84,19 @@ options {
   }
 
   private void validate(Facet facet) {
-    stripIndent(facet);   
+    stripIndent(facet);
+    
+    if (facet.getName().equals(INIT_BLOCK_TAG)) {
+    	if (facet.getArguments().size() != 0) {throw new PythonValidationException(facet, INIT_BLOCK_TAG + " facet with arguments not permitted.");}
+    }
+    
+    if (facet.getBody().equals("")) {return;}   
     try {
       Py.compile(new java.io.ByteArrayInputStream(facet.getBody().getBytes()), null, CompileMode.exec);      
     } catch (Exception e) {throw new PythonValidationException(facet, e);}
+    
+
   }
 }
 
-topdown: ^(r=Facet.*) {validate((Facet) r);};
+topdown: r=FACET {validate((Facet) r);};

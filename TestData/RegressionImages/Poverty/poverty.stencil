@@ -2,31 +2,31 @@ STREAM: File
 NAME: Region
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/regions.txt
+SOURCE: ./regions.txt
 CHECKHEADER: true
 STREAM: File
 NAME: Poverty
 HEADER: State,Children, Adults, Elderly, Total
 SEPARATOR: ,
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/povertyPercent.csv
+SOURCE: ./povertyPercent.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Postal
 HEADER: State  ID
 SEPARATOR: \s\s+
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/postal.txt
+SOURCE: ./postal.txt
 CHECKHEADER: false
 STREAM: File
 NAME: Pop
 HEADER: State,Children,Adults,Elderly, Total
 SEPARATOR: ,
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/povertyCounts.csv
+SOURCE: ./povertyCounts.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Items
 HEADER: Name
 SEPARATOR: ,
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/Poverty/items.txt
+SOURCE: ./items.txt
 CHECKHEADER: false
 
 external stream Items(Name)
@@ -169,51 +169,51 @@ legend Ordering (ID) -> (VALUE)
 	all => VAlUE : Index(ID) -> VALUE
 
 python Pop
-facet Init {{
+facet Init {
 pop =dict()
-}}
-facet Add(State, Total,Children,Adults,Elderly) -> (State) {{
-pop[State.upper()] = (int(Total), int(Children), int(Adults), int(Elderly))
-}}
+}
+facet Add(State, Total,Children,Adults,Elderly) -> (State) {
+	pop[State.upper()] = (int(Total), int(Children), int(Adults), int(Elderly))
+}
 
-facet Map(State) -> (State,Total,Children,Adults,Elderly) {{
-source = pop[State.upper()]
-Total = source[0]
-Children = source[1]
-Adults = source[2]
-Elderly = source[3]
-}}
+facet Map(State) -> (State,Total,Children,Adults,Elderly) {
+	source = pop[State.upper()]
+	Total = source[0]
+	Children = source[1]
+	Adults = source[2]
+	Elderly = source[3]
+}
 
-facet Query(State) -> (State,Total,Children,Adults,Elderly) {{
-source = pop[State.upper()]
-Total = source[0]
-Children = source[1]
-Adults = source[2]
-Elderly = source[3]
-}}
+facet Query(State) -> (State,Total,Children,Adults,Elderly) {
+	source = pop[State.upper()]
+	Total = source[0]
+	Children = source[1]
+	Adults = source[2]
+	Elderly = source[3]
+}
 
 
 python Reg
-facet Init {{
-regions = dict()
-}}
-facet Add (State, Region, Division) -> (Region) {{
-regions[State.upper()] = (Region, Division)
-}}
+facet Init {
+	regions = dict()
+}
+facet Add (State, Region, Division) -> (Region) {
+	regions[State.upper()] = (Region, Division)
+}
 
-facet Query (State) -> (Region, Division)  {{
-p = regions[State.upper()]
-Region = p[0]
-Division = p[1]
-}}
+facet Query (State) -> (Region, Division)  {
+	p = regions[State.upper()]
+	Region = p[0]
+	Division = p[1]
+}
 
-facet Map (State) -> (Region, Division)  {{
-p = regions[State.upper()]
-Region = p[0]
-Division = p[1]
-}}
+facet Map (State) -> (Region, Division)  {
+	p = regions[State.upper()]
+	Region = p[0]
+	Division = p[1]
+}
 
 python Abr
-facet Init {{codes= dict()}}
-facet Add(State, id) -> (id) {{codes[State.upper()] = id}}
-facet Map(State) -> (id) {{id = codes[State.upper()]}}
+facet Init {codes= dict()}
+facet Add(State, id) -> (id) {codes[State.upper()] = id}
+facet Map(State) -> (id) {id = codes[State.upper()]}

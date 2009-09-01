@@ -2,13 +2,13 @@ STREAM: File
 NAME: MTTSource
 HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
 SEPARATOR: \s*\|\s*
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/SeeTest/18049-arch-compiler.output.txt
+SOURCE: ./18049-arch-compiler.output.txt
 CHECKHEADER: true
 STREAM: File
 NAME: MTTNotApplicable
 HEADER: axis1A, axis1B, axis2A, axis2B
 SEPARATOR: ,\s*
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/SeeTest/NoData-Comp.txt
+SOURCE: ./NoData-Comp.txt
 CHECKHEADER: true
 
 external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
@@ -40,7 +40,7 @@ legend Pallet(Name) -> (C)
 
 
 python Layout
-facet Init {{
+facet Init {
 XIndex= []
 YIndex = []
 majorOffset = 50
@@ -80,20 +80,20 @@ def suiteLayout(baseX, baseY, suite):
 	X = baseX + border + (offset%2 * minorOffset)
 	Y = baseY + border+ (offset/2 * minorOffset)
 	return (X,Y) 
-}}
+}
 
 @project facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
-{{
-(X,Y) = baseLayout(X1,X2,Y1,Y2)
-(X,Y) = suiteLayout(X,Y, suite)
-}}
+{
+	(X,Y) = baseLayout(X1,X2,Y1,Y2)
+	(X,Y) = suiteLayout(X,Y, suite)
+}
 
-@project facet Map (X1,X2,Y1,Y2) -> (X,Y) {{
-(X,Y) = baseLayout(X1,X2,Y1,Y2)
-}}
+@project facet Map (X1,X2,Y1,Y2) -> (X,Y) {
+	(X,Y) = baseLayout(X1,X2,Y1,Y2)
+}
 
-@project facet Query (X1,X2,Y1,Y2) -> (X,Y) {{(X,Y) = queryLayout(X1,X2,Y1,Y2)}}
-@project facet DoGuide () -> (T) {{T = "FALSE"}}
+@project facet Query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
+@project facet DoGuide () -> (T) {T = "FALSE"}
 
-@project facet Guide (X1,X2,Y1,Y2) -> (X,Y) {{(X,Y) = queryLayout(X1,X2,Y1,Y2)}}
+@project facet Guide (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
 

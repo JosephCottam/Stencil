@@ -28,6 +28,8 @@
  */
 package stencil.rules;
 
+import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
+
 import org.python.util.PythonInterpreter;
 
 import stencil.parser.tree.Facet;
@@ -58,6 +60,8 @@ public class EncapsulationGenerator {
 		registerEnv(pythonSpec.getEnvironment());
 		JythonLegend legend = new JythonLegend(module.getModuleData().getName(), pythonSpec.getName());
 		for (Facet b: pythonSpec.getFacets()) {
+			if (b.getName().equals(INIT_BLOCK_TAG)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
+			
 			try {legend.add(new JythonEncapsulation(pythonSpec,b,this), b);}
 			catch (Exception e) {throw new RuntimeException(String.format("Error creating encapsulation for facet %1$s (%2$s).", b.getName(), b.getBody()),e);}
 		}
@@ -67,7 +71,17 @@ public class EncapsulationGenerator {
 		return legend;
 	}
 	
+	/**Invoke the init block of a spec in the named environment.*/ 
+	private void invokeInitBlock(Facet init, String env) {
+		String body=init.getBody();
+		PythonInterpreter environment = registerEnv(env);
+		if (body !=null && !body.trim().equals("")) {
+			environment.exec(body);
+		}
 
+	}
+	
+	/**Get the named environment.*/
 	public PythonInterpreter getEnvironment(String name) {return environments.get(name);}
 
 	/**Ensures that an environment with the given name exists.  It it already exists, it is

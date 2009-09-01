@@ -164,6 +164,8 @@ public abstract class ParseStencil {
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
 
+		//Verify that Python legends are syntactically correct and appropriately indented
+		treeTokens = new CommonTreeNodeStream(p);
 		PythonValidator pyValidator = new PythonValidator(treeTokens);
 		pyValidator.downup(p);
 		

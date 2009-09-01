@@ -16,18 +16,17 @@ import stencil.util.collections.*;
 
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)
 public class TwitterTuples extends CacheFeed<HttpClient> {
-	public static final String HEADER = "MESSAGE, LINK, TIME";
+	public static final String HEADER = "MESSAGE, LINK, SOURCE, TIME";
+	private static final String[] FIELDS = HEADER.split(", ");
 	
 	private static class TwitterTuple implements Tuple {
-		private static final String[] FIELDS = HEADER.split(", ");
 		private String[] values = new String[FIELDS.length];
-		private String feed;
 
 		public TwitterTuple(String feed, String message, String link, String time) {
-			this.feed = feed;
 			values[0] = message;
 			values[1] = link;
-			values[2] = time;
+			values[2] = feed;
+			values[3] = time;
 		}
 
 		public Object get(String name) throws InvalidNameException {

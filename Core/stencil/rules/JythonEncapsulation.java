@@ -61,16 +61,11 @@ public class JythonEncapsulation {
 	protected PyCode codeCache;
 
 	public JythonEncapsulation(Python python, Facet facet, EncapsulationGenerator envSource) {
+		assert !facet.getName().equals(INIT_BLOCK_TAG) : "Should never create an encapusluation for init block.";
+
 		this.facet = facet;
 		environment = envSource.registerEnv(python.getEnvironment());
 		codeCache = Py.compile(new java.io.ByteArrayInputStream(facet.getBody().getBytes()), null, CompileMode.exec);
-		
-		
-		String body=facet.getBody();
-		if (facet.getName().equals(INIT_BLOCK_TAG) && body !=null && !body.trim().equals("")) {
-			environment.exec(body);
-		}
-		
 	}
 	
 	public Tuple invoke(Object... args) {

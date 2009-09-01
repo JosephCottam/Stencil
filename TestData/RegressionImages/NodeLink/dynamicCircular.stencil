@@ -2,7 +2,7 @@ STREAM: File
 NAME: Edges
 HEADER: ID1,ID2
 SEPARATOR: ,
-SOURCE: /u/jcottam/Documents/workspace/Stencil/TSM-Test/TestData/RegressionImages/NodeLink/er_100_0.005.adj
+SOURCE: ./er_100_0.005.adj
 CHECKHEADER: true
 
 external stream Edges (ID1, ID2)
@@ -13,12 +13,12 @@ from Edges
 	ID: ID1
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y)<< Ordering(ID1) -> Spiral.Query(VALUE) -> (X,Y)
+	(X,Y)<< Ordering(ID1) -> Circular.Query(VALUE) -> (X,Y)
 from Edges
 	ID: ID2
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y)<< Ordering(ID2) -> Spiral.Query(VALUE) -> (X,Y)
+	(X,Y)<< Ordering(ID2) -> Circular.Query(VALUE) -> (X,Y)
 
 layer Edges[LINE]
 from Edges 
@@ -32,19 +32,19 @@ from Edges
 legend Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
-python Spiral
-facet Init {{
-from math import *
-max =0
-}}
+python Circular
+facet Init {
+	from math import *
+	max =0
+}
 
-facet Query(Seq) -> (X,Y) {{
-Seq = float(Seq) +1
-if (Seq > max): max=Seq
+facet Query(Seq) -> (X,Y) {
+	Seq = float(Seq) +1
+	if (Seq > max): max=Seq
 
-radius = sqrt(max)+ max/100 * 20
-offset = (Seq/max)*360*0.01745   #to radians
+	radius = sqrt(max)+ max/100 * 20
+	offset = (Seq/max)*360*0.01745   #to radians
 
-X = radius * cos(offset)
-Y = radius * sin(offset)
-}}
+	X = radius * cos(offset)
+	Y = radius * sin(offset)
+}

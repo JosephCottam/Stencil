@@ -16,6 +16,7 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.string.StencilLexer;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.*;
+import stencil.parser.validators.PythonValidator;
 import stencil.rules.ModuleCache;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
@@ -65,6 +66,11 @@ public class TestFragments extends TestCase {
 		ModuleCache modules = imports.processImports(p);
 
 		//Create ad-hoc operators
+		treeTokens = new CommonTreeNodeStream(p);
+		PythonValidator pyValidator = new PythonValidator(treeTokens);
+		pyValidator.downup(p);
+		
+		treeTokens = new CommonTreeNodeStream(p);
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
 		
