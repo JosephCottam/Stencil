@@ -18,7 +18,7 @@ import stencil.util.collections.*;
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)
 public class TwitterTuples extends CacheFeed<HttpClient> {
 	public static final String HEADER = "MESSAGE, LINK, SOURCE, TIME";
-	private static final String[] FIELDS = HEADER.split(", ");
+	protected static final String[] FIELDS = HEADER.split(", ");
 	
 	private static class TwitterTuple implements Tuple {
 		private String[] values = new String[FIELDS.length];

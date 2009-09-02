@@ -150,13 +150,16 @@ public abstract class ImageTest {
 			counter++;
 		}
 
-		List<Integer> differences = new ArrayList<Integer>();
+		List<String> differences = new ArrayList<String>();
 		while (file1.ready() && file2.ready()) {
 			String line1 = file1.readLine();
 			String line2 = file2.readLine();
-			if (!line1.equals(line2)) {differences.add(counter);}
+			if (!line1.equals(line2)) {differences.add(Integer.toString(counter));}
 			counter++;
 		}
+		if (file1.ready() && !file2.ready()) {differences.add("Original has more lines than test result");}
+		if (file2.ready() && !file1.ready()) {differences.add("Test result has more lines than original");}
+		
 		if (differences.size()>0) {fail("Differences on lines "+ Arrays.deepToString(differences.toArray()));}
 
 	}
