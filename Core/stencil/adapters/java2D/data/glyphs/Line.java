@@ -43,10 +43,8 @@ public final class Line extends Stroked {
 	static {
 		attributes = new AttributeList(Stroked.attributes);
 
-		attributes.add(new Attribute("X.1", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Y.1", Yn.getDefaultValue(), Yn.getType()));
-		attributes.add(new Attribute("X.2", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Y.2", Yn.getDefaultValue(), Yn.getType()));
+		attributes.add(new Attribute("Xn", Xn.getDefaultValue(), Xn.getType()));
+		attributes.add(new Attribute("Yn", Yn.getDefaultValue(), Yn.getType()));
 		
 		attributes.remove(StandardAttribute.HEIGHT);
 		attributes.remove(StandardAttribute.WIDTH);
@@ -72,6 +70,8 @@ public final class Line extends Stroked {
 		else if (name.equals("Y.1")) {return y1;}
 		else if (name.equals("X.2")) {return x2;}
 		else if (name.equals("Y.2")) {return y2;}
+		else if (name.equals("Xn"))  {return new Double[]{x1,x2};}
+		else if (name.equals("Yn"))  {return new Double[]{y1,y2};}
 		else{return super.get(name);}		
 	}
 	

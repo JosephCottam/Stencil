@@ -87,7 +87,7 @@ public class Text extends CommonNode {
 	}
 
 	public Object getFormatPart(String att) {
-		return TextFormats.get(att, text.getFont(), text.getTextPaint(), text.getJustification(), Math.toDegrees(text.getRotation()));
+		return TextFormats.get(att, text.getFont(), text.getTextPaint(), text.getJustification());
 	}
 
 

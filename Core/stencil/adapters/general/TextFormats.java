@@ -138,6 +138,9 @@ public final class TextFormats {
 		return newFont;
 	}
 
+	public static Format set(String key, Object value, Format format) {
+		return set(key, value, format.font, format.textColor, format.justification);
+	}
 
 	public static Format set(String key, Object value, Font font, Paint color, float justify) {
 		String name = font.getName();
@@ -158,7 +161,10 @@ public final class TextFormats {
 
 	}
 
-	public static Object get(String key, Font font, Paint color, float justify, double orientation) {
+	public static Object get(String key, Format format) {
+		return get(key, format.font, format.textColor, format.justification);
+	}
+	public static Object get(String key, Font font, Paint color, float justify) {
 		TextProperty att = TextProperty.valueOf(key.toString());
 
 		switch (att) {

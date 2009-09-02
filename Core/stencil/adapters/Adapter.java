@@ -28,6 +28,9 @@
  */package stencil.adapters;
 
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Layer;
@@ -50,6 +53,8 @@ import stencil.streams.Tuple;
  *
  */
 public interface Adapter {
+	/**Graphics object that may be used by adapters for planning purposes.*/
+	public static final Graphics2D DEFAULT_GRAPHICS = (Graphics2D) new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB).getGraphics();
 
 	//------------------------------------------------------------------------------------------
 	//Compile-time support operations.  These methods are used by the host application

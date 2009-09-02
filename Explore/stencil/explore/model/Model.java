@@ -36,12 +36,12 @@ import java.util.HashMap;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
 import stencil.explore.model.sources.StreamSource;
+import stencil.explore.util.ListModel;
 import stencil.explore.util.StencilRunner;
 import stencil.adapters.Adapter;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.explore.coordination.*;
-import stencil.explore.util.ListModel;
 
 /**Central data repository and control structure for a stencil application.
  *
@@ -60,7 +60,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	protected StencilRunner runner;
 
-
+	/**Construct a new model for the Stencil application.*/
 	public Model() {
 		sources = new ListModel();
 		adapterOpts = new AdapterOpts();
@@ -110,7 +110,12 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 			public void run() {
 				try {runner.join();}
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
-				reporter.addMessage("Execution terminated.");
+				
+				if (runner.getThrowable() == null) {reporter.addMessage("Execution terminated.");}
+				else {
+					reporter.addMessage("Execution terminated abnormally.");
+					runner.getThrowable().printStackTrace();
+				}
 			}
 		};
 

@@ -28,7 +28,6 @@
  */
 package stencil.unittests.adapters;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import stencil.unittests.adapters.examples.*;
 
@@ -57,9 +56,8 @@ public abstract class Examples extends TestCase {
 		if (pngFail == null && txtFail == null) {return;} //passed!
 		if (pngFail == null && txtFail != null) {throw txtFail;}
 		if (pngFail != null && txtFail == null) {throw pngFail;}
-		if (pngFail instanceof AssertionFailedError && txtFail instanceof AssertionFailedError) {throw new AssertionFailedError("Mismatch in both txt and png.");}
 		
-		if (txtFail != null) {throw new Exception("Error creating txt", txtFail);}
+		if (txtFail != null) {throw new Exception("Error creating txt and png (txt error enclosed)", txtFail);}
 		throw new Exception("Error creating png", pngFail);		
 	}
 

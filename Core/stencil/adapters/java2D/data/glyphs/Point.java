@@ -80,12 +80,12 @@ public abstract class Point implements Glyph {
 			return g;
 		} catch (Exception e) {throw new Error("Error duplicating tuple:" + this.toString());}
 	}	
-		
+
 	public void set(String name, Object value) {
 		if (name.equals(ID.name())) {this.id = Converter.toString(value);}
 		else if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
 		else if (name.equals(Y.name())) {this.y = Converter.toDouble(value);}
-		else if (name.equals(Z.name())) {this.y = Converter.toDouble(value);}
+		else if (name.equals(Z.name())) {this.z = Converter.toDouble(value);}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	

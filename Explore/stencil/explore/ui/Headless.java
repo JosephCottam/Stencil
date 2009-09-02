@@ -39,6 +39,7 @@ import stencil.explore.model.Model;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
+import stencil.explore.util.StencilRunner;
 import stencil.types.Converter;
 
 
@@ -130,10 +131,11 @@ public class Headless {
 
 		//Run
 		model.compile();
-		Thread t = model.execute();
+		StencilRunner t = model.execute();
 		t.join();
 
-		Thread.yield();
+		if (t.getThrowable() != null) {throw new Exception("Stencil stopped with an error.", t.getThrowable());}
+		
 
 		//Save output
 		for (int i =0; i < args.length; i++) {

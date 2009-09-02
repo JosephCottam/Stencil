@@ -136,7 +136,8 @@ public final class Tuples {
 		Arrays.sort(fields);
 		for (String name: fields){
 			Object value =t.get(name);
-
+			if (value instanceof Number && ((Number) value).doubleValue() ==-0) {value =0.0d;}//Prevent negative zeros
+			 
 			//Skip values currently set to the default
 			if (t.isDefault(name, value)) {continue;}
 			
@@ -150,7 +151,6 @@ public final class Tuples {
 			}else if (value.getClass().isArray()) {
 				value = Arrays.deepToString((Object[]) value);
 			}
-
 			rv.append(String.format("%1$s:%2$s; ", name, value));
 		}
 

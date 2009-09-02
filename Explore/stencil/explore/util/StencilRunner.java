@@ -50,18 +50,21 @@ import stencil.parser.tree.Atom;
  *
  * This contains the heart of the data coordination engine that is part
  * of the Explore extension to Stencil.
+ * 
+ * TODO: Add error reporting
  * @author jcottam
  *
  */
-public class StencilRunner extends Thread {
+public final class StencilRunner extends Thread {
 	public static class AbnormalTerminiationException extends RuntimeException {
 		public AbnormalTerminiationException(String message) {super(message);}
 		public AbnormalTerminiationException(String message, Throwable t) {super(message, t);}
 	}
 	
-	protected boolean running =false;
-	protected Model model;
-	protected TupleLoader loader;
+	private boolean running =false;
+	private Model model;
+	private TupleLoader loader;
+	private Throwable throwable;
 
 	private boolean keepRunning = true;
 
@@ -109,10 +112,10 @@ public class StencilRunner extends Thread {
 			}
 			
 			adapter.finalize(panel);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			running = false;
+			throwable = e;
 			reporter.addError("Error executing Stencil program: %1$s.", e.getMessage());
-			e.printStackTrace();
 		}
 		running = false;
 	}
@@ -153,4 +156,6 @@ public class StencilRunner extends Thread {
 			}
 		}
 	}
+	
+	public Throwable getThrowable() {return throwable;}
 }
