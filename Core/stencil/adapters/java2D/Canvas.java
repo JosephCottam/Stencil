@@ -32,6 +32,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import javax.swing.JComponent;
@@ -65,7 +66,7 @@ public final class Canvas extends JComponent {
 		
 		this.setSize(400,400);//set a default size
 	}
-	
+		
 	public void paintComponent(Graphics g) {
 		paintBufferToScreen(g);
 	}
@@ -76,12 +77,17 @@ public final class Canvas extends JComponent {
 
 	public void setBackBuffer(Image i) {this.buffer = i;}
 	
-	protected void finalize() {
-		painter.signalStop();
-	}
 	
 	public Rectangle getContentDimension() {
-		return new Rectangle(-100,-100,200,200);
+		Rectangle2D bounds = new Rectangle2D.Double(0,0,0,0);
+		
+		for (Table<? extends Point> t: layers) {
+			for (Point p: t) {
+				bounds.add(p.getBounds());
+			}
+		}
+		return bounds.getBounds();
 	}	
-	
+
+	public void stopPainter() {painter.signalStop();}
 }

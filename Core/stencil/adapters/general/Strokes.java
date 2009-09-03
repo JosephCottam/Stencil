@@ -73,7 +73,7 @@ public final class Strokes {
 		ROUND (BasicStroke.CAP_ROUND),
 		SQUARE (BasicStroke.CAP_SQUARE);
 
-		private int equiv;
+		int equiv;
 		CapStyles(int equiv){this.equiv = equiv;}
 		public Integer getValue() {return equiv;}
 		public static CapStyles fromValue(int equiv) {
@@ -90,7 +90,7 @@ public final class Strokes {
 		BEVEL (BasicStroke.JOIN_BEVEL),
 		ROUND (BasicStroke.JOIN_ROUND);
 
-		private int equiv;
+		int equiv;
 		JoinStyles(int equiv){this.equiv = equiv;}
 		public Integer getValue() {return equiv;}
 		public static JoinStyles fromValue(int equiv) {
@@ -111,8 +111,8 @@ public final class Strokes {
 //		PATTERN ('0' , String.class),
 //		PATTERN_PHASE (0, Double.class);
 
-		private final Object defaultValue;
-		private final Class type;
+		final Object defaultValue;
+		final Class type;
 
 		StrokeProperty(Object defaultValue, Class type)  {
 			this.defaultValue = defaultValue;

@@ -31,11 +31,10 @@ package stencil.adapters.piccoloDynamic.glyphs;
 
 import java.awt.Paint;
 import java.awt.Color;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Ellipse2D;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Strokes.StrokeProperty;
+import stencil.adapters.general.Pies;
 import stencil.adapters.piccoloDynamic.util.Attribute;
 import stencil.adapters.piccoloDynamic.util.Attributes;
 
@@ -47,7 +46,6 @@ public class Pie extends Path {
 	protected static final Attributes PROVIDED_ATTRIBUTES  = new Attributes();
 
 	protected static final Color DEFAULT_SLICE_COLOR  = Color.RED;
-	protected static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
 
 	static {
 		for (Attribute a : Path.PROVIDED_ATTRIBUTES.values()) {PROVIDED_ATTRIBUTES.put(a);}
@@ -108,44 +106,18 @@ public class Pie extends Path {
 	}
 
 	private void verifyShape() {
+		double angle = this.angle;
 		double percent = getPercent();
-		java.awt.Shape arc = null;
-		java.awt.Shape fill = null;
+		double x = getX();
+		double y = getY();
+		double size = getSize();
+		double strokeWidth = (Double) getAttribute(StrokeProperty.STROKE_WEIGHT.name());
+		Color strokePaint = (Color) getAttribute(StrokeProperty.STROKE_COLOR.name());
+		
+		java.awt.Shape arc = Pies.makeSlice(angle, percent, x, y, size, strokeWidth, strokePaint);
+		java.awt.Shape outline = Pies.makePieOutline(angle, percent, x, y, size, strokeWidth, strokePaint);
 
-		//Calculate circle size based on stroke
-		double marginWidth = (Double) getAttribute(StrokeProperty.STROKE_WEIGHT.name());
-		Color c = (Color) getAttribute(StrokeProperty.STROKE_COLOR.name());
-		if (c.getAlpha() == 1) {marginWidth=0;}
-
-		Double circleWidth=this.getBounds().getBounds2D().getWidth() -marginWidth;
-		Double circleHeight=this.getBounds().getBounds2D().getHeight() - marginWidth;
-		Double x = this.getBounds().getBounds2D().getX() + (marginWidth /2);
-		Double y = this.getBounds().getBounds2D().getY() + (marginWidth /2);
-
-
-		//Render appropriately
-		if (percent != 0 && percent != 1) {
-			Arc2D a;
-			double startAngle;
-			double extentAngle;
-
-			startAngle = (90 + getAngle()) %360;
-			extentAngle = -360*percent;
-
-			a = new Arc2D.Double(Arc2D.PIE);
-			a.setAngleStart(startAngle);
-			a.setAngleExtent(extentAngle);
-			a.setFrame(x,y, circleWidth, circleHeight);
-			arc =a;
-		} else if (percent ==1) {
-			arc = new Ellipse2D.Double();
-			((Ellipse2D) arc).setFrame(x,y, circleWidth, circleHeight);
-		}
-
-		fill = new Ellipse2D.Double();
-		((Ellipse2D)fill).setFrame(x,y,circleWidth, circleHeight);
-
-		super.setPath(fill);
+		super.setPath(outline);
 		if (arc != null) {sliceGlyph.setPathTo(arc);}
 		else {sliceGlyph.setPathTo(new java.awt.geom.GeneralPath());}
 	}

@@ -75,8 +75,8 @@ public final class Shape extends Filled {
 	public StandardShape getShape() {return shape;}
 	public Double getSize() {return size;}
 
-	public Double getWidth() {return size;}
-	public Double getHeight() {return size;}
+	public double getWidth() {return size;}
+	public double getHeight() {return size;}
 	public String getImplantation() {return "SHAPE";}
 	
 	public void render(Graphics2D g) {

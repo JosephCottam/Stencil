@@ -52,7 +52,7 @@ public final class TextFormats {
 			
 			font =  new Font(fontName, style, size);
 			textColor =(Color) TextProperty.FONT_COLOR.defaultValue;
-			justification= ((Justification) TextProperty.JUSTIFY.defaultValue).jLabelEquiv;
+			justification= ((Justification) TextProperty.JUSTIFY.defaultValue).equiv;
 		}
 		public Format(Font font, Color textColor, float justification) {
 			super();
@@ -69,12 +69,12 @@ public final class TextFormats {
 		RIGHT (Component.RIGHT_ALIGNMENT),
 		CENTER (Component.CENTER_ALIGNMENT);
 
-		private float jLabelEquiv;
-		Justification(float equiv){this.jLabelEquiv = equiv;}
-		public float getJLabelEquiv() {return jLabelEquiv;}
+		float equiv;
+		Justification(float equiv){this.equiv = equiv;}
+		public float getJLabelEquiv() {return equiv;}
 		public static Justification fromJLabelEquiv(float equiv) {
 			for (Justification j: Justification.values()) {
-				if (j.jLabelEquiv == equiv) {return j;}
+				if (j.equiv == equiv) {return j;}
 			}
 			throw new IllegalArgumentException("No justification equivalent found for " + equiv + ".");
 		}
@@ -88,7 +88,7 @@ public final class TextFormats {
 		ITALIC (Font.ITALIC),
 		BOLD_ITALIC (Font.BOLD + Font.ITALIC);
 
-		private int equiv;
+		int equiv;
 		FontStyle(int equiv) {this.equiv = equiv;}
 		public int getFontEquiv() {return equiv;}
 		public static FontStyle fromFontEquiv(int equiv) {
@@ -99,14 +99,13 @@ public final class TextFormats {
 
 	public enum TextProperty implements Attribute {
 		JUSTIFY	 	(Justification.LEFT, Justification.class),
-//		ALIGN	 	(Alignment.TOP, Alignment.class, "Alignment"),
 		FONT		("Helvetica", String.class),
 		FONT_COLOR  (Color.BLACK, Color.class),
 		FONT_STYLE	(FontStyle.PLAIN, FontStyle.class),
 		FONT_SIZE	(12.0f, Float.class);			//Should be a round integer by default to be properly supported in default format
 
-		private final Object defaultValue;
-		private final Class type;
+		final Object defaultValue;
+		final Class type;
 
 		TextProperty(Object defaultValue, Class type)  {
 			this.defaultValue = defaultValue;

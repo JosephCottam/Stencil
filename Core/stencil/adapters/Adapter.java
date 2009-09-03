@@ -84,7 +84,14 @@ public interface Adapter {
 	
 	
 	/**The data loading process has ended.  
-	 * Get the panel into a final state.*/
+	 * Get the panel into a final state.
+	 * 
+	 * NOTE: This method should not be confused with finalize().  
+	 * 'finalize(StencilPanel)' completes any post-data loading
+	 * actions on the visualization.  It has nothing to do with 
+	 * the garbage collection.  'finalize()' is called by the 
+	 * garbage collector when the adapter is being reclaimed.
+	 * */
 	public void finalize(StencilPanel panel);
 	
 	/**Transfer the values of the source over to the target glyph.

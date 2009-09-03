@@ -10,6 +10,7 @@ import static stencil.adapters.general.TextFormats.Format;
 
 import static stencil.adapters.Adapter.DEFAULT_GRAPHICS;
 import static stencil.util.enums.EnumUtils.contains;
+import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.TextFormats;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -17,7 +18,12 @@ import stencil.types.Converter;
 
 public final class Text extends Point {
 	private static Pattern splitter = Pattern.compile("\n");
+	
+	private static final double AUTO_SIZE = -1;
 	private static final Attribute TEXT = new Attribute("TEXT", "");
+	private static final Attribute WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SIZE, Double.class);
+	private static final Attribute HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SIZE, Double.class);
+	
 	protected static final AttributeList attributes;
 	static {
 		attributes = new AttributeList(Point.attributes);
@@ -28,8 +34,12 @@ public final class Text extends Point {
 
 	private String text = (String) TEXT.defaultValue;
 	private Format format = new Format();
-	private double width;
-	private double height;
+	
+	private boolean autoWidth = true;
+	private boolean autoHeight = true;
+	
+	private double width = (Double) WIDTH.defaultValue;
+	private double height= (Double) HEIGHT.defaultValue;
 	
 	public Text(String id) {super(id);}
 	
@@ -40,7 +50,9 @@ public final class Text extends Point {
 	}
 	
 	public void set(String name, Object value) {
-		if (name.equals("TEXT")) {this.text = Converter.toString(value);}
+			 if (TEXT.is(name)) 	{this.text = Converter.toString(value);}
+		else if (WIDTH.is(name)) 	{this.width = Converter.toDouble(value); autoWidth = (this.width ==AUTO_SIZE);}
+		else if (HEIGHT.is(name)) 	{this.height = Converter.toDouble(value); autoHeight = (this.height ==AUTO_SIZE);}
 		else if (contains(TextProperty.class, name)) {
 			Class c = attributes.get(name).type;
 			value = Converter.convert(value, c);
@@ -53,8 +65,12 @@ public final class Text extends Point {
 	@Override
 	protected AttributeList getAttributes() {return attributes;}
 
-	public Double getHeight() {return height;}	
-	public Double getWidth() {return width;}
+	public double getHeight() {
+		return height;
+	}	
+	public double getWidth() {
+		return width;
+	}
 	public String getImplantation() {return "TEXT";}
 
 
@@ -66,6 +82,8 @@ public final class Text extends Point {
 
 	//TODO: Change to 'compute layout' and determine line breaks...if needed
 	private final void computeMetrics() {
+		if (!autoHeight && !autoWidth) {return;}
+		
         FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(format.font);
         String[] lines = splitter.split(text);
         double maxWidth=0;
@@ -73,8 +91,8 @@ public final class Text extends Point {
         	double width = fm.stringWidth(line);
         	maxWidth = Math.max(maxWidth, width);
         }
-        this.height = fm.getHeight() * lines.length;
-        this.width = maxWidth;
+        if (autoHeight) {this.height = fm.getHeight() * lines.length;}
+        if (autoWidth) {this.width = maxWidth;}
 	}
 
 	

@@ -28,63 +28,75 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
-
-import java.awt.geom.Line2D;
 import java.awt.Graphics2D;
 
-import stencil.types.Converter;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
+
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
+import stencil.types.Converter;
 
-public final class Line extends Stroked {
-	protected static final AttributeList attributes;
+public final class Image extends Point {
+	private static final double AUTO_SCALE = -1;
+	
+	private static final Attribute HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SCALE);
+	private static final Attribute WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SCALE);
+	private static final Attribute FILE= new Attribute("FILE", null, String.class);
+	protected static final AttributeList attributes = new AttributeList();
+
 	static {
-		attributes = new AttributeList(Stroked.attributes);
-
-		attributes.add(new Attribute("Xn", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Yn", Yn.getDefaultValue(), Yn.getType()));
-		
-		attributes.remove(StandardAttribute.HEIGHT);
-		attributes.remove(StandardAttribute.WIDTH);
+		attributes.add(FILE);
+		attributes.add(HEIGHT);
+		attributes.add(WIDTH);
 	}
-
-	private double x1 = (Double) attributes.get(X.name()).defaultValue;
-	private double y1 = (Double) attributes.get(X.name()).defaultValue;
-	private double x2 = (Double) attributes.get(X.name()).defaultValue;
-	private double y2 = (Double) attributes.get(X.name()).defaultValue;
 	
-	public Line(String id) {super(id);}
+	private java.awt.image.BufferedImage i;
+	private String filename = (String) FILE.defaultValue;
 
-	public double getHeight() {return Math.abs(y1-y2);}
-
-	public double getWidth() {return Math.abs(x1-x2);}
+	private double width = (Double) HEIGHT.defaultValue;
+	private double height = (Double) WIDTH.defaultValue;
 	
-	public String getImplantation() {return "LINE";} 
+	public Image(String id) {super(id);}
 
 	protected AttributeList getAttributes() {return attributes;}
+
+	public void set(String name, Object value) {
+			 if (HEIGHT.is(name)) 	{height= Converter.toDouble(value); verifyImage();}
+		else if (WIDTH.is(name)) 	{width = Converter.toDouble(value); verifyImage();}
+		else if (FILE.is(name)) {filename = Converter.toString(value); verifyImage();}
+		else						{super.set(name, value);}
+	}
 	
 	public Object get(String name) {
-		if (name.equals("X.1")) 	 {return x1;}
-		else if (name.equals("Y.1")) {return y1;}
-		else if (name.equals("X.2")) {return x2;}
-		else if (name.equals("Y.2")) {return y2;}
-		else if (name.equals("Xn"))  {return new Double[]{x1,x2};}
-		else if (name.equals("Yn"))  {return new Double[]{y1,y2};}
-		else{return super.get(name);}		
+		if (HEIGHT.is(name)) 	{return height;}
+		if (WIDTH.is(name)) 	{return width;}
+		if (FILE.is(name)) 	{return filename;}
+		
+		return super.get(name);
 	}
 	
-	public void set(String name, Object value) {
-		if (name.equals("X.1")) 	 {x1 = Converter.toDouble(value);}
-		else if (name.equals("Y.1")) {y1 = Converter.toDouble(value);}
-		else if (name.equals("X.2")) {x2 = Converter.toDouble(value);}
-		else if (name.equals("Y.2")) {y2 = Converter.toDouble(value);}
-		else{super.set(name, value);}
+	public double getHeight() {
+		if (i ==null) {return 0;}
+		else if (height != AUTO_SCALE) {return height;}
+		return i.getHeight();
+	}
+	public String getImplantation() {return "IMAGE";}
+
+	public double getWidth() {
+		if (i ==null) {return 0;}
+		else if (width != AUTO_SCALE) {return width;}
+		return i.getWidth();
 	}
 	
+	/**Given the current information, make sure the image is 
+	 * ready to be rendered.
+	 */
+	private void verifyImage() {
+		//TODO: Implement
+	}
+
+	@Override
 	public void render(Graphics2D g) {
-		Line2D l = new Line2D.Double(x1,y1,x2,y2);
-		super.render(g,l);		
+		//TODO: Actually render...
 	}
 }

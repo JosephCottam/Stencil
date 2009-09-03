@@ -61,6 +61,7 @@ public class Adapter implements stencil.adapters.Adapter {
 
 
 	public void finalize(StencilPanel p) {
+		((Panel) p).getCanvas().getComponent().stopPainter();
 		return; //No finalization required
 	}
 

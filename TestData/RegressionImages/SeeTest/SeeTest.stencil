@@ -69,14 +69,14 @@ from MTTSource
 	ID: Concatenate(axis1A, axis1B) -> VALUE
 	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12) -> VALUE
 	TEXT: Concatenate(axis1A, "\n", axis1B) -> VALUE
-	(Y, Width): (-5, 50)
-	(ROTATION, JUSTIFY, ALIGN): ("VERTICAL", "LEFT", "CENTER")
+	(Y, WIDTH): (-5, 50)
+	(ROTATION, JUSTIFY): ("VERTICAL", "LEFT")
 from MTTSource
 	ID: Concatenate(axis2A, axis2B) -> VALUE
 	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12) -> VALUE
 	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(VALUE) -> Label
 	(X, WIDTH) : (-155, 150)
-	(JUSTIFY, ALIGN): ("RIGHT", "CENTER")
+	(JUSTIFY): ("RIGHT")
 from MTTSource
 	ID: graphLabel
 	Y: NamesIndex(graphLabel) -> VALUE

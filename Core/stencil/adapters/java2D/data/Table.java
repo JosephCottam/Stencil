@@ -94,7 +94,12 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 				return new Table<Line>(name, new Line("PROTOTYPE"));
 			} else if (implantation.equals("TEXT")) {
 				return new Table<Text>(name, new Text("PROTOTYPE"));
+			} else if (implantation.equals("PIE")) {
+				return new Table<Pie>(name, new Pie("PROTOTYPE"));
+			} else if (implantation.equals("IMAGE")) {
+				return new Table<Image>(name, new Image("PROTOTYPE"));
 			}
+
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
 		throw new IllegalArgumentException("Glyph type not know: " + implantation);
 	}

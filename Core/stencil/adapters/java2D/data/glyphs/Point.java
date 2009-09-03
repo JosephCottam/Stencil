@@ -30,6 +30,7 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
@@ -79,11 +80,27 @@ public abstract class Point implements Glyph {
 	
 	protected Point(String id) {this.id = id;}
 	
+	/**How wide is this glyph?*/
+	public abstract double getWidth();
 	
-	public abstract Double getWidth();
-	public abstract Double getHeight();
+	/**How tall is this glyph?*/
+	public abstract double getHeight();
+	
+	/**What is the name of this implantation?*/
 	public abstract String getImplantation();
+
+	/**Return a list of all of the attributes of this glyph.*/
+	protected abstract AttributeList getAttributes();
 	
+	/**Render the glyph to the given graphics object.*/
+	public abstract void render(Graphics2D g);
+
+	/**Returns the bounding box of this glyph.
+	 * 
+	 * TODO: Implement general bounds caching...(use a Point-level variable and a protected 'invalidate' method)
+	 * */
+	public Rectangle2D getBounds() {return new Rectangle2D.Double(x,y,getWidth(),getHeight());}
+
 	
 	/**Duplicate the current glyph, but give it a new ID.
 	 * 
@@ -104,6 +121,7 @@ public abstract class Point implements Glyph {
 		else if (name.equals(ROTATION.name())) {this.rotation = Converter.toDouble(value);}
 		else if (name.equals(REGISTRATION.name())) {this.registration = (Registration) Converter.convert(value, Registration.class);}
 		else if (name.equals(ID.name())) {this.id = Converter.toString(value);}
+		else if (name.equals(IMPLANTATION)) {throw new IllegalArgumentException("Cannot set implantation.");}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
@@ -125,8 +143,6 @@ public abstract class Point implements Glyph {
 	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
 		return Converter.convert(get(name), type);
 	}
-
-	protected abstract AttributeList getAttributes();
 	
 	public List<String> getFields() {
 		return getAttributes().getNames();
@@ -140,9 +156,7 @@ public abstract class Point implements Glyph {
 		Object def = getAttributes().getDefault(name);
 		return ((def == value) || (def != null) && def.equals(value));
 	}
-	
-	public abstract void render(Graphics2D g);
-	
+		
 	public String toString() {return Tuples.toString(this);}
 	
 	public void setLayer(Table layer) {this.layer =layer;}
@@ -150,4 +164,5 @@ public abstract class Point implements Glyph {
 	public final Point2D correctRegistration() {
 		return Registrations.registrationToTopLeft(registration, x,y, getHeight(), getWidth());
 	}
+	
 }
