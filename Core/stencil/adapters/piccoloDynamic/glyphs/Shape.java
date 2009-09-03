@@ -61,7 +61,6 @@ public class Shape extends Path {
 		for (FillProperty prop: FillProperty.values()) {
 			Object def = prop.getDefaultValue();
 			Class clss = prop.getType();
-			if (clss == Float.class) {clss = Double.class;}
 			PROVIDED_ATTRIBUTES.put(new Attribute(prop.name(), "getFillPart", "setFillPart", Shape.class, true, def, clss));
 		}
 

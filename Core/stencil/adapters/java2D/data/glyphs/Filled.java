@@ -31,13 +31,11 @@ package stencil.adapters.java2D.data.glyphs;
 import static stencil.util.enums.EnumUtils.contains;
 import static stencil.adapters.general.Fills.FillProperty;
 import stencil.adapters.general.Fills;
-import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import java.awt.Paint;
 import java.awt.Graphics2D;
 import java.awt.Shape;
-
 
 public abstract class Filled extends Stroked {
 	
@@ -45,7 +43,6 @@ public abstract class Filled extends Stroked {
 	static {
 		attributes = new AttributeList(Stroked.attributes);
 		for (FillProperty p: FillProperty.values()) {attributes.add(new Attribute(p));}
-		for (StrokeProperty p: StrokeProperty.values()) {attributes.add(new Attribute(p));}
 	}
 	
 	protected Filled(String id) {super(id);}

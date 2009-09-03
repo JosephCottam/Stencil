@@ -50,16 +50,16 @@ public abstract class CommonNode extends Node {
 	static {
 		for (Attribute a : Node.PROVIDED_ATTRIBUTES.values()) {PROVIDED_ATTRIBUTES.put(a);}
 
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.REGISTRATION, "getRegistration", "setRegistration", CommonNode.class, Registration.TOP_LEFT));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.REGISTRATION, "getRegistration", "setRegistration", CommonNode.class, StandardAttribute.REGISTRATION.getDefaultValue()));
 
 		//Modify to use registration-respecting X/Y coords
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.X.name(), "getXPosition", "setXPosition", CommonNode.class, 0.0));
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.Y.name(), "getYPosition", "setYPosition", CommonNode.class, 0.0));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.X.name(), "getXPosition", "setXPosition", CommonNode.class, StandardAttribute.X.getDefaultValue()));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.Y.name(), "getYPosition", "setYPosition", CommonNode.class, StandardAttribute.Y.getDefaultValue()));
 
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.WIDTH, "getWidth", "setWidth", CommonNode.class, new Double(1)));
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.HEIGHT, "getHeight", "setHeight", CommonNode.class, new Double(1)));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.WIDTH, "getWidth", "setWidth", CommonNode.class, StandardAttribute.WIDTH.getDefaultValue()));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.HEIGHT, "getHeight", "setHeight", CommonNode.class, StandardAttribute.HEIGHT.getDefaultValue()));
 
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.ROTATION, "getRotate", "setRotate", CommonNode.class, 0.0));
+		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.ROTATION, "getRotate", "setRotate", CommonNode.class, StandardAttribute.ROTATION.getDefaultValue()));
 	}
 
 	protected Registration registration = (Registration) PROVIDED_ATTRIBUTES.get(StandardAttribute.REGISTRATION).defaultValue;

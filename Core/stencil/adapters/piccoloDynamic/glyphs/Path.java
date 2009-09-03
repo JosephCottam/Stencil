@@ -50,9 +50,7 @@ public abstract class Path extends CommonNode {
 		//Used to derive defaults for stroke-related properties
 
 		for (StrokeProperty prop: StrokeProperty.values()) {
-			Object def = prop.getDefaultValue();
-			Class clss = prop.getType();
-			PROVIDED_ATTRIBUTES.put(new Attribute(prop.name(), "getStrokePart", "setStrokePart", Path.class, true, def, clss));
+			PROVIDED_ATTRIBUTES.put(new Attribute(prop.name(), "getStrokePart", "setStrokePart", Path.class, true, prop.getDefaultValue(), prop.getType()));
 		}
 	}
 
