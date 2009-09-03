@@ -75,12 +75,13 @@ public final class Image extends Point {
 		return super.get(name);
 	}
 	
+	public String getImplantation() {return "IMAGE";}
+
 	public double getHeight() {
 		if (i ==null) {return 0;}
 		else if (height != AUTO_SCALE) {return height;}
 		return i.getHeight();
 	}
-	public String getImplantation() {return "IMAGE";}
 
 	public double getWidth() {
 		if (i ==null) {return 0;}

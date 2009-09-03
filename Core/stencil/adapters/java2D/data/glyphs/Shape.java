@@ -30,6 +30,7 @@ package stencil.adapters.java2D.data.glyphs;
 
 
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
 
@@ -37,9 +38,12 @@ import stencil.types.Converter;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
+import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
- 
+import static stencil.types.color.NamedColor.CLEAR;
+
+
 public final class Shape extends Filled {
 	
 	private static final Attribute SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
@@ -50,15 +54,20 @@ public final class Shape extends Filled {
 		attributes = new AttributeList(Filled.attributes);
 		attributes.add(SHAPE);
 		attributes.add(SIZE);
+		attributes.add(new Attribute(StrokeProperty.STROKE_COLOR.name(), CLEAR, Paint.class));
 		
 		attributes.remove(StandardAttribute.WIDTH);
 		attributes.remove(StandardAttribute.HEIGHT);
 	}
 	
-	public Shape(String id) {super(id);}
+	public Shape(String id) {
+		super(id);
+		
+		this.outlinePaint = CLEAR;
+	}
 	
 	private StandardShape shape;
-	private Double size;
+	private double size;
 	
 	public void set(String name, Object value) {
 		if (SHAPE.is(name)) {this.shape = (StandardShape) Converter.convert(value, StandardShape.class);}
@@ -73,7 +82,7 @@ public final class Shape extends Filled {
 	}
 	
 	public StandardShape getShape() {return shape;}
-	public Double getSize() {return size;}
+	public double getSize() {return size;}
 
 	public double getWidth() {return size;}
 	public double getHeight() {return size;}

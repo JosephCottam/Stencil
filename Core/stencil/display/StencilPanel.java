@@ -64,6 +64,12 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 		this.setLayout(new BorderLayout());
 		this.add(canvas, BorderLayout.CENTER);
 	}
+	
+	/**Clean up any system resources/threads/etc. required
+	 * by this panel.  The default implementation does nothing
+	 * as some adapters may have nothing to dispose of.
+	 */
+	public void dispose() {/*By default, no action is taken*/}
 
 	/**Returns an unmodifiable copy of the current layers mapping.*/
 	public List<String> getLayers() {

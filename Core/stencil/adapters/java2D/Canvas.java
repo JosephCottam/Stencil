@@ -63,9 +63,14 @@ public final class Canvas extends JComponent {
 		this.painter = new Painter(this.layers, this);
 		painter.start();
 
+		setDoubleBuffered(false);	//Manually double buffered.  Needs to be changed if we use hardware double buffering.
+		setBackground(Color.WHITE);
+		setOpaque(true);
 		
 		this.setSize(400,400);//set a default size
 	}
+	
+	public void dispose() {painter.signalStop();}
 		
 	public void paintComponent(Graphics g) {
 		paintBufferToScreen(g);

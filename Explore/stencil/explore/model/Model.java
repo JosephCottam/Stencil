@@ -86,6 +86,8 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	/**Compile the source found in the editor, set the panel accordingly**/
 	public void compile() throws Exception {
+		if (stencilPanel != null) {stencilPanel.dispose();}
+		
 		Adapter adapter = adapterOpts.getAdapter();
 		Program program = ParseStencil.parse(stencil, adapter);
 		StencilPanel panel = adapter.generate(program);

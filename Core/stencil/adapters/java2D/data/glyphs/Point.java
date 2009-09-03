@@ -95,12 +95,21 @@ public abstract class Point implements Glyph {
 	/**Render the glyph to the given graphics object.*/
 	public abstract void render(Graphics2D g);
 
-	/**Returns the bounding box of this glyph.
-	 * 
-	 * TODO: Implement general bounds caching...(use a Point-level variable and a protected 'invalidate' method)
-	 * */
-	public Rectangle2D getBounds() {return new Rectangle2D.Double(x,y,getWidth(),getHeight());}
-
+	/**What are the actual bounds of this glyph?  
+	 * The X and Y of this may not match those stored in 'x' and 'y' because
+	 * the actual bounds will be as rendered on the screen, and 
+	 * therefore will always be the top-left corner.
+	 */
+	public Rectangle2D getBounds() {
+		double x,y,w,h;
+		w = getWidth();
+		h= getHeight();
+		x = this.x;
+		y = this.y;
+		Point2D r = Registrations.registrationToTopLeft(registration, x,y, w,h);		
+		return new Rectangle2D.Double(r.getX(), r.getY(),w,h);
+	}
+	
 	
 	/**Duplicate the current glyph, but give it a new ID.
 	 * 

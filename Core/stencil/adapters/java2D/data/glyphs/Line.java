@@ -76,11 +76,17 @@ public final class Line extends Stroked {
 	}
 	
 	public void set(String name, Object value) {
-		if (name.equals("X.1")) 	 {x1 = Converter.toDouble(value);}
-		else if (name.equals("Y.1")) {y1 = Converter.toDouble(value);}
+		if (name.equals("X.1")) 	 {x1 = Converter.toDouble(value); validateXY();}
+		else if (name.equals("Y.1")) {y1 = Converter.toDouble(value); validateXY();}
 		else if (name.equals("X.2")) {x2 = Converter.toDouble(value);}
 		else if (name.equals("Y.2")) {y2 = Converter.toDouble(value);}
+		else if (name.equals("X") || name.equals("Y")) {throw new IllegalArgumentException("Cannot set raw X and Y on a line.");}
 		else{super.set(name, value);}
+	}
+	
+	private void validateXY() {
+		this.x = Math.min(x1,x2);
+		this.y = Math.min(y1,y2);
 	}
 	
 	public void render(Graphics2D g) {

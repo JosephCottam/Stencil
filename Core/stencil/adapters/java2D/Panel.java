@@ -50,4 +50,6 @@ public class Panel extends stencil.display.StencilPanel<Table, Canvas> {
 	public Rectangle getVewBounds() {
 		return canvas.getContentDimension();
 	}
+	
+	public void dispose() {canvas.dispose();}
 }

@@ -32,7 +32,7 @@ package stencil.adapters.java2D.data;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.display.DisplayGuide;
@@ -40,7 +40,7 @@ import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
 public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
-	Map<String, T> index = new HashMap<String, T>();
+	Map<String, T> index = new ConcurrentHashMap<String, T>();
 	String name; 
 	T prototypeGlyph;
 

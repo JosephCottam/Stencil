@@ -76,8 +76,8 @@ public interface ViewTuple extends MutableTuple {
 		HEIGHT (StandardAttribute.HEIGHT.getDefaultValue(),StandardAttribute.HEIGHT.getType());
 
 
-		private final Object defaultValue;
-		private final Class type;
+		final Object defaultValue;
+		final Class type;
 
 		ViewAttribute(Object defaultValue, Class type)  {
 			this.defaultValue = defaultValue;

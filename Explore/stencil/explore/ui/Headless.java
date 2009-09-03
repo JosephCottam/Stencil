@@ -133,7 +133,7 @@ public class Headless {
 		model.compile();
 		StencilRunner t = model.execute();
 		t.join();
-
+		
 		if (t.getThrowable() != null) {throw new Exception("Stencil stopped with an error.", t.getThrowable());}
 		
 
@@ -153,7 +153,8 @@ public class Headless {
 				}
 			}
 		}
-
+		
+		model.getStencilPanel().dispose();
 	}
 
 }

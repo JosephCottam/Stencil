@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import static stencil.adapters.general.TextFormats.TextProperty;
 import static stencil.adapters.general.TextFormats.Format;
 
-import static stencil.adapters.Adapter.DEFAULT_GRAPHICS;
+import static stencil.adapters.Adapter.REFERENCE_GRAPHICS;
 import static stencil.util.enums.EnumUtils.contains;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.TextFormats;
@@ -84,7 +84,7 @@ public final class Text extends Point {
 	private final void computeMetrics() {
 		if (!autoHeight && !autoWidth) {return;}
 		
-        FontMetrics fm = DEFAULT_GRAPHICS.getFontMetrics(format.font);
+        FontMetrics fm = REFERENCE_GRAPHICS.getFontMetrics(format.font);
         String[] lines = splitter.split(text);
         double maxWidth=0;
         for (String line: lines) {
