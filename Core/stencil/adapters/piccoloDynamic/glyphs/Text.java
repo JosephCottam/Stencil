@@ -55,7 +55,6 @@ public class Text extends CommonNode {
 		for (TextProperty prop: TextProperty.values()) {
 			Object def = prop.getDefaultValue();
 			Class clss = prop.getType();
-			if (clss == Float.class) {clss = Double.class;}
 			PROVIDED_ATTRIBUTES.put(new Attribute(prop.name(), "getFormatPart", "setFormatPart", Text.class, true, def, clss));
 		}
 	}

@@ -54,6 +54,8 @@ public final class AttributeList implements Iterable<Attribute>{
 		names = null;
 	}
 	
+	public Attribute get(Enum name) {return get(name.name());}
+	
 	/**Get the given attribute.*/
 	public Attribute get(String name) {
 		return attributes.get(name);

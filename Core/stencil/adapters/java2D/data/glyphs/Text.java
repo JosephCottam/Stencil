@@ -17,7 +17,7 @@ import stencil.types.Converter;
 
 public final class Text extends Point {
 	private static Pattern splitter = Pattern.compile("\n");
-	private static final Attribute TEXT = new Attribute("Text", "");
+	private static final Attribute TEXT = new Attribute("TEXT", "");
 	protected static final AttributeList attributes;
 	static {
 		attributes = new AttributeList(Point.attributes);
@@ -26,22 +26,26 @@ public final class Text extends Point {
 		for (TextProperty p:TextProperty.values()) {attributes.add(new Attribute(p));}
 	}
 
-	private String text = (String) TEXT.getDefault();
-	private Format format;
+	private String text = (String) TEXT.defaultValue;
+	private Format format = new Format();
 	private double width;
 	private double height;
 	
 	public Text(String id) {super(id);}
 	
 	public Object get(String name) {
-		if (name.equals("TEXT")) {return text;}
+		if (TEXT.is(name)) {return text;}
 		else if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
 		else {return super.get(name);}
 	}
 	
 	public void set(String name, Object value) {
 		if (name.equals("TEXT")) {this.text = Converter.toString(value);}
-		else if (contains(TextProperty.class, name)) {format = TextFormats.set(name, value, format);}
+		else if (contains(TextProperty.class, name)) {
+			Class c = attributes.get(name).type;
+			value = Converter.convert(value, c);
+			format = TextFormats.set(name, value, format);
+		}
 		else {super.set(name,value);}
 		computeMetrics();
 	}

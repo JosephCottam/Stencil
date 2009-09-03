@@ -59,7 +59,11 @@ public final class Strokes {
 	}
 
 	/**Default stroke if no attributes are explicitly set*/
-	public static final BasicStroke DEFAULT_STROKE = new BasicStroke();
+	public static final BasicStroke DEFAULT_STROKE = //new BasicStroke(); 
+		new BasicStroke(((Double) StrokeProperty.STROKE_WEIGHT.defaultValue).floatValue(),
+						((CapStyles) StrokeProperty.CAP_STYLE.defaultValue).equiv,
+						((JoinStyles) StrokeProperty.JOIN_STYLE.defaultValue).equiv,
+						((Double) StrokeProperty.MITER_LIMIT.defaultValue).floatValue());
 
 	public static final Color DEFAULT_PAINT = new java.awt.Color(0,0,0); //Black, but it needs to be a special instance so we can check if the property has been changed
 
@@ -100,9 +104,9 @@ public final class Strokes {
 	/**Stroke attributes supported by this mix-in**/
 	public static enum StrokeProperty implements Attribute {
 		STROKE_WEIGHT (1d, Double.class),
-		CAP_STYLE (CapStyles.SQUARE, CapStyles.class),
+		CAP_STYLE (CapStyles.ROUND, CapStyles.class),
 		JOIN_STYLE (JoinStyles.MITER, JoinStyles.class),
-		MITER_LIMIT (10.0, Double.class),
+		MITER_LIMIT (10.0d, Double.class),
 		STROKE_COLOR (DEFAULT_PAINT, Paint.class);
 //		PATTERN ('0' , String.class),
 //		PATTERN_PHASE (0, Double.class);
@@ -143,8 +147,8 @@ public final class Strokes {
 	public static ColoredStroke modify(StrokeProperty att, Object value, Stroke style, Paint paint) {
 		switch(att) {
 		case STROKE_WEIGHT: style = modifyStroke(style, Converter.toDouble(value), null,null,null,null,null); break;
-		case CAP_STYLE: style = modifyStroke(style, null, Converter.toInteger(value),null,null,null,null); break;
-		case JOIN_STYLE: style = modifyStroke(style, null, null, Converter.toInteger(value),null,null,null); break;
+		case CAP_STYLE: style = modifyStroke(style, null, ((CapStyles)Converter.convert(value, CapStyles.class)).equiv,null,null,null,null); break;
+		case JOIN_STYLE: style = modifyStroke(style, null, null, ((JoinStyles)Converter.convert(value, JoinStyles.class)).equiv,null,null,null); break;
 		case MITER_LIMIT: style = modifyStroke(style, null, null,null, Converter.toDouble(value),null,null); break;
 		case STROKE_COLOR: paint = (Color) Converter.convert(value, Color.class); break;
 //		case PATTERN: modifyStroke(null, null,null,null,value,null); break;

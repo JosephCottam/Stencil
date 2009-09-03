@@ -50,10 +50,10 @@ public final class Line extends Stroked {
 		attributes.remove(StandardAttribute.WIDTH);
 	}
 
-	private double x1 = (Double) attributes.get(X.name()).getDefault();
-	private double y1 = (Double) attributes.get(X.name()).getDefault();
-	private double x2 = (Double) attributes.get(X.name()).getDefault();
-	private double y2 = (Double) attributes.get(X.name()).getDefault();
+	private double x1 = (Double) attributes.get(X.name()).defaultValue;
+	private double y1 = (Double) attributes.get(X.name()).defaultValue;
+	private double x2 = (Double) attributes.get(X.name()).defaultValue;
+	private double y2 = (Double) attributes.get(X.name()).defaultValue;
 	
 	public Line(String id) {super(id);}
 

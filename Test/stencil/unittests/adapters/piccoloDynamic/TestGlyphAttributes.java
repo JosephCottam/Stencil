@@ -10,6 +10,7 @@ import stencil.adapters.piccoloDynamic.glyphs.*;
 //TODO: Add tests for failure cases
 public class TestGlyphAttributes extends TestCase{
 	public static Double[] doubles = new Double[] {11.0, 3.0, 1.5, 10.25};
+	public static Float[] floats = new Float[] {11.0f, 3.0f, 1.5f, 10.25f};
 	public static Integer[] integers = new Integer[] {11, 3, 33, 10};
 	public static String[] strings = new String[] {"one", "two", "three", "four"};
 	public static Paint[] colors = new Color[]{Color.RED, Color.CYAN, Color.DARK_GRAY, Color.WHITE, new Color(.33f, .81f, .90f)};
@@ -19,6 +20,7 @@ public class TestGlyphAttributes extends TestCase{
 		if (type.isEnum()) {return EnumSet.allOf(type).toArray();}
 
 		if (Double.class.isAssignableFrom(type)) {return doubles;}
+		if (Float.class.isAssignableFrom(type)) {return floats;}
 		if (Integer.class.isAssignableFrom(type)) {return integers;}
 		if (String.class.isAssignableFrom(type)) {return strings;}
 		if (Paint.class.isAssignableFrom(type)) {return colors;}

@@ -31,6 +31,7 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Point2D;
 
 import stencil.types.Converter;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
@@ -38,7 +39,7 @@ import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
-
+ 
 public final class Shape extends Filled {
 	
 	private static final Attribute SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
@@ -79,10 +80,11 @@ public final class Shape extends Filled {
 	public String getImplantation() {return "SHAPE";}
 	
 	public void render(Graphics2D g) {
-		java.awt.Shape s = Shapes.getShape(shape, new Rectangle2D.Double(x,y, size,size));
-		
-		if (s==null) {return;}
+		if (shape == StandardShape.NONE) {return;}
 
+		Point2D renderPoint = correctRegistration();
+		java.awt.Shape s = Shapes.getShape(shape, new Rectangle2D.Double(renderPoint.getX(),renderPoint.getY(), size,size));
+		
 		super.render(g, s);
 	}
 

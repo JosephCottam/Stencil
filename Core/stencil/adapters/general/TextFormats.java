@@ -38,13 +38,22 @@ import stencil.util.enums.Attribute;
 
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
 public final class TextFormats {
-
-	/**Package for the multiple return values.*/
+	
+	/**Class for the multiple return values.*/
 	public static final class Format {
-		public final Font font;
+		public final Font font; 
 		public final Color textColor;
 		public final float justification;
 
+		public Format() {	
+			String fontName =(String) TextProperty.FONT.defaultValue;
+			int style =((FontStyle) TextProperty.FONT_STYLE.defaultValue).equiv;
+			int size =((Float) TextProperty.FONT_SIZE.defaultValue).intValue();
+			
+			font =  new Font(fontName, style, size);
+			textColor =(Color) TextProperty.FONT_COLOR.defaultValue;
+			justification= ((Justification) TextProperty.JUSTIFY.defaultValue).jLabelEquiv;
+		}
 		public Format(Font font, Color textColor, float justification) {
 			super();
 			this.font = font;
@@ -53,6 +62,7 @@ public final class TextFormats {
 		}
 	}
 
+	
 	/**Text justification values that are recognized**/
 	public static enum Justification {
 		LEFT (Component.LEFT_ALIGNMENT),
@@ -93,7 +103,7 @@ public final class TextFormats {
 		FONT		("Helvetica", String.class),
 		FONT_COLOR  (Color.BLACK, Color.class),
 		FONT_STYLE	(FontStyle.PLAIN, FontStyle.class),
-		FONT_SIZE	(12.0, Double.class);
+		FONT_SIZE	(12.0f, Float.class);			//Should be a round integer by default to be properly supported in default format
 
 		private final Object defaultValue;
 		private final Class type;
@@ -122,7 +132,7 @@ public final class TextFormats {
 	 * @param style
 	 * @return
 	 */
-	public static Font modifyFont(Font base, String name, Double size, Integer style) {
+	public static Font modifyFont(Font base, String name, Float size, Integer style) {
 		assert base != null : "Cannot pass null font to modifyFont.";
 
 		//Check for easy return case
@@ -130,7 +140,7 @@ public final class TextFormats {
 		if (base.getName().equals(name) && base.getSize() == size && base.getStyle() == style) {return base;}
 
 		if (name == null) {name = base.getName();}
-		if (size == null) {size = new Double(base.getSize2D());}
+		if (size == null) {size = new Float(base.getSize2D());}
 		if (style == null) {style = base.getStyle();}
 		Font newFont = new Font(name, style, 10);
 		newFont = newFont.deriveFont(size.floatValue());
@@ -144,7 +154,7 @@ public final class TextFormats {
 
 	public static Format set(String key, Object value, Font font, Paint color, float justify) {
 		String name = font.getName();
-		double size =  font.getSize2D();
+		float size =  font.getSize2D();
 		int style = font.getStyle();
 
 		TextProperty att = TextProperty.valueOf(key.toString());
@@ -153,7 +163,7 @@ public final class TextFormats {
 			case FONT: name = (String) value; break;
 			case FONT_COLOR: color = (Color) value; break;
 			case FONT_STYLE: style = ((FontStyle) value).getFontEquiv(); break;
-			case FONT_SIZE: size = (Double) value; break;
+			case FONT_SIZE: size = (Float) value; break;
 		}
 
 		font = modifyFont(font, name, size, style);
@@ -172,9 +182,9 @@ public final class TextFormats {
 			case FONT: return font.getName();
 			case FONT_COLOR: return color;
 			case FONT_STYLE: return FontStyle.fromFontEquiv(font.getStyle());
-			case FONT_SIZE: return new Double(font.getSize2D());
+			case FONT_SIZE: return new Float(font.getSize2D());
 			default: throw new IllegalArgumentException("Could not handle key " + key + " in text format handler.");
 		}
 	}
-
+	
 }

@@ -87,13 +87,15 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 		String name = l.getName();
 		String implantation = l.getImplantation();
 		
-		if (implantation.equals("SHAPE")) {
-			return new Table<Shape>(name, new Shape("PROTOTYPE"));
-		} else if (implantation.equals("LINE")) {
-			return new Table<Line>(name, new Line("PROTOTYPE"));
-		} else if (implantation.equals("TEXT")) {
-			return new Table<Text>(name, new Text("PROTOTYPE"));
-		}
+		try {
+			if (implantation.equals("SHAPE")) {
+				return new Table<Shape>(name, new Shape("PROTOTYPE"));
+			} else if (implantation.equals("LINE")) {
+				return new Table<Line>(name, new Line("PROTOTYPE"));
+			} else if (implantation.equals("TEXT")) {
+				return new Table<Text>(name, new Text("PROTOTYPE"));
+			}
+		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
 		throw new IllegalArgumentException("Glyph type not know: " + implantation);
 	}
 

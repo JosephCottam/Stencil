@@ -70,8 +70,8 @@ public interface ViewTuple extends MutableTuple {
 	public enum ViewAttribute implements Attribute{
 		IMPLANTATION (null, String.class),
 		ZOOM (0, Double.class),
-		X (StandardAttribute.X.getDefaultValue(),StandardAttribute.X.getType()),
-		Y (StandardAttribute.Y.getDefaultValue(),StandardAttribute.Y.getType()),
+		X (null,StandardAttribute.X.getType()),
+		Y (null,StandardAttribute.Y.getType()),
 		WIDTH (StandardAttribute.WIDTH.getDefaultValue(),StandardAttribute.WIDTH.getType()),
 		HEIGHT (StandardAttribute.HEIGHT.getDefaultValue(),StandardAttribute.HEIGHT.getType());
 

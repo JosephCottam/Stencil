@@ -52,7 +52,6 @@ public abstract class Path extends CommonNode {
 		for (StrokeProperty prop: StrokeProperty.values()) {
 			Object def = prop.getDefaultValue();
 			Class clss = prop.getType();
-			if (clss == Float.class) {clss = Double.class;}
 			PROVIDED_ATTRIBUTES.put(new Attribute(prop.name(), "getStrokePart", "setStrokePart", Path.class, true, def, clss));
 		}
 	}

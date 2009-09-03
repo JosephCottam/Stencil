@@ -51,9 +51,6 @@ public class Attribute {
 		this.type = att.getType();
 	}
 	
-	public Object getDefault() {return defaultValue;}
-	public String getName() {return name;}
-	public Class getType() {return type;} 
-	
 	public boolean is(String name) {return this.name.equals(name);}
+	public boolean is(Enum candidate) {return this.name.equals(candidate.name());}
 }

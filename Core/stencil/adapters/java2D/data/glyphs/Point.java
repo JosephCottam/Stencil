@@ -29,16 +29,19 @@
 package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
 import stencil.adapters.Glyph;
+import stencil.adapters.general.Registrations;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.InvalidNameException;
 import stencil.types.Converter;
 import stencil.util.Tuples;
+import static stencil.adapters.general.Registrations.*;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
 public abstract class Point implements Glyph {
@@ -53,12 +56,25 @@ public abstract class Point implements Glyph {
 		attributes.add(new Attribute(HEIGHT));
 		attributes.add(new Attribute(LAYERNAME));
 		attributes.add(new Attribute(IMPLANTATION));
+		attributes.add(new Attribute(REGISTRATION));
+		attributes.add(new Attribute(ROTATION));
 	}
 	
-	protected String id = (String) attributes.get(ID.name()).getDefault();
-	protected Double x = (Double) attributes.get(X.name()).getDefault();
-	protected Double y = (Double) attributes.get(Y.name()).getDefault();
-	protected Double z = (Double) attributes.get(Z.name()).getDefault();
+	protected String id = (String) attributes.get(ID).defaultValue;
+	
+	/**The value stored here must be interpreted with respect to registration
+	 * before it can be used for rendering. Use the 'correctRegistrtion' method.
+	 */
+	protected Double x = (Double) attributes.get(X).defaultValue;
+
+	/**The value stored here must be interpreted with respect to registration
+	 * before it can be used for rendering.  Use the 'correctRegistrtion' method.
+	 */
+	protected double y = (Double) attributes.get(Y).defaultValue;
+	protected double z = (Double) attributes.get(Z).defaultValue;
+	protected Registration registration = (Registration) attributes.get(REGISTRATION).defaultValue;
+	protected double rotation = (Double) attributes.get(ROTATION).defaultValue;
+	
 	protected Table layer;
 	
 	protected Point(String id) {this.id = id;}
@@ -82,10 +98,12 @@ public abstract class Point implements Glyph {
 	}	
 
 	public void set(String name, Object value) {
-		if (name.equals(ID.name())) {this.id = Converter.toString(value);}
-		else if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
+		if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
 		else if (name.equals(Y.name())) {this.y = Converter.toDouble(value);}
 		else if (name.equals(Z.name())) {this.z = Converter.toDouble(value);}
+		else if (name.equals(ROTATION.name())) {this.rotation = Converter.toDouble(value);}
+		else if (name.equals(REGISTRATION.name())) {this.registration = (Registration) Converter.convert(value, Registration.class);}
+		else if (name.equals(ID.name())) {this.id = Converter.toString(value);}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
@@ -99,7 +117,8 @@ public abstract class Point implements Glyph {
 		if (name.equals(HEIGHT.name())) {return getHeight();}
 		if (name.equals(LAYERNAME.name())) {return layer==null?null:layer.getName();}
 		if (name.equals(IMPLANTATION.name())) {return getImplantation();}
-		
+		if (name.equals(REGISTRATION.name())) {return registration;}
+		if (name.equals(ROTATION.name())) {return rotation;}
 		throw new InvalidNameException(name, getFields());
 	}
 
@@ -127,4 +146,8 @@ public abstract class Point implements Glyph {
 	public String toString() {return Tuples.toString(this);}
 	
 	public void setLayer(Table layer) {this.layer =layer;}
+	
+	public final Point2D correctRegistration() {
+		return Registrations.registrationToTopLeft(registration, x,y, getHeight(), getWidth());
+	}
 }
