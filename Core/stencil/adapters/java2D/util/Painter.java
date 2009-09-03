@@ -4,8 +4,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Rectangle;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.lang.ref.WeakReference;
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.data.glyphs.Point;
@@ -13,25 +13,32 @@ import stencil.adapters.java2D.data.glyphs.Point;
 public final class Painter extends Thread {
 	private boolean run = true;
 	private final Table[] layers;
-	private final Canvas target;
+	private final WeakReference<Canvas> target;	//Prevents the painter thread from preventing the target from being reclaimed
 	
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;
 	
 	public Painter(Table[] layers, Canvas target) {
 		this.layers = layers;
-		this.target = target;
+		this.target = new WeakReference<Canvas>(target);
 	}
 	
 	public void run() {
-		while (run) {
-			Image i = selfBuffer();
-			target.setBackBuffer(i);
+		while (run && target.get() != null) {
+			Canvas c;
+			try {c= target.get();}
+			catch (Exception e) {continue;}
+
+			Image i = selfBuffer(c);
+			c.setBackBuffer(i);
+			
 			Thread.yield();
 		}
+		run=false;
 	}
 	
-	private void doDrawing(Graphics2D g) {
+	/**Render glyphs immediately onto the passed graphics object.*/
+	public void doDrawing(Graphics2D g) {
 		for (Table<? extends Point> table: layers) {
 			for (Point glyph: table) {
 				glyph.render(g);
@@ -39,17 +46,17 @@ public final class Painter extends Thread {
 		}
 	}
 			
-	private Image selfBuffer() {
+	private Image selfBuffer(Canvas canvas) {
 		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
-		Rectangle size = target.getContentDimension();
+		Rectangle size = canvas.getContentDimension();
 		
 		//Ensure that the buffer is the 'right' size
 		if (buffer == null ||
 			buffer.getHeight() != size.height
 			|| buffer.getWidth() != size.width) 
 		{
-			buffers[nextBuffer] = newBuffer(size.height, size.width);
+			buffers[nextBuffer] = newBuffer(canvas, size.height, size.width);
 			buffer= buffers[nextBuffer];
 		}
 		
@@ -67,11 +74,11 @@ public final class Painter extends Thread {
 	public void signalStop() {run = false;}
 
 	//Taken from Prefuse's Display 
-    protected BufferedImage newBuffer(int width, int height) {
+    protected BufferedImage newBuffer(Canvas canvas, int width, int height) {
         BufferedImage img = null;
         if ( !GraphicsEnvironment.isHeadless() ) {
             try {
-                img = (BufferedImage)target.createImage(width, height);
+                img = (BufferedImage)canvas.createImage(width, height);
             } catch ( Exception e ) {
                 img = null;
             }
