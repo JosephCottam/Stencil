@@ -2,7 +2,6 @@ package stencil.adapters.java2D.util;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -27,12 +26,18 @@ public final class Painter extends Thread {
 	
 	public void run() {
 		while (run) {
-			Image i = selfBuffer(target);
-			target.setBackBuffer(i);
+			if (dataChanged(layers)) {
+				BufferedImage i = selfBuffer(target);
+				target.setBackBuffer(i);
+			}
 			
 			Thread.yield();
 		}
 		run=false;
+	}
+	
+	private static boolean dataChanged(Table[] layers) {
+		return true;
 	}
 	
 	/**Render glyphs immediately onto the passed graphics object.*/
@@ -44,7 +49,7 @@ public final class Painter extends Thread {
 		}
 	}
 			
-	private Image selfBuffer(Canvas canvas) {
+	private BufferedImage selfBuffer(Canvas canvas) {
 		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = canvas.getContentDimension();

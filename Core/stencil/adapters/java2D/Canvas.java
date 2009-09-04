@@ -30,7 +30,7 @@ package stencil.adapters.java2D;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
@@ -46,10 +46,9 @@ import stencil.parser.tree.Layer;
 
 /**Some of this is derived from Prefuse's display and related objects.*/
 
-//TODO: Try to use the BufferStrategy sometime instead of manually double buffering
 public final class Canvas extends JComponent {	
 	protected final Painter painter;	
-	protected Image buffer;
+	protected BufferedImage buffer;
 	
 	final Table<? extends Point>[] layers;
 	
@@ -63,11 +62,8 @@ public final class Canvas extends JComponent {
 		this.painter = new Painter(this.layers, this);
 		painter.start();
 
-		setDoubleBuffered(false);	//Manually double buffered.  Needs to be changed if we use hardware double buffering.
-		setBackground(Color.WHITE);
+		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
-		
-		this.setSize(400,400);//set a default size
 	}
 	
 	public void dispose() {painter.signalStop();}
@@ -80,7 +76,7 @@ public final class Canvas extends JComponent {
     	g.drawImage(buffer, 0, 0, null);
     }
 
-	public void setBackBuffer(Image i) {this.buffer = i;}
+	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
 	
 	
 	public Rectangle getContentDimension() {

@@ -30,9 +30,14 @@ package stencil.adapters.java2D;
 
 import stencil.adapters.java2D.data.*;
 import stencil.parser.tree.Program;
+import stencil.types.Converter;
+
 import java.awt.Rectangle;
 
+import javax.imageio.ImageIO;
+
 public class Panel extends stencil.display.StencilPanel<Table, Canvas> {
+	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
 
@@ -52,4 +57,16 @@ public class Panel extends stencil.display.StencilPanel<Table, Canvas> {
 	}
 	
 	public void dispose() {canvas.dispose();}
+	
+	public void export(String filename, String type, Object info) throws Exception {
+		if (type.equals("PNG") || type.equals("RASTER")) {
+			exportPNG(filename, Converter.toInteger(info));
+		}		
+		super.export(filename, type, info);
+	}
+	
+	private void exportPNG(String filename, Integer dpi) throws Exception { 
+		//TODO: DPI Scaling
+		ImageIO.write(canvas.buffer, "png", new java.io.File(filename));
+	}
 }

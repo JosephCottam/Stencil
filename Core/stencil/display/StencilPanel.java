@@ -54,6 +54,8 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 	protected Program program;
 	protected C canvas;
 
+	public static int ABSTRACT_SCREEN_RESOLUTION = 72;
+
 	public StencilPanel() {super();}
 	public StencilPanel(boolean isDoubleBuffered) {super(isDoubleBuffered);}
 	public StencilPanel(LayoutManager manager, boolean isDoubleBuffered) {super(manager, isDoubleBuffered);}
@@ -156,7 +158,7 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 		writer.close();
 	}
 	
-	private static final class IDOrdered implements Comparator<Tuple> {
+	protected static final class IDOrdered implements Comparator<Tuple> {
 		public int compare(Tuple o1, Tuple o2) {
 			String s1 = o1.get("ID").toString();
 			String s2 = o2.get("ID").toString();

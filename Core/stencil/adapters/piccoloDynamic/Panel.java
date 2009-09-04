@@ -43,8 +43,6 @@ import edu.umd.cs.piccolo.util.PBounds;
 
 public class Panel extends StencilPanel<DisplayLayer, PCanvas> {
 	private static final long serialVersionUID = 1L;
-	public static int ABSTRACT_SCREEN_RESOLUTION = 72;
-
 	public Panel(Program program) {
 		super(program, new PCanvas());
 
@@ -86,7 +84,7 @@ public class Panel extends StencilPanel<DisplayLayer, PCanvas> {
 	public void export(String filename, String type, Object info) throws Exception {
 		type = type.toUpperCase();
 		if (type.equals("PNG") || type.equals("RASTER")) {savePNG(filename, (Integer) info);}
-		else if (type.equals("TXT") || type.equals("TUPLES")) {super.exportTuples(filename);}
+		else {super.export(filename, type, info);}
 	}
 
 	/**Exports the display as currently constituted to an PNG having at least the given DPI.
@@ -100,7 +98,7 @@ public class Panel extends StencilPanel<DisplayLayer, PCanvas> {
 		double scale;
 
 		try {scale =Math.ceil(dpi/java.awt.Toolkit.getDefaultToolkit().getScreenResolution());}
-		catch (java.awt.HeadlessException e) {scale = Math.ceil(((double) dpi)/ABSTRACT_SCREEN_RESOLUTION);}
+		catch (java.awt.HeadlessException e) {scale = Math.ceil(((double) dpi)/StencilPanel.ABSTRACT_SCREEN_RESOLUTION);}
 
 		long width =  Math.round(Math.ceil(scale * this.getWidth()));
 		long height =  Math.round(Math.ceil(scale * this.getHeight()));
