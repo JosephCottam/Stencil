@@ -39,7 +39,7 @@ public class StringUtils {
 	/**@return List of files that have an extension, works recursively.*/
 	public static Collection<String> allFiles(String root, final String extension) throws Exception {
 		File source = new File(root);
-
+		
 		File[] files = source.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(extension) || pathname.isDirectory();

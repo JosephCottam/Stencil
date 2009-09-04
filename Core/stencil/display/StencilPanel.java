@@ -33,7 +33,9 @@ import java.awt.BorderLayout;
 import java.awt.LayoutManager;
 import java.awt.Component;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
 
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
@@ -121,7 +123,10 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 	
 	/**Saves all of the tuples currently held in this panel.  This is
 	 * a text representation of the graphic, independent of other file formats.  The format
-	 * is one tuple per line.  
+	 * is one tuple per line. 
+	 * 
+	 * Tuples are ordered by layering and then lexicographically by ID within layers.
+	 * Special tuples (like view and canvas) preface layer tuples.
 	 *
 	 * To completely represent
 	 * the graphic, a tuple to represent the canvas and view are also need to be exported.
@@ -134,18 +139,30 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 	/**Export a list of tuples describing all glyphs (even those out of the view), plus the view and canvas.*/
 	protected void exportTuples(String filename) throws Exception {
 		java.io.FileWriter writer = new java.io.FileWriter(filename);
+		IDOrdered comp = new IDOrdered();
 
 		writer.write(getCanvas().toString() + "\n");
 		writer.write(getView().toString() + "\n");
 
 		for (Layer l: program.getLayers()) {
+			TreeSet<Tuple> s  =new TreeSet<Tuple>(comp);
 			DisplayLayer<? extends Tuple> layer = l.getDisplayLayer();
-			for (Tuple t: layer) {
+			for (Tuple t: layer) {s.add(t);}
+			for (Tuple t: s) {
 				writer.write(t.toString().replace("\n", "\\n"));
 				writer.write("\n");
 			}
 		}
 		writer.close();
+	}
+	
+	private static final class IDOrdered implements Comparator<Tuple> {
+		public int compare(Tuple o1, Tuple o2) {
+			String s1 = o1.get("ID").toString();
+			String s2 = o2.get("ID").toString();
+			return s1.compareTo(s2);
+		}
+		
 	}
 	
 	/**Return a list of the valid 'type' arguments to the Export command.
