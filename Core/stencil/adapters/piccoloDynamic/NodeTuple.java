@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.swing.SwingUtilities;
 
-import stencil.adapters.Glyph;
+import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
 import stencil.adapters.piccoloDynamic.glyphs.Node;
 import stencil.types.Converter;
 import stencil.util.Tuples;
@@ -40,7 +40,7 @@ import stencil.util.enums.EnumUtils;
 
 import static stencil.adapters.GlyphAttributes.*;
 
-public class NodeTuple<T extends Node> implements Glyph {
+public class NodeTuple<T extends Node> implements PiccoloGlyph {
 	protected T node;
 
 	/**Create a new PNode tuple from the given source.  The object passed

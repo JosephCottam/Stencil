@@ -29,10 +29,11 @@
 package stencil.adapters.java2D.data;
 
 
-import java.util.Iterator;
+ import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.display.DisplayGuide;
@@ -40,7 +41,7 @@ import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
 public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
-	Map<String, T> index = new ConcurrentHashMap<String, T>();
+	ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	String name; 
 	T prototypeGlyph;
 
@@ -80,6 +81,19 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 
 	public int size() {return index.size();}
 	
+	/**Updates an existing glyph with the new glyph.
+	 * Checks that the new glyph actually replaces an old one.
+	 * @param glyph
+	 * @param RuntimeException The glyph introduced does not update a prior glyph (ID matching is used to determine if something is an update)
+	 */
+	public void update(T glyph) throws RuntimeException {
+		String ID = glyph.getID();
+		T prior = index.replace(ID, glyph);
+		
+		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
+		
+		//TODO: Transfer markers
+	}
 
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	

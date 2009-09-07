@@ -52,7 +52,7 @@ import stencil.streams.Tuple;
  * @author jcottam
  *
  */
-public interface Adapter {
+public interface Adapter<T extends Glyph> {
 	/**Graphics object that may be used by adapters for planning purposes.*/
 	public static final BufferedImage REFERENCE_CANVAS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 	public static final Graphics2D REFERENCE_GRAPHICS = (Graphics2D) REFERENCE_CANVAS.getGraphics();
@@ -81,7 +81,7 @@ public interface Adapter {
 	/**Add a dynamic binding that will apply the given rule with the passed data
 	 * to the passed glyph object. 
 	 */
-	public void addDynamic(Glyph g, Rule rule, Tuple source);
+	public void addDynamic(T g, Rule rule, Tuple source);
 	
 	
 	/**The data loading process has ended.  
@@ -98,7 +98,7 @@ public interface Adapter {
 	/**Transfer the values of the source over to the target glyph.
 	 * Exceptions in the transfer process may be propagated out.
 	 * */
-	public void transfer(Tuple source, Glyph target)  throws Exception; 
+	public void transfer(Tuple source, T target)  throws Exception; 
 
 	
 	

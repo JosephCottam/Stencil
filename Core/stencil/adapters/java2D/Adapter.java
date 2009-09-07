@@ -30,7 +30,7 @@ package stencil.adapters.java2D;
 
 import java.awt.Color;
 
-import stencil.adapters.Glyph;
+import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Layer;
@@ -39,10 +39,10 @@ import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 import stencil.adapters.java2D.data.Table;
 
-public class Adapter implements stencil.adapters.Adapter {
+public class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter INSTANCE = new Adapter();
 	
-	public void addDynamic(Glyph g, Rule rule, Tuple source) {
+	public void addDynamic(Glyph2D g, Rule rule, Tuple source) {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 
@@ -65,10 +65,15 @@ public class Adapter implements stencil.adapters.Adapter {
 		return; //No finalization required
 	}
 
-	public void transfer(Tuple source, Glyph target) throws Exception {
+	public void transfer(Tuple source, Glyph2D target) throws Exception {
+		Glyph2D temp = null;
 		for (String field: source.getFields()) {
-			target.set(field, source.get(field));
+			temp = target.update(field, source.get(field));
 		}
+		if (temp == null || temp == source) {return;}
+		
+		Table t = target.getLayer();
+		t.update(temp);
 	}
 
 	

@@ -29,34 +29,31 @@
 package stencil.adapters.java2D;
 
 import stencil.adapters.java2D.data.*;
+import stencil.adapters.java2D.util.Stopable;
 import stencil.parser.tree.Program;
 import stencil.types.Converter;
 
 import java.awt.Rectangle;
+import java.util.List;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
 public class Panel extends stencil.display.StencilPanel<Table, Canvas> {
+	List<Stopable> workers = new ArrayList<Stopable>();
 	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
-
-		//TODO: Handle default interaction mode
 	}
 	
-	public CanvasTuple getCanvas() {
-		return new CanvasTuple(this.canvas);
-	}
-
-	public ViewTuple getView() {
-		return new ViewTuple(this);
-	}
+	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
+	public ViewTuple getView() {return new ViewTuple(this);}
+	public Rectangle getVewBounds() {return canvas.getContentDimension();}
 	
-	public Rectangle getVewBounds() {
-		return canvas.getContentDimension();
+	public void dispose() {
+		canvas.dispose();
+		for (Stopable s: workers) {s.signalStop();}
 	}
-	
-	public void dispose() {canvas.dispose();}
 	
 	public void export(String filename, String type, Object info) throws Exception {
 		if (type.equals("PNG") || type.equals("RASTER")) {

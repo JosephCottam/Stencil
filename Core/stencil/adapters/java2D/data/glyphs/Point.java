@@ -34,7 +34,7 @@ import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.util.List;
 
-import stencil.adapters.Glyph;
+import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
@@ -45,7 +45,7 @@ import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
 import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
-public abstract class Point implements Glyph {
+public abstract class Point implements Glyph2D {
 	protected static final AttributeList attributes = new AttributeList();
 	static {
 		attributes.add(new Attribute(ID));
@@ -115,10 +115,10 @@ public abstract class Point implements Glyph {
 	 * 
 	 * Assumes there is a constructor which takes the ID as its only argument. 
 	 * */
-	public Glyph duplicate(String ID) {
+	public Glyph2D duplicate(String ID) {
 		try {
 			Constructor c = this.getClass().getConstructor(String.class);
-			Glyph g = (Glyph) c.newInstance(ID);
+			Glyph2D g = (Glyph2D) c.newInstance(ID);
 			return g;
 		} catch (Exception e) {throw new Error("Error duplicating tuple:" + this.toString());}
 	}	
@@ -149,6 +149,10 @@ public abstract class Point implements Glyph {
 		throw new InvalidNameException(name, getFields());
 	}
 
+	public String getLayerName() {
+		return layer==null?null:layer.getName();
+	}
+	
 	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
 		return Converter.convert(get(name), type);
 	}
@@ -169,6 +173,9 @@ public abstract class Point implements Glyph {
 	public String toString() {return Tuples.toString(this);}
 	
 	public void setLayer(Table layer) {this.layer =layer;}
+	public Table getLayer() {return layer;}
+	
+	public String getID() {return id;}
 	
 	public final Point2D correctRegistration() {
 		return Registrations.registrationToTopLeft(registration, x,y, getHeight(), getWidth());

@@ -40,7 +40,6 @@ import stencil.types.Converter;
 import stencil.util.ConversionException;
 import stencil.util.Tuples;
 import stencil.streams.Tuple;
-import stencil.streams.MutableTuple;
 import stencil.parser.tree.Rule;
 
 import edu.umd.cs.piccolo.PNode;
@@ -98,7 +97,7 @@ public abstract class Node extends PNode {
 	//HACK: The whole dynamic rules implementation is a hack... so is this part.
 	public Set<DynamicRule> dynamicRules = new HashSet<DynamicRule>();
 	//Part of the dynamic rules hack...
-	private MutableTuple self = new stencil.adapters.piccoloDynamic.NodeTuple(this);
+	private PiccoloGlyph self = new stencil.adapters.piccoloDynamic.NodeTuple(this);
 	
 	/**Piccolo has no in-layer ordering mechanism, so we provide a way to signal it here.*/
 	protected double z =0;

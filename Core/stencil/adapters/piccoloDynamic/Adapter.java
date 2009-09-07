@@ -34,7 +34,7 @@ import javax.swing.SwingUtilities;
 
 import edu.umd.cs.piccolo.util.PPaintContext;
 
-import stencil.adapters.Glyph;
+import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
 import stencil.adapters.piccoloDynamic.util.ZPLayer;
 import stencil.adapters.piccoloDynamic.glyphs.Node;
 import stencil.adapters.piccoloDynamic.guides.*;
@@ -54,7 +54,7 @@ import stencil.interpreter.DynamicRule;
  * @author jcottam
  *
  */
-public class Adapter implements stencil.adapters.Adapter {
+public class Adapter implements stencil.adapters.Adapter<PiccoloGlyph> {
 	public static final Adapter INSTANCE = new Adapter();
 
 	private boolean transfers = true;
@@ -117,7 +117,7 @@ public class Adapter implements stencil.adapters.Adapter {
 		}
 	}
 
-	public void addDynamic(Glyph glyph, Rule rule, Tuple source) {
+	public void addDynamic(PiccoloGlyph glyph, Rule rule, Tuple source) {
 		assert glyph instanceof NodeTuple : "Can only use NodeTuple glyphs";
 	
 		NodeTuple node = (NodeTuple) glyph;
@@ -154,7 +154,7 @@ public class Adapter implements stencil.adapters.Adapter {
 	
 
 	/**Perform a transfer operation in the event dispatch thread.*/
-	public void transfer(final Tuple source, final Glyph target) throws Exception {
+	public void transfer(final Tuple source, final PiccoloGlyph target) throws Exception {
 		if (SwingUtilities.isEventDispatchThread()) {
 			Tuples.transfer(source, target, false);
 		} else {
