@@ -34,7 +34,7 @@ import java.util.HashSet;
 import java.util.regex.Pattern;
 
 
-import stencil.adapters.piccoloDynamic.Adapter;
+import stencil.adapters.piccoloDynamic.Panel;
 import stencil.adapters.piccoloDynamic.util.*;
 import stencil.types.Converter;
 import stencil.util.ConversionException;
@@ -78,12 +78,12 @@ public abstract class Node extends PNode {
 	public static final class DynamicRule {
 		public Tuple source;
 		public Rule rule;
-		protected Adapter adapter;
+		public Panel panel;
 		
-		public DynamicRule(Tuple source, Rule rule, Adapter adapter) {
+		public DynamicRule(Tuple source, Rule rule, Panel panel) {
 			this.source = source;
 			this.rule = rule;
-			this.adapter = adapter;
+			this.panel = panel;
 		}
 	}
 
@@ -296,7 +296,7 @@ public abstract class Node extends PNode {
 			try {
 				t = r.rule.apply(r.source);
 				if (!Tuples.transferNeutral(t, self)) {
-					r.adapter.setTransfers();	//Inform adapter that a transfer is being made (e.g. a rule ran with results that cause a change)
+					r.panel.setTransfers();	//Inform adapter that a transfer is being made (e.g. a rule ran with results that cause a change)
 					Tuples.transfer(t, self, false);
 				}
 			} catch (Exception e) {System.err.print("Error in dynamic legend (ignored)."); e.printStackTrace();} //Ignored...

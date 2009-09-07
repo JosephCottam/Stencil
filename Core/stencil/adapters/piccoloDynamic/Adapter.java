@@ -30,8 +30,6 @@ package stencil.adapters.piccoloDynamic;
 
 
 
-import javax.swing.SwingUtilities;
-
 import edu.umd.cs.piccolo.util.PPaintContext;
 
 import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
@@ -43,11 +41,6 @@ import stencil.display.StencilPanel;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.Rule;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
-
-import stencil.interpreter.DynamicRule;
 
 /**Given a parsed program, creates the necessary objects to
  * run a piccolo-driven visualization.
@@ -56,9 +49,13 @@ import stencil.interpreter.DynamicRule;
  */
 public class Adapter implements stencil.adapters.Adapter<PiccoloGlyph> {
 	public static final Adapter INSTANCE = new Adapter();
+	
+	/**Maximum number of dynamic update cycles to run after all data is loaded.
+	 * This attempts to put the visualization into a stable state.
+	 *
+	 */
+	public static final int FINALIZE_ATTEMPT_MAX = 100;
 
-	private boolean transfers = true;
-	private Object transferLock = "Lock";
 	private boolean lowQuality = false;
 	
 	private Adapter() {/**Adapter is a singleton.*/}
@@ -116,56 +113,6 @@ public class Adapter implements stencil.adapters.Adapter<PiccoloGlyph> {
 			}
 		}
 	}
-
-	public void addDynamic(PiccoloGlyph glyph, Rule rule, Tuple source) {
-		assert glyph instanceof NodeTuple : "Can only use NodeTuple glyphs";
-	
-		NodeTuple node = (NodeTuple) glyph;
-		Rule dynamicRule = DynamicRule.toDynamic(rule);
-		Node.DynamicRule dynamic = new Node.DynamicRule(source, dynamicRule, this);
-		node.getNode().dynamicRules.add(dynamic);
-	}
-	
-	public void setTransfers() {synchronized(transferLock) {this.transfers = true;}}
-
-	public void finalize(StencilPanel panel) {
-		int attempts =0;
-		transfers = true;
-		
-		while (hasUpdates() && attempts < 100) {//100 just paint cycles (sort of arbitrary...) to try to exhaust all of the dynamic rules
-			for (Layer layer: panel.getProgram().getLayers()) {
-				for (Object t: layer.getDisplayLayer()) {
-					Node n = ((NodeTuple) t).getNode();
-					n.prePaint();
-				}
-			}
-			attempts++;
-		}
-		System.out.println("Stopping after attempt " + attempts);
-	}
-	
-	private boolean hasUpdates() {
-		synchronized (transferLock) {
-			boolean transfers = this.transfers;
-			this.transfers = false;
-			return transfers;
-		}
-	}
-	
-
-	/**Perform a transfer operation in the event dispatch thread.*/
-	public void transfer(final Tuple source, final PiccoloGlyph target) throws Exception {
-		if (SwingUtilities.isEventDispatchThread()) {
-			Tuples.transfer(source, target, false);
-		} else {
-			final Runnable r = new Runnable() {
-				public final void run() {
-					Tuples.transfer(source, target, false);
-				}
-			};
-			SwingUtilities.invokeAndWait(r);
-		}
-	}
 	
 	
 	/**Will set the render default render quality to low if the passed value
@@ -177,4 +124,23 @@ public class Adapter implements stencil.adapters.Adapter<PiccoloGlyph> {
 		if ("LOW".equals(value.toUpperCase())) {lowQuality = true;}
 		else {lowQuality = false;}
 	}
+	
+
+	public void finalize(StencilPanel p) {
+		Panel panel = (Panel) p;
+		
+		int attempts =0;
+		panel.setTransfers();
+		
+		while (panel.hasUpdates() && attempts < FINALIZE_ATTEMPT_MAX) {
+			for (Layer layer: panel.getProgram().getLayers()) {
+				for (Object t: layer.getDisplayLayer()) {
+					Node n = ((NodeTuple) t).getNode();
+					n.prePaint();
+				}
+			}
+			attempts++;
+		}
+	}
+
 }

@@ -2,12 +2,13 @@ package stencil.unittests.adapters;
 
 import static stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.Adapter;
+import stencil.adapters.Glyph;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
-import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;
+import stencil.util.BasicTuple;
 
 public abstract class TestLayer extends junit.framework.TestCase {
 	String ruleSources ="external stream Stream1(A,B,C) layer Layer1 from Stream1 X: A";
@@ -20,10 +21,9 @@ public abstract class TestLayer extends junit.framework.TestCase {
 		DisplayLayer layer = panel.getLayer("Layer1");
 
 		for (int i=0; i<100; i++) {
-			MutableTuple t = layer.make(Integer.toString(i));
-			t.set("X", i);
-			t.set("Y", i);
-			t.set("Z", i);
+			Glyph glyph = layer.make(Integer.toString(i));
+			Tuple values = new BasicTuple(new String[]{"X","Y","Z"}, new Object[]{i,i,i});
+			panel.transfer(values, glyph);
 		}
 		return layer;
 	}
@@ -64,7 +64,7 @@ public abstract class TestLayer extends junit.framework.TestCase {
 		int expectedSize = layer.size();
 
 		for (int i=0; i< 100; i++) {
-			MutableTuple source = layer.find(Integer.toString(i));
+			Glyph source = layer.find(Integer.toString(i));
 			layer.remove((String) source.get("ID"));
 			expectedSize = expectedSize -1;
 

@@ -33,6 +33,8 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.general.Registrations;
@@ -40,6 +42,7 @@ import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.InvalidNameException;
+import stencil.streams.Tuple;
 import stencil.types.Converter;
 import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
@@ -60,6 +63,8 @@ public abstract class Point implements Glyph2D {
 		attributes.add(new Attribute(REGISTRATION));
 		attributes.add(new Attribute(ROTATION));
 	}
+	
+	protected Set<Integer> markers = new TreeSet<Integer>();
 	
 	protected String id = (String) attributes.get(ID).defaultValue;
 	
@@ -114,6 +119,9 @@ public abstract class Point implements Glyph2D {
 	/**Duplicate the current glyph, but give it a new ID.
 	 * 
 	 * Assumes there is a constructor which takes the ID as its only argument. 
+	 * 
+	 * 
+	 * TODO: REMOVE WHEN THE IMMUTIBLE TUPLE CONVERSION IS COMPLETE (duplicate is replaced by 'update' then)
 	 * */
 	public Glyph2D duplicate(String ID) {
 		try {
@@ -180,5 +188,21 @@ public abstract class Point implements Glyph2D {
 	public final Point2D correctRegistration() {
 		return Registrations.registrationToTopLeft(registration, x,y, getHeight(), getWidth());
 	}
+	
+	public Glyph2D update(String field, Object value) {
+		if (field.equals("ID")) {return duplicate((String) value);} 
+		else {set(field, value); return this;}
+	}
+
+	public Glyph2D update(Tuple source) {
+		Glyph2D temp = this;
+		for (String field: source.getFields()) {
+			temp = temp.update(field, source.get(field));
+		}
+		return temp;
+	}
+	
+	public boolean hasMarker(int marker) {return  markers.contains(marker);}
+	public void markForUpdate(int marker) {markers.add(marker);}
 	
 }

@@ -39,7 +39,7 @@ public abstract class TestGenerator extends junit.framework.TestCase {
 		StencilPanel panel = adapter.generate(program);
 		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		stream.open(OVERLAY_SHORT);
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(adapter, panel));
+		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
 
 		assertNotNull(loader);
 		return loader;

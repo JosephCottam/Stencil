@@ -103,14 +103,13 @@ public final class StencilRunner extends Thread {
 				if (streams.size() >1) {input = new ConcurrentStream(streams);}
 				else {input =  streams.get(0);}
 				names = names.substring(5);
-				loader = new TupleLoader(panel, input, new Interpreter(adapter, panel));
+				loader = new TupleLoader(panel, input, new Interpreter(panel));
 
 				reporter.addMessage("Starting loading %1$s.", names);
 				loader.load();
 				reporter.addMessage("Finished load of %1$s.", names);
 				panel.repaint();
 			}
-			
 			adapter.finalize(panel);
 		} catch (Throwable e) {
 			running = false;

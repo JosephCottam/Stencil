@@ -31,7 +31,6 @@ package stencil.interpreter;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.TreeNodeStream;
 
-import stencil.adapters.Adapter;
 import stencil.display.StencilPanel;
 import stencil.interpreter.NeedsGuides;
 import stencil.interpreter.UpdateGuides;
@@ -39,20 +38,19 @@ import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.rules.ModuleCache;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 
 public class Interpreter {
 	private final StencilPanel panel;
 	private final Program program;
-	private final Adapter adapter; 
 	
 	private final NeedsGuides needsGuides;
 	private final UpdateGuides updateGuides;
 	
 	private boolean abortOnError = false;
 	
-	public Interpreter(Adapter adapter, StencilPanel panel) {
-		this.adapter = adapter;
+	public Interpreter(StencilPanel panel) {
 		this.panel = panel;
 		this.program = panel.getProgram();
 		
@@ -105,9 +103,9 @@ public class Interpreter {
 							if (result == null) {
 								if (abortOnError) {throw new RuleAbortException(rule);}
 								else {
-									if (created && ! preExisting) {
-										String id = (String) buffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
-										layer.getDisplayLayer().remove(id);	 //This won't be possible if we remove the remove from layer in the compiled version...
+									if (created && !preExisting && buffer !=null) {
+										String id = Converter.toString(buffer.get(ParserConstants.GLYPH_ID_FIELD));
+										layer.getDisplayLayer().remove(id);	 //This won't be possible if we remove the remove from layer in the compiled version...try a two-phase 'reserved' and 'created' hold if something requests a 'reserved' value
 									}
 									continue groups;
 								}
@@ -121,12 +119,11 @@ public class Interpreter {
 								//any rule.  This is especially important for dynamic bindings
 								if (!created && buffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
 									String id = (String) buffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
-									
 									preExisting = (layer.getDisplayLayer().find(id) != null); //TODO: This probably needs to be synchronzied with the creation...against what, I'm not sure
-	
 									glyph = layer.getDisplayLayer().makeOrFind(id);	
+									created = true;
 								}
-							}//TODO: Handle other targets as need (esp. Local, since View and Canvas are handled in the target)
+							}
 
 							
 						}
@@ -134,16 +131,17 @@ public class Interpreter {
 						if (buffer != null && buffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
 							String id = (String) buffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
 							glyph = layer.getDisplayLayer().makeOrFind(id);							
-							adapter.transfer(buffer, glyph);
+							panel.transfer(buffer, glyph);
 						} else {
 							//If ID is not set, then it is an 'fyi' tuple, rule-set only ran for side-effects
 							//TODO: Remove when stream-stream transform works
 							continue;
 						}
 						
-						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {adapter.addDynamic(glyph, rule, source);}}
+						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
 					
 					} catch (RuleAbortException ra) {
+						//TODO: Handle (at least report) rule aborts.
 					}					
 				}
 			}

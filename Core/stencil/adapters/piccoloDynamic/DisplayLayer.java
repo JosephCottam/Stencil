@@ -38,13 +38,14 @@ import javax.swing.SwingUtilities;
 
 import stencil.adapters.piccoloDynamic.glyphs.Node;
 import stencil.adapters.piccoloDynamic.util.ImplantationCache;
+import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
 import stencil.adapters.piccoloDynamic.util.ZPLayer;
 import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import edu.umd.cs.piccolo.*;
 
 
-public class DisplayLayer implements stencil.display.DisplayLayer<NodeTuple> {
+public class DisplayLayer implements stencil.display.DisplayLayer<PiccoloGlyph> {
 	private final Object LAYER_LOCK = ""; //Special lock to make sure index and layer children stay in synch
 
 	protected ZPLayer source;
@@ -113,15 +114,15 @@ public class DisplayLayer implements stencil.display.DisplayLayer<NodeTuple> {
 	/**Iterator over all of the keys currently held by this layer.  By iterating the keys,
 	 * the tuples of the layer may also be iterated.
 	 */
-	public Iterator<NodeTuple> iterator() {
-		return new Iterator<NodeTuple>() {
+	public Iterator<PiccoloGlyph> iterator() {
+		return new Iterator<PiccoloGlyph>() {
 			Iterator<Node> source = index.values().iterator();
 
 			public boolean hasNext() {
 				return source.hasNext();
 			}
 
-			public NodeTuple next() { 
+			public PiccoloGlyph next() { 
 				return new NodeTuple(source.next());
 			}
 

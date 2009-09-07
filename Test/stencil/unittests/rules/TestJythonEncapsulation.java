@@ -1,10 +1,5 @@
 package stencil.unittests.rules;
 
-import org.python.util.PythonInterpreter;
-
-import stencil.adapters.piccoloDynamic.Adapter;
-import stencil.parser.string.ParseStencil;
-import stencil.parser.tree.Program;
 import stencil.parser.tree.Python;
 import stencil.rules.*;
 import stencil.streams.Tuple;

@@ -29,22 +29,15 @@
 package stencil.adapters.java2D;
 
 import java.awt.Color;
-
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.Rule;
-import stencil.streams.Tuple;
 import stencil.adapters.java2D.data.Table;
 
-public class Adapter implements stencil.adapters.Adapter<Glyph2D> {
+public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter INSTANCE = new Adapter();
-	
-	public void addDynamic(Glyph2D g, Rule rule, Tuple source) {
-		throw new UnsupportedOperationException("Not implemented");
-	}
 
 	public StencilPanel generate(Program program) {
 		Panel panel = new Panel(program);
@@ -59,25 +52,6 @@ public class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		return Table.instance(l);
 	}
 
-
-	public void finalize(StencilPanel p) {
-		((Panel) p).getCanvas().getComponent().stopPainter();
-		return; //No finalization required
-	}
-
-	public void transfer(Tuple source, Glyph2D target) throws Exception {
-		Glyph2D temp = null;
-		for (String field: source.getFields()) {
-			temp = target.update(field, source.get(field));
-		}
-		if (temp == null || temp == source) {return;}
-		
-		Table t = target.getLayer();
-		t.update(temp);
-	}
-
-	
-
 	public void setDefaultMouse(boolean m) {
 		throw new UnsupportedOperationException("Not implemented");
 	}
@@ -88,5 +62,9 @@ public class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		throw new UnsupportedOperationException("Not implemented");
+	}
+
+	public void finalize(StencilPanel panel) {
+		//No finalization required...yet
 	}
 }

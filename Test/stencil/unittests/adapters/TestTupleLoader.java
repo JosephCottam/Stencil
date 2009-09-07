@@ -26,7 +26,7 @@ public class TestTupleLoader extends TestCase {
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", "\\s+");
 		input.open(COORDS);
-		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(Adapter.INSTANCE, panel));
+		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(panel));
 		loader.load();
 
 		assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").size());
@@ -40,7 +40,7 @@ public class TestTupleLoader extends TestCase {
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		input.open(OVERLAY_FULL);
-		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(Adapter.INSTANCE, panel));
+		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(panel));
 
 		Thread thread = new Thread(loader);
 

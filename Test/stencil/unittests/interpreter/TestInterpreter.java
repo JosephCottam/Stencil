@@ -34,7 +34,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 
 		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		stream.open(OVERLAY_SHORT);
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(adapter, panel));
+		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
 		loader.load();
 		DisplayLayer layer = panel.getLayer("Overlay");
 
@@ -49,7 +49,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "\\s+\\|\\s+");
 		stream.open("./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt");
 
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(adapter, panel));
+		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
 		loader.load();
 
 		DisplayLayer<Tuple> layer = panel.getLayer("GridLines");

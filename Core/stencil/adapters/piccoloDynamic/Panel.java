@@ -28,20 +28,25 @@
  */
 package stencil.adapters.piccoloDynamic;
 
-
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
 
 import stencil.display.StencilPanel;
+import stencil.interpreter.DynamicRule;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-
+import stencil.parser.tree.Rule;
+import stencil.streams.Tuple;
+import stencil.util.Tuples;
+import stencil.adapters.piccoloDynamic.glyphs.Node;
+import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.util.PBounds;
 
-public class Panel extends StencilPanel<DisplayLayer, PCanvas> {
+public class Panel extends StencilPanel<PiccoloGlyph, DisplayLayer, PCanvas> {
 	private static final long serialVersionUID = 1L;
 	public Panel(Program program) {
 		super(program, new PCanvas());
@@ -131,5 +136,45 @@ public class Panel extends StencilPanel<DisplayLayer, PCanvas> {
 		BufferedImage b = new BufferedImage((int) width, (int) height, BufferedImage.TYPE_INT_RGB);
 		canvas.getCamera().toImage(b, java.awt.Color.WHITE);
 		ImageIO.write(b, "png", new java.io.File(filename));
+	}
+
+	@Override
+	public void addDynamic(PiccoloGlyph glyph, Rule rule, Tuple source) {
+		assert glyph instanceof NodeTuple : "Can only use NodeTuple glyphs";
+	
+		NodeTuple node = (NodeTuple) glyph;
+		Rule dynamicRule = DynamicRule.toDynamic(rule);
+		Node.DynamicRule dynamic = new Node.DynamicRule(source, dynamicRule, this);
+		node.getNode().dynamicRules.add(dynamic);
+	}
+
+
+	private boolean transfers = true;
+	private Object transferLock = "Lock";
+	
+	
+	public void setTransfers() {synchronized(transferLock) {this.transfers = true;}}
+	
+	boolean hasUpdates() {
+		synchronized (transferLock) {
+			boolean transfers = this.transfers;
+			this.transfers = false;
+			return transfers;
+		}
+	}
+	
+
+	/**Perform a transfer operation in the event dispatch thread.*/
+	public void transfer(final Tuple source, final PiccoloGlyph target) throws Exception {
+		if (SwingUtilities.isEventDispatchThread()) {
+			Tuples.transfer(source, target, false);
+		} else {
+			final Runnable r = new Runnable() {
+				public final void run() {
+					Tuples.transfer(source, target, false);
+				}
+			};
+			SwingUtilities.invokeAndWait(r);
+		}
 	}
 }

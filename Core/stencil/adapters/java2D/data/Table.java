@@ -40,7 +40,7 @@ import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
-public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
+public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
 	ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	String name; 
 	T prototypeGlyph;
@@ -66,7 +66,7 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 	}
 
 	public T make(String ID) throws DuplicateIDException {
-		T glyph = (T) prototypeGlyph.duplicate(ID);
+		T glyph = (T) prototypeGlyph.update("ID", ID);
 		glyph.setLayer(this);
 		index.put(ID, glyph);
 		return glyph;
@@ -89,6 +89,8 @@ public class Table<T extends Point> implements stencil.display.DisplayLayer<T> {
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
+		
+		glyph.setLayer(this);
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 		

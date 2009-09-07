@@ -39,11 +39,16 @@ import java.util.TreeSet;
 
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
+import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 
 /**Wraps the layers and glyphs to tie them to a display context.
+ * 
+ * T -- The glyph type stored in tables
+ * L -- The layer type
+ * C -- The canvas type
  * */
-public abstract class StencilPanel<L extends DisplayLayer, C extends Component> extends javax.swing.JPanel {
+public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C extends Component> extends javax.swing.JPanel {
 	/**Set flag to true when default interaction states are desired.
 	 * Set to false when all interaction should be handled in stencil rules.
 	 * Default state is true.
@@ -170,4 +175,18 @@ public abstract class StencilPanel<L extends DisplayLayer, C extends Component> 
 	/**Return a list of the valid 'type' arguments to the Export command.
 	 * May return a zero-length array, but should never return null.*/
 	public String[] getExports() {return new String[0];}
+	
+	
+	//------------------------------------------------------------------------------------------
+	//Runtime support operations.  These are methods called by the interpreter.
+	
+	/**Add a dynamic binding that will apply the given rule with the passed data
+	 * to the passed glyph object. 
+	 */
+	public abstract void addDynamic(T g, Rule rule, Tuple source);
+	
+	/**Transfer the values of the source over to the target glyph.
+	 * Exceptions in the transfer process may be propagated out.
+	 * */
+	public abstract void transfer(Tuple source, T target)  throws Exception; 	
 }

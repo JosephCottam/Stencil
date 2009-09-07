@@ -36,9 +36,6 @@ import stencil.parser.tree.Program;
 import stencil.parser.tree.Layer;
 import stencil.display.DisplayLayer;
 
-import stencil.parser.tree.Rule;
-import stencil.streams.Tuple;
-
 /**The generator takes a stencil program and generators an
  * executable entity.  It returns an operating panel that
  * can be joined to a UI and will display the results.
@@ -74,33 +71,8 @@ public interface Adapter<T extends Glyph> {
 	public Class getGuideClass(String name);
 
 	
-	
-	//------------------------------------------------------------------------------------------
-	//Runtime support operations.  These are methods called by the interpreter.
-	
-	/**Add a dynamic binding that will apply the given rule with the passed data
-	 * to the passed glyph object. 
-	 */
-	public void addDynamic(T g, Rule rule, Tuple source);
-	
-	
-	/**The data loading process has ended.  
-	 * Get the panel into a final state.
-	 * 
-	 * NOTE: This method should not be confused with finalize().  
-	 * 'finalize(StencilPanel)' completes any post-data loading
-	 * actions on the visualization.  It has nothing to do with 
-	 * the garbage collection.  'finalize()' is called by the 
-	 * garbage collector when the adapter is being reclaimed.
-	 * */
+	//TODO: Re-think adapter-based finalize.. why not just invoke this on the panel?  Is there a time that the adapter knows somethign the panel does not?
 	public void finalize(StencilPanel panel);
-	
-	/**Transfer the values of the source over to the target glyph.
-	 * Exceptions in the transfer process may be propagated out.
-	 * */
-	public void transfer(Tuple source, T target)  throws Exception; 
-
-	
 	
 	
 	//------------------------------------------------------------------------------------------

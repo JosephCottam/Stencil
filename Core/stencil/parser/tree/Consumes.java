@@ -10,7 +10,7 @@ public class Consumes extends StencilTree {
 	
 	public List<Filter> getFilters() {return (List<Filter>) getChild(0);}
 	public List<Rule> getRules() {return (List<Rule>) getChild(1);}
-	public Layer getLayer() {return (Layer) getParent();}
+	public Layer getLayer() {return (Layer) getParent().getParent();}
 	
 	public boolean matches(Tuple tuple) {
 		//Check the tuple source and stream name

@@ -40,12 +40,14 @@ import stencil.types.Converter;
 
 public final class Pie extends Stroked {
 	protected static final Color DEFAULT_SLICE_COLOR  = Color.RED;
+	protected static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
 
 	
 	private static final Attribute PERCENT = new Attribute("PERCENT", 0.5d);
 	private static final Attribute SLICE = new Attribute("SLICE", 0.5d);
 	private static final Attribute FIELD = new Attribute("FIELD", 0.5d);
 	private static final Attribute SLICE_COLOR = new Attribute("SLICE_COLOR", DEFAULT_SLICE_COLOR, Paint.class);
+	private static final Attribute FIELD_COLOR = new Attribute("FIELD_COLOR", DEFAULT_FIELD_COLOR, Paint.class);
 	private static final Attribute ANGLE = new Attribute("ANGLE", 0.0d);
 	private static final Attribute SIZE = new Attribute("SIZE", 1.0d);
 	
@@ -60,10 +62,13 @@ public final class Pie extends Stroked {
 		attributes.add(SLICE_COLOR);
 		attributes.add(ANGLE);
 		attributes.add(SIZE);
+		attributes.add(FIELD_COLOR);
 	}
 
 	private double size = (Double) SIZE.defaultValue;	
 	private Paint slicePaint = (Paint) SLICE_COLOR.defaultValue;
+	private Paint fieldPaint = (Paint) FIELD_COLOR.defaultValue;
+
 	private double angle;
 	
 	private double field;
@@ -75,9 +80,10 @@ public final class Pie extends Stroked {
 		if (PERCENT.is(name)) {double p = Converter.toDouble(value); slice = p; field = 1-p;}
 		else if (SLICE.is(name)) {slice = Converter.toDouble(value);}
 		else if (FIELD.is(name)) {field = Converter.toDouble(value);}
-		else if (SLICE_COLOR.is(name)) {slicePaint = (Paint) Converter.convert(value, Paint.class);}
 		else if (ANGLE.is(name)) {angle = Converter.toDouble(value);}
 		else if (SIZE.is(name)) {size = Converter.toDouble(size);}
+		else if (SLICE_COLOR.is(name)) {slicePaint = (Paint) Converter.convert(value, Paint.class);}
+		else if (FIELD_COLOR.is(name)) {fieldPaint = (Paint) Converter.convert(value, Paint.class);}
 		else {super.set(name, value);}
 	}
 	
@@ -86,6 +92,7 @@ public final class Pie extends Stroked {
 		if (SLICE.is(name)) {return slice;}
 		if (FIELD.is(name)) {return field;}
 		if (SLICE_COLOR.is(name)) {return slicePaint;}
+		if (FIELD_COLOR.is(name)) {return fieldPaint;}
 		if (ANGLE.is(name)) {return angle;}
 		if (SIZE.is(name)) {return name;}
 		
@@ -112,9 +119,15 @@ public final class Pie extends Stroked {
 		java.awt.Shape arc = Pies.makeSlice(angle, percent, x, y, size, strokeWidth, strokePaint);
 		java.awt.Shape outline = Pies.makePieOutline(angle, percent, x, y, size, strokeWidth, strokePaint);
 
-		g.setPaint(slicePaint);
-		g.fill(arc);
 
+		g.setPaint(fieldPaint);
+		g.fill(outline);
+		
+		if (arc != null) {
+			g.setPaint(slicePaint);
+			g.fill(arc);
+		}
+		
 		g.setPaint(outlinePaint);
 		g.setStroke(outlineStyle);
 		g.draw(outline);
