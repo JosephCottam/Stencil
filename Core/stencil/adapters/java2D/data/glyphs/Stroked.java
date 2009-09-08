@@ -69,11 +69,16 @@ public abstract class Stroked extends Point {
 	}
 
 	protected void render(Graphics2D g, Shape s) {
-		if (outlinePaint != null && outlineStyle != null) {
+		if (outlinePaint != null && outlineStyle != null && !clear(outlinePaint)) {
 			g.setStroke(outlineStyle);
 			g.setPaint(outlinePaint);
 			g.draw(s);
 		}
+	}
+	
+	private static final boolean clear(Paint p) {
+		if (p instanceof java.awt.Color) {return ((java.awt.Color) p).getAlpha() == 0;}
+		return false;
 	}
 	
 }

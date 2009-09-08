@@ -14,6 +14,7 @@ public final class Painter extends Thread {
 	
 	private boolean run = true;
 	private final Table[] layers;
+	private final int[] layerGenerations;
 	private final Canvas target;
 	
 	private final BufferedImage[] buffers = new BufferedImage[2];
@@ -22,11 +23,12 @@ public final class Painter extends Thread {
 	public Painter(Table[] layers, Canvas target) {
 		this.layers = layers;
 		this.target = target;
+		layerGenerations = new int[layers.length];
 	}
 	
 	public void run() {
 		while (run) {
-			if (dataChanged(layers)) {
+			if (dataChanged()) {
 				BufferedImage i = selfBuffer(target);
 				target.setBackBuffer(i);
 			}
@@ -36,8 +38,15 @@ public final class Painter extends Thread {
 		run=false;
 	}
 	
-	private static boolean dataChanged(Table[] layers) {
-		return true;
+	private final boolean dataChanged() {
+		for (int i=0; i< layers.length; i++) {
+			int gen = layers[i].getGeneration();
+			if (gen != layerGenerations[i]) {
+				layerGenerations[i] = gen;
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	/**Render glyphs immediately onto the passed graphics object.*/
@@ -54,7 +63,7 @@ public final class Painter extends Thread {
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = canvas.getContentDimension();
 		
-		if (size.width ==0 || size.height ==0) {size = DEFAULT_SIZE;}
+		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		
 		//Ensure that the buffer is the 'right' size
 		if (buffer == null ||
@@ -66,7 +75,7 @@ public final class Painter extends Thread {
 		}
 		
 		try {
-			g = (Graphics2D) buffer.getGraphics();
+			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
 			g.setPaint(canvas.getBackground());
 			g.fillRect(0, 0, size.width, size.height);
 

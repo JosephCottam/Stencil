@@ -64,8 +64,7 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 	public void export(String filename, String type, Object info) throws Exception {
 		if (type.equals("PNG") || type.equals("RASTER")) {
 			exportPNG(filename, Converter.toInteger(info));
-		}		
-		super.export(filename, type, info);
+		} else {super.export(filename, type, info);}
 	}
 	
 	private void exportPNG(String filename, Integer dpi) throws Exception { 

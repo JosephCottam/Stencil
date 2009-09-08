@@ -41,9 +41,10 @@ import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
 public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
-	ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
-	String name; 
-	T prototypeGlyph;
+	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
+	private int generation =0;
+	private String name; 
+	private T prototypeGlyph;
 
 	protected Table(String name, T prototype) {
 		this.name = name;
@@ -89,14 +90,27 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
+		updateGeneration();
 		
 		glyph.setLayer(this);
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
-		
-		//TODO: Transfer markers
 	}
 
+	/**What is the current edit generation of the data table?
+	 * Any edit should update the generation id.  Generations
+	 * ids do not have to be assigned sequentially, so that property
+	 * should not be relied on, however sufficient generation ids
+	 * should be used to keep the repeat rate low.
+	 * 
+	 * Generation id is not guaranteed to change in any timely manner,
+	 * only eventually after an update.
+	 */
+	public int getGeneration() {return generation;}
+	
+	/**Update the generation ID.**/ 
+	private void updateGeneration() {generation++;}
+	
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
 	public static Table<?> instance(Layer l) {

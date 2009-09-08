@@ -69,15 +69,10 @@ public final class Canvas extends JComponent {
 	public void dispose() {painter.signalStop();}
 		
 	public void paintComponent(Graphics g) {
-		paintBufferToScreen(g);
+		g.drawImage(buffer, 0, 0, null);
 	}
 	
-    protected void paintBufferToScreen(Graphics g) {
-    	g.drawImage(buffer, 0, 0, null);
-    }
-
 	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
-	
 	
 	public Rectangle getContentDimension() {
 		Rectangle2D bounds = new Rectangle2D.Double(0,0,0,0);

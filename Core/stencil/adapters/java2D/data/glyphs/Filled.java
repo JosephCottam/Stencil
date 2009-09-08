@@ -35,6 +35,7 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import java.awt.Paint;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.Shape;
 
 public abstract class Filled extends Stroked {
@@ -64,6 +65,9 @@ public abstract class Filled extends Stroked {
 	}
 	
 	protected void render(Graphics2D g, Shape s) {
+		Rectangle bounds = s.getBounds();
+		if (bounds.width ==0 || bounds.height ==0) {return;}
+
 		if (fill != null) {
 			g.setPaint(fill);
 			g.fill(s);

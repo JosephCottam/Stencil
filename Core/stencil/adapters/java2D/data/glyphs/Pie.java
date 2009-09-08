@@ -128,9 +128,7 @@ public final class Pie extends Stroked {
 			g.fill(arc);
 		}
 		
-		g.setPaint(outlinePaint);
-		g.setStroke(outlineStyle);
-		g.draw(outline);
+		super.render(g, outline);
 	}
 
 }

@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.parser.tree.Rule;
-import stencil.adapters.Glyph;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Table;
 import stencil.streams.Tuple;
@@ -58,16 +57,15 @@ public final class DynamicUpdater extends Thread implements Stopable {
 			
 		}
 		
-		//Sweep all stored tuples not marked 
+		//Sweep all stored tuples not marked.  Since the whole table was just iterated, this should remove only defunct values
 		for (Entry e: sourceData.values()) {
 			if (e.mark != iterationMark) {sourceData.remove(e);}
 		}
 	}
 	
-	public void addUpdate(Tuple sourceData, Glyph target) {
-		
-		//Associate the glyph with this thread in some way (could be a ref to this thread)
-		//Store the source data in a mark-sweep set
+	public void addUpdate(Tuple sourceData, Glyph2D target) {
+		Entry e = new Entry(sourceData);
+		this.sourceData.put(target.getID(), e);
 	}
 	
 	public void signalStop() {run = false;}	
