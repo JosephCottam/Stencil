@@ -150,7 +150,7 @@ public class Panel extends StencilPanel<PiccoloGlyph, DisplayLayer, PCanvas> {
 
 
 	private boolean transfers = true;
-	private Object transferLock = "Lock";
+	private final Object transferLock = new Object();
 	
 	
 	public void setTransfers() {synchronized(transferLock) {this.transfers = true;}}

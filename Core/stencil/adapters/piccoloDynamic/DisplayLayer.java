@@ -46,7 +46,7 @@ import edu.umd.cs.piccolo.*;
 
 
 public class DisplayLayer implements stencil.display.DisplayLayer<PiccoloGlyph> {
-	private final Object LAYER_LOCK = ""; //Special lock to make sure index and layer children stay in synch
+	private final Object LAYER_LOCK = new Object(); //Special lock to make sure index and layer children stay in synch
 
 	protected ZPLayer source;
 	protected String name;

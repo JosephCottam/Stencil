@@ -52,13 +52,13 @@ import java.lang.reflect.Method;
  * @author jcottam
  *
  */
-public class JythonEncapsulation {
+public final class JythonEncapsulation {
 	public static final String INVOKE_METHOD = "invoke";
 	public static final Object ABORT_VALUE = "STENCIL:CANCEL";
 
-	protected Facet facet;
-	protected PythonInterpreter environment;
-	protected PyCode codeCache;
+	protected final Facet facet;
+	protected final PythonInterpreter environment;
+	protected final PyCode codeCache;
 
 	public JythonEncapsulation(Python python, Facet facet, EncapsulationGenerator envSource) {
 		assert !facet.getName().equals(INIT_BLOCK_TAG) : "Should never create an encapusluation for init block.";

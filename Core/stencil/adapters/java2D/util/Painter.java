@@ -9,7 +9,7 @@ import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.data.glyphs.Point;
 
-public final class Painter extends Thread {
+public final class Painter extends Thread implements Stopable {
 	private Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	
 	private boolean run = true;
@@ -32,7 +32,6 @@ public final class Painter extends Thread {
 				BufferedImage i = selfBuffer(target);
 				target.setBackBuffer(i);
 			}
-			
 			Thread.yield();
 		}
 		run=false;
@@ -109,7 +108,7 @@ public final class Painter extends Thread {
         return img;
     }
 	
-	private int updateNextBuffer() {
-		return (nextBuffer+1)%(buffers.length);
+	private void updateNextBuffer() {
+		nextBuffer = (nextBuffer+1)%(buffers.length);
 	}
 }

@@ -47,8 +47,8 @@ import stencil.parser.tree.Layer;
 /**Some of this is derived from Prefuse's display and related objects.*/
 
 public final class Canvas extends JComponent {	
-	protected final Painter painter;	
-	protected BufferedImage buffer;
+	final Painter painter;	
+	BufferedImage buffer;
 	
 	final Table<? extends Point>[] layers;
 	
@@ -72,7 +72,9 @@ public final class Canvas extends JComponent {
 		g.drawImage(buffer, 0, 0, null);
 	}
 	
-	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
+	public void setBackBuffer(BufferedImage i) {
+		this.buffer = i;
+	}
 	
 	public Rectangle getContentDimension() {
 		Rectangle2D bounds = new Rectangle2D.Double(0,0,0,0);
