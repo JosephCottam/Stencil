@@ -126,9 +126,10 @@ public abstract class Point implements Glyph2D {
 	public Glyph2D duplicate(String ID) {
 		try {
 			Constructor c = this.getClass().getConstructor(String.class);
-			Glyph2D g = (Glyph2D) c.newInstance(ID);
+			Point g = (Point) c.newInstance(ID);
+			g.updateNonID(this);
 			return g;
-		} catch (Exception e) {throw new Error("Error duplicating tuple:" + this.toString());}
+		} catch (Exception e) {throw new Error("Error duplicating glyph:" + this.toString(), e);}
 	}	
 
 	public void set(String name, Object value) {
@@ -190,13 +191,24 @@ public abstract class Point implements Glyph2D {
 	}
 	
 	public Glyph2D update(String field, Object value) {
-		if (field.equals("ID")) {return duplicate((String) value);} 
-		else {set(field, value); return this;}
+		Object existing = this.get(field);
+		if (existing == value || (existing !=null && existing.equals(value))) {
+			return this;
+		} else if (field.equals("ID") && !value.equals(this.getID())){
+			return duplicate((String) value);
+		}  else {
+			set(field, value); 
+			return this;
+		}
 	}
 
-	public Glyph2D update(Tuple source) {
+	
+	private Glyph2D updateNonID(Tuple source) {return update(source, false);}
+	public Glyph2D update(Tuple source) {return update(source, true);}
+	private Glyph2D update(Tuple source, boolean id) {
 		Glyph2D temp = this;
 		for (String field: source.getFields()) {
+			if (!id && field.equals("ID")) {continue;}
 			temp = temp.update(field, source.get(field));
 		}
 		return temp;

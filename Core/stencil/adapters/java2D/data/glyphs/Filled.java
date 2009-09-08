@@ -67,7 +67,6 @@ public abstract class Filled extends Stroked {
 	protected void render(Graphics2D g, Shape s) {
 		Rectangle bounds = s.getBounds();
 		if (bounds.width ==0 || bounds.height ==0) {return;}
-
 		if (fill != null) {
 			g.setPaint(fill);
 			g.fill(s);
