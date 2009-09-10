@@ -32,7 +32,6 @@ package stencil.adapters.java2D.data.glyphs;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.Rectangle2D;
-import java.awt.geom.Point2D;
 
 import stencil.types.Converter;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
@@ -60,6 +59,9 @@ public final class Shape extends Filled {
 		attributes.remove(StandardAttribute.HEIGHT);
 	}
 	
+	private Rectangle2D boundsCache;
+	private java.awt.Shape shapeCache;
+	
 	public Shape(String id) {
 		super(id);
 		this.outlinePaint = CLEAR;
@@ -72,6 +74,13 @@ public final class Shape extends Filled {
 		if (SHAPE.is(name)) {this.shape = (StandardShape) Converter.convert(value, StandardShape.class);}
 		else if (SIZE.is(name)) {this.size = Converter.toDouble(value);}
 		else {super.set(name,value);}
+		
+		shapeCache = null; boundsCache = null;
+	}
+	
+	public Rectangle2D getBounds() {
+		if (boundsCache == null) {boundsCache = super.getBounds();}
+		return boundsCache;
 	}
 	
 	public Object get(String name) {
@@ -89,13 +98,15 @@ public final class Shape extends Filled {
 	
 	public void render(Graphics2D g) {
 		if (shape == StandardShape.NONE) {return;}
+		if (shapeCache == null) {
+			Rectangle2D b = getBounds();
+			shapeCache = Shapes.getShape(shape, new Rectangle2D.Double(b.getX(),b.getY(), size,size));
+		}
 
-		Point2D renderPoint = correctRegistration();
-		java.awt.Shape s = Shapes.getShape(shape, new Rectangle2D.Double(renderPoint.getX(),renderPoint.getY(), size,size));
-		if (s != null) {
+		if (shapeCache != null) {
 //			Rectangle bounds = s.getBounds();
 //			if (bounds.getWidth()==0 || bounds.getHeight() ==0) {return;}
-			super.render(g, s);
+			super.render(g, shapeCache);
 		}
 	}
 

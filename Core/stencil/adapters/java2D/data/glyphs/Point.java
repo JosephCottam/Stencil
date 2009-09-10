@@ -186,10 +186,6 @@ public abstract class Point implements Glyph2D {
 	
 	public String getID() {return id;}
 	
-	public final Point2D correctRegistration() {
-		return Registrations.registrationToTopLeft(registration, x,y, getHeight(), getWidth());
-	}
-	
 	public Glyph2D update(String field, Object value) {
 		Object existing = this.get(field);
 		if (existing == value || (existing !=null && existing.equals(value))) {
