@@ -42,6 +42,7 @@ import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 import stencil.util.Tuples;
 import stencil.adapters.piccoloDynamic.glyphs.Node;
+import stencil.adapters.piccoloDynamic.util.ExtendedZoomHandler;
 import stencil.adapters.piccoloDynamic.util.PiccoloGlyph;
 import edu.umd.cs.piccolo.PCanvas;
 import edu.umd.cs.piccolo.util.PBounds;

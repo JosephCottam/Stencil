@@ -14,7 +14,7 @@ public final class Painter extends Thread implements Stopable {
 	
 	private boolean run = true;
 	private final Table[] layers;
-	private final int[] layerGenerations;
+	private final GenerationTracker generations;
 	private final Canvas target;
 	
 	private final BufferedImage[] buffers = new BufferedImage[2];
@@ -23,12 +23,12 @@ public final class Painter extends Thread implements Stopable {
 	public Painter(Table[] layers, Canvas target) {
 		this.layers = layers;
 		this.target = target;
-		layerGenerations = new int[layers.length];
+		generations = new GenerationTracker(layers);
 	}
 	
 	public void run() {
 		while (run) {
-			if (dataChanged()) {
+			if (generations.changed()) {
 				BufferedImage i = selfBuffer(target);
 				target.setBackBuffer(i);
 			}
@@ -37,20 +37,10 @@ public final class Painter extends Thread implements Stopable {
 		run=false;
 	}
 	
-	private final boolean dataChanged() {
-		for (int i=0; i< layers.length; i++) {
-			int gen = layers[i].getGeneration();
-			if (gen != layerGenerations[i]) {
-				layerGenerations[i] = gen;
-				return true;
-			}
-		}
-		return false;
-	}
-	
 	/**Render glyphs immediately onto the passed graphics object.*/
 	public void doDrawing(Graphics2D g) {
 		for (Table<? extends Point> table: layers) {
+			generations.fixGeneration(table);	//Prevents some types of over-painting, but not all of them
 			for (Point glyph: table) {
 				glyph.render(g);
 			}
@@ -60,7 +50,8 @@ public final class Painter extends Thread implements Stopable {
 	private BufferedImage selfBuffer(Canvas canvas) {
 		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
-		Rectangle size = canvas.getContentDimension();
+		canvas.getContentDimension();
+		Rectangle size = canvas.getBounds();
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		
@@ -78,6 +69,7 @@ public final class Painter extends Thread implements Stopable {
 			g.setPaint(canvas.getBackground());
 			g.fillRect(0, 0, size.width, size.height);
 
+			g.setTransform(canvas.getViewTransform());
 			doDrawing(g);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -91,7 +83,7 @@ public final class Painter extends Thread implements Stopable {
 
 	public void signalStop() {run = false;}
 
-	//Taken from Prefuse's Display 
+	//Taken roughly from Prefuse's Display 
     protected BufferedImage newBuffer(Canvas canvas, int width, int height) {
         BufferedImage img = null;
         if ( !GraphicsEnvironment.isHeadless() ) {

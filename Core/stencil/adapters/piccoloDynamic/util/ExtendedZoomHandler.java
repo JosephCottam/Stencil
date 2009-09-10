@@ -27,7 +27,7 @@
  * Piccolo was written at the Human-Computer Interaction Laboratory www.cs.umd.edu/hcil by Jesse Grosjean
  * under the supervision of Ben Bederson. The Piccolo website is www.cs.umd.edu/hcil/piccolo.
  */
-package stencil.adapters.piccoloDynamic;
+package stencil.adapters.piccoloDynamic.util;
 
 import java.awt.event.InputEvent;
 import java.awt.geom.Point2D;

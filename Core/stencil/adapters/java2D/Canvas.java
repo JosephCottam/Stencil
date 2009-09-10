@@ -33,12 +33,14 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.AffineTransform;
 import java.util.List;
 
 import javax.swing.JComponent;
 
 import stencil.adapters.java2D.data.glyphs.Point;
 import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.util.GenerationTracker;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
 import stencil.parser.tree.Layer;
@@ -49,7 +51,9 @@ import stencil.parser.tree.Layer;
 public final class Canvas extends JComponent {	
 	final Painter painter;	
 	BufferedImage buffer;
-	
+	AffineTransform viewTransform;
+	private final GenerationTracker tracker;
+	private Rectangle2D contentBounds;
 	final Table<? extends Point>[] layers;
 	
 	public Canvas(List<Layer> layers) {
@@ -64,28 +68,52 @@ public final class Canvas extends JComponent {
 
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
+		tracker = new GenerationTracker(this.layers);
+		
+		viewTransform = new  AffineTransform();
 	}
 	
 	public void dispose() {painter.signalStop();}
 		
-	public void paintComponent(Graphics g) {
-		g.drawImage(buffer, 0, 0, null);
-	}
+	public void paintComponent(Graphics g) {g.drawImage(buffer, 0, 0, null);}
 	
-	public void setBackBuffer(BufferedImage i) {
-		this.buffer = i;
-	}
+	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
 	
 	public Rectangle getContentDimension() {
-		Rectangle2D bounds = new Rectangle2D.Double(0,0,0,0);
-		
-		for (Table<? extends Point> t: layers) {
-			for (Point p: t) {
-				bounds.add(p.getBounds());
+		Rectangle2D bounds =contentBounds;
+		if (tracker.changed()) {
+			bounds = new Rectangle2D.Double(0,0,0,0);
+			
+			for (Table<? extends Point> t: layers) {
+				tracker.fixGeneration(t);
+				for (Point p: t) {
+					bounds.add(p.getBounds());
+				}
 			}
-		}
+		} 
+		zoomFit(bounds); //HACK: remove when there is user-controlled zoom/pan.  Right now, it just makes things fit.
 		return bounds.getBounds();
 	}	
 
 	public void stopPainter() {painter.signalStop();}
+	
+	private void zoomFit(Rectangle2D bounds) {
+		Rectangle view = this.getBounds();
+		double scale = getScale(bounds, view);
+		viewTransform.setToTranslation(center(bounds.getMinX(),bounds.getWidth(), view.getWidth()),
+										center(bounds.getMinY(), bounds.getHeight(), view.getHeight()));
+		viewTransform.scale(scale, scale);
+	}
+	
+	private double center(double itemP, double itemD, double frameD) {
+		return -itemP + (frameD/2.0 - itemD/2.0);
+	}
+	
+	private double getScale(Rectangle2D item, Rectangle2D frame) {
+		double scaleX = (frame.getWidth())/item.getWidth();
+		double scaleY = (frame.getHeight())/item.getHeight();
+		return Math.min(scaleX,scaleY);
+	}
+	
+	public AffineTransform getViewTransform() {return viewTransform;}
 }
