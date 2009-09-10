@@ -28,8 +28,9 @@ public final class Painter extends Thread implements Stopable {
 	
 	public void run() {
 		while (run) {
-			if (generations.changed()) {
-				BufferedImage i = selfBuffer(target);
+
+			if (generations.changed() || resized()) {
+				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
 			}
 			Thread.yield();
@@ -46,12 +47,19 @@ public final class Painter extends Thread implements Stopable {
 			}
 		}
 	}
-			
-	private BufferedImage selfBuffer(Canvas canvas) {
+	
+	private boolean resized() {
+		BufferedImage i = buffers[nextBuffer];
+		if (i == null) {return false;}	//Has not been resized since last rendering, if there has been no last rendering.
+		Rectangle target = this.target.getBounds();
+		return (target.getHeight() != i.getHeight()) || (target.getWidth() != i.getWidth()); 
+	}
+	
+	private BufferedImage selfBuffer() {
 		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
-		canvas.getContentDimension();
-		Rectangle size = canvas.getBounds();
+		target.getContentDimension();			//TODO: REMOVE, this is part of a hack that sets up zoon...needs to be removed AS SOON AS POSSIBLE!!!
+		Rectangle size = target.getBounds();
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		
@@ -60,16 +68,16 @@ public final class Painter extends Thread implements Stopable {
 			buffer.getWidth() != size.width ||
 			buffer.getHeight() != size.height) 
 		{
-			buffers[nextBuffer] = newBuffer(canvas, size.width, size.height);
+			buffers[nextBuffer] = newBuffer(target, size.width, size.height);
 			buffer= buffers[nextBuffer];
 		}
 		
 		try {
 			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
-			g.setPaint(canvas.getBackground());
+			g.setPaint(target.getBackground());
 			g.fillRect(0, 0, size.width, size.height);
 
-			g.setTransform(canvas.getViewTransform());
+			g.setTransform(target.getViewTransform());
 			doDrawing(g);
 		} catch (Exception e) {
 			e.printStackTrace();

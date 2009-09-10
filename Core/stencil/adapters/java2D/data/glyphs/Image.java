@@ -29,6 +29,7 @@
 package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
@@ -98,6 +99,8 @@ public final class Image extends Point {
 
 	@Override
 	public void render(Graphics2D g) {
+		AffineTransform rs = super.preRender(g);
+		super.postRender(g,rs);
 		//TODO: Actually render...
 	}
 }

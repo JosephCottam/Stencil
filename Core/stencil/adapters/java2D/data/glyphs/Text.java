@@ -3,6 +3,7 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
+import java.awt.geom.AffineTransform;
 import java.util.regex.Pattern;
 
 import static stencil.adapters.general.TextFormats.TextProperty;
@@ -17,7 +18,7 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.types.Converter;
 
 public final class Text extends Point {
-	private static Pattern splitter = Pattern.compile("\n");
+	private static final Pattern SPLITTER = Pattern.compile("\n");
 	
 	private static final double AUTO_SIZE = -1;
 	private static final Attribute TEXT = new Attribute("TEXT", "");
@@ -76,8 +77,13 @@ public final class Text extends Point {
 
 	@Override
 	public void render(Graphics2D g) {
-		// TODO Auto-generated method stub
+		AffineTransform rs = super.preRender(g);
 		
+		g.setFont(format.font);
+		g.setPaint(format.textColor);
+		g.drawString(text, 0, (float)getHeight());
+		
+		super.postRender(g,rs);
 	}	
 
 	//TODO: Change to 'compute layout' and determine line breaks...if needed
@@ -85,7 +91,7 @@ public final class Text extends Point {
 		if (!autoHeight && !autoWidth) {return;}
 		
         FontMetrics fm = REFERENCE_GRAPHICS.getFontMetrics(format.font);
-        String[] lines = splitter.split(text);
+        String[] lines = SPLITTER.split(text);
         double maxWidth=0;
         for (String line: lines) {
         	double width = fm.stringWidth(line);

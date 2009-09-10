@@ -31,6 +31,7 @@ package stencil.adapters.java2D.data.glyphs;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.geom.AffineTransform;
 
 import stencil.adapters.general.Pies;
 import stencil.adapters.general.Strokes.StrokeProperty;
@@ -81,7 +82,7 @@ public final class Pie extends Stroked {
 		else if (SLICE.is(name)) {slice = Converter.toDouble(value);}
 		else if (FIELD.is(name)) {field = Converter.toDouble(value);}
 		else if (ANGLE.is(name)) {angle = Converter.toDouble(value);}
-		else if (SIZE.is(name)) {size = Converter.toDouble(size);}
+		else if (SIZE.is(name)) {size = Converter.toDouble(value);}
 		else if (SLICE_COLOR.is(name)) {slicePaint = (Paint) Converter.convert(value, Paint.class);}
 		else if (FIELD_COLOR.is(name)) {fieldPaint = (Paint) Converter.convert(value, Paint.class);}
 		else {super.set(name, value);}
@@ -94,7 +95,7 @@ public final class Pie extends Stroked {
 		if (SLICE_COLOR.is(name)) {return slicePaint;}
 		if (FIELD_COLOR.is(name)) {return fieldPaint;}
 		if (ANGLE.is(name)) {return angle;}
-		if (SIZE.is(name)) {return name;}
+		if (SIZE.is(name)) {return size;}
 		
 		return super.get(name);
 	}
@@ -110,16 +111,15 @@ public final class Pie extends Stroked {
 	public void render(Graphics2D g) {
 		double angle = this.angle;
 		double percent = getPercent();
-		double x = this.x;
-		double y = this.y;
 		double size = this.size;
 		double strokeWidth = (Double) get(StrokeProperty.STROKE_WEIGHT.name());
 		Color strokePaint = (Color) outlinePaint;
 		
-		java.awt.Shape arc = Pies.makeSlice(angle, percent, x, y, size, strokeWidth, strokePaint);
-		java.awt.Shape outline = Pies.makePieOutline(angle, percent, x, y, size, strokeWidth, strokePaint);
+		java.awt.Shape arc = Pies.makeSlice(angle, percent, 0, 0, size, strokeWidth, strokePaint);
+		java.awt.Shape outline = Pies.makePieOutline(angle, percent, 0, 0, size, strokeWidth, strokePaint);
 
 
+		AffineTransform rs = super.preRender(g);
 		g.setPaint(fieldPaint);
 		g.fill(outline);
 		
@@ -127,8 +127,10 @@ public final class Pie extends Stroked {
 			g.setPaint(slicePaint);
 			g.fill(arc);
 		}
+
 		
 		super.render(g, outline);
+		super.postRender(g, rs);
 	}
 
 }

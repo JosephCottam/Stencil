@@ -15,9 +15,11 @@ public final class DynamicUpdater extends Thread implements Stopable {
 	private static final class Entry {
 		Tuple sourceData;
 		boolean mark = true;
+		String ID;
 		
-		Entry(Tuple sourceData) {
+		Entry(Tuple sourceData, String ID) {
 			this.sourceData = sourceData;
+			this.ID = ID;
 		}
 	}
 	
@@ -35,6 +37,7 @@ public final class DynamicUpdater extends Thread implements Stopable {
 	public void run() {
 		while(run) {
 			updateAll();
+			Thread.yield();
 		}
 	}
 	
@@ -59,12 +62,14 @@ public final class DynamicUpdater extends Thread implements Stopable {
 		
 		//Sweep all stored tuples not marked.  Since the whole table was just iterated, this should remove only defunct values
 		for (Entry e: sourceData.values()) {
-			if (e.mark != iterationMark) {sourceData.remove(e);}
+			if (e.mark != iterationMark) {
+				sourceData.remove(e);
+			}
 		}
 	}
 	
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
-		Entry e = new Entry(sourceData);
+		Entry e = new Entry(sourceData, target.getID());
 		this.sourceData.put(target.getID(), e);
 	}
 	

@@ -31,6 +31,7 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import stencil.types.Converter;
@@ -97,16 +98,17 @@ public final class Shape extends Filled {
 	public String getImplantation() {return "SHAPE";}
 	
 	public void render(Graphics2D g) {
+		java.awt.Shape s;
 		if (shape == StandardShape.NONE) {return;}
 		if (shapeCache == null) {
-			Rectangle2D b = getBounds();
-			shapeCache = Shapes.getShape(shape, new Rectangle2D.Double(b.getX(),b.getY(), size,size));
+			shapeCache = Shapes.getShape(shape, new Rectangle2D.Double(0,0, size,size));
 		}
+		s = shapeCache;
 
-		if (shapeCache != null) {
-//			Rectangle bounds = s.getBounds();
-//			if (bounds.getWidth()==0 || bounds.getHeight() ==0) {return;}
-			super.render(g, shapeCache);
+		if (s != null) {
+			AffineTransform rs = super.preRender(g);
+			super.render(g, s);
+			super.postRender(g,rs);
 		}
 	}
 

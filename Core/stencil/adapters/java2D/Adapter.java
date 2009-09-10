@@ -35,6 +35,7 @@ import stencil.display.StencilPanel;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.glyphs.Point;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter INSTANCE = new Adapter();
@@ -57,7 +58,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	}
 	
 	public void setDebugColor(Color c) {
-		throw new UnsupportedOperationException("Not implemented");
+		Point.DEBUG_COLOR = c;
 	}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {

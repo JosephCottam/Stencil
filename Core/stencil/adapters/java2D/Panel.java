@@ -85,6 +85,7 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 		if (!updaters.containsKey(rule)) {
 			updater = new DynamicUpdater(table, rule);
 			updaters.put(rule, updater);
+			updater.start();
 		}
 		updater = updaters.get(rule);
 		updater.addUpdate(source, g);

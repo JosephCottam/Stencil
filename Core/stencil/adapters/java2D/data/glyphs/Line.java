@@ -30,9 +30,11 @@ package stencil.adapters.java2D.data.glyphs;
 
 
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
 
 import stencil.types.Converter;
+import stencil.adapters.general.Registrations;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -40,11 +42,18 @@ import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
 public final class Line extends Stroked {
 	protected static final AttributeList attributes;
+	protected static final Attribute X1 = new Attribute("X.1", 0, double.class);
+	protected static final Attribute X2 = new Attribute("X.2", 0, double.class);
+	protected static final Attribute Y1 = new Attribute("Y.1", 0, double.class);
+	protected static final Attribute Y2 = new Attribute("Y.2", 0, double.class);
+	
 	static {
 		attributes = new AttributeList(Stroked.attributes);
 
-		attributes.add(new Attribute("Xn", Xn.getDefaultValue(), Xn.getType()));
-		attributes.add(new Attribute("Yn", Yn.getDefaultValue(), Yn.getType()));
+		attributes.add(X1);
+		attributes.add(Y1);
+		attributes.add(X2);
+		attributes.add(Y2);
 		
 		attributes.remove(StandardAttribute.HEIGHT);
 		attributes.remove(StandardAttribute.WIDTH);
@@ -66,31 +75,35 @@ public final class Line extends Stroked {
 	protected AttributeList getAttributes() {return attributes;}
 	
 	public Object get(String name) {
-		if (name.equals("X.1")) 	 {return x1;}
-		else if (name.equals("Y.1")) {return y1;}
-		else if (name.equals("X.2")) {return x2;}
-		else if (name.equals("Y.2")) {return y2;}
-		else if (name.equals("Xn"))  {return new Double[]{x1,x2};}
-		else if (name.equals("Yn"))  {return new Double[]{y1,y2};}
+		if (X1.is(name)) 	  {return x1;}
+		else if (Y1.is(name)) {return y1;}
+		else if (X2.is(name)) {return x2;}
+		else if (Y2.is(name)) {return y2;}
 		else{return super.get(name);}		
 	}
 	
 	public void set(String name, Object value) {
-		if (name.equals("X.1")) 	 {x1 = Converter.toDouble(value); validateXY();}
-		else if (name.equals("Y.1")) {y1 = Converter.toDouble(value); validateXY();}
-		else if (name.equals("X.2")) {x2 = Converter.toDouble(value);}
-		else if (name.equals("Y.2")) {y2 = Converter.toDouble(value);}
+		if (X1.is(name)) 	  {x1 = Converter.toDouble(value); validateXY();}
+		else if (Y1.is(name)) {y1 = Converter.toDouble(value); validateXY();}
+		else if (X2.is(name)) {x2 = Converter.toDouble(value);}
+		else if (Y2.is(name)) {y2 = Converter.toDouble(value);}
 		else if (name.equals("X") || name.equals("Y")) {throw new IllegalArgumentException("Cannot set raw X and Y on a line.");}
 		else{super.set(name, value);}
 	}
 	
 	private void validateXY() {
-		this.x = Math.min(x1,x2);
-		this.y = Math.min(y1,y2);
+		double x,y;
+		x = Math.min(x1,x2);
+		y = Math.min(y1,y2);
+		
+		Point2D p = Registrations.topLeftToRegistration(registration, x,y,getWidth(), getHeight());
+		this.x = p.getX();
+		this.y = p.getY();
 	}
 	
 	public void render(Graphics2D g) {
 		Line2D l = new Line2D.Double(x1,y1,x2,y2);
-		super.render(g,l);		
+		super.render(g,l);	
+		super.postRender(g, null);
 	}
 }

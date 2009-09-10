@@ -28,7 +28,11 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
@@ -37,6 +41,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import stencil.adapters.java2D.data.Glyph2D;
+import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
@@ -46,40 +51,57 @@ import stencil.streams.Tuple;
 import stencil.types.Converter;
 import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
-import static stencil.adapters.GlyphAttributes.StandardAttribute.*;
 
 public abstract class Point implements Glyph2D {
+	public static Color DEBUG_COLOR = null;
+	private static final Stroke DEBUG_STROKE = new BasicStroke(.25f);
+	
+	private static final Attribute ID = new Attribute(StandardAttribute.ID);
+	private static final Attribute X = new Attribute(StandardAttribute.X);
+	private static final Attribute Y = new Attribute(StandardAttribute.Y);
+	private static final Attribute Z = new Attribute(StandardAttribute.Z);
+	private static final Attribute WIDTH = new Attribute(StandardAttribute.WIDTH);
+	private static final Attribute HEIGHT = new Attribute(StandardAttribute.HEIGHT);
+	private static final Attribute LAYERNAME = new Attribute(StandardAttribute.LAYERNAME);
+	private static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
+	private static final Attribute REGISTRATION = new Attribute(StandardAttribute.REGISTRATION);
+	private static final Attribute ROTATION = new Attribute(StandardAttribute.ROTATION);
+
+	
+	
 	protected static final AttributeList attributes = new AttributeList();
 	static {
-		attributes.add(new Attribute(ID));
-		attributes.add(new Attribute(X));
-		attributes.add(new Attribute(Y));
-		attributes.add(new Attribute(Z));
+		attributes.add(ID);
+		attributes.add(X);
+		attributes.add(Y);
+		attributes.add(Z);
 
-		attributes.add(new Attribute(WIDTH));
-		attributes.add(new Attribute(HEIGHT));
-		attributes.add(new Attribute(LAYERNAME));
-		attributes.add(new Attribute(IMPLANTATION));
-		attributes.add(new Attribute(REGISTRATION));
-		attributes.add(new Attribute(ROTATION));
+		attributes.add(WIDTH);
+		attributes.add(HEIGHT);
+		attributes.add(LAYERNAME);
+		attributes.add(IMPLANTATION);
+		attributes.add(REGISTRATION);
+		attributes.add(ROTATION);
 	}
 	
 	protected Set<Integer> markers = new TreeSet<Integer>();
 	
-	protected String id = (String) attributes.get(ID).defaultValue;
+	protected String id = (String) attributes.get(StandardAttribute.ID).defaultValue;
 	
 	/**The value stored here must be interpreted with respect to registration
 	 * before it can be used for rendering. Use the 'correctRegistrtion' method.
 	 */
-	protected Double x = (Double) attributes.get(X).defaultValue;
+	protected Double x = (Double) attributes.get(StandardAttribute.X).defaultValue;
 
 	/**The value stored here must be interpreted with respect to registration
 	 * before it can be used for rendering.  Use the 'correctRegistrtion' method.
 	 */
-	protected double y = (Double) attributes.get(Y).defaultValue;
-	protected double z = (Double) attributes.get(Z).defaultValue;
-	protected Registration registration = (Registration) attributes.get(REGISTRATION).defaultValue;
-	protected double rotation = (Double) attributes.get(ROTATION).defaultValue;
+	protected double y = (Double) attributes.get(StandardAttribute.Y).defaultValue;
+	protected double z = (Double) attributes.get(StandardAttribute.Z).defaultValue;
+	protected Registration registration = (Registration) attributes.get(StandardAttribute.REGISTRATION).defaultValue;
+	
+	/**The rotation, stored in degrees.*/
+	protected double rotation = (Double) attributes.get(StandardAttribute.ROTATION).defaultValue;
 	
 	protected Table layer;
 	
@@ -133,28 +155,30 @@ public abstract class Point implements Glyph2D {
 	}	
 
 	public void set(String name, Object value) {
-		if (name.equals(X.name())) {this.x = Converter.toDouble(value);}
-		else if (name.equals(Y.name())) {this.y = Converter.toDouble(value);}
-		else if (name.equals(Z.name())) {this.z = Converter.toDouble(value);}
-		else if (name.equals(ROTATION.name())) {this.rotation = Converter.toDouble(value);}
-		else if (name.equals(REGISTRATION.name())) {this.registration = (Registration) Converter.convert(value, Registration.class);}
-		else if (name.equals(ID.name())) {this.id = Converter.toString(value);}
-		else if (name.equals(IMPLANTATION)) {throw new IllegalArgumentException("Cannot set implantation.");}
+			 if (X.is(name)) {this.x = Converter.toDouble(value);}
+		else if (Y.is(name)) {this.y = Converter.toDouble(value);}
+		else if (Z.is(name)) {this.z = Converter.toDouble(value);}
+		else if (ROTATION.is(name)) {
+			this.rotation = Converter.toDouble(value);
+		}
+		else if (REGISTRATION.is(name)) {this.registration = (Registration) Converter.convert(value, Registration.class);}
+		else if (ID.is(name)) {this.id = Converter.toString(value);}
+		else if (IMPLANTATION.is(name)) {throw new IllegalArgumentException("Cannot set implantation.");}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
 	public Object get(String name) {
-		if (name.equals(ID.name())) {return id;}
-		if (name.equals(X.name())) {return x;}
-		if (name.equals(Y.name())) {return y;}
-		if (name.equals(Z.name())) {return z;}
+		if (ID.is(name)) {return id;}
+		if (X.is(name)) {return x;}
+		if (Y.is(name)) {return y;}
+		if (Z.is(name)) {return z;}
 
-		if (name.equals(WIDTH.name())) {return getWidth();}
-		if (name.equals(HEIGHT.name())) {return getHeight();}
-		if (name.equals(LAYERNAME.name())) {return layer==null?null:layer.getName();}
-		if (name.equals(IMPLANTATION.name())) {return getImplantation();}
-		if (name.equals(REGISTRATION.name())) {return registration;}
-		if (name.equals(ROTATION.name())) {return rotation;}
+		if (WIDTH.is(name)) {return getWidth();}
+		if (HEIGHT.is(name)) {return getHeight();}
+		if (LAYERNAME.is(name)) {return layer==null?null:layer.getName();}
+		if (IMPLANTATION.is(name)) {return getImplantation();}
+		if (REGISTRATION.is(name)) {return registration;}
+		if (ROTATION.is(name)) {return rotation;}
 		throw new InvalidNameException(name, getFields());
 	}
 
@@ -213,4 +237,32 @@ public abstract class Point implements Glyph2D {
 	public boolean hasMarker(int marker) {return  markers.contains(marker);}
 	public void markForUpdate(int marker) {markers.add(marker);}
 	
+	/**Prepare the graphics object for rendering.
+	 * @returns The affine transform that the graphics object originally had.  
+	 * 			This should transform should be given to postRender to ensure other elements render properly.
+	 *TODO:An alternative to passing around the transforms is to allocate a graphics2D object.  Is that a better idea?  
+	 */
+	protected AffineTransform preRender(Graphics2D g) {
+		AffineTransform restore = g.getTransform();
+		if (x!=0 || y!=0) {
+			Point2D p = Registrations.registrationToTopLeft(registration, x,y,getWidth(),getHeight());
+			g.translate(p.getX(), p.getY());
+		}
+		if (rotation != 0) {g.rotate(Math.toRadians(rotation));}
+		return restore;
+	}
+	
+	
+	/**Post rendering actions are to restore the transform and draw debugging entities (if requested).
+	 * The transform passed should be the same as the one returned from preRender.
+	 * 
+	 */
+	protected void postRender(Graphics2D g, AffineTransform restore) {
+		if (DEBUG_COLOR != null) {
+			g.setPaint(DEBUG_COLOR);
+			g.setStroke(DEBUG_STROKE);
+			g.draw(new Rectangle2D.Double(0.0,0.0,getWidth(),getHeight()));
+		}
+		if (restore != null) {g.setTransform(restore);}	
+	}
 }

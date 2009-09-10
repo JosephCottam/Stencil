@@ -81,7 +81,7 @@ public final class Canvas extends JComponent {
 	
 	public Rectangle getContentDimension() {
 		Rectangle2D bounds =contentBounds;
-		if (tracker.changed()) {
+		if (contentBounds == null || tracker.changed()) {
 			bounds = new Rectangle2D.Double(0,0,0,0);
 			
 			for (Table<? extends Point> t: layers) {
