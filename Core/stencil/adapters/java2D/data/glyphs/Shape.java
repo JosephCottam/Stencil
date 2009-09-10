@@ -62,7 +62,6 @@ public final class Shape extends Filled {
 	
 	public Shape(String id) {
 		super(id);
-		
 		this.outlinePaint = CLEAR;
 	}
 	
@@ -93,8 +92,11 @@ public final class Shape extends Filled {
 
 		Point2D renderPoint = correctRegistration();
 		java.awt.Shape s = Shapes.getShape(shape, new Rectangle2D.Double(renderPoint.getX(),renderPoint.getY(), size,size));
-		
-		super.render(g, s);
+		if (s != null) {
+//			Rectangle bounds = s.getBounds();
+//			if (bounds.getWidth()==0 || bounds.getHeight() ==0) {return;}
+			super.render(g, s);
+		}
 	}
 
 	protected AttributeList getAttributes() {return attributes;}

@@ -65,6 +65,8 @@ public abstract class Filled extends Stroked {
 	}
 	
 	protected void render(Graphics2D g, Shape s) {
+		assert s !=  null : "Cannot render null shape";
+		
 		Rectangle bounds = s.getBounds();
 		if (bounds.width ==0 || bounds.height ==0) {return;}
 		if (fill != null) {

@@ -45,8 +45,17 @@ public interface SigilType<E, T extends Tuple> {
 	 */
 	public String toString(E source);
 	
+	/**General conversion that convert to or from 
+	 * the tuple and external representations.
+	 * 
+	 * @param value
+	 * @param target
+	 * @return
+	 */
 	public Object convert(Object value, Class target);
 	
+	
+	/**Create a new instance of the tuple representaiton.*/
 	public T create(List<Value> args) throws TypeCreationException;
 	
 }
