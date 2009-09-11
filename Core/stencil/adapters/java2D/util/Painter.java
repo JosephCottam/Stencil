@@ -3,6 +3,7 @@ package stencil.adapters.java2D.util;
 import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
@@ -10,7 +11,9 @@ import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.data.glyphs.Point;
 
 public final class Painter extends Thread implements Stopable {
-	private Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
+	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
+	private static final RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	
 	
 	private boolean run = true;
 	private final Table[] layers;
@@ -41,6 +44,7 @@ public final class Painter extends Thread implements Stopable {
 	
 	/**Render glyphs immediately onto the passed graphics object.*/
 	public void doDrawing(Graphics2D g) {
+		g.addRenderingHints(rh);
 		for (Table<? extends Point> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of over-painting, but not all of them
 			for (Point glyph: table) {

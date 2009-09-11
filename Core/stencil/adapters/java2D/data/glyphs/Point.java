@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Area;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
@@ -122,10 +123,13 @@ public abstract class Point implements Glyph2D {
 	/**Render the glyph to the given graphics object.*/
 	public abstract void render(Graphics2D g);
 
-	/**What are the actual bounds of this glyph?  
+	/**What are the bounds of this glyph on the logical canvas?  
+	 * 
 	 * The X and Y of this may not match those stored in 'x' and 'y' because
-	 * the actual bounds will be as rendered on the screen, and 
-	 * therefore will always be the top-left corner.
+	 * the bounds will be as rendered on the screen, and therefore will always 
+	 * be the top-left corner.  Further changes may result from rotation
+	 * (which affects X and Y even if the registration point is the top left
+	 * and may modify height and width in the bounding box).
 	 */
 	public Rectangle2D getBounds() {
 		double x,y,w,h;
@@ -133,10 +137,14 @@ public abstract class Point implements Glyph2D {
 		h= getHeight();
 		x = this.x;
 		y = this.y;
-		Point2D r = Registrations.registrationToTopLeft(registration, x,y, w,h);		
-		return new Rectangle2D.Double(r.getX(), r.getY(),w,h);
-	}
-	
+		Point2D tl = Registrations.registrationToTopLeft(registration, x,y, w,h);
+		Rectangle2D r = new Rectangle2D.Double(0,0, w, h);
+		Area a = new Area(r);
+		AffineTransform af = AffineTransform.getTranslateInstance(tl.getX(), tl.getY());
+		af.rotate(Math.toRadians(rotation));
+		a.transform(af);
+		return a.getBounds2D();
+	}	
 	
 	/**Duplicate the current glyph, but give it a new ID.
 	 * 
@@ -263,6 +271,13 @@ public abstract class Point implements Glyph2D {
 			g.setStroke(DEBUG_STROKE);
 			g.draw(new Rectangle2D.Double(0.0,0.0,getWidth(),getHeight()));
 		}
+		
 		if (restore != null) {g.setTransform(restore);}	
+
+		if (DEBUG_COLOR != null) {
+			g.setPaint(DEBUG_COLOR.darker());
+			g.setStroke(DEBUG_STROKE);
+			g.draw(getBounds());
+		}
 	}
 }

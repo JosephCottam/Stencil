@@ -44,6 +44,12 @@ public final class Text extends Point {
 	
 	public Text(String id) {super(id);}
 	
+	protected AttributeList getAttributes() {return attributes;}
+	public double getHeight() {return height;}	
+	public double getWidth() {return width;}
+	public String getImplantation() {return "TEXT";}
+
+	
 	public Object get(String name) {
 		if (TEXT.is(name)) {return text;}
 		else if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
@@ -62,20 +68,7 @@ public final class Text extends Point {
 		else {super.set(name,value);}
 		computeMetrics();
 	}
-	
-	@Override
-	protected AttributeList getAttributes() {return attributes;}
 
-	public double getHeight() {
-		return height;
-	}	
-	public double getWidth() {
-		return width;
-	}
-	public String getImplantation() {return "TEXT";}
-
-
-	@Override
 	public void render(Graphics2D g) {
 		AffineTransform rs = super.preRender(g);
 		

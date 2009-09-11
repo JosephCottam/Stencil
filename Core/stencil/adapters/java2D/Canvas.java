@@ -102,13 +102,13 @@ public final class Canvas extends JComponent {
 		if (view.width == 0 || view.height ==0) {return;}	//Don't bother transforming if there is no view!
 		
 		double scale = getScale(bounds, view);
-		viewTransform.setToTranslation(center(bounds.getMinX(),bounds.getWidth(), view.getWidth()),
-										center(bounds.getMinY(), bounds.getHeight(), view.getHeight()));
+		viewTransform.setToTranslation(center(bounds.getMinX(),bounds.getWidth(), view.getWidth(), scale),
+										center(bounds.getMinY(), bounds.getHeight(), view.getHeight(), scale));
 		viewTransform.scale(scale, scale);
 	}
 	
-	private double center(double itemP, double itemD, double frameD) {
-		return -itemP + (frameD/2.0 - itemD/2.0);
+	private double center(double itemP, double itemD, double frameD, double scale) {
+		return -(itemP * scale) + (frameD/2.0 - (itemD * scale) /2.0);
 	}
 	
 	private double getScale(Rectangle2D item, Rectangle2D frame) {
