@@ -15,11 +15,9 @@ public final class DynamicUpdater extends Thread implements Stopable {
 	private static final class Entry {
 		Tuple sourceData;
 		boolean mark = true;
-		String ID;
 		
-		Entry(Tuple sourceData, String ID) {
+		Entry(Tuple sourceData) {
 			this.sourceData = sourceData;
-			this.ID = ID;
 		}
 	}
 	
@@ -69,7 +67,7 @@ public final class DynamicUpdater extends Thread implements Stopable {
 	}
 	
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
-		Entry e = new Entry(sourceData, target.getID());
+		Entry e = new Entry(sourceData);
 		this.sourceData.put(target.getID(), e);
 	}
 	

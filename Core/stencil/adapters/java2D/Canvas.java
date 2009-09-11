@@ -99,6 +99,8 @@ public final class Canvas extends JComponent {
 	
 	private void zoomFit(Rectangle2D bounds) {
 		Rectangle view = this.getBounds();
+		if (view.width == 0 || view.height ==0) {return;}	//Don't bother transforming if there is no view!
+		
 		double scale = getScale(bounds, view);
 		viewTransform.setToTranslation(center(bounds.getMinX(),bounds.getWidth(), view.getWidth()),
 										center(bounds.getMinY(), bounds.getHeight(), view.getHeight()));

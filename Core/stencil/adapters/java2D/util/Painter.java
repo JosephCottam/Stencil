@@ -32,6 +32,7 @@ public final class Painter extends Thread implements Stopable {
 			if (generations.changed() || resized()) {
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
+				target.repaint();
 			}
 			Thread.yield();
 		}
