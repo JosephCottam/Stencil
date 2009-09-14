@@ -140,10 +140,11 @@ public final class StencilRunner extends Thread {
 	@SuppressWarnings("deprecation")
 	public void signalStop() throws AbnormalTerminiationException{
 		keepRunning = false;
-		loader.setKeepRunning(false);
+		loader.signalStop();
 		
 		try {Thread.sleep(500);}
-		catch (Exception e) {
+		catch (Exception e) {/*Left empty, all cases are handled in finally.*/}
+		finally {
 			if (isAlive()) {
 				try {stop();}	//When working with Jython, you can write infinite loops that are outside of the normal thread control flow.
 							//When that happens, you can't just signal a stop.  If we signaled and waited half of a second and the thread did

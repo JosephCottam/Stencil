@@ -184,8 +184,8 @@ public class Interactive implements Runnable {
 			model.execute();
 		}
 		catch (Exception e) {
-			reporter.addError("Execution aborted.");
 			reporter.addError(e.getMessage());
+			reporter.addError("Execution aborted.");
 			e.printStackTrace();
 		}
 	}

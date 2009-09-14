@@ -14,11 +14,12 @@
  		/> 
  	</target>
  	
- 	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, ModuleData, Validators">
+ 	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!--compilerarg value="-Xlint"/-->
 		</javac>
+ 	 	<antcall target="EclipseRefresh"/>
  	</target>
 
  	<target name="Interpreter" depends="StencilGrammar">
@@ -40,6 +41,7 @@
 			outputdirectory="${dest}"
  			libdirectory="${lib}"
  		/> 		
+ 	 	<antcall target="EclipseRefresh"/>
  	</target>
  	
 
@@ -55,7 +57,7 @@
 
 
  	<target name="EclipseRefresh" if="eclipse.running">
- 		<eclipse.refreshLocal resource="Stencil/Core/parser/string/" depth="zero" />
+ 		<eclipse.refreshLocal resource="Stencil/Core/" depth="infinite" />
  	</target>
  			
  	
@@ -93,6 +95,7 @@
  			target="${grammars}/GuideSpecializers.g"
 			outputdirectory="${grammars}/string/"
  		/>
+ 	 	<antcall target="EclipseRefresh"/>
  	</target>
 
  	<target name="Validators" depends="StencilGrammar">
@@ -119,6 +122,8 @@
  			target="${modulesUtil}/ModuleData.g"
 			outputdirectory="${modulesUtil}"
  		/>
+ 	 	<antcall target="EclipseRefresh"/>
+
  	</target>
  	
 
@@ -128,6 +133,7 @@
  			target="${grammars}/StencilTreeAdapter.g"
  			outputdirectory="${grammars}/tree/"
  		/>
+ 	 	<antcall target="EclipseRefresh"/>
 	</target>
 
  	<target name="TreeAdapter" depends="TreeAdapterGrammar, StencilBuild">
@@ -141,6 +147,7 @@
 			<arg value="${grammars}/StencilTreeAdapter.stg" />
 			<arg value="${grammars}/tree/StencilTreeAdapter.java" />
 		</java>
+ 	 	<antcall target="EclipseRefresh"/> 		
  	</target>
 
  	<target name="StencilBuild">

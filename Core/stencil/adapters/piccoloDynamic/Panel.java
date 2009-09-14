@@ -67,8 +67,8 @@ public class Panel extends StencilPanel<PiccoloGlyph, DisplayLayer, PCanvas> {
 	/**Listening to the panel is really listening to its canvas.
 	 * HACK: How can you get events to bubble up automatically?  Do I need to use glass pane?
 	 */
-	public void addMouseListener(MouseListener l) {canvas.addMouseListener(l);}
-	public void addMouseMotionListener(MouseMotionListener l) {canvas.addMouseMotionListener(l);}
+	public synchronized void addMouseListener(MouseListener l) {canvas.addMouseListener(l);}
+	public synchronized void addMouseMotionListener(MouseMotionListener l) {canvas.addMouseMotionListener(l);}
 	
 	public CanvasTuple getCanvas() {return new CanvasTuple(canvas);}
 	public ViewTuple getView() {return new ViewTuple(canvas.getCamera());}

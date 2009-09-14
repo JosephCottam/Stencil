@@ -112,7 +112,7 @@ public class TupleLoader extends Observable implements Runnable {
 		this.notifyObservers(recordsLoaded);
 	}
 
-	public boolean isRunning() {return state==STATE.RUNNING;}
+	public boolean isRunning() {return state == STATE.RUNNING;}
 	public boolean isStopped() {return state == STATE.STOPPED;}
 	public boolean unstarted() {return state == STATE.UNSTARTED;}
 
@@ -137,5 +137,5 @@ public class TupleLoader extends Observable implements Runnable {
 	 *
 	 * @param value
 	 */
-	public void setKeepRunning(boolean value) {keepRunning = value;}
+	public void signalStop() {keepRunning = false;}
 }

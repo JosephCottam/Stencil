@@ -46,4 +46,8 @@ public class MapEntry extends StencilTree implements Map.Entry<String, Atom> {
 		return (alter.getKey().equals(getKey())) && 
 				(alter.getValue().equals(getValue()));
 	}
+
+	public int hashCode() {
+		return getKey().hashCode() * getValue().hashCode();
+	}
 }

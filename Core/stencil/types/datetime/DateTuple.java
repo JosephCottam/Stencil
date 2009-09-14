@@ -8,13 +8,17 @@ import stencil.types.Converter;
 import stencil.util.enums.EnumUtils;
 
 public final class DateTuple implements Tuple {
-	private static enum FIELD {
-		HOUR, MINUTE, SECOND, MONTH, DAY, YEAR
-	};
+	private static enum FIELD {HOUR, MINUTE, SECOND, MONTH, DAY, YEAR};
+	private static final List<String> FIELDS = EnumUtils.allNames(FIELD.class);
 	
 	private Calendar cal;
 	
 	public DateTuple(Calendar cal) {this.cal = cal;}
+	public DateTuple(java.util.Date date) {
+		cal = Calendar.getInstance();
+		cal.setTime(date);
+	}
+		
 	
 	public Object get(String name) throws InvalidNameException {
 		try {
@@ -27,7 +31,7 @@ public final class DateTuple implements Tuple {
 				case DAY: return cal.get(Calendar.DATE);
 				case YEAR:return cal.get(Calendar.YEAR);
 			}			
-		} catch (Exception e) {}
+		} catch (Exception e) {/*Exception thrown in next statement, if needed.*/}
 		throw new InvalidNameException(name, EnumUtils.allNames(FIELD.class));
 	}
 
@@ -36,19 +40,11 @@ public final class DateTuple implements Tuple {
 		return Converter.convert(get(name), type);
 	}
 
-	public List<String> getFields() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public List<String> getFields() {return FIELDS;}
 
-	public boolean hasField(String name) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	public boolean hasField(String name) {return FIELDS.contains(name);}
 
-	public boolean isDefault(String name, Object value) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+	/**There is no default date/time, so all fields have no default value.*/
+	public boolean isDefault(String name, Object value) {return false;}
 
 }

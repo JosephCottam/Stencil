@@ -4,6 +4,7 @@ import java.lang.reflect.*;
 
 import stencil.rules.MethodInvokeFailedException;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 
 
 /**Combines a method and a target object (null for static items)
@@ -78,6 +79,7 @@ public final class Invokeable<T, R> {
 				args[args.length-1] = varArgs;
 				result = (R) method.invoke(target, args);
 			} else {
+//				args = validateTypes(arguments, method.getParameterTypes());
 				args = arguments;
 				result = (R) method.invoke(target, args);
 			}
@@ -85,6 +87,19 @@ public final class Invokeable<T, R> {
 		 	throw new MethodInvokeFailedException(String.format("Exception thrown invoking %1$s with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(args)), e);
 		}
 		return result;
+	}
+	
+	private Object[] validateTypes(Object[] arguments, Class<?>[] types) {
+		Object[] results = new Object[arguments.length];
+		
+		for (int i=0; i< arguments.length; i++) {
+			if (arguments.getClass().isAssignableFrom(types[i])) {
+				results[i] = arguments[i];
+			} else {
+				results[i] = Converter.convert(arguments[i], types[i]);
+			}
+		}
+		return results;
 	}
 	
 }
