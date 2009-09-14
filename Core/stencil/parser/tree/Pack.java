@@ -54,10 +54,24 @@ public final class Pack extends CallTarget {
 
 	private static final String generateName(int seed) {return Integer.toString(seed);} //TODO: Updated autogen name when numerical de-referencing is the game
 
-	//TODO: Add logic when implicit pack is added to grammar
-	public boolean isImplicit() {return false;}
-
-	/**Return the current tree, wrapped as a list of Value objects.*/
+	/**List of values that are being packed.*/
 	public List<Value> getArguments() {return new stencil.parser.tree.List.WrapperList<Value>(this);}
 	public boolean isTerminal() {return true;}
+	
+	/**What is the function that immediately precedes this pack?
+	 * If there is no function before the pack, then return null.
+	 */
+	public Function getPriorCall() {
+		StencilTree parent = this.getParent();
+		if (parent instanceof Rule) {return null;}
+		
+		return (Function) parent;	
+	}
+	
+	/**What is the root rule this pack is associated with?*/
+	public Rule getRule() {
+		StencilTree parent = this.getParent();
+		while (parent != null && !(parent instanceof Rule)) {parent = parent.getParent();}
+		return (Rule) parent;
+	}
 }

@@ -110,11 +110,11 @@ options {
     
     //Rename functions to use the guide channel
     public Object rename(Object t) {
-		layerName = null;
-		inGuide = false;
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return renameMappingsUp(); }};
-   	    return downup(t, down, up);		
+			layerName = null;
+			inGuide = false;
+			fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
+	   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return renameMappingsUp(); }};
+	   	    return downup(t, down, up);		
     }
     
     

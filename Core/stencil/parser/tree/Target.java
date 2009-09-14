@@ -48,7 +48,7 @@ public abstract class Target extends StencilTree {
 	public String getName() {return token.getText();}
 
 	/**What properties of the target entity are being affected?*/
-	protected TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
+	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
 
 	/**Processes the values tuple relative to the prototype
 	 *

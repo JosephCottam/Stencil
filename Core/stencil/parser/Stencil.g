@@ -222,8 +222,11 @@ legendRule
 predicate
 	: GROUP? ALL CLOSE_GROUP?
 		-> ^(LIST["Predicates"] ^(PREDICATE ALL))
-	| GROUP callGroup booleanOp callGroup (SEPARATOR callGroup booleanOp callGroup)* CLOSE_GROUP
-		-> ^(LIST["Predicates"] ^(PREDICATE callGroup booleanOp callGroup)+);
+  | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
+    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
+//TODO : Permit call groups in predicates again...or come up with a better mechanism, like the one used in filter targets....
+//	| GROUP callGroup booleanOp callGroup (SEPARATOR callGroup booleanOp callGroup)* CLOSE_GROUP
+//		-> ^(LIST["Predicates"] ^(PREDICATE callGroup booleanOp callGroup)+);
 
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
@@ -243,9 +246,10 @@ callTarget
 	: value -> ^(PACK value)
 	| valueList -> ^(PACK valueList)
 	| emptySet -> ^(PACK)
-	| f1=functionCall passOp f2=callTarget
-		-> ^($f1 passOp $f2);
-	//TODO: add functionCall only rule (Stencil derives a default pack by counting the number of items in the target and inserting that many sequential tuple-refs)
+  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
+	| f1=functionCall passOp f2=callTarget 
+	   -> ^($f1 passOp $f2);
+
 
 functionCall
 	: name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList

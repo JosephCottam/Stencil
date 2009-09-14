@@ -8,10 +8,14 @@
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
- 			target="${grammars}/util/DynamicRule.g"
-			outputdirectory="${grammars}/util/"
- 			libdirectory="${lib}"
+ 			target="${grammars}/DefaultPack.g"
+			outputdirectory="${grammars}/string/"
  		/> 
+ 		<antlr
+ 			target="${grammars}/Stencil.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
+ 	 	<antcall target="EclipseRefresh"/>
  	</target>
  	
  	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
@@ -94,6 +98,10 @@
  		<antlr
  			target="${grammars}/GuideSpecializers.g"
 			outputdirectory="${grammars}/string/"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/DefaultPack.g"
+ 			outputdirectory="${grammars}/string/"
  		/>
  	 	<antcall target="EclipseRefresh"/>
  	</target>

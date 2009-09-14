@@ -179,6 +179,14 @@ public abstract class ParseStencil {
 		specializers.setTreeAdaptor(treeAdaptor);
 		specializers.downup(p);
 		
+		//Add default packs where required
+		treeTokens = new CommonTreeNodeStream(p);
+		DefaultPack defaultPack = new DefaultPack(treeTokens, modules);
+		defaultPack.setTreeAdaptor(treeAdaptor);
+		defaultPack.downup(p);
+		
+		
+		//Insert guide spcializers
 		treeTokens = new CommonTreeNodeStream(p);
 		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
 		guideSpecailizers.setTreeAdaptor(treeAdaptor);

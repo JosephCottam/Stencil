@@ -103,4 +103,6 @@ public class StencilTree extends CommonTree {
 	}
 	
 	public int getType() {return getToken().getType();}
+	
+	public StencilTree getParent() {return (StencilTree) super.getParent();}
 }
