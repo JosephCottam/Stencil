@@ -246,7 +246,7 @@ callTarget
 	: value -> ^(PACK value)
 	| valueList -> ^(PACK valueList)
 	| emptySet -> ^(PACK)
-  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
+    | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
 	| f1=functionCall passOp f2=callTarget 
 	   -> ^($f1 passOp $f2);
 
@@ -363,6 +363,7 @@ atom 	: sigil | number | STRING | DEFAULT	| ALL; 	//TODO: Does this need to be h
 
 tupleRef
 	: ID -> ^(TUPLE_REF ID)
+	| '_' -> ^(TUPLE_REF NUMBER["0"])
 //	| qualifiedID ->  ^(TUPLE_REF qualifiedID)		//TODO: Implement sequences ([1][1][2]) and named (LOCAL[1])
 	| ARG number CLOSE_ARG -> ^(TUPLE_REF number);
 
