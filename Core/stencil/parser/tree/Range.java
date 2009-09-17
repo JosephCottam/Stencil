@@ -43,4 +43,12 @@ public class Range extends StencilTree {
 	}
 	
 	public String rangeString() {return getStart() + this.getText() + getEnd();}
+
+	public int hashCode() {
+		int a = getStartValue();
+		int b = getEndValue();
+		int c = a >> 16 | a<<16;
+		int d = b >>16 | b<<16;
+		return a * b * c *d;
+	}
 }

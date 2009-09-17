@@ -199,8 +199,6 @@ public class Specializer extends StencilTree {
 	}
 	
 	
-	
-	
 	public Specializer(Token source) {super(source);}
 
 	/**Is the split before or after the range?*/
@@ -240,6 +238,19 @@ public class Specializer extends StencilTree {
 				((this.getRange() == null && alter.getRange() == null)  || (this.getRange().equals(alter.getRange()))) &&
 				((this.getSplit() == null && alter.getSplit() == null) || (this.getSplit().equals(alter.getSplit()))) &&
 				allArgsEqual(this, alter);
+	}
+	
+	@Override
+	public int hashCode() {
+		return getSplit().hashCode() * getRange().hashCode() * hashArgs();
+	}
+
+	private final int hashArgs() {
+		int acc=1;
+		for (Atom arg: getArgs()) {acc = acc*arg.hashCode();}
+		for (Atom arg: getMap().values()) {acc = acc*arg.hashCode();}
+		for (String arg: getMap().keySet()) {acc = acc*arg.hashCode();}
+ 		return acc;
 	}
 	
 	/**Compare the argument lists.*/

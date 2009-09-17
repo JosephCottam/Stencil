@@ -26,4 +26,11 @@ public class Split extends StencilTree {
 			this.isPre() == alter.isPre() &&
 			(!this.hasSplitField() || this.splitField().equals(alter.splitField()));
 	}
+
+	public int hashCode() {
+		int f = hasSplitField() ? splitField().hashCode() : 0x7FFFFFFF;	//real hash value or a nice prime
+		int p = isPre() ? 0x55555555 : 0xAAAAAAAA;		//1010 vs. 0101
+		int o = isOrdered() ? 0x99999999 : 0x66666666;    //1001 vs. 0110
+		return f * p *o;
+	}
 }
