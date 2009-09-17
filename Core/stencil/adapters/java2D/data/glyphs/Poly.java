@@ -36,6 +36,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
@@ -73,7 +74,8 @@ public abstract class Poly extends Stroked {
 	}
 	
 	private List<Point2D.Double> points = new CopyOnWriteArrayList<Point2D.Double>(); //TODO: Change to something faster when Polys become immutible..
-	private GeneralPath cache;
+	private GeneralPath cache;	
+	private Rectangle2D cacheBounds;
 	private boolean connect;
 	
 	public Poly(String id, boolean connect) {
@@ -131,55 +133,43 @@ public abstract class Poly extends Stroked {
 	public void set(String name, Object value) {
 		String base = baseName(name);
 
-		if (base.equals(name)) {
-			if (Xn.is(base)) {fromPointsArray(true, (Double[]) value);}
-			if (Yn.is(base)) {fromPointsArray(true, (Double[]) value);}
-		}
-		
-		else if (Xn.is(base)) {this.updatePoints(Converter.toDouble(value), Double.NaN, index(name, false));}
-		else if (Yn.is(base)) {this.updatePoints(Double.NaN, Converter.toDouble(value), index(name, false));}
+			 if (Xn.is(base) && Xn.is(name)) {fromPointsArray(true, (Double[]) value); cachePath();}
+		else if (Yn.is(base) && Yn.is(name)) {fromPointsArray(true, (Double[]) value); cachePath();}
+		else if (Xn.is(base) && !Xn.is(name)) {this.updatePoints(Converter.toDouble(value), Double.NaN, index(name, false)); cachePath();}
+		else if (Yn.is(base) && !Yn.is(name)) {this.updatePoints(Double.NaN, Converter.toDouble(value), index(name, false)); cachePath();}
 		else {super.set(name, value);}
 	}
 	
-	public double getHeight() {	
-		double bottom = Double.MAX_VALUE;
-		double top = Double.MIN_VALUE;
-		for (Point2D p: points) {
-			bottom = Math.min(bottom, p.getY());
-			top = Math.max(top, p.getY());
-		}
-		return top-bottom;
-	}
+	public double getHeight() {return cacheBounds == null? 0 : cacheBounds.getHeight();}	
+	public double getWidth() {return cacheBounds == null? 0 : cacheBounds.getWidth();}
 
-	public double getWidth() {
-		double left = Double.MAX_VALUE;
-		double right = Double.MIN_VALUE;
-		for (Point2D p: points) {
-			left = Math.min(left, p.getX());
-			right = Math.max(right, p.getX());
-		}
-		return right-left;
-	}
-
-	public void render(Graphics2D g) {
-		AffineTransform restore = super.preRender(g);
+	private void cachePath() {
+		if (points.size() < 1) {return;} //Nothing to draw until there are two points...
+		
+		GeneralPath p = new GeneralPath();
 		Point2D prior = points.get(0);
 		Point2D first = prior;
-		GeneralPath p = cache;		
-		if (p== null) {
-			p = new GeneralPath();
 
-			for (int i=1; i< points.size(); i++) {
-				Point2D current = points.get(i);
-				Line2D l = new Line2D.Double(prior, current);
-				p.append(l, false);
-				prior = current;
-			}			
-			if (connect) {p.append(new Line2D.Double(prior, first), false);}
-			cache =p;
-		}
+		for (int i=1; i< points.size(); i++) {
+			Point2D current = points.get(i);
+			Line2D l = new Line2D.Double(prior, current);
+			p.append(l, false);
+			prior = current;
+		}			
+		if (connect) {p.append(new Line2D.Double(prior, first), false);}
+		cache =p;
 		
-		g.draw(p);
+		cacheBounds = p.getBounds2D();
+		this.x = cacheBounds.getX();
+		this.y = cacheBounds.getY();
+	}
+	
+	public void render(Graphics2D g) {
+		GeneralPath p = cache;
+		if (p == null) {return;}
+		
+		AffineTransform restore = super.preRender(g);
+		super.render(g, p);
 		super.postRender(g, restore);
 	}
 	
@@ -256,6 +246,5 @@ public abstract class Poly extends Stroked {
 			if (idx < points.size()) {points.set(idx, p);}
 			else {points.add(p);}
 		}
-		cache = null;
 	}
 }

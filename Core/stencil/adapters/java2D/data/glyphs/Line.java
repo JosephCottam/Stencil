@@ -29,6 +29,7 @@
 package stencil.adapters.java2D.data.glyphs;
 
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
@@ -102,6 +103,7 @@ public final class Line extends Stroked {
 	}
 	
 	public void render(Graphics2D g) {
+//		AffineTransform restore = super.preRender(g);
 		Line2D l = new Line2D.Double(x1,y1,x2,y2);
 		super.render(g,l);	
 		super.postRender(g, null);

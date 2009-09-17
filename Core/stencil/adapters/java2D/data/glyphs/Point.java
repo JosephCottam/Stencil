@@ -107,7 +107,7 @@ public abstract class Point implements Glyph2D {
 	protected Table layer;
 	
 	/**Should this glyph be drawn?**/
-	protected boolean visible;
+	protected boolean visible = (Boolean) attributes.get("VISIBLE").defaultValue;
 	
 	protected Point(String id) {this.id = id;}
 	
