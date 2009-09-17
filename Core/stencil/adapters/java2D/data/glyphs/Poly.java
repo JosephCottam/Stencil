@@ -26,103 +26,167 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.piccoloDynamic.glyphs;
+package stencil.adapters.java2D.data.glyphs;
 
-import java.awt.geom.GeneralPath;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-
-import stencil.adapters.GlyphAttributes.StandardAttribute;
-import stencil.adapters.general.ImplicitArgumentException;
-import stencil.adapters.piccoloDynamic.util.Attribute;
-import stencil.adapters.piccoloDynamic.util.Attributes;
-import stencil.types.Converter;
-
-import edu.umd.cs.piccolo.util.PBounds;
 import static stencil.parser.ParserConstants.FINAL_VALUE;
 import static stencil.parser.ParserConstants.NEW_VALUE;
 
-public abstract class AbstractPoly extends Path {
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.List;
+
+import stencil.adapters.GlyphAttributes.StandardAttribute;
+import stencil.adapters.general.ImplicitArgumentException;
+import stencil.adapters.java2D.util.Attribute;
+import stencil.adapters.java2D.util.AttributeList;
+import stencil.types.Converter;
+
+public abstract class Poly extends Stroked {
+	public static class PolyLine extends Poly {
+		public PolyLine(String id) {super(id, false);}
+		public String getImplantation() {return "POLY_LINE";}
+	}
+	public static class Polygon extends Poly {
+		public Polygon(String id) {super(id, true);}
+		public String getImplantation() {return "POLYGON";}
+	}
+	
 	public static final Double DEFAULT_COORDINATE_VALUE = 0.0;
-	private static final Double INVALID_COORDINATE_VALUE = Double.NaN;
 	private static final Double UNITIAILZED_COORDINATE  = Double.NaN;
-
-	protected static final Attributes PROVIDED_ATTRIBUTES  = new Attributes();
-
+	
+	protected static final AttributeList attributes;
+	protected static final Attribute Xn = new Attribute("Xn", 0, double.class);
+	protected static final Attribute Yn = new Attribute("Yn", 0, double.class);
+	
 	static {
-		for (Attribute a : Path.PROVIDED_ATTRIBUTES.values()) {PROVIDED_ATTRIBUTES.put(a);}
+		attributes = new AttributeList(Stroked.attributes);
 
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.Xn, "getXArray", "setXArray", AbstractPoly.class, true, null, Double.class));
-		PROVIDED_ATTRIBUTES.put(new Attribute(StandardAttribute.Yn, "getYArray", "setYArray", AbstractPoly.class, true, null, Double.class));
-	}
-
-	public static class PolyLine extends AbstractPoly {
-		public static final String IMPLANTATION_NAME = "POLY_LINE";
-		public PolyLine(String id) {super(id, IMPLANTATION_NAME, false);}
-	}
-
-	public static class Poly extends AbstractPoly {
-		public static final String IMPLANTATION_NAME = "POLY";
-		public Poly(String id) {super(id, IMPLANTATION_NAME, false);}
-	}
-
-
-	protected ArrayList<Point2D.Double> points;
-	protected boolean closePath;
-
-	protected AbstractPoly(String id, String implantationName,boolean closePath) {
-		super(id, implantationName, PROVIDED_ATTRIBUTES);
-		points = new ArrayList<Point2D.Double>(5);
-		this.closePath = closePath;
-	}
-
-
-	/**Either move the line (attribute Y) or move the line end (Y1 or Y2)*/
-	public void setYArray(String att, double value) throws ImplicitArgumentException {
-		assert !att.equals(StandardAttribute.Y.name()) : "Recieved simple Y in indexed Y accessor";
-		double idx = index(att, false);
-		double y = Converter.toDouble(value);
-		updatePoints(INVALID_COORDINATE_VALUE, y, idx);
-	}
-
-
-	public Object getYArray(String att) throws ImplicitArgumentException {
-		assert !att.equals(StandardAttribute.Y.name()) : "Recieved simple Y in indexed Y accessor";
-		int idx = (int) index(att, true);
-
-		if (idx >= points.size()) {return INVALID_COORDINATE_VALUE;}
-		if (idx >= 0) {return points.get(idx).y;}
+		attributes.add(Xn);
+		attributes.add(Yn);
 		
-		Double[] ys = new Double[points.size()];
-		for (int i=0; i< points.size(); i++) {ys[i] = points.get(i).y;}
-		return ys;
+		attributes.remove(StandardAttribute.HEIGHT);
+		attributes.remove(StandardAttribute.WIDTH);
+	}
+	
+	private List<Point2D.Double> points = new CopyOnWriteArrayList<Point2D.Double>(); //TODO: Change to something faster when Polys become immutible..
+	private GeneralPath cache;
+	private boolean connect;
+	
+	public Poly(String id, boolean connect) {
+		super(id);
+		this.connect = connect;
+	}
+	
+	
+	protected AttributeList getAttributes() {return attributes;}
+
+	public Object get(String name) {
+		String base = baseName(name);
 		
-	}
-
-	/**Either move the line (attribute X) or move the line end (X1 or X2)*/
-	public void setXArray(String att, double value) throws ImplicitArgumentException {
-		assert !att.equals(StandardAttribute.X.name()) : "Recieved simple X in indexed X accessor";
-		double idx = index(att, false);
-		double x = Converter.toDouble(value);
-		updatePoints(x, INVALID_COORDINATE_VALUE, idx);
-	}
-
-	public Object getXArray(String att) throws ImplicitArgumentException {
-		assert !att.equals(StandardAttribute.Y.name()) : "Recieved simple X in indexed X accessor";
-		int idx = (int) index(att, true);
-		if (idx >= points.size()) {return INVALID_COORDINATE_VALUE;}
-		if (idx >= 0) {return points.get(idx).x;}
-
+		if (base.equals(name)) {
+			if (Xn.is(base)) {return pointsArrays()[0];}
+			if (Yn.is(base)) {return pointsArrays()[1];}
+		}
 		
-		Double[] xs = new Double[points.size()];
-		for (int i=0; i< points.size(); i++) {xs[i] = points.get(i).y;}
-		return xs;
+		if (Xn.is(base) || Yn.is(base)) {
+			int index = (int) index(name, true);
+			if (index == points.size()) {return UNITIAILZED_COORDINATE;}
+			if (Xn.is(base)) {return points.get(index).x;}
+			if (Yn.is(base)) {return points.get(index).y;}
+		} 
+		return super.get(name);
+	}
+	
+	private Double[][] pointsArrays() {
+		List<Point2D.Double> pts = points;
+		Double[][] vs = new Double[2][pts.size()];
+		
+		for (int i=0; i< pts.size(); i++) {
+			vs[0][i] = pts.get(i).x;
+			vs[1][i] = pts.get(i).y;
+		}
+		return vs;
+	}
+	
+	public void fromPointsArray(boolean x, Double[] halfPoints) {
+		boolean clear = points.size()!=halfPoints.length;
+		
+		for (int i=0; i< halfPoints.length; i++) {
+			Point2D.Double p = points.get(i);
+			if (x) {
+				p.x = halfPoints[i];
+				if (clear) {p.y = DEFAULT_COORDINATE_VALUE;}
+			} else {
+				p.y = halfPoints[i];
+				if (clear) {p.y = DEFAULT_COORDINATE_VALUE;}
+			}		
+		}
+	}
+	
+	
+	public void set(String name, Object value) {
+		String base = baseName(name);
+
+		if (base.equals(name)) {
+			if (Xn.is(base)) {fromPointsArray(true, (Double[]) value);}
+			if (Yn.is(base)) {fromPointsArray(true, (Double[]) value);}
+		}
+		
+		else if (Xn.is(base)) {this.updatePoints(Converter.toDouble(value), Double.NaN, index(name, false));}
+		else if (Yn.is(base)) {this.updatePoints(Double.NaN, Converter.toDouble(value), index(name, false));}
+		else {super.set(name, value);}
+	}
+	
+	public double getHeight() {	
+		double bottom = Double.MAX_VALUE;
+		double top = Double.MIN_VALUE;
+		for (Point2D p: points) {
+			bottom = Math.min(bottom, p.getY());
+			top = Math.max(top, p.getY());
+		}
+		return top-bottom;
 	}
 
+	public double getWidth() {
+		double left = Double.MAX_VALUE;
+		double right = Double.MIN_VALUE;
+		for (Point2D p: points) {
+			left = Math.min(left, p.getX());
+			right = Math.max(right, p.getX());
+		}
+		return right-left;
+	}
 
+	public void render(Graphics2D g) {
+		AffineTransform restore = super.preRender(g);
+		Point2D prior = points.get(0);
+		Point2D first = prior;
+		GeneralPath p = cache;		
+		if (p== null) {
+			p = new GeneralPath();
+
+			for (int i=1; i< points.size(); i++) {
+				Point2D current = points.get(i);
+				Line2D l = new Line2D.Double(prior, current);
+				p.append(l, false);
+				prior = current;
+			}			
+			if (connect) {p.append(new Line2D.Double(prior, first), false);}
+			cache =p;
+		}
+		
+		g.draw(p);
+		super.postRender(g, restore);
+	}
+	
 	/**What is the X/Y implicit argument (as a number)*/
 	private double index(String att, boolean onlyInt) {
-		if (isXn(att) || isYn(att)) {return -1;}
+		if (Xn.is(att) && Yn.is(att)) {return -1;}
+		
 		try {
 			double val;
 			int nextIndex = points.size();
@@ -143,7 +207,7 @@ public abstract class AbstractPoly extends Path {
 
 			if (onlyInt && Math.floor(val) != val) {throw new ImplicitArgumentException(Line.class, att, "Can only reference integers in current call context.", null);}
 			return val;
-		} catch (Exception e) {throw new ImplicitArgumentException(Line.class, att, e);}
+		} catch (Exception e) {throw new ImplicitArgumentException(this.getClass(), att, e);}
 	}
 
 	/**
@@ -192,31 +256,6 @@ public abstract class AbstractPoly extends Path {
 			if (idx < points.size()) {points.set(idx, p);}
 			else {points.add(p);}
 		}
-
-		buildPath();
+		cache = null;
 	}
-
-	/**Construct a path from the points supplied.*/
-	protected void buildPath() {
-		if (points.size() == 0) {super.setPath(new GeneralPath()); return;}
-
-		Point2D.Double p = points.get(0);
-		GeneralPath newPath = new GeneralPath();
-
-		newPath.moveTo((float) p.x, (float)p.y);
-		for (int i=1; i< points.size(); i++) {
-			p = points.get(i);
-			newPath.lineTo((float) p.x, (float)p.y);
-		}
-
-		if (closePath) {newPath.closePath();}
-
-		super.setPath(newPath);
-		this.signalBoundsChanged();
-	}
-
-	public PBounds getBoundsReference() {return path.getBoundsReference();}
-
-	private boolean isXn(String att) {return att.equals(StandardAttribute.Xn.name());}
-	private boolean isYn(String att) {return att.equals(StandardAttribute.Yn.name());}
 }

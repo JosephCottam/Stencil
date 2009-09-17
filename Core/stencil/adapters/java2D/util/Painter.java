@@ -48,7 +48,7 @@ public final class Painter extends Thread implements Stopable {
 		for (Table<? extends Point> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of over-painting, but not all of them
 			for (Point glyph: table) {
-				glyph.render(g);
+				if (glyph.isVisible()) {glyph.render(g);}
 			}
 		}
 	}

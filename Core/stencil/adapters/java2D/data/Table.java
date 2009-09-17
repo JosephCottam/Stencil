@@ -128,6 +128,10 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 				return new Table<Pie>(name, new Pie("PROTOTYPE"));
 			} else if (implantation.equals("IMAGE")) {
 				return new Table<Image>(name, new Image("PROTOTYPE"));
+			} else if (implantation.equals("POLY_LINE")) {
+				return new Table<Poly.PolyLine>(name, new Poly.PolyLine("PROTOTYPE"));
+			} else if (implantation.equals("POLYGON")) {
+				return new Table<Poly.Polygon>(name, new Poly.Polygon("PROTOTYPE"));
 			}
 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}

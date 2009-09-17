@@ -38,8 +38,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.Constructor;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
@@ -67,6 +66,7 @@ public abstract class Point implements Glyph2D {
 	private static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
 	private static final Attribute REGISTRATION = new Attribute(StandardAttribute.REGISTRATION);
 	private static final Attribute ROTATION = new Attribute(StandardAttribute.ROTATION);
+	private static final Attribute VISIBLE = new Attribute("VISIBLE", true);
 
 	
 	
@@ -83,9 +83,8 @@ public abstract class Point implements Glyph2D {
 		attributes.add(IMPLANTATION);
 		attributes.add(REGISTRATION);
 		attributes.add(ROTATION);
+		attributes.add(VISIBLE);
 	}
-	
-	protected Set<Integer> markers = new TreeSet<Integer>();
 	
 	protected String id = (String) attributes.get(StandardAttribute.ID).defaultValue;
 	
@@ -104,7 +103,11 @@ public abstract class Point implements Glyph2D {
 	/**The rotation, stored in degrees.*/
 	protected double rotation = (Double) attributes.get(StandardAttribute.ROTATION).defaultValue;
 	
+	/**What layer does this glyph belong to?*/
 	protected Table layer;
+	
+	/**Should this glyph be drawn?**/
+	protected boolean visible;
 	
 	protected Point(String id) {this.id = id;}
 	
@@ -123,6 +126,7 @@ public abstract class Point implements Glyph2D {
 	/**Render the glyph to the given graphics object.*/
 	public abstract void render(Graphics2D g);
 
+	
 	/**What are the bounds of this glyph on the logical canvas?  
 	 * 
 	 * The X and Y of this may not match those stored in 'x' and 'y' because
@@ -146,14 +150,11 @@ public abstract class Point implements Glyph2D {
 		return a.getBounds2D();
 	}	
 	
-	/**Duplicate the current glyph, but give it a new ID.
+	/**Duplicate the current glyph, may give it a new ID.
 	 * 
 	 * Assumes there is a constructor which takes the ID as its only argument. 
-	 * 
-	 * 
-	 * TODO: REMOVE WHEN THE IMMUTIBLE TUPLE CONVERSION IS COMPLETE (duplicate is replaced by 'update' then)
 	 * */
-	public Glyph2D duplicate(String ID) {
+	protected Glyph2D duplicate(String ID) {
 		try {
 			Constructor c = this.getClass().getConstructor(String.class);
 			Point g = (Point) c.newInstance(ID);
@@ -172,6 +173,7 @@ public abstract class Point implements Glyph2D {
 		else if (REGISTRATION.is(name)) {this.registration = (Registration) Converter.convert(value, Registration.class);}
 		else if (ID.is(name)) {this.id = Converter.toString(value);}
 		else if (IMPLANTATION.is(name)) {throw new IllegalArgumentException("Cannot set implantation.");}
+		else if (VISIBLE.is(name)) {this.visible = (Boolean) Converter.convert(value, boolean.class);}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
@@ -187,6 +189,7 @@ public abstract class Point implements Glyph2D {
 		if (IMPLANTATION.is(name)) {return getImplantation();}
 		if (REGISTRATION.is(name)) {return registration;}
 		if (ROTATION.is(name)) {return rotation;}
+		if (VISIBLE.is(name)) {return visible;}
 		throw new InvalidNameException(name, getFields());
 	}
 
@@ -218,16 +221,20 @@ public abstract class Point implements Glyph2D {
 	
 	public String getID() {return id;}
 	
+	public boolean isVisible() {return visible;}
+	
 	public Glyph2D update(String field, Object value) {
-		Object existing = this.get(field);
-		if (existing == value || (existing !=null && existing.equals(value))) {
-			return this;
-		} else if (field.equals("ID") && !value.equals(this.getID())){
-			return duplicate((String) value);
-		}  else {
-			set(field, value); 
-			return this;
-		}
+		try {
+			Object existing = this.get(field);
+			if (existing == value || (existing !=null && existing.equals(value))) {
+				return this;
+			} else if (field.equals("ID") && !value.equals(this.getID())){
+				return duplicate((String) value);
+			}  else {
+				set(field, value); 
+				return this;
+			}
+		} catch (Exception e) {throw new RuntimeException(String.format("Error updating %1$s to %2$s", field, value.toString()),e);}
 	}
 
 	
@@ -241,9 +248,7 @@ public abstract class Point implements Glyph2D {
 		}
 		return temp;
 	}
-	
-	public boolean hasMarker(int marker) {return  markers.contains(marker);}
-	public void markForUpdate(int marker) {markers.add(marker);}
+
 	
 	/**Prepare the graphics object for rendering.
 	 * @returns The affine transform that the graphics object originally had.  
@@ -279,5 +284,36 @@ public abstract class Point implements Glyph2D {
 			g.setStroke(DEBUG_STROKE);
 			g.draw(getBounds());
 		}
+	}
+	
+	/**Convert a full property name to just a base property name.
+	 * Base properties are the first component of a dotted name,
+	 * but to distinguish properties that take arguments from
+	 * properties that do not, base names for properties that
+	 * take arguments have an 'n' appended to the end.
+	 *
+	 *  For example:
+	 *  	FullName	BaseName	Notes
+	 *  	   Y		   Y		  Simple Y that cannot take arguments
+	 *  	   Y.1		   Yn		  Y that takes an argument
+	 **/
+	private static final Pattern NAME_SPLITTER = Pattern.compile("\\."); 
+	public static String baseName(String fullName) {
+		String baseName = NAME_SPLITTER.split(fullName)[0];
+		if (baseName.length() == fullName.length()) {return fullName;} //Return quick if nothing changed
+		baseName = baseName.concat("n");
+		return baseName;
+	}
+	
+	/**What are the implicit arguments in the full name passed?
+	 * This is the converse of the baseName operation.  Anything
+	 * that is not part of the base name is part of the implicit arguments.
+	 *
+	 */
+	public String nameArgs(String fullName) {
+		String baseName = baseName(fullName);
+		if (baseName.equals(fullName)) {return null;}
+
+		return fullName.substring(baseName(fullName).length());
 	}
 }
