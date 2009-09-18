@@ -36,12 +36,22 @@ import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.data.glyphs.Point;
+import stencil.adapters.java2D.util.ZoomPanHandler;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter INSTANCE = new Adapter();
-
+	
+	private boolean defaultMouse;
+	
 	public StencilPanel generate(Program program) {
 		Panel panel = new Panel(program);
+		
+		if (defaultMouse) {
+			ZoomPanHandler zp = new ZoomPanHandler();
+			Canvas c = panel.getCanvas().getComponent();
+			c.addMouseListener(zp);
+			c.addMouseMotionListener(zp);
+		}
 		return panel;
 	}
 
@@ -53,9 +63,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		return Table.instance(l);
 	}
 
-	public void setDefaultMouse(boolean m) {
-		throw new UnsupportedOperationException("Not implemented");
-	}
+	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
 	
 	public void setDebugColor(Color c) {
 		Point.DEBUG_COLOR = c;

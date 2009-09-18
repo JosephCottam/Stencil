@@ -98,9 +98,9 @@ public final class Image extends Point {
 	}
 
 	@Override
-	public void render(Graphics2D g) {
-		AffineTransform rs = super.preRender(g);
-		super.postRender(g,rs);
+	public void render(Graphics2D g, AffineTransform base) {
+		super.preRender(g);
 		//TODO: Actually render...
+		super.postRender(g,base);
 	}
 }

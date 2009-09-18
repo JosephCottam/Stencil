@@ -4,6 +4,7 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
@@ -22,6 +23,8 @@ public final class Painter extends Thread implements Stopable {
 	
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;
+	AffineTransform priorTransform=new AffineTransform();
+	
 	
 	public Painter(Table[] layers, Canvas target) {
 		this.layers = layers;
@@ -32,7 +35,7 @@ public final class Painter extends Thread implements Stopable {
 	public void run() {
 		while (run) {
 
-			if (generations.changed() || resized()) {
+			if (generations.changed() || resized() || transformed()) {
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
 				target.repaint();
@@ -43,12 +46,12 @@ public final class Painter extends Thread implements Stopable {
 	}
 	
 	/**Render glyphs immediately onto the passed graphics object.*/
-	public void doDrawing(Graphics2D g) {
+	public void doDrawing(Graphics2D g, AffineTransform base) {
 		g.addRenderingHints(rh);
 		for (Table<? extends Point> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of over-painting, but not all of them
 			for (Point glyph: table) {
-				if (glyph.isVisible()) {glyph.render(g);}
+				if (glyph.isVisible()) {glyph.render(g, base);}
 			}
 		}
 	}
@@ -60,11 +63,13 @@ public final class Painter extends Thread implements Stopable {
 		return (target.getHeight() != i.getHeight()) || (target.getWidth() != i.getWidth()); 
 	}
 	
+	private boolean transformed() {return priorTransform.equals(target.getViewTransform());}
+	
 	private BufferedImage selfBuffer() {
 		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
-		target.getContentDimension();			//TODO: REMOVE, this is part of a hack that sets up zoon...needs to be removed AS SOON AS POSSIBLE!!!
 		Rectangle size = target.getBounds();
+		priorTransform = target.getViewTransform();
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		
@@ -83,7 +88,7 @@ public final class Painter extends Thread implements Stopable {
 			g.fillRect(0, 0, size.width, size.height);
 
 			g.setTransform(target.getViewTransform());
-			doDrawing(g);
+			doDrawing(g, priorTransform);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

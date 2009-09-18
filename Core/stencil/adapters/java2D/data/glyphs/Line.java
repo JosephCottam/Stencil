@@ -102,7 +102,7 @@ public final class Line extends Stroked {
 		this.y = p.getY();
 	}
 	
-	public void render(Graphics2D g) {
+	public void render(Graphics2D g, AffineTransform base) {
 //		AffineTransform restore = super.preRender(g);
 		Line2D l = new Line2D.Double(x1,y1,x2,y2);
 		super.render(g,l);	

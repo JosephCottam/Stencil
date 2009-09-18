@@ -97,7 +97,7 @@ public final class Shape extends Filled {
 	public double getHeight() {return size;}
 	public String getImplantation() {return "SHAPE";}
 	
-	public void render(Graphics2D g) {
+	public void render(Graphics2D g, AffineTransform base) {
 		java.awt.Shape s;
 		if (shape == StandardShape.NONE) {return;}
 		if (shapeCache == null) {
@@ -106,9 +106,9 @@ public final class Shape extends Filled {
 		s = shapeCache;
 
 		if (s != null) {
-			AffineTransform rs = super.preRender(g);
+			super.preRender(g);
 			super.render(g, s);
-			super.postRender(g,rs);
+			super.postRender(g,base);
 		}
 	}
 

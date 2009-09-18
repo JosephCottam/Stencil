@@ -124,7 +124,7 @@ public abstract class Point implements Glyph2D {
 	protected abstract AttributeList getAttributes();
 	
 	/**Render the glyph to the given graphics object.*/
-	public abstract void render(Graphics2D g);
+	public abstract void render(Graphics2D g, AffineTransform base);
 
 	
 	/**What are the bounds of this glyph on the logical canvas?  
@@ -255,14 +255,12 @@ public abstract class Point implements Glyph2D {
 	 * 			This should transform should be given to postRender to ensure other elements render properly.
 	 *TODO:An alternative to passing around the transforms is to allocate a graphics2D object.  Is that a better idea?  
 	 */
-	protected AffineTransform preRender(Graphics2D g) {
-		AffineTransform restore = g.getTransform();
+	protected void preRender(Graphics2D g) {
 		if (x!=0 || y!=0) {
 			Point2D p = Registrations.registrationToTopLeft(registration, x,y,getWidth(),getHeight());
 			g.translate(p.getX(), p.getY());
 		}
 		if (rotation != 0) {g.rotate(Math.toRadians(rotation));}
-		return restore;
 	}
 	
 	

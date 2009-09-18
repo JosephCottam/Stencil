@@ -108,7 +108,7 @@ public final class Pie extends Stroked {
 	public String getImplantation() {return "PIE";}
 
 
-	public void render(Graphics2D g) {
+	public void render(Graphics2D g, AffineTransform base) {
 		double angle = this.angle;
 		double percent = getPercent();
 		double size = this.size;
@@ -119,7 +119,7 @@ public final class Pie extends Stroked {
 		java.awt.Shape outline = Pies.makePieOutline(angle, percent, 0, 0, size, strokeWidth, strokePaint);
 
 
-		AffineTransform rs = super.preRender(g);
+		super.preRender(g);
 		g.setPaint(fieldPaint);
 		g.fill(outline);
 		
@@ -130,7 +130,7 @@ public final class Pie extends Stroked {
 
 		
 		super.render(g, outline);
-		super.postRender(g, rs);
+		super.postRender(g, base);
 	}
 
 }

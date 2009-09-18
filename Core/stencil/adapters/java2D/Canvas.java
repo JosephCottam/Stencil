@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.util.List;
@@ -51,10 +53,18 @@ import stencil.parser.tree.Layer;
 public final class Canvas extends JComponent {	
 	final Painter painter;	
 	BufferedImage buffer;
-	AffineTransform viewTransform;
-	private final GenerationTracker tracker;
+	
+	private AffineTransform viewTransform;
+	private AffineTransform inverseViewTransform;
+	
+	private final GenerationTracker tablesTracker;
+	
 	private Rectangle2D contentBounds;
 	final Table<? extends Point>[] layers;
+
+	/**Point used in many navigation operations.*/
+	private final Point2D tempPoint = new Point2D.Double();
+
 	
 	public Canvas(List<Layer> layers) {
 		this.setBackground((Color) CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.getDefaultValue());
@@ -68,9 +78,11 @@ public final class Canvas extends JComponent {
 
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
-		tracker = new GenerationTracker(this.layers);
+		tablesTracker = new GenerationTracker(this.layers);
 		
-		viewTransform = new  AffineTransform();
+		viewTransform = new AffineTransform();
+		try {inverseViewTransform = viewTransform.createInverse();}
+		catch (NoninvertibleTransformException e) {throw new Error("Exception thrown from supposed impossible place.",e);}	
 	}
 	
 	public void dispose() {painter.signalStop();}
@@ -81,41 +93,114 @@ public final class Canvas extends JComponent {
 	
 	public Rectangle getContentDimension() {
 		Rectangle2D bounds =contentBounds;
-		if (contentBounds == null || tracker.changed()) {
+		if (contentBounds == null || tablesTracker.changed()) {
 			bounds = new Rectangle2D.Double(0,0,0,0);
 			
 			for (Table<? extends Point> t: layers) {
-				tracker.fixGeneration(t);
+				tablesTracker.fixGeneration(t);
 				for (Point p: t) {
 					bounds.add(p.getBounds());
 				}
 			}
 		} 
-		zoomFit(bounds); //HACK: remove when there is user-controlled zoom/pan.  Right now, it just makes things fit.
 		return bounds.getBounds();
-	}	
+	}
+	
+	/**Zoom anchored on the given screen point to the given scale.*/
+	public synchronized void zoom(final Point2D p, double scale) {
+		inverseViewTransform.transform(p, tempPoint);
+		zoomAbs(tempPoint, scale);
+	}
+	
+	/**Zoom anchored on the given absolute point (e.g. canvas 
+	 * under the identity transform) to the given scale.
+	 */
+	public synchronized void zoomAbs(final Point2D p, double scale) {
+		double zx = p.getX(), zy = p.getY();
+        viewTransform.translate(zx, zy);
+        viewTransform.scale(scale,scale);
+        viewTransform.translate(-zx, -zy);
+        try {
+            inverseViewTransform = viewTransform.createInverse();
+        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
+	}
+	
+    /**
+     * Pans the view provided by this display in screen coordinates.
+     * @param dx the amount to pan along the x-dimension, in pixel units
+     * @param dy the amount to pan along the y-dimension, in pixel units
+     */
+    public synchronized void pan(double dx, double dy) {
+    	tempPoint.setLocation(dx, dy);
+    	inverseViewTransform.transform(tempPoint, tempPoint);
+        double panx = tempPoint.getX();
+        double pany = tempPoint.getY();
+        tempPoint.setLocation(0, 0);
+        inverseViewTransform.transform(tempPoint, tempPoint);
+        panx -= tempPoint.getX();
+        pany -= tempPoint.getY();
+        panAbs(panx, pany);
+    }
+    
+    /**
+     * Pans the view provided by this display in absolute (i.e. item-space)
+     * coordinates.
+     * @param dx the amount to pan along the x-dimension, in absolute co-ords
+     * @param dy the amount to pan along the y-dimension, in absolute co-ords
+     */
+    public synchronized void panAbs(double dx, double dy) {
+    	viewTransform.translate(dx, dy);
+        try {
+        	inverseViewTransform = viewTransform.createInverse();
+        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
+    }
+	
+	/**Pan so the display is centered on the given screen point.*/
+	public synchronized void panTo(final Point2D p) {
+        inverseViewTransform.transform(p, tempPoint);
+        panToAbs(tempPoint);
+	}
+	
+	/**Pan so the display is centered on the given canvas
+	 * point.
+	 */
+	public synchronized void panToAbs(final Point2D p) {
+        double sx = viewTransform.getScaleX();
+        double sy = viewTransform.getScaleY();
+        double x = p.getX(); x = (Double.isNaN(x) ? 0 : x);
+        double y = p.getY(); y = (Double.isNaN(y) ? 0 : y);
+        x = getWidth() /(2*sx) - x;
+        y = getHeight()/(2*sy) - y;
+        
+        double dx = x-(viewTransform.getTranslateX()/sx);
+        double dy = y-(viewTransform.getTranslateY()/sy);
 
-	public void stopPainter() {painter.signalStop();}
-	
-	private void zoomFit(Rectangle2D bounds) {
-		Rectangle view = this.getBounds();
-		if (view.width == 0 || view.height ==0) {return;}	//Don't bother transforming if there is no view!
-		
-		double scale = getScale(bounds, view);
-		viewTransform.setToTranslation(center(bounds.getMinX(),bounds.getWidth(), view.getWidth(), scale),
-										center(bounds.getMinY(), bounds.getHeight(), view.getHeight(), scale));
-		viewTransform.scale(scale, scale);
+        viewTransform.translate(dx, dy);
+        try {
+        	inverseViewTransform = viewTransform.createInverse();
+        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
 	}
 	
-	private double center(double itemP, double itemD, double frameD, double scale) {
-		return -(itemP * scale) + (frameD/2.0 - (itemD * scale) /2.0);
-	}
+    /**
+     * Gets the absolute co-ordinate corresponding to the given screen
+     * co-ordinate.
+     * @param screen the screen co-ordinate to transform
+     * @param abs a reference to put the result in. If this is the same
+     *  object as the screen co-ordinate, it will be overridden safely. If
+     *  this value is null, a new Point2D instance will be created and 
+     *  returned.
+     * @return the point in absolute co-ordinates (stored in abs)
+     */
+    public Point2D getAbsoluteCoordinate(final Point2D screen, Point2D abs) {
+        return inverseViewTransform.transform(screen, abs);
+    }
 	
-	private double getScale(Rectangle2D item, Rectangle2D frame) {
-		double scaleX = (frame.getWidth())/item.getWidth();
-		double scaleY = (frame.getHeight())/item.getHeight();
-		return Math.min(scaleX,scaleY);
-	}
-	
+    /**Get the current scale factor factor (in cases
+     * where it is significant, this is the X-scale).
+     */
+    public double getScale() {return viewTransform.getScaleX();}
+    
+    
 	public AffineTransform getViewTransform() {return viewTransform;}
+	public AffineTransform getInverseViewTransform() {return inverseViewTransform;}
 }

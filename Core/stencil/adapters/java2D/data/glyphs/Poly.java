@@ -164,13 +164,13 @@ public abstract class Poly extends Stroked {
 		this.y = cacheBounds.getY();
 	}
 	
-	public void render(Graphics2D g) {
+	public void render(Graphics2D g, AffineTransform base) {
 		GeneralPath p = cache;
 		if (p == null) {return;}
 		
-		AffineTransform restore = super.preRender(g);
+		super.preRender(g);
 		super.render(g, p);
-		super.postRender(g, restore);
+		super.postRender(g, base);
 	}
 	
 	/**What is the X/Y implicit argument (as a number)*/

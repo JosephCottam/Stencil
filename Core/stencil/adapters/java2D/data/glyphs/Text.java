@@ -69,14 +69,14 @@ public final class Text extends Point {
 		computeMetrics();
 	}
 
-	public void render(Graphics2D g) {
-		AffineTransform rs = super.preRender(g);
+	public void render(Graphics2D g, AffineTransform base) {
+		super.preRender(g);
 		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
 		g.drawString(text, 0, (float)getHeight());
 		
-		super.postRender(g,rs);
+		super.postRender(g,base);
 	}	
 
 	//TODO: Change to 'compute layout' and determine line breaks...if needed
