@@ -181,7 +181,10 @@ public final class Tuples {
 				values = new HashMap<String, Object>();
 			}
 
-			public Object get(String name) throws InvalidNameException {return values.get(name);}
+			public Object get(String name) throws InvalidNameException {
+				if (!values.containsKey(name)) {throw new InvalidNameException(name);}
+				return values.get(name);
+			}
 
 			public Object get(String name, Class<?> target) throws IllegalArgumentException {
 				return Converter.convert(values.get(name), target);

@@ -59,6 +59,8 @@ public final class Image extends Point {
 	private BufferedImage display;
 	private String filename = (String) FILE.defaultValue;
 
+	private double oldSX, oldSY;
+	
 	private double width = (Double) HEIGHT.defaultValue;
 	private double height = (Double) WIDTH.defaultValue;
 	
@@ -96,10 +98,10 @@ public final class Image extends Point {
 	}
 	
 	private double autoScale() {
-		if (display == null) {return 1;} 								//Nothing to scale yet
-		if (width == AUTO_SCALE && height == AUTO_SCALE) {return 1;}	//No scale specified
-		if (width == AUTO_SCALE) {return height/display.getHeight();}	//Scale width based on height specified
-		if (height == AUTO_SCALE) {return width/display.getWidth();}	//Scale width based on height specified
+		if (base == null) {return 1;} 								//Nothing to scale yet
+		if (width == AUTO_SCALE && height == AUTO_SCALE) {return 1;}//No scale specified
+		if (width == AUTO_SCALE) {return height/base.getHeight();}	//Scale width based on height specified
+		if (height == AUTO_SCALE) {return width/base.getWidth();}	//Scale width based on height specified
 		return 1;//Default scale factor
 	}
 	
@@ -112,27 +114,31 @@ public final class Image extends Point {
 				String filename = WorkingDirectory.resolvePath(this.filename);
 				base = javax.imageio.ImageIO.read(new File(filename));
 			}
-			
-			if (base != null) {
-				double scaleX = getWidth()/base.getWidth();
-				double scaleY = getHeight()/base.getHeight();
-				
-				AffineTransformOp atOp = new AffineTransformOp(AffineTransform.getScaleInstance(scaleX,scaleY), AffineTransformOp.TYPE_BICUBIC); 
-				display = atOp.createCompatibleDestImage(base, base.getColorModel());
-				atOp.filter(base, display);
-			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error validating image.", e);
 		}
 	}
 
 	@Override
-	public void render(Graphics2D g, AffineTransform base) {
-		super.preRender(g);
-		AffineTransform t = g.getTransform();
+	public void render(Graphics2D g, AffineTransform baseTransform) {
+		if (base == null) {return;}
 		
+		super.preRender(g);
+		 
+		AffineTransform t = g.getTransform();
+		g.setTransform(AffineTransform.getTranslateInstance(t.getTranslateX(), t.getTranslateY()));
+		double sx = t.getScaleX() * (getWidth()/base.getWidth());
+		double sy = t.getScaleY() * (getHeight()/base.getHeight());
+		
+		if (sx != oldSX || sy != oldSY) {	
+			AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(sx, sy), AffineTransformOp.TYPE_BICUBIC);
+			display = op.createCompatibleDestImage(base,base.getColorModel());
+			op.filter(base, display);
+			oldSX = sx;
+			oldSY = sy;
+		}		
 		
 		g.drawRenderedImage(display, null);
-		super.postRender(g,base);
+		super.postRender(g,baseTransform);
 	}
 }

@@ -158,6 +158,7 @@ public abstract class Point implements Glyph2D {
 		try {
 			Constructor c = this.getClass().getConstructor(String.class);
 			Point g = (Point) c.newInstance(ID);
+			g.setLayer(layer);
 			g.updateNonID(this);
 			return g;
 		} catch (Exception e) {throw new Error("Error duplicating glyph:" + this.toString(), e);}
@@ -174,6 +175,9 @@ public abstract class Point implements Glyph2D {
 		else if (ID.is(name)) {this.id = Converter.toString(value);}
 		else if (IMPLANTATION.is(name)) {throw new IllegalArgumentException("Cannot set implantation.");}
 		else if (VISIBLE.is(name)) {this.visible = (Boolean) Converter.convert(value, boolean.class);}
+		else if (LAYERNAME.is(name)) {
+			if (!layer.getName().equals(value)) {throw new RuntimeException("Cannot change layer.");}
+		}
 		else {throw new InvalidNameException(name, getFields());}
 	}
 	
@@ -229,12 +233,12 @@ public abstract class Point implements Glyph2D {
 			if (existing == value || (existing !=null && existing.equals(value))) {
 				return this;
 			} else if (field.equals("ID") && !value.equals(this.getID())){
-				return duplicate((String) value);
+				return duplicate(Converter.toString(value)); //TODO: Should this really do a conversion here?
 			}  else {
 				set(field, value); 
 				return this;
 			}
-		} catch (Exception e) {throw new RuntimeException(String.format("Error updating %1$s to %2$s", field, value.toString()),e);}
+		} catch (Exception e) {throw new RuntimeException(String.format("Error updating %1$s to %2$s", field, value),e);}
 	}
 
 	
@@ -276,12 +280,6 @@ public abstract class Point implements Glyph2D {
 		}
 		
 		if (restore != null) {g.setTransform(restore);}	
-
-		if (DEBUG_COLOR != null) {
-			g.setPaint(DEBUG_COLOR.darker());
-			g.setStroke(DEBUG_STROKE);
-			g.draw(getBounds());
-		}
 	}
 	
 	/**Convert a full property name to just a base property name.

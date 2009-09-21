@@ -49,7 +49,7 @@ public class ViewTuple extends stencil.display.ViewTuple.Simple {
 	}
 
 
-
+	@SuppressWarnings("incomplete-switch")
 	public void set(String field, Object value) {
 		double val = Converter.toDouble(value);
 		PAffineTransform viewTrans = camera.getViewTransformReference();
@@ -86,9 +86,9 @@ public class ViewTuple extends stencil.display.ViewTuple.Simple {
 					viewTrans.setToScale(scalex,space/val);
 					viewTrans.translate(oldx, oldy);
 					return;
-				default: throw new IllegalArgumentException(String.format("Unknown field, cannot set %1$s on view.", field));
 			}
 		}
+		throw new IllegalArgumentException(String.format("Cannot set %1$s on view.", field));
 	}
 
 	public Object get(String name) {

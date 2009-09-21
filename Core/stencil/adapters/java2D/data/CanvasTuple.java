@@ -29,7 +29,10 @@
 package stencil.adapters.java2D.data;
 
 import java.awt.Rectangle;
+import java.awt.Color;
 import stencil.adapters.java2D.Canvas;
+import stencil.types.Converter;
+
 
 public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
 	private Canvas  canvas;
@@ -41,7 +44,11 @@ public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
 	protected Rectangle getBounds() {return canvas.getContentBounds();}
 
 	public void set(String field, Object value) {
-		throw new UnsupportedOperationException("Canvas is currently read-only.");
+		if (CanvasAttribute.BACKGROUND_COLOR.name().equals(field)) {
+			canvas.setBackground((Color) Converter.convert(value, Color.class));
+		} else {
+			throw new IllegalArgumentException("Cannot modify " + field + " on canvas.");
+		}
 	}
 
 

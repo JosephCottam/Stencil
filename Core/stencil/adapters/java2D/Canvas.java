@@ -116,9 +116,13 @@ public final class Canvas extends JComponent {
 	 * under the identity transform) to the given scale.
 	 */
 	public synchronized void zoomAbs(final Point2D p, double scale) {
+		zoomAbs(p, scale, scale);
+	}
+	
+	public synchronized void zoomAbs(final Point2D p, double scaleX, double scaleY) {
 		double zx = p.getX(), zy = p.getY();
         viewTransform.translate(zx, zy);
-        viewTransform.scale(scale,scale);
+        viewTransform.scale(scaleX,scaleY);
         viewTransform.translate(-zx, -zy);
         try {
             inverseViewTransform = viewTransform.createInverse();
@@ -200,6 +204,10 @@ public final class Canvas extends JComponent {
      */
     public double getScale() {return viewTransform.getScaleX();}
     
+    public void setViewTransform(AffineTransform transform) throws Exception{
+    	this.viewTransform = transform;
+    	this.inverseViewTransform = transform.createInverse();
+    }
     
 	public AffineTransform getViewTransform() {return viewTransform;}
 	public AffineTransform getInverseViewTransform() {return inverseViewTransform;}

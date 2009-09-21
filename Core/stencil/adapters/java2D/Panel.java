@@ -37,7 +37,8 @@ import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
 
-import java.awt.Rectangle;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -50,11 +51,16 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
-	}
+	} 
+	
+	/**Listening to the panel is really listening to its canvas.
+	 * HACK: How can you get events to bubble up automatically?  Do I need to use glass pane?
+	 */
+	public synchronized void addMouseListener(MouseListener l) {canvas.addMouseListener(l);}
+	public synchronized void addMouseMotionListener(MouseMotionListener l) {canvas.addMouseMotionListener(l);}
 	
 	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
 	public ViewTuple getView() {return new ViewTuple(this);}
-	public Rectangle getVewBounds() {return canvas.getContentBounds();}
 	
 	public void dispose() {
 		canvas.dispose();

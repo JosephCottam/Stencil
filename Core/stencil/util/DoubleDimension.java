@@ -30,13 +30,18 @@ package stencil.util;
 
 import java.awt.geom.Dimension2D;
 
-public class DoubleDimension extends Dimension2D {
-	protected double width;
-	protected double height;
+public final class DoubleDimension extends Dimension2D {
+	public double width;
+	public double height;
 
+	public DoubleDimension(int width, int height) {
+		this.width = width;
+		this.height = height;
+	}
+	
 	public DoubleDimension(Double width, Double height) {
-		super();
-		setSize(width, height);
+		this.width = width;
+		this.height = height;
 	}
 
 	public double getHeight() {return height;}

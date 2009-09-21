@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.data.glyphs;
 
 
+import java.awt.Component;
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
 import java.awt.geom.AffineTransform;
@@ -16,6 +17,7 @@ import stencil.adapters.general.TextFormats;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.types.Converter;
+import stencil.util.DoubleDimension;
 
 public final class Text extends Point {
 	private static final Pattern SPLITTER = Pattern.compile("\n");
@@ -74,16 +76,23 @@ public final class Text extends Point {
 		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
-		g.drawString(text, 0, (float)getHeight());
+		g.drawString(text, (float) horizontalOffset(), (float)getHeight());
 		
 		super.postRender(g,base);
 	}	
+	
+	private double horizontalOffset() {
+		if (format.justification == Component.LEFT_ALIGNMENT) {return 0;}
+		DoubleDimension dm = computeMetrics();
+		if (format.justification == Component.RIGHT_ALIGNMENT) {return width - dm.width;}
+		if (format.justification == Component.CENTER_ALIGNMENT) {return width/2.0 - dm.width/2.0;}
+		throw new RuntimeException("Unknown justification value: " + format.justification);
+	}
 
 	//TODO: Change to 'compute layout' and determine line breaks...if needed
-	private final void computeMetrics() {
-		if (!autoHeight && !autoWidth) {return;}
-		
-        FontMetrics fm = REFERENCE_GRAPHICS.getFontMetrics(format.font);
+	private DoubleDimension computeMetrics() {
+        
+		FontMetrics fm = REFERENCE_GRAPHICS.getFontMetrics(format.font);
         String[] lines = SPLITTER.split(text);
         double maxWidth=0;
         for (String line: lines) {
@@ -92,6 +101,8 @@ public final class Text extends Point {
         }
         if (autoHeight) {this.height = fm.getHeight() * lines.length;}
         if (autoWidth) {this.width = maxWidth;}
+
+        return new DoubleDimension(maxWidth, (double) fm.getHeight());
 	}
 
 	

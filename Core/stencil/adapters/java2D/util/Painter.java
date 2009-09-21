@@ -34,7 +34,6 @@ public final class Painter extends Thread implements Stopable {
 	
 	public void run() {
 		while (run) {
-
 			if (generations.changed() || resized() || transformed()) {
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
@@ -49,7 +48,7 @@ public final class Painter extends Thread implements Stopable {
 	public void doDrawing(Graphics2D g, AffineTransform base) {
 		g.addRenderingHints(rh);
 		for (Table<? extends Point> table: layers) {
-			generations.fixGeneration(table);	//Prevents some types of over-painting, but not all of them
+			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
 			for (Point glyph: table) {
 				if (glyph.isVisible()) {glyph.render(g, base);}
 			}
@@ -63,6 +62,7 @@ public final class Painter extends Thread implements Stopable {
 		return (target.getHeight() != i.getHeight()) || (target.getWidth() != i.getWidth()); 
 	}
 	
+	/**Has the target been transformed since it was last rendered?*/
 	private boolean transformed() {return priorTransform.equals(target.getViewTransform());}
 	
 	private BufferedImage selfBuffer() {
@@ -87,7 +87,7 @@ public final class Painter extends Thread implements Stopable {
 			g.setPaint(target.getBackground());
 			g.fillRect(0, 0, size.width, size.height);
 
-			g.setTransform(target.getViewTransform());
+			g.setTransform(priorTransform);
 			doDrawing(g, priorTransform);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -118,7 +118,5 @@ public final class Painter extends Thread implements Stopable {
         return img;
     }
 	
-	private void updateNextBuffer() {
-		nextBuffer = (nextBuffer+1)%(buffers.length);
-	}
+	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 }

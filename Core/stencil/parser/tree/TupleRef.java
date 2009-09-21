@@ -74,7 +74,8 @@ public class TupleRef extends Value {
 		TupleRef ref = (TupleRef) potentialRef;
 		
 		//Check for local reference
-		if (valueSource == null) {return null;} //TODO: Make it so that valueSource is never null...
+		//TODO: Make it so that valueSource is never null...
+		if (valueSource == null) {return null;} 
 		
 		if (ref.canRef(valueSource)) {return ref.getValue(valueSource);}
 		
@@ -91,7 +92,7 @@ public class TupleRef extends Value {
 			}
 		} 
 		
-		throw new IllegalArgumentException(String.format("Could not resolved %1$s to a value (valid local tuple fields are %2$s, source is %3$s).", potentialRef.toStringTree(), Arrays.deepToString(valueSource.getFields().toArray()), valueSource.get(Tuple.SOURCE_KEY)));
+		throw new IllegalArgumentException(String.format("Could not resolved %1$s to a value (valid local tuple fields are %2$s).", potentialRef.toStringTree(), Arrays.deepToString(valueSource.getFields().toArray())));
 	}
 	
 	/**Given a list of candidates for resolution (e.g., lexical arguments),

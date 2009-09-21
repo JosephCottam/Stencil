@@ -168,9 +168,8 @@ public abstract class Poly extends Stroked {
 		GeneralPath p = cache;
 		if (p == null) {return;}
 		
-		super.preRender(g);
 		super.render(g, p);
-		super.postRender(g, base);
+		super.postRender(g, null);
 	}
 	
 	/**What is the X/Y implicit argument (as a number)*/
