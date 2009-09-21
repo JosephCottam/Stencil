@@ -91,7 +91,7 @@ public final class Canvas extends JComponent {
 	
 	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
 	
-	public Rectangle getContentDimension() {
+	public Rectangle getContentBounds() {
 		Rectangle2D bounds =contentBounds;
 		if (contentBounds == null || tablesTracker.changed()) {
 			bounds = new Rectangle2D.Double(0,0,0,0);

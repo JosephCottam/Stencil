@@ -132,6 +132,8 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 				return new Table<Poly.PolyLine>(name, new Poly.PolyLine("PROTOTYPE"));
 			} else if (implantation.equals("POLYGON")) {
 				return new Table<Poly.Polygon>(name, new Poly.Polygon("PROTOTYPE"));
+			} else if (implantation.equals("ARC")) {
+				return new Table<Arc>(name, new Arc("PROTOTYPE"));
 			}
 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}

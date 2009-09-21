@@ -54,7 +54,7 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 	
 	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
 	public ViewTuple getView() {return new ViewTuple(this);}
-	public Rectangle getVewBounds() {return canvas.getContentDimension();}
+	public Rectangle getVewBounds() {return canvas.getContentBounds();}
 	
 	public void dispose() {
 		canvas.dispose();

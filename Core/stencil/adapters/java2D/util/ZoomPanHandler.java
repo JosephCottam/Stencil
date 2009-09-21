@@ -48,7 +48,7 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
 	/**
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed(MouseEvent e) { 	
         if (buttonEquals(e, ZOOM_BUTTON) ) {
             Canvas canvas = (Canvas)e.getComponent();
 
@@ -126,7 +126,23 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
     	return (e.getModifiers() & button) == button;
     }
 
-	public void mouseClicked(MouseEvent e) {} //TODO: Add zoom-fit
+	public void mouseClicked(MouseEvent e) { 
+		if (e.getClickCount() == 2) {
+			Canvas canvas = (Canvas)e.getComponent();
+			Rectangle2D content = canvas.getContentBounds();
+			Rectangle2D space = canvas.getBounds();
+
+			double w = space.getWidth()/content.getWidth();
+			double h = space.getHeight()/content.getHeight();
+			double scale = Math.min(w, h);
+			scale = scale/canvas.getScale();
+			Point2D center = new Point2D.Double(content.getCenterX(), content.getCenterY());  
+			
+			canvas.zoomAbs(center, scale);
+			canvas.panToAbs(center);
+		}
+		
+	} //TODO: Add zoom-fit
 
 	public void mouseEntered(MouseEvent e) {/*Ignored.*/}
 

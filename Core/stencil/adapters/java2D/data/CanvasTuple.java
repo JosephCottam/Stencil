@@ -38,7 +38,7 @@ public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
 	
 	public Canvas getComponent() {return canvas;}
 
-	protected Rectangle getBounds() {return canvas.getContentDimension();}
+	protected Rectangle getBounds() {return canvas.getContentBounds();}
 
 	public void set(String field, Object value) {
 		throw new UnsupportedOperationException("Canvas is currently read-only.");

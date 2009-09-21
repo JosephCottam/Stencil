@@ -30,7 +30,11 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+import java.io.File;
 
+import stencil.WorkingDirectory;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
 import stencil.adapters.java2D.util.Attribute;
@@ -50,8 +54,9 @@ public final class Image extends Point {
 		attributes.add(HEIGHT);
 		attributes.add(WIDTH);
 	}
-	
-	private java.awt.image.BufferedImage i;
+
+	private BufferedImage base;
+	private BufferedImage display;
 	private String filename = (String) FILE.defaultValue;
 
 	private double width = (Double) HEIGHT.defaultValue;
@@ -64,7 +69,7 @@ public final class Image extends Point {
 	public void set(String name, Object value) {
 			 if (HEIGHT.is(name)) 	{height= Converter.toDouble(value); verifyImage();}
 		else if (WIDTH.is(name)) 	{width = Converter.toDouble(value); verifyImage();}
-		else if (FILE.is(name)) {filename = Converter.toString(value); verifyImage();}
+		else if (FILE.is(name)) 	{filename = Converter.toString(value); base = null; verifyImage();}
 		else						{super.set(name, value);}
 	}
 	
@@ -79,28 +84,55 @@ public final class Image extends Point {
 	public String getImplantation() {return "IMAGE";}
 
 	public double getHeight() {
-		if (i ==null) {return 0;}
+		if (base ==null) {return 0;}
 		else if (height != AUTO_SCALE) {return height;}
-		return i.getHeight();
+		return base.getHeight() * autoScale();
 	}
-
+	
 	public double getWidth() {
-		if (i ==null) {return 0;}
+		if (base ==null) {return 0;}
 		else if (width != AUTO_SCALE) {return width;}
-		return i.getWidth();
+		return base.getWidth() * autoScale();
+	}
+	
+	private double autoScale() {
+		if (display == null) {return 1;} 								//Nothing to scale yet
+		if (width == AUTO_SCALE && height == AUTO_SCALE) {return 1;}	//No scale specified
+		if (width == AUTO_SCALE) {return height/display.getHeight();}	//Scale width based on height specified
+		if (height == AUTO_SCALE) {return width/display.getWidth();}	//Scale width based on height specified
+		return 1;//Default scale factor
 	}
 	
 	/**Given the current information, make sure the image is 
 	 * ready to be rendered.
 	 */
 	private void verifyImage() {
-		//TODO: Implement
+		try {
+			if (base == null && filename !=null) {
+				String filename = WorkingDirectory.resolvePath(this.filename);
+				base = javax.imageio.ImageIO.read(new File(filename));
+			}
+			
+			if (base != null) {
+				double scaleX = getWidth()/base.getWidth();
+				double scaleY = getHeight()/base.getHeight();
+				
+				AffineTransformOp atOp = new AffineTransformOp(AffineTransform.getScaleInstance(scaleX,scaleY), AffineTransformOp.TYPE_BICUBIC); 
+				display = atOp.createCompatibleDestImage(base, base.getColorModel());
+				atOp.filter(base, display);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException("Error validating image.", e);
+		}
 	}
 
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
 		super.preRender(g);
-		//TODO: Actually render...
+		AffineTransform t = g.getTransform();
+		
+		
+		g.drawRenderedImage(display, null);
 		super.postRender(g,base);
 	}
 }
