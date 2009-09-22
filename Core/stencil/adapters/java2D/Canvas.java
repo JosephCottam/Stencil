@@ -54,8 +54,8 @@ public final class Canvas extends JComponent {
 	final Painter painter;	
 	BufferedImage buffer;
 	
-	private AffineTransform viewTransform;
-	private AffineTransform inverseViewTransform;
+	private AffineTransform viewTransform = new AffineTransform();
+	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
 	
 	private final GenerationTracker tablesTracker;
 	
@@ -78,11 +78,7 @@ public final class Canvas extends JComponent {
 
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
-		tablesTracker = new GenerationTracker(this.layers);
-		
-		viewTransform = new AffineTransform();
-		try {inverseViewTransform = viewTransform.createInverse();}
-		catch (NoninvertibleTransformException e) {throw new Error("Exception thrown from supposed impossible place.",e);}	
+		tablesTracker = new GenerationTracker(this.layers);		
 	}
 	
 	public void dispose() {painter.signalStop();}
@@ -94,12 +90,11 @@ public final class Canvas extends JComponent {
 	public Rectangle getContentBounds() {
 		Rectangle2D bounds =contentBounds;
 		if (contentBounds == null || tablesTracker.changed()) {
-			bounds = new Rectangle2D.Double(0,0,0,0);
-			
 			for (Table<? extends Point> t: layers) {
 				tablesTracker.fixGeneration(t);
 				for (Point p: t) {
-					bounds.add(p.getBounds());
+					if (bounds == null) {bounds = p.getBounds();}
+					else {bounds.add(p.getBounds());}
 				}
 			}
 		} 
@@ -184,31 +179,29 @@ public final class Canvas extends JComponent {
         	inverseViewTransform = viewTransform.createInverse();
         } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
 	}
-	
-    /**
-     * Gets the absolute co-ordinate corresponding to the given screen
-     * co-ordinate.
-     * @param screen the screen co-ordinate to transform
-     * @param abs a reference to put the result in. If this is the same
-     *  object as the screen co-ordinate, it will be overridden safely. If
-     *  this value is null, a new Point2D instance will be created and 
-     *  returned.
-     * @return the point in absolute co-ordinates (stored in abs)
-     */
-    public Point2D getAbsoluteCoordinate(final Point2D screen, Point2D abs) {
-        return inverseViewTransform.transform(screen, abs);
-    }
+
 	
     /**Get the current scale factor factor (in cases
      * where it is significant, this is the X-scale).
      */
     public double getScale() {return viewTransform.getScaleX();}
     
-    public void setViewTransform(AffineTransform transform) throws Exception{
+    public void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;
     	this.inverseViewTransform = transform.createInverse();
     }
     
-	public AffineTransform getViewTransform() {return viewTransform;}
-	public AffineTransform getInverseViewTransform() {return inverseViewTransform;}
+    
+    /**Use this transform to convert values from the absolute system
+     * to the screen system.
+     */
+	public AffineTransform getViewTransform() {return new AffineTransform(viewTransform);}
+	public AffineTransform getViewTransformRef() {return viewTransform;}
+	
+	/**Use this transform to convert screen values to the absolute/canvas
+	 * values.
+	 */
+	public AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
+	public AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
+
 }

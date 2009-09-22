@@ -273,13 +273,13 @@ public abstract class Point implements Glyph2D {
 	 * 
 	 */
 	protected void postRender(Graphics2D g, AffineTransform restore) {
+		if (restore != null) {g.setTransform(restore);}	
 		if (DEBUG_COLOR != null) {
 			g.setPaint(DEBUG_COLOR);
 			g.setStroke(DEBUG_STROKE);
-			g.draw(new Rectangle2D.Double(0.0,0.0,getWidth(),getHeight()));
+			g.draw(getBounds());
 		}
 		
-		if (restore != null) {g.setTransform(restore);}	
 	}
 	
 	/**Convert a full property name to just a base property name.

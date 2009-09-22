@@ -63,7 +63,7 @@ public final class Painter extends Thread implements Stopable {
 	}
 	
 	/**Has the target been transformed since it was last rendered?*/
-	private boolean transformed() {return priorTransform.equals(target.getViewTransform());}
+	private boolean transformed() {return !priorTransform.equals(target.getViewTransformRef());}
 	
 	private BufferedImage selfBuffer() {
 		Graphics2D g =null;

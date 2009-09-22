@@ -207,7 +207,10 @@
  		<property name="lib.app.dir" location="${release}/lib"/>
  		<mkdir dir="${lib.app.dir}"/>
  		<copy todir="${lib.app.dir}">
- 			<fileset dir="${runtimeLibrary}" includes="*.jar"/>
+ 			<fileset dir="${runtimeLibrary}">
+ 				<include name="*.jar"/>
+ 				<exclude name="antrl3-ant.jar"/>
+ 			</fileset>
  		</copy>
 
  		<copy file="./TestData/Stencil.properties" tofile="${release}/Stencil.properties" overwrite="true"/>

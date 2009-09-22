@@ -52,10 +52,9 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
         if (buttonEquals(e, ZOOM_BUTTON) ) {
             Canvas canvas = (Canvas)e.getComponent();
 
-            canvas.setCursor(
-                Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
+            canvas.setCursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR));
             
-            canvas.getAbsoluteCoordinate(e.getPoint(), down);
+            canvas.getInverseViewTransformRef().transform(e.getPoint(), down);
             yLast = e.getY();
         } else if (buttonEquals(e, PAN_BUTTON)) {
             e.getComponent().setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));

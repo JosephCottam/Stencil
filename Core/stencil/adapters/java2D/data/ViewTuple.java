@@ -30,14 +30,14 @@ package stencil.adapters.java2D.data;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Dimension2D;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 
-import stencil.adapters.general.Registrations;
-import stencil.adapters.general.Registrations.Registration;
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.Panel;
 import stencil.streams.InvalidNameException;
 import stencil.types.Converter;
+import stencil.util.DoubleDimension;
 import stencil.util.enums.EnumUtils;
 
 public final class ViewTuple extends stencil.display.ViewTuple.Simple {
@@ -57,7 +57,10 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 			double scaleY = t.getScaleY();
 			double scaleX = t.getScaleX();
 
-			double oldY = t.getTranslateY();
+			double space;
+			double val = Converter.toDouble(value);
+			double oldY = -getY();
+			double oldX = -getX();
 			Point2D p = new Point2D.Double(t.getTranslateX(), t.getTranslateY());
 
 			switch (ename) {
@@ -68,26 +71,36 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 		
 				case X:
 					t.setToScale(scaleX, scaleY);
-					t.translate(-Converter.toDouble(value), -oldY);
+					t.translate(-val, oldY);
 					try {canvas.setViewTransform(t);}
-					catch (Exception e) {}
+					catch (NoninvertibleTransformException e) {/*Modifications to translate cannot give errors.*/}
 					return;
 					
 				case Y: 
-//					p.setLocation(p.getX(), Converter.toDouble(value));
-//					p = Registrations.topLeftToRegistration(Registration.CENTER, p, canvas.getContentBounds().getWidth(), canvas.getContentBounds().getHeight());
-//					canvas.panTo(p);
+					t.setToScale(scaleX, scaleY);
+					t.translate(oldX, -val);
+					try {canvas.setViewTransform(t);}
+					catch (NoninvertibleTransformException e) {/*Modifications to translate cannot give errors.*/}
 					return;
 					
 				case WIDTH:
-//					scaleX =  (Converter.toDouble(value)/view.getWidth())/scaleX;
-//					p = canvas.getAbsoluteCoordinate(p, p);
-//					canvas.zoomAbs(p, scaleX, scaleY);
+					space = canvas.getWidth();
+					
+					t.setToScale(space/val, scaleY);
+					t.translate(oldX, oldY);
+
+					try {canvas.setViewTransform(t);}
+					catch (NoninvertibleTransformException e) {/*Scale so calculated cannot yield error.*/}
+
 					return;
 				case HEIGHT:
-//					scaleY =  (Converter.toDouble(value)/view.getHeight())/scaleY;
-//					p = canvas.getAbsoluteCoordinate(p, p);
-//					canvas.zoomAbs(p, scaleX, scaleY);
+					space = canvas.getHeight();
+					
+					t.setToScale(scaleX, space/val);
+					t.translate(oldX, oldY);
+
+					try {canvas.setViewTransform(t);}
+					catch (NoninvertibleTransformException e) {/*Scale so calculated cannot yield error.*/}
 					return;
 			}
 		}
@@ -101,8 +114,8 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 			switch (ename) {
 				case ZOOM: return canvas.getScale();
 				case IMPLANTATION: return VIEW_IMPLANTATION;
-				case X: return t.getTranslateX()/t.getScaleX();
-				case Y: return t.getTranslateY()/t.getScaleY();
+				case X: return getX();
+				case Y: return getY();
 				case WIDTH: return t.getScaleX() * view.getBounds().getWidth();
 				case HEIGHT: return t.getScaleY() * view.getBounds().getHeight();
 				default: throw new RuntimeException("Did not handle value in ViewAttribute enum: " + name);
@@ -115,25 +128,38 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 		throw new IllegalArgumentException("Unknown field, cannot query " + name + " on view.");
 	}
 	
+	private double getX() {
+		AffineTransform t = canvas.getViewTransform();
+		return -t.getTranslateX()/t.getScaleX();
+	}
+	
+	private double getY() {
+		AffineTransform t = canvas.getViewTransform();
+		return -t.getTranslateY()/t.getScaleY();	
+	}
+	
 	public Point2D canvasToView(Point2D p) {
 		return canvas.getViewTransform().transform(p, p);
 	}
 	
 	public Dimension2D canvasToView(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
-		canvas.getViewTransform().transform(p, p);
+		canvas.getViewTransform().deltaTransform(p, p);
 		d.setSize(p.getX(), p.getY());
 		return d;
 	}
 	
 	public Point2D viewToCanvas(Point2D p) {
-		return canvas.getAbsoluteCoordinate(p, p);
+		return canvas.getInverseViewTransform().transform(p, p);
 	}
 	
 	public Dimension2D viewToCanvas(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
-		canvas.getAbsoluteCoordinate(p, p);
-		d.setSize(p.getX(), p.getY());
-		return d;
+		System.out.println(p);
+		p = canvas.getInverseViewTransform().deltaTransform(p, p);
+		System.out.println(p);
+		System.out.println();
+
+		return new DoubleDimension(p.getX(), p.getY());
 	}
 }
