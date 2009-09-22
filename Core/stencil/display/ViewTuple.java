@@ -73,8 +73,9 @@ public interface ViewTuple extends MutableTuple {
 		X (null,StandardAttribute.X.getType()),
 		Y (null,StandardAttribute.Y.getType()),
 		WIDTH (StandardAttribute.WIDTH.getDefaultValue(),StandardAttribute.WIDTH.getType()),
-		HEIGHT (StandardAttribute.HEIGHT.getDefaultValue(),StandardAttribute.HEIGHT.getType());
-
+		HEIGHT (StandardAttribute.HEIGHT.getDefaultValue(),StandardAttribute.HEIGHT.getType()),
+		PORTAL_WIDTH (0, Double.class),
+		PORTAL_HEIGHT (0, Double.class);
 
 		final Object defaultValue;
 		final Class type;

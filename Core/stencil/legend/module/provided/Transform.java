@@ -92,19 +92,26 @@ public class Transform extends BasicModule {
 		return new BasicTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
 	}
 
+	/**Calculates the scale factor to keep values undistorted but all objects visible.
+	 * If an illegal scale value appears (such as 0, NaN or Inf), the scale value returned is 1.
+	 * 
+	 * @param viewWidth
+	 * @param viewHeight
+	 * @param canvasWidth
+	 * @param canvasHeight
+	 * @return
+	 */
 	public static Tuple zoom(Object viewWidth, Object viewHeight, Object canvasWidth, Object canvasHeight) {
 		double vw = Converter.toDouble(viewWidth);
 		double vh = Converter.toDouble(viewHeight);
 		double cw = Converter.toDouble(canvasWidth);
 		double ch = Converter.toDouble(canvasHeight);
 		
-		double zoom;
-		if (cw > ch) {
-			zoom = vw/cw;
-		} else {
-			zoom = vh/ch;
-		}
-		return BasicTuple.singleton(zoom);
+		double zy = ch !=0?vh/ch:1;
+		double zx = cw !=0?vw/cw:1;
+		double min = Math.min(zx, zy);
+		if (min ==0 || Double.isInfinite(min) || Double.isNaN(min)) {min =1;} //TODO: Is there a better value to return?  
+		return BasicTuple.singleton(min);		
 	}
 	
 	public Transform(ModuleData md) {super(md);}

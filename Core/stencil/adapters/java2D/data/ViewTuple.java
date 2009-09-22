@@ -65,8 +65,7 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 
 			switch (ename) {
 				case ZOOM:
-					double delta = Converter.toDouble(value)/t.getScaleX();
-					canvas.zoom(p, delta);
+					canvas.zoomTo(p, val);
 					return;
 		
 				case X:
@@ -109,15 +108,23 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 
 	public Object get(String name) throws InvalidNameException {
 		if (EnumUtils.contains(ViewAttribute.class, name)) {
-			AffineTransform t = canvas.getViewTransform();
+			AffineTransform t = canvas.getInverseViewTransform();
 			ViewAttribute ename = ViewAttribute.valueOf(name);
+			Point2D p;
+			
 			switch (ename) {
 				case ZOOM: return canvas.getScale();
 				case IMPLANTATION: return VIEW_IMPLANTATION;
 				case X: return getX();
 				case Y: return getY();
-				case WIDTH: return t.getScaleX() * view.getBounds().getWidth();
-				case HEIGHT: return t.getScaleY() * view.getBounds().getHeight();
+				case PORTAL_WIDTH: return view.getBounds().getWidth();
+				case PORTAL_HEIGHT: return view.getBounds().getHeight();
+				case WIDTH: 
+					p = new Point2D.Double(view.getBounds().getWidth(), 0);
+					return t.deltaTransform(p,p).getX();
+				case HEIGHT: 
+					p = new Point2D.Double(0,view.getBounds().getHeight());
+					return t.deltaTransform(p, p).getY();
 				default: throw new RuntimeException("Did not handle value in ViewAttribute enum: " + name);
 			}
 		}

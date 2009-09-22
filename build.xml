@@ -8,10 +8,6 @@
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
- 			target="${grammars}/DefaultPack.g"
-			outputdirectory="${grammars}/string/"
- 		/> 
- 		<antlr
  			target="${grammars}/Stencil.g"
 			outputdirectory="${grammars}/string/"
  		/> 

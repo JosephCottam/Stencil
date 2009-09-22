@@ -101,7 +101,26 @@ public final class Canvas extends JComponent {
 		return bounds.getBounds();
 	}
 	
-	/**Zoom anchored on the given screen point to the given scale.*/
+	/**Zooms anchored on the given screen point TO the given scale.*/
+	public synchronized void zoomTo(final Point2D p, double scale) {
+		inverseViewTransform.transform(p, tempPoint);
+		zoomToAbs(tempPoint, scale);
+	}
+
+	/**Zooms anchored on the given screen point TO the given scale.*/
+	public synchronized void zoomToAbs(final Point2D p, double scale) {
+		zoomToAbs(p, scale, scale);
+	}
+	
+	/**Zooms anchored on the given screen point TO the given scale.*/
+	public synchronized void zoomToAbs(final Point2D p, double scaleX, double scaleY) {
+		zoomAbs(p, scaleX/viewTransform.getScaleX(), scaleY/viewTransform.getScaleY());
+	}
+
+
+
+	
+	/**Zoom anchored on the given screen point by the given scale.*/
 	public synchronized void zoom(final Point2D p, double scale) {
 		inverseViewTransform.transform(p, tempPoint);
 		zoomAbs(tempPoint, scale);
@@ -119,9 +138,8 @@ public final class Canvas extends JComponent {
         viewTransform.translate(zx, zy);
         viewTransform.scale(scaleX,scaleY);
         viewTransform.translate(-zx, -zy);
-        try {
-            inverseViewTransform = viewTransform.createInverse();
-        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
+        try {setViewTransform(viewTransform);}
+        catch (NoninvertibleTransformException e ) {throw new Error("Supposedly impossible error occured.", e);}
 	}
 	
     /**
@@ -149,9 +167,8 @@ public final class Canvas extends JComponent {
      */
     public synchronized void panAbs(double dx, double dy) {
     	viewTransform.translate(dx, dy);
-        try {
-        	inverseViewTransform = viewTransform.createInverse();
-        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
+        try {setViewTransform(viewTransform);}
+        catch (NoninvertibleTransformException e ) {throw new Error("Supposedly impossible error occured.", e);}
     }
 	
 	/**Pan so the display is centered on the given screen point.*/
@@ -175,9 +192,8 @@ public final class Canvas extends JComponent {
         double dy = y-(viewTransform.getTranslateY()/sy);
 
         viewTransform.translate(dx, dy);
-        try {
-        	inverseViewTransform = viewTransform.createInverse();
-        } catch ( Exception e ) {throw new Error("Supposedly impossible error occured.", e);}
+        try {setViewTransform(viewTransform);}
+        catch (NoninvertibleTransformException e ) {throw new Error("Supposedly impossible error occured.", e);}
 	}
 
 	
@@ -188,7 +204,11 @@ public final class Canvas extends JComponent {
     
     public void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;
-    	this.inverseViewTransform = transform.createInverse();
+    	try {this.inverseViewTransform = transform.createInverse();}
+    	catch (NoninvertibleTransformException e) {
+    		System.out.println("HERE");
+    		throw e;
+    	}
     }
     
     

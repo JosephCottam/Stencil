@@ -102,6 +102,8 @@ public class ViewTuple extends stencil.display.ViewTuple.Simple {
 				case IMPLANTATION: return VIEW_IMPLANTATION;
 				case X: return -viewTrans.getTranslateX()/viewTrans.getScaleX();
 				case Y: return -viewTrans.getTranslateY()/viewTrans.getScaleY();
+				case PORTAL_WIDTH: return camera.getWidth();
+				case PORTAL_HEIGHT: return camera.getHeight();
 				case WIDTH: return viewTrans.getScaleX() * viewBounds.getWidth();
 				case HEIGHT: return viewTrans.getScaleY() * viewBounds.getHeight();
 				default: throw new RuntimeException("Did not handle value in ViewAttribute enum: " + name);
