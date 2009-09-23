@@ -10,16 +10,15 @@ import static stencil.operator.util.BasicProject.packArguments;
 import static stencil.parser.ParserConstants.*;
 
 import stencil.streams.Tuple;
-import stencil.util.Invokeable;
 import stencil.util.Tuples;
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
+import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Facet;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Value;
-import stencil.rules.JythonEncapsulation;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import static stencil.parser.ParserConstants.QUERY_BLOCK_TAG;
 

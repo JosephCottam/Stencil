@@ -1,8 +1,8 @@
 package stencil.operator;
 
-import stencil.util.Invokeable;
 import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
+import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Specializer;
 
 /**A dynamic legend is one that is defined during Java runtime.

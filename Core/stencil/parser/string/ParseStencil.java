@@ -32,11 +32,11 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 
+import stencil.operator.module.ModuleCache;
 import stencil.parser.validators.*;
 import stencil.adapters.Adapter;
 import stencil.parser.tree.*;
 import stencil.parser.ProgramParseException;
-import stencil.rules.ModuleCache;
 
 public abstract class ParseStencil {
 	public static final String ASTNodeType =  "jacottam.tsm.parser.ASTNode";

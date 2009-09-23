@@ -34,9 +34,9 @@ import org.antlr.runtime.Token;
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.Modules;
+import stencil.operator.util.Invokeable;
 import stencil.parser.string.StencilParser;
 import stencil.streams.Tuple;
-import stencil.util.Invokeable;
 import stencil.util.MultiPartName;
 
 

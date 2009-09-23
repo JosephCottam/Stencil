@@ -31,8 +31,9 @@ package stencil.parser.tree;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.antlr.runtime.Token;
+
+import stencil.operator.module.ModuleCache;
 import stencil.parser.string.StencilParser;
-import stencil.rules.ModuleCache;
 
 public class Program extends StencilTree {
 	private ModuleCache mc;	//TODO: Remove when all tuple references are positional

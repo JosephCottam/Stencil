@@ -26,7 +26,7 @@ public class Configure {
 		}
 
 
-		stencil.rules.ModuleCache.registerModules(props);
+		stencil.operator.module.ModuleCache.registerModules(props);
 	}
 
 	public static void loadProperties(String... files) throws Exception {

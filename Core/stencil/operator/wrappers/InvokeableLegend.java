@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Arrays;
 
 import stencil.operator.util.BasicProject;
+import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Value;
 import stencil.streams.Tuple;
-import stencil.util.Invokeable;
 import stencil.util.Tuples;
 
 

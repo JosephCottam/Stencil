@@ -1,8 +1,7 @@
-package stencil.util;
+package stencil.operator.util;
 
 import java.lang.reflect.*;
 
-import stencil.rules.MethodInvokeFailedException;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
 
