@@ -37,6 +37,7 @@ options {
 	filter = true;
 	superClass = TreeRewriteSequence;
 }
+
 @header {
 package stencil.parser.string;
 

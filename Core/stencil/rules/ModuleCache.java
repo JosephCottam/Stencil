@@ -30,11 +30,11 @@ package stencil.rules;
 
 import java.util.*;
 
+import stencil.operator.StencilOperator;
+import stencil.operator.module.*;
+import stencil.operator.module.util.*;
 import stencil.parser.tree.Specializer;
 
-import stencil.legend.StencilLegend;
-import stencil.legend.module.*;
-import stencil.legend.module.util.*;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
@@ -50,7 +50,7 @@ import java.io.InputStreamReader;
  * modules that have been imported into the name-space, as well as the contents
  * of those name-spaces for locating a Module, given a method name.  This instance
  * half adds all mapping functions defined in the Stencil itself (e.g. those done with
- * the LEGEND or PYTHON keywords) to the name-space in a 'default' Module.
+ * the operator or python keywords) to the name-space in a 'default' Module.
  *
  */
 public class ModuleCache {
@@ -117,30 +117,30 @@ s	 */
 	 * @param specializer
 	 * @return
 	 */
-	public StencilLegend instance(String name, Specializer specializer) throws MethodInstanceException {		
+	public StencilOperator instance(String name, Specializer specializer) throws MethodInstanceException {		
 		try {
-			PrefixedModule pm = findModuleForLegend(name);
-			String legendName = Modules.removePrefix(name);
+			PrefixedModule pm = findModuleForOperator(name);
+			String operatorName = Modules.removePrefix(name);
 
-			StencilLegend legend = pm.module.instance(legendName, specializer);
-			return legend;
+			StencilOperator operator = pm.module.instance(operatorName, specializer);
+			return operator;
 		}
 		catch (Exception e) {throw new MethodInstanceException(name, true, e);}		
 	}
 	
-	/** @param name Legend name to find (should not include facet). Must be prefixed if corresponding module was imported prefixed. 
-	 * @return Prefixed Module which contains the legend.
-	 * @throws IllegalArgumentException Name does not indicate any known legend 
+	/** @param name operator name to find (should not include facet). Must be prefixed if corresponding module was imported prefixed. 
+	 * @return Prefixed Module which contains the operator.
+	 * @throws IllegalArgumentException Name does not indicate any known operator 
 	 */
-	public PrefixedModule findModuleForLegend(String name) throws IllegalArgumentException {
+	public PrefixedModule findModuleForOperator(String name) throws IllegalArgumentException {
 		for (PrefixedModule pm: importedModules) {
-			for (String legendName: pm.module.getModuleData().getOperators()) {
-				if (name.equals(Modules.prefixName(pm.prefix, legendName))) {
+			for (String operatorName: pm.module.getModuleData().getOperators()) {
+				if (name.equals(Modules.prefixName(pm.prefix, operatorName))) {
 					return pm;
 				}
 			}
 		}
-		throw new IllegalArgumentException("Could not find module for legend named " + name);
+		throw new IllegalArgumentException("Could not find module for operator named " + name);
 	}
 	
 	/**Import a given Module into the method index so its members

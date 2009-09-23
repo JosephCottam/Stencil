@@ -32,11 +32,11 @@ import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 
 import org.python.util.PythonInterpreter;
 
+import stencil.operator.DynamicStencilOperator;
+import stencil.operator.module.util.MutableModule;
+import stencil.operator.wrappers.JythonOperator;
 import stencil.parser.tree.Facet;
 import stencil.parser.tree.Python;
-import stencil.legend.DynamicStencilLegend;
-import stencil.legend.wrappers.JythonLegend;
-import stencil.legend.module.util.MutableModule;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -54,11 +54,11 @@ public class EncapsulationGenerator {
 	 * @param register Module
 	 * @return Set of encapsulations.
 	 */
-	public DynamicStencilLegend generate(Python pythonSpec, MutableModule module) {
+	public DynamicStencilOperator generate(Python pythonSpec, MutableModule module) {
 		assert module != null : "Null moduled passed.";
 		
 		registerEnv(pythonSpec.getEnvironment());
-		JythonLegend legend = new JythonLegend(module.getModuleData().getName(), pythonSpec.getName());
+		JythonOperator legend = new JythonOperator(module.getModuleData().getName(), pythonSpec.getName());
 		for (Facet b: pythonSpec.getFacets()) {
 			if (b.getName().equals(INIT_BLOCK_TAG)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
 			

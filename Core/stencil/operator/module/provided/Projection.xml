@@ -1,0 +1,21 @@
+<ModuleData grammarRev="2" name="Projection">
+	<Class name="stencil.operator.module.provided.Projection"/>
+	<Description><![CDATA[Set to set transformations, filed under a really bad name.]]></Description>
+
+	<Defaults>
+		<Opts>
+			<Opt specializer="[1 .. n]"/>
+		</Opts>
+		<Facets>
+			<Facet name="Map" type="PROJECT" function="false" prototype="VALUE" />
+			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/>
+		</Facets>
+	</Defaults>
+
+	<Operator name="Count"/>
+	<Operator name="Index"/>
+	<Operator name="Justify"/>	
+	<Operator name="HeatScale">
+		<Opt specializer="[1 .. n, hot=@color(WHITE), cold=@color(RED)]"/>
+	</Operator>
+</ModuleData>

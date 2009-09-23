@@ -41,7 +41,7 @@ tokens {
 	CALL_CHAIN;
 	FUNCTION;
 	GUIDE;
-	LEGEND_RULE;	//Combination of filter, return and function calls in a legend
+	OPERATOR_RULE;	//Combination of filter, return and function calls in a operator
 	LIST;
 	NUMBER;
 	POST;
@@ -70,11 +70,10 @@ tokens {
 	IMPORT		= 'import';
 	LOCAL		= 'local';	//Target to indicate temporary storage
 	LAYER		= 'layer';
-	LEGEND		= 'legend';
+	OPERATOR		= 'operator';
 	ORDER		= 'order';
 	PYTHON  	= 'python';
 	RETURN		= 'return';
-	STATIC		= 'static';	//vs. dynamic in legends (this is the default type)
 	STREAM		= 'stream';
 	VIEW 		= 'view';
 	AS			= 'as'; //used in imports
@@ -110,22 +109,19 @@ tokens {
 	TAG = '@';
 }
 
-
 @header{
 	package stencil.parser.string;
 
-	//TODO: Include base types in layers
 	//TODO: Remove/delete glyph operation
 	//TODO: Replacement of identifiers with numbers in tuples
-	//TOOD: Modular color space
 
 	import static stencil.parser.ParserConstants.*;
 	import java.util.ArrayList;
 	import java.util.List;
-	
-	
+		
 }
-@lexer::header{
+
+ @lexer::header{
 	package stencil.parser.string;
 	import static stencil.util.Tuples.stripQuotes;
 }
@@ -148,8 +144,8 @@ tokens {
 		Empty}; //Must be empty
 }
 
-program	: imports* externals order (streamDef | layerDef | legendDef | pythonDef)*
-		-> ^(PROGRAM  ^(LIST["Imports"] imports*) order externals ^(LIST["Layers"] layerDef*) ^(LIST["Legends"] legendDef*) ^(LIST["Pythons"] pythonDef*));
+program	: imports* externals order (streamDef | layerDef | operatorDef | pythonDef)*
+		-> ^(PROGRAM  ^(LIST["Imports"] imports*) order externals ^(LIST["Layers"] layerDef*) ^(LIST["Operators"] operatorDef*) ^(LIST["Pythons"] pythonDef*));
 
 
 
@@ -209,15 +205,15 @@ rulePredicate
 
 
 
-//////////////////////////////////////////// LEGEND ///////////////////////////
+//////////////////////////////////////////// OPERATORS ///////////////////////////
 
-legendDef
-	: LEGEND name=ID tuple[false] YIELDS tuple[false] legendRule+
-		-> 	^(LEGEND[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] legendRule+));
-		
-legendRule
+operatorDef
+	: OPERATOR name=ID tuple[false] YIELDS tuple[false] operatorRule+
+		-> 	^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+));
+				
+operatorRule
 	: predicate GATE rule["return"]+
-		-> ^(LEGEND_RULE predicate ^(LIST["Rules"] rule+));
+		-> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
 
 predicate
 	: GROUP? ALL CLOSE_GROUP?

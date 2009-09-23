@@ -39,7 +39,7 @@ from VertexList
 	STROKE_COLOR: @color(0.3,0.3,0.3,0.8)
 
 
-legend Ordering (ID)->(VALUE)  
+operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
 python Squarify

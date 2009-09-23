@@ -40,5 +40,5 @@ from LineSource
 	STROKE_COLOR: @color(GRAY80)
 	STROKE_WEIGHT: 3
 
-legend Spacing (ID) -> (V) 
+operator Spacing (ID) -> (V) 
 	all => V : Index(ID) -> Mult(VALUE, 100) -> (VALUE)

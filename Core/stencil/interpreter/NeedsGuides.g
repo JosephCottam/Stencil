@@ -36,11 +36,13 @@ options {
 	ASTLabelType = StencilTree;	
 	filter = true;
 }
+
 @header{
 	package stencil.interpreter;
 	
 	import stencil.parser.tree.*;	
 }
+
 @members {
 	private boolean needsGuide;
 	

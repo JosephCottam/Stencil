@@ -28,7 +28,7 @@ from Edges
 	STROKE_WEIGHT: .25
 
 
-legend Ordering (ID)->(VALUE)  
+operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
 python Circular

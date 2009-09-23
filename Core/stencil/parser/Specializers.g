@@ -37,6 +37,7 @@ options {
 	output = AST;
 	filter = true;
 }
+
 @header{
 	/**  Make sure that every mapping operator has a specializer.
 	 *
@@ -46,11 +47,12 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
-	import static stencil.parser.ParserConstants.SIMPLE_SPECIALIZER;
 	import stencil.util.MultiPartName;
-	import stencil.legend.module.*;
-	import stencil.legend.module.util.*;
+	import stencil.operator.module.*;
+	import stencil.operator.module.util.*;
 	import stencil.rules.ModuleCache;
+
+  import static stencil.parser.ParserConstants.SIMPLE_SPECIALIZER;
 	
 }
 
@@ -67,7 +69,7 @@ options {
 		MultiPartName name= new MultiPartName(fullName);
 		ModuleData md;
 		try{
-    		Module m = modules.findModuleForLegend(name.prefixedName()).module;
+    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
     		md = m.getModuleData();
 		} catch (Exception e) {
 			throw new RuntimeException("Error getting module information for operator " + fullName, e);

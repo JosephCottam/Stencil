@@ -19,5 +19,5 @@ from Values
   FILL_COLOR<< Count(Category) #-> HeatScale[1..n, cold=@color(RED), hot=@color(GRAY90)](VALUE) -> VALUE
   /*The above line uses two special forms: Dynamic bind and 'reframe' map.*/
   /*Dyanmic bind '<<' keeps results up to date in a globally changing context.*/
-  /*Reframe map '#->' is used by legend generation to indicate that the results
+  /*Reframe map '#->' is used by operator generation to indicate that the results
 	  before the reframe should be used as labels, not the incomming values.*/

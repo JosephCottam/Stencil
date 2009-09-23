@@ -121,7 +121,7 @@
  		
  	
  	<target name="ModuleData">
- 		<property name="modulesUtil" location="${src}/stencil/legend/module/util/"/>
+ 		<property name="modulesUtil" location="${src}/stencil/operator/module/util/"/>
  		<antlr
  			target="${modulesUtil}/ModuleData.g"
 			outputdirectory="${modulesUtil}"

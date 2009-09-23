@@ -30,7 +30,7 @@ from Mouse
 	filter(CLICK_COUNT=3) : CLICK_COUNT
 	view(WIDTH, HEIGHT, X,Y) : (canvas.WIDTH, canvas.HEIGHT, canvas.X, canvas.Y)
 
-legend Colorize(Meta) -> C
+operator Colorize(Meta) -> C
 	(Meta !~ "true") => C: @color(WHITE)
 	(Meta =~ "true") => C: @color(GREEN)
 

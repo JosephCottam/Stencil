@@ -32,8 +32,8 @@ from Stocks
 	Y.new: Price(Open) -> Mean[-30 .. -10](Price) -> (VALUE) /*Average that lags by 10 and includes 20 values.*/
 	(STROKE_WEIGHT, STROKE_COLOR): (1, @color(ORANGE,150))
 
-legend Price (Open) -> (Price)
+operator Price (Open) -> (Price)
 	all => (Price) : Mult(-1, Open) -> (VALUE)
 
-legend TimeStep (T) -> (VALUE)
+operator TimeStep (T) -> (VALUE)
 	all => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE

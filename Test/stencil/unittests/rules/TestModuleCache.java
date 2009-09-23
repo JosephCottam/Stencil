@@ -4,9 +4,9 @@ import java.io.FileInputStream;
 import java.util.Properties;
 
 import junit.framework.TestCase;
-import stencil.legend.StencilLegend;
 import stencil.rules.ModuleCache;
 import stencil.rules.MethodInstanceException;
+import stencil.operator.StencilOperator;
 import stencil.parser.ParserConstants;
 
 public class TestModuleCache extends TestCase {
@@ -31,7 +31,7 @@ public class TestModuleCache extends TestCase {
 		initCache();
 		
 		ModuleCache m = new ModuleCache();
-		StencilLegend l= null;
+		StencilOperator l= null;
 
 		try {l=m.instance("NoMethod", ParserConstants.SIMPLE_SPECIALIZER);}
 		catch (MethodInstanceException e) {/*Exception expected, tested below.*/}

@@ -31,13 +31,13 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 
+import stencil.operator.DynamicStencilOperator;
+import stencil.operator.StencilOperator;
+import stencil.operator.module.util.Modules;
 import stencil.parser.string.StencilParser;
 import stencil.streams.Tuple;
 import stencil.util.Invokeable;
 import stencil.util.MultiPartName;
-import stencil.legend.DynamicStencilLegend;
-import stencil.legend.StencilLegend;
-import stencil.legend.module.util.Modules;
 
 
 public class Function extends CallTarget {
@@ -55,10 +55,10 @@ public class Function extends CallTarget {
 		public boolean isYields() {return getToken().getType() == StencilParser.YIELDS;}
 	}
 
-	protected StencilLegend operator;
+	protected StencilOperator operator;
 		
 	public Function(Token source) {super(source);}
-	public Function(Token source, StencilLegend operator) throws NoSuchMethodException {
+	public Function(Token source, StencilOperator operator) throws NoSuchMethodException {
 		super(source);
 		setOperator(operator);
 	}
@@ -87,17 +87,17 @@ public class Function extends CallTarget {
 	}
 
 	
-	public void setOperator(StencilLegend operator)  {this.operator = operator;}
+	public void setOperator(StencilOperator operator)  {this.operator = operator;}
 	
-	public StencilLegend getOperator() {return operator;}
+	public StencilOperator getOperator() {return operator;}
 
 	/**What actually needs to be invoked when a call is to be made?*/
-	private Invokeable<StencilLegend, Tuple> getInvokeable() throws NoSuchMethodException {
+	private Invokeable<StencilOperator, Tuple> getInvokeable() throws NoSuchMethodException {
 		Invokeable invokeable;
 		MultiPartName name = new MultiPartName(getName());
 		
-		if (operator instanceof DynamicStencilLegend) {
-			invokeable = ((DynamicStencilLegend) operator).getFacet(name.getFacet());
+		if (operator instanceof DynamicStencilOperator) {
+			invokeable = ((DynamicStencilOperator) operator).getFacet(name.getFacet());
 		} else {
 			invokeable = new Invokeable(Modules.javaCase(name.getFacet()), operator);
 		}

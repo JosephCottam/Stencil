@@ -41,5 +41,5 @@ from Mouse
 	filter(BUTTON = 1): BUTTON
 	view(X, Y, WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
 
-legend TimeStep (Date) -> (VALUE)
+operator TimeStep (Date) -> (VALUE)
 	all => VALUE : Index(Date) -> Mult(3, VALUE) -> VALUE

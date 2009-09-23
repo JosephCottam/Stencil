@@ -49,15 +49,19 @@ options {
 	
 	import java.util.Map;
 	import java.util.HashMap;
+
+  import org.antlr.runtime.tree.*;
+
 	import stencil.parser.tree.*;
-	import stencil.legend.module.*;
-	import stencil.legend.module.util.*;
 	import stencil.rules.ModuleCache;
-	import org.antlr.runtime.tree.*;
 	import stencil.rules.ModuleCache;
 	import stencil.util.MultiPartName;
-	import static stencil.parser.ParserConstants.GUIDE_BLOCK_TAG;
-	import stencil.legend.module.LegendData.OpType;
+  import stencil.operator.module.*;
+  import stencil.operator.module.util.*;
+	import stencil.operator.module.OperatorData.OpType;
+
+  import static stencil.parser.ParserConstants.GUIDE_BLOCK_TAG;
+
 	
 }
 @members{
@@ -148,7 +152,7 @@ options {
 	
 	private boolean isCategorize(Function f) {
    		MultiPartName name = new MultiPartName(f.getName());
-   		Module m = modules.findModuleForLegend(name.prefixedName()).module;
+   		Module m = modules.findModuleForOperator(name.prefixedName()).module;
    		try {
    			OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();;
    			return (opType == OpType.CATEGORIZE);

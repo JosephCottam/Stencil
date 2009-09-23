@@ -35,7 +35,7 @@ from Attributes
 	SIZE: 3.1
 	FILL_COLOR: Coloring(ATT) -> (C)
 
-legend Coloring(ATT) -> (C)
+operator Coloring(ATT) -> (C)
 	(ATT =~ "Python") => C : @color(30,100,50)		/*Sigil colors*/
 	(ATT =~ "Java")   => C : @color(65,70,135)
 	(ATT =~ "C")      => C : @color(120,40,80)

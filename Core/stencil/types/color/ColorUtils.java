@@ -28,10 +28,10 @@
  */
 package stencil.types.color;
 
-import stencil.legend.module.ModuleData; 
-import stencil.legend.module.util.BasicModule;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
+import stencil.operator.module.ModuleData;
+import stencil.operator.module.util.BasicModule;
 import stencil.parser.tree.Value;
 import stencil.util.BasicTuple;
 

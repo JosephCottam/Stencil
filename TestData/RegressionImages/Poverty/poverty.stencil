@@ -140,13 +140,13 @@ from Poverty
 					--> Color2(Division, VALUE) -> C
 
 
-legend Color2 (State, Alpha) -> (C)
+operator Color2 (State, Alpha) -> (C)
 (all) => (C): Color(State) -> C
 					| Mult(Alpha,.5) -> Add(.25, VALUE) -> VALUE  /*Squish ragne to .25-.75*/
 				  	| SetAlpha(VALUE, C) -> VALUE
 					--> VALUE
 
-legend Color(Division) -> (C)
+operator Color(Division) -> (C)
 (Division =~ "USA") => (C) : @color(GRAY40)
 (Division =~ "New England") => (C) : @color(GREEN, .5)
 (Division =~ "Mid Atlantic") => (C) : @color(DARKGREEN, .5)
@@ -159,13 +159,13 @@ legend Color(Division) -> (C)
 (Division =~ "Pacific") => (C) : @color(VIOLET, .5)
 (all) => (C) : @color(RED)
 
-legend XLayout (Name) -> (X)
+operator XLayout (Name) -> (X)
 (Name =~ "Total") => (X) : 0
 (Name =~ "Children") => (X) : 80
 (Name =~ "Adult") => (X) : 160
 (Name =~ "Elderly") => (X) : 240
 
-legend Ordering (ID) -> (VALUE) 
+operator Ordering (ID) -> (VALUE) 
 	all => VAlUE : Index(ID) -> VALUE
 
 python Pop

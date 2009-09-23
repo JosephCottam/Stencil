@@ -9,7 +9,7 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.piccoloDynamic.Adapter;
-import stencil.legend.module.Module;
+import stencil.operator.module.Module;
 import stencil.parser.string.AdHocOperators;
 import stencil.parser.string.Imports;
 import stencil.parser.string.ParseStencil;

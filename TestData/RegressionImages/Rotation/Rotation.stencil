@@ -23,5 +23,5 @@ from Elements
 	Y : 40
 	SIZE: 30
 
-legend Count(Name) -> (VALUE) 
+operator Count(Name) -> (VALUE) 
 	(all) => VALUE : Index(Name) -> VALUE

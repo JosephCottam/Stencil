@@ -48,9 +48,8 @@ options {
 	package stencil.parser.string;
 	
     import stencil.rules.ModuleCache;
-    import stencil.legend.StencilLegend;
-    import stencil.legend.DynamicStencilLegend;
-    import stencil.legend.module.util.Modules;
+    import stencil.operator.*;
+    import stencil.operator.module.util.Modules;
     import stencil.parser.tree.Function;
     import stencil.parser.tree.Specializer;
     import stencil.parser.tree.StencilTree;
@@ -59,7 +58,7 @@ options {
 
 }
 
-@members {
+@members { 
 	protected ModuleCache modules;
 
 	public SetOperators(TreeNodeStream input, ModuleCache modules) {
@@ -72,7 +71,7 @@ options {
     		MultiPartName name = new MultiPartName(func.getName());
     		Specializer s = func.getSpecializer();
 
-    		StencilLegend op = modules.instance(name.prefixedName(), s);
+    		StencilOperator op = modules.instance(name.prefixedName(), s);
     		func.setOperator(op);
     	} catch (Exception e) {
     		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getName()); //TODO: Add line number report...tree.getLine() doesn't work!

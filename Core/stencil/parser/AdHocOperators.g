@@ -42,17 +42,13 @@ options {
 
 	import stencil.adapters.Adapter;
 	import stencil.display.DisplayLayer;
-    import stencil.rules.ModuleCache;
-    import stencil.rules.EncapsulationGenerator;
-    import stencil.legend.StencilLegend;
-    import stencil.legend.DynamicStencilLegend;
-    import stencil.parser.tree.Legend;
-    import stencil.parser.tree.Python;
-    import stencil.parser.tree.Layer;
-    import stencil.parser.tree.StencilTree;
-    import stencil.legend.module.*;
-    import stencil.legend.module.util.*;
-	import stencil.legend.wrappers.*;
+  import stencil.rules.ModuleCache;
+  import stencil.rules.EncapsulationGenerator;
+  import stencil.operator.*;
+  import stencil.operator.module.*;
+  import stencil.operator.module.util.*;    
+  import stencil.operator.wrappers.*;
+  import stencil.parser.tree.*;
 }
 
 @members {
@@ -69,9 +65,9 @@ options {
 		this.adapter = adapter;		
 	}
 
-	protected void makeOperator(Legend op) {
+	protected void makeOperator(Operator op) {
 		MutableModule adHoc = modules.getAdHoc();
-		DynamicStencilLegend operator = new SyntheticLegend(adHoc.getModuleData().getName(), op);
+		DynamicStencilOperator operator = new SyntheticOperator(adHoc.getModuleData().getName(), op);
 		
 		adHoc.addOperator(operator);
 	}	
@@ -85,14 +81,14 @@ options {
 		DisplayLayer dl =adapter.makeLayer(l); 
 		l.setDisplayLayer(dl);
 		
-		DisplayLegend legend = new DisplayLegend(dl);
-		adHoc.addOperator(legend, legend.getLegendData(adHoc.getName()));
+		DisplayOperator operator = new DisplayOperator(dl);
+		adHoc.addOperator(operator, operator.getOperatorData(adHoc.getName()));
 	}
 
 	
 }
 
 topdown
-	: ^(op=LEGEND .*) {makeOperator((Legend) $op);}
+	: ^(op=OPERATOR .*) {makeOperator((Operator) $op);}
 	| ^(py=PYTHON .*) {makePython((Python) $py);}
 	| ^(lay=LAYER .*) {makeLayer((Layer) $lay);};

@@ -48,11 +48,12 @@ options {
 	import java.util.Set;
 	import java.util.HashSet;
 	import stencil.util.MultiPartName;
-	import stencil.legend.StencilLegend;
+  import stencil.operator.module.*;
+	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	import stencil.rules.ModuleCache;
-	import stencil.legend.module.*;
-	import static stencil.legend.module.LegendData.OpType;
+	
+	import static stencil.operator.module.OperatorData.OpType;
 	import static stencil.util.Tuples.stripQuotes;	 
 	 //TODO: Extend so we can handle more than the first field in a mapping definition
 
@@ -130,7 +131,7 @@ options {
     	while (!(call instanceof Pack) && !hasCategorize) {
     		Function f = (Function) call;
     		MultiPartName name = new MultiPartName(f.getName());
-    		Module m = modules.findModuleForLegend(name.prefixedName()).module;
+    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
        		try {
         		OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();
         		hasCategorize = (opType == OpType.CATEGORIZE);
@@ -170,7 +171,7 @@ options {
     	
     	String specSource = String.format("[1 .. n, \%1\$s]", intialArgs);
     	Specializer specializer;
-    	StencilLegend op;
+    	StencilOperator op;
     
     	try {
 	    	specializer =ParseStencil.parseSpecializer(specSource); 

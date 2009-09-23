@@ -1,0 +1,57 @@
+STREAM: File
+NAME: Stocks
+HEADER: Date,Open,High,Low,Close,Volume
+SEPARATOR: ,
+SOURCE: /home/rduhon/Downloads/Stencil_28Aug09/Examples/Stocks/google_stocks.csv
+CHECKHEADER: true
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: 30
+
+external stream Stocks(Date, Open)
+external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
+
+
+layer Ticker[POLY_LINE]					/*Poly-line is a set of line segments treated as a group.*/
+from Stocks
+	ID: "Google"
+	X.new: TimeStep(Date) -> (VALUE) /*Indicates that a new segment of a poly-line is to be crated.*/
+	Y.new: Price(Open) -> (Price)		/*All news in a block indicate the same extension until a new input is started.*/
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @color(BLUE)
+
+
+layer Lookup[SHAPE]
+from Stocks
+	ID : TimeStep(Date)
+   X : TimeStep(Date)
+   Y : Price(Open)
+   VISIBLE : "False"
+   FILL_COLOR : @color(BLUE, 0)
+
+
+layer Selected[TEXT]
+from Mouse
+  ID : "Selected"
+  (X, Y) : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> (X, Y)
+  TEXT : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> Mult(-1, Y)
+  view(ZOOM) : Zoom(view.WIDTH, view.HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
+  view(X,Y): (canvas.X, canvas.Y)
+
+layer Highlight[LINE]
+from Mouse
+  ID : "Highlight"
+  (X.1, X.2) : Nearest(X, 3) -> (_, _)
+  Y.1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
+  Y.2 : Add(canvas.Y, 3)
+  STROKE_WEIGHT : 3
+  STROKE_COLOR : @color(BLUE, 100)
+
+
+  
+
+operator Price (Open) -> (Price)
+	all => (Price) : Mult(-1, Open) -> Add(300, _)
+
+operator TimeStep (T) -> (VALUE)
+	all => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE

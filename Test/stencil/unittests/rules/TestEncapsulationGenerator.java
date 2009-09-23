@@ -1,5 +1,7 @@
 package stencil.unittests.rules;
 
+import stencil.operator.DynamicStencilOperator;
+import stencil.operator.wrappers.JythonOperator;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
 import stencil.rules.EncapsulationGenerator;
@@ -7,8 +9,6 @@ import stencil.rules.JythonEncapsulation;
 import stencil.rules.ModuleCache;
 import stencil.testUtilities.StringUtils;
 import stencil.adapters.piccoloDynamic.Adapter;
-import stencil.legend.wrappers.JythonLegend;
-import stencil.legend.DynamicStencilLegend;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import junit.framework.*;
@@ -71,9 +71,9 @@ public class TestEncapsulationGenerator extends TestCase {
 			
 			ModuleCache modules = new ModuleCache();
 			
-			Set<DynamicStencilLegend> legends = new HashSet<DynamicStencilLegend>();
+			Set<DynamicStencilOperator> legends = new HashSet<DynamicStencilOperator>();
 			for (Python p: program.getPython()) {
-				DynamicStencilLegend l = g.generate(p, modules.getAdHoc());
+				DynamicStencilOperator l = g.generate(p, modules.getAdHoc());
 				legends.add(l);
 			}				
 			assertEquals("Incorrect number of encapsulations generated.", program.getPython().size(),legends.size());
@@ -84,7 +84,7 @@ public class TestEncapsulationGenerator extends TestCase {
 			}
 			
 			for (Python p: program.getPython()) {
-				JythonLegend legend = findLegend(p.getName(), legends);
+				JythonOperator legend = findLegend(p.getName(), legends);
 				
 				for (Facet b: p.getFacets()) {
 					if (b.getName().equals(INIT_BLOCK_TAG)) {continue;}//Init blocks are not transfered, just executed.
@@ -131,9 +131,9 @@ public class TestEncapsulationGenerator extends TestCase {
 		assertEquals("Invalid value after Map facet was declared (but not executed).", 500, env2.get("sv").__tojava__(Object.class));
 	}
 	
-	private JythonLegend findLegend(String name, Set<DynamicStencilLegend> legends) {
-		for (DynamicStencilLegend l: legends) {
-			if (l.getName().equals(name)) {return (JythonLegend) l;}
+	private JythonOperator findLegend(String name, Set<DynamicStencilOperator> legends) {
+		for (DynamicStencilOperator l: legends) {
+			if (l.getName().equals(name)) {return (JythonOperator) l;}
 		}
 		return null;
 	}

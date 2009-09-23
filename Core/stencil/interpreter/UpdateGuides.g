@@ -37,7 +37,7 @@ options {
 	filter = true;
 }
 
-@header{
+ @header{
 	package stencil.interpreter;
 	
 	import java.util.Arrays;
@@ -47,7 +47,7 @@ options {
 	import stencil.util.MultiPartName;
 	import stencil.display.*;
 	import stencil.rules.ModuleCache;
-	import stencil.legend.module.*;
+	import stencil.operator.module.*;
 }
 
 @members{
@@ -99,8 +99,8 @@ options {
 		MultiPartName name = new MultiPartName(f.getName());
 		Specializer spec = f.getSpecializer();
 		try {
-   			Module m = cache.findModuleForLegend(name.prefixedName()).module;
-   			LegendData ld = m.getOperatorData(name.getName(), spec);
+   			Module m = cache.findModuleForOperator(name.prefixedName()).module;
+   			OperatorData ld = m.getOperatorData(name.getName(), spec);
    			FacetData fd = ld.getFacetData("Query");//TODO: This is not always query...we need to add guide facet data
    			assert fd.tupleFields() != null : "Unexpected null prototype tuple.";
    			return fd.tupleFields();

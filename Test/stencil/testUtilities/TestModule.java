@@ -1,10 +1,10 @@
 package stencil.testUtilities;
 
-import stencil.legend.StencilLegend;
-import stencil.legend.wrappers.InvokeableLegend;
-import stencil.legend.module.*;
-import stencil.legend.module.LegendData.OpType;
-import stencil.legend.module.util.*;
+import stencil.operator.StencilOperator;
+import stencil.operator.module.*;
+import stencil.operator.module.OperatorData.OpType;
+import stencil.operator.module.util.*;
+import stencil.operator.wrappers.InvokeableLegend;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.streams.Tuple;
@@ -38,7 +38,7 @@ public class TestModule implements Module {
 	
 	public ModuleData getModuleData() {return MODULE_DATA;}
 
-	public StencilLegend instance(String name, Specializer specializer)
+	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
 		
 		try {
@@ -52,7 +52,7 @@ public class TestModule implements Module {
 
 	public String getName() {return MODULE_DATA.getName();}
 
-	public LegendData getOperatorData(String name, Specializer specializer)
+	public OperatorData getOperatorData(String name, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
 		if (name.equals("FilterFail")) {return MODULE_DATA.getOperatorData("FilterFail");}
 		throw new IllegalArgumentException("No legend of name " + name);

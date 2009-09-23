@@ -24,6 +24,6 @@ layer Prime
 from BFS
 	() : Ordering(ID) -> ()
 
-legend Ordering (ID) -> (VALUE)
+operator Ordering (ID) -> (VALUE)
 	(all) => VALUE : Index(ID) -> VALUE
 

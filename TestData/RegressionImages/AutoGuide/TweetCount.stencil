@@ -19,5 +19,5 @@ from Tweets
 	view(X,Y): (canvas.X, canvas.Y)
 	
 
-legend firstLetter(Phrase) -> (Letter)
+operator firstLetter(Phrase) -> (Letter)
 	(all) => Letter: Trim(Phrase) -> Substring(VALUE, 0,1)-> VALUE

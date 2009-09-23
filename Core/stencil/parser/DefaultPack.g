@@ -45,8 +45,8 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.util.MultiPartName;
-	import stencil.legend.module.*;
-	import stencil.legend.module.util.*;
+	import stencil.operator.module.*;
+	import stencil.operator.module.util.*;
 	import stencil.rules.ModuleCache;
 	import stencil.parser.tree.*;
 	

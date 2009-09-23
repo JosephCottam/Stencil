@@ -76,9 +76,9 @@ public class Program extends StencilTree {
 	}
 
 	/**List of all legends defined by this stencil.*/
-	public List<Legend> getLegends() {
+	public List<Operator> getLegends() {
 		assert verifyType(getChild(4), StencilParser.LIST);
-		return (List<Legend>) getChild(4);
+		return (List<Operator>) getChild(4);
 	}
 	
 	public List<Python> getPython() {

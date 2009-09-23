@@ -27,11 +27,11 @@ from MTTSource
 	SHAPE: "RECTANGLE"
 	REGISTRATION: "TOP_LEFT"
 
-legend BasicFails(fails) -> (C)
+operator BasicFails(fails) -> (C)
 	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C) -> (VALUE)
 	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
 
-legend Pallet(Name) -> (C)
+operator Pallet(Name) -> (C)
 	(Name =~"FAIL")    => C: @color(200,30,30)
 	(Name =~"PASS")    => C: @color(0,180,0)
 	(Name =~"MISSING") => C: @color(WHITE)

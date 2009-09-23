@@ -8,8 +8,8 @@ import java.util.Properties;
 import org.antlr.runtime.tree.*;
 
 import stencil.adapters.piccoloDynamic.Adapter;
+import stencil.operator.module.util.*;
 import stencil.parser.string.*;
-import stencil.legend.module.util.*;
 
 public class TreeView {
 	public static String HEADER_FLAG = "-header";

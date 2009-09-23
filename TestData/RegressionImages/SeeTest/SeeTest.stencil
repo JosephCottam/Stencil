@@ -105,26 +105,26 @@ from MTTSource
 	X.2 << EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
 	STROKE_COLOR: Pallet("GRID") -> (C)
 
-legend EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
+operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
 	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE) -> VALUE
 
-legend EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
+operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
 	all => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[1 .. n](VALUE) -> VALUE
 
 
-legend NamesIndex(ID) -> (VALUE)
+operator NamesIndex(ID) -> (VALUE)
 	all => VALUE: Index(ID) -> (VALUE)
 
-legend BasicFails(fails) -> (C)
+operator BasicFails(fails) -> (C)
 	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C) -> (VALUE)
 	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
 
-legend RelativeFails(fails, passes) -> (C)
+operator RelativeFails(fails, passes) -> (C)
 	(passes= 0) => C: @color(BLACK)
 	(fails = 0) => C: Pallet("PASS") -> (C)
 	(fails > 0) => C: Pallet("FAIL") -> (C)
 
-legend Pallet(Name) -> (C)
+operator Pallet(Name) -> (C)
 	(Name =~"FAIL")    => C: @color(200,30,30)
 	(Name =~"PASS")    => C: @color(0,180,0)
 	(Name =~"MISSING") => C: @color(WHITE)

@@ -1,0 +1,21 @@
+<ModuleData grammarRev="2" name="Average" >
+	<Class name="stencil.operator.module.provided.Average"/>
+
+	<Defaults>
+		<Opts>
+			<Opt specializer="[1 .. n]" />
+		</Opts>
+		<Facets>
+			<Facet name="Map" type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/>
+		</Facets>
+	</Defaults>
+
+
+	<Operator name="Mean"/>
+	<Operator name="Median"/>
+	<Operator name="Mode"/>	
+	
+	<Operator name="Average" target="Mean" />
+	<Operator name="Avg" target="Mean" />
+</ModuleData>
