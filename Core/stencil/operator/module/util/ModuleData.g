@@ -58,15 +58,16 @@ tokens {
 }
 
 @header{
-	package stencil.legend.module.util;
+	package stencil.operator.module.util;
 	
 	import java.io.*;
 	import stencil.parser.string.ParseStencil;	
-	import stencil.legend.module.ModuleData;
+	import stencil.operator.module.ModuleData;
 	import static stencil.util.Tuples.stripQuotes;	
 }
+
 @lexer::header{
-  package stencil.legend.module.util;
+  package stencil.operator.module.util;
 }
 
 @members {

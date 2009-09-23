@@ -27,6 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 grammar Stencil;
+
 options {
 	language = Java;
 	output=AST;
@@ -34,14 +35,15 @@ options {
 
 tokens {
 	ANNOTATION;
-	BOOLEAN_OP;		//Boolean operator
-	BASIC;			//Marker for specialization (BASIC vs. ORDER)
+	BOOLEAN_OP;		 //Boolean operator
+	BASIC;         //Marker for specialization (BASIC vs. ORDER)
 	CONSUMES;
 	CALL_GROUP;
 	CALL_CHAIN;
 	FUNCTION;
 	GUIDE;
-	OPERATOR_RULE;	//Combination of filter, return and function calls in a operator
+	OPERATOR_RULE;	   //Combination of filter, return and function calls in a operator
+	OPERATOR_TEMPLATE;
 	LIST;
 	NUMBER;
 	POST;
@@ -56,28 +58,28 @@ tokens {
 	TUPLE_REF;
 	MAP_ENTRY;
 
-
 	//General Keywords
-	ALL			= 'all';	//Default pattern
-	BASE		= 'base';	//Refer to the base entity
-	CANVAS		= 'canvas';
-	COLOR		= 'color';	//Refer to a color
-	DEFAULT 	= 'default';//Use the default value (or revert to it...)
-	EXTERNAL	= 'external';
-	FILTER		= 'filter';
-	FROM 		= 'from';
-	GLYPH		= 'glyph';
-	IMPORT		= 'import';
-	LOCAL		= 'local';	//Target to indicate temporary storage
-	LAYER		= 'layer';
-	OPERATOR		= 'operator';
-	ORDER		= 'order';
-	PYTHON  	= 'python';
-	RETURN		= 'return';
-	STREAM		= 'stream';
-	VIEW 		= 'view';
-	AS			= 'as'; //used in imports
-	FACET		= 'facet';
+	ALL	= 'all';	//Default pattern
+	BASE	= 'base';	//Refer to the base entity
+	CANVAS	= 'canvas';
+	COLOR	= 'color';	//Refer to a color
+	DEFAULT = 'default';//Use the default value (or revert to it...)
+	EXTERNAL= 'external';
+	FILTER	= 'filter';
+	FROM 	= 'from';
+	GLYPH	= 'glyph';
+	IMPORT	= 'import';
+	LOCAL	= 'local';	//Target to indicate temporary storage
+	LAYER	= 'layer';
+	OPERATOR= 'operator';
+	TEMPLATE= 'template';
+	ORDER	= 'order';
+	PYTHON  = 'python';
+	RETURN	= 'return';
+	STREAM	= 'stream';
+	VIEW 	= 'view';
+	AS	= 'as'; //used in imports
+	FACET	= 'facet';
 
 	//Markers
 	GROUP		= '(';
@@ -206,11 +208,14 @@ rulePredicate
 
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
-
+  
 operatorDef
-	: OPERATOR name=ID tuple[false] YIELDS tuple[false] operatorRule+
-		-> 	^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+));
-				
+	: OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
+		-> 	^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
+	| OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
+	  -> ^(OPERATOR[$name.text] BASE[$base.text] specializer);
+	  
+	  
 operatorRule
 	: predicate GATE rule["return"]+
 		-> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
@@ -239,13 +244,13 @@ callGroup
 callChain: callTarget -> ^(CALL_CHAIN callTarget);
 
 callTarget
+options {backtrack = true;}
 	: value -> ^(PACK value)
-	| valueList -> ^(PACK valueList)
 	| emptySet -> ^(PACK)
-    | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
+	| valueList -> ^(PACK valueList)
+	| f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
 	| f1=functionCall passOp f2=callTarget 
 	   -> ^($f1 passOp $f2);
-
 
 functionCall
 	: name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList

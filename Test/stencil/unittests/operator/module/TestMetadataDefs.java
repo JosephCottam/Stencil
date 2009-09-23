@@ -8,7 +8,7 @@ import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
 
 public class TestMetadataDefs  extends TestCase {
-	public static final String METADATA_PATH = "./Core/stencil/legend/module/provided/";
+	public static final String METADATA_PATH = "./Core/stencil/operator/module/provided/";
 	
 	public void testParseAll() throws Exception {
 		ArrayList errors = new ArrayList();
