@@ -37,7 +37,7 @@ options {
 	filter = true;
 }
 
- @header{
+@header{
 	package stencil.interpreter;
 	
 	import java.util.Arrays;
@@ -46,7 +46,6 @@ options {
 	import stencil.parser.tree.*;	
 	import stencil.util.MultiPartName;
 	import stencil.display.*;
-	import stencil.rules.ModuleCache;
 	import stencil.operator.module.*;
 }
 

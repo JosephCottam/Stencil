@@ -42,8 +42,7 @@ options {
 
 	import stencil.adapters.Adapter;
 	import stencil.display.DisplayLayer;
-  import stencil.rules.ModuleCache;
-  import stencil.rules.EncapsulationGenerator;
+  import stencil.operator.wrappers.EncapsulationGenerator;
   import stencil.operator.*;
   import stencil.operator.module.*;
   import stencil.operator.module.util.*;    

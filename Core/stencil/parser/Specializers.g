@@ -50,8 +50,7 @@ options {
 	import stencil.util.MultiPartName;
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
-	import stencil.rules.ModuleCache;
-
+	
   import static stencil.parser.ParserConstants.SIMPLE_SPECIALIZER;
 	
 }

@@ -28,10 +28,9 @@
  */
 package stencil.operator.module;
 
-import java.util.*;
+ import java.util.*;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.*;
 import stencil.operator.module.util.*;
 import stencil.parser.tree.Specializer;
 

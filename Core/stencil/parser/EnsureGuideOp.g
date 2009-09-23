@@ -33,6 +33,7 @@ options {
 	output = AST;
 	filter = true;
 }
+
 @header{
 	/** Performs the built of automatic guide mark generation.
 	 *
@@ -51,7 +52,6 @@ options {
   import stencil.operator.module.*;
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
-	import stencil.rules.ModuleCache;
 	
 	import static stencil.operator.module.OperatorData.OpType;
 	import static stencil.util.Tuples.stripQuotes;	 

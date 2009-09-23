@@ -46,9 +46,8 @@ options {
 	import stencil.parser.tree.*;
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
-	import stencil.rules.ModuleCache;
 	import org.antlr.runtime.tree.*;
-	import stencil.rules.ModuleCache;
+	
 }
 
 @members{

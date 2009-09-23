@@ -34,6 +34,7 @@ options {
 	output = AST;
 	filter = true;
 }
+
 @header{
 	/** Performs the built of automatic guide mark generation.
 	 *
@@ -53,8 +54,6 @@ options {
   import org.antlr.runtime.tree.*;
 
 	import stencil.parser.tree.*;
-	import stencil.rules.ModuleCache;
-	import stencil.rules.ModuleCache;
 	import stencil.util.MultiPartName;
   import stencil.operator.module.*;
   import stencil.operator.module.util.*;
@@ -64,6 +63,7 @@ options {
 
 	
 }
+
 @members{
 	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();
 	protected ModuleCache modules;

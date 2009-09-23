@@ -421,14 +421,14 @@ STRING
 
 fragment
 ESCAPE_SEQUENCE
-		: '\\b' {setText($text.substring(0, $text.length()-2) + "\bp");} //'p' is for pad, which seems striped of at return...don't know why
-		| '\\t' {setText($text.substring(0, $text.length()-2) + "\tp");} //TODO: Figure out how to do this without the pad character (or the reason why its required)
-		| '\\n' {setText($text.substring(0, $text.length()-2) + "\np");}
-		| '\\f' {setText($text.substring(0, $text.length()-2) + "\fp");}
-		| '\\r' {setText($text.substring(0, $text.length()-2) + "\rp");}
-		| '\\\"'{setText($text.substring(0, $text.length()-2) + "\"p");}
-		| '\\\''{setText($text.substring(0, $text.length()-2) + "\'p");}
-		| '\\\\'{setText($text.substring(0, $text.length()-2) + "\\p");};
+		: '\\b' {setText($text.substring(0, $text.length()-2) + "\b");} 
+		| '\\t' {setText($text.substring(0, $text.length()-2) + "\t");}
+		| '\\n' {setText($text.substring(0, $text.length()-2) + "\n");}
+		| '\\f' {setText($text.substring(0, $text.length()-2) + "\f");}
+		| '\\r' {setText($text.substring(0, $text.length()-2) + "\r");}
+		| '\\\"'{setText($text.substring(0, $text.length()-2) + "\"");}
+		| '\\\''{setText($text.substring(0, $text.length()-2) + "\'");}
+		| '\\\\'{setText($text.substring(0, $text.length()-2) + "\\");};
 
 
 WS	:	(' '|'\r'|'\t'|'\u000C'|'\n')+ {skip();};

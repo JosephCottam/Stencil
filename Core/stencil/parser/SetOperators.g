@@ -47,14 +47,14 @@ options {
 
 	package stencil.parser.string;
 	
-    import stencil.rules.ModuleCache;
     import stencil.operator.*;
-    import stencil.operator.module.util.Modules;
+    import stencil.operator.module.*;
+    import stencil.operator.module.util.*;
+    import stencil.operator.util.*;
     import stencil.parser.tree.Function;
     import stencil.parser.tree.Specializer;
     import stencil.parser.tree.StencilTree;
-    import stencil.util.MultiPartName;
-    import stencil.util.Invokeable;
+    import stencil.util.*;
 
 }
 

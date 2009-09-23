@@ -37,6 +37,7 @@ options {
 	output = AST;
 	filter = true;
 }
+
 @header{
 	/**  Convert default PACKs to fully fledged PACKs.
 	 *
@@ -47,7 +48,6 @@ options {
 	import stencil.util.MultiPartName;
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
-	import stencil.rules.ModuleCache;
 	import stencil.parser.tree.*;
 	
 }
