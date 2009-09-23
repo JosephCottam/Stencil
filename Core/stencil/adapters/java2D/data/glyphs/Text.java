@@ -68,7 +68,7 @@ public final class Text extends Point {
 			format = TextFormats.set(name, value, format);
 		}
 		else {super.set(name,value);}
-		computeMetrics();
+		computeMetrics(null);
 	}
 
 	public void render(Graphics2D g, AffineTransform base) {
@@ -76,33 +76,50 @@ public final class Text extends Point {
 		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
-		g.drawString(text, (float) horizontalOffset(), (float)getHeight());
+
+		final DoubleDimension[] dims = computeMetrics(g);
+		final String[] lines =SPLITTER.split(text);
+		for (int i=0; i< lines.length; i++) {
+			final DoubleDimension dim = dims[i];
+			String line = lines[i];
+			g.drawString(line, (float) horizontalOffset(dim.width), (float) dim.height *i);
+		}
 		
 		super.postRender(g,base);
 	}	
 	
-	private double horizontalOffset() {
+	private double horizontalOffset(double lineWidth) {
 		if (format.justification == Component.LEFT_ALIGNMENT) {return 0;}
-		DoubleDimension dm = computeMetrics();
-		if (format.justification == Component.RIGHT_ALIGNMENT) {return width - dm.width;}
-		if (format.justification == Component.CENTER_ALIGNMENT) {return width/2.0 - dm.width/2.0;}
+
+		if (format.justification == Component.RIGHT_ALIGNMENT) {
+			return width - lineWidth;
+		}
+		if (format.justification == Component.CENTER_ALIGNMENT) {return width/2.0 - lineWidth/2.0;}
 		throw new RuntimeException("Unknown justification value: " + format.justification);
 	}
 
 	//TODO: Change to 'compute layout' and determine line breaks...if needed
-	private DoubleDimension computeMetrics() {
+	private DoubleDimension[] computeMetrics(Graphics2D g) {
         
 		FontMetrics fm = REFERENCE_GRAPHICS.getFontMetrics(format.font);
         String[] lines = SPLITTER.split(text);
+        DoubleDimension[] dims = new DoubleDimension[lines.length];
+        double height = fm.getHeight();
         double maxWidth=0;
-        for (String line: lines) {
-        	double width = fm.stringWidth(line);
+        for (int i=0; i<lines.length; i++) {
+        	String line = lines[i];
+        	double width;
+        	if (g==null) {width= fm.stringWidth(line);}
+        	else {width = fm.getStringBounds(line, g).getWidth();}
+        	
+        	dims[i] = new DoubleDimension(width, height);
+        	
         	maxWidth = Math.max(maxWidth, width);
         }
         if (autoHeight) {this.height = fm.getHeight() * lines.length;}
         if (autoWidth) {this.width = maxWidth;}
 
-        return new DoubleDimension(maxWidth, (double) fm.getHeight());
+        return dims;
 	}
 
 	
