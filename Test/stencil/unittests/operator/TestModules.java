@@ -5,9 +5,8 @@ import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.util.*;
 import stencil.parser.tree.Specializer;
-import stencil.rules.ModuleCache;
 import stencil.streams.Tuple;
-import stencil.unittests.rules.TestModuleCache;
+import stencil.unittests.operator.module.TestModuleCache;
 import stencil.util.MultiPartName;
 
 import java.lang.reflect.*;

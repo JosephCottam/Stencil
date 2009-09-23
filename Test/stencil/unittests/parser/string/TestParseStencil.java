@@ -7,7 +7,7 @@ import java.util.Map;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;
-import stencil.unittests.rules.TestModuleCache;
+import stencil.unittests.operator.module.TestModuleCache;
 
 
 public class TestParseStencil extends TestCase {

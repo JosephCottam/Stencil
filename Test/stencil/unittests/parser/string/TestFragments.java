@@ -10,6 +10,7 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.piccoloDynamic.Adapter;
 import stencil.operator.module.Module;
+import stencil.operator.module.ModuleCache;
 import stencil.parser.string.AdHocOperators;
 import stencil.parser.string.Imports;
 import stencil.parser.string.ParseStencil;
@@ -17,7 +18,6 @@ import stencil.parser.string.StencilLexer;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.*;
 import stencil.parser.validators.PythonValidator;
-import stencil.rules.ModuleCache;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
 
