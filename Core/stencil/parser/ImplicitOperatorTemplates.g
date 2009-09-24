@@ -27,33 +27,90 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Make sure sensible specializers are present on every
- * mapping operator. 
- */
 tree grammar ImplicitOperatorTemplates;
 
 options {
   tokenVocab = Stencil;
-  ASTLabelType = StencilTree; 
+  ASTLabelType = StencilTree;
+  superClass = TreeRewriteSequence; 
   output = AST;
   filter = true;
 }
 
 @header{
-  /**Takes operators with an implicit base
+  /**Takes operators with an implicit template and creates the explicit template
    *
    * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality    
    **/
   package stencil.parser.string;
   
-  import stencil.parser.tree.StencilTree;  
+  import stencil.parser.tree.*;  
 }
 
 @members{
-  private String derivedName(StencilTree name) {return "$" + name.getText();} 
+  private String derivedName(StencilTree name) {return "$" + name.getText();}
+  
+  public Program transform(Program t) {
+    t = createTemplates(t);
+    List operators = (List) adaptor.create(LIST, "Operators");
+    List templates = (List) adaptor.create(LIST,  "Templates");
+    
+    getOperators(t, operators);
+    getTemplates(t, templates);
+    
+    setOperators(t, operators);
+    setTemplates(t, templates);
+    
+    return t;
+  }
+  
+  //Rename functions to use the guide channel
+  private Program createTemplates(Object t) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return topdown(); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return createTemplates(); }};
+      return (Program) downup(t, down, up);   
+  }
+  
+  //Rename functions to use the guide channel
+  private void getOperators(Object t, final List operators) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return getOperators(operators); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+      downup(t, down, up);   
+  }
+
+  private void getTemplates(Object t, final List templates) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return getTemplates(templates); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+      downup(t, down, up);   
+  }
+  
+  
+  private void setOperators(Program program, List operators) {
+    int i =0;
+    for (Object t: program.getChildren()) {
+      if (((StencilTree) t).getText().equals("Operators")) {break;}
+      i++;
+    }
+        
+    if (i == program.getChildCount()) {
+      adaptor.addChild(program, operators);
+    } else {
+      adaptor.replaceChildren(program, i, i, operators);
+    }
+  }
+  
+  private void setTemplates(Program program, List templates) {
+    adaptor.addChild(program, templates);
+  }
 }
 
-topDown:
-  ^(OPERATOR name=ID TUPLE YIELDS TUPLE LIST) 
-    -> ^(OPERATOR $name BASE ID[derivedName(name)] ^(SPECIALIZER DEFAULT))
-       ^(OPERATOR_TEMPLATE[derivedName(name)] ^(SPECIALIZER DEFAULT) TUPLE YIELDS TUPLE LIST);
+getOperators[List l]:
+  ^(o=OPERATOR .*) {adaptor.addChild(l, o);};
+   
+getTemplates[List l]:
+  ^(t=OPERATOR_TEMPLATE .*) {adaptor.addChild(l, t);};
+
+createTemplates:
+  ^(o=OPERATOR yeilds=. ops=.) 
+    -> ^(LIST ^(OPERATOR BASE[derivedName($o)] ^(SPECIALIZER DEFAULT))
+              ^(OPERATOR_TEMPLATE[derivedName($o)] ^(SPECIALIZER DEFAULT) $yeilds $ops));

@@ -105,15 +105,15 @@ options {
     }
     
     //Transfer appropriate mapping tree to the guide clause
-    public Object transfer(Object t) {
+    private Object transfer(Object t) {
     	layerName = null;
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
+		  fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
    	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
    	    return downup(t, down, up);
     }
     
     //Rename functions to use the guide channel
-    public Object rename(Object t) {
+    private Object rename(Object t) {
 			layerName = null;
 			inGuide = false;
 			fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
