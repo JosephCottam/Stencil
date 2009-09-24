@@ -29,144 +29,148 @@
 grammar Stencil;
 
 options {
-	language = Java;
-	output=AST;
+  language = Java;
+  output=AST;
 }
 
 tokens {
-	ANNOTATION;
-	BOOLEAN_OP;		 //Boolean operator
-	BASIC;         //Marker for specialization (BASIC vs. ORDER)
-	CONSUMES;
-	CALL_GROUP;
-	CALL_CHAIN;
-	FUNCTION;
-	GUIDE;
-	OPERATOR_RULE;	   //Combination of filter, return and function calls in a operator
-	OPERATOR_TEMPLATE;
-	LIST;
-	NUMBER;
-	POST;
-	PRE;
-	PREDICATE;
-	PROGRAM;
-	PACK;
-	RULE;
-	SIGIL;
-	SPECIALIZER;
-	TUPLE_PROTOTYPE;
-	TUPLE_REF;
-	MAP_ENTRY;
+  ANNOTATION;
+  BOOLEAN_OP;    //Boolean operator
+  BASIC;         //Marker for specialization (BASIC vs. ORDER)
+  CONSUMES;
+  CALL_GROUP;
+  CALL_CHAIN;
+  FUNCTION;
+  GUIDE;
+  LIST;
+  NUMBER;
+  OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
+  OPERATOR_PROXY;    //Operator, specfied by base reference to an instance of an imported operator 
+  OPERATOR_REFERENCE;//Operator, specified by base reference to a template or imported operator (instantiates to either a proxy or an instance)
+  OPERATOR_TEMPLATE; //Template used to create an operator instance
+  OPERATOR_RULE;     //Combination of filter, return and function calls in a operator
+  OPERATOR_BASE;
+  POST;
+  PRE;
+  PREDICATE;
+  PROGRAM;
+  PACK;
+  RULE;
+  SIGIL;
+  SPECIALIZER;
+  TUPLE_PROTOTYPE;
+  TUPLE_REF;
+  MAP_ENTRY;
 
-	//General Keywords
-	ALL	= 'all';	//Default pattern
-	BASE	= 'base';	//Refer to the base entity
-	CANVAS	= 'canvas';
-	COLOR	= 'color';	//Refer to a color
-	DEFAULT = 'default';//Use the default value (or revert to it...)
-	EXTERNAL= 'external';
-	FILTER	= 'filter';
-	FROM 	= 'from';
-	GLYPH	= 'glyph';
-	IMPORT	= 'import';
-	LOCAL	= 'local';	//Target to indicate temporary storage
-	LAYER	= 'layer';
-	OPERATOR= 'operator';
-	TEMPLATE= 'template';
-	ORDER	= 'order';
-	PYTHON  = 'python';
-	RETURN	= 'return';
-	STREAM	= 'stream';
-	VIEW 	= 'view';
-	AS	= 'as'; //used in imports
-	FACET	= 'facet';
+  //General Keywords
+  ALL = 'all';  //Default pattern
+  BASE  = 'base'; //Refer to the base entity
+  CANVAS  = 'canvas';
+  COLOR = 'color';  //Refer to a color
+  DEFAULT = 'default';//Use the default value (or revert to it...)
+  EXTERNAL= 'external';
+  FILTER  = 'filter';
+  FROM  = 'from';
+  GLYPH = 'glyph';
+  IMPORT  = 'import';
+  LOCAL = 'local';  //Target to indicate temporary storage
+  LAYER = 'layer';
+  OPERATOR= 'operator';
+  TEMPLATE= 'template';
+  ORDER = 'order';
+  PYTHON  = 'python';
+  RETURN  = 'return';
+  STREAM  = 'stream';
+  VIEW  = 'view';
+  AS  = 'as'; //used in imports
+  FACET = 'facet';
 
-	//Markers
-	GROUP		= '(';
-	CLOSE_GROUP	= ')';
-	ARG			= '[';
-	CLOSE_ARG	= ']';
-	SEPARATOR	= ',';
-	RANGE		= '..';
+  //Markers
+  GROUP   = '(';
+  CLOSE_GROUP = ')';
+  ARG     = '[';
+  CLOSE_ARG = ']';
+  SEPARATOR = ',';
+  RANGE   = '..';
 
 
-	//Name manipulation
-	NAMESPACE  = '::';
-	NAMESPLIT  = '.';
-	
+  //Name manipulation
+  NAMESPACE  = '::';
+  NAMESPLIT  = '.';
+  
 
-	//Bindings
-	DEFINE		= ':';
-	DYNAMIC	= '<<';//Rules that should be periodically re-evaluated
+  //Bindings
+  DEFINE    = ':';
+  DYNAMIC = '<<';//Rules that should be periodically re-evaluated
 
-	//Operators
-	YIELDS	= '->';
-	FEED	= '>>';
-	GUIDE_FEED	= '#>>';
-	GUIDE_YIELD	= '#->';
+  //Operators
+  YIELDS  = '->';
+  FEED  = '>>';
+  GUIDE_FEED  = '#>>';
+  GUIDE_YIELD = '#->';
 
-	GATE	= '=>';
-	SPLIT	= '|';
-	JOIN	= '-->';
-	TAG = '@';
+  GATE  = '=>';
+  SPLIT = '|';
+  JOIN  = '-->';
+  TAG = '@';
 }
 
 @header{
-	package stencil.parser.string;
+  package stencil.parser.string;
 
-	//TODO: Remove/delete glyph operation
-	//TODO: Replacement of identifiers with numbers in tuples
+  //TODO: Remove/delete glyph operation
+  //TODO: Replacement of identifiers with numbers in tuples
 
-	import static stencil.parser.ParserConstants.*;
-	import java.util.ArrayList;
-	import java.util.List;
-		
+  import static stencil.parser.ParserConstants.*;
+  import java.util.ArrayList;
+  import java.util.List;
+    
 }
 
- @lexer::header{
-	package stencil.parser.string;
-	import static stencil.util.Tuples.stripQuotes;
+@lexer::header{
+  package stencil.parser.string;
+  import static stencil.util.Tuples.stripQuotes;
 }
 
 @members {
-	List<String> errors = new ArrayList<String>();
+  List<String> errors = new ArrayList<String>();
 
-	/**Buried IDs are strings that cannot be input as identifiers according to the
-	 * Stencil grammar, but are used internally as IDs.
-	 */
-	public static String buryID(String input) {return "#" + input;}
-	
-	public void emitErrorMessage(String msg) {errors.add(msg);}
-	public List getErrors() {return errors;}
+  /**Buried IDs are strings that cannot be input as identifiers according to the
+   * Stencil grammar, but are used internally as IDs.
+   */
+  public static String buryID(String input) {return "#" + input;}
+  
+  public void emitErrorMessage(String msg) {errors.add(msg);}
+  public List getErrors() {return errors;}
 
 
-	public static enum RuleOpts {
-		All, 	//Anything is allowed 
-		Simple,	//Only argument lists (no split or range)
-		Empty}; //Must be empty
+  public static enum RuleOpts {
+    All,  //Anything is allowed 
+    Simple, //Only argument lists (no split or range)
+    Empty}; //Must be empty
 }
 
-program	: imports* externals order (streamDef | layerDef | operatorDef | pythonDef)*
-		-> ^(PROGRAM  ^(LIST["Imports"] imports*) order externals ^(LIST["Layers"] layerDef*) ^(LIST["Operators"] operatorDef*) ^(LIST["Pythons"] pythonDef*));
+program : imports* externals order (streamDef | layerDef | operatorDef | pythonDef)*
+    -> ^(PROGRAM  ^(LIST["Imports"] imports*) order externals ^(LIST["Layers"] layerDef*) ^(LIST["Operators"] operatorDef*) ^(LIST["Pythons"] pythonDef*));
 
 
 
 //////////////////////////////////////////// PREAMBLE ///////////////////////////
 imports
-	: IMPORT name=ID (ARG args=argList CLOSE_ARG)? (AS as=ID)? 
-			-> {as==null && args==null}? ^(IMPORT[$name.text] ID[""] LIST["Arguments"])
-			-> {as==null && args!=null}? ^(IMPORT[$name.text] ID[""] $args)
-			-> {as!=null && args==null}? ^(IMPORT[$name.text] $as LIST["Arguments"])
-			-> ^(IMPORT[$name.text] $as $args);	
+  : IMPORT name=ID (ARG args=argList CLOSE_ARG)? (AS as=ID)? 
+      -> {as==null && args==null}? ^(IMPORT[$name.text] ID[""] LIST["Arguments"])
+      -> {as==null && args!=null}? ^(IMPORT[$name.text] ID[""] $args)
+      -> {as!=null && args==null}? ^(IMPORT[$name.text] $as LIST["Arguments"])
+      -> ^(IMPORT[$name.text] $as $args); 
 
 order
-	: ORDER orderRef ('>' orderRef)*
-		-> ^(ORDER orderRef+)
-	| -> ^(ORDER);
+  : ORDER orderRef ('>' orderRef)*
+    -> ^(ORDER orderRef+)
+  | -> ^(ORDER);
 
 orderRef
-	: ID -> ^(LIST["Streams"] ID)
-	| GROUP ID (SPLIT ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
+  : ID -> ^(LIST["Streams"] ID)
+  | GROUP ID (SPLIT ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
 
 externals: externalStream* -> ^(LIST["Externals"] externalStream*);
 externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] tuple);
@@ -176,197 +180,196 @@ externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] t
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 
 streamDef
-	: STREAM name=ID tuple[true]  (consumesBlock["return"])+
-		-> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+))*;
+  : STREAM name=ID tuple[true]  (consumesBlock["return"])+
+    -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+))*;
 
 layerDef
-	: LAYER name=ID implantationDef guidesBlock consumesBlock["glyph"]+
-		-> ^(LAYER[$name.text] implantationDef guidesBlock ^(LIST["Consumes"] consumesBlock+));
-	
+  : LAYER name=ID implantationDef guidesBlock consumesBlock["glyph"]+
+    -> ^(LAYER[$name.text] implantationDef guidesBlock ^(LIST["Consumes"] consumesBlock+));
+  
 implantationDef
-	: ARG type=ID CLOSE_ARG -> GLYPH[$type.text]
-	| -> GLYPH[DEFAULT_GLYPH_TYPE];
-	
+  : ARG type=ID CLOSE_ARG -> GLYPH[$type.text]
+  | -> GLYPH[DEFAULT_GLYPH_TYPE];
+  
 guidesBlock
-	: (ID specializer[RuleOpts.Simple] DEFINE ID)* 
-		-> ^(LIST["Guides"] ^(GUIDE ID specializer ID)*);
-	
+  : (ID specializer[RuleOpts.Simple] DEFINE ID)* 
+    -> ^(LIST["Guides"] ^(GUIDE ID specializer ID)*);
+  
 consumesBlock[String def]
-	: FROM stream=ID filterRule* rule[def]+ 
-		-> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filterRule*) ^(LIST["Rules"] rule+));
+  : FROM stream=ID filterRule* rule[def]+ 
+    -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filterRule*) ^(LIST["Rules"] rule+));
 
 filterRule
-	: FILTER rulePredicate DEFINE callGroup
-		-> ^(FILTER rulePredicate callGroup);
+  : FILTER rulePredicate DEFINE callGroup
+    -> ^(FILTER rulePredicate callGroup);
 
 rulePredicate
-	: GROUP ALL CLOSE_GROUP
-		-> ^(LIST["Predicates"] ^(PREDICATE ALL))
-	| GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
-		-> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
+  : GROUP ALL CLOSE_GROUP
+    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
+  | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
+    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
 
 
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
   
 operatorDef
-	: OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
-		-> 	^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
-	| OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
-	  -> ^(OPERATOR[$name.text] BASE[$base.text] specializer);
-	  
-	  
+  : OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
+    ->  ^(OPERATOR_INSTANCE[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+));
+  | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
+    -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
+    
 operatorRule
-	: predicate GATE rule["return"]+
-		-> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
+  : predicate GATE rule["return"]+
+    -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
 
 predicate
-	: GROUP? ALL CLOSE_GROUP?
-		-> ^(LIST["Predicates"] ^(PREDICATE ALL))
+  : GROUP? ALL CLOSE_GROUP?
+    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
   | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
     -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
 //TODO : Permit call groups in predicates again...or come up with a better mechanism, like the one used in filter targets....
-//	| GROUP callGroup booleanOp callGroup (SEPARATOR callGroup booleanOp callGroup)* CLOSE_GROUP
-//		-> ^(LIST["Predicates"] ^(PREDICATE callGroup booleanOp callGroup)+);
+//  | GROUP callGroup booleanOp callGroup (SEPARATOR callGroup booleanOp callGroup)* CLOSE_GROUP
+//    -> ^(LIST["Predicates"] ^(PREDICATE callGroup booleanOp callGroup)+);
 
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[String def]
-	: target[def] (DEFINE | DYNAMIC) callGroup
-		-> ^(RULE target callGroup DEFINE? DYNAMIC?);
+  : target[def] (DEFINE | DYNAMIC) callGroup
+    -> ^(RULE target callGroup DEFINE? DYNAMIC?);
 
 callGroup
-	: (callChain SPLIT)=> callChain (SPLIT callChain)+ JOIN callChain
-		-> ^(CALL_GROUP callChain+)
-	| callChain
-		-> ^(CALL_GROUP callChain);
+  : (callChain SPLIT)=> callChain (SPLIT callChain)+ JOIN callChain
+    -> ^(CALL_GROUP callChain+)
+  | callChain
+    -> ^(CALL_GROUP callChain);
 
 callChain: callTarget -> ^(CALL_CHAIN callTarget);
 
 callTarget
-options {backtrack = true;}
-	: value -> ^(PACK value)
-	| emptySet -> ^(PACK)
-	| valueList -> ^(PACK valueList)
-	| f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
-	| f1=functionCall passOp f2=callTarget 
-	   -> ^($f1 passOp $f2);
+options {backtrack=true;}
+  : value -> ^(PACK value)
+  | emptySet -> ^(PACK)
+  | valueList -> ^(PACK valueList)
+  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
+  | f1=functionCall passOp f2=callTarget 
+     -> ^($f1 passOp $f2);
 
 functionCall
-	: name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList
-		-> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList));
+  : name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList
+    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList));
 
 //Apply defaultCall to functions that have no explicit call
 callName[String defaultCall]
-	: pre=ID NAMESPACE post=ID 
-		-> {post.getText().indexOf(".") > 0}? ID[$pre.text + NAMESPACE + $post.text]
-		-> 									  ID[$pre.text + NAMESPACE + $post.text + "." + defaultCall]
-	| name=ID
-		-> {name.getText().indexOf(".") > 0}? ID[$name.text] 
-		-> 									  ID[$name.text + "." + defaultCall];
+  : pre=ID NAMESPACE post=ID 
+    -> {post.getText().indexOf(".") > 0}? ID[$pre.text + NAMESPACE + $post.text]
+    ->                    ID[$pre.text + NAMESPACE + $post.text + "." + defaultCall]
+  | name=ID
+    -> {name.getText().indexOf(".") > 0}? ID[$name.text] 
+    ->                    ID[$name.text + "." + defaultCall];
 
 target[String def]
-	: GLYPH^ tuple[false]
-	| RETURN^ tuple[false]
-	| CANVAS^ tuple[false]
-	| LOCAL^ tuple[false]
-	| VIEW^ tuple[false]
-	| tuple[true]
-		-> {def.equals("glyph")}? ^(GLYPH tuple)
-		-> {def.equals("return")}? ^(RETURN tuple)
-		-> ^(DEFAULT tuple);
+  : GLYPH^ tuple[false]
+  | RETURN^ tuple[false]
+  | CANVAS^ tuple[false]
+  | LOCAL^ tuple[false]
+  | VIEW^ tuple[false]
+  | tuple[true]
+    -> {def.equals("glyph")}? ^(GLYPH tuple)
+    -> {def.equals("return")}? ^(RETURN tuple)
+    -> ^(DEFAULT tuple);
 
 //////////////////////////////////////////// PYTHON ///////////////////////////
 
 pythonDef
-	: (PYTHON ARG) => PYTHON ARG env=ID CLOSE_ARG name=ID pythonBlock+
-		-> ^(PYTHON[$name.text] ID pythonBlock+)
-	| PYTHON name=ID pythonBlock+
-		-> ^(PYTHON[$name.text] ID[buryID($name.text)] pythonBlock+);
-	
+  : (PYTHON ARG) => PYTHON ARG env=ID CLOSE_ARG name=ID pythonBlock+
+    -> ^(PYTHON[$name.text] ID pythonBlock+)
+  | PYTHON name=ID pythonBlock+
+    -> ^(PYTHON[$name.text] ID[buryID($name.text)] pythonBlock+);
+  
 pythonBlock
-	: FACET 'Init' CODE_BLOCK
-		-> ^(FACET["Init"] ^(YIELDS TUPLE_PROTOTYPE TUPLE_PROTOTYPE) ^(LIST["Annotations"] ^(ANNOTATION["Type"] STRING["NA"])) CODE_BLOCK)
-	| annotations FACET name=ID tuple[true] YIELDS tuple[false] CODE_BLOCK
-		-> ^(FACET[name] ^(YIELDS tuple tuple) annotations CODE_BLOCK);
-	
+  : FACET 'Init' CODE_BLOCK
+    -> ^(FACET["Init"] ^(YIELDS TUPLE_PROTOTYPE TUPLE_PROTOTYPE) ^(LIST["Annotations"] ^(ANNOTATION["Type"] STRING["NA"])) CODE_BLOCK)
+  | annotations FACET name=ID tuple[true] YIELDS tuple[false] CODE_BLOCK
+    -> ^(FACET[name] ^(YIELDS tuple tuple) annotations CODE_BLOCK);
+  
 annotations
-	: a=annotation -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING[$a.text.toUpperCase().substring(1)]))
-	| -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING["CATEGORIZE"]));
+  : a=annotation -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING[$a.text.toUpperCase().substring(1)]))
+  | -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING["CATEGORIZE"]));
 
 annotation: t=TAGGED_ID -> ANNOTATION["JUNK"]; //Remove the tag and convert to upper case
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 
 specializer[RuleOpts opts]
-	: ARG range sepArgList CLOSE_ARG
-		{opts == RuleOpts.All}? -> ^(SPECIALIZER range ^(SPLIT BASIC PRE ID[(String) null]) sepArgList)
-	| ARG split[false] sepArgList CLOSE_ARG
-		{opts == RuleOpts.All}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) split sepArgList)
-	| ARG range SPLIT split[false] sepArgList CLOSE_ARG
-		{opts == RuleOpts.All}? ->  ^(SPECIALIZER range split sepArgList)
-	| ARG split[true] SPLIT range sepArgList CLOSE_ARG
-		{opts == RuleOpts.All}? -> ^(SPECIALIZER range split sepArgList)
-	| ARG argList CLOSE_ARG
-		{opts != RuleOpts.Empty}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) ^(SPLIT BASIC PRE ID[(String) null]) argList)
-	| -> ^(SPECIALIZER DEFAULT);
+  : ARG range sepArgList CLOSE_ARG
+    {opts == RuleOpts.All}? -> ^(SPECIALIZER range ^(SPLIT BASIC PRE ID[(String) null]) sepArgList)
+  | ARG split[false] sepArgList CLOSE_ARG
+    {opts == RuleOpts.All}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) split sepArgList)
+  | ARG range SPLIT split[false] sepArgList CLOSE_ARG
+    {opts == RuleOpts.All}? ->  ^(SPECIALIZER range split sepArgList)
+  | ARG split[true] SPLIT range sepArgList CLOSE_ARG
+    {opts == RuleOpts.All}? -> ^(SPECIALIZER range split sepArgList)
+  | ARG argList CLOSE_ARG
+    {opts != RuleOpts.Empty}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) ^(SPLIT BASIC PRE ID[(String) null]) argList)
+  | -> ^(SPECIALIZER DEFAULT);
 
 sepArgList
-	: SEPARATOR! argList
-	| -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"]);
-	 
+  : SEPARATOR! argList
+  | -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"]);
+   
 argList
-	: -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"])
-	| values -> values ^(LIST["Map Arguments"])
-	| mapList -> ^(LIST["Value Arguments"]) mapList
-	| values SEPARATOR! mapList;
+  : -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"])
+  | values -> values ^(LIST["Map Arguments"])
+  | mapList -> ^(LIST["Value Arguments"]) mapList
+  | values SEPARATOR! mapList;
 
 values
-	: atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
+  : atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
 
 mapList
-	: mapEntry (SEPARATOR mapEntry)* -> ^(LIST["Map Arguments"] mapEntry*);
-	
+  : mapEntry (SEPARATOR mapEntry)* -> ^(LIST["Map Arguments"] mapEntry*);
+  
 mapEntry 
-	: k=ID '=' v=atom -> ^(MAP_ENTRY[$k.text] $v);
+  : k=ID '=' v=atom -> ^(MAP_ENTRY[$k.text] $v);
 
 tuple[boolean allowEmpty]
-	: emptySet {allowEmpty}?
-		-> ^(TUPLE_PROTOTYPE)
-	| ID
-		-> ^(TUPLE_PROTOTYPE ID)
-	| GROUP ID (SEPARATOR ID)* CLOSE_GROUP
-		-> ^(TUPLE_PROTOTYPE ID+);
+  : emptySet {allowEmpty}?
+    -> ^(TUPLE_PROTOTYPE)
+  | ID
+    -> ^(TUPLE_PROTOTYPE ID)
+  | GROUP ID (SEPARATOR ID)* CLOSE_GROUP
+    -> ^(TUPLE_PROTOTYPE ID+);
 
 
-emptySet:	GROUP! CLOSE_GROUP!;
+emptySet: GROUP! CLOSE_GROUP!;
 
-valueList:	GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;  //TODO: combine with 'values' above...
+valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;  //TODO: combine with 'values' above...
 
 range
-	: number RANGE number
-		-> ^(RANGE number number)
-	| number RANGE 'n'
-		-> ^(RANGE number NUMBER[RANGE_END])
-	| 'n' RANGE 'n'
-		-> ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]);
+  : number RANGE number
+    -> ^(RANGE number number)
+  | number RANGE 'n'
+    -> ^(RANGE number NUMBER[RANGE_END])
+  | 'n' RANGE 'n'
+    -> ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]);
 
 
 split[boolean pre]
-	: ID  -> {pre}? ^(SPLIT BASIC PRE ID)
-		  ->       ^(SPLIT BASIC POST ID)
+  : ID  -> {pre}? ^(SPLIT BASIC PRE ID)
+      ->       ^(SPLIT BASIC POST ID)
     | ORDER ID
-    	-> {pre}? ^(SPLIT ORDER PRE ID)
-		->       ^(SPLIT ORDER  POST ID);
+      -> {pre}? ^(SPLIT ORDER PRE ID)
+    ->       ^(SPLIT ORDER  POST ID);
 
-value	: tupleRef |  atom;
-atom 	: sigil | number | STRING | DEFAULT	| ALL; 	//TODO: Does this need to be here, now that there is separate filterRule branch?
+value : tupleRef |  atom;
+atom  : sigil | number | STRING | DEFAULT | ALL;  //TODO: Does this need to be here, now that there is separate filterRule branch?
 
 tupleRef
-	: ID -> ^(TUPLE_REF ID)
-	| '_' -> ^(TUPLE_REF NUMBER["0"])
-//	| qualifiedID ->  ^(TUPLE_REF qualifiedID)		//TODO: Implement sequences ([1][1][2]) and named (LOCAL[1])
-	| ARG number CLOSE_ARG -> ^(TUPLE_REF number);
+  : ID -> ^(TUPLE_REF ID)
+  | '_' -> ^(TUPLE_REF NUMBER["0"])
+//  | qualifiedID ->  ^(TUPLE_REF qualifiedID)    //TODO: Implement sequences ([1][1][2]) and named (LOCAL[1])
+  | ARG number CLOSE_ARG -> ^(TUPLE_REF number);
 
 qualifiedID : ID^ ARG! number CLOSE_ARG!;
 
@@ -376,44 +379,44 @@ private sValue : tupleRef | number | STRING;
 
 
 booleanOp
-	: t= '>'  -> BOOLEAN_OP[t]
-	| t= '>=' -> BOOLEAN_OP[t]
-	| t= '<'  -> BOOLEAN_OP[t]
-	| t= '<=' -> BOOLEAN_OP[t]
-	| t= '='  -> BOOLEAN_OP[t]
-	| t= '!=' -> BOOLEAN_OP[t]
-	| t= '=~' -> BOOLEAN_OP[t]
-	| t= '!~' -> BOOLEAN_OP[t];
+  : t= '>'  -> BOOLEAN_OP[t]
+  | t= '>=' -> BOOLEAN_OP[t]
+  | t= '<'  -> BOOLEAN_OP[t]
+  | t= '<=' -> BOOLEAN_OP[t]
+  | t= '='  -> BOOLEAN_OP[t]
+  | t= '!=' -> BOOLEAN_OP[t]
+  | t= '=~' -> BOOLEAN_OP[t]
+  | t= '!~' -> BOOLEAN_OP[t];
 
 
-passOp	
+passOp  
   : YIELDS
-	| GUIDE_YIELD; 
-		//TODO: Add feed
+  | GUIDE_YIELD; 
+    //TODO: Add feed
 
 
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.
-number	:  doubleNum | intNum;
+number  :  doubleNum | intNum;
 
 intNum
-	: (n='-' | p='+') d=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text])
-	| d=DIGITS -> ^(NUMBER[$d.text]);
+  : (n='-' | p='+') d=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text])
+  | d=DIGITS -> ^(NUMBER[$d.text]);
 
 doubleNum
-	: '.' d2=DIGITS -> ^(NUMBER["0." + $d2.text])
-	| d=DIGITS '.' d2=DIGITS -> ^(NUMBER[$d.text + "." + $d2.text])
-	| (n='-' | p='+') d=DIGITS '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text]);
+  : '.' d2=DIGITS -> ^(NUMBER["0." + $d2.text])
+  | d=DIGITS '.' d2=DIGITS -> ^(NUMBER[$d.text + "." + $d2.text])
+  | (n='-' | p='+') d=DIGITS '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text]);
 
 
 TAGGED_ID: TAG ID;
 
-ID 		: ('a'..'z' | 'A'..'Z' | '_') ('.'? ('a'..'z' | 'A'..'Z' | '_' | '0'..'9'))*;
+ID    : ('a'..'z' | 'A'..'Z' | '_') ('.'? ('a'..'z' | 'A'..'Z' | '_' | '0'..'9'))*;
 
-DIGITS 	: '0'..'9'+;
+DIGITS  : '0'..'9'+;
 
 
 CODE_BLOCK
-		: NESTED_BLOCK {setText($text.substring(1, $text.length()-1));}; //Strip braces
+    : NESTED_BLOCK {setText($text.substring(1, $text.length()-1));}; //Strip braces
 
 fragment 
 NESTED_BLOCK
@@ -421,20 +424,20 @@ NESTED_BLOCK
 
 
 STRING
-    	:  '"' ( ESCAPE_SEQUENCE | ~('\\'|'"') )* '"'
-    		{setText(stripQuotes($text));}; //Strip the quotes
+      :  '"' ( ESCAPE_SEQUENCE | ~('\\'|'"') )* '"'
+        {setText(stripQuotes($text));}; //Strip the quotes
 
 fragment
 ESCAPE_SEQUENCE
-		: '\\b' {setText($text.substring(0, $text.length()-2) + "\b");} 
-		| '\\t' {setText($text.substring(0, $text.length()-2) + "\t");}
-		| '\\n' {setText($text.substring(0, $text.length()-2) + "\n");}
-		| '\\f' {setText($text.substring(0, $text.length()-2) + "\f");}
-		| '\\r' {setText($text.substring(0, $text.length()-2) + "\r");}
-		| '\\\"'{setText($text.substring(0, $text.length()-2) + "\"");}
-		| '\\\''{setText($text.substring(0, $text.length()-2) + "\'");}
-		| '\\\\'{setText($text.substring(0, $text.length()-2) + "\\");};
+    : '\\b' {setText($text.substring(0, $text.length()-2) + "\b");} 
+    | '\\t' {setText($text.substring(0, $text.length()-2) + "\t");}
+    | '\\n' {setText($text.substring(0, $text.length()-2) + "\n");}
+    | '\\f' {setText($text.substring(0, $text.length()-2) + "\f");}
+    | '\\r' {setText($text.substring(0, $text.length()-2) + "\r");}
+    | '\\\"'{setText($text.substring(0, $text.length()-2) + "\"");}
+    | '\\\''{setText($text.substring(0, $text.length()-2) + "\'");}
+    | '\\\\'{setText($text.substring(0, $text.length()-2) + "\\");};
 
 
-WS	:	(' '|'\r'|'\t'|'\u000C'|'\n')+ {skip();};
-COMMENT :  	'/*' (options {greedy=false;} :.)* '*/' {skip(); };
+WS  : (' '|'\r'|'\t'|'\u000C'|'\n')+ {skip();};
+COMMENT :   '/*' (options {greedy=false;} :.)* '*/' {skip(); };
