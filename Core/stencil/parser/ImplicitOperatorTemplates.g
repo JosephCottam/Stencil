@@ -112,5 +112,5 @@ getTemplates[List l]:
 
 createTemplates:
   ^(o=OPERATOR yeilds=. ops=.) 
-    -> ^(LIST ^(OPERATOR BASE[derivedName($o)] ^(SPECIALIZER DEFAULT))
+    -> ^(LIST ^(OPERATOR_REFERENCE BASE[derivedName($o)] ^(SPECIALIZER DEFAULT))
               ^(OPERATOR_TEMPLATE[derivedName($o)] ^(SPECIALIZER DEFAULT) $yeilds $ops));

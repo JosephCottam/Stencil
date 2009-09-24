@@ -27,22 +27,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Ensures that stencil native and python operators are defined in the 
- * ad-hoc module.  Does NOT modify the AST, just populates the ad-hoc module.
+/* Instantiate operator references and put them in the adhoc module.
+ * Operator references are created with the operator keyword.
  */
 tree grammar AdHocOperators;
+
 options {
-	tokenVocab = Stencil;
-	ASTLabelType = StencilTree;	
-	filter = true;
+  tokenVocab = Stencil;
+  ASTLabelType = StencilTree; 
+  filter = true;
 }
 
 @header {
-	package stencil.parser.string;
+  package stencil.parser.string;
 
-	import stencil.adapters.Adapter;
-	import stencil.display.DisplayLayer;
-  import stencil.operator.wrappers.EncapsulationGenerator;
   import stencil.operator.*;
   import stencil.operator.module.*;
   import stencil.operator.module.util.*;    
@@ -51,34 +49,53 @@ options {
 }
 
 @members {
-	protected MutableModule adHoc;
-	protected Adapter adapter;
-	EncapsulationGenerator encGenerator = new EncapsulationGenerator();
-	
-	public AdHocOperators(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
-		super(input, new RecognizerSharedState());
-		assert modules != null : "Module cache must not be null.";
-		assert adapter != null : "Adapter must not be null.";
-		
-		this.adHoc = modules.getAdHoc();
-		this.adapter = adapter;		
-	}
-	
-	protected void makePython(Python p) {
-		encGenerator.generate(p, modules.getAdHoc());
-	}
-	
-	protected void makeLayer(Layer l) {
-		DisplayLayer dl =adapter.makeLayer(l); 
-		l.setDisplayLayer(dl);
-		
-		DisplayOperator operator = new DisplayOperator(dl);
-		adHoc.addOperator(operator, operator.getOperatorData(adHoc.getName()));
-	}
+  public static final UnknownTemplateException extends RuntimeException  {
+    private static final String names(List<OperatorTemplate> templates) {
+       StringBuilder b = new StringBuilder();
+       
+       for (OperatorTemplate t: templates) {
+         b.append(t.getName());
+         b.append(", ");
+       }
+       b.delete(2);
+       return b.toString();
+    }
+  
+    public UnknownTemplateException(String name, List<OperatorTemplate> templates) {
+       super("No template named " + name + " found.  Valid names are " + names(templates));
+    }
+  }
 
-	
+  protected MutableModule adHoc;
+  protected Program p;
+  
+  public AdHocOperators(TreeNodeStream input, Program p, ModuleCache modules) {
+    super(input, new RecognizerSharedState());
+    assert modules != null : "Module cache must not be null.";
+    assert p != null;
+    
+    this.adHoc = modules.getAdHoc();
+    this.p = p;
+  }
+  
+  protected void makeOperator(OperatorReference ref) { 
+    OperatorTemplate t = findTemplate(ref.getName());
+    
+    StencilLegened instance = t.instantiate(ref.getSpecializer());
+    MutableModule adHoc = modules.getAdHoc();
+    adHoc.addOperator(instance);
+  
+  }
+
+  private OperatorTemplate findTemplate(String name) {
+    for (OperatorTemplate t:p.getOperatorTemplates()) {
+      if (name.equals(t.getName())) {return t;}
+    }
+    throw new UnknownTemplateException(name, p.getOperatorTemplates());   
+  }
+
+  
 }
 
 topdown
-	: ^(py=PYTHON .*)   {makePython((Python) $py);}
-	| ^(lay=LAYER .*)   {makeLayer((Layer) $lay);};
+  : ^(op=OPERATOR_REFERENCE .*) {makeOperator((OperatorReference) $op);};
