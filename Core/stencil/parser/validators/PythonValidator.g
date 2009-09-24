@@ -44,8 +44,7 @@ options {
 
   package stencil.parser.validators;
   
-  import stencil.parser.tree.Facet;
-  import stencil.parser.tree.Python;
+  import stencil.parser.tree.*;
   import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
     
   import org.python.core.*;
@@ -53,16 +52,16 @@ options {
 
 @members {
   private static final class PythonValidationException extends ValidationException {
-  	public PythonValidationException(Facet facet, String message) {
+  	public PythonValidationException(PythonFacet facet, String message) {
   		super("Error parsing \%1\$s.\%2\$s. \%3\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName(), message);
   	}
   	
-    public PythonValidationException(Facet facet, Exception e) {
+    public PythonValidationException(PythonFacet facet, Exception e) {
       super(e, "Error parsing \%1\$s.\%2\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName());
     }
   }  
 
-  private void stripIndent(Facet facet) {
+  private void stripIndent(PythonFacet facet) {
     String body = facet.getBody();
     
     String[] lines = body.split("\\n");
@@ -83,7 +82,7 @@ options {
     facet.setBody(newBody.toString().trim());
   }
 
-  private void validate(Facet facet) {
+  private void validate(PythonFacet facet) {
     stripIndent(facet);
     
     if (facet.getName().equals(INIT_BLOCK_TAG)) {
@@ -99,4 +98,4 @@ options {
   }
 }
 
-topdown: r=FACET {validate((Facet) r);};
+topdown: r=PYTHON_FACET {validate((PythonFacet) r);};

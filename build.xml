@@ -107,6 +107,14 @@
  			target="${grammars}/DefaultPack.g"
  			outputdirectory="${grammars}/string/"
  		/>
+ 		<antlr
+ 			target="${grammars}/BaseSpecializers.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/DereferenceOperators.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 

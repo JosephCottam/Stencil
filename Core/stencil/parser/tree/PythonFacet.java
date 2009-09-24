@@ -13,8 +13,8 @@ import stencil.util.ANTLRTree.NameNotFoundException;
 /**In a Python group, there may be more than one block of executable
  * code.  Each of these is a Facet...captured here!
  */
-public final class Facet extends StencilTree {
-	Facet(Token token) {super(token);}
+public final class PythonFacet extends StencilTree {
+	PythonFacet(Token token) {super(token);}
 
 	public String getName() {return token.getText();}
 	

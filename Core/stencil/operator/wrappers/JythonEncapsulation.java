@@ -32,7 +32,7 @@ import org.python.util.PythonInterpreter;
 import org.python.core.*;
 
 import stencil.parser.tree.Python;
-import stencil.parser.tree.Facet;
+import stencil.parser.tree.PythonFacet;
 import stencil.streams.Tuple;
 import stencil.util.BasicTuple;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
@@ -56,11 +56,11 @@ public final class JythonEncapsulation {
 	public static final String INVOKE_METHOD = "invoke";
 	public static final Object ABORT_VALUE = "STENCIL:CANCEL";
 
-	protected final Facet facet;
+	protected final PythonFacet facet;
 	protected final PythonInterpreter environment;
 	protected final PyCode codeCache;
 
-	public JythonEncapsulation(Python python, Facet facet, EncapsulationGenerator envSource) {
+	public JythonEncapsulation(Python python, PythonFacet facet, EncapsulationGenerator envSource) {
 		assert !facet.getName().equals(INIT_BLOCK_TAG) : "Should never create an encapusluation for init block.";
 
 		this.facet = facet;

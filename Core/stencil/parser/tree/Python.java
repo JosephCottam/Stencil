@@ -35,5 +35,5 @@ public class Python extends StencilTree {
 
 	public String getName() {return token.getText();}
 	public String getEnvironment() {return getChild(0).getText();}
-	public java.util.List<Facet> getFacets() {return new List.WrapperList<Facet>(this, 1);}
+	public java.util.List<PythonFacet> getFacets() {return new List.WrapperList<PythonFacet>(this, 1);}
 }

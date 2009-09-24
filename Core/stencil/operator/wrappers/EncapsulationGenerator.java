@@ -34,7 +34,7 @@ import org.python.util.PythonInterpreter;
 
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.module.util.MutableModule;
-import stencil.parser.tree.Facet;
+import stencil.parser.tree.PythonFacet;
 import stencil.parser.tree.Python;
 
 import java.util.Map;
@@ -58,7 +58,7 @@ public class EncapsulationGenerator {
 		
 		registerEnv(pythonSpec.getEnvironment());
 		JythonOperator legend = new JythonOperator(module.getModuleData().getName(), pythonSpec.getName());
-		for (Facet b: pythonSpec.getFacets()) {
+		for (PythonFacet b: pythonSpec.getFacets()) {
 			if (b.getName().equals(INIT_BLOCK_TAG)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
 			
 			try {legend.add(new JythonEncapsulation(pythonSpec,b,this), b);}
@@ -71,7 +71,7 @@ public class EncapsulationGenerator {
 	}
 	
 	/**Invoke the init block of a spec in the named environment.*/ 
-	private void invokeInitBlock(Facet init, String env) {
+	private void invokeInitBlock(PythonFacet init, String env) {
 		String body=init.getBody();
 		PythonInterpreter environment = registerEnv(env);
 		if (body !=null && !body.trim().equals("")) {

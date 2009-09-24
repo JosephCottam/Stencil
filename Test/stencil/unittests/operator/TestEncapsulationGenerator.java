@@ -24,7 +24,7 @@ import java.util.Set;
 import org.python.util.PythonInterpreter;
 
 import stencil.parser.tree.Python;
-import stencil.parser.tree.Facet;
+import stencil.parser.tree.PythonFacet;
 
 
 public class TestEncapsulationGenerator extends TestCase {
@@ -87,7 +87,7 @@ public class TestEncapsulationGenerator extends TestCase {
 			for (Python p: program.getPythons()) {
 				JythonOperator legend = findLegend(p.getName(), legends);
 				
-				for (Facet b: p.getFacets()) {
+				for (PythonFacet b: p.getFacets()) {
 					if (b.getName().equals(INIT_BLOCK_TAG)) {continue;}//Init blocks are not transfered, just executed.
 					assertNotNull("Could not find declared python block", legend.getFacet(b.getName()));
 				}

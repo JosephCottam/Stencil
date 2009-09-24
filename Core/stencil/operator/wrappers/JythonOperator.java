@@ -16,7 +16,7 @@ import stencil.operator.module.*;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.Invokeable;
-import stencil.parser.tree.Facet;
+import stencil.parser.tree.PythonFacet;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Value;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
@@ -53,7 +53,7 @@ public class JythonOperator implements DynamicStencilOperator {
 		return operatorData;		
 	}
 	
-	public void add(JythonEncapsulation enc, Facet f) {
+	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new Invokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
 		
 		FacetData data = new BasicFacetData(f.getName(), f.getAnnotation("Type"),  enc.getReturnLabels());

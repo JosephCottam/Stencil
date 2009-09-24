@@ -33,7 +33,7 @@ options {
   output=AST;
 }
 
-tokens {
+ tokens {
   ANNOTATION;
   BOOLEAN_OP;    //Boolean operator
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
@@ -55,6 +55,7 @@ tokens {
   PREDICATE;
   PROGRAM;
   PACK;
+  PYTHON_FACET;
   RULE;
   SIGIL;
   SPECIALIZER;
@@ -128,8 +129,8 @@ tokens {
 }
 
 @lexer::header{
-  package stencil.parser.string;
-  import static stencil.util.Tuples.stripQuotes;
+	package stencil.parser.string;
+	import static stencil.util.Tuples.stripQuotes;
 }
 
 @members {
@@ -219,6 +220,7 @@ rulePredicate
 
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
+
 operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text]);
   
 operatorDef
@@ -226,7 +228,19 @@ operatorDef
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
   | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
-    
+
+//TODO: For operator facets
+//  : OPERATOR name=ID operatorFacet+
+//    -> (OPERATOR[$name.text] operatorFacet+)
+//  | OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
+//    ->  ^(OPERATOR[$name.text] ^(OPERATOR_FACET[DEFAULT_FACET] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+)))
+//  | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
+//    -> ^(OPERATOR[$name.text] BASE[$base.text] specializer);
+// 
+//operatorFacet
+//  : FACET name=ID tuple[false] YIELDS tuple[false] operatorRule+
+//    -> ^(OPERATOR_FACET[$name.text] ^(YIELDS tuple tuple) operatorRule+); 
+  	  
 operatorRule
   : predicate GATE rule["return"]+
     -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
@@ -299,11 +313,11 @@ pythonDef
     -> ^(PYTHON[$name.text] ID[buryID($name.text)] pythonBlock+);
   
 pythonBlock
-  : FACET 'Init' CODE_BLOCK
-    -> ^(FACET["Init"] ^(YIELDS TUPLE_PROTOTYPE TUPLE_PROTOTYPE) ^(LIST["Annotations"] ^(ANNOTATION["Type"] STRING["NA"])) CODE_BLOCK)
-  | annotations FACET name=ID tuple[true] YIELDS tuple[false] CODE_BLOCK
-    -> ^(FACET[name] ^(YIELDS tuple tuple) annotations CODE_BLOCK);
-  
+	: FACET 'Init' CODE_BLOCK
+		-> ^(PYTHON_FACET["Init"] ^(YIELDS TUPLE_PROTOTYPE TUPLE_PROTOTYPE) ^(LIST["Annotations"] ^(ANNOTATION["Type"] STRING["NA"])) CODE_BLOCK)
+	| annotations FACET name=ID tuple[true] YIELDS tuple[false] CODE_BLOCK
+		-> ^(PYTHON_FACET[name] ^(YIELDS tuple tuple) annotations CODE_BLOCK);
+
 annotations
   : a=annotation -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING[$a.text.toUpperCase().substring(1)]))
   | -> ^(LIST["Annotations"] ^(ANNOTATION["TYPE"] STRING["CATEGORIZE"]));
