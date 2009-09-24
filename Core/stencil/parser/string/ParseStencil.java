@@ -163,59 +163,66 @@ public abstract class ParseStencil {
 		treeTokens = new CommonTreeNodeStream(p);
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
+		p.setModuleCache(modules);//TODO: Remove when all tuple references are positional
 
 		//Verify that Python operators are syntactically correct and appropriately indented
 		treeTokens = new CommonTreeNodeStream(p);
 		PythonValidator pyValidator = new PythonValidator(treeTokens);
 		pyValidator.downup(p);
-		
-		//Create the implicit operator templates
+
+		//Add default specializers where required
 		treeTokens = new CommonTreeNodeStream(p);
-		ImplicitOperatorTemplates opTemplates = new ImplicitOperatorTemplates(treeTokens);
+		BaseSpecializers baseSpecializers = new BaseSpecializers(treeTokens, modules);
+		baseSpecializers.setTreeAdaptor(treeAdaptor);
+		baseSpecializers.downup(p);
+
+		
+		//Remove all operator references
+		treeTokens = new CommonTreeNodeStream(p);
+		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
 		opTemplates.setTreeAdaptor(treeAdaptor);
-		p = opTemplates.transform(p);
+		p = (Program) opTemplates.downup(p);
 		
 		
-//		//Create ad-hoc operators
-//		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-//		adHoc.downup(p);
-//		
-//		//Add default specializers where required
-//		treeTokens = new CommonTreeNodeStream(p);
-//		Specializers specializers = new Specializers(treeTokens, modules);
-//		specializers.setTreeAdaptor(treeAdaptor);
-//		specializers.downup(p);
-//		
-//		//Add default packs where required
-//		treeTokens = new CommonTreeNodeStream(p);
-//		DefaultPack defaultPack = new DefaultPack(treeTokens, modules);
-//		defaultPack.setTreeAdaptor(treeAdaptor);
-//		defaultPack.downup(p);
-//		
-//		
-//		//Insert guide specializers
-//		treeTokens = new CommonTreeNodeStream(p);
-//		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
-//		guideSpecailizers.setTreeAdaptor(treeAdaptor);
-//		guideSpecailizers.downup(p);
-//		
-//		//Ensure that auto-guide requirements are met
-//		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
-//		ensure.setTreeAdaptor(treeAdaptor);		
-//		p = (Program) ensure.transform(p);
-//		
-//		//Prime tree nodes with operators from the modules cache
-//		SetOperators set = new SetOperators(treeTokens, modules);
-//		set.downup(p);
-//		
-//		treeTokens = new CommonTreeNodeStream(p);
-//		AutoGuide ag = new AutoGuide(treeTokens, modules);
-//		ag.setTreeAdaptor(treeAdaptor);
-//		p = (Program) ag.transform(p);
-//		
-//		validate(p);
+		//Create ad-hoc operators
+		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
+		adHoc.downup(p);
 		
-		p.setModuleCache(modules);//TODO: Remove when all tuple references are positional
+		//Add default specializers where required
+		treeTokens = new CommonTreeNodeStream(p);
+		Specializers specializers = new Specializers(treeTokens, modules);
+		specializers.setTreeAdaptor(treeAdaptor);
+		specializers.downup(p);
+		
+		//Add default packs where required
+		treeTokens = new CommonTreeNodeStream(p);
+		DefaultPack defaultPack = new DefaultPack(treeTokens, modules);
+		defaultPack.setTreeAdaptor(treeAdaptor);
+		defaultPack.downup(p);
+		
+		
+		//Insert guide specializers
+		treeTokens = new CommonTreeNodeStream(p);
+		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
+		guideSpecailizers.setTreeAdaptor(treeAdaptor);
+		guideSpecailizers.downup(p);
+		
+		//Ensure that auto-guide requirements are met
+		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
+		ensure.setTreeAdaptor(treeAdaptor);		
+		p = (Program) ensure.transform(p);
+		
+		//Prime tree nodes with operators from the modules cache
+		SetOperators set = new SetOperators(treeTokens, modules);
+		set.downup(p);
+		
+		treeTokens = new CommonTreeNodeStream(p);
+		AutoGuide ag = new AutoGuide(treeTokens, modules);
+		ag.setTreeAdaptor(treeAdaptor);
+		p = (Program) ag.transform(p);
+		
+		validate(p);
+		
 		return p;
 	}
 	

@@ -75,7 +75,7 @@ public class TestFragments extends TestCase {
 		adHoc.downup(p);
 		
 		Module m = modules.getAdHoc();
-		int expected = p.getLegends().size() + p.getPython().size() + p.getLayers().size();
+		int expected = p.getOperators().size() + p.getPythons().size() + p.getLayers().size();
 		assertEquals("Ad-hoc legends size incorrect.", expected, m.getModuleData().getOperators().size());
 	}
 	

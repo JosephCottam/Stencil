@@ -27,70 +27,62 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Ensures that stencil native and python operators are defined in the 
- * ad-hoc module.  Does NOT modify the AST, just populates the ad-hoc module.
+/* Make sure sensible specializers are present on every
+ * mapping operator. 
  */
-tree grammar AdHocOperators;
+tree grammar BaseSpecializers;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = StencilTree;	
+	output = AST;
 	filter = true;
 }
 
-@header {
+@header{
+	/**  Make sure that every mapping operator has a specializer.
+	 *
+	 *
+	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
+	 **/
 	package stencil.parser.string;
-
-	import stencil.adapters.Adapter;
-	import stencil.display.DisplayLayer;
-  import stencil.operator.wrappers.EncapsulationGenerator;
-  import stencil.operator.*;
-  import stencil.operator.module.*;
-  import stencil.operator.module.util.*;    
-  import stencil.operator.wrappers.*;
-  import stencil.parser.tree.*;
+	
+	import stencil.parser.tree.*;
+	import stencil.util.MultiPartName;
+	import stencil.operator.module.*;
+	import stencil.operator.module.util.*;
+	
+  import static stencil.parser.ParserConstants.SIMPLE_SPECIALIZER;
+	
 }
 
-@members {
-	protected MutableModule adHoc;
-	protected Adapter adapter;
-	EncapsulationGenerator encGenerator = new EncapsulationGenerator();
-	
-	public AdHocOperators(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
+@members{
+	protected ModuleCache modules;
+    
+	public BaseSpecializers(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
-		assert modules != null : "Module cache must not be null.";
-		assert adapter != null : "Adapter must not be null.";
-		
-		this.adHoc = modules.getAdHoc();
-		this.adapter = adapter;		
+		assert modules != null : "ModuleCache must not be null.";
+		this.modules = modules;
 	}
 
-	protected void makeOperator(Operator op) {
-		DynamicStencilOperator operator = new SyntheticOperator(adHoc.getModuleData().getName(), op);
-		
-		adHoc.addOperator(operator);
-	}
-	
-	protected void transferProxy(OperatorProxy proxy) {
-	  adHoc.addOperator(proxy.getName(), proxy.getOperator(), proxy.getOperatorData()); 
-	}	
-	
-	protected void makePython(Python p) {
-		encGenerator.generate(p, adHoc);
-	}
-	
-	protected void makeLayer(Layer l) {
-		DisplayLayer dl =adapter.makeLayer(l); 
-		l.setDisplayLayer(dl);
-		
-		DisplayOperator operator = new DisplayOperator(dl);
-		adHoc.addOperator(operator, operator.getOperatorData(adHoc.getName()));
+	public Specializer getDefault(String fullName) {
+		MultiPartName name= new MultiPartName(fullName);
+		ModuleData md;
+		try{
+    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
+    		md = m.getModuleData();
+		} catch (Exception e) {
+			throw new RuntimeException("Error getting module information for operator " + fullName, e);
+		}
+		    		
+		try {
+    		return  (Specializer) adaptor.dupTree(md.getDefaultSpecializer(name.getName()));
+    	} catch (Exception e) {
+    		throw new RuntimeException("Error finding default specializer for " + fullName, e);
+    	} 
 	}
 
-	
 }
- 
-topdown
-	: ^(r=OPERATOR .*) {makeOperator((Operator) $r);}
-	| ^(r=OPERATOR_PROXY .*) {transferProxy((OperatorProxy) $r);}
-	| ^(r=PYTHON .*) {makePython((Python) $r);}
-	| ^(r=LAYER .*) {makeLayer((Layer) $r);};
+
+topdown: ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) -> ^(OPERATOR_REFERENCE $base {getDefault($base.getText())});		
+
+//Instructions at http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching%2C+rewriting+a+reality

@@ -47,7 +47,7 @@ public class TestEncapsulationGenerator extends TestCase {
 		
 		String source = String.format(mainFormat, env, facet, yields, body);	
 		Program p = ParseStencil.parse(source, Adapter.INSTANCE);
-		return p.getPython().get(0);
+		return p.getPythons().get(0);
 	}
 	
 	public void setUp() throws Exception {
@@ -73,18 +73,18 @@ public class TestEncapsulationGenerator extends TestCase {
 			ModuleCache modules = new ModuleCache();
 			
 			Set<DynamicStencilOperator> legends = new HashSet<DynamicStencilOperator>();
-			for (Python p: program.getPython()) {
+			for (Python p: program.getPythons()) {
 				DynamicStencilOperator l = g.generate(p, modules.getAdHoc());
 				legends.add(l);
 			}				
-			assertEquals("Incorrect number of encapsulations generated.", program.getPython().size(),legends.size());
+			assertEquals("Incorrect number of encapsulations generated.", program.getPythons().size(),legends.size());
 			
-			for (Python p: program.getPython()) {
+			for (Python p: program.getPythons()) {
 				assertNotNull("Defined environment not found: " + p.getEnvironment(), g.getEnvironment(p.getEnvironment()));
 				assertNotNull("Defined python group not found: " + p.getName(), findLegend(p.getName(), legends));
 			}
 			
-			for (Python p: program.getPython()) {
+			for (Python p: program.getPythons()) {
 				JythonOperator legend = findLegend(p.getName(), legends);
 				
 				for (Facet b: p.getFacets()) {

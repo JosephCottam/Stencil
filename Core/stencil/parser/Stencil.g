@@ -150,8 +150,15 @@ tokens {
     Empty}; //Must be empty
 }
 
-program : imports* externals order (streamDef | layerDef | operatorDef | pythonDef)*
-    -> ^(PROGRAM  ^(LIST["Imports"] imports*) order externals ^(LIST["Layers"] layerDef*) ^(LIST["Operators"] operatorDef*) ^(LIST["Pythons"] pythonDef*));
+program : imports* externals order (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+    -> ^(PROGRAM  
+          ^(LIST["Imports"] imports*) 
+          order 
+          externals 
+          ^(LIST["Layers"] layerDef*) 
+          ^(LIST["Operators"] operatorDef*) 
+          ^(LIST["Pythons"] pythonDef*) 
+          ^(LIST["OperatorTemplates"] operatorTemplate*));
 
 
 
@@ -212,10 +219,11 @@ rulePredicate
 
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
+operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text]);
   
 operatorDef
   : OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
-    ->  ^(OPERATOR_INSTANCE[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+));
+    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
   | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
     
@@ -247,13 +255,16 @@ callGroup
 callChain: callTarget -> ^(CALL_CHAIN callTarget);
 
 callTarget
-options {backtrack=true;}
   : value -> ^(PACK value)
   | emptySet -> ^(PACK)
   | valueList -> ^(PACK valueList)
-  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT))
-  | f1=functionCall passOp f2=callTarget 
-     -> ^($f1 passOp $f2);
+  | functionCallTarget;
+  
+functionCallTarget
+  : (functionCall passOp)=> f1=functionCall passOp f2=callTarget 
+     -> ^($f1 passOp $f2)
+  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT));
+   
 
 functionCall
   : name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList

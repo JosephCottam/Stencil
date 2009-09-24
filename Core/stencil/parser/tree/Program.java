@@ -76,16 +76,21 @@ public class Program extends StencilTree {
 		return (List<External>) getChild(2);
 	}
 
-	/**List of all legends defined by this stencil.*/
-	public List<Operator> getLegends() {
+	/**List of all operators defined by this stencil.*/
+	public List<Operator> getOperators() {
 		assert verifyType(getChild(4), StencilParser.LIST);
 		return (List<Operator>) getChild(4);
 	}
 	
-	public List<Python> getPython() {
+	public List<Python> getPythons() {
 		assert verifyType(getChild(5), StencilParser.LIST);
 		return (List<Python>) getChild(5);
 	}
+	
+	public List<OperatorTemplate> getOperatorTemplates() {
+		assert verifyType(getChild(6), StencilParser.LIST);
+		return (List<OperatorTemplate>) getChild(6);
+	}	
 	
 	public void setModuleCache(ModuleCache mc) {this.mc = mc;}//TODO: Remove when all tuple references are positional
 	public ModuleCache getModuleCache() {return mc;}//TODO: Remove when all tuple references are positional

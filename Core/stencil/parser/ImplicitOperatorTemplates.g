@@ -105,7 +105,7 @@ options {
 }
 
 getOperators[List l]:
-  ^(o=OPERATOR .*) {adaptor.addChild(l, o);};
+  ^(o=OPERATOR_REFERENCE .*) {adaptor.addChild(l, o);};
    
 getTemplates[List l]:
   ^(t=OPERATOR_TEMPLATE .*) {adaptor.addChild(l, t);};

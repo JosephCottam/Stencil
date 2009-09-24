@@ -1,0 +1,5 @@
+Split Text out two types: TEXT and TEXT_SHAPES
+TEXT_SHAPES distorts with the scaleX/Y
+TEXT always scales X and Y by the same factor.
+
+SCALE_BY : X, Y, SMALLEST, LARGEST

@@ -14,20 +14,20 @@ public class TestOperator extends TestCase {
 
 	public void testGenerate() throws Exception {
 		Program program = ParseStencil.testParse(fullLegendSource);
-		StencilOperator legend = new SyntheticOperator(null, program.getLegends().get(0));
+		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 		
 		assertEquals("full", legend.getName());
 		assertEquals(SyntheticOperator.class, legend.getClass());
 
 		program = ParseStencil.testParse(basicLegendSource);
-		legend = new SyntheticOperator(null, program.getLegends().get(0));
+		legend = new SyntheticOperator(null, program.getOperators().get(0));
 		assertEquals("basic", legend.getName());
 		assertEquals(SyntheticOperator.class, legend.getClass());
 	}
 
 	public void testMap() throws Exception {
 		Program program = ParseStencil.testParse(fullLegendSource);
-		StencilOperator legend = new SyntheticOperator(null, program.getLegends().get(0));
+		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 		Tuple rv;
 		
 		boolean error = false;
@@ -50,7 +50,7 @@ public class TestOperator extends TestCase {
 	public void testMapNulls() throws Exception {
 		Program program = ParseStencil.testParse(basicLegendSource);
 
-		StencilOperator legend = new SyntheticOperator(null, program.getLegends().get(0));
+		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 
 
 		boolean error = false;
@@ -79,7 +79,7 @@ public class TestOperator extends TestCase {
 
 	public void testMapfail() throws Exception {
 		Program program = ParseStencil.testParse(fullLegendSource);
-		StencilOperator legend = new SyntheticOperator(null, program.getLegends().get(0));
+		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 
 		boolean failed = false;
 		try {

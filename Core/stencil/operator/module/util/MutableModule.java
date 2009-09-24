@@ -43,9 +43,14 @@ public class MutableModule implements Module {
 		}
 	}
 	
-	public void addOperator(StencilOperator target, OperatorData legendData) {
+	public void addOperator(StencilOperator target, OperatorData opData) {
 		legends.put(target.getName(), target);
-		moduleData.addOperator(legendData);
+		moduleData.addOperator(opData);
+	}
+	
+	public void addOperator(String name, StencilOperator op, OperatorData opData) {
+		legends.put(name, op);
+		moduleData.addOperator(opData);
 	}
 	
 	public String getName() {return moduleData.getName();}
