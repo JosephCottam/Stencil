@@ -5,7 +5,6 @@ import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
-import stencil.interpreter.Interpreter;
 import stencil.operator.module.ModuleCache;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
@@ -34,7 +33,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 
 		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		stream.open(OVERLAY_SHORT);
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
+		TupleLoader loader = new TupleLoader(panel, stream);
 		loader.load();
 		DisplayLayer layer = panel.getLayer("Overlay");
 
@@ -49,7 +48,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "\\s+\\|\\s+");
 		stream.open("./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt");
 
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
+		TupleLoader loader = new TupleLoader(panel, stream);
 		loader.load();
 
 		DisplayLayer<Tuple> layer = panel.getLayer("GridLines");

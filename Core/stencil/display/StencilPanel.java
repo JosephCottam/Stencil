@@ -37,9 +37,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import stencil.interpreter.Interpreter;
+import stencil.parser.tree.Canvas;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
+import stencil.parser.tree.View;
 import stencil.streams.Tuple;
 
 /**Wraps the layers and glyphs to tie them to a display context.
@@ -58,7 +61,9 @@ public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C
 
 	protected Program program;
 	protected C canvas;
-
+	private Interpreter interpreter;
+	
+	
 	public static int ABSTRACT_SCREEN_RESOLUTION = 72;
 
 	public StencilPanel() {super();}
@@ -69,7 +74,9 @@ public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C
 		super();
 		this.program = program;
 		this.canvas = canvas;
+		this.interpreter = new Interpreter(this);
 
+		
 		this.setLayout(new BorderLayout());
 		this.add(canvas, BorderLayout.CENTER);
 	}
@@ -176,6 +183,16 @@ public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C
 	 * May return a zero-length array, but should never return null.*/
 	public String[] getExports() {return new String[0];}
 	
+	
+	//------------------------------------------------------------------------------------------
+	//Interpreter Operators
+	public void processTuple(Tuple source) throws Exception {interpreter.processTuple(source);}
+	
+	public void preRun() {
+		//TODO: Modify when view and canvas can have multiple instances
+		View.Global.setView(getView());
+		Canvas.Global.setCanvas(getCanvas());
+	}
 	
 	//------------------------------------------------------------------------------------------
 	//Runtime support operations.  These are methods called by the interpreter.

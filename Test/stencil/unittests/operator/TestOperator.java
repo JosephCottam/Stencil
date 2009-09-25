@@ -1,5 +1,6 @@
 package stencil.unittests.operator;
 
+import stencil.adapters.Adapter;
 import stencil.operator.*;
 import stencil.operator.wrappers.SyntheticOperator;
 import stencil.operator.wrappers.SyntheticOperator.NoMatchException;
@@ -11,22 +12,24 @@ import junit.framework.TestCase;
 public class TestOperator extends TestCase {
 	public static final String fullLegendSource = "operator full(X,Y,Z) -> (X,Y,Z) (X !~ \"[null]\") => (X,Y,Z) : (Z,Y,X)";			
 	public static final String basicLegendSource = "operator basic(A,B,C,D,E,F,G) -> (Z,Y,X) (A !~ \"[null]\") => (Z,Y,X): (A,E,G)";
-
+	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.INSTANCE;
+	
+	
 	public void testGenerate() throws Exception {
-		Program program = ParseStencil.testParse(fullLegendSource);
+		Program program = ParseStencil.parse(fullLegendSource, ADAPTER);
 		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 		
 		assertEquals("full", legend.getName());
 		assertEquals(SyntheticOperator.class, legend.getClass());
 
-		program = ParseStencil.testParse(basicLegendSource);
+		program = ParseStencil.parse(basicLegendSource, ADAPTER);
 		legend = new SyntheticOperator(null, program.getOperators().get(0));
 		assertEquals("basic", legend.getName());
 		assertEquals(SyntheticOperator.class, legend.getClass());
 	}
 
 	public void testMap() throws Exception {
-		Program program = ParseStencil.testParse(fullLegendSource);
+		Program program = ParseStencil.parse(fullLegendSource, ADAPTER);
 		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 		Tuple rv;
 		
@@ -48,7 +51,7 @@ public class TestOperator extends TestCase {
 	}
 
 	public void testMapNulls() throws Exception {
-		Program program = ParseStencil.testParse(basicLegendSource);
+		Program program = ParseStencil.parse(basicLegendSource, ADAPTER);
 
 		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 
@@ -64,7 +67,7 @@ public class TestOperator extends TestCase {
 		String source = "legend bad(X,Y) -> (X,Y, Z) (X=~'.*') => (Z,Y,X): (X,Y)";
 		boolean failed = false;
 		try {
-			ParseStencil.testParse(source);
+			ParseStencil.parse(source, ADAPTER);
 		} catch (Exception e) {failed = true;}
 		finally {assertTrue("Exception not thrown when spec has argument mismatch in return.", failed);}
 
@@ -72,13 +75,13 @@ public class TestOperator extends TestCase {
 		source = "legend bad(X,Y,Z) -> (X,Y,Z) (A=~ \".*\") => (X,Y,Z) : (Z,Y,X)";
 		failed = false;
 		try {
-			ParseStencil.testParse(source);
+			ParseStencil.parse(source, ADAPTER);
 		} catch (Exception e) {failed = true;}
 		finally {assertTrue("Exception not thrown with unknown argument in filter.", failed);}
 	}
 
 	public void testMapfail() throws Exception {
-		Program program = ParseStencil.testParse(fullLegendSource);
+		Program program = ParseStencil.parse(fullLegendSource, ADAPTER);
 		StencilOperator legend = new SyntheticOperator(null, program.getOperators().get(0));
 
 		boolean failed = false;

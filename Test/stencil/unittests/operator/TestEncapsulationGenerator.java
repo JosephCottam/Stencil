@@ -67,7 +67,7 @@ public class TestEncapsulationGenerator extends TestCase {
 			foundStencils = true;
 			
 			Program program;
-			try {program  = ParseStencil.testParse(source);}
+			try {program  = ParseStencil.parse(source, stencil.adapters.java2D.Adapter.INSTANCE);}
 			catch (Exception e) {errors.add(name); continue;}
 			
 			ModuleCache modules = new ModuleCache();

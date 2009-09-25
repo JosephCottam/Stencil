@@ -4,7 +4,6 @@ import static stencil.unittests.adapters.TestTupleLoader.OVERLAY_SHORT;
 import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
-import stencil.interpreter.Interpreter;
 import stencil.parser.tree.*;
 import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;
@@ -39,7 +38,7 @@ public abstract class TestGenerator extends junit.framework.TestCase {
 		StencilPanel panel = adapter.generate(program);
 		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		stream.open(OVERLAY_SHORT);
-		TupleLoader loader = new TupleLoader(panel, stream, new Interpreter(panel));
+		TupleLoader loader = new TupleLoader(panel, stream);
 
 		assertNotNull(loader);
 		return loader;

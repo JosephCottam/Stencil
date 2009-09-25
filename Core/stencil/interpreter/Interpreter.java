@@ -155,10 +155,4 @@ public class Interpreter {
 	}
 
 	public StencilPanel getPanel() {return panel;}
-
-	public void preRun() {
-		//TODO: Modify when view and canvas can have multiple instances
-		View.Global.setView(panel.getView());
-		Canvas.Global.setCanvas(panel.getCanvas());
-	}
 }

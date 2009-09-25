@@ -28,7 +28,7 @@
  */
 package stencil.explore.model;
 
-import java.util.List;
+ import java.util.List;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
@@ -39,8 +39,6 @@ import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.ListModel;
 import stencil.explore.util.StencilRunner;
 import stencil.adapters.Adapter;
-import stencil.parser.string.ParseStencil;
-import stencil.parser.tree.Program;
 import stencil.explore.coordination.*;
 
 /**Central data repository and control structure for a stencil application.
@@ -89,8 +87,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 		if (stencilPanel != null) {stencilPanel.dispose();}
 		
 		Adapter adapter = adapterOpts.getAdapter();
-		Program program = ParseStencil.parse(stencil, adapter);
-		StencilPanel panel = adapter.generate(program);
+		StencilPanel panel = adapter.compile(stencil);
 		setStencilPanel(panel);
 	}
 

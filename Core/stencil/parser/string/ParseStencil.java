@@ -102,19 +102,6 @@ public abstract class ParseStencil {
 		}
 	}
 	
-	
-	/**Do a compile with an arbitrary adapter. 
-	 * This is a test method and should be used with caution,
-	 * it is intended to be used to see if the syntax is correct on
-	 * a Stencil program.
-	 * 
-	 * TODO: Remove when the Adapter is exposed throughout the Stencil Explore application in a sane way.
-	 * 
-	 */
-	public static Program testParse(String source) throws ProgramParseException, Exception {
-		return parse(source, stencil.adapters.piccoloDynamic.Adapter.INSTANCE);
-	}
-	
 	/**Checks to see if a program can be parsed.  This is the first stage of a full
 	 * parse.  It includes only minimal validation and few transformations.*/
 	public static Program checkParse(String source) throws ProgramParseException {

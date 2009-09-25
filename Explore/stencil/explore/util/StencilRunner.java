@@ -28,7 +28,7 @@
  */
 package stencil.explore.util;
 
-import java.util.List;
+ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
@@ -39,7 +39,6 @@ import static stencil.explore.Application.reporter;
 import stencil.explore.model.Model;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
-import stencil.interpreter.Interpreter;
 import stencil.adapters.Adapter;
 import stencil.streams.TupleStream;
 import stencil.util.streams.ConcurrentStream;
@@ -103,7 +102,7 @@ public final class StencilRunner extends Thread {
 				if (streams.size() >1) {input = new ConcurrentStream(streams);}
 				else {input =  streams.get(0);}
 				names = names.substring(5);
-				loader = new TupleLoader(panel, input, new Interpreter(panel));
+				loader = new TupleLoader(panel, input);
 
 				reporter.addMessage("Starting loading %1$s.", names);
 				loader.load();

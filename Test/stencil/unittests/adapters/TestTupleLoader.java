@@ -2,7 +2,6 @@ package stencil.unittests.adapters;
 
 import stencil.adapters.TupleLoader;
 import stencil.adapters.piccoloDynamic.*;
-import stencil.interpreter.Interpreter;
 import stencil.parser.tree.*;
 import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;
@@ -26,7 +25,7 @@ public class TestTupleLoader extends TestCase {
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", "\\s+");
 		input.open(COORDS);
-		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(panel));
+		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
 		assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").size());
@@ -40,7 +39,7 @@ public class TestTupleLoader extends TestCase {
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
 		input.open(OVERLAY_FULL);
-		TupleLoader loader = new TupleLoader(panel, input, new Interpreter(panel));
+		TupleLoader loader = new TupleLoader(panel, input);
 
 		Thread thread = new Thread(loader);
 

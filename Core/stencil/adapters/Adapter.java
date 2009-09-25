@@ -71,9 +71,11 @@ public interface Adapter<T extends Glyph> {
 	public Class getGuideClass(String name);
 
 	
-	//TODO: Re-think adapter-based finalize.. why not just invoke this on the panel?  Is there a time that the adapter knows somethign the panel does not?
+	//TODO: Re-think adapter-based finalize.. why not just invoke this on the panel?  Is there a time that the adapter knows something the panel does not?
 	public void finalize(StencilPanel panel);
 	
+	/**Given a stencil program as a string, return a new panel ready to go...*/
+	public StencilPanel compile(String programSource)  throws Exception;
 	
 	//------------------------------------------------------------------------------------------
 	//Optional operations to influence the behavior of the adapter.
@@ -93,7 +95,5 @@ public interface Adapter<T extends Glyph> {
 	 * @throws UnsupportedOperationException The render quality cannot be set on this adapter.
 	 */
 	public void setRenderQuality(String value) throws IllegalArgumentException, UnsupportedOperationException;
-
-
 
 }

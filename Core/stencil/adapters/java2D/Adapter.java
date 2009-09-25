@@ -32,6 +32,7 @@ import java.awt.Color;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
+import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.Table;
@@ -43,14 +44,13 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	private boolean defaultMouse;
 	
-	public StencilPanel generate(Program program) {
+	public Panel generate(Program program) {
 		Panel panel = new Panel(program);
 		
 		if (defaultMouse) {
 			ZoomPanHandler zp = new ZoomPanHandler();
-			Canvas c = panel.getCanvas().getComponent();
-			c.addMouseListener(zp);
-			c.addMouseMotionListener(zp);
+			panel.addMouseListener(zp);
+			panel.addMouseMotionListener(zp);
 		}
 		return panel;
 	}
@@ -65,15 +65,15 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
 	
-	public void setDebugColor(Color c) {
-		Point.DEBUG_COLOR = c;
-	}
+	public void setDebugColor(Color c) {Point.DEBUG_COLOR = c;}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		throw new UnsupportedOperationException("Not implemented");
 	}
 
-	public void finalize(StencilPanel panel) {
-		//No finalization required...yet
+	public void finalize(StencilPanel panel) {/**No finalization required...yet**/}
+	
+	public Panel compile(String programSource) throws Exception {
+		return generate(ParseStencil.parse(programSource, this));
 	}
 }

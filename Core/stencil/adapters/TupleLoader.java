@@ -33,7 +33,6 @@ import java.util.Observable;
 import stencil.display.StencilPanel;
 import stencil.streams.Tuple;
 import stencil.streams.TupleStream;
-import stencil.interpreter.Interpreter;
 import stencil.util.streams.txt.InvalidInputLineException;
 
 /**Load tuples from a stream source into the program
@@ -47,17 +46,15 @@ public class TupleLoader extends Observable implements Runnable {
 	protected StencilPanel panel;
 	protected STATE state;
 	protected Exception exception;
-	protected Interpreter engine;
 	protected long recordsLoaded;
 	protected long updateFrequency;
 	protected boolean keepRunning = true;
 
-	public TupleLoader(StencilPanel panel, TupleStream input, Interpreter engine) {
+	public TupleLoader(StencilPanel panel, TupleStream input) {
 		this.panel = panel;
 		this.input = input;
 		state = STATE.UNSTARTED;
 		exception = null;
-		this.engine = engine;
 		recordsLoaded = 0;
 		updateFrequency = DEFAULT_UPDATE_FREQUENCY;
 	}
@@ -95,14 +92,14 @@ public class TupleLoader extends Observable implements Runnable {
 		state = STATE.RUNNING;
 		this.setChanged();
 		this.notifyObservers(recordsLoaded);
-		engine.preRun();
+		panel.preRun();
 
 		while(input.hasNext() && keepRunning) {
 			Tuple tuple;
 			try {tuple = input.next();}
 			catch (InvalidInputLineException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
-			engine.processTuple(tuple); 
+			panel.processTuple(tuple); 
 			recordsLoaded++;
 			this.setChanged();
 			if (recordsLoaded%updateFrequency == 0) {this.notifyObservers(recordsLoaded);}

@@ -38,6 +38,7 @@ import stencil.adapters.piccoloDynamic.glyphs.Node;
 import stencil.adapters.piccoloDynamic.guides.*;
 import stencil.display.DisplayGuide;
 import stencil.display.StencilPanel;
+import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
@@ -143,4 +144,7 @@ public class Adapter implements stencil.adapters.Adapter<PiccoloGlyph> {
 		}
 	}
 
+	public Panel compile(String programSource) throws Exception {
+		return generate(ParseStencil.parse(programSource, this));
+	}
 }
