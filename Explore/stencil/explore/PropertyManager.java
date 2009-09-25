@@ -28,7 +28,7 @@
  */
 package stencil.explore;
 
-import java.io.FileInputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -100,10 +100,14 @@ public class PropertyManager {
 	 */
 	private static Properties loadProperties(String... configFiles) {
 		Properties p = new Properties();
+		URL base;
+		
+		try {base = new URL("file:\\");}
+		catch (Exception e) {throw new Error("Error initailizing context.");}
 
 		Properties props = new Properties();
 		for (String file: configFiles) {
-			try {props.loadFromXML(new FileInputStream(file));}
+			try {props.loadFromXML(new URL(base, file).openStream());}
 			catch (Exception e) {
 				System.err.println(String.format("Error loading properties from %1$s. (%2$s) Ignoring error and continuing.", file, e.getMessage()));
 			}

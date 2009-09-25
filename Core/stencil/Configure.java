@@ -1,8 +1,7 @@
 package stencil;
 
 import java.util.Properties;
-import java.io.FileInputStream;
-
+import java.net.URL;
 
 
 /**Methods to configure the Stencil system based
@@ -29,10 +28,10 @@ public class Configure {
 		stencil.operator.module.ModuleCache.registerModules(props);
 	}
 
-	public static void loadProperties(String... files) throws Exception {
+	public static void loadProperties(String... urls) throws Exception {
 		Properties p = new Properties();
 
-		for (String f:files) {p.loadFromXML(new FileInputStream(f));}
+		for (String url:urls) {p.loadFromXML(new URL(url).openStream());}
 
 		loadProperties(p);
 	}

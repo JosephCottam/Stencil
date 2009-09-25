@@ -97,6 +97,8 @@ public abstract class StencilIO {
 	
 	/**Saves the current editor to the specified file.*/
 	public static void save(String filename, Model model) {
+		if (filename == null) {System.err.println("Could not save state, no location specified."); return;}
+		
 		BufferedWriter output;
 		try {output= new BufferedWriter(new FileWriter(filename));}
 		catch (Exception e) {throw new RuntimeException(e);}
