@@ -8,17 +8,17 @@ import stencil.operator.module.FacetData;
 import stencil.operator.module.OperatorData;
 import stencil.parser.tree.Specializer;
 
-public class MutableLegendData implements OperatorData {
+public class MutableOperatorData implements OperatorData {
 	protected Map<String, FacetData> facetData = new HashMap<String, FacetData>();
 	protected Map<String, String> attributes = new HashMap<String, String>();
 	protected String module;
-	protected String legendName;
+	protected String operatorName;
 	protected Specializer defaultSpecializer;
 	
-	public MutableLegendData(OperatorData basis) {
+	public MutableOperatorData(OperatorData basis) {
 		this.defaultSpecializer = basis.getDefaultSpecializer();
 		this.module = basis.getModule();
-		this.legendName = basis.getName();
+		this.operatorName = basis.getName();
 		
 		for (String facet: basis.getFacets()) {
 			facetData.put(facet, basis.getFacetData(facet));
@@ -29,13 +29,13 @@ public class MutableLegendData implements OperatorData {
 		}
 	}
 	
-	public MutableLegendData(String module, String name, Specializer defaultSpecializer) {
+	public MutableOperatorData(String module, String name, Specializer defaultSpecializer) {
 		assert module != null : "Module cannot be null";
 		assert name != null : "Name cannot be null";
 		
 		this.defaultSpecializer = defaultSpecializer;
 		this.module =module;
-		legendName =name;
+		operatorName =name;
 	}
 	
 	public void addFacet(FacetData data) {
@@ -56,7 +56,8 @@ public class MutableLegendData implements OperatorData {
 	public Collection<String> getFacets() {return facetData.keySet();}
 
 	public String getModule() {return module;}
- 	public String getName() {return legendName;}
+ 	public String getName() {return operatorName;}
+ 	public void setName(String operatorName) {this.operatorName = operatorName;}
 
  	public String getAttribute(String name) {return attributes.get(name);}
  	public void addAttribute(String name, String value) {attributes.put(name, value);}

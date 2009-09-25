@@ -27,13 +27,13 @@ public class JythonOperator implements DynamicStencilOperator {
 	protected String operatorName;
 	protected String module;
 	protected Map<String, Invokeable<JythonEncapsulation, Tuple>> invokeables;
-	protected MutableLegendData operatorData;
+	protected MutableOperatorData operatorData;
 	
 	public JythonOperator(String module, String name) {
 		this.module = module;
 		this.operatorName = name;
 		invokeables = new HashMap<String, Invokeable<JythonEncapsulation, Tuple>>();
-		operatorData = new MutableLegendData(module, name, SIMPLE_SPECIALIZER);
+		operatorData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
 	}
 		
 	public String getName() {return operatorName;}

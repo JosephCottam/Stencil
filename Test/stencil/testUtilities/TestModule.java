@@ -19,7 +19,7 @@ public class TestModule implements Module {
 		try {MODULE_DATA.addOperator("FilterFail", ParseStencil.parseSpecializer("[1 .. n]"));}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
-		MutableLegendData ld = (MutableLegendData) MODULE_DATA.getOperatorData("FilterFail");
+		MutableOperatorData ld = (MutableOperatorData) MODULE_DATA.getOperatorData("FilterFail");
 		ld.addFacet(new BasicFacetData("Map", OpType.PROJECT, "VALUE"));
 	}
 	

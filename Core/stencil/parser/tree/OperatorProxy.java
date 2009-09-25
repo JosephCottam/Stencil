@@ -32,6 +32,7 @@ import org.antlr.runtime.Token;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.MutableOperatorData;
 
 public class OperatorProxy extends StencilTree {
 	private StencilOperator operator;
@@ -43,7 +44,13 @@ public class OperatorProxy extends StencilTree {
 	
 	public void setOperator(StencilOperator operator, OperatorData operatorData) {
 		this.operator = operator;
-		this.operatorData = operatorData;
+		
+		if (!operatorData.getName().equals(getName())) {
+			this.operatorData = new MutableOperatorData(operatorData);
+			((MutableOperatorData)this.operatorData).setName(getName());
+		} else {
+			this.operatorData =operatorData; 
+		}
 	}
 	public StencilOperator getOperator() {return operator;}
 	

@@ -131,13 +131,17 @@ public class Temp extends BasicModule {
 		
 		protected Map<Object, Object[]> map = new HashMap();
 		String[] names;
-
+		boolean caseSensitive=true;
+		
 		public Mapping(String...names) {this.names = names;}
 
-		public Tuple map(Object... values) {
+		public String getName() {return NAME;}
+
+		public Tuple put(Object... values) {
 			Object key = values[0];
 			Object[] objects = new Object[values.length-1];
 			System.arraycopy(values, 1, objects, 0, values.length-1);
+			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 			
 			if (objects.length ==0) {
 				objects = map.get(key);
@@ -148,16 +152,19 @@ public class Temp extends BasicModule {
 			}
 			return new BasicTuple(names, objects);
 		}
-		public String getName() {return NAME;}
 
+		public Tuple map(Object... args) {return query(args);}
 		public Tuple query(Object... args) {
 			if (args.length > 1) {throw new IllegalArgumentException("Can only query with single-argument to map.");}
-			return new BasicTuple(names, map.get(args[0]));
+			Object key = args[0];
+			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
+			
+			Object[] results = map.get(key);
+			if (results == null) {return null;}			
+			return new BasicTuple(names, results);
 		}
 		
 		public static OperatorData getLegendData(String moduleName, String name, Specializer specializer) throws SpecializationException{
-			if (!specializer.isSimple()) {throw new SpecializationException(moduleName, name, specializer);}
-
 			String[] fields;
 			try {fields = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(moduleName, name, specializer, e);}
@@ -166,12 +173,18 @@ public class Temp extends BasicModule {
 		}
 
 		public static StencilOperator instance(String moduleName, String name, Specializer specializer) throws SpecializationException, NoSuchMethodException {
-			if (!specializer.getRange().isSimple() || specializer.getSplit().hasSplitField()) {throw new SpecializationException(moduleName, name, specializer);}
+			if (!specializer.getRange().isFullRange() || specializer.getSplit().hasSplitField()) {
+				throw new SpecializationException(moduleName, name, specializer);
+			}
 
 			String[] names;
 			try {names = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(moduleName, name, specializer, e);}			
-			return new Mapping(names);
+			Mapping m = new Mapping(names);
+			
+			if (specializer.getMap().containsKey("CaseInsensitive")) {m.caseSensitive = false;}
+			
+			return m;
 		}
 
 		/**Convert a specializer into a list of strings.  
@@ -184,9 +197,8 @@ public class Temp extends BasicModule {
 
 			for (int i = 0; i< specializer.getArgs().size(); i++) {
 				Atom atom = specializer.getArgs().get(i);
-				if (!atom.isName()) {throw new IllegalArgumentException("Non-name in position "+ i);}
-				fields[i] = ((Id) atom).getName();
-				i++;
+				if (!atom.isString()) {throw new IllegalArgumentException(String.format("Non-string in position %1$d.  Found '%2$s' instead.", i, atom.toStringTree()));}
+				fields[i] = atom.getText();
 			}
 			return fields;
 		}

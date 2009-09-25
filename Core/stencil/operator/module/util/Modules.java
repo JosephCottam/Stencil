@@ -132,7 +132,7 @@ public final class Modules {
 	 * Default facet set is Map and Query.
 	 * 
 	 **/
-	public static MutableLegendData basicLegendData(String module, String name) {
+	public static MutableOperatorData basicLegendData(String module, String name) {
 		return basicLegendData(module, name, OpType.PROJECT, "VALUE");
 	}
 	
@@ -145,8 +145,8 @@ public final class Modules {
 	 * @param fields
 	 * @return
 	 */
-	public static MutableLegendData basicLegendData(String module, String name, OpType type, String...fields) {
-		MutableLegendData legendData = new MutableLegendData(module, name, SIMPLE_SPECIALIZER);
+	public static MutableOperatorData basicLegendData(String module, String name, OpType type, String...fields) {
+		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
 		legendData.addFacet(new BasicFacetData("Map", type, fields));
 		legendData.addFacet(new BasicFacetData("Query", type, fields));
 		return legendData;

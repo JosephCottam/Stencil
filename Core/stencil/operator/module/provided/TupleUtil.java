@@ -165,7 +165,7 @@ public class TupleUtil extends BasicModule {
 		
 		/**Complete the legend data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
-			MutableLegendData ld = new MutableLegendData(base);
+			MutableOperatorData ld = new MutableOperatorData(base);
 			FacetData fd = ld.getFacetData("Map");
 			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), spec.getArgs());
 			ld.addFacet(fd);

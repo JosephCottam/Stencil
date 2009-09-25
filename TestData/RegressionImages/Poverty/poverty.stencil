@@ -2,31 +2,31 @@ STREAM: File
 NAME: Region
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
-SOURCE: ./regions.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/regions.txt
 CHECKHEADER: true
 STREAM: File
 NAME: Poverty
 HEADER: State,Children, Adults, Elderly, Total
 SEPARATOR: ,
-SOURCE: ./povertyPercent.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/povertyPercent.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Postal
 HEADER: State  ID
 SEPARATOR: \s\s+
-SOURCE: ./postal.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/postal.txt
 CHECKHEADER: false
 STREAM: File
 NAME: Pop
 HEADER: State,Children,Adults,Elderly, Total
 SEPARATOR: ,
-SOURCE: ./povertyCounts.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/povertyCounts.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Items
 HEADER: Name
 SEPARATOR: ,
-SOURCE: ./items.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/items.txt
 CHECKHEADER: false
 
 external stream Items(Name)
@@ -49,20 +49,25 @@ from Items
 
 layer Prime
 from Postal
-	() : Abr.Add(State, ID) -> ()
+	() : Abr.Put(State, ID) -> ()
 from Region
-	() : Reg.Add(State, Region, Division) -> ()
+	() : Reg.Put(State, State, Region, Division) -> ()
 from Pop
-	() : Pop.Add(State, Total,Children,Adults,Elderly) -> ()
+	() : Pop.Put(State, State, Total,Children,Adults,Elderly) -> ()
+
+
+operator Pop base Mapping [1 .. n, "State", "Total", "Children", "Adults", "Elderly", CaseInsensitive=1]
+operator Reg base Mapping [1 .. n, "State", "Region", "Division", CaseInsensitive=1]
+operator Abr base Mapping [1 .. n, "id", CaseInsensitive=1]
 
 layer Children[TEXT]
-	sidebar[displayOn="FILL_COLOR", example.SHAPE="RECTANGLE", label.FONT_SIZE=10, example.SIZE=12,  X=350, Y=100]: FONT_COLOR
+/*	sidebar[displayOn="FILL_COLOR", example.SHAPE="RECTANGLE", label.FONT_SIZE=10, example.SIZE=12,  X=350, Y=100]: FONT_COLOR*/
 from Poverty
 	ID: State
-	TEXT: Abr(State) -> id
-	X: XLayout("Children") -> (X)
-	Y<< Rank(Children, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR:  Reg(State) #-> Color(Division) -> C
+	TEXT: Abr(State)
+	X: XLayout("Children")
+	Y<< Rank(Children, State) -> Mult(15, VALUE) 
+	FONT_COLOR:  Reg(State) #-> Color(Division)
 
 layer Children2[TEXT]
 from Poverty
@@ -167,53 +172,3 @@ operator XLayout (Name) -> (X)
 
 operator Ordering (ID) -> (VALUE) 
 	all => VAlUE : Index(ID) -> VALUE
-
-python Pop
-facet Init {
-pop =dict()
-}
-facet Add(State, Total,Children,Adults,Elderly) -> (State) {
-	pop[State.upper()] = (int(Total), int(Children), int(Adults), int(Elderly))
-}
-
-facet Map(State) -> (State,Total,Children,Adults,Elderly) {
-	source = pop[State.upper()]
-	Total = source[0]
-	Children = source[1]
-	Adults = source[2]
-	Elderly = source[3]
-}
-
-facet Query(State) -> (State,Total,Children,Adults,Elderly) {
-	source = pop[State.upper()]
-	Total = source[0]
-	Children = source[1]
-	Adults = source[2]
-	Elderly = source[3]
-}
-
-
-python Reg
-facet Init {
-	regions = dict()
-}
-facet Add (State, Region, Division) -> (Region) {
-	regions[State.upper()] = (Region, Division)
-}
-
-facet Query (State) -> (Region, Division)  {
-	p = regions[State.upper()]
-	Region = p[0]
-	Division = p[1]
-}
-
-facet Map (State) -> (Region, Division)  {
-	p = regions[State.upper()]
-	Region = p[0]
-	Division = p[1]
-}
-
-python Abr
-facet Init {codes= dict()}
-facet Add(State, id) -> (id) {codes[State.upper()] = id}
-facet Map(State) -> (id) {id = codes[State.upper()]}

@@ -33,8 +33,8 @@ public class MutableModuleData implements ModuleData {
 	 * @param defaultSpecializer
 	 * @return
 	 */
-	public MutableLegendData addOperator(String name, Specializer defaultSpecializer) {
-		MutableLegendData legendData = new MutableLegendData(getName(), name, defaultSpecializer);
+	public MutableOperatorData addOperator(String name, Specializer defaultSpecializer) {
+		MutableOperatorData legendData = new MutableOperatorData(getName(), name, defaultSpecializer);
 		operators.put(name, legendData);
 		return legendData;
 	}
