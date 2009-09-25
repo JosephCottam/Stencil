@@ -84,7 +84,8 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 					
 				case WIDTH:
 					space = canvas.getWidth();
-					
+					if (space == 0) {space =1;} //TODO: Is this the right thing to do?
+
 					t.setToScale(space/val, scaleY);
 					t.translate(oldX, oldY);
 
@@ -94,7 +95,8 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 					return;
 				case HEIGHT:
 					space = canvas.getHeight();
-					
+					if (space == 0) {space =1;} //TODO: Is this the right thing to do?
+
 					t.setToScale(scaleX, space/val);
 					t.translate(oldX, oldY);
 
@@ -162,11 +164,7 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 	
 	public Dimension2D viewToCanvas(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
-		System.out.println(p);
 		p = canvas.getInverseViewTransform().deltaTransform(p, p);
-		System.out.println(p);
-		System.out.println();
-
 		return new DoubleDimension(p.getX(), p.getY());
 	}
 }

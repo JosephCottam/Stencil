@@ -119,21 +119,23 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 		
 		try {
 			if (implantation.equals("SHAPE")) {
-				return new Table<Shape>(name, new Shape("PROTOTYPE"));
+				return new Table(name, new Shape("PROTOTYPE"));
 			} else if (implantation.equals("LINE")) {
-				return new Table<Line>(name, new Line("PROTOTYPE"));
+				return new Table(name, new Line("PROTOTYPE"));
 			} else if (implantation.equals("TEXT")) {
-				return new Table<Text>(name, new Text("PROTOTYPE"));
+				return new Table(name, new Text("PROTOTYPE"));
+			} else if (implantation.equals("TEXT_SHAPE")) {
+				return new Table(name, new Text.TextShape("PROTOTYPE"));
 			} else if (implantation.equals("PIE")) {
-				return new Table<Pie>(name, new Pie("PROTOTYPE"));
+				return new Table(name, new Pie("PROTOTYPE"));
 			} else if (implantation.equals("IMAGE")) {
-				return new Table<Image>(name, new Image("PROTOTYPE"));
+				return new Table(name, new Image("PROTOTYPE"));
 			} else if (implantation.equals("POLY_LINE")) {
-				return new Table<Poly.PolyLine>(name, new Poly.PolyLine("PROTOTYPE"));
+				return new Table(name, new Poly.PolyLine("PROTOTYPE"));
 			} else if (implantation.equals("POLYGON")) {
-				return new Table<Poly.Polygon>(name, new Poly.Polygon("PROTOTYPE"));
+				return new Table(name, new Poly.Polygon("PROTOTYPE"));
 			} else if (implantation.equals("ARC")) {
-				return new Table<Arc>(name, new Arc("PROTOTYPE"));
+				return new Table(name, new Arc("PROTOTYPE"));
 			}
 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}

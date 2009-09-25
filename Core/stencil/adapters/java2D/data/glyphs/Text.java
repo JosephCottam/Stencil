@@ -19,23 +19,40 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 
-public final class Text extends Point {
+public class Text extends Point {
+	
+	public static final class TextShape extends Text {
+		protected static final AttributeList attributes;
+		static {
+			attributes = new AttributeList(Text.attributes);
+			attributes.remove("SCALE_BY");
+		}
+		
+		public TextShape(String id) {super(id);}
+
+		protected final void fixScale(Graphics2D g) {/*deliberately does nothing*/}
+	}
+	
 	private static final Pattern SPLITTER = Pattern.compile("\n");
 	
 	private static final double AUTO_SIZE = -1;
 	private static final Attribute TEXT = new Attribute("TEXT", "");
 	private static final Attribute WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SIZE, Double.class);
 	private static final Attribute HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SIZE, Double.class);
+	private static final Attribute SCALE_BY = new Attribute("SCALE_BY", "SMALLEST");
 	
 	protected static final AttributeList attributes;
 	static {
 		attributes = new AttributeList(Point.attributes);
-
+		
 		attributes.add(TEXT);
+		attributes.add(SCALE_BY);
+		
 		for (TextProperty p:TextProperty.values()) {attributes.add(new Attribute(p));}
 	}
 
 	private String text = (String) TEXT.defaultValue;
+	private String scaleBy = (String) SCALE_BY.defaultValue;
 	private Format format = new Format();
 	
 	private boolean autoWidth = true;
@@ -54,12 +71,14 @@ public final class Text extends Point {
 	
 	public Object get(String name) {
 		if (TEXT.is(name)) {return text;}
-		else if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
-		else {return super.get(name);}
+		if (SCALE_BY.is(name)) {return scaleBy;}
+		if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
+		return super.get(name);
 	}
 	
 	public void set(String name, Object value) {
 			 if (TEXT.is(name)) 	{this.text = Converter.toString(value);}
+		else if (SCALE_BY.is(name)) {this.scaleBy = Converter.toString(value).toUpperCase();}
 		else if (WIDTH.is(name)) 	{this.width = Converter.toDouble(value); autoWidth = (this.width ==AUTO_SIZE);}
 		else if (HEIGHT.is(name)) 	{this.height = Converter.toDouble(value); autoHeight = (this.height ==AUTO_SIZE);}
 		else if (contains(TextProperty.class, name)) {
@@ -71,8 +90,23 @@ public final class Text extends Point {
 		computeMetrics(null);
 	}
 
+	protected void fixScale(Graphics2D g) {
+		AffineTransform trans = g.getTransform();
+		double scale = -1;
+		if (trans.getScaleX() != trans.getScaleY()) {
+			if (scaleBy.equals("X")) {scale = trans.getScaleX();}
+			else if (scaleBy.equals("Y")) {scale = trans.getScaleY();}
+			else if (scaleBy.equals("LARGEST")) {scale = Math.min(trans.getScaleX(), trans.getScaleY());}
+			else {scale = Math.min(trans.getScaleX(), trans.getScaleY());}
+
+			g.scale(scale/trans.getScaleX(), scale/trans.getScaleY());
+		}
+	}
+	
 	public void render(Graphics2D g, AffineTransform base) {
 		super.preRender(g);
+		
+		fixScale(g);
 		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
@@ -82,10 +116,10 @@ public final class Text extends Point {
 		for (int i=0; i< lines.length; i++) {
 			final DoubleDimension dim = dims[i];
 			String line = lines[i];
-			g.drawString(line, (float) horizontalOffset(dim.width), (float) dim.height *i);
+			g.drawString(line, (float) horizontalOffset(dim.width), (float) dim.height *(i+1));
 		}
 		
-		super.postRender(g,base);
+		super.postRender(g, base);
 	}	
 	
 	private double horizontalOffset(double lineWidth) {

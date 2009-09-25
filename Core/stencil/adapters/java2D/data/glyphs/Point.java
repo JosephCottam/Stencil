@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
+import stencil.adapters.general.Shapes;
 import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -89,12 +90,12 @@ public abstract class Point implements Glyph2D {
 	protected String id = (String) attributes.get(StandardAttribute.ID).defaultValue;
 	
 	/**The value stored here must be interpreted with respect to registration
-	 * before it can be used for rendering. Use the 'correctRegistrtion' method.
+	 * before it can be used for rendering. 
 	 */
 	protected Double x = (Double) attributes.get(StandardAttribute.X).defaultValue;
 
 	/**The value stored here must be interpreted with respect to registration
-	 * before it can be used for rendering.  Use the 'correctRegistrtion' method.
+	 * before it can be used for rendering. 
 	 */
 	protected double y = (Double) attributes.get(StandardAttribute.Y).defaultValue;
 	protected double z = (Double) attributes.get(StandardAttribute.Z).defaultValue;
@@ -278,6 +279,10 @@ public abstract class Point implements Glyph2D {
 			g.setPaint(DEBUG_COLOR);
 			g.setStroke(DEBUG_STROKE);
 			g.draw(getBounds());
+			
+			g.setPaint(DEBUG_COLOR.darker());
+			double scale=2;
+			g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
 		}
 		
 	}
