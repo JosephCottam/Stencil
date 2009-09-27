@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.java2D.data.glyphs;
+package stencil.adapters.java2D.data.immutibles;
 
 
  import java.awt.geom.AffineTransform;
@@ -35,35 +35,48 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
 public final class Line extends Stroked {
-	protected static final AttributeList attributes;
+	private static final AttributeList ATTRIBUTES;
+	private static final AttributeList UNSETTABLES;
+	
+	protected static final Attribute<Double> X = new Attribute("X", 0d);
+	protected static final Attribute<Double> Y = new Attribute("Y", 0d);
+	protected static final Attribute<Double> WIDTH = new Attribute("Y", 0d);
+	protected static final Attribute<Double> HEIGHT = new Attribute("Y", 0d);
 	protected static final Attribute<Double> X1 = new Attribute("X.1", 0d);
 	protected static final Attribute<Double> X2 = new Attribute("X.2", 0d);
 	protected static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
 	protected static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
 	
 	static {
-		attributes = new AttributeList(Stroked.attributes);
-
-		attributes.add(X1);
-		attributes.add(Y1);
-		attributes.add(X2);
-		attributes.add(Y2);
+		ATTRIBUTES = new AttributeList(Stroked.attributes);
 		
-		attributes.remove(StandardAttribute.HEIGHT);
-		attributes.remove(StandardAttribute.WIDTH);
+		ATTRIBUTES.add(X1);
+		ATTRIBUTES.add(Y1);
+		ATTRIBUTES.add(X2);
+		ATTRIBUTES.add(Y2);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
+		ATTRIBUTES.add(WIDTH);
+		ATTRIBUTES.add(HEIGHT);
+
+		
+		UNSETTABLES = new AttributeList();
+		UNSETTABLES.add(X);
+		UNSETTABLES.add(Y);
+		UNSETTABLES.add(WIDTH);
+		UNSETTABLES.add(HEIGHT);
 	}
 
-	private double x1;
-	private double y1;
-	private double x2;
-	private double y2;
+	private final double x1;
+	private final double y1;
+	private final double x2;
+	private final double y2;
 	
 	private java.awt.Shape shapeCache;
 	private java.awt.geom.Rectangle2D bounds = new Rectangle2D.Double();
@@ -76,9 +89,21 @@ public final class Line extends Stroked {
 		y2 = Y1.defaultValue;	
 	}
 	
+	private Line(Line source, Tuple option) {
+		super(source, option, UNSETTABLES);
+
+		this.x1 = switchCopy(source.x1, (Double) safeGet(option, X1));
+		this.x2 = switchCopy(source.x2, (Double) safeGet(option, X2));
+		this.y1 = switchCopy(source.y1, (Double) safeGet(option, Y1));
+		this.y2 = switchCopy(source.y2, (Double) safeGet(option, Y2));
+		
+		validateXY();
+	}
+	
 	public double getHeight() {return bounds.getHeight();}
 	public double getWidth() {return bounds.getWidth();}
 	public Rectangle2D getBounds() {return (Rectangle2D) bounds.clone();}
+	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public String getImplantation() {return "LINE";} 
 
@@ -90,15 +115,6 @@ public final class Line extends Stroked {
 		else if (X2.is(name)) {return x2;}
 		else if (Y2.is(name)) {return y2;}
 		else{return super.get(name);}		
-	}
-	
-	public void set(String name, Object value) {
-		if (X1.is(name)) 	  {x1 = Converter.toDouble(value); validateXY();}
-		else if (Y1.is(name)) {y1 = Converter.toDouble(value); validateXY();}
-		else if (X2.is(name)) {x2 = Converter.toDouble(value); validateXY();}
-		else if (Y2.is(name)) {y2 = Converter.toDouble(value); validateXY();}
-		else if (name.equals("X") || name.equals("Y")) {throw new IllegalArgumentException("Cannot set raw X and Y on a line.");}
-		else{super.set(name, value);}
 	}
 	
 	private void validateXY() {

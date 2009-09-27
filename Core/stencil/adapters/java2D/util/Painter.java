@@ -8,8 +8,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
+import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Table;
-import stencil.adapters.java2D.data.glyphs.Point;
 
 public final class Painter extends Thread implements Stopable {
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
@@ -47,10 +47,14 @@ public final class Painter extends Thread implements Stopable {
 	/**Render glyphs immediately onto the passed graphics object.*/
 	public void doDrawing(Graphics2D g, AffineTransform base) {
 		g.addRenderingHints(rh);
-		for (Table<? extends Point> table: layers) {
+		for (Table<? extends Glyph2D> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
-			for (Point glyph: table) {
-				if (glyph.isVisible()) {glyph.render(g, base);}
+			for (Glyph2D glyph: table) {
+				Rectangle r = glyph.getBoundsReference().getBounds();
+				if (glyph.isVisible() 
+					&& g.hitClip(r.x, r.y, r.width, r.height)) {
+					glyph.render(g, base);
+				}
 			}
 		}
 	}

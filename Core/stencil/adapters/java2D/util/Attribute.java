@@ -28,18 +28,18 @@
  */
 package stencil.adapters.java2D.util;
 
-public class Attribute {
+public class Attribute<T> {
 	public String name;
 	public Class type;
-	public Object defaultValue;
+	public T defaultValue;
 
-	public Attribute(String name, Object defaultValue) {
+	public Attribute(String name, T defaultValue) {
 		this.name = name;
 		this.defaultValue = defaultValue;
 		this.type = defaultValue.getClass();
 	}
 	
-	public Attribute(String name, Object defaultValue, Class type) {
+	public Attribute(String name, T defaultValue, Class type) {
 		this.name = name;
 		this.defaultValue = defaultValue;
 		this.type = type;
@@ -47,7 +47,7 @@ public class Attribute {
 	
 	public Attribute(stencil.util.enums.Attribute att) {
 		this.name = att.toString();
-		this.defaultValue = att.getDefaultValue();
+		this.defaultValue = (T) att.getDefaultValue();
 		this.type = att.getType();
 	}
 	

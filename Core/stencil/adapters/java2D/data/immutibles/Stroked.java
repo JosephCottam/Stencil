@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.java2D.data.glyphs;
+package stencil.adapters.java2D.data.immutibles;
 
 import static stencil.util.enums.EnumUtils.contains;
 
@@ -52,8 +52,8 @@ public abstract class Stroked extends Point {
 	protected Paint outlinePaint = Strokes.DEFAULT_PAINT;
 	
 	protected Stroked(String id) {super(id);}
-	protected Stroked(Stroked source, Tuple option) {
-		super(source, option);
+	protected Stroked(Stroked source, Tuple option, AttributeList unsettables) {
+		super(source, option, unsettables);
 		
 
 		

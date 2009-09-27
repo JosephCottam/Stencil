@@ -28,8 +28,6 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
-import static stencil.adapters.GlyphAttributes.StandardAttribute.X;
-
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -43,11 +41,11 @@ import stencil.types.Converter;
 
 public class Arc extends Stroked {
 	protected static final AttributeList attributes;
-	protected static final Attribute X1 = new Attribute("X.1", 0, double.class);
-	protected static final Attribute X2 = new Attribute("X.2", 0, double.class);
-	protected static final Attribute Y1 = new Attribute("Y.1", 0, double.class);
-	protected static final Attribute Y2 = new Attribute("Y.2", 0, double.class);
-	protected static final Attribute ARC_HEIGHT = new Attribute("ARC_HEIGHT", 10.0, double.class);
+	protected static final Attribute<Double> X1 = new Attribute("X.1", 0d);
+	protected static final Attribute<Double> X2 = new Attribute("X.2", 0d);
+	protected static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
+	protected static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
+	protected static final Attribute<Double> ARC_HEIGHT = new Attribute("ARC_HEIGHT", 10.0);
 	
 	static {
 		attributes = new AttributeList(Stroked.attributes);
@@ -62,10 +60,10 @@ public class Arc extends Stroked {
 		attributes.remove(StandardAttribute.WIDTH);
 	}
 
-	private double x1 = (Double) attributes.get(X.name()).defaultValue;
-	private double y1 = (Double) attributes.get(X.name()).defaultValue;
-	private double x2 = (Double) attributes.get(X.name()).defaultValue;
-	private double y2 = (Double) attributes.get(X.name()).defaultValue;
+	private double x1 = X1.defaultValue;
+	private double y1 = Y1.defaultValue;
+	private double x2 = X2.defaultValue;
+	private double y2 = Y2.defaultValue;
 
 	private QuadCurve2D arc = new QuadCurve2D.Double();
 	private double arcHeight = (Double) ARC_HEIGHT.defaultValue;

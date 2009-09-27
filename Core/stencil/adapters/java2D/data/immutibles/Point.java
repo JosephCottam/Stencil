@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.java2D.data.glyphs;
+package stencil.adapters.java2D.data.immutibles;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -111,8 +111,10 @@ public abstract class Point implements Glyph2D {
 	protected boolean visible = (Boolean) attributes.get("VISIBLE").defaultValue;
 	
 	protected Point(String id) {this.id = id;}
-	protected Point(Point source, Tuple option) {
+	protected Point(Point source, Tuple option, AttributeList unsettables) {
+		validateOptions(option, unsettables);
 		id = switchCopy(source.id, (String) safeGet(option, ID));
+		
 	}
 	
 	/**How wide is this glyph?*/
@@ -153,8 +155,6 @@ public abstract class Point implements Glyph2D {
 		a.transform(af);
 		return a.getBounds2D();
 	}	
-	
-	public Rectangle2D getBoundsReference() {return getBounds();}
 	
 	/**Duplicate the current glyph, may give it a new ID.
 	 * 
@@ -236,13 +236,24 @@ public abstract class Point implements Glyph2D {
 	
 	public boolean isVisible() {return visible;}
 	
+	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
 	protected static final Object safeGet(Tuple source, Attribute att) {
 		String field = att.name;
 		return (source == null || !source.hasField(field)) ? null : Converter.convert(source.get(field), att.type);
 	}
 	
+	/**REturn either the candidate value -or- if it is null, the defaultValue.*/
 	protected static final <T> T switchCopy(T defaultValue, T candidate) {
 		return candidate==null ? defaultValue : candidate;
+	}
+	
+	/**Ensure that the tuple passed does not have any of the listed 'unsettable' fields.*/
+	protected final void validateOptions(Tuple t, AttributeList unsettables) {
+		for (Attribute att: unsettables) {
+			if (t.hasField(att.name)) {
+				throw new IllegalArgumentException(String.format("Cannot set field %1$s on glyph of type %2$s", att.name, getImplantation()));
+			}
+		}
 	}
 	
 	public Glyph2D update(String field, Object value) {
