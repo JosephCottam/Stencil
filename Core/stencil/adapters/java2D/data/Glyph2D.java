@@ -31,11 +31,6 @@ public interface Glyph2D extends stencil.adapters.Glyph {
 
 	/**Accessor method used in drawing; provided to reduce indirection costs.*/
 	public boolean isVisible();
-
-	
-	//TODO: GET THIS OUT OF HERE!  PASS THE TABLE TO THE CONSTRUCTOR OR SOMETHING!!!!
-	public void setLayer(Table t);
-
 	
 	/**Get the bounding box of the glyph.  The bounding box returned from
 	 * this method MAY BE (but is not necessarily) a direct pointer to an

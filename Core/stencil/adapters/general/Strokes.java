@@ -34,6 +34,7 @@ import java.awt.Color;
 import java.awt.Paint;
 import java.awt.Stroke;
 
+import stencil.streams.Tuple;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.ValueEnum;
@@ -129,6 +130,15 @@ public final class Strokes {
 	public static Stroke setMiterLimit(Double value, Stroke style) {return modify(StrokeProperty.MITER_LIMIT, value, style, null).style;}
 	public static Paint setColor(Double value, Paint paint) {return modify(StrokeProperty.STROKE_WEIGHT, value, null, paint).paint;}
 
+	/**Create a stroke from the given list of tuples.  Tuples are evaluated in order, so later tuples recieve
+	 * precedence of earlier ones.
+	 */
+	public static ColoredStroke makeStroke (Tuple... sources) {
+		
+		//TODO: Implement...
+		return null;
+	}
+	
 	/**Create a modified style/color pair from passed stroke information.
 	 * These methods create new strokes/paints from the ones passed, so the appropriate
 	 * stroke and stroke-paint setting methods need to be called with the respective components of the returned ColoredStroke.

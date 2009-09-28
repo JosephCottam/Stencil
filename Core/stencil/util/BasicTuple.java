@@ -54,7 +54,11 @@ public final class BasicTuple implements Tuple {
 
 	/**Create a Tuple with a single value in it.  If key is left unspecified, the default key is used.*/
 	public static BasicTuple singleton(Object value) {
-		return new BasicTuple(Arrays.asList(new String[]{DEFAULT_KEY}), Arrays.asList(value));
+		return singleton(DEFAULT_KEY, value);
+	}
+	
+	public static BasicTuple singleton(String key, Object value) {
+		return new BasicTuple(Arrays.asList(new String[]{key}), Arrays.asList(value));
 	}
 
 	/**Create a new tuple.

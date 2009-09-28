@@ -31,12 +31,12 @@ package stencil.adapters.java2D.data.immutibles;
 
  import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
 import stencil.streams.Tuple;
-import stencil.adapters.general.Registrations;
+import stencil.adapters.java2D.data.Glyph2D;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
@@ -52,7 +52,7 @@ public final class Line extends Stroked {
 	protected static final Attribute<Double> X2 = new Attribute("X.2", 0d);
 	protected static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
 	protected static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
-	
+
 	static {
 		ATTRIBUTES = new AttributeList(Stroked.attributes);
 		
@@ -81,8 +81,8 @@ public final class Line extends Stroked {
 	private java.awt.Shape shapeCache;
 	private java.awt.geom.Rectangle2D bounds = new Rectangle2D.Double();
 	
-	public Line(String id) {
-		super(id);
+	public Line(Table layer, String id) {
+		super(layer, id);
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
 		x2 = X2.defaultValue;
@@ -121,10 +121,6 @@ public final class Line extends Stroked {
 		shapeCache = new Line2D.Double(x1,y1,x2,y2);
 		
 		bounds = outlineStyle.createStrokedShape(shapeCache).getBounds2D();
-		
-		Point2D p = Registrations.topLeftToRegistration(registration, bounds);
-		this.x = p.getX();
-		this.y = p.getY();
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
@@ -132,4 +128,6 @@ public final class Line extends Stroked {
 		super.render(g,shapeCache);	
 		super.postRender(g, null);
 	}
+
+	public Glyph2D update(Tuple t) throws IllegalArgumentException {return new Line(this, t);}
 }

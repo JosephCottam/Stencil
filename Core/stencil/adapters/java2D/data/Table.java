@@ -68,7 +68,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 
 	public T make(String ID) throws DuplicateIDException {
 		T glyph = (T) prototypeGlyph.update("ID", ID);
-		glyph.setLayer(this);
+		((Point) glyph).setLayer(this);		//TODO: HACK: TEMPORARY FIX...will not be stable
 		index.put(ID, glyph);
 		return glyph;
 	}
@@ -92,7 +92,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 		T prior = index.replace(ID, glyph);
 		updateGeneration();
 		
-		glyph.setLayer(this);
+		((Point)glyph).setLayer(this);	//TODO: HACK: TEMPORARY FIX...will not be stable
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 	}
