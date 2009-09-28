@@ -65,7 +65,10 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
 	
-	public void setDebugColor(Color c) {Point.DEBUG_COLOR = c;}
+	public void setDebugColor(Color c) {
+		Point.DEBUG_COLOR = c;
+		stencil.adapters.java2D.data.immutibles.Point.DEBUG_COLOR = c;
+	}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		throw new UnsupportedOperationException("Not implemented");

@@ -37,6 +37,7 @@ import java.awt.Stroke;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
+import stencil.util.enums.EnumUtils;
 import stencil.util.enums.ValueEnum;
 
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
@@ -134,10 +135,44 @@ public final class Strokes {
 	 * precedence of earlier ones.
 	 */
 	public static ColoredStroke makeStroke (Tuple... sources) {
+		BasicStroke source = DEFAULT_STROKE;
 		
-		//TODO: Implement...
-		return null;
-	}
+		Color strokeColor = DEFAULT_PAINT;
+		Double miterLimit = null;
+		Double strokeWeight = null;
+		Object pattern = null;
+		Integer capStyle = null;
+		Double patternPhase = null;
+		Integer joinStyle = null;
+		
+		for (Tuple t: sources) {
+			for (String f: t.getFields()) {
+				if (EnumUtils.contains(StrokeProperty.class, f)) {
+					StrokeProperty p = StrokeProperty.valueOf(f);
+					Object value = t.get(f);
+					switch (p) {
+						case CAP_STYLE:
+							capStyle = Converter.toInteger(value);
+							break;
+						case JOIN_STYLE:
+							joinStyle = Converter.toInteger(value);
+							break;
+						case MITER_LIMIT:
+							miterLimit = Converter.toDouble(value);
+							break;
+						case STROKE_COLOR:
+							strokeColor = Converter.convertFor(value, strokeColor);
+							break;
+						case STROKE_WEIGHT:
+							strokeWeight = Converter.toDouble(value);
+							break;
+					}
+				}
+			}
+		}		
+		
+		return new ColoredStroke(Strokes.modifyStroke(source, strokeWeight, capStyle, joinStyle, miterLimit, pattern, patternPhase), strokeColor);
+	}  
 	
 	/**Create a modified style/color pair from passed stroke information.
 	 * These methods create new strokes/paints from the ones passed, so the appropriate

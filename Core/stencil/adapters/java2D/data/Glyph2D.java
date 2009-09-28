@@ -23,6 +23,9 @@ public interface Glyph2D extends stencil.adapters.Glyph {
 	 */
 	public Glyph2D update(Tuple t) throws IllegalArgumentException;
 	
+	/**Create a new glyph that belongs to the passed table.*/
+	public Glyph2D updateLayer(Table t);
+	
 	/**Accessor method used in updates; provided to reduce indirection costs.*/
 	public String getID();
 	

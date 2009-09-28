@@ -28,10 +28,22 @@
  */
 package stencil.streams;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface Tuple {
-
+	/**Tuple with no fields.  Should be used instead of null wherever a tuple 
+	 * is required but cannot be supplied.*/
+	public static final Tuple EMPTY_TUPLE = new Tuple() {
+		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
+		public Object get(String name, Class<?> type)
+				throws IllegalArgumentException, InvalidNameException {throw new InvalidNameException(name);}
+		public List<String> getFields() {return new ArrayList<String>();}
+		public boolean hasField(String name) {return false;}
+		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}
+		
+	};
+	
 	public static final String DEFAULT_KEY = "VALUE";
 	public static final String SOURCE_KEY = "SOURCE";
 

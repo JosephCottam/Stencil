@@ -106,4 +106,12 @@ public final class Converter {
 		
 		throw new ConversionException(value, target);
 	}
+	
+	/**Convert a value for storage in the given target.
+	 * This method should only be used if the target is the exact type
+	 * required (super classes, especially Object) may result in incorrect conversions.  
+	 */
+	public static final <T> T convertFor(Object value, T target) throws ConversionException {
+		return (T) convert(value, target.getClass());
+	}
 }

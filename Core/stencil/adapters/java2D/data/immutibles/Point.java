@@ -97,10 +97,10 @@ public abstract class Point implements Glyph2D {
 		
 	}
 
-	protected Point(Point source, Tuple option, AttributeList unsettables) {
-		layer = source.layer;
+	protected Point(Table t, Point source, Tuple option, AttributeList unsettables) {
 		validateOptions(option, unsettables);
 
+		this.layer = t;
 		id = switchCopy(source.id, (String) safeGet(option, ID));
 		rotation = switchCopy(source.rotation, (Double) safeGet(option, ROTATION));
 		visible = switchCopy(source.visible, (Boolean) safeGet(option, VISIBLE));
@@ -170,7 +170,7 @@ public abstract class Point implements Glyph2D {
 	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
 	protected static final Object safeGet(Tuple source, Attribute att) {
 		String field = att.name;
-		return (source == null || !source.hasField(field)) ? null : Converter.convert(source.get(field), att.type);
+		return (!source.hasField(field)) ? null : Converter.convert(source.get(field), att.type);
 	}
 	
 	/**REturn either the candidate value -or- if it is null, the defaultValue.*/

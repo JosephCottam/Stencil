@@ -59,8 +59,8 @@ public abstract class Stroked extends Point {
 		outlinePaint = Strokes.DEFAULT_PAINT;
 	}
 	
-	protected Stroked(Stroked source, Tuple option, AttributeList unsettables) {
-		super(source, option, unsettables);
+	protected Stroked(Table t, Stroked source, Tuple option, AttributeList unsettables) {
+		super(t, source, option, unsettables);
 		ColoredStroke s = Strokes.makeStroke(source, option);
 		outlineStyle = s.style;
 		outlinePaint = s.paint;

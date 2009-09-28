@@ -43,32 +43,28 @@ import stencil.parser.tree.Layer;
 public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
 	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private int generation =0;
-	private String name; 
+	private final String name; 
 	private T prototypeGlyph;
 
-	protected Table(String name, T prototype) {
+	protected Table(String name, T prototypeGlyph) {
 		this.name = name;
-		this.prototypeGlyph = prototype;
-	} 
+		this.prototypeGlyph = (T) prototypeGlyph.updateLayer(this);
+	}
 	
 	public String getName() {return name;}
 	
-	public T find(String ID) {
-		return index.get(ID);
-	}
+	public T find(String ID) {return index.get(ID);}
 
 	public DisplayGuide getGuide(String attribute)
 			throws IllegalArgumentException {
 		return null;
 	}
 
-	public Iterator<T> iterator() {
-		return index.values().iterator();
-	}
+	public Iterator<T> iterator() {return index.values().iterator();}
 
 	public T make(String ID) throws DuplicateIDException {
 		T glyph = (T) prototypeGlyph.update("ID", ID);
-		((Point) glyph).setLayer(this);		//TODO: HACK: TEMPORARY FIX...will not be stable
+		glyph.updateLayer(this);
 		index.put(ID, glyph);
 		return glyph;
 	}
@@ -91,8 +87,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
 		updateGeneration();
-		
-		((Point)glyph).setLayer(this);	//TODO: HACK: TEMPORARY FIX...will not be stable
+		glyph.updateLayer(this);
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 	}
@@ -111,6 +106,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	/**Update the generation ID.**/ 
 	private void updateGeneration() {generation++;}
 	
+	/**Get the tuple prototype of this table.*/
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
 	public static Table<?> instance(Layer l) {
@@ -121,7 +117,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 			if (implantation.equals("SHAPE")) {
 				return new Table(name, new Shape("PROTOTYPE"));
 			} else if (implantation.equals("LINE")) {
-				return new Table(name, new Line("PROTOTYPE"));
+				return new Table(name, new stencil.adapters.java2D.data.immutibles.Line(null, "PROTOTYPE"));
 			} else if (implantation.equals("TEXT")) {
 				return new Table(name, new Text("PROTOTYPE"));
 			} else if (implantation.equals("TEXT_SHAPE")) {

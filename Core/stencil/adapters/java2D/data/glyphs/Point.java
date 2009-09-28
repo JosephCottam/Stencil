@@ -245,6 +245,11 @@ public abstract class Point implements Glyph2D {
 		return candidate==null ? defaultValue : candidate;
 	}
 	
+	public Glyph2D updateLayer(Table t) {
+		this.layer = t;
+		return this;
+	}
+	
 	public Glyph2D update(String field, Object value) {
 		try {
 			Object existing = this.get(field);
@@ -301,7 +306,6 @@ public abstract class Point implements Glyph2D {
 			double scale=2;
 			g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
 		}
-		
 	}
 	
 	/**Convert a full property name to just a base property name.

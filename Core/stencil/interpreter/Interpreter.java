@@ -142,7 +142,9 @@ public class Interpreter {
 					
 					} catch (RuleAbortException ra) {
 						//TODO: Handle (at least report) rule aborts.
-					}					
+					} catch (Exception e) {
+						throw new RuntimeException("Error apply rules in layer " + layer.getName(), e);
+					}
 				}
 			}
 		}

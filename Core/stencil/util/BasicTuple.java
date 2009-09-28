@@ -51,7 +51,7 @@ import stencil.types.Converter;
 public final class BasicTuple implements Tuple {
 	protected List<String> names;
 	protected List values;
-
+	
 	/**Create a Tuple with a single value in it.  If key is left unspecified, the default key is used.*/
 	public static BasicTuple singleton(Object value) {
 		return singleton(DEFAULT_KEY, value);

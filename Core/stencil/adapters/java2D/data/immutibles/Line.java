@@ -89,8 +89,8 @@ public final class Line extends Stroked {
 		y2 = Y1.defaultValue;	
 	}
 	
-	private Line(Line source, Tuple option) {
-		super(source, option, UNSETTABLES);
+	private Line(Table t, Line source, Tuple option) {
+		super(t, source, option, UNSETTABLES);
 
 		this.x1 = switchCopy(source.x1, (Double) safeGet(option, X1));
 		this.x2 = switchCopy(source.x2, (Double) safeGet(option, X2));
@@ -129,5 +129,7 @@ public final class Line extends Stroked {
 		super.postRender(g, null);
 	}
 
-	public Glyph2D update(Tuple t) throws IllegalArgumentException {return new Line(this, t);}
+	public Glyph2D update(Tuple t) throws IllegalArgumentException {return new Line(this.layer, this, t);}
+
+	public Glyph2D updateLayer(Table t) {return new Line(t, this, Tuple.EMPTY_TUPLE);}
 }
