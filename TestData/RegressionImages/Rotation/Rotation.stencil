@@ -2,7 +2,7 @@ STREAM: File
 NAME: Elements
 HEADER: Name
 SEPARATOR: ,
-SOURCE: ./RotationData.txt
+SOURCE: /nfs/rontok/xraid/users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Rotation/RotationData.txt
 CHECKHEADER: true
 
 external stream Elements(Name)
@@ -16,12 +16,25 @@ from Elements
 
 layer Shape
 from Elements
-	ID: Name
+	ID: Concatenate(Name, "TL")
 	SHAPE: "CROSS"
 	ROTATION: Count(Name) -> Mult(12.5, VALUE) -> (VALUE)
 	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
 	Y : 40
 	SIZE: 30
+ 	FILL_COLOR: @color(RED)
+
+from Elements
+	ID: Concatenate(Name, "Center")
+	SHAPE: "CROSS"
+	REGISTRATION: "CENTER"
+	ROTATION: Count(Name) -> Mult(12.8, VALUE) 
+	X : Count(Name) -> Mult(40, _) -> Add(15,_)
+	Y : 100
+	SIZE: 30
+ 	FILL_COLOR: @color(BLUE)
+
+
 
 operator Count(Name) -> (VALUE) 
 	(all) => VALUE : Index(Name) -> VALUE

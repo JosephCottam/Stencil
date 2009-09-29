@@ -94,10 +94,10 @@ public final class Canvas extends JComponent {
 				tablesTracker.fixGeneration(t);
 				for (Glyph2D g: t) {
 					if (bounds == null) {
-						bounds = g.getBoundsReference();
-						bounds = new Rectangle2D.Double(bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+						bounds = (Rectangle2D) g.getBoundsReference().clone();
+					} else {
+						bounds.add(g.getBoundsReference());
 					}
-					else {bounds.add(g.getBoundsReference());}
 				}
 			}
 		} 

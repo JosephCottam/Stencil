@@ -34,7 +34,10 @@ import java.awt.Paint;
 import java.awt.Color;
 import java.awt.Font;
 
+import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.enums.Attribute;
+import stencil.util.enums.EnumUtils;
 
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
 public final class TextFormats {
@@ -48,14 +51,15 @@ public final class TextFormats {
 		public Format() {	
 			String fontName =(String) TextProperty.FONT.defaultValue;
 			int style =((FontStyle) TextProperty.FONT_STYLE.defaultValue).equiv;
-			int size =((Float) TextProperty.FONT_SIZE.defaultValue).intValue();
+			float size = (Float) TextProperty.FONT_SIZE.defaultValue;
 			
-			font =  new Font(fontName, style, size);
+			Font temp =  new Font(fontName, style, 1);
+			font = temp.deriveFont(style, size);
 			textColor =(Color) TextProperty.FONT_COLOR.defaultValue;
 			justification= ((Justification) TextProperty.JUSTIFY.defaultValue).equiv;
 		}
+		
 		public Format(Font font, Color textColor, float justification) {
-			super();
 			this.font = font;
 			this.textColor = textColor;
 			this.justification = justification;
@@ -118,6 +122,47 @@ public final class TextFormats {
 
 	private TextFormats() {/*Utility class. Not instantiable.*/}
 
+	public static final Format make(Tuple... sources) {
+		String name = (String) TextProperty.FONT.defaultValue;
+		FontStyle style = (FontStyle) TextProperty.FONT_STYLE.defaultValue;;
+		Float size = (Float) TextProperty.FONT_SIZE.defaultValue;
+		Color color = (Color) TextProperty.FONT_COLOR.defaultValue;
+		Justification just = (Justification) TextProperty.JUSTIFY.defaultValue;
+		
+		for (Tuple t: sources) {
+			for (String field: t.getFields()) {
+				if (EnumUtils.contains(TextProperty.class, field)) {
+					TextProperty p = TextProperty.valueOf(field);
+					Object value = t.get(field);
+					
+					switch(p) {
+						case FONT:
+							name = Converter.convertFor(value, name); 
+							break;
+						case FONT_COLOR:
+							color = Converter.convertFor(value, color);
+							break;
+						case FONT_SIZE:
+							size = Converter.convertFor(value, size);
+							break;
+						case FONT_STYLE:
+							style = Converter.convertFor(value, style);
+							break;
+						case JUSTIFY:
+							just = Converter.convertFor(value, just);
+							break;
+					}
+					
+				}
+			}
+		}
+		
+		Font f = new Font(name, style.equiv, 1);
+		f = f.deriveFont(style.equiv, size);
+		
+		return new Format(f, color, just.equiv);
+	}
+	
 	/**Given the base font, return a new font with the specified name/size/style.
 	 * Null values indicate that the current value should be retained in the base.
 	 * The original font is not modified (as Fonts are invariant), instead a new

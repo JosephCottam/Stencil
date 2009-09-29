@@ -33,6 +33,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -60,26 +61,21 @@ public abstract class Point implements Glyph2D {
 	protected static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
 
 	protected static final Attribute<Registrations.Registration> REGISTRATION = new Attribute(StandardAttribute.REGISTRATION);
-	protected static final Attribute<Double> ROTATION = new Attribute(StandardAttribute.ROTATION);
 
 	protected static final Attribute<Boolean> VISIBLE = new Attribute("VISIBLE", true);
 	
-	protected static final AttributeList attributes = new AttributeList();
+	protected static final AttributeList ATTRIBUTES = new AttributeList();
 	static {
-		attributes.add(ID);
+		ATTRIBUTES.add(ID);
 
-		attributes.add(LAYERNAME);
-		attributes.add(IMPLANTATION);
-		attributes.add(VISIBLE);
-		attributes.add(ROTATION);
+		ATTRIBUTES.add(LAYERNAME);
+		ATTRIBUTES.add(IMPLANTATION);
+		ATTRIBUTES.add(VISIBLE);
 	}
 	
 	protected final String id;
 	
 	protected final Registration registration;
-	
-	/**The rotation, stored in degrees.*/
-	protected final double rotation;
 	
 	/**What layer does this glyph belong to?*/
 	protected final Table layer;
@@ -91,7 +87,6 @@ public abstract class Point implements Glyph2D {
 		this.layer = layer;
 
 		this.id = id;
-		rotation = ROTATION.defaultValue;
 		visible = VISIBLE.defaultValue;
 		registration = REGISTRATION.defaultValue;
 		
@@ -102,16 +97,9 @@ public abstract class Point implements Glyph2D {
 
 		this.layer = t;
 		id = switchCopy(source.id, (String) safeGet(option, ID));
-		rotation = switchCopy(source.rotation, (Double) safeGet(option, ROTATION));
-		visible = switchCopy(source.visible, (Boolean) safeGet(option, VISIBLE));
-		registration = switchCopy(source.registration, (Registrations.Registration) safeGet(option, REGISTRATION));		
+		visible = switchCopy(source.visible, safeGet(option, VISIBLE));
+		registration = switchCopy(source.registration, safeGet(option, REGISTRATION));		
 	}
-	
-	/**How wide is this glyph?*/
-	public abstract double getWidth();
-	
-	/**How tall is this glyph?*/
-	public abstract double getHeight();
 	
 	/**What is the name of this implantation?*/
 	public abstract String getImplantation();
@@ -141,7 +129,6 @@ public abstract class Point implements Glyph2D {
 		if (LAYERNAME.is(name)) {return layer==null?null:layer.getName();}
 		if (IMPLANTATION.is(name)) {return getImplantation();}
 		if (REGISTRATION.is(name)) {return registration;}
-		if (ROTATION.is(name)) {return rotation;}
 		if (VISIBLE.is(name)) {return visible;}
 		throw new InvalidNameException(name, getFields());
 	}
@@ -168,9 +155,9 @@ public abstract class Point implements Glyph2D {
 	public boolean isVisible() {return visible;}
 	
 	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
-	protected static final Object safeGet(Tuple source, Attribute att) {
+	protected static final <T> T safeGet(Tuple source, Attribute<T> att) {
 		String field = att.name;
-		return (!source.hasField(field)) ? null : Converter.convert(source.get(field), att.type);
+		return (!source.hasField(field)) ? null : (T) Converter.convert(source.get(field), att.type);
 	}
 	
 	/**REturn either the candidate value -or- if it is null, the defaultValue.*/
@@ -186,22 +173,13 @@ public abstract class Point implements Glyph2D {
 			}
 		}
 	}
-		
-	/**Prepare the graphics object for rendering.
-	 * @returns The affine transform that the graphics object originally had.  
-	 * 			This should transform should be given to postRender to ensure other elements render properly.
-	 */
-	protected void preRender(Graphics2D g) {
-		if (rotation != 0) {g.rotate(Math.toRadians(rotation));}
-	}
-	
 	
 	/**Post rendering actions are to restore the transform and draw debugging entities (if requested).
 	 * The transform passed should be the same as the one returned from preRender.
 	 * 
 	 */
 	protected void postRender(Graphics2D g, AffineTransform restore) {
-		if (restore != null) {g.setTransform(restore);}	
+		if (restore != null) {g.setTransform(restore);}			
 		if (DEBUG_COLOR != null) {
 			Rectangle2D r =getBoundsReference();
 			g.setPaint(DEBUG_COLOR);
@@ -210,9 +188,10 @@ public abstract class Point implements Glyph2D {
 			
 			g.setPaint(DEBUG_COLOR.darker());
 			double scale=2;
-			g.fill(Shapes.cross(r.getX()-scale/2, r.getY()-scale/2, scale));
+			double x = (Double) this.get("X", Double.class);
+			double y = (Double) this.get("Y", Double.class);
+			g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
 		}
-		
 	}
 	
 	/**Convert a full property name to just a base property name.
@@ -239,7 +218,7 @@ public abstract class Point implements Glyph2D {
 	 * that is not part of the base name is part of the implicit arguments.
 	 *
 	 */
-	public String nameArgs(String fullName) {
+	public static String nameArgs(String fullName) {
 		String baseName = baseName(fullName);
 		if (baseName.equals(fullName)) {return null;}
 
@@ -248,4 +227,30 @@ public abstract class Point implements Glyph2D {
 
 	public Glyph2D update(String field, Object value) {return update(BasicTuple.singleton(field, value));}
 
+	
+	/**Given two registration and point descriptions (potentially), what should the top-left
+	 * of a new glyph be if it were the merge of source and option?
+	 *  
+	 * @param targetWidth The width of the newly formed thing
+	 * @param targetHeight The height of the newly formed thing
+	 */
+	public static Point2D mergeRegistrations(Point source, Tuple option, double targetWidth, double targetHeight, Attribute<Double> X, Attribute<Double> Y) {
+		double x = switchCopy((Double) source.get(X.name, Double.class), safeGet(option, X));
+		double y = switchCopy((Double) source.get(Y.name, Double.class), safeGet(option, Y));			
+		Registrations.Registration reg = switchCopy(source.registration, safeGet(option, REGISTRATION));
+		
+		//If registrations are split between before and after AND the coordinates are also split, take the old partial value to the new registration system
+		if (source.registration != reg) {
+			if (option.hasField(X.name) && !option.hasField(Y.name)) {	
+				y = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getY();	
+			} else if (!option.hasField(X.name) && option.hasField(Y.name)) {
+				x = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getX();
+			}
+			//Any other case and both X and Y came from the same source, so it will be registration consistent.
+		}		
+
+		//Knowing the registration coordiantes, what is the new top left?
+		Point2D topLeft = Registrations.registrationToTopLeft(reg, x,y, targetHeight, targetWidth);
+		return topLeft;
+	}
 }

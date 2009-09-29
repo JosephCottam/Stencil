@@ -131,7 +131,7 @@ public final class Strokes {
 	public static Stroke setMiterLimit(Double value, Stroke style) {return modify(StrokeProperty.MITER_LIMIT, value, style, null).style;}
 	public static Paint setColor(Double value, Paint paint) {return modify(StrokeProperty.STROKE_WEIGHT, value, null, paint).paint;}
 
-	/**Create a stroke from the given list of tuples.  Tuples are evaluated in order, so later tuples recieve
+	/**Create a stroke from the given list of tuples.  Tuples are evaluated in order, so later tuples receive
 	 * precedence of earlier ones.
 	 */
 	public static ColoredStroke makeStroke (Tuple... sources) {

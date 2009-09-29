@@ -39,11 +39,18 @@ import stencil.parser.string.ParseStencil;
 import stencil.util.ConversionException;
 
 public final class Color implements SigilType<java.awt.Color, ColorTuple> {
-	static final int CLEAR_INT = 0;
-	static final int OPAQUE_INT = 255;
-	
-	public static final boolean isTransparent(java.awt.Color c) {return c.getAlpha()==CLEAR_INT;}
-	public static final boolean isOpaque(java.awt.Color c) {return c.getAlpha()==OPAQUE_INT;}
+	public static final int CLEAR_INT = 0;
+	public static final int OPAQUE_INT = 255;
+
+	public static final boolean isTransparent(java.awt.Paint c) {
+		if (c instanceof java.awt.Color) {return ((java.awt.Color) c).getAlpha()==CLEAR_INT;}
+		return false;
+	}
+
+	public static final boolean isOpaque(java.awt.Paint c) {
+		if (c instanceof java.awt.Color) {return ((java.awt.Color) c).getAlpha()==OPAQUE_INT;}
+		return false;
+	}
 	
 	private static final List<String> HSB = Arrays.asList("HSV", "HSVA", "HSB", "HSBA");
 	private static final List<String> RGB = Arrays.asList("RGB", "RGBA");

@@ -44,19 +44,19 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 
 public abstract class Stroked extends Point {
-	protected static final AttributeList attributes;
+	protected static final AttributeList ATTRIBUTES;
 	static {
-		attributes = new AttributeList(Point.attributes);
-		for (StrokeProperty p: StrokeProperty.values()) {attributes.add(new Attribute(p));}
+		ATTRIBUTES = new AttributeList(Point.ATTRIBUTES);
+		for (StrokeProperty p: StrokeProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
 
 	protected final Stroke outlineStyle;
 	protected final Paint outlinePaint;
 	
-	protected Stroked(Table layer, String id) {
+	protected Stroked(Table layer, String id, Stroke outlineStyle, Paint outlinePaint) {
 		super(layer, id);
-		outlineStyle = Strokes.DEFAULT_STROKE;
-		outlinePaint = Strokes.DEFAULT_PAINT;
+		this.outlineStyle = outlineStyle;
+		this.outlinePaint = outlinePaint;
 	}
 	
 	protected Stroked(Table t, Stroked source, Tuple option, AttributeList unsettables) {

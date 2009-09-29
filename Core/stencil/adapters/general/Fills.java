@@ -42,8 +42,10 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 
+import stencil.streams.Tuple;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
+import stencil.util.enums.EnumUtils;
 
 /**General purpose fill items, covers both textures and solid fills.
  **/
@@ -148,8 +150,8 @@ public final class Fills {
 		PATTERN_BACK(Color.WHITE, Color.class),
 		FILL_COLOR(Color.BLACK, Color.class);			//Will be used as the foreground if pattern is empty or null
 
-		private final Object defaultValue;
-		private final Class type;
+		protected final Object defaultValue;
+		protected final Class type;
 
 		FillProperty(Object defaultValue, Class type)  {
 			this.defaultValue = defaultValue;
@@ -177,7 +179,38 @@ public final class Fills {
 		return "Custom Texture: " +p.toString();
 	}
 
-	public static Paint getFill(Pattern p, int scale, double weight, Color fore, Color back) {
+	/**Make a paint from the list of tuples.  Tuples are evaluated
+	 * in order so precedence is given to later tuples.  The 
+	 * starting point is the default paint.
+	 */
+	public static Paint make(Tuple... sources) {
+	
+		Pattern pattern = (Pattern) FillProperty.PATTERN.defaultValue;
+		int scale = (Integer) FillProperty.PATTERN_SCALE.defaultValue;
+		double weight = (Double) FillProperty.PATTERN_WEIGHT.defaultValue;
+		Color fore = (Color) FillProperty.FILL_COLOR.defaultValue;
+		Color back = (Color) FillProperty.PATTERN_BACK.defaultValue;
+		
+		for (Tuple t: sources) {
+			for (String f: t.getFields()) {
+				if (EnumUtils.contains(FillProperty.class, f)) {
+					FillProperty att = FillProperty.valueOf(f);
+					Object value = t.get(f);
+					switch (att) {
+						case PATTERN: pattern = Converter.convertFor(value, pattern); break;
+						case PATTERN_SCALE: scale = Converter.convertFor(value, scale); break;
+						case PATTERN_WEIGHT: weight = Converter.convertFor(value, weight); break;
+						case PATTERN_BACK: back = Converter.convertFor(value, fore); break;
+						case FILL_COLOR:  fore = Converter.convertFor(value, back); break;
+					}
+				}
+			}
+		}
+		
+		return getFill(pattern, scale, weight, fore, back);
+	}
+	
+	public static CachePaint getFill(Pattern p, int scale, double weight, Color fore, Color back) {
 		switch(p) {
 			case HATCH: return hatch(scale, weight, fore, back);
 			case SOLID: return solid(scale, weight, fore, back);
@@ -203,8 +236,8 @@ public final class Fills {
 			case PATTERN: p = Pattern.valueOf(value.toString()); break;
 			case PATTERN_SCALE: scale = Converter.toInteger(value); break;
 			case PATTERN_WEIGHT: weight = Converter.toDouble(value); break;
-			case PATTERN_BACK: back = (Color) Converter.convert(value, Color.class); break;
-			case FILL_COLOR: fore = (Color) Converter.convert(value, Color.class); break;
+			case PATTERN_BACK: back = Converter.convertFor(value, back); break;
+			case FILL_COLOR: fore = Converter.convertFor(value, fore); break;
 			default: throw new RuntimeException(String.format("Could not find property %1$s on a texture.", att));
 		}
 
@@ -240,11 +273,11 @@ public final class Fills {
 		}
 	}
 
-	public static Paint solid(int scale, double weight, Color fore, Color back) {
+	public static CachePaint solid(int scale, double weight, Color fore, Color back) {
 		return new CachePaint(Pattern.SOLID, scale, weight, fore, back);
 	}
 	
-	public static Paint hatch(int scale, double weight, Color fore, Color back) {
+	public static CachePaint hatch(int scale, double weight, Color fore, Color back) {
 		BufferedImage i = new BufferedImage(scale, scale, BufferedImage.TYPE_INT_RGB);
 		Graphics2D g = (Graphics2D) i.getGraphics();
 
@@ -257,7 +290,7 @@ public final class Fills {
 		g.setStroke(new BasicStroke((float) weight));
 		g.draw(new Line2D.Double(0, 0, scale, scale));
 		g.draw(new Line2D.Double(0, scale, scale,0));
-		Paint p = new CachePaint(Pattern.HATCH, scale, weight, fore, back, i, new Rectangle2D.Double(0,0, i.getWidth(), i.getHeight()));
+		CachePaint p = new CachePaint(Pattern.HATCH, scale, weight, fore, back, i, new Rectangle2D.Double(0,0, i.getWidth(), i.getHeight()));
 
 		return p;
 	}

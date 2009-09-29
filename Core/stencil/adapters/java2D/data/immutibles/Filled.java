@@ -26,58 +26,54 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.java2D.data.glyphs;
+package stencil.adapters.java2D.data.immutibles;
 
 import static stencil.util.enums.EnumUtils.contains;
 
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
-import java.awt.Stroke;
 
+import stencil.adapters.general.Fills;
 import stencil.adapters.general.Strokes;
-import stencil.adapters.general.Strokes.StrokeProperty;
+import stencil.adapters.general.Fills.FillProperty;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 import stencil.types.color.Color;
 
-public abstract class Stroked extends Point {
-	protected static final AttributeList attributes;
+public abstract class Filled extends Stroked {
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
 	static {
-		attributes = new AttributeList(Point.attributes);
-		for (StrokeProperty p: StrokeProperty.values()) {attributes.add(new Attribute(p));}
-	}
-
-	protected Stroke outlineStyle = Strokes.DEFAULT_STROKE;
-	protected Paint outlinePaint = Strokes.DEFAULT_PAINT;
-	
-	protected Stroked(String id) {super(id);}
-	protected Stroked(Stroked source, Tuple option) {
-		super(source, option);
-	}
-
-	/**Sets any fill-related properties.*/
-	public void set(String name, Object value) {
-		if (contains(StrokeProperty.class, name)) {
-			Strokes.ColoredStroke cs= Strokes.modify(name, value, outlineStyle, outlinePaint);
-			outlineStyle = cs.style;
-			outlinePaint = cs.paint;
-		} else {super.set(name, value);}
+		for (FillProperty p: FillProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
 	
-	/**Gets fill-related properties.*/
+	protected final Paint fill;
+	
+	protected Filled(Table layer, String id) {
+		super(layer, id, Strokes.DEFAULT_STROKE, new java.awt.Color(0,0,0, Color.CLEAR_INT));
+		fill = Fills.getDefault();
+	}
+	
+	protected Filled(Table t, Stroked source, Tuple option, AttributeList unsettables) {
+		super(t, source, option, unsettables);
+		fill = Fills.make(source, option);
+	}
+
 	public Object get(String name) {
-		if (contains(StrokeProperty.class, name)) {
-			return Strokes.get(name, outlineStyle, outlinePaint);
+		if (contains(FillProperty.class, name)) {
+			return Fills.get(name, fill);
 		} else {return super.get(name);}
 	}
-
+	
 	protected void render(Graphics2D g, Shape s) {
-		if (outlinePaint != null && outlineStyle != null && !Color.isTransparent(outlinePaint)) {
-			g.setStroke(outlineStyle);
-			g.setPaint(outlinePaint);
-			g.draw(s);
+		assert s !=  null : "Cannot render null shape";
+		
+		if (!Color.isTransparent(fill)) {
+			g.setPaint(fill);
+			g.fill(s);
 		}
+		super.render(g, s);
 	}
 }

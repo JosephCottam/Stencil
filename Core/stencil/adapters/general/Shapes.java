@@ -50,25 +50,30 @@ public final class Shapes {
 
 	private Shapes() {/*Utility class. Not instantiable.*/}
 
+
 	public static Shape getShape(StandardShape shapeType, Rectangle2D bounds) {
+		return getShape(shapeType, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
+	}
+	
+	public static Shape getShape(StandardShape shapeType, double x, double y, double width, double height) {		
 		Shape shape = null;
 
-		Double minDimension = Math.min(bounds.getWidth(), bounds.getHeight());
+		Double minDimension = Math.min(width, height);
 
 		if (shapeType == null) {shapeType = DEFAULT_SHAPE;}
 
 
 		switch (shapeType) {
-			case RECTANGLE: shape = Shapes.rectangle(bounds.getX(),bounds.getY(), bounds.getWidth(), bounds.getHeight()); break;
-			case CROSS: shape = Shapes.cross(bounds.getX(),bounds.getY(), minDimension); break;
-			case ELLIPSE: shape = Shapes.ellipse(bounds.getX(),bounds.getY(), bounds.getWidth(), bounds.getHeight()); break;
-			case DIAMOND: shape = Shapes.diamond(bounds.getX(),bounds.getY(), minDimension); break;
-			case HEXAGON: shape = Shapes.hexagon(bounds.getX(),bounds.getY(), minDimension); break;
-			case STAR: shape = Shapes.star(bounds.getX(),bounds.getY(), minDimension); break;
-			case TRIANGLE_UP: shape =Shapes.triangle_up(bounds.getX(),bounds.getY(), minDimension); break;
-			case TRIANGLE_DOWN:shape =Shapes.triangle_down(bounds.getX(),bounds.getY(), minDimension); break;
-			case TRIANGLE_LEFT: shape =Shapes.triangle_left(bounds.getX(),bounds.getY(), minDimension); break;
-			case TRIANGLE_RIGHT: shape =Shapes.triangle_right(bounds.getX(),bounds.getY(), minDimension); break;
+			case RECTANGLE: shape = Shapes.rectangle(x,y, width, height); break;
+			case CROSS: shape = Shapes.cross(x,y, minDimension); break;
+			case ELLIPSE: shape = Shapes.ellipse(x,y, width, height); break;
+			case DIAMOND: shape = Shapes.diamond(x,y, minDimension); break;
+			case HEXAGON: shape = Shapes.hexagon(x,y, minDimension); break;
+			case STAR: shape = Shapes.star(x,y, minDimension); break;
+			case TRIANGLE_UP: shape =Shapes.triangle_up(x,y, minDimension); break;
+			case TRIANGLE_DOWN:shape =Shapes.triangle_down(x,y, minDimension); break;
+			case TRIANGLE_LEFT: shape =Shapes.triangle_left(x,y, minDimension); break;
+			case TRIANGLE_RIGHT: shape =Shapes.triangle_right(x,y, minDimension); break;
 			case NONE: break; //for none, do nothing!
 			default: throw new AssertionError("ShapePNode does not have renderer for all standard shapes (encountered shape " + shapeType + ").");
 		}

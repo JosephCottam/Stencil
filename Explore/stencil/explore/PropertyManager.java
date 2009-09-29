@@ -102,7 +102,7 @@ public class PropertyManager {
 		Properties p = new Properties();
 		URL base;
 		
-		try {base = new URL("file:\\");}
+		try {base = new URL("file://" + System.getProperty("user.dir")+"/");}
 		catch (Exception e) {throw new Error("Error initailizing context.");}
 
 		Properties props = new Properties();
@@ -113,6 +113,8 @@ public class PropertyManager {
 			}
 			p.putAll(props);
 		}
+		
+		if (p.size() == 0) {throw new Error("No configuration files were loaded.  Aborting Stencil startup.");}
 
 		//Setup session file information for interactive application
 		Interactive.sessionFile = p.getProperty(SESSION_FILE_KEY);
@@ -137,6 +139,9 @@ public class PropertyManager {
 			}
 		}
 		String defaultAdapter = p.getProperty(DEFAULT_ADAPTER);
+		if (defaultAdapter == null) {defaultAdapter = adapterMap.values().iterator().next();}
+		if (defaultAdapter == null) {throw new Error("No stencil adapters found.  Stencil configuration invalid.");}
+		
 		adapterMap.put("(" + defaultAdapter + ")", adapterMap.get(defaultAdapter));
 		
 		AdapterOpts.adapterMap = adapterMap;

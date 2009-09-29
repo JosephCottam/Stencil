@@ -150,7 +150,7 @@ public class Text extends Point {
         	
         	maxWidth = Math.max(maxWidth, width);
         }
-        if (autoHeight) {this.height = fm.getHeight() * lines.length;}
+        if (autoHeight) {this.height = height * lines.length;}
         if (autoWidth) {this.width = maxWidth;}
 
         return dims;
