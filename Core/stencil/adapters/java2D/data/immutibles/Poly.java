@@ -174,7 +174,7 @@ public abstract class Poly extends Stroked {
 				double idx = index(source.points, field, false);
 				if (idx > (int) idx) {insertions.add(idx);}
 				if (idx ==0) {insertions.add(idx);}
-				if (idx > source.points.length) {insertions.add(idx);}
+				if (idx >= source.points.length) {insertions.add(idx);}
 			}
 		}
 		
@@ -183,7 +183,6 @@ public abstract class Poly extends Stroked {
 		
 		//Update values in holes
 		
-		
 		for (String field: option.getFields()) {
 			String base = baseName(field);
 			if (!Xn.is(base) && !Yn.is(base)) {continue;}
@@ -191,10 +190,10 @@ public abstract class Poly extends Stroked {
 			//TODO: Update IDX based on the number of insertions passed
 			int idx = (int) Math.ceil(index(source.points, field, false));
 			double value =  (Double) option.get(field, double.class);
-
+			int offset = insertions.headSet((double) idx+1).size()-1;
 			
-			if (Xn.is(base)) {update[idx][0] = value;
-			} else {update[idx][1] = value;}
+			if (Xn.is(base)) {update[idx+offset][0] = value;}
+			else 			 {update[idx+offset][1] = value;}
 		}
 		
 		return update;

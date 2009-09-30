@@ -225,6 +225,7 @@ public abstract class Point implements Glyph2D {
 		return fullName.substring(baseName(fullName).length());
 	}
 
+	//TODO: collect the appropriate constructor at construction time and do a direct invocation of it.  Then move the update(tuple) method up to here...and profile to see if it is horribly slower 
 	public Glyph2D update(String field, Object value) {return update(BasicTuple.singleton(field, value));}
 
 	

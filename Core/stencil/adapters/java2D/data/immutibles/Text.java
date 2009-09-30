@@ -76,11 +76,10 @@ public class Text extends Point {
 	private final boolean autoWidth;
 	private final boolean autoHeight;
 	
-	private final double width;
-	private final double height;
+	private final Rectangle2D bounds;
 	private final double rotation;
 	
-	private final Rectangle2D bounds;
+	private final Rectangle2D drawBounds;
 	
 	public Text(Table layer, String id) {
 		super(layer, id);
@@ -88,13 +87,12 @@ public class Text extends Point {
 		text = TEXT.defaultValue;
 		scaleBy = SCALE_BY.defaultValue;
 		format = new Format();
-		width = WIDTH.defaultValue;
-		height = HEIGHT.defaultValue;
 		rotation = ROTATION.defaultValue;
 		autoWidth = true;
 		autoHeight = true;
-		
-		bounds  = new Rectangle2D.Double(X.defaultValue,Y.defaultValue,width,height); 
+
+		bounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
+		drawBounds  = (Rectangle2D) bounds.clone(); 
 	}
 	
 	protected Text(Table layer, Text source, Tuple option) {
@@ -121,24 +119,24 @@ public class Text extends Point {
 				
 		DoubleDimension[] sizes = computeLayout(null);
 		 
+		double width, height;
 		if (autoWidth) {width = sizes[sizes.length-1].width;} 
-		else {width = switchCopy(source.width, safeGet(option, WIDTH));}
+		else {width = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));}
 		 
 		if (autoHeight) {height = sizes[sizes.length-1].height;}
-		else {height = switchCopy(source.height, safeGet(option, HEIGHT));}
+		else {height = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));}
 
-		
 		Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
+		bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
+		
 		GeneralPath p = new GeneralPath(new Rectangle2D.Double(0,0, width, height));
 		p.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
 		p.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
-		bounds = p.getBounds2D();
+		drawBounds = p.getBounds2D();
 	}
 
 	
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
-	public double getHeight() {return height;}	
-	public double getWidth() {return width;}
 	public String getImplantation() {return IMPLANTATION;}
 
 	
@@ -165,7 +163,6 @@ public class Text extends Point {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-		if (rotation != ROTATION.defaultValue) {g.rotate(Math.toRadians(rotation));}		
 		
 		fixScale(g);
 		
@@ -174,10 +171,19 @@ public class Text extends Point {
 
 		final DoubleDimension[] dims = computeLayout(g);
 		final String[] lines =SPLITTER.split(text);
+
+		g.translate(bounds.getX(), bounds.getY());
+		g.rotate(Math.toRadians(this.rotation));
+		
 		for (int i=0; i< lines.length; i++) {
 			final DoubleDimension dim = dims[i];
 			String line = lines[i];
-			g.drawString(line, (float) horizontalOffset(dim.width), (float) dim.height *(i+1));
+			
+			double x = horizontalOffset(dim.width);
+			double y = dim.height * i + (dim.height*.8); //TODO: get standard ascent instead...this is just an approximation of baseline to top of ascent
+
+			g.drawString(line, (float) x, (float)y);
+
 			//TODO: Stop drawing when you run out of height
 		}
 		
@@ -188,9 +194,9 @@ public class Text extends Point {
 		if (format.justification == Component.LEFT_ALIGNMENT) {return 0;}
 
 		if (format.justification == Component.RIGHT_ALIGNMENT) {
-			return width - lineWidth;
+			return bounds.getWidth() - lineWidth;
 		}
-		if (format.justification == Component.CENTER_ALIGNMENT) {return width/2.0 - lineWidth/2.0;}
+		if (format.justification == Component.CENTER_ALIGNMENT) {return bounds.getWidth()/2.0 - lineWidth/2.0;}
 		throw new RuntimeException("Unknown justification value: " + format.justification);
 	}
 
@@ -199,7 +205,7 @@ public class Text extends Point {
 	 * it is the overall dimensions.  Iterate on the lines, not on the dimensions when working with dimensions. 
 	 * 
 	 */
-	//TODO: Do width-base line wrapping
+	//TODO: Do width-based line wrapping
 	private DoubleDimension[] computeLayout(Graphics2D g) {
         Graphics2D g2 = g ==null? REFERENCE_GRAPHICS: g;
 		FontMetrics fm = g2.getFontMetrics(format.font);
@@ -222,7 +228,7 @@ public class Text extends Point {
         return dims;
 	}
 
-	public Rectangle2D getBoundsReference() {return bounds;}
+	public Rectangle2D getBoundsReference() {return drawBounds;}
 
 	
 	public Text update(Tuple t) throws IllegalArgumentException {return new Text(this.layer, this, t);}
