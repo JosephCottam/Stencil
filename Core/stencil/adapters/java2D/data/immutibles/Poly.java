@@ -37,8 +37,8 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import stencil.adapters.general.ImplicitArgumentException;
 import stencil.adapters.general.Strokes;
@@ -94,7 +94,7 @@ public abstract class Poly extends Stroked {
 		ATTRIBUTES.add(Yn);
 	}
 	
-	private final Double[][] points;
+	private final List<Point2D> points;
 	private final GeneralPath path;	
 	private final Rectangle2D bounds;
 	private final boolean connect;
@@ -103,7 +103,7 @@ public abstract class Poly extends Stroked {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		this.connect = connect;
 		
-		points = new Double[0][2];
+		points = new ArrayList();
 		path = buildPath(points, this.connect);
 		bounds = path.getBounds2D();
 	}
@@ -112,10 +112,15 @@ public abstract class Poly extends Stroked {
 		super(layer, source, option, UNSETTABLES);
 		this.connect = connect;
 		
-		points = updatePoints(source, option);
-		//Update points array...if required...
+		if (changesPoints(option)) {
+			points = new ArrayList(source.points);
+			updatePoints(points, option);
+			path = buildPath(points, this.connect);
+		} else {
+			points = source.points;
+			path = source.path;
+		}
 		
-		path = buildPath(points, this.connect);
 		bounds = path.getBounds2D();
 	}
 	
@@ -133,22 +138,31 @@ public abstract class Poly extends Stroked {
 		
 		if (Xn.is(base) || Yn.is(base)) {
 			int index = (int) index(points, name, true);
-			if (index == points.length) {return UNITIAILZED_COORDINATE;}
-			if (Xn.is(base)) {return points[index][0];}
-			if (Yn.is(base)) {return points[index][1];}
+			if (index == points.size()) {return UNITIAILZED_COORDINATE;}
+			if (Xn.is(base)) {return points.get(index).getX();}
+			if (Yn.is(base)) {return points.get(index).getY();}
 		} 
 		return super.get(name);
 	}	
 	
-	private static GeneralPath buildPath(Double[][] points, boolean connect) {
-		if (points.length < 1) {return new GeneralPath();} //Nothing to draw until there are two points...
+	/**Does the given tuple have up point-related updates?*/
+	private static final boolean changesPoints(Tuple t) {
+		for (String field: t.getFields()) {
+			String base = baseName(field);
+			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {return true;}
+		}
+		return false;
+	}
+	
+	private static GeneralPath buildPath(List<Point2D> points, boolean connect) {
+		if (points.size() == 0) {return new GeneralPath();} //Nothing to draw until there are two points...
 		
 		GeneralPath p = new GeneralPath();
-		Point2D prior = new Point2D.Double(points[0][0], points[0][1]);
+		Point2D prior = points.get(0);
 		Point2D first = prior;
+		for (int i=1; i< points.size(); i++) {
+			Point2D current = points.get(i);
 
-		for (int i=1; i< points.length; i++) {
-			Point2D current = new Point2D.Double(points[i][0], points[i][1]);
 			Line2D l = new Line2D.Double(prior, current);
 			p.append(l, false);
 			prior = current;
@@ -164,77 +178,80 @@ public abstract class Poly extends Stroked {
 		super.postRender(g, null);
 	}
 	
-	private static final Double[][] updatePoints(Poly source, Tuple option) {
+	private static final class IdxValuePair {
+		final double idx;
+		final double value;
+		final boolean x;
+		final boolean isInsertion;
 		
-		//Figure out where to put extra things...(and how many there are)
-		SortedSet<Double> insertions = new TreeSet<Double>();
-		for (String field: option.getFields()) {
-			String base = baseName(field);
-			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
-				double idx = index(source.points, field, false);
-				if (idx > (int) idx) {insertions.add(idx);}
-				if (idx ==0) {insertions.add(idx);}
-				if (idx >= source.points.length) {insertions.add(idx);}
+		IdxValuePair(double idx, double value, boolean x) {
+			this.idx = idx;
+			this.value = value;
+			this.x = x;
+			isInsertion = (idx == Math.ceil(idx) || idx ==0);//Fractional values and insert at the start of the list
+		}
+		
+		int realIndex() {return (int) Math.ceil(idx);}
+		
+		Point2D update(Point2D original) {
+			if (x) {
+				return new Point2D.Double(value, original.getY());
+			} else {
+				return new Point2D.Double(original.getX(), value);
 			}
 		}
-		
-		//Create target array from old array with holes in the right spots
-		Double[][] update = duplicate(source.points, insertions.toArray(new Double[insertions.size()]));		
-		
-		//Update values in holes
-		
-		for (String field: option.getFields()) {
-			String base = baseName(field);
-			if (!Xn.is(base) && !Yn.is(base)) {continue;}
-			
-			//TODO: Update IDX based on the number of insertions passed
-			int idx = (int) Math.ceil(index(source.points, field, false));
-			double value =  (Double) option.get(field, double.class);
-			int offset = insertions.headSet((double) idx+1).size()-1;
-			
-			if (Xn.is(base)) {update[idx+offset][0] = value;}
-			else 			 {update[idx+offset][1] = value;}
-		}
-		
-		return update;
 	}
 	
-	protected static Double[][] duplicate(Double[][] source, Double[] insertions) {
-		Double[][] duplicate = new Double[source.length + insertions.length][];
+	private static final void updatePoints(List<Point2D> points, Tuple option) {
+		List<IdxValuePair> updates = new ArrayList(option.getFields().size());
+		
+		for (String field: option.getFields()) {
+			final String base = baseName(field);
+			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
+				double idx = index(points, field, false);
+				double value = (Double) option.get(field, Double.class);
+				updates.add(new IdxValuePair(idx, value, Xn.is(base)));
+			}
+		}
 
-		for (int d=0, o=0, i=0; d < duplicate.length; d++, o++) {
-			//Create a new entry
-			duplicate[d] = new Double[2];
-
-			//Insert a value if we are the correct index in the original
-			if (i < insertions.length && insertions[i] == o) {
-				duplicate[d][0] = Xn.defaultValue;
-				duplicate[d][1] = Xn.defaultValue;
-				d++; 
-				i++;
-			} else if (o<source.length) {
-				duplicate[d][0] = source[o][0];
-				duplicate[d][1] = source[o][1];
-			} else {
-				duplicate[d][0] = Xn.defaultValue;
-				duplicate[d][1] = Xn.defaultValue;
+		for (IdxValuePair p: updates) {
+			if (!p.isInsertion) {
+				int index = p.realIndex();
+				Point2D original = points.get(index);
+				points.set(index, p.update(original));
 			}
 		}
 		
-		return duplicate;
-		
+		List<Point2D> added = new ArrayList(updates.size());
+		for (IdxValuePair p: updates) {
+			if (p.isInsertion) {
+				int index = p.realIndex();
+				Point2D candidate = null;
+				if (index < points.size()) {candidate = points.get(index);}
+				
+				if (!added.contains(candidate)) {
+					candidate = new Point2D.Double();
+					candidate = p.update(candidate);
+					points.add(index, candidate);
+					added.add(candidate);
+				} else {
+					candidate = p.update(candidate);
+					points.set(index, candidate);					
+				}
+			}
+		}
 	}
 
 	/**What is the X/Y implicit argument (as a number)*/
-	private static double index(Double[][] points, String att, boolean onlyInt) {
+	private static double index(List<Point2D> points, String att, boolean onlyInt) {
 		if (Xn.is(att) && Yn.is(att)) {return -1;}
 		
 		try {
 			double val;
 			String arg = nameArgs(att);
 
-			if (arg.equals(NEW_VALUE)) {val = points.length;}
-			else if (arg.equals(FINAL_VALUE)) {val = points.length-1;}
+			if (arg.equals(NEW_VALUE)) {val = points.size();}
+			else if (arg.equals(FINAL_VALUE)) {val = points.size()-1;}
 			else {val = Double.parseDouble(arg);}
 
 			if (onlyInt && Math.floor(val) != val) {throw new ImplicitArgumentException(Line.class, att, "Can only reference integers in current call context.", null);}
