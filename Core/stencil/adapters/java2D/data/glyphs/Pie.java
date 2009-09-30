@@ -32,31 +32,39 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 
 import stencil.adapters.general.Pies;
+import stencil.adapters.general.Registrations;
+import stencil.adapters.general.Strokes;
 import stencil.adapters.general.Strokes.StrokeProperty;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 
 public final class Pie extends Stroked {
-	protected static final Color DEFAULT_SLICE_COLOR  = Color.RED;
-	protected static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
+	private static final String IMPLANTATION = "PIE";
+	
+	private static final Color DEFAULT_SLICE_COLOR  = Color.RED;
+	private static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
 
+	private static final AttributeList attributes = new AttributeList(Stroked.ATTRIBUTES);;
+	private static final AttributeList UNSETTABLES = new AttributeList();;
+
+	private static final Attribute<Double> X = new Attribute("X", 0d);
+	private static final Attribute<Double> Y = new Attribute("Y", 0d);
+	private static final Attribute<Double> PERCENT = new Attribute("PERCENT", 0.5d);
+	private static final Attribute<Double> SLICE = new Attribute("SLICE", 0.5d);
+	private static final Attribute<Double> FIELD = new Attribute("FIELD", 0.5d);
+	private static final Attribute<Color> SLICE_COLOR = new Attribute("SLICE_COLOR", DEFAULT_SLICE_COLOR, Paint.class);
+	private static final Attribute<Color> FIELD_COLOR = new Attribute("FIELD_COLOR", DEFAULT_FIELD_COLOR, Paint.class);
+	private static final Attribute<Double> ANGLE = new Attribute("ANGLE", 0.0d);
+	private static final Attribute<Double> SIZE = new Attribute("SIZE", 1.0d);
 	
-	private static final Attribute PERCENT = new Attribute("PERCENT", 0.5d);
-	private static final Attribute SLICE = new Attribute("SLICE", 0.5d);
-	private static final Attribute FIELD = new Attribute("FIELD", 0.5d);
-	private static final Attribute SLICE_COLOR = new Attribute("SLICE_COLOR", DEFAULT_SLICE_COLOR, Paint.class);
-	private static final Attribute FIELD_COLOR = new Attribute("FIELD_COLOR", DEFAULT_FIELD_COLOR, Paint.class);
-	private static final Attribute ANGLE = new Attribute("ANGLE", 0.0d);
-	private static final Attribute SIZE = new Attribute("SIZE", 1.0d);
-	
-	protected static final AttributeList attributes;
 	
 	static {
-		attributes = new AttributeList(Stroked.attributes);
-
 		attributes.add(PERCENT);
 		attributes.add(SLICE);
 		attributes.add(FIELD);
@@ -66,26 +74,55 @@ public final class Pie extends Stroked {
 		attributes.add(FIELD_COLOR);
 	}
 
-	private double size = (Double) SIZE.defaultValue;	
-	private Paint slicePaint = (Paint) SLICE_COLOR.defaultValue;
-	private Paint fieldPaint = (Paint) FIELD_COLOR.defaultValue;
+	private final double size;	
+	private final Paint slicePaint;
+	private final Paint fieldPaint;
 
-	private double angle;
+	private final double angle;
+	private final double field;
+	private final double slice;
 	
-	private double field;
-	private double slice;
+	private final Rectangle2D bounds;
+	private final java.awt.Shape arc;
+	private final java.awt.Shape outline;
 	
-	public Pie(String id) {super(id);}
 	
-	public void set(String name, Object value) {
-		if (PERCENT.is(name)) {double p = Converter.toDouble(value); slice = p; field = 1-p;}
-		else if (SLICE.is(name)) {slice = Converter.toDouble(value);}
-		else if (FIELD.is(name)) {field = Converter.toDouble(value);}
-		else if (ANGLE.is(name)) {angle = Converter.toDouble(value);}
-		else if (SIZE.is(name)) {size = Converter.toDouble(value);}
-		else if (SLICE_COLOR.is(name)) {slicePaint = (Paint) Converter.convert(value, Paint.class);}
-		else if (FIELD_COLOR.is(name)) {fieldPaint = (Paint) Converter.convert(value, Paint.class);}
-		else {super.set(name, value);}
+	public Pie(Table layer, String id) {
+		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
+		
+		size = SIZE.defaultValue;
+		slicePaint = SLICE_COLOR.defaultValue;
+		fieldPaint = FIELD_COLOR.defaultValue;
+		angle = ANGLE.defaultValue;
+		field = FIELD.defaultValue;
+		slice = SLICE.defaultValue;
+
+		arc = Pies.makeSlice(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		outline = Pies.makePieOutline(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		bounds = outline.getBounds2D();
+	}
+	
+	private Pie(Table layer, Pie source, Tuple option) {
+		super(layer, source, option, UNSETTABLES);
+		
+		size = switchCopy(source.size, safeGet(option, SIZE));
+		slicePaint = switchCopy(source.slicePaint, safeGet(option, SLICE_COLOR));
+		fieldPaint = switchCopy(source.fieldPaint, safeGet(option, FIELD_COLOR));
+		angle = switchCopy(source.angle, safeGet(option, ANGLE));
+		
+		if (option.hasField(PERCENT.name)) {
+			slice = (Double) option.get(PERCENT.name, Double.class);
+			field = 100 - slice;
+		} else {
+			field = switchCopy(source.field, safeGet(option, FIELD));
+			slice = switchCopy(source.slice, safeGet(option, SLICE));
+		}
+		
+		Point2D topLeft = mergeRegistrations(source, option, size, size, X, Y);
+		
+		arc = Pies.makeSlice(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		outline = Pies.makePieOutline(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		bounds = outline.getBounds2D();
 	}
 	
 	public Object get(String name) {
@@ -96,30 +133,20 @@ public final class Pie extends Stroked {
 		if (FIELD_COLOR.is(name)) {return fieldPaint;}
 		if (ANGLE.is(name)) {return angle;}
 		if (SIZE.is(name)) {return size;}
-		
+		if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
+		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
 		return super.get(name);
 	}
 	
 	protected AttributeList getAttributes() {return attributes;}
 
 	private double getPercent() {return slice/(slice+field);}
-	public double getHeight() {return size;}
-	public double getWidth() {return size;}
-	public String getImplantation() {return "PIE";}
+	public String getImplantation() {return IMPLANTATION;}
+	
+	public Rectangle2D getBoundsReference() {return bounds;}
 
 
 	public void render(Graphics2D g, AffineTransform base) {
-		double angle = this.angle;
-		double percent = getPercent();
-		double size = this.size;
-		double strokeWidth = (Double) get(StrokeProperty.STROKE_WEIGHT.name());
-		Color strokePaint = (Color) outlinePaint;
-		
-		java.awt.Shape arc = Pies.makeSlice(angle, percent, 0, 0, size, strokeWidth, strokePaint);
-		java.awt.Shape outline = Pies.makePieOutline(angle, percent, 0, 0, size, strokeWidth, strokePaint);
-
-
-		super.preRender(g);
 		g.setPaint(fieldPaint);
 		g.fill(outline);
 		
@@ -128,9 +155,10 @@ public final class Pie extends Stroked {
 			g.fill(arc);
 		}
 
-		
 		super.render(g, outline);
 		super.postRender(g, base);
 	}
 
+	public Pie update(Tuple t) throws IllegalArgumentException {return new Pie(this.layer, this, t);}
+	public Pie updateLayer(Table layer) {return new Pie(layer, this, Tuple.EMPTY_TUPLE);}
 }

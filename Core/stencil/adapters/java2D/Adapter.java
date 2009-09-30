@@ -36,7 +36,7 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.Table;
-import stencil.adapters.java2D.data.glyphs.Point;
+import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
@@ -66,8 +66,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
 	
 	public void setDebugColor(Color c) {
-		Point.DEBUG_COLOR = c;
-		stencil.adapters.java2D.data.immutibles.Basic.DEBUG_COLOR = c;
+		Basic.DEBUG_COLOR = c;
 	}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {

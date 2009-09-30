@@ -30,6 +30,8 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -37,63 +39,96 @@ import java.io.File;
 import stencil.WorkingDirectory;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
+import stencil.adapters.general.Registrations;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 
-public final class Image extends Point {
+public final class Image extends Basic {
 	private static final double AUTO_SCALE = -1;
-	
-	private static final Attribute HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SCALE);
-	private static final Attribute WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SCALE);
-	private static final Attribute FILE= new Attribute("FILE", null, String.class);
-	protected static final AttributeList attributes = new AttributeList();
 
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
+	protected static final AttributeList UNSETTABLES= new AttributeList();
+	
+	private static final Attribute<Double> X = new Attribute("X", 0d);
+	private static final Attribute<Double> Y = new Attribute("Y", 0d);
+	private static final Attribute<Double> HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SCALE);
+	private static final Attribute<Double> WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SCALE);
+	private static final Attribute<String> FILE= new Attribute("FILE", null, String.class);
+	protected static final Attribute<Double> ROTATION = new Attribute(StandardAttribute.ROTATION);
+	
 	static {
-		attributes.add(FILE);
-		attributes.add(HEIGHT);
-		attributes.add(WIDTH);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
+		ATTRIBUTES.add(FILE);
+		ATTRIBUTES.add(HEIGHT);
+		ATTRIBUTES.add(WIDTH);
+		ATTRIBUTES.add(ROTATION);
 	}
 
+	private final String filename;
+	private final double width;
+	private final double height;
+
+	private final double rotation;
+	private final Rectangle2D bounds;
+	
+	private double oldSX, oldSY;
 	private BufferedImage base;
 	private BufferedImage display;
-	private String filename = (String) FILE.defaultValue;
 
-	private double oldSX, oldSY;
-	
-	private double width = (Double) HEIGHT.defaultValue;
-	private double height = (Double) WIDTH.defaultValue;
-	
-	public Image(String id) {super(id);}
+	public Image(Table layer, String id) {
+		super(layer, id);
+		
+		filename = FILE.defaultValue;
+		
+		rotation = ROTATION.defaultValue;
+		width = WIDTH.defaultValue;
+		height = HEIGHT.defaultValue;
 
-	protected AttributeList getAttributes() {return attributes;}
-
-	public void set(String name, Object value) {
-			 if (HEIGHT.is(name)) 	{height= Converter.toDouble(value); verifyImage();}
-		else if (WIDTH.is(name)) 	{width = Converter.toDouble(value); verifyImage();}
-		else if (FILE.is(name)) 	{filename = Converter.toString(value); base = null; verifyImage();}
-		else						{super.set(name, value);}
+		Point2D topLeft = Registrations.registrationToTopLeft(registration, X.defaultValue, Y.defaultValue, height, width);
+		
+		bounds = getBounds(topLeft);
 	}
 	
-	public Object get(String name) {
-		if (HEIGHT.is(name)) 	{return height;}
-		if (WIDTH.is(name)) 	{return width;}
-		if (FILE.is(name)) 	{return filename;}
+	public Image(Table layer, Image source, Tuple option) {
+		super(layer, source, option, UNSETTABLES);
 		
+		filename = switchCopy(source.filename, safeGet(option, FILE));
+		width = switchCopy(source.width, safeGet(option, WIDTH));
+		height = switchCopy(source.height, safeGet(option, HEIGHT));
+		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
+		Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
+
+		bounds = getBounds(topLeft);
+
+	}
+	
+	private final Rectangle2D getBounds(Point2D p) {return new Rectangle2D.Double(p.getX(), p.getY(), getWidth(), getHeight());}
+
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
+
+	public Object get(String name) {
+		if (HEIGHT.is(name)){return getHeight();}
+		if (WIDTH.is(name))	{return getWidth();}
+		if (FILE.is(name)) 	{return filename;}
+		if (X.is(name))		{return Registrations.topLeftToRegistration(registration, bounds).getX();}
+		if (Y.is(name))		{return Registrations.topLeftToRegistration(registration, bounds).getY();}
 		return super.get(name);
 	}
 	
 	public String getImplantation() {return "IMAGE";}
 
-	public double getHeight() {
-		if (base ==null) {return 0;}
-		else if (height != AUTO_SCALE) {return height;}
+	private double getHeight() {
+		if (height != AUTO_SCALE) {return height;}
+		else if (base == null) {return 0;}
 		return base.getHeight() * autoScale();
 	}
 	
 	public double getWidth() {
-		if (base ==null) {return 0;}
-		else if (width != AUTO_SCALE) {return width;}
+		if (width != AUTO_SCALE) {return width;}
+		else if (base ==null) {return 0;}
 		return base.getWidth() * autoScale();
 	}
 	
@@ -121,9 +156,11 @@ public final class Image extends Point {
 
 	@Override
 	public void render(Graphics2D g, AffineTransform baseTransform) {
+		verifyImage();
 		if (base == null) {return;}
 		
-		super.preRender(g);
+
+		g.translate(bounds.getX(), bounds.getY());
 		 
 		AffineTransform t = g.getTransform();
 		g.setTransform(AffineTransform.getTranslateInstance(t.getTranslateX(), t.getTranslateY()));
@@ -141,4 +178,10 @@ public final class Image extends Point {
 		g.drawRenderedImage(display, null);
 		super.postRender(g,baseTransform);
 	}
+
+	public Rectangle2D getBoundsReference() {return bounds;}
+
+	public Image update(Tuple t) throws IllegalArgumentException {return new Image(layer, this, t);}
+
+	public Image updateLayer(Table layer) {return new Image(layer, this, Tuple.EMPTY_TUPLE);}
 }

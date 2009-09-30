@@ -31,89 +31,102 @@ package stencil.adapters.java2D.data.glyphs;
 
  import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.GlyphAttributes.StandardAttribute;
+import stencil.adapters.general.Strokes;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
 public final class Line extends Stroked {
-	protected static final AttributeList attributes;
-	protected static final Attribute<Double> X1 = new Attribute("X.1", 0d);
-	protected static final Attribute<Double> X2 = new Attribute("X.2", 0d);
-	protected static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
-	protected static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
+	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
+	private static final AttributeList UNSETTABLES = new AttributeList();
+	private static final String IMPLANTATION = "LINE";
 	
-	static {
-		attributes = new AttributeList(Stroked.attributes);
+	private static final Attribute<Double> X = new Attribute("X", 0d);
+	private static final Attribute<Double> Y = new Attribute("Y", 0d);
+	private static final Attribute<Double> WIDTH = new Attribute("WIDTH", 0d);
+	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 0d);
+	private static final Attribute<Double> X1 = new Attribute("X.1", 0d);
+	private static final Attribute<Double> X2 = new Attribute("X.2", 0d);
+	private static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
+	private static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
 
-		attributes.add(X1);
-		attributes.add(Y1);
-		attributes.add(X2);
-		attributes.add(Y2);
-		
-		attributes.remove(StandardAttribute.HEIGHT);
-		attributes.remove(StandardAttribute.WIDTH);
+	static {
+		ATTRIBUTES.add(X1);
+		ATTRIBUTES.add(Y1);
+		ATTRIBUTES.add(X2);
+		ATTRIBUTES.add(Y2);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
+		ATTRIBUTES.add(WIDTH);
+		ATTRIBUTES.add(HEIGHT);
+
+		UNSETTABLES.add(X);
+		UNSETTABLES.add(Y);
+		UNSETTABLES.add(WIDTH);
+		UNSETTABLES.add(HEIGHT);
 	}
 
-	private double x1;
-	private double y1;
-	private double x2;
-	private double y2;
+	private final double x1;
+	private final double y1;
+	private final double x2;
+	private final double y2;
 	
-	private java.awt.Shape shapeCache;
-	private java.awt.geom.Rectangle2D bounds = new Rectangle2D.Double();
+	private final java.awt.Shape glyph;
+	private final java.awt.geom.Rectangle2D bounds;
 	
-	public Line(String id) {
-		super(id);
+	public Line(Table layer, String id) {
+		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
 		x2 = X2.defaultValue;
 		y2 = Y1.defaultValue;	
+
+		glyph = new Line2D.Double(x1,y1,x2,y2);		
+		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
 	}
 	
-	public double getHeight() {return bounds.getHeight();}
-	public double getWidth() {return bounds.getWidth();}
-	public Rectangle2D getBounds() {return (Rectangle2D) bounds.clone();}
+	private Line(Table t, Line source, Tuple option) {
+		super(t, source, option, UNSETTABLES);
 
-	public String getImplantation() {return "LINE";} 
+		x1 = switchCopy(source.x1, safeGet(option, X1));
+		x2 = switchCopy(source.x2, safeGet(option, X2));
+		y1 = switchCopy(source.y1, safeGet(option, Y1));
+		y2 = switchCopy(source.y2, safeGet(option, Y2));
+		
+		glyph = new Line2D.Double(x1,y1,x2,y2);		
+		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
+	}
+	
+	public Rectangle2D getBoundsReference() {return bounds;}
 
-	protected AttributeList getAttributes() {return attributes;}
+	public String getImplantation() {return IMPLANTATION;} 
+
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	
 	public Object get(String name) {
 		if (X1.is(name)) 	  {return x1;}
 		else if (Y1.is(name)) {return y1;}
 		else if (X2.is(name)) {return x2;}
 		else if (Y2.is(name)) {return y2;}
+		else if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
+		else if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
+		else if (WIDTH.is(name)) {return bounds.getWidth();}
+		else if (HEIGHT.is(name)) {return bounds.getHeight();}
 		else{return super.get(name);}		
 	}
-	
-	public void set(String name, Object value) {
-		if (X1.is(name)) 	  {x1 = Converter.toDouble(value); validateXY();}
-		else if (Y1.is(name)) {y1 = Converter.toDouble(value); validateXY();}
-		else if (X2.is(name)) {x2 = Converter.toDouble(value); validateXY();}
-		else if (Y2.is(name)) {y2 = Converter.toDouble(value); validateXY();}
-		else if (name.equals("X") || name.equals("Y")) {throw new IllegalArgumentException("Cannot set raw X and Y on a line.");}
-		else{super.set(name, value);}
-	}
-	
-	private void validateXY() {
-		shapeCache = new Line2D.Double(x1,y1,x2,y2);
 		
-		bounds = outlineStyle.createStrokedShape(shapeCache).getBounds2D();
-		
-		Point2D p = Registrations.topLeftToRegistration(registration, bounds);
-		this.x = p.getX();
-		this.y = p.getY();
-	}
-	
 	public void render(Graphics2D g, AffineTransform base) {
-//		AffineTransform restore = super.preRender(g);
-		super.render(g,shapeCache);	
-		super.postRender(g, null);
+		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
+
+		super.render(g,glyph);	
+		super.postRender(g, base);
 	}
+
+	public Line update(Tuple t) throws IllegalArgumentException {return new Line(this.layer, this, t);}
+	public Line updateLayer(Table t) {return new Line(t, this, Tuple.EMPTY_TUPLE);}
 }

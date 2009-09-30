@@ -29,35 +29,38 @@
 package stencil.adapters.java2D.data.glyphs;
 
 import static stencil.util.enums.EnumUtils.contains;
-import static stencil.adapters.general.Fills.FillProperty;
-import stencil.adapters.general.Fills;
-import stencil.adapters.java2D.util.Attribute;
-import stencil.adapters.java2D.util.AttributeList;
-import java.awt.Paint;
+
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Paint;
 import java.awt.Shape;
 
-public abstract class Filled extends Stroked {
-	
-	protected static final AttributeList attributes;
-	static {
-		attributes = new AttributeList(Stroked.attributes);
-		for (FillProperty p: FillProperty.values()) {attributes.add(new Attribute(p));}
-	}
-	
-	protected Filled(String id) {super(id);}
-	
-	protected Paint fill = Fills.getDefault();
+import stencil.adapters.general.Fills;
+import stencil.adapters.general.Strokes;
+import stencil.adapters.general.Fills.FillProperty;
+import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.util.Attribute;
+import stencil.adapters.java2D.util.AttributeList;
+import stencil.streams.Tuple;
+import stencil.types.color.Color;
 
-	/**Sets any fill-related properties.*/
-	public void set(String name, Object value) {
-		if (contains(FillProperty.class, name)) {
-			fill = Fills.modify(fill, name, value);
-		} else {super.set(name, value);}
+public abstract class Filled extends Stroked {
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
+	static {
+		for (FillProperty p: FillProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
 	
-	/**Gets fill-related properties.*/
+	protected final Paint fill;
+	
+	protected Filled(Table layer, String id) {
+		super(layer, id, Strokes.DEFAULT_STROKE, new java.awt.Color(0,0,0, Color.CLEAR_INT));
+		fill = Fills.getDefault();
+	}
+	
+	protected Filled(Table t, Stroked source, Tuple option, AttributeList unsettables) {
+		super(t, source, option, unsettables);
+		fill = Fills.make(source, option);
+	}
+
 	public Object get(String name) {
 		if (contains(FillProperty.class, name)) {
 			return Fills.get(name, fill);
@@ -67,9 +70,7 @@ public abstract class Filled extends Stroked {
 	protected void render(Graphics2D g, Shape s) {
 		assert s !=  null : "Cannot render null shape";
 		
-		Rectangle bounds = s.getBounds();
-		if (bounds.width ==0 || bounds.height ==0) {return;}
-		if (fill != null) {
+		if (!Color.isTransparent(fill)) {
 			g.setPaint(fill);
 			g.fill(s);
 		}

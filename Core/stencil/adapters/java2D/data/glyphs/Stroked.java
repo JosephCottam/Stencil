@@ -36,34 +36,34 @@ import java.awt.Shape;
 import java.awt.Stroke;
 
 import stencil.adapters.general.Strokes;
+import stencil.adapters.general.Strokes.ColoredStroke;
 import stencil.adapters.general.Strokes.StrokeProperty;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
-import stencil.types.color.Color;
 
-public abstract class Stroked extends Point {
-	protected static final AttributeList attributes;
+public abstract class Stroked extends Basic {
+	protected static final AttributeList ATTRIBUTES;
 	static {
-		attributes = new AttributeList(Point.attributes);
-		for (StrokeProperty p: StrokeProperty.values()) {attributes.add(new Attribute(p));}
+		ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
+		for (StrokeProperty p: StrokeProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
 
-	protected Stroke outlineStyle = Strokes.DEFAULT_STROKE;
-	protected Paint outlinePaint = Strokes.DEFAULT_PAINT;
+	protected final Stroke outlineStyle;
+	protected final Paint outlinePaint;
 	
-	protected Stroked(String id) {super(id);}
-	protected Stroked(Stroked source, Tuple option) {
-		super(source, option);
+	protected Stroked(Table layer, String id, Stroke outlineStyle, Paint outlinePaint) {
+		super(layer, id);
+		this.outlineStyle = outlineStyle;
+		this.outlinePaint = outlinePaint;
 	}
-
-	/**Sets any fill-related properties.*/
-	public void set(String name, Object value) {
-		if (contains(StrokeProperty.class, name)) {
-			Strokes.ColoredStroke cs= Strokes.modify(name, value, outlineStyle, outlinePaint);
-			outlineStyle = cs.style;
-			outlinePaint = cs.paint;
-		} else {super.set(name, value);}
+	
+	protected Stroked(Table t, Stroked source, Tuple option, AttributeList unsettables) {
+		super(t, source, option, unsettables);
+		ColoredStroke s = Strokes.makeStroke(source, option);
+		outlineStyle = s.style;
+		outlinePaint = s.paint;
 	}
 	
 	/**Gets fill-related properties.*/
@@ -74,10 +74,16 @@ public abstract class Stroked extends Point {
 	}
 
 	protected void render(Graphics2D g, Shape s) {
-		if (outlinePaint != null && outlineStyle != null && !Color.isTransparent(outlinePaint)) {
+		if (outlinePaint != null && outlineStyle != null && !clear(outlinePaint)) {
 			g.setStroke(outlineStyle);
 			g.setPaint(outlinePaint);
 			g.draw(s);
 		}
 	}
+	
+	private static final boolean clear(Paint p) {
+		if (p instanceof java.awt.Color) {return ((java.awt.Color) p).getAlpha() == 0;}
+		return false;
+	}
+	
 }

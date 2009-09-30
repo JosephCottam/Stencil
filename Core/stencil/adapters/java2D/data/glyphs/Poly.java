@@ -37,213 +37,230 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
 import java.util.List;
 
-import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.ImplicitArgumentException;
+import stencil.adapters.general.Strokes;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
-		public PolyLine(String id) {super(id, false);}
+		public PolyLine(Table layer, String id) {super(layer, id, false);}
+		public PolyLine(Table layer, PolyLine source, Tuple option) {
+			super(layer, source, option, false);
+		}
+		
 		public String getImplantation() {return "POLY_LINE";}
+		
+		public PolyLine update(Tuple t) throws IllegalArgumentException {
+			return new PolyLine(this.getLayer(), this, t);
+		}
+
+		public PolyLine updateLayer(Table layer) {
+			return new PolyLine(layer, this, Tuple.EMPTY_TUPLE);
+		}
 	}
 	public static class Polygon extends Poly {
-		public Polygon(String id) {super(id, true);}
+		public Polygon(Table layer,String id) {super(layer, id, true);}
+		public Polygon(Table layer, Polygon source, Tuple option) {
+			super(layer, source, option, true);
+		}
+		
 		public String getImplantation() {return "POLYGON";}
+
+		public Polygon update(Tuple t) throws IllegalArgumentException {
+			return new Polygon(this.getLayer(), this, t);
+		}
+
+		public Polygon updateLayer(Table layer) {
+			return new Polygon(layer, this, Tuple.EMPTY_TUPLE);
+		}
 	}
 	
 	public static final Double DEFAULT_COORDINATE_VALUE = 0.0;
 	private static final Double UNITIAILZED_COORDINATE  = Double.NaN;
 	
-	protected static final AttributeList attributes;
-	protected static final Attribute Xn = new Attribute("Xn", 0, double.class);
-	protected static final Attribute Yn = new Attribute("Yn", 0, double.class);
-	
-	static {
-		attributes = new AttributeList(Stroked.attributes);
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
+	protected static final AttributeList UNSETTABLES = new AttributeList();
+	protected static final Attribute<Double> Xn = new Attribute("Xn", 0d, double.class);
+	protected static final Attribute<Double> Yn = new Attribute("Yn", 0d, double.class);
+	protected static final Attribute<Double> X = new Attribute("X", 0d, double.class);
+	protected static final Attribute<Double> Y = new Attribute("Y", 0d, double.class);
 
-		attributes.add(Xn);
-		attributes.add(Yn);
+	static {
+		ATTRIBUTES.add(Xn);
+		ATTRIBUTES.add(Yn);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
 		
-		attributes.remove(StandardAttribute.HEIGHT);
-		attributes.remove(StandardAttribute.WIDTH);
+		UNSETTABLES.add(X);
+		UNSETTABLES.add(Y);
 	}
 	
-	private List<Point2D.Double> points = new CopyOnWriteArrayList<Point2D.Double>(); //TODO: Change to something faster when Polys become immutible..
-	private GeneralPath cache;	
-	private Rectangle2D cacheBounds;
-	private boolean connect;
+	private final List<Point2D> points;
+	private final GeneralPath path;	
+	private final Rectangle2D bounds;
+	private final boolean connect;
 	
-	public Poly(String id, boolean connect) {
-		super(id);
+	public Poly(Table layer, String id, boolean connect) {
+		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		this.connect = connect;
+		
+		points = new ArrayList();
+		path = buildPath(points, this.connect);
+		bounds = path.getBounds2D();
+	}
+	
+	protected Poly(Table layer, Poly source, Tuple option, boolean connect) {
+		super(layer, source, option, UNSETTABLES);
+		this.connect = connect;
+		
+		if (changesPoints(option)) {
+			points = new ArrayList(source.points);
+			updatePoints(points, option);
+			path = buildPath(points, this.connect);
+		} else {
+			points = source.points;
+			path = source.path;
+		}
+		
+		bounds = path.getBounds2D();
 	}
 	
 	
-	protected AttributeList getAttributes() {return attributes;}
+	protected AttributeList getAttributes() {return ATTRIBUTES;}	
+	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public Object get(String name) {
 		String base = baseName(name);
 		
-		if (base.equals(name)) {
-			if (Xn.is(base)) {return pointsArrays()[0];}
-			if (Yn.is(base)) {return pointsArrays()[1];}
-		}
+		if (X.is(name)) {return bounds.getX();}
+		if (Y.is(name)) {return bounds.getY();}
 		
 		if (Xn.is(base) || Yn.is(base)) {
-			int index = (int) index(name, true);
+			int index = (int) index(points, name, true);
 			if (index == points.size()) {return UNITIAILZED_COORDINATE;}
-			if (Xn.is(base)) {return points.get(index).x;}
-			if (Yn.is(base)) {return points.get(index).y;}
+			if (Xn.is(base)) {return points.get(index).getX();}
+			if (Yn.is(base)) {return points.get(index).getY();}
 		} 
 		return super.get(name);
-	}
+	}	
 	
-	private Double[][] pointsArrays() {
-		List<Point2D.Double> pts = points;
-		Double[][] vs = new Double[2][pts.size()];
-		
-		for (int i=0; i< pts.size(); i++) {
-			vs[0][i] = pts.get(i).x;
-			vs[1][i] = pts.get(i).y;
+	/**Does the given tuple have up point-related updates?*/
+	private static final boolean changesPoints(Tuple t) {
+		for (String field: t.getFields()) {
+			String base = baseName(field);
+			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {return true;}
 		}
-		return vs;
+		return false;
 	}
 	
-	public void fromPointsArray(boolean x, Double[] halfPoints) {
-		boolean clear = points.size()!=halfPoints.length;
-		
-		for (int i=0; i< halfPoints.length; i++) {
-			Point2D.Double p = points.get(i);
-			if (x) {
-				p.x = halfPoints[i];
-				if (clear) {p.y = DEFAULT_COORDINATE_VALUE;}
-			} else {
-				p.y = halfPoints[i];
-				if (clear) {p.y = DEFAULT_COORDINATE_VALUE;}
-			}		
-		}
-	}
-	
-	
-	public void set(String name, Object value) {
-		String base = baseName(name);
-
-			 if (Xn.is(base) && Xn.is(name)) {fromPointsArray(true, (Double[]) value); cachePath();}
-		else if (Yn.is(base) && Yn.is(name)) {fromPointsArray(true, (Double[]) value); cachePath();}
-		else if (Xn.is(base) && !Xn.is(name)) {this.updatePoints(Converter.toDouble(value), Double.NaN, index(name, false)); cachePath();}
-		else if (Yn.is(base) && !Yn.is(name)) {this.updatePoints(Double.NaN, Converter.toDouble(value), index(name, false)); cachePath();}
-		else {super.set(name, value);}
-	}
-	
-	public double getHeight() {return cacheBounds == null? 0 : cacheBounds.getHeight();}	
-	public double getWidth() {return cacheBounds == null? 0 : cacheBounds.getWidth();}
-
-	private void cachePath() {
-		if (points.size() < 1) {return;} //Nothing to draw until there are two points...
+	private static GeneralPath buildPath(List<Point2D> points, boolean connect) {
+		if (points.size() == 0) {return new GeneralPath();} //Nothing to draw until there are two points...
 		
 		GeneralPath p = new GeneralPath();
 		Point2D prior = points.get(0);
 		Point2D first = prior;
-
 		for (int i=1; i< points.size(); i++) {
 			Point2D current = points.get(i);
+
 			Line2D l = new Line2D.Double(prior, current);
 			p.append(l, false);
 			prior = current;
 		}			
 		if (connect) {p.append(new Line2D.Double(prior, first), false);}
-		cache =p;
-		
-		cacheBounds = p.getBounds2D();
-		this.x = cacheBounds.getX();
-		this.y = cacheBounds.getY();
+		return p;
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-		GeneralPath p = cache;
-		if (p == null) {return;}
+		if (path == null) {return;}
 		
-		super.render(g, p);
+		super.render(g, path);
 		super.postRender(g, null);
 	}
 	
+	private static final class IdxValuePair {
+		final double idx;
+		final double value;
+		final boolean x;
+		final boolean isInsertion;
+		
+		IdxValuePair(double idx, double value, boolean x) {
+			this.idx = idx;
+			this.value = value;
+			this.x = x;
+			isInsertion = (idx == Math.ceil(idx) || idx ==0);//Fractional values and insert at the start of the list
+		}
+		
+		int realIndex() {return (int) Math.ceil(idx);}
+		
+		Point2D update(Point2D original) {
+			if (x) {
+				return new Point2D.Double(value, original.getY());
+			} else {
+				return new Point2D.Double(original.getX(), value);
+			}
+		}
+	}
+	
+	private static final void updatePoints(List<Point2D> points, Tuple option) {
+		List<IdxValuePair> updates = new ArrayList(option.getFields().size());
+		
+		for (String field: option.getFields()) {
+			final String base = baseName(field);
+			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
+				double idx = index(points, field, false);
+				double value = (Double) option.get(field, Double.class);
+				updates.add(new IdxValuePair(idx, value, Xn.is(base)));
+			}
+		}
+
+		for (IdxValuePair p: updates) {
+			if (!p.isInsertion) {
+				int index = p.realIndex();
+				Point2D original = points.get(index);
+				points.set(index, p.update(original));
+			}
+		}
+		
+		List<Point2D> added = new ArrayList(updates.size());
+		for (IdxValuePair p: updates) {
+			if (p.isInsertion) {
+				int index = p.realIndex();
+				Point2D candidate = null;
+				if (index < points.size()) {candidate = points.get(index);}
+				
+				if (!added.contains(candidate)) {
+					candidate = new Point2D.Double();
+					candidate = p.update(candidate);
+					points.add(index, candidate);
+					added.add(candidate);
+				} else {
+					candidate = p.update(candidate);
+					points.set(index, candidate);					
+				}
+			}
+		}
+	}
+
 	/**What is the X/Y implicit argument (as a number)*/
-	private double index(String att, boolean onlyInt) {
+	private static double index(List<Point2D> points, String att, boolean onlyInt) {
 		if (Xn.is(att) && Yn.is(att)) {return -1;}
 		
 		try {
 			double val;
-			int nextIndex = points.size();
-			boolean isX = att.startsWith(StandardAttribute.X.name());
 			String arg = nameArgs(att);
 
-			if (arg.equals(NEW_VALUE)) {
-				//Add if its something new, re-use if its something old, but not yet completed
-				if (nextIndex ==0) {val =nextIndex;}
-				else if ((isX && !UNITIAILZED_COORDINATE.equals(points.get(nextIndex -1).x)) ||
-				 	     (!isX && !UNITIAILZED_COORDINATE.equals(points.get(nextIndex -1).y))) {val = nextIndex;}
-				else if ((isX && UNITIAILZED_COORDINATE.equals(points.get(nextIndex -1).x)) ||
-						 (!isX && UNITIAILZED_COORDINATE.equals(points.get(nextIndex -1).y))) {val = nextIndex-1;}
-				else {throw new Error("Reached a conditional case that is supposed to be impossible...");}
-
-			} else if (arg.equals(FINAL_VALUE)) {val = points.size()-1;}
+			if (arg.equals(NEW_VALUE)) {val = points.size();}
+			else if (arg.equals(FINAL_VALUE)) {val = points.size()-1;}
 			else {val = Double.parseDouble(arg);}
 
 			if (onlyInt && Math.floor(val) != val) {throw new ImplicitArgumentException(Line.class, att, "Can only reference integers in current call context.", null);}
 			return val;
-		} catch (Exception e) {throw new ImplicitArgumentException(this.getClass(), att, e);}
-	}
-
-	/**
-	 *
-	 * @param x Prototype x value (Nan if the current value, or generic default should be used)
-	 * @param y Prototype y value (Nan if the current value, or generic default should be used)
-	 * @param idxGuess Which point is being updated (may not be exact idx as fractional values indicate insertion)?
-	 */
-	protected void updatePoints(double x, double y, double idxGuess) {
-		assert !(Double.isNaN(x) && Double.isNaN(y)) : "Cannot pass NaN for both and Y";
-
-		Point2D.Double p;
-		boolean updateX = !Double.isNaN(x);
-		int idx = (int) Math.floor(idxGuess);
-
-		//Before we move on, make sure the last thing added with 'new' is finsihed off
-		if (points.size() >0) {
-			p = points.get(points.size()-1);
-			if (p.x == UNITIAILZED_COORDINATE) {p.x = DEFAULT_COORDINATE_VALUE;}
-			if (p.y == UNITIAILZED_COORDINATE) {p.y = DEFAULT_COORDINATE_VALUE;}
-		}
-
-		if (Math.floor(idxGuess) != idx) {
-			//Create a new points, put it between two existing ones
-			idx = idx+1;
-			p = new Point2D.Double(UNITIAILZED_COORDINATE, UNITIAILZED_COORDINATE);
-
-			if (updateX) {p.x = x;}
-			else {p.y = y;}
-
-			if (idx < points.size()) {points.add(idx, p);}
-			else {points.add(p);}
-
-
-		} else {
-			//Update existing point or append to the end
-			if (idx < points.size()) {
-				p = points.get(idx);
-			} else {
-				p = new Point2D.Double(UNITIAILZED_COORDINATE, UNITIAILZED_COORDINATE);
-			}
-
-			if (updateX) {p.x = x;}
-			else {p.y = y;}
-
-			if (idx < points.size()) {points.set(idx, p);}
-			else {points.add(p);}
-		}
+		} catch (Exception e) {throw new ImplicitArgumentException(Poly.class, att, e);}
 	}
 }

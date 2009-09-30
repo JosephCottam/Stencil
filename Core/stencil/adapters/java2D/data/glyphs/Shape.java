@@ -28,89 +28,127 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
-
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-import stencil.types.Converter;
-import stencil.adapters.GlyphAttributes.StandardAttribute;
+import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.adapters.general.Strokes.StrokeProperty;
-import stencil.adapters.java2D.util.AttributeList;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
-import static stencil.types.color.NamedColor.CLEAR;
+import stencil.adapters.java2D.util.AttributeList;
+import stencil.streams.Tuple;
 
-
-public final class Shape extends Filled {
+public class Shape extends Filled {
+	protected static final class InitResult {
+		GeneralPath glyph;
+		Rectangle2D bounds;
+		double regX;
+		double regY;
+	}
 	
-	private static final Attribute SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
-	private static final Attribute SIZE = new Attribute("SIZE", 1.0d);
-	private static final AttributeList attributes;
+	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
+	private static final AttributeList UNSETTABLES = new AttributeList();
+	private static final String IMPLANTATION = "SHAPE";
+	
+	private static final Attribute<StandardShape> SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
+	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);
+	private static final Attribute<Double> SIZE = new Attribute("SIZE", 1.0d);
+	private static final Attribute<Double> X = new Attribute("X", 0d);
+	private static final Attribute<Double> Y = new Attribute("Y", 0d);
 	
 	static {
-		attributes = new AttributeList(Filled.attributes);
-		attributes.add(SHAPE);
-		attributes.add(SIZE);
-		attributes.add(new Attribute(StrokeProperty.STROKE_COLOR.name(), CLEAR, Paint.class));
+		ATTRIBUTES.add(SHAPE);
+		ATTRIBUTES.add(SIZE);
+		ATTRIBUTES.add(ROTATION);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
+	}
+	
+	private final Rectangle2D bounds;
+	private final GeneralPath glyph;
+
+	private final StandardShape shape;
+	private final double size;
+	
+	private final double rotation;
+	private final double regX;
+	private final double regY;
+	
+	public Shape(Table layer, String id) {
+		super(layer, id);
 		
-		attributes.remove(StandardAttribute.WIDTH);
-		attributes.remove(StandardAttribute.HEIGHT);
-	}
-	
-	private Rectangle2D boundsCache;
-	private java.awt.Shape shapeCache;
-	
-	public Shape(String id) {
-		super(id);
-		this.outlinePaint = CLEAR;
-	}
-	
-	private StandardShape shape;
-	private double size;
-	
-	public void set(String name, Object value) {
-		if (SHAPE.is(name)) {this.shape = (StandardShape) Converter.convert(value, StandardShape.class);}
-		else if (SIZE.is(name)) {this.size = Converter.toDouble(value);}
-		else {super.set(name,value);}
+		shape =  SHAPE.defaultValue;
+		size = SIZE.defaultValue;
+		regX = X.defaultValue;
+		regY = Y.defaultValue;
+		rotation = ROTATION.defaultValue;	
 		
-		shapeCache = null; boundsCache = null;
+		InitResult rs = initWork();
+		bounds = rs.bounds;
+		glyph = rs.glyph;
 	}
 	
-	public Rectangle2D getBounds() {
-		if (boundsCache == null) {boundsCache = super.getBounds();}
-		return boundsCache;
+	protected Shape(Table t, Shape source, Tuple option) {
+		super(t, source, option, UNSETTABLES);
+		
+		shape = switchCopy(source.shape, safeGet(option, SHAPE));
+		size = switchCopy(source.size, safeGet(option, SIZE));
+		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
+		
+		Point2D topLeft = mergeRegistrations(source, option, size, size, X, Y);
+		Point2D reg = Registrations.topLeftToRegistration(registration, topLeft.getX(), topLeft.getY(), size, size);
+		
+		regX = reg.getX();
+		regY = reg.getY();
+		
+		InitResult rs = initWork();
+		bounds = rs.bounds;
+		glyph = rs.glyph;
+	}
+
+	private InitResult initWork() {
+		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, size, size);
+		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), size, size);
+		
+		java.awt.Shape s = Shapes.getShape(shape, bounds.getX()-regX, bounds.getY()-regY, size, size);
+		GeneralPath p = new GeneralPath(s);
+		
+		p.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+		p.transform(AffineTransform.getTranslateInstance(regX, regY));
+		
+		InitResult rv = new InitResult();
+		rv.bounds = p.getBounds2D();
+		rv.glyph = p;
+		
+		return rv;
 	}
 	
 	public Object get(String name) {
-		if (SHAPE.is(name)) {return getShape();}
-		if (SIZE.is(name)) {return getSize();}
-		return super.get(name);
+			 if (SHAPE.is(name)) {return shape;}
+		else if (X.is(name)) {return regX;}
+		else if (Y.is(name)) {return regY;}
+		else if (SIZE.is(name)) {return size;}
+		else if (ROTATION.is(name)) {return rotation;}
+		else {return super.get(name);}
 	}
 	
-	public StandardShape getShape() {return shape;}
-	public double getSize() {return size;}
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	public Rectangle2D getBoundsReference() {return bounds;}
+	public String getImplantation() {return IMPLANTATION;}
 
-	public double getWidth() {return size;}
-	public double getHeight() {return size;}
-	public String getImplantation() {return "SHAPE";}
-	
+	@Override
 	public void render(Graphics2D g, AffineTransform base) {
-		java.awt.Shape s;
-		if (shape == StandardShape.NONE) {return;}
-		if (shapeCache == null) {
-			shapeCache = Shapes.getShape(shape, new Rectangle2D.Double(0,0, size,size));
-		}
-		s = shapeCache;
-
-		if (s != null) {
-			super.preRender(g);
-			super.render(g, s);
-			super.postRender(g,base);
-		}
+		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
+	
+		super.render(g, glyph);
+		super.postRender(g, null);
 	}
 
-	protected AttributeList getAttributes() {return attributes;}
+	public Shape update(Tuple t) throws IllegalArgumentException {return new Shape(this.layer, this, t);}
+	public Shape updateLayer(Table t) {return new Shape(t, this, Tuple.EMPTY_TUPLE);}
+
 }

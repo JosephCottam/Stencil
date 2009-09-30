@@ -32,57 +32,86 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
+import java.awt.geom.Rectangle2D;
 
-import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
+import stencil.adapters.general.Strokes;
+import stencil.adapters.java2D.data.Table;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.types.Converter;
+import stencil.streams.Tuple;
 
 public class Arc extends Stroked {
-	protected static final AttributeList attributes;
-	protected static final Attribute<Double> X1 = new Attribute("X.1", 0d);
-	protected static final Attribute<Double> X2 = new Attribute("X.2", 0d);
-	protected static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
-	protected static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
-	protected static final Attribute<Double> ARC_HEIGHT = new Attribute("ARC_HEIGHT", 10.0);
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
+	protected static final AttributeList UNSETTABLES = new AttributeList();
+	
+	private static final String IMPLANTATION = "ARC";
+	
+	private static final Attribute<Double> X1 = new Attribute("X.1", 0d);
+	private static final Attribute<Double> X2 = new Attribute("X.2", 0d);
+	private static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
+	private static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
+	private static final Attribute<Double> ARC_HEIGHT = new Attribute("ARC_HEIGHT", 10.0);
+
+	private static final Attribute<Double> X = new Attribute("X", 0d);
+	private static final Attribute<Double> Y = new Attribute("Y", 0d);
+	private static final Attribute<Double> WIDTH = new Attribute("WIDTH", 0d);
+	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 0d);
+
 	
 	static {
-		attributes = new AttributeList(Stroked.attributes);
-
-		attributes.add(X1);
-		attributes.add(Y1);
-		attributes.add(X2);
-		attributes.add(Y2);
-		attributes.add(ARC_HEIGHT);
+		ATTRIBUTES.add(X1);
+		ATTRIBUTES.add(Y1);
+		ATTRIBUTES.add(X2);
+		ATTRIBUTES.add(Y2);
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
+		ATTRIBUTES.add(ARC_HEIGHT);
 		
-		attributes.remove(StandardAttribute.HEIGHT);
-		attributes.remove(StandardAttribute.WIDTH);
+		UNSETTABLES.add(X);
+		UNSETTABLES.add(Y);
+		UNSETTABLES.add(WIDTH);
+		UNSETTABLES.add(HEIGHT);
 	}
 
-	private double x1 = X1.defaultValue;
-	private double y1 = Y1.defaultValue;
-	private double x2 = X2.defaultValue;
-	private double y2 = Y2.defaultValue;
+	private final double x1;
+	private final double y1;
+	private final double x2;
+	private final double y2;
+	private final double arcHeight;
 
-	private QuadCurve2D arc = new QuadCurve2D.Double();
-	private double arcHeight = (Double) ARC_HEIGHT.defaultValue;
+	private final QuadCurve2D arc;
+	private final Rectangle2D bounds;
 	
-	public Arc(String id) {super(id);}
-	
-	public double getHeight() {
-		validateArc();
-		return arc.getBounds2D().getHeight();
+	public Arc(Table layer, String id) {
+		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
+		
+		x1 = X1.defaultValue;
+		y1 = Y1.defaultValue;
+		x2 = X2.defaultValue;
+		y2 = Y2.defaultValue;
+		arcHeight = ARC_HEIGHT.defaultValue;
+		
+		arc = validateArc();
+		bounds = arc.getBounds2D();
 	}
-
-	public double getWidth() {
-		validateArc();
-		return arc.getBounds2D().getWidth();
-	}
 	
-	public String getImplantation() {return "LINE";} 
+	private Arc(Table t, Arc source, Tuple option) {
+		super(t, source, option, UNSETTABLES);
 
-	protected AttributeList getAttributes() {return attributes;}
+		x1 = switchCopy(source.x1, safeGet(option, X1));
+		x2 = switchCopy(source.x2, safeGet(option, X2));
+		y1 = switchCopy(source.y1, safeGet(option, Y1));
+		y2 = switchCopy(source.y2, safeGet(option, Y2));
+		arcHeight = switchCopy(source.arcHeight, safeGet(option, ARC_HEIGHT));
+		
+		arc = validateArc();
+		bounds = arc.getBounds2D();
+	}
+		
+	public String getImplantation() {return IMPLANTATION;} 
+
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	
 	public Object get(String name) {
 		if (X1.is(name)) 	  {return x1;}
@@ -90,52 +119,24 @@ public class Arc extends Stroked {
 		else if (X2.is(name)) {return x2;}
 		else if (Y2.is(name)) {return y2;}
 		else if (ARC_HEIGHT.is(name)) {return arcHeight;}
+		else if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
+		else if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
+		else if (WIDTH.is(name)) {return bounds.getWidth();}
+		else if (HEIGHT.is(name)) {return bounds.getHeight();}
 		else{return super.get(name);}		
-	}
-	
-	public void set(String name, Object value) {
-		if (X1.is(name)) 	  {x1 = Converter.toDouble(value); validate();}
-		else if (Y1.is(name)) {y1 = Converter.toDouble(value); validate();}
-		else if (X2.is(name)) {x2 = Converter.toDouble(value); validate();}
-		else if (Y2.is(name)) {y2 = Converter.toDouble(value); validate();}
-		else if (name.equals("X") || name.equals("Y")) {throw new IllegalArgumentException("Cannot set raw X and Y on a line.");}
-		else if (ARC_HEIGHT.is(name)) {arcHeight = Converter.toDouble(value);}
-		else{super.set(name, value);}
-	}
-
-	private void validate() {
-		double x,y;
-		x = Math.min(x1,x2);
-		y = Math.min(y1,y2);
-		
-		Point2D p = Registrations.topLeftToRegistration(registration, x,y,getWidth(), getHeight());
-		this.x = p.getX();
-		this.y = p.getY();
-		
-		arc = null;
 	}
 	
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
-		QuadCurve2D arc = this.arc;
-		if (arc == null) {arc = validateArc();}
-		
 		super.render(g, arc);
 		super.postRender(g, null);
 	}
-	
-	public void setArcHeight(double arcHeight) {
-		if (this.arcHeight == arcHeight) {return;}
-		this.arcHeight = arcHeight;
-		arc = null;
-	}
-	
+
 	private QuadCurve2D validateArc() {
 		Point2D p1 = new Point2D.Double(x1, y1);
 		Point2D p2 = new Point2D.Double(x2, y2);
 		QuadCurve2D arc = new QuadCurve2D.Double();
 		arc.setCurve(p1, getControl(p1, p2, arcHeight), p2);
-		this.arc = arc;
 		return arc;
 	}
 	
@@ -174,5 +175,11 @@ public class Arc extends Stroked {
 		double y = (p1.getY()+p2.getY())/2.0;
 		return new Point2D.Double(x, y);
 	}
+
+	@Override
+	public Rectangle2D getBoundsReference() {return bounds;}
+	public Arc update(Tuple t) throws IllegalArgumentException {return new Arc(this.layer, this, t);}
+	public Arc updateLayer(Table t) {return new Arc(t, this, Tuple.EMPTY_TUPLE);}
+
 
 }

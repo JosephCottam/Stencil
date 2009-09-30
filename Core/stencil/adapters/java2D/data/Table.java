@@ -41,8 +41,6 @@ import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
 public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
-	public static final boolean USE_IMMUTABLES = true;
-	
 	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private int generation =0;
 	private final String name; 
@@ -111,60 +109,27 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	/**Get the tuple prototype of this table.*/
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
-	private static Table<?> immutables(Layer l) {
-		String name = l.getName();
-		String implantation = l.getImplantation();
-
-		try {
-			if (implantation.equals("SHAPE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Shape(null, "PROTOTYPE"));
-			} else if (implantation.equals("LINE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Line(null, "PROTOTYPE"));
-			} else if (implantation.equals("TEXT")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Text(null, "PROTOTYPE"));
-			} else if (implantation.equals("TEXT_SHAPE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Text.TextShape(null, "PROTOTYPE"));
-			} else if (implantation.equals("PIE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Pie(null, "PROTOTYPE"));
-			} else if (implantation.equals("IMAGE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Image(null, "PROTOTYPE"));
-			} else if (implantation.equals("POLY_LINE")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Poly.PolyLine(null, "PROTOTYPE"));
-			} else if (implantation.equals("POLYGON")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Poly.Polygon(null, "PROTOTYPE"));
-			} else if (implantation.equals("ARC")) {
-				return new Table(name, new stencil.adapters.java2D.data.immutibles.Arc(null, "PROTOTYPE"));
-			}
-
-		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
-		throw new IllegalArgumentException("Glyph type not know: " + implantation);
-	}
-	
 	public static Table<?> instance(Layer l) {
-		if (USE_IMMUTABLES) {return immutables(l);}
-		
 		String name = l.getName();
 		String implantation = l.getImplantation();
 		
 		try {
 			if (implantation.equals("SHAPE")) {
-				return new Table(name, new Shape("PROTOTYPE"));
+				return new Table(name, new Shape(null, "PROTOTYPE"));
 			} else if (implantation.equals("LINE")) {
-				return new Table(name, new Line("PROTOTYPE"));
+				return new Table(name, new Line(null, "PROTOTYPE"));
 			} else if (implantation.equals("TEXT")) {
-				return new Table(name, new Text("PROTOTYPE"));
-			} else if (implantation.equals("TEXT_SHAPE")) {
-				return new Table(name, new Text.TextShape("PROTOTYPE"));
+				return new Table(name, new Text(null, "PROTOTYPE"));
 			} else if (implantation.equals("PIE")) {
-				return new Table(name, new Pie("PROTOTYPE"));
+				return new Table(name, new Pie(null, "PROTOTYPE"));
 			} else if (implantation.equals("IMAGE")) {
-				return new Table(name, new Image("PROTOTYPE"));
+				return new Table(name, new Image(null, "PROTOTYPE"));
 			} else if (implantation.equals("POLY_LINE")) {
-				return new Table(name, new Poly.PolyLine("PROTOTYPE"));
+				return new Table(name, new Poly.PolyLine(null, "PROTOTYPE"));
 			} else if (implantation.equals("POLYGON")) {
-				return new Table(name, new Poly.Polygon("PROTOTYPE"));
+				return new Table(name, new Poly.Polygon(null, "PROTOTYPE"));
 			} else if (implantation.equals("ARC")) {
-				return new Table(name, new Arc("PROTOTYPE"));
+				return new Table(name, new Arc(null, "PROTOTYPE"));
 			}
 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
