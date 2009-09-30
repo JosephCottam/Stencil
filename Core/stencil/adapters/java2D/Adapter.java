@@ -30,12 +30,11 @@ package stencil.adapters.java2D;
 
 import java.awt.Color;
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 
@@ -60,7 +59,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	}
 
 	public DisplayLayer makeLayer(Layer l) {
-		return Table.instance(l);
+		return DisplayLayer.instance(l);
 	}
 
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}

@@ -46,7 +46,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
-public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
+public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
 	List<Stopable> workers = new ArrayList<Stopable>();
 	
 	public Panel(Program p) {
@@ -83,9 +83,9 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 	private Map<Rule, DynamicUpdater> updaters = new HashMap();
 	public void addDynamic(Glyph2D g, Rule rule, Tuple source) {
 		DynamicUpdater updater;
-		Table table = null;
+		DisplayLayer table = null;
 		
-		for (Table t: canvas.layers) {if (t.getName().equals(rule.getGroup().getLayer().getName())) {table = t; break;}}
+		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getLayer().getName())) {table = t; break;}}
 		assert table != null : "Table null after name-based search.";
 		
 		if (!updaters.containsKey(rule)) {
@@ -103,7 +103,7 @@ public class Panel extends StencilPanel<Glyph2D, Table<Glyph2D>, Canvas> {
 		Glyph2D result = target.update(source);
 		if (result == source) {return;}
 		
-		Table t = target.getLayer();
+		DisplayLayer t = target.getLayer();
 		t.update(result);
 	}
 }

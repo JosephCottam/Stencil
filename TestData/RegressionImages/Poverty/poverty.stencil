@@ -2,31 +2,31 @@ STREAM: File
 NAME: Region
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/regions.txt
+SOURCE: ./regions.txt
 CHECKHEADER: true
 STREAM: File
 NAME: Poverty
 HEADER: State,Children, Adults, Elderly, Total
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/povertyPercent.csv
+SOURCE: ./povertyPercent.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Postal
 HEADER: State  ID
 SEPARATOR: \s\s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/postal.txt
+SOURCE: ./postal.txt
 CHECKHEADER: false
 STREAM: File
 NAME: Pop
 HEADER: State,Children,Adults,Elderly, Total
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/povertyCounts.csv
+SOURCE: ./povertyCounts.csv
 CHECKHEADER: true
 STREAM: File
 NAME: Items
 HEADER: Name
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Poverty/items.txt
+SOURCE: ./items.txt
 CHECKHEADER: false
 
 external stream Items(Name)

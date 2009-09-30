@@ -28,13 +28,13 @@
  */
 package stencil.adapters.java2D.util;
 
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 
 public class GenerationTracker {
-	private final Table[] tables;
+	private final DisplayLayer[] tables;
 	private final int[] generations;
 	
-	public GenerationTracker(Table[] layers) {
+	public GenerationTracker(DisplayLayer[] layers) {
 		this.tables = layers;
 		this.generations = new int[layers.length];
 	}
@@ -50,7 +50,7 @@ public class GenerationTracker {
 		return false;
 	}
 
-	public void fixGeneration(Table t) {
+	public void fixGeneration(DisplayLayer t) {
 		for (int i=0;i<tables.length; i++) {if (tables[i] == t) {generations[i] = t.getGeneration();}}
 	}
 	

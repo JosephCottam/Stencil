@@ -37,7 +37,7 @@ import java.awt.Graphics2D;
 import stencil.streams.Tuple;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Strokes;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
@@ -79,7 +79,7 @@ public final class Line extends Stroked {
 	private final java.awt.Shape glyph;
 	private final java.awt.geom.Rectangle2D bounds;
 	
-	public Line(Table layer, String id) {
+	public Line(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
@@ -90,8 +90,20 @@ public final class Line extends Stroked {
 		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
 	}
 	
-	private Line(Table t, Line source, Tuple option) {
-		super(t, source, option, UNSETTABLES);
+	
+	
+	private Line(String id, Line source) {
+		super(id, source);
+		this.x1 = source.x1;
+		this.y1 = source.y1;
+		this.x2 = source.x2;
+		this.y2 = source.y2;
+		this.glyph = source.glyph;
+		this.bounds = source.bounds;
+	}
+
+	private Line(Line source, Tuple option) {
+		super(source, option, UNSETTABLES);
 
 		x1 = switchCopy(source.x1, safeGet(option, X1));
 		x2 = switchCopy(source.x2, safeGet(option, X2));
@@ -127,6 +139,6 @@ public final class Line extends Stroked {
 		super.postRender(g, base);
 	}
 
-	public Line update(Tuple t) throws IllegalArgumentException {return new Line(this.layer, this, t);}
-	public Line updateLayer(Table t) {return new Line(t, this, Tuple.EMPTY_TUPLE);}
+	public Line update(Tuple t) throws IllegalArgumentException {return new Line(this, t);}
+	public Line updateID(String id) {return new Line(id, this);}
 }

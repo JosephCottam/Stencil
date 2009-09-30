@@ -131,30 +131,32 @@ public class Headless {
 
 		//Run
 		model.compile();
-		StencilRunner t = model.execute();
-		t.join();
-		
-		if (t.getThrowable() != null) {throw new Exception("Stencil stopped with an error.", t.getThrowable());}
-		
-
-		//Save output
-		for (int i =0; i < args.length; i++) {
-			int idx = Arrays.binarySearch(Application.FORMATS, args[i].substring(1).toUpperCase());
-
-			if (idx >=0) {
-				String format = Application.FORMATS[idx];
-				Class argClass = Application.ARG_CLASS.get(format);
-
-				if (argClass == null) {
-					model.export(prefix + args[i+1], format, null);
-				} else {
-					Object arg = Converter.convert(args[i+1], argClass);
-					model.export(prefix + args[i+2], format,  arg);
+		try {
+			StencilRunner t = model.execute();
+			t.join();
+			
+			if (t.getThrowable() != null) {throw new Exception("Stencil stopped with an error.", t.getThrowable());}
+			
+	
+			//Save output
+			for (int i =0; i < args.length; i++) {
+				int idx = Arrays.binarySearch(Application.FORMATS, args[i].substring(1).toUpperCase());
+	
+				if (idx >=0) {
+					String format = Application.FORMATS[idx];
+					Class argClass = Application.ARG_CLASS.get(format);
+	
+					if (argClass == null) {
+						model.export(prefix + args[i+1], format, null);
+					} else {
+						Object arg = Converter.convert(args[i+1], argClass);
+						model.export(prefix + args[i+2], format,  arg);
+					}
 				}
 			}
+		} finally {
+			model.getStencilPanel().dispose();
 		}
-		
-		model.getStencilPanel().dispose();
 	}
 
 }

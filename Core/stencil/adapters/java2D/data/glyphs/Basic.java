@@ -42,13 +42,12 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
-import stencil.util.BasicTuple;
 import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
 
@@ -78,12 +77,12 @@ public abstract class Basic implements Glyph2D {
 	protected final Registration registration;
 	
 	/**What layer does this glyph belong to?*/
-	protected final Table layer;
+	protected final DisplayLayer layer;
 	
 	/**Should this glyph be drawn?**/
 	protected final boolean visible;		//TODO: Experiment with this as a mutable value...
 	
-	protected Basic(Table layer, String id) {
+	protected Basic(DisplayLayer layer, String id) {
 		this.layer = layer;
 
 		this.id = id;
@@ -92,10 +91,17 @@ public abstract class Basic implements Glyph2D {
 		
 	}
 
-	protected Basic(Table t, Basic source, Tuple option, AttributeList unsettables) {
+	protected Basic(String id, Basic source) {
+		this.id = id;
+		this.layer = source.layer;
+		this.registration = source.registration;
+		this.visible = source.visible;
+	}
+	
+	protected Basic(Basic source, Tuple option, AttributeList unsettables) {
 		validateOptions(option, unsettables);
 
-		this.layer = t;
+		this.layer = source.layer;
 		id = switchCopy(source.id, (String) safeGet(option, ID));
 		visible = switchCopy(source.visible, safeGet(option, VISIBLE));
 		registration = switchCopy(source.registration, safeGet(option, REGISTRATION));		
@@ -148,7 +154,7 @@ public abstract class Basic implements Glyph2D {
 		
 	public String toString() {return Tuples.toString(this);}
 	
-	public Table getLayer() {return layer;}
+	public DisplayLayer getLayer() {return layer;}
 	
 	public String getID() {return id;}
 	
@@ -224,10 +230,6 @@ public abstract class Basic implements Glyph2D {
 
 		return fullName.substring(baseName(fullName).length());
 	}
-
-	//TODO: collect the appropriate constructor at construction time and do a direct invocation of it.  Then move the update(tuple) method up to here...and profile to see if it is horribly slower 
-	public Glyph2D update(String field, Object value) {return update(BasicTuple.singleton(field, value));}
-
 	
 	/**Given two registration and point descriptions (potentially), what should the top-left
 	 * of a new glyph be if it were the merge of source and option?

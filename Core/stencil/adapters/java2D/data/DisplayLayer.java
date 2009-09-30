@@ -40,15 +40,14 @@ import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
-public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
+public class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
 	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private int generation =0;
 	private final String name; 
 	private T prototypeGlyph;
 
-	protected Table(String name, T prototypeGlyph) {
+	protected DisplayLayer(String name) {
 		this.name = name;
-		this.prototypeGlyph = (T) prototypeGlyph.updateLayer(this);
 	}
 	
 	public String getName() {return name;}
@@ -63,8 +62,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	public Iterator<T> iterator() {return index.values().iterator();}
 
 	public T make(String ID) throws DuplicateIDException {
-		T glyph = (T) prototypeGlyph.update("ID", ID);
-		glyph.updateLayer(this);
+		T glyph = (T) prototypeGlyph.updateID(ID);
 		index.put(ID, glyph);
 		return glyph;
 	}
@@ -80,6 +78,7 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	
 	/**Updates an existing glyph with the new glyph.
 	 * Checks that the new glyph actually replaces an old one.
+	 * 
 	 * @param glyph
 	 * @param RuntimeException The glyph introduced does not update a prior glyph (ID matching is used to determine if something is an update)
 	 */
@@ -87,10 +86,11 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
 		updateGeneration();
-		glyph.updateLayer(this);
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 	}
+	
+	private void setPrototype(T prototypeGlyph) {this.prototypeGlyph = prototypeGlyph;}
 
 	/**What is the current edit generation of the data table?
 	 * Any edit should update the generation id.  Generations
@@ -109,31 +109,42 @@ public class Table<T extends Glyph2D> implements stencil.display.DisplayLayer<T>
 	/**Get the tuple prototype of this table.*/
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
-	public static Table<?> instance(Layer l) {
+	public static DisplayLayer<?> instance(Layer l) {
 		String name = l.getName();
 		String implantation = l.getImplantation();
-		
+		DisplayLayer layer = null;
 		try {
 			if (implantation.equals("SHAPE")) {
-				return new Table(name, new Shape(null, "PROTOTYPE"));
+				layer =  new DisplayLayer(name);
+				layer.setPrototype(new Shape(layer, "PROTOTYPE"));
 			} else if (implantation.equals("LINE")) {
-				return new Table(name, new Line(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Line(layer, "PROTOTYPE"));
 			} else if (implantation.equals("TEXT")) {
-				return new Table(name, new Text(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Text(layer, "PROTOTYPE"));
 			} else if (implantation.equals("PIE")) {
-				return new Table(name, new Pie(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Pie(layer, "PROTOTYPE"));
 			} else if (implantation.equals("IMAGE")) {
-				return new Table(name, new Image(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Image(layer, "PROTOTYPE"));
 			} else if (implantation.equals("POLY_LINE")) {
-				return new Table(name, new Poly.PolyLine(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Poly.PolyLine(layer, "PROTOTYPE"));
 			} else if (implantation.equals("POLYGON")) {
-				return new Table(name, new Poly.Polygon(null, "PROTOTYPE"));
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Poly.Polygon(layer, "PROTOTYPE"));
 			} else if (implantation.equals("ARC")) {
-				return new Table(name, new Arc(null, "PROTOTYPE"));
-			}
-
+				layer = new DisplayLayer(name);
+				layer.setPrototype(new Arc(layer, "PROTOTYPE"));
+			} 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
-		throw new IllegalArgumentException("Glyph type not know: " + implantation);
+		
+		if (layer == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
+
+		return layer;
+
 	}
 
 }

@@ -37,7 +37,7 @@ import java.awt.geom.Rectangle2D;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
@@ -78,7 +78,7 @@ public class Shape extends Filled {
 	private final double regX;
 	private final double regY;
 	
-	public Shape(Table layer, String id) {
+	public Shape(DisplayLayer layer, String id) {
 		super(layer, id);
 		
 		shape =  SHAPE.defaultValue;
@@ -92,8 +92,24 @@ public class Shape extends Filled {
 		glyph = rs.glyph;
 	}
 	
-	protected Shape(Table t, Shape source, Tuple option) {
-		super(t, source, option, UNSETTABLES);
+	
+	
+	private Shape(String id, Shape source) {
+		super(id, source);
+	
+		this.bounds = source.bounds;
+		this.glyph = source.glyph;
+		this.shape = source.shape;
+		this.size = source.size;
+		this.rotation = source.rotation;
+		this.regX = source.regX;
+		this.regY = source.regY;
+	}
+
+
+
+	protected Shape(Shape source, Tuple option) {
+		super(source, option, UNSETTABLES);
 		
 		shape = switchCopy(source.shape, safeGet(option, SHAPE));
 		size = switchCopy(source.size, safeGet(option, SIZE));
@@ -148,7 +164,7 @@ public class Shape extends Filled {
 		super.postRender(g, null);
 	}
 
-	public Shape update(Tuple t) throws IllegalArgumentException {return new Shape(this.layer, this, t);}
-	public Shape updateLayer(Table t) {return new Shape(t, this, Tuple.EMPTY_TUPLE);}
+	public Shape update(Tuple t) throws IllegalArgumentException {return new Shape(this, t);}
+	public Shape updateID(String id) {return new Shape(id, this);}	
 
 }

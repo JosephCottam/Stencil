@@ -41,7 +41,7 @@ import java.util.List;
 import javax.swing.JComponent;
 
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.GenerationTracker;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
@@ -60,7 +60,7 @@ public final class Canvas extends JComponent {
 	private final GenerationTracker tablesTracker;
 	
 	private Rectangle2D contentBounds;
-	final Table<? extends Glyph2D>[] layers;
+	final DisplayLayer<? extends Glyph2D>[] layers;
 
 	/**Point used in many navigation operations.*/
 	private final Point2D tempPoint = new Point2D.Double();
@@ -69,9 +69,9 @@ public final class Canvas extends JComponent {
 	public Canvas(List<Layer> layers) {
 		this.setBackground((Color) CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.getDefaultValue());
 		
-		this.layers = new Table[layers.size()];
+		this.layers = new DisplayLayer[layers.size()];
 		for (int i=0;i< layers.size();i++) {
-			this.layers[i] = (Table) layers.get(i).getDisplayLayer();
+			this.layers[i] = (DisplayLayer) layers.get(i).getDisplayLayer();
 		}
 		this.painter = new Painter(this.layers, this);
 		painter.start();
@@ -90,7 +90,7 @@ public final class Canvas extends JComponent {
 	public Rectangle getContentBounds() {
 		Rectangle2D bounds =contentBounds;
 		if (contentBounds == null || tablesTracker.changed()) {
-			for (Table<? extends Glyph2D> t: layers) {
+			for (DisplayLayer<? extends Glyph2D> t: layers) {
 				tablesTracker.fixGeneration(t);
 				for (Glyph2D g: t) {
 					if (bounds == null) {

@@ -36,7 +36,7 @@ import java.awt.geom.Rectangle2D;
 
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Strokes;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
@@ -83,7 +83,7 @@ public class Arc extends Stroked {
 	private final QuadCurve2D arc;
 	private final Rectangle2D bounds;
 	
-	public Arc(Table layer, String id) {
+	public Arc(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		
 		x1 = X1.defaultValue;
@@ -96,8 +96,20 @@ public class Arc extends Stroked {
 		bounds = arc.getBounds2D();
 	}
 	
-	private Arc(Table t, Arc source, Tuple option) {
-		super(t, source, option, UNSETTABLES);
+	protected Arc(String id, Arc source) {
+		super(id, source);
+		
+		this.x1 = source.x1;
+		this.y1 = source.y1;
+		this.x2 = source.x2;
+		this.y2 = source.y2;
+		this.arcHeight = source.arcHeight;
+		this.arc = source.arc;
+		this.bounds = source.bounds;
+	}
+
+	private Arc(Arc source, Tuple option) {
+		super(source, option, UNSETTABLES);
 
 		x1 = switchCopy(source.x1, safeGet(option, X1));
 		x2 = switchCopy(source.x2, safeGet(option, X2));
@@ -178,8 +190,6 @@ public class Arc extends Stroked {
 
 	@Override
 	public Rectangle2D getBoundsReference() {return bounds;}
-	public Arc update(Tuple t) throws IllegalArgumentException {return new Arc(this.layer, this, t);}
-	public Arc updateLayer(Table t) {return new Arc(t, this, Tuple.EMPTY_TUPLE);}
-
-
+	public Arc update(Tuple t) throws IllegalArgumentException {return new Arc(this, t);}
+	public Arc updateID(String id) {return new Arc(id, this);}
 }

@@ -40,7 +40,7 @@ import stencil.WorkingDirectory;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
 import stencil.adapters.general.Registrations;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
@@ -78,7 +78,7 @@ public final class Image extends Basic {
 	private BufferedImage base;
 	private BufferedImage display;
 
-	public Image(Table layer, String id) {
+	public Image(DisplayLayer layer, String id) {
 		super(layer, id);
 		
 		filename = FILE.defaultValue;
@@ -92,8 +92,25 @@ public final class Image extends Basic {
 		bounds = getBounds(topLeft);
 	}
 	
-	public Image(Table layer, Image source, Tuple option) {
-		super(layer, source, option, UNSETTABLES);
+	
+	
+	protected Image(String id, Image source) {
+		super(id, source);
+		this.filename = source.filename;
+		this.width = source.width;
+		this.height = source.height;
+		this.rotation = source.rotation;
+		this.bounds = source.bounds;
+		this.oldSX = source.oldSX;
+		this.oldSY = source.oldSY;
+		this.base = source.base;
+		this.display = source.display;
+	}
+
+
+
+	protected Image(Image source, Tuple option) {
+		super(source, option, UNSETTABLES);
 		
 		filename = switchCopy(source.filename, safeGet(option, FILE));
 		width = switchCopy(source.width, safeGet(option, WIDTH));
@@ -115,6 +132,7 @@ public final class Image extends Basic {
 		if (FILE.is(name)) 	{return filename;}
 		if (X.is(name))		{return Registrations.topLeftToRegistration(registration, bounds).getX();}
 		if (Y.is(name))		{return Registrations.topLeftToRegistration(registration, bounds).getY();}
+		if (ROTATION.is(name)) {return rotation;}
 		return super.get(name);
 	}
 	
@@ -181,7 +199,6 @@ public final class Image extends Basic {
 
 	public Rectangle2D getBoundsReference() {return bounds;}
 
-	public Image update(Tuple t) throws IllegalArgumentException {return new Image(layer, this, t);}
-
-	public Image updateLayer(Table layer) {return new Image(layer, this, Tuple.EMPTY_TUPLE);}
+	public Image update(Tuple t) throws IllegalArgumentException {return new Image(this, t);}
+	public Image updateID(String id) {return new Image(id, this);}
 }

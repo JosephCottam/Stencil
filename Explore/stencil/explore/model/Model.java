@@ -109,6 +109,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 			public void run() {
 				try {runner.join();}
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
+
 				
 				if (runner.getThrowable() == null) {reporter.addMessage("Execution terminated.");}
 				else {

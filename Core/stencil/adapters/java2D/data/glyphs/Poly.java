@@ -42,44 +42,44 @@ import java.util.List;
 
 import stencil.adapters.general.ImplicitArgumentException;
 import stencil.adapters.general.Strokes;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
-		public PolyLine(Table layer, String id) {super(layer, id, false);}
-		public PolyLine(Table layer, PolyLine source, Tuple option) {
-			super(layer, source, option, false);
+		public PolyLine(DisplayLayer layer, String id) {super(layer, id, false);}
+		protected PolyLine(String id, PolyLine source) {super(id, source);}
+		protected PolyLine(PolyLine source, Tuple option) {
+			super(source, option, false);
 		}
 		
 		public String getImplantation() {return "POLY_LINE";}
 		
 		public PolyLine update(Tuple t) throws IllegalArgumentException {
-			return new PolyLine(this.getLayer(), this, t);
+			return new PolyLine(this, t);
 		}
 
-		public PolyLine updateLayer(Table layer) {
-			return new PolyLine(layer, this, Tuple.EMPTY_TUPLE);
-		}
+		public PolyLine updateID(String id) {return new PolyLine(id, this);}
+		
 	}
 	public static class Polygon extends Poly {
-		public Polygon(Table layer,String id) {super(layer, id, true);}
-		public Polygon(Table layer, Polygon source, Tuple option) {
-			super(layer, source, option, true);
+		public Polygon(DisplayLayer layer,String id) {super(layer, id, true);}
+		protected Polygon(String id, Polygon source) {super(id, source);}
+		protected Polygon(Polygon source, Tuple option) {
+			super(source, option, true);
 		}
 		
 		public String getImplantation() {return "POLYGON";}
 
 		public Polygon update(Tuple t) throws IllegalArgumentException {
-			return new Polygon(this.getLayer(), this, t);
+			return new Polygon(this, t);
 		}
 
-		public Polygon updateLayer(Table layer) {
-			return new Polygon(layer, this, Tuple.EMPTY_TUPLE);
-		}
+		public Polygon updateID(String id) {return new Polygon(id, this);}
 	}
+	
 	
 	public static final Double DEFAULT_COORDINATE_VALUE = 0.0;
 	private static final Double UNITIAILZED_COORDINATE  = Double.NaN;
@@ -106,7 +106,7 @@ public abstract class Poly extends Stroked {
 	private final Rectangle2D bounds;
 	private final boolean connect;
 	
-	public Poly(Table layer, String id, boolean connect) {
+	public Poly(DisplayLayer layer, String id, boolean connect) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		this.connect = connect;
 		
@@ -115,8 +115,20 @@ public abstract class Poly extends Stroked {
 		bounds = path.getBounds2D();
 	}
 	
-	protected Poly(Table layer, Poly source, Tuple option, boolean connect) {
-		super(layer, source, option, UNSETTABLES);
+	
+	
+	protected Poly(String id, Poly source) {
+		super(id, source);
+		this.points = source.points;
+		this.path = source.path;
+		this.bounds = source.bounds;
+		this.connect = source.connect;
+	}
+
+
+
+	protected Poly(Poly source, Tuple option, boolean connect) {
+		super(source, option, UNSETTABLES);
 		this.connect = connect;
 		
 		if (changesPoints(option)) {
@@ -249,7 +261,7 @@ public abstract class Poly extends Stroked {
 
 	/**What is the X/Y implicit argument (as a number)*/
 	private static double index(List<Point2D> points, String att, boolean onlyInt) {
-		if (Xn.is(att) && Yn.is(att)) {return -1;}
+		if (Xn.is(att) || Yn.is(att)) {return -1;}
 		
 		try {
 			double val;

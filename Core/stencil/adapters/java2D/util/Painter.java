@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 
 public final class Painter extends Thread implements Stopable {
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
@@ -17,7 +17,7 @@ public final class Painter extends Thread implements Stopable {
 	
 	
 	private boolean run = true;
-	private final Table[] layers;
+	private final DisplayLayer[] layers;
 	private final GenerationTracker generations;
 	private final Canvas target;
 	
@@ -26,11 +26,14 @@ public final class Painter extends Thread implements Stopable {
 	AffineTransform priorTransform=new AffineTransform();
 	
 	
-	public Painter(Table[] layers, Canvas target) {
+	public Painter(DisplayLayer[] layers, Canvas target) {
 		this.layers = layers;
 		this.target = target;
 		generations = new GenerationTracker(layers);
 	}
+	
+
+	public void signalStop() {run = false;}
 	
 	public void run() {
 		while (run) {
@@ -47,7 +50,7 @@ public final class Painter extends Thread implements Stopable {
 	/**Render glyphs immediately onto the passed graphics object.*/
 	public void doDrawing(Graphics2D g, AffineTransform base) {
 		g.addRenderingHints(rh);
-		for (Table<? extends Glyph2D> table: layers) {
+		for (DisplayLayer<? extends Glyph2D> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
 			for (Glyph2D glyph: table) {
 				Rectangle r = glyph.getBoundsReference().getBounds();
@@ -102,8 +105,6 @@ public final class Painter extends Thread implements Stopable {
 		updateNextBuffer();
 		return buffer;
 	}
-
-	public void signalStop() {run = false;}
 
 	//Taken roughly from Prefuse's Display 
     protected BufferedImage newBuffer(Canvas canvas, int width, int height) {

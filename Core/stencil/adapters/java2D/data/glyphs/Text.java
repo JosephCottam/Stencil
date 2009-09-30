@@ -18,7 +18,7 @@ import static stencil.util.enums.EnumUtils.contains;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.TextFormats;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
@@ -62,7 +62,7 @@ public class Text extends Basic {
 	
 	private final Rectangle2D drawBounds;
 	
-	public Text(Table layer, String id) {
+	public Text(DisplayLayer layer, String id) {
 		super(layer, id);
 		
 		text = TEXT.defaultValue;
@@ -76,12 +76,25 @@ public class Text extends Basic {
 		drawBounds  = (Rectangle2D) bounds.clone(); 
 	}
 	
-	protected Text(Table layer, Text source, Tuple option) {
-		this(layer, source, option, UNSETTABLES);
+	protected Text(String id, Text source) {
+		super(id, source);
+		
+		this.text = source.text;
+		this.scaleBy = source.scaleBy;
+		this.format = source.format;
+		this.autoHeight = source.autoHeight;
+		this.autoWidth = source.autoWidth;
+		this.bounds = source.bounds;
+		this.rotation = source.rotation;
+		this.drawBounds = source.drawBounds;
+	}
+	
+	protected Text(Text source, Tuple option) {
+		this(source, option, UNSETTABLES);
 	}
 
-	protected Text(Table layer, Text source, Tuple option, AttributeList unsettables) {
-		super(layer, source, option, unsettables);
+	protected Text(Text source, Tuple option, AttributeList unsettables) {
+		super(source, option, unsettables);
 
 		scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
 		text = switchCopy(source.text, safeGet(option, TEXT));
@@ -126,12 +139,14 @@ public class Text extends Basic {
 		if (SCALE_BY.is(name)) {return scaleBy;}
 		if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
 		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
+		if (ROTATION.is(name)) {return rotation;}
 		if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
 		return super.get(name);
 	}
 
 	protected void fixScale(Graphics2D g) {
 		AffineTransform trans = g.getTransform();
+		
 		double scale = -1;
 		
 		if (scaleBy.equals("X")) {scale = trans.getScaleX();}
@@ -141,7 +156,10 @@ public class Text extends Basic {
 		else if (scaleBy.equals("SMALLEST")){scale = Math.min(trans.getScaleX(), trans.getScaleY());}
 		else {return;} //Scale by all...do nothing to the current transform
 
-		g.scale(scale/trans.getScaleX(), scale/trans.getScaleY());
+		double scaleXBy = trans.getScaleX() == 0 ? 1 : scale/trans.getScaleX();
+		double scaleYBy = trans.getScaleY() == 0 ? 1 : scale/trans.getScaleY();
+		
+		g.scale(scaleXBy, scaleYBy);
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
@@ -172,6 +190,7 @@ public class Text extends Basic {
 				g.getTransform().inverseTransform(p, p);
 			} catch (Exception e) {p = new Point2D.Double(x,y);}
 			
+//			System.out.println("Text at:" + p.getX() + ", " +p.getY() + "    (" + line + ")");
 			g.drawString(line, (float) p.getX(), (float) p.getY());
 
 			//TODO: Stop drawing when you run out of height
@@ -221,8 +240,6 @@ public class Text extends Basic {
 	public Rectangle2D getBoundsReference() {return drawBounds;}
 
 	
-	public Text update(Tuple t) throws IllegalArgumentException {return new Text(this.layer, this, t);}
-	public Text updateLayer(Table layer) {return new Text(layer, this, Tuple.EMPTY_TUPLE);}
-
-	
+	public Text update(Tuple t) throws IllegalArgumentException {return new Text(this, t);}
+	public Text updateID(String id) {return new Text(id, this);}
 }

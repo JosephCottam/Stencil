@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.parser.tree.Rule;
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.streams.Tuple;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
@@ -23,11 +23,11 @@ public final class DynamicUpdater extends Thread implements Stopable {
 	
 	private boolean run =true;
 	private final Rule rule;
-	private final Table<Glyph2D> table;
+	private final DisplayLayer<Glyph2D> table;
 	private final Map<String, Entry> sourceData = new ConcurrentHashMap();
 	private boolean iterationMark = false;
 	
-	public DynamicUpdater(Table<Glyph2D> table, Rule rule) {
+	public DynamicUpdater(DisplayLayer<Glyph2D> table, Rule rule) {
 		this.table = table;
 		this.rule = rule;
 	}

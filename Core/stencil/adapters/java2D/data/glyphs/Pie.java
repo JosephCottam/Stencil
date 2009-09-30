@@ -39,7 +39,7 @@ import stencil.adapters.general.Pies;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Strokes;
 import stencil.adapters.general.Strokes.StrokeProperty;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.streams.Tuple;
@@ -87,7 +87,7 @@ public final class Pie extends Stroked {
 	private final java.awt.Shape outline;
 	
 	
-	public Pie(Table layer, String id) {
+	public Pie(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
 		
 		size = SIZE.defaultValue;
@@ -102,8 +102,26 @@ public final class Pie extends Stroked {
 		bounds = outline.getBounds2D();
 	}
 	
-	private Pie(Table layer, Pie source, Tuple option) {
-		super(layer, source, option, UNSETTABLES);
+	
+	
+	private Pie(String id, Pie source) {
+		super(id, source);
+		
+		this.size = source.size;
+		this.slicePaint = source.slicePaint;
+		this.fieldPaint = source.fieldPaint;
+		this.angle = source.angle;
+		this.field = source.field;
+		this.slice = source.slice;
+		this.bounds = source.bounds;
+		this.arc = source.arc;
+		this.outline = source.outline;
+	}
+
+
+
+	private Pie(Pie source, Tuple option) {
+		super(source, option, UNSETTABLES);
 		
 		size = switchCopy(source.size, safeGet(option, SIZE));
 		slicePaint = switchCopy(source.slicePaint, safeGet(option, SLICE_COLOR));
@@ -159,6 +177,6 @@ public final class Pie extends Stroked {
 		super.postRender(g, base);
 	}
 
-	public Pie update(Tuple t) throws IllegalArgumentException {return new Pie(this.layer, this, t);}
-	public Pie updateLayer(Table layer) {return new Pie(layer, this, Tuple.EMPTY_TUPLE);}
+	public Pie update(Tuple t) throws IllegalArgumentException {return new Pie(this, t);}
+	public Pie updateID(String id) {return new Pie(id, this);}
 }

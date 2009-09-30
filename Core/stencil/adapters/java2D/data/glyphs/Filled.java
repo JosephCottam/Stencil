@@ -37,7 +37,7 @@ import java.awt.Shape;
 import stencil.adapters.general.Fills;
 import stencil.adapters.general.Strokes;
 import stencil.adapters.general.Fills.FillProperty;
-import stencil.adapters.java2D.data.Table;
+import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
@@ -51,13 +51,18 @@ public abstract class Filled extends Stroked {
 	
 	protected final Paint fill;
 	
-	protected Filled(Table layer, String id) {
+	protected Filled(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, new java.awt.Color(0,0,0, Color.CLEAR_INT));
 		fill = Fills.getDefault();
 	}
 	
-	protected Filled(Table t, Stroked source, Tuple option, AttributeList unsettables) {
-		super(t, source, option, unsettables);
+	protected Filled(String id, Filled source) {
+		super(id, source);
+		this.fill = source.fill;
+	}
+	
+	protected Filled(Stroked source, Tuple option, AttributeList unsettables) {
+		super(source, option, unsettables);
 		fill = Fills.make(source, option);
 	}
 
