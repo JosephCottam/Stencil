@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: /home/rduhon/Downloads/Stencil_28Aug09/Examples/Stocks/google_stocks.csv
+SOURCE: /nfs/rontok/xraid/users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
 CHECKHEADER: true
 STREAM: Mouse
 NAME: Mouse
@@ -19,7 +19,8 @@ from Stocks
 	Y.new: Price(Open) -> (Price)		/*All news in a block indicate the same extension until a new input is started.*/
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @color(BLUE)
-
+   view(ZOOM) : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
+   view(X,Y): (canvas.X, canvas.Y)
 
 layer Lookup[SHAPE]
 from Stocks
@@ -35,14 +36,13 @@ from Mouse
   ID : "Selected"
   (X, Y) : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> (X, Y)
   TEXT : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> Mult(-1, Y)
-  view(ZOOM) : Zoom(view.WIDTH, view.HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
-  view(X,Y): (canvas.X, canvas.Y)
+
 
 layer Highlight[LINE]
 from Mouse
   ID : "Highlight"
   (X.1, X.2) : Nearest(X, 3) -> (_, _)
-  Y.1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
+  Y.1 : Add(canvas.Y, view.PORTAL_HEIGHT) -> Sub(_, 3)
   Y.2 : Add(canvas.Y, 3)
   STROKE_WEIGHT : 3
   STROKE_COLOR : @color(BLUE, 100)

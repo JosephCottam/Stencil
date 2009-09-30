@@ -24,7 +24,7 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 import stencil.util.DoubleDimension;
 
-public class Text extends Point {
+public class Text extends Basic {
 	
 	public static final class TextShape extends Text {
 		protected static final AttributeList ATTRIBUTES = new AttributeList(Text.ATTRIBUTES);
@@ -44,7 +44,7 @@ public class Text extends Point {
 		protected final void fixScale(Graphics2D g) {/*deliberately does nothing*/}
 	}
 	
-	protected static final AttributeList ATTRIBUTES = new AttributeList(Point.ATTRIBUTES);
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
 	private static final String IMPLANTATION = "TEXT";
 	

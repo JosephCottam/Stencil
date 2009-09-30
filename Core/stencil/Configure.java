@@ -30,8 +30,12 @@ public class Configure {
 
 	public static void loadProperties(String... urls) throws Exception {
 		Properties p = new Properties();
-
-		for (String url:urls) {p.loadFromXML(new URL(url).openStream());}
+		URL base;
+		
+		try {base = new URL("file://" + System.getProperty("user.dir")+"/");}
+		catch (Exception e) {throw new Error("Error initailizing context.");}
+		
+		for (String url:urls) {p.loadFromXML(new URL(base, url).openStream());}
 
 		loadProperties(p);
 	}

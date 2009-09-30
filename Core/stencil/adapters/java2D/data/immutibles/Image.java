@@ -45,10 +45,10 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 
-public final class Image extends Point {
+public final class Image extends Basic {
 	private static final double AUTO_SCALE = -1;
 
-	protected static final AttributeList ATTRIBUTES = new AttributeList(Point.ATTRIBUTES);
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES= new AttributeList();
 	
 	private static final Attribute<Double> X = new Attribute("X", 0d);

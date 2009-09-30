@@ -52,7 +52,7 @@ import stencil.util.BasicTuple;
 import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
 
-public abstract class Point implements Glyph2D {
+public abstract class Basic implements Glyph2D {
 	public static Color DEBUG_COLOR = null;
 	private static final Stroke DEBUG_STROKE = new BasicStroke(.25f);
 	
@@ -83,7 +83,7 @@ public abstract class Point implements Glyph2D {
 	/**Should this glyph be drawn?**/
 	protected final boolean visible;		//TODO: Experiment with this as a mutable value...
 	
-	protected Point(Table layer, String id) {
+	protected Basic(Table layer, String id) {
 		this.layer = layer;
 
 		this.id = id;
@@ -92,7 +92,7 @@ public abstract class Point implements Glyph2D {
 		
 	}
 
-	protected Point(Table t, Point source, Tuple option, AttributeList unsettables) {
+	protected Basic(Table t, Basic source, Tuple option, AttributeList unsettables) {
 		validateOptions(option, unsettables);
 
 		this.layer = t;
@@ -235,7 +235,7 @@ public abstract class Point implements Glyph2D {
 	 * @param targetWidth The width of the newly formed thing
 	 * @param targetHeight The height of the newly formed thing
 	 */
-	public static Point2D mergeRegistrations(Point source, Tuple option, double targetWidth, double targetHeight, Attribute<Double> X, Attribute<Double> Y) {
+	public static Point2D mergeRegistrations(Basic source, Tuple option, double targetWidth, double targetHeight, Attribute<Double> X, Attribute<Double> Y) {
 		double x = switchCopy((Double) source.get(X.name, Double.class), safeGet(option, X));
 		double y = switchCopy((Double) source.get(Y.name, Double.class), safeGet(option, Y));			
 		Registrations.Registration reg = switchCopy(source.registration, safeGet(option, REGISTRATION));

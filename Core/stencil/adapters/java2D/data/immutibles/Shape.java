@@ -132,6 +132,7 @@ public class Shape extends Filled {
 		else if (X.is(name)) {return regX;}
 		else if (Y.is(name)) {return regY;}
 		else if (SIZE.is(name)) {return size;}
+		else if (ROTATION.is(name)) {return rotation;}
 		else {return super.get(name);}
 	}
 	

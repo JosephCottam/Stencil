@@ -43,10 +43,10 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 
-public abstract class Stroked extends Point {
+public abstract class Stroked extends Basic {
 	protected static final AttributeList ATTRIBUTES;
 	static {
-		ATTRIBUTES = new AttributeList(Point.ATTRIBUTES);
+		ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 		for (StrokeProperty p: StrokeProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
 

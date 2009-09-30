@@ -67,7 +67,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	public void setDebugColor(Color c) {
 		Point.DEBUG_COLOR = c;
-		stencil.adapters.java2D.data.immutibles.Point.DEBUG_COLOR = c;
+		stencil.adapters.java2D.data.immutibles.Basic.DEBUG_COLOR = c;
 	}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
