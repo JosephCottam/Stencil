@@ -54,6 +54,8 @@ public class Sidebar implements Guide2D {
 	private float vSpacing;
 	private float hSpacing;
 	
+	protected Rectangle2D bounds = new Rectangle2D.Double();
+	
 	public double X;
 	public double Y;
 	
@@ -90,24 +92,15 @@ public class Sidebar implements Guide2D {
 		List<Pair> listing = validate(elements);
 		marks = createLabeledBoxes(listing);
 		
+		Rectangle2D bounds = GuideUtils.fullBounds(marks);
 		if (autoPlace) {
-			Rectangle2D bounds = fullBounds(marks);
 			X = -1d * bounds.getWidth();
 			Y = -1d * bounds.getHeight();
 		}
+		this.bounds = new Rectangle2D.Double(X,Y, bounds.getWidth(), bounds.getY());
 	}
 	
-	private Rectangle2D fullBounds(Collection<Glyph2D> glyphs) {
-		Rectangle2D bounds =  null;
-		for (Glyph2D g: glyphs) {
-			if (bounds == null) {
-				bounds = (Rectangle2D) g.getBoundsReference().clone();
-			} else {
-				bounds.add(g.getBoundsReference());
-			}
-		}
-		return bounds;
-	}
+	public Rectangle2D getBoundsReference() {return bounds;}
 	
 	private Collection<Glyph2D> createLabeledBoxes(List<Pair> elements) {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);

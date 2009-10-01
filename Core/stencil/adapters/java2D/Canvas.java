@@ -42,6 +42,7 @@ import javax.swing.JComponent;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.util.GenerationTracker;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
@@ -99,7 +100,8 @@ public final class Canvas extends JComponent {
 						bounds.add(g.getBoundsReference());
 					}
 				}
-			}
+				for (Guide2D g: t.getGuides()) {bounds.add(g.getBoundsReference());}
+			}			
 		} 
 		return bounds.getBounds();
 	}

@@ -2,6 +2,7 @@ package stencil.adapters.java2D.data.guides;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,8 +34,6 @@ public class Axis implements Guide2D {
 		public boolean category() {return category;}
 		public String toString() {return "(" + label + ", " + value + ")";}
 	}
-	
-	
 	
 	/**In the axial specializer, map values that start with
 	 * this tag will be applied to the labels.
@@ -78,6 +77,8 @@ public class Axis implements Guide2D {
 	protected Glyph2D prototypeLine = new Line(null, "prototype");
 
 	protected Collection<Glyph2D> marks;
+
+	protected Rectangle2D bounds = new Rectangle2D.Double();
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(String id, Specializer specializer) {
@@ -97,15 +98,17 @@ public class Axis implements Guide2D {
 
 	public AXIS getAxis() {return axis;} 
 	
-	public void setElements(List<AutoguidePair> elements) {
+	public synchronized void setElements(List<AutoguidePair> elements) {
 		List<Pair> listing = validate(elements);		
 		categorical = !allNumbers(listing);		
 		
 		marks = createLabeledTics(listing);
 		Glyph2D line = createLine(listing);
 		if (line !=null) {marks.add(line);}	
+		bounds = GuideUtils.fullBounds(marks);
 	}
 
+	public Rectangle2D getBoundsReference() {return bounds;}
 	
 	/**Create the major axial line for the axis.*/
 	private Glyph2D createLine(List<Pair> elements) {
@@ -283,12 +286,9 @@ public class Axis implements Guide2D {
 	}
 
 	
-	public void render(Graphics2D g, AffineTransform viewTransform) {
+	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
 		if (marks == null) {return;}
 		
-		for (Glyph2D glyph: marks) { 
-			glyph.render(g, viewTransform);
-		}
+		for (Glyph2D glyph: marks) {glyph.render(g, viewTransform);}
 	}
-
 }

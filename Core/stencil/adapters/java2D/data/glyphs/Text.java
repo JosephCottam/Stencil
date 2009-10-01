@@ -2,8 +2,11 @@ package stencil.adapters.java2D.data.glyphs;
 
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
+import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -63,6 +66,7 @@ public class Text extends Basic {
 	private final double rotation;
 	
 	private final Rectangle2D drawBounds;
+	private final GeneralPath renderedText;
 	
 	public Text(DisplayLayer layer, String id) {
 		super(layer, id);
@@ -75,7 +79,8 @@ public class Text extends Basic {
 		autoHeight = true;
 
 		bounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
-		drawBounds  = (Rectangle2D) bounds.clone(); 
+		drawBounds  = (Rectangle2D) bounds.clone();
+		renderedText = new GeneralPath();
 	}
 	
 	protected Text(String id, Text source) {
@@ -89,6 +94,7 @@ public class Text extends Basic {
 		this.bounds = source.bounds;
 		this.rotation = source.rotation;
 		this.drawBounds = source.drawBounds;
+		this.renderedText = source.renderedText;
 	}
 	
 	protected Text(Text source, Tuple option) {
@@ -112,23 +118,30 @@ public class Text extends Basic {
 			double width = (Double) option.get(WIDTH.name, Double.class);
 			autoWidth = (width <= AUTO_SIZE);
 		}else {autoWidth = source.autoWidth;}
-				
-		DoubleDimension[] sizes = computeLayout(null);
-		 
-		double width, height;
-		if (autoWidth) {width = sizes[sizes.length-1].width;} 
-		else {width = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));}
-		 
-		if (autoHeight) {height = sizes[sizes.length-1].height;}
-		else {height = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));}
 
-		Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
-		bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
-		
-		GeneralPath p = new GeneralPath(new Rectangle2D.Double(0,0, width, height));
-		p.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
-		p.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
-		drawBounds = p.getBounds2D();
+		if (text.equals(source.text)) {
+			this.renderedText = source.renderedText;
+			this.drawBounds = source.drawBounds;
+			this.bounds = source.bounds;
+		} else {
+			renderedText = layoutText(text, format);
+			Rectangle2D layoutBounds = renderedText.getBounds2D();
+			
+			double width, height;
+			if (autoWidth) {width = layoutBounds.getWidth();} 
+			else {width = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));}
+			 
+			if (autoHeight) {height = layoutBounds.getHeight();}
+			else {height = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));}
+
+			Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
+			bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
+			
+			GeneralPath layout = (GeneralPath) renderedText.clone();
+			layout.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+			layout.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
+			drawBounds = layout.getBounds2D();
+		}
 	}
 
 	
@@ -168,61 +181,46 @@ public class Text extends Basic {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-
-		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
 
-		final DoubleDimension[] dims = computeLayout(g);
-		final String[] lines =SPLITTER.split(text);
-
 		g.translate(bounds.getX(), bounds.getY());
 		g.rotate(Math.toRadians(this.rotation));
-		AffineTransform trans = g.getTransform();
-		fixScale(g);
+		g.fill(renderedText);
+		super.postRender(g, base);
+	}	
+	
+	private static GeneralPath layoutText(String text, Format format) {
+		Graphics2D g = REFERENCE_GRAPHICS;
+		FontRenderContext context = g.getFontRenderContext();
+		DoubleDimension[] dims = computeLayout(g, text, format.font);
+		final String[] lines =SPLITTER.split(text);
+
+		GeneralPath compound = new GeneralPath();
 		
 		for (int i=0; i< lines.length; i++) {
 			final DoubleDimension dim = dims[i];
 			String line = lines[i];
 			
-			double x = horizontalOffset(dim.width);
+			double x = horizontalOffset(dim.width, dims[dims.length-1].width, format.justification);
 			double y = dim.height * i + (dim.height*.8); //TODO: get standard ascent instead...this is just an approximation of baseline to top of ascent
 			
-			Point2D p =  new Point2D.Double(x,y);//Scale may have changed, translate point according to old scaling...
-			
-			try {
-				trans.transform(p,p);
-				g.getTransform().inverseTransform(p, p);
-			} catch (Exception e) {p = new Point2D.Double(x,y);}
-			
-//			System.out.println("Text at:" + p.getX() + ", " +p.getY() + "    (" + line + ")");
-			g.drawString(line, (float) p.getX(), (float) p.getY());
-
-			//TODO: Stop drawing when you run out of height
+			java.awt.Shape s = format.font.createGlyphVector(context, line).getOutline((float) x, (float) y);
+			compound.append(s, false);
 		}
-		
-		super.postRender(g, base);
-	}	
-	
-	private double horizontalOffset(double lineWidth) {
-		if (format.justification == Component.LEFT_ALIGNMENT) {return 0;}
 
-		if (format.justification == Component.RIGHT_ALIGNMENT) {
-			return bounds.getWidth() - lineWidth;
-		}
-		if (format.justification == Component.CENTER_ALIGNMENT) {return bounds.getWidth()/2.0 - lineWidth/2.0;}
-		throw new RuntimeException("Unknown justification value: " + format.justification);
+		return compound;
 	}
-
+	
 	/**Get the appropriate metrics for the layout of the requested text.
 	 * The last entry of the returned dimensions array DOES NOT CORRESPONDE TO A SINGLE LINE;
 	 * it is the overall dimensions.  Iterate on the lines, not on the dimensions when working with dimensions. 
 	 * 
 	 */
 	//TODO: Do width-based line wrapping
-	private DoubleDimension[] computeLayout(Graphics2D g) {
+	private static DoubleDimension[] computeLayout(Graphics2D g, String text, Font font) {
         Graphics2D g2 = g ==null? REFERENCE_GRAPHICS: g;
-		FontMetrics fm = g2.getFontMetrics(format.font);
+		FontMetrics fm = g2.getFontMetrics(font);
         String[] lines = SPLITTER.split(text);
         DoubleDimension[] dims = new DoubleDimension[lines.length +1];
         
@@ -242,6 +240,17 @@ public class Text extends Basic {
         return dims;
 	}
 
+	private static double horizontalOffset(double lineWidth, double spaceWidth, float justification) {
+		if (justification == Component.LEFT_ALIGNMENT) {return 0;}
+
+		if (justification == Component.RIGHT_ALIGNMENT) {return spaceWidth- lineWidth;}
+		
+		if (justification == Component.CENTER_ALIGNMENT) {return spaceWidth/2.0 - lineWidth/2.0;}
+		
+		throw new RuntimeException("Unknown justification value: " + justification);
+	}
+
+	
 	public Rectangle2D getBoundsReference() {return drawBounds;}
 
 	

@@ -29,8 +29,10 @@
 package stencil.adapters.java2D.data.guides;
 
  import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.awt.geom.Rectangle2D;
 import java.lang.reflect.*;
 
 import stencil.adapters.java2D.data.Glyph2D;
@@ -86,5 +88,19 @@ public abstract class GuideUtils {
 			}			
 
 		}
+	}
+	
+	
+	/**Given a collection of glyphs, what is a bounding box that contains them?*/
+	public static final Rectangle2D fullBounds(Collection<Glyph2D> glyphs) {
+		Rectangle2D bounds =  null;
+		for (Glyph2D g: glyphs) {
+			if (bounds == null) {
+				bounds = (Rectangle2D) g.getBoundsReference().clone();
+			} else {
+				bounds.add(g.getBoundsReference());
+			}
+		}
+		return bounds;
 	}
  }
