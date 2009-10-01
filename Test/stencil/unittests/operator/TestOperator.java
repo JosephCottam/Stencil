@@ -43,11 +43,6 @@ public class TestOperator extends TestCase {
 		assertEquals("0", rv.get("Z"));
 		assertEquals("1", rv.get("Y"));
 		assertEquals("2", rv.get("X"));
-
-		boolean failed = false;
-		try {legend.map(null,null);}
-		catch (Exception e) {failed = true;}
-		finally {if (!failed) {fail("Exception not thrown when incorrect number of arguments passed to legend.");}}
 	}
 
 	public void testMapNulls() throws Exception {
@@ -64,7 +59,7 @@ public class TestOperator extends TestCase {
 	}
 
 	public void testGenerateFail() throws Exception {
-		String source = "legend bad(X,Y) -> (X,Y, Z) (X=~'.*') => (Z,Y,X): (X,Y)";
+		String source = "legend bad(X,Y) -> (X,Y, Z) (X=~\".*\") => (Z,Y,X): (X,Y)";
 		boolean failed = false;
 		try {
 			ParseStencil.parse(source, ADAPTER);

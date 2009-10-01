@@ -264,7 +264,7 @@ public final class Fills {
 		else {att = FillProperty.valueOf(key.toString());}
 
 		switch (att) {
-		case PATTERN: return base.pattern.toString();
+		case PATTERN: return base.pattern;
 		case PATTERN_SCALE: return base.scale;
 		case PATTERN_WEIGHT: return base.weight;
 		case PATTERN_BACK: return base.back;

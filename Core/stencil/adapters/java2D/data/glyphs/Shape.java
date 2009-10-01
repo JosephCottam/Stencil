@@ -50,7 +50,7 @@ public class Shape extends Filled {
 		double regY;
 	}
 	
-	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
+	private static final AttributeList ATTRIBUTES = new AttributeList(Filled.ATTRIBUTES);
 	private static final AttributeList UNSETTABLES = new AttributeList();
 	private static final String IMPLANTATION = "SHAPE";
 	

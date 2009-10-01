@@ -71,6 +71,11 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	/**Returns the mapping set in this legend.  
 	 */
 	public Tuple map(Object... values) {
+		if (source.getArguments().size() != values.length) {
+			String args = Arrays.deepToString(source.getArguments().toArray());
+			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", args, values.length));
+		}
+
 		Tuple tuple = new BasicTuple(source.getArguments(), Arrays.asList(values));
 		OperatorRule action = matchingAction(tuple);
 

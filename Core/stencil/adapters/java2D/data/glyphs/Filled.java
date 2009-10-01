@@ -45,14 +45,17 @@ import stencil.types.color.Color;
 
 public abstract class Filled extends Stroked {
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
+	
+	protected static final Attribute<Paint> STROKE_COLOR = new Attribute<Paint>("STROKE_COLOR", new java.awt.Color(0,0,0, Color.CLEAR_INT));
 	static {
 		for (FillProperty p: FillProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
+		ATTRIBUTES.add(STROKE_COLOR); //Override the standard stroke default value
 	}
 	
 	protected final Paint fill;
 	
 	protected Filled(DisplayLayer layer, String id) {
-		super(layer, id, Strokes.DEFAULT_STROKE, new java.awt.Color(0,0,0, Color.CLEAR_INT));
+		super(layer, id, Strokes.DEFAULT_STROKE, STROKE_COLOR.defaultValue);
 		fill = Fills.getDefault();
 	}
 	

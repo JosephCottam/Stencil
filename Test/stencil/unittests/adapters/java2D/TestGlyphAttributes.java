@@ -1,77 +1,58 @@
 package stencil.unittests.adapters.java2D;
 
 import junit.framework.TestCase;
-import java.awt.Color;
-import java.awt.Paint;
-import java.util.EnumSet;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
 //TODO: Add tests for failure cases
 public class TestGlyphAttributes extends TestCase{
-//	public static Double[] doubles = new Double[] {11.0, 3.0, 1.5, 10.25};
-//	public static Integer[] integers = new Integer[] {11, 3, 33, 10};
-//	public static String[] strings = new String[] {"one", "two", "three", "four"};
-//	public static Paint[] colors = new Color[]{Color.RED, Color.CYAN, Color.DARK_GRAY, Color.WHITE, new Color(.33f, .81f, .90f)};
-//
-//
-//	public static Object[] testSet(Class type) {
-//		if (type.isEnum()) {return EnumSet.allOf(type).toArray();}
-//
-//		if (Double.class.isAssignableFrom(type)) {return doubles;}
-//		if (Integer.class.isAssignableFrom(type)) {return integers;}
-//		if (String.class.isAssignableFrom(type)) {return strings;}
-//		if (Paint.class.isAssignableFrom(type)) {return colors;}
-//
-//
-//		throw new RuntimeException("No value set known for " + type.getName());
-//	}
-//
-//	private void testAttributes(Node node) throws Exception {
-//		String[] attributes =node.getAttributes().toArray(new String[0]);
-//		testAttributes(node, attributes);
-//	}
-//
-//	private void testAttributes(Node node, String[] attributes) throws Exception {
-//		for(String att : attributes) {
-//			Object[] testSet = testSet(node.getType(att));
-//			testAttribute(node, att, testSet);
-//		}
-//
-//		checkCustomAttribute(node);
-//	}
-//
-//	private void testAttribute(Node node, String attribute, Object[] testSet) {
-//		if (node.getProvidedAttributes().get(attribute).set.passName) {return;} //Do not test if there is an implicit argument
-//		node.reset();
-//
-//		if (node.getDefault(attribute) != null) {
-//			assertEquals("Error testing default " + attribute, node.getDefault(attribute), node.getAttribute(attribute));
-//		}
-//
-//		for (Object value: testSet) {
-//			node.setAttribute(attribute, value);
-//			assertEquals("Error testing " + attribute, value, node.getAttribute(attribute));
-//		}
-//	}
-//
-//	public void checkCustomAttribute(Node node) throws Exception {
-//		String key = "CUSTOM_Property_NAME";
-//		String value = "Property value";
-//		assertNull(node.getAttribute(key));
-//
-//
-//		node.setAttribute(key, value);
-//		assertTrue("Custom attribute not found after add.", node.getAttributes().contains(key));
-//		assertEquals("Custom attribute value did not match expected.", value, node.getAttribute(key));
-//	}
-//
-//	public void testText() throws Exception {testAttributes(new Text("MyID"));}
-//	public void testShape() throws Exception {testAttributes(new Shape("MyID"));}
-//	public void testImage() throws Exception {testAttributes(new Image("MyID"));}
-//	public void testLine() throws Exception {testAttributes(new Line("MyID"));}
-//	public void testPolyLine() throws Exception {testAttributes(new AbstractPoly.PolyLine("MyID"));}
-//	public void testPoly() throws Exception {testAttributes(new AbstractPoly.Poly("MyID"));}
-//	public void testPie() throws Exception {testAttributes(new Pie("MyID"));}
+	private void testAttributes(Glyph2D node, String...ignores) throws Exception {
+		List<String> ignore = new ArrayList(Arrays.asList(ignores));
+		ignore.add("ID");
+		ignore.add("IMPLANTATION");
+		
+		for(String att : node.getFields()) {
+			if (ignore.contains(att)) {continue;} 
+			Object value = node.get(att);
+			assertTrue(String.format("Default value not returned for %1$s when expected (got %2$s)", att, value), node.isDefault(att, value));
+		}
+		
+		for (String att: node.getFields()) {
+			assertTrue(String.format("Expected to find %1$s in glyph of type %2$s", att, node.get("IMPLANTATION")), node.hasField(att));
+		}
+	}
+
+	public void testText() throws Exception {
+		testAttributes(new Text(null, "MyID"));
+	}
+	
+	public void testShape() throws Exception {
+		testAttributes(new Shape(null, "MyID"));
+	}
+
+	public void testImage() throws Exception {
+		testAttributes(new Image(null, "MyID"), "HEIGHT", "WIDTH");
+	}
+
+	public void testLine() throws Exception {
+		testAttributes(new Line(null, "MyID"), "X", "Y", "HEIGHT", "WIDTH");
+	}
+	
+	public void testPolyLine() throws Exception {
+		testAttributes(new Poly.PolyLine(null, "MyID"), "X", "Y", "Xn", "Yn");
+	}
+	
+	public void testPoly() throws Exception {
+		testAttributes(new Poly.Polygon(null, "MyID"), "X", "Y", "Xn", "Yn");
+	}
+	
+	public void testPie() throws Exception {
+		testAttributes(new Pie(null, "MyID"));
+	}
 
 }
