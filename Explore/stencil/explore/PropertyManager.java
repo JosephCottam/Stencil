@@ -102,7 +102,7 @@ public class PropertyManager {
 		Properties p = new Properties();
 		URL base;
 		
-		try {base = new URL("file://" + System.getProperty("user.dir")+"/");}
+		try {base = new java.io.File(System.getProperty("user.dir")).toURI().toURL();}
 		catch (Exception e) {throw new Error("Error initailizing context.");}
 
 		Properties props = new Properties();
