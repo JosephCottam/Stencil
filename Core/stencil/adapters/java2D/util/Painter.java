@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.adapters.java2D.data.Guide2D;
 
 public final class Painter extends Thread implements Stopable {
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
@@ -59,6 +60,8 @@ public final class Painter extends Thread implements Stopable {
 					glyph.render(g, base);
 				}
 			}
+			
+			for (Guide2D guide: table.getGuides()) {guide.render(g, base);} //TODO: Guides should probably be associated with the entire panel and rendered after all layers...
 		}
 	}
 	

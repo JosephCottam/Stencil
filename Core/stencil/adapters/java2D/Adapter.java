@@ -28,14 +28,17 @@
  */
 package stencil.adapters.java2D;
 
-import java.awt.Color;
+ import java.awt.Color;
 import stencil.adapters.java2D.data.Glyph2D;
+import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.StencilPanel;
 import stencil.parser.string.ParseStencil;
+import stencil.parser.tree.Guide;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.glyphs.Basic;
+import stencil.adapters.java2D.data.guides.*;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
@@ -45,6 +48,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	public Panel generate(Program program) {
 		Panel panel = new Panel(program);
+		constructGuides(panel, program);
 		
 		if (defaultMouse) {
 			ZoomPanHandler zp = new ZoomPanHandler();
@@ -55,18 +59,16 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	}
 
 	public Class getGuideClass(String name) {
-		throw new UnsupportedOperationException("Not implemented");
+//		if (name.equals("axis")) {return Axis.class;}
+//		else if (name.equals("sidebar")) {return Sidebar.class;}
+		
+		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
 
-	public DisplayLayer makeLayer(Layer l) {
-		return DisplayLayer.instance(l);
-	}
-
+	public DisplayLayer makeLayer(Layer l) {return DisplayLayer.instance(l);}
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
+	public void setDebugColor(Color c) {Basic.DEBUG_COLOR = c;}
 	
-	public void setDebugColor(Color c) {
-		Basic.DEBUG_COLOR = c;
-	}
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		throw new UnsupportedOperationException("Not implemented");
@@ -76,5 +78,34 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	public Panel compile(String programSource) throws Exception {
 		return generate(ParseStencil.parse(programSource, this));
+	}
+	
+	
+	//TODO: Lift out into a grammar pass...
+	private void constructGuides(Panel panel, Program program) {
+		int sidebarCount = 0;//How many side-bars have been created?
+		
+		for (Layer layer: program.getLayers()) {
+			for (Guide guideDef: layer.getGuides()) {
+				String guideType = guideDef.getGuideType();
+				DisplayLayer l = panel.getLayer(layer.getName());
+				String attribute = guideDef.getAttribute();
+				
+				if (guideType.equals("axis")) {
+					Guide2D guide = new Axis(attribute, guideDef.getArguments());
+					l.addGuide(attribute, guide);
+					
+					if (l.hasGuide("X") && l.hasGuide("Y")) {
+						((Axis) l.getGuide("X")).setConnect(true);
+						((Axis) l.getGuide("Y")).setConnect(true);
+					}
+				} else if (guideType.equals("sidebar")) {
+					Guide2D guide = new Sidebar(attribute, guideDef.getArguments(), sidebarCount++);
+					l.addGuide(attribute, guide);	
+				} else {
+					throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
+				}
+			}
+		}
 	}
 }

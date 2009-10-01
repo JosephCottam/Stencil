@@ -27,10 +27,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package stencil.adapters.java2D.data;
-
-
- import java.util.Iterator;
+ 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -40,24 +41,19 @@ import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
 
-public class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
+public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
 	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private int generation =0;
 	private final String name; 
 	private T prototypeGlyph;
+	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();
+	
 
-	protected DisplayLayer(String name) {
-		this.name = name;
-	}
+	protected DisplayLayer(String name) {this.name = name;}
 	
 	public String getName() {return name;}
 	
 	public T find(String ID) {return index.get(ID);}
-
-	public DisplayGuide getGuide(String attribute)
-			throws IllegalArgumentException {
-		return null;
-	}
 
 	public Iterator<T> iterator() {return index.values().iterator();}
 
@@ -109,6 +105,12 @@ public class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayL
 	/**Get the tuple prototype of this table.*/
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
+	public DisplayGuide getGuide(String attribute) {return guides.get(attribute);}
+	public void addGuide(String attribute, Guide2D guide) {guides.put(attribute, guide);}
+	public boolean hasGuide(String attribute) {return guides.containsKey(attribute);}
+	public Collection<Guide2D> getGuides() {return guides.values();}
+
+	
 	public static DisplayLayer<?> instance(Layer l) {
 		String name = l.getName();
 		String implantation = l.getImplantation();
@@ -146,5 +148,4 @@ public class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayL
 		return layer;
 
 	}
-
 }

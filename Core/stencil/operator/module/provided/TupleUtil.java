@@ -135,7 +135,9 @@ public class TupleUtil extends BasicModule {
 			assert sourceArguments == null && prototype == null : "Non-null sourceArgument or prototpye passed to categorize operator's Guide facet.";
 			
 			priorCount = seen.size();
-			return seen;
+			
+			//Duplicate list, for thread safety.  TODO: Should we use a thread safe container instead?
+			return new ArrayList(seen); 
 		}
 
 		public Tuple map(Object... args) {

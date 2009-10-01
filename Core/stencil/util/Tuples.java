@@ -44,6 +44,45 @@ import stencil.types.TypesCache;
 public final class Tuples {
 	private Tuples() {/*Utility class. Not instantiable.*/}
 
+	/**Tuple with no fields.  Should be used instead of null wherever a tuple 
+	 * is required but cannot be supplied.*/
+	public static final Tuple EMPTY_TUPLE = new Tuple() {
+		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
+		public Object get(String name, Class<?> type)
+				throws IllegalArgumentException, InvalidNameException {throw new InvalidNameException(name);}
+		public List<String> getFields() {return new ArrayList<String>();}
+		public boolean hasField(String name) {return false;}
+		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
+	};
+
+	
+	/**Tuple backed by a map.  The tuple is immutable, but the backing
+	 * map may not be.  Updates to the map WILL be represented in the tuple.
+	 * @author jcottam
+	 *
+	 */
+	public static final class MapTuple implements Tuple {
+		private Map<String, ?> map;
+		
+		public MapTuple(Map<String, ?> source) {this.map = source;}
+		
+		public Object get(String name) throws InvalidNameException {return map.get(name);}
+
+		public Object get(String name, Class<?> type)
+				throws IllegalArgumentException, InvalidNameException {
+			return Converter.convert(get(name), type);
+		}
+
+		public List<String> getFields() {return new ArrayList(map.keySet());}
+
+		public boolean hasField(String name) {return map.containsKey(name);}
+
+		public boolean isDefault(String name, Object value) {return false;}
+	};
+
+	
+
+	
 	/**Creates a read-only copy of the given tuple.  Values
 	 * are copied per the rules defined in Transfer.
 	 *

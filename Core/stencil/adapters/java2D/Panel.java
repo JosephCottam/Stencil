@@ -32,6 +32,7 @@ import stencil.adapters.java2D.data.*;
 import stencil.adapters.java2D.util.DynamicUpdater;
 import stencil.adapters.java2D.util.Stopable;
 import stencil.display.StencilPanel;
+import stencil.interpreter.DynamicRule;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
@@ -89,7 +90,8 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		assert table != null : "Table null after name-based search.";
 		
 		if (!updaters.containsKey(rule)) {
-			updater = new DynamicUpdater(table, rule);
+			Rule dynamicRule = DynamicRule.toDynamic(rule);
+			updater = new DynamicUpdater(table, dynamicRule);
 			updaters.put(rule, updater);
 			updater.start();
 		}

@@ -38,7 +38,7 @@ public class Text extends Basic {
 	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);
 	private static final Attribute<Double> WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SIZE, Double.class);
 	private static final Attribute<Double> HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SIZE, Double.class);
-	protected static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "SMALLEST");
+	protected static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "ALL");
 		
 	static {
 		ATTRIBUTES.add(X);
@@ -46,6 +46,8 @@ public class Text extends Basic {
 		ATTRIBUTES.add(TEXT);
 		ATTRIBUTES.add(SCALE_BY);
 		ATTRIBUTES.add(ROTATION);
+		ATTRIBUTES.add(HEIGHT);
+		ATTRIBUTES.add(WIDTH);
 		
 		for (TextProperty p:TextProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
 	}
@@ -140,6 +142,8 @@ public class Text extends Basic {
 		if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
 		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
 		if (ROTATION.is(name)) {return rotation;}
+		if (HEIGHT.is(name)) {return bounds.getHeight();}
+		if (WIDTH.is(name)) {return bounds.getWidth();}
 		if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
 		return super.get(name);
 	}
@@ -154,7 +158,8 @@ public class Text extends Basic {
 		else if (scaleBy.equals("LARGEST")) {scale = Math.min(trans.getScaleX(), trans.getScaleY());}
 		else if (scaleBy.equals("NONE")) {scale = 1;}
 		else if (scaleBy.equals("SMALLEST")){scale = Math.min(trans.getScaleX(), trans.getScaleY());}
-		else {return;} //Scale by all...do nothing to the current transform
+		else if (scaleBy.equals("ALL")){return;} //Scale by all...do nothing to the current transform
+		else {throw new IllegalArgumentException("Attempted to use SCALE_BY of an unknown value " + scaleBy);}
 
 		double scaleXBy = trans.getScaleX() == 0 ? 1 : scale/trans.getScaleX();
 		double scaleYBy = trans.getScaleY() == 0 ? 1 : scale/trans.getScaleY();
