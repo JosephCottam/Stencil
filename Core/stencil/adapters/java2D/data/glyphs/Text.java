@@ -144,17 +144,18 @@ public class Text extends Basic {
 		} else {
 			LayoutDescription ld = computeLayout(text, format);
 			
-			double width, height;
-			if (autoWidth) {width = ld.fullWidth;} 
-			else {width = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));}
+			if (!autoWidth) {
+				ld.fullWidth = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));
+			}
 			 
-			if (autoHeight) {height = ld.fullHeight;}
-			else {height = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));}
+			if (!autoHeight) { 
+				ld.fullHeight = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));
+			}
 
 			renderedText = layoutText(text, ld, format);
 			
-			Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
-			bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
+			Point2D topLeft = mergeRegistrations(source, option, ld.fullWidth, ld.fullHeight, X, Y);
+			bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
 			Point2D reg = Registrations.topLeftToRegistration(registration, bounds);
 
 			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));

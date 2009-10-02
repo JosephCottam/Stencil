@@ -187,21 +187,24 @@ public abstract class Basic implements Glyph2D {
 	protected void postRender(Graphics2D g, AffineTransform restore) {
 		if (restore != null) {g.setTransform(restore);}			
 		if (DEBUG_COLOR != null) {
+			
+			//Bounds for clip calculation
 			Rectangle2D r =getBoundsReference();
 			g.setPaint(DEBUG_COLOR);
 			g.setStroke(DEBUG_STROKE);
 			g.draw(r);
 			
+//			//Bounds as reported
+//			try {
+//				double x = (Double) this.get("X", Double.class);
+//				double y = (Double) this.get("Y", Double.class);
+//				double w = (Double) this.get("WIDTH", Double.class);
+//				double h = (Double) this.get("HEIGHT", Double.class);
+//				r = new Rectangle2D.Double(x,y,w,h);
+//				g.draw(r);
+//			} catch  (Exception e) {}
 
-			try {
-				double x = (Double) this.get("X", Double.class);
-				double y = (Double) this.get("Y", Double.class);
-				double w = (Double) this.get("WIDTH", Double.class);
-				double h = (Double) this.get("HEIGHT", Double.class);
-				r = new Rectangle2D.Double(x,y,w,h);
-				g.draw(r);
-			} catch  (Exception e) {}
-
+			//Registration point
 			try {
 				g.setPaint(DEBUG_COLOR.darker());
 				double scale=2;
