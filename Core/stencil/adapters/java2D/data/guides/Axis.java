@@ -45,7 +45,7 @@ public class Axis implements Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[label.FONT_SIZE=1, label.FONT_COLOR=@color(BLACK), line.STROKE_WEIGHT=.1, line.STROKE_COLOR=@color(GRAY), textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
+	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=1, label.FONT_COLOR=@color(BLACK), line.STROKE_WEIGHT=.1, line.STROKE_COLOR=@color(GRAY), textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
@@ -63,13 +63,29 @@ public class Axis implements Guide2D {
 	
 	/**How tall should the ticks be?*/
 	public float tickSize;
+
+	/**True -- Ensure that the axis touches the origin.
+	 * False - Only display for the range of values provided.*/
+	public boolean connect;
 	
-	/**TODO: Auto-determine tick count...*/
+	/**Indicates how many ticks are desired on the axis.
+	 * This property is not used by the axis itself, but is 
+	 * rather used by continuous guide ops to influence the sample points.
+	 * 
+	 * This value is only a suggestion.  It will be approximately the number
+	 * of tick marks used, but the exact number is determined by the continuous guide
+	 * operator and may take into account the strategy and the range.
+	 * 
+	 * */
 	public float tickCount;
 
-	public boolean connect;
-
-	protected boolean categorical;
+	/**Valid samples are CATEGORICAL, LINEAR, LOG and EXP.
+	 * 
+	 * Sample is actually used by the guide operator, not by the guide itself.
+	 * Using categorical ensures a categorical guide op.  All other values
+	 * yield a continuous guide op and dictate the sample strategy.
+	 **/
+	public String sample;
 	
 	protected AXIS axis;
 	
@@ -100,7 +116,6 @@ public class Axis implements Guide2D {
 	
 	public synchronized void setElements(List<AutoguidePair> elements) {
 		List<Pair> listing = validate(elements);		
-		categorical = !allNumbers(listing);		
 		
 		marks = createLabeledTics(listing);
 		Glyph2D line = createLine(listing);
@@ -143,35 +158,13 @@ public class Axis implements Guide2D {
 	private Collection<Glyph2D> createLabeledTics(List<Pair> elements) {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);//One for tick, one for label
 		
-		if (categorical) {
-			for (Pair p: elements) {
-				double location = p.value;
-				Glyph2D tick = makeTick(location);
-				if (tick != null) {marks.add(tick);}
-				Glyph2D label = makeLabel(p.label, location);
-				if (label !=null) {marks.add(label);}
-			}
-		} else {
-			double max = elements.get(elements.size()-1).value;
-			double min = elements.get(0).value;
-			
-						
-			double range = niceNum(max-min, false);							//'Nice' range
-			double spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
-			double graphMin = Math.floor(min/spacing) * spacing;			//Smallest value on the graph
-			double graphMax = Math.ceil(max/spacing) * spacing;				//Largest value on the graph
-			double nfrac = -Math.max(Math.floor(Math.log10(spacing)), 0); 	//Number of decimal places in the fraction
-			String format = String.format("%%1.%1$df", (int) nfrac);		//Format template for labels
-			
-			
-			for (double v=graphMin; v<(graphMax+.5*spacing); v+=spacing) {
-				Glyph2D label = makeLabel(String.format(format, v),v); 
-				if (label != null) {marks.add(label);}
-				Glyph2D tick =makeTick(v);
-				if (tick != null) {marks.add(tick);}
-			}
+		for (Pair p: elements) {
+			double location = p.value;
+			Glyph2D tick = makeTick(location);
+			if (tick != null) {marks.add(tick);}
+			Glyph2D label = makeLabel(p.label, location);
+			if (label !=null) {marks.add(label);}
 		}
-		
 		return marks;
 	}
 	
@@ -218,40 +211,6 @@ public class Axis implements Guide2D {
 
 		return prototypeLine.update(new BasicTuple(fields, values));
 	}
-	
-	/**Finds a multiple of 1,2 or 5 or a power of 10 near the passed number.
-	 * 
-	 * From: Graphic Gems, "Nice Numbers for Graph Labels," by Paul Heckbert*/
-	private static double niceNum(double num, boolean round) {
-		int exp;
-		double f;
-		double nf;
-		
-		exp = (int) Math.floor(Math.log10(num));
-		f = num/Math.pow(10, exp);
-		if (round) {
-			if (f< 1.5) {nf=1;}
-			else if (f<3) {nf=2;}
-			else if (f<7) {nf=5;}
-			else {nf=10;}
-		} else {
-			if (f<=1) {nf=1;}
-			else if (f<=2) {nf=2;}
-			else if (f<=5) {nf=5;}
-			else {nf=10;}
-		}		
-		return (float) (nf*Math.pow(10, exp));
-	}
-	
-	
-	/**Check if all input fields are numerical in nature.*/
-	private static boolean allNumbers(Collection<Pair> elements) {
-		for (Pair p: elements) {
-			if (p.category()) {return false;}
-		}
-		return true;
-	}
-	
 	
 	/**Verify that all Autoguide pairs have exactly one result, and that result
 	 * is some type of Number.

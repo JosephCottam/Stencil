@@ -1,0 +1,25 @@
+<ModuleData grammarRev="2" name="StencilUtil">
+	<Class name="stencil.operator.module.provided.StencilUtil"/>
+	<Description><![CDATA[Utilities to manipulate the tuple data representation.]]></Description>
+
+	<Defaults>
+		<Opts>
+			<Opt specializer="[1 .. n, 1]"/>
+		</Opts>
+		<Facets>
+			<Facet name="Map"  function="true" type="PROJECT" prototype="VALUE"/>
+			<Facet name="Query" function="true" type="PROJECT" prototype="VALUE"/>
+		</Facets>
+	</Defaults>
+
+	<Operator name="EchoCategorize">
+		<Facet name="Map" function="true" type="CATEGORIZE" prototype="%"/>
+		<Facet name="Query" function="true" type="CATEGORIZE" prototype="%"/>
+	</Operator>
+	
+	<Operator name="EchoContinuous">
+		<Facet name="Map" function="true" type="CATEGORIZE" prototype="%"/>
+		<Facet name="Query" function="true" type="CATEGORIZE" prototype="%"/>
+	</Operator>
+
+</ModuleData>

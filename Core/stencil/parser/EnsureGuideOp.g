@@ -53,15 +53,20 @@ options {
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	
+	import static stencil.parser.ParserConstants.BIND_OPERATOR;
 	import static stencil.operator.module.OperatorData.OpType;
-	import static stencil.util.Tuples.stripQuotes;	 
+	import static stencil.util.Tuples.stripQuotes;
+	import static stencil.parser.tree.Guide.SampleStrategy;
 	 //TODO: Extend so we can handle more than the first field in a mapping definition
 
 }
 
 @members {
-	protected Set<String> requestedGuides = new HashSet<String>();
 	protected ModuleCache modules;
+
+  //Mapping from requested guides to descriptor construction strategy.  This is populated by the 'build' pass
+  protected HashMap<String, SampleStrategy> requestedGuides = new HashMap<String, SampleStrategy>();
+
     
 	public EnsureGuideOp(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
@@ -114,31 +119,62 @@ options {
     }
     
     
+
+    /**Given a tree, how should it be looked up in the guides map?*/
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
-	private String key(String layer, String attribute) {
-    	MultiPartName att = new MultiPartName(attribute);
-    	String key= layer + ":" + att.getName();	//Trim to just the attribute name
+	  private String key(String layer, String attribute) {
+     	MultiPartName att = new MultiPartName(attribute);
+    	String key= layer + BIND_OPERATOR + att.getName();	//Trim to just the attribute name
     	return key;
     } 
 
-    private boolean requiresChanges(CallGroup group) {
-    	if (group.getChildCount() >1) {throw new RuntimeException("Cannot support auto-guide ensure for compound call groups.");}
-       	CallChain chain = group.getChains().get(0);
-        CallTarget call = chain.getStart();
+    /**What sample type is requested?
+     * 
+     * @param specializer The specializer of the guide
+     */
+    private SampleStrategy getSampleStrategy(Tree specializer) {
+      Specializer s = (Specializer) specializer;
+      SampleStrategy strat = new SampleStrategy(s);
+      return strat;
+    }
 
-		//Check if there is a categorize operator
-    	boolean hasCategorize = false;
-    	while (!(call instanceof Pack) && !hasCategorize) {
-    		Function f = (Function) call;
-    		MultiPartName name = new MultiPartName(f.getName());
-    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
-       		try {
-        		OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();
-        		hasCategorize = (opType == OpType.CATEGORIZE);
-        	} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.");}
-			call = f.getCall();
-       	}    	
-    	return !hasCategorize;
+    /**Does the given call group need an echo operator?
+    * 
+    * For categorization, this checks that there is no other categorical operator
+    * and only returns true if there is no other categorical operator.
+    * 
+    * For continuous guides, always returns if EchoContinuous is not found.
+    * 
+    **/ 
+    private boolean requiresChanges(CallGroup group, SampleStrategy strat) {
+       if (group.getChildCount() >1) {throw new RuntimeException("Cannot support auto-guide ensure for compound call groups.");}
+       CallChain chain = group.getChains().get(0);
+       CallTarget call = chain.getStart();
+
+
+       if (strat.isCategorical()) {
+         //Check if there is a categorize operator
+         boolean hasCategorize = false;
+         while (!(call instanceof Pack) && !hasCategorize) {
+            Function f = (Function) call;
+            MultiPartName name = new MultiPartName(f.getName());
+            Module m = modules.findModuleForOperator(name.prefixedName()).module;
+              try {
+                OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();
+                hasCategorize = (opType == OpType.CATEGORIZE);
+              } catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.");}
+           call = f.getCall();
+         }      
+         return !hasCategorize;
+       } else {
+          while(!(call instanceof Pack)) {
+             Function f  = (Function) call;
+             if (f.getName().equals("EchoContinuous.Map")) {return false;}
+             call = f.getCall();
+          }
+          return true;
+       }
+
     }
     
     //Given a call group, what are the values retrieved from the tuple in the first round
@@ -161,12 +197,24 @@ options {
     	
     	return args.toString();
     }
-                
-	private Tree newCall(String layer, String field, CommonTree c) {
-	 	CallGroup call = (CallGroup) c; 
+
+
+    /**Construct a new call
+     *
+     * 
+     * @param layer -- Layer to build operator for 
+     * @param field -- Field being constructor for
+     * @param c -- Call group being operated on
+     */
+	  private Tree newCall(String layer, String field, CommonTree c) {
+	 	  CallGroup call = (CallGroup) c; 
     	String key = key(layer, field);
-    	if (!requestedGuides.contains(key)) {return call;}
-    	if (!requiresChanges(call)) {return call;} 
+    	if (!requestedGuides.containsKey(key)) {return call;}
+
+      Guide.SampleStrategy strat = requestedGuides.get(key);
+          
+      if (!requiresChanges(call, strat)) {return call;}
+    	
     	String intialArgs = findInitialArgs(call);
     	
     	String specSource = String.format("[1 .. n, \%1\$s]", intialArgs);
@@ -193,8 +241,12 @@ options {
     		throw new Error("Error creating auto-guide required argument list.",e);
     	}
 
-		//Construct function node
-    	Function functionNode = (Function) adaptor.create(FUNCTION, "EchoCategorize.Map");
+		  //Construct function node
+		  Function functionNode;
+		
+      if (strat.isCategorical()) {functionNode = (Function) adaptor.create(FUNCTION, "EchoCategorize.Map");}
+      else {functionNode = (Function) adaptor.create(FUNCTION, "EchoContinuous.Map");}
+
     	adaptor.addChild(functionNode, specializer);
     	adaptor.addChild(functionNode, args);
     	adaptor.addChild(functionNode, adaptor.create(YIELDS, "->"));
@@ -216,6 +268,11 @@ options {
     	return groupNode;
     }
     
+    
+    /**Construct the specializer for the echo operatation.
+     *
+     * @param t Call target that will follow the new echo operator.
+     */
 	public Specializer autoEchoSpecializer(CommonTree t) {
     	//Switch on the target type
     	//Get the names out of its arguments list
@@ -239,7 +296,7 @@ options {
     	}
     	
     	
-		String specSource =String.format(specializerTemplate, refs);
+		  String specSource =String.format(specializerTemplate, refs);
     	try {
     		Specializer spec = ParseStencil.parseSpecializer(specSource);
     		return spec;
@@ -248,28 +305,44 @@ options {
     	}
     }
     
+    
+    /**Construct the arguments section of an echo call block.
+     *
+     * @param t Call target that will follow the new echo operator.
+     */
     public List<Value> autoEchoArgs(CommonTree t) {
     	CallTarget target = (CallTarget) t;
     	List<Value> args = (List<Value>) adaptor.create(LIST, "Arguments");
     	
- 		for (Value v: target.getArguments()) {
- 			if (v.isAtom()) {continue;}
- 			adaptor.addChild(args, adaptor.dupTree(v));
- 		}
- 		return args;
+ 		  for (Value v: target.getArguments()) {
+ 			  if (v.isAtom()) {continue;}
+ 			  adaptor.addChild(args, adaptor.dupTree(v));
+ 		  }
+ 		  return args;
+    } 
+    
+    public String selectOperator(Tree t) {
+      Function f = (Function) t;
+      
+      Layer layer = (Layer) f.getAncestor(StencilParser.LAYER);
+      Consumes consumes = (Consumes) f.getAncestor(StencilParser.CONSUMES);
+      Rule r = (Rule) f.getAncestor(StencilParser.RULE);
+      String field = r.getTarget().getPrototype().get(0);
+      
+      SampleStrategy strat = requestedGuides.get(key(layer.getName(), field));
+      
+      if (strat.isCategorical()) {return "EchoCategorize.Map";}
+      else {return "EchoContinuous.Map";}
     }
-
+    
 }
 
 //Identify requested guides for guides section
 //Scan associated mapping chains
 //  If a categorical exists, celebrate
 //  If a categorical does not exist, place one at start
-
 listRequirements: ^(name=LAYER . ^(LIST guide[$name.text]*) .);
-guide[String layer]: ^(GUIDE . . field=ID) 	{requestedGuides.add(key(layer, field));};
-
-
+guide[String layer]: ^(GUIDE . spec=. field=ID) 	{requestedGuides.put(key(layer, field), getSampleStrategy(spec));};
 
 ensure: ^(name=LAYER . . ^(LIST ^(CONSUMES . ^(LIST rule[$name.text]*))));
 rule[String layer]: 
@@ -279,7 +352,7 @@ rule[String layer]:
 //First field in a prototype list
 glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$f.text;};
 
-//Replace the #-> with an actual categorical operator...
+//Replace the #-> with an echo operator...
 replaceCompactForm:
- ^(FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a YIELDS ^(FUNCTION["EchoCategorize.Map"] {autoEchoSpecializer($t)} {autoEchoArgs($t)} YIELDS {adaptor.dupTree($t)}));  
+ ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
+		^(FUNCTION $s $a YIELDS ^(FUNCTION[selectOperator($f)] {autoEchoSpecializer($t)} {autoEchoArgs($t)} YIELDS {adaptor.dupTree($t)}));  

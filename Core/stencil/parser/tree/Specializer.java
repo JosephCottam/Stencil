@@ -170,7 +170,11 @@ public class Specializer extends StencilTree {
 
 		public boolean containsKey(Object key) {return search(key)!= null;}
 		
-		public Atom get(Object key) {return search(key).getValue();}
+		public Atom get(Object key) {
+			MapEntry m = search(key);
+			if (m == null) {throw new IllegalArgumentException("Element '" + key + "' not found in specializer map.");}
+			return m.getValue();
+		}
 		public boolean isEmpty() {return source.size() ==0;}
 
 		public Set<String> keySet() {return keySet;}

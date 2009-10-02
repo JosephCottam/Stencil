@@ -19,11 +19,4 @@
 		<Facet name="Map" function="true" type="PROJECT" prototype="%"/>
 		<Facet name="Query" function="true" type="PROJECT" prototype="%"/>
 	</Operator>
-
-	<Operator name="EchoCategorize">
-		<Opt specializer="[1 .. n, 1]"/>
-		<Facet name="Map" function="true" type="CATEGORIZE" prototype="%"/>
-		<Facet name="Query" function="true" type="CATEGORIZE" prototype="%"/>
-	</Operator>
-
 </ModuleData>

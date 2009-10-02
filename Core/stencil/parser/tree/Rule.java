@@ -29,11 +29,13 @@
 package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
+import org.antlr.runtime.tree.Tree;
+
+
 
 
 import stencil.streams.Tuple;
 import stencil.parser.string.StencilParser;
-
 
 /** A rule is a CallGroup and a tuple prototype.
  * This is a complete, individual mapping definition.
@@ -53,8 +55,9 @@ public class Rule extends StencilTree {
 	public boolean isStatic() {return getChild(2).getType() == StencilParser.DEFINE;}
 
 	public Consumes getGroup() {
-		if (getParent().getParent() instanceof Consumes) {return (Consumes) getParent().getParent();}
-		throw new RuntimeException("Rules not part of a layer do not belong to a group.");
+		Tree t = this.getAncestor(StencilParser.CONSUMES);
+		if (t == null) {throw new RuntimeException("Rules not part of a layer do not belong to a group.");}
+		return (Consumes) t;
 	}
 	
 	/**What is the string of named entities (layers, operators, consumes blocks, etc.) to get to this rule.*/

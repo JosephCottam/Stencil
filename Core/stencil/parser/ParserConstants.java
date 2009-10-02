@@ -89,6 +89,9 @@ public abstract class ParserConstants {
 	public static final String VIEW_PREFIX = "view";
 	public static final String CANVAS_PREFIX = "canvas";
 
+	
+	public static final String BIND_OPERATOR = ":";
+	
 	/**Specializer to indicate that only the current value 
 	 * is significant and no other special instructions are given.
 	 * This is a common default specializer.
