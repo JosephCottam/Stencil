@@ -1,0 +1,13 @@
+* Guide declaration is tagged with a type attribute: Categorical, linear, log, exp
+	--> Tick count determines sample count -or- 'every' determines sample interval (only valid on non-categorical)
+* Ensure guide op cares about what type of guide is requested
+* Continuos guide procedure:
+	* Op records min/max of input from start or from the #->
+	* Op knows sample strategy
+	* On guide, op constructs sample points.  Different sample point creation for double, int and sigils
+			--> Sigils need to provide a sample strategy operation
+
+			
+NOTES:
+	*Force guide to certain bounds?
+		-> Error in op if an input exceeds the bounds
