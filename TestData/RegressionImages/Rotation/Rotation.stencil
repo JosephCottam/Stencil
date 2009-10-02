@@ -2,7 +2,7 @@ STREAM: File
 NAME: Elements
 HEADER: Name
 SEPARATOR: ,
-SOURCE: /nfs/rontok/xraid/users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Rotation/RotationData.txt
+SOURCE: ./RotationData.txt
 CHECKHEADER: true
 
 external stream Elements(Name)

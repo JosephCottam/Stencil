@@ -2,7 +2,7 @@ STREAM: File
 NAME: Values
 HEADER: Category
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/AutoGuide/Fruits.txt
+SOURCE: ./Fruits.txt
 CHECKHEADER: false
 
 external stream Values(Category)

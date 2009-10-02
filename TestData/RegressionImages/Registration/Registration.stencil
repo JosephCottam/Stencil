@@ -2,13 +2,13 @@ STREAM: File
 NAME: Reg
 HEADER: Name
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Registration/RegistrationData.txt
+SOURCE: ./RegistrationData.txt
 CHECKHEADER: false
 STREAM: File
 NAME: Reg2
 HEADER: Name
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Registration/RegistrationData.txt
+SOURCE: ./RegistrationData.txt
 CHECKHEADER: false
 
 external stream Reg(Name)
