@@ -43,13 +43,6 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 
 public class Shape extends Filled {
-	protected static final class InitResult {
-		GeneralPath glyph;
-		Rectangle2D bounds;
-		double regX;
-		double regY;
-	}
-	
 	private static final AttributeList ATTRIBUTES = new AttributeList(Filled.ATTRIBUTES);
 	private static final AttributeList UNSETTABLES = new AttributeList();
 	private static final String IMPLANTATION = "SHAPE";
@@ -87,9 +80,8 @@ public class Shape extends Filled {
 		regY = Y.defaultValue;
 		rotation = ROTATION.defaultValue;	
 		
-		InitResult rs = initWork();
-		bounds = rs.bounds;
-		glyph = rs.glyph;
+		glyph  = initWork();
+		bounds = glyph.getBounds2D();
 	}
 	
 	
@@ -120,13 +112,12 @@ public class Shape extends Filled {
 		
 		regX = reg.getX();
 		regY = reg.getY();
-		
-		InitResult rs = initWork();
-		bounds = rs.bounds;
-		glyph = rs.glyph;
+
+		glyph =initWork();
+		bounds = glyph.getBounds2D();
 	}
 
-	private InitResult initWork() {
+	private GeneralPath initWork() {
 		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, size, size);
 		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), size, size);
 		
@@ -136,11 +127,7 @@ public class Shape extends Filled {
 		p.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
 		p.transform(AffineTransform.getTranslateInstance(regX, regY));
 		
-		InitResult rv = new InitResult();
-		rv.bounds = p.getBounds2D();
-		rv.glyph = p;
-		
-		return rv;
+		return p;
 	}
 	
 	public Object get(String name) {

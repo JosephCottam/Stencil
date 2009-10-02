@@ -1,12 +1,9 @@
 package stencil.adapters.java2D.data.glyphs;
 
-
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
-import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -28,6 +25,27 @@ import stencil.streams.Tuple;
 import stencil.util.DoubleDimension;
 
 public class Text extends Basic {
+	
+	/**Results of computing a layout.*/
+	private static final class LayoutDescription {
+		/**Individual lines of text to render.*/
+		String[] lines;
+		
+		/**Metrics about each line.*/
+		DoubleDimension[] dims;
+
+		/**Length of the longest line.*/
+		double fullWidth;
+		
+		/**Height of all lines added up.*/
+		double fullHeight;
+
+		public LayoutDescription(String[] lines) {
+			this.lines = lines;
+			dims = new DoubleDimension[lines.length];
+		}		
+	}
+	
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
 	private static final String IMPLANTATION = "TEXT";
@@ -124,23 +142,28 @@ public class Text extends Basic {
 			this.drawBounds = source.drawBounds;
 			this.bounds = source.bounds;
 		} else {
-			renderedText = layoutText(text, format);
-			Rectangle2D layoutBounds = renderedText.getBounds2D();
+			LayoutDescription ld = computeLayout(text, format);
 			
 			double width, height;
-			if (autoWidth) {width = layoutBounds.getWidth();} 
+			if (autoWidth) {width = ld.fullWidth;} 
 			else {width = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));}
 			 
-			if (autoHeight) {height = layoutBounds.getHeight();}
+			if (autoHeight) {height = ld.fullHeight;}
 			else {height = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));}
 
+			renderedText = layoutText(text, ld, format);
+			
 			Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
 			bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
-			
+			Point2D reg = Registrations.topLeftToRegistration(registration, bounds);
+
+			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));
+			renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+			renderedText.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
+
 			GeneralPath layout = (GeneralPath) renderedText.clone();
-			layout.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
 			layout.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
-			drawBounds = layout.getBounds2D();
+			drawBounds = renderedText.getBounds2D();
 		}
 	}
 
@@ -183,27 +206,25 @@ public class Text extends Basic {
 	public void render(Graphics2D g, AffineTransform base) {
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
-
-		g.translate(bounds.getX(), bounds.getY());
-		g.rotate(Math.toRadians(this.rotation));
+		
 		g.fill(renderedText);
 		super.postRender(g, base);
 	}	
 	
-	private static GeneralPath layoutText(String text, Format format) {
+	private static GeneralPath layoutText(String text, LayoutDescription ld, Format format) {
 		Graphics2D g = REFERENCE_GRAPHICS;
 		FontRenderContext context = g.getFontRenderContext();
-		DoubleDimension[] dims = computeLayout(g, text, format.font);
+		FontMetrics fm = g.getFontMetrics(format.font);
 		final String[] lines =SPLITTER.split(text);
 
 		GeneralPath compound = new GeneralPath();
 		
 		for (int i=0; i< lines.length; i++) {
-			final DoubleDimension dim = dims[i];
+			final DoubleDimension dim = ld.dims[i];
 			String line = lines[i];
 			
-			double x = horizontalOffset(dim.width, dims[dims.length-1].width, format.justification);
-			double y = dim.height * i + (dim.height*.8); //TODO: get standard ascent instead...this is just an approximation of baseline to top of ascent
+			double x = horizontalOffset(dim.width, ld.fullWidth, format.justification);
+			double y = dim.height * i + fm.getAscent();
 			
 			java.awt.Shape s = format.font.createGlyphVector(context, line).getOutline((float) x, (float) y);
 			compound.append(s, false);
@@ -213,31 +234,28 @@ public class Text extends Basic {
 	}
 	
 	/**Get the appropriate metrics for the layout of the requested text.
-	 * The last entry of the returned dimensions array DOES NOT CORRESPONDE TO A SINGLE LINE;
-	 * it is the overall dimensions.  Iterate on the lines, not on the dimensions when working with dimensions. 
-	 * 
 	 */
-	//TODO: Do width-based line wrapping
-	private static DoubleDimension[] computeLayout(Graphics2D g, String text, Font font) {
-        Graphics2D g2 = g ==null? REFERENCE_GRAPHICS: g;
-		FontMetrics fm = g2.getFontMetrics(font);
-        String[] lines = SPLITTER.split(text);
-        DoubleDimension[] dims = new DoubleDimension[lines.length +1];
+	//TODO: Do width-based line wrapping, will have to pass in width to do so
+	private static LayoutDescription computeLayout(String text, Format format) {
+		Graphics2D g = REFERENCE_GRAPHICS;
+		FontMetrics fm = g.getFontMetrics(format.font);
+
+        LayoutDescription ld = new LayoutDescription(SPLITTER.split(text));
         
         double height = fm.getHeight();
         double maxWidth=0;
         
-        for (int i=0; i<lines.length; i++) {
-        	String line = lines[i];
-        	double width = fm.getStringBounds(line, g2).getWidth();
-        	dims[i] = new DoubleDimension(width, height);
+        for (int i=0; i<ld.lines.length; i++) {
+        	String line = ld.lines[i];
+        	double width = fm.getStringBounds(line, g).getWidth();
+        	ld.dims[i] = new DoubleDimension(width, height);
         	
         	maxWidth = Math.max(maxWidth, width);
         }        
-        
-        double fullHeight = height * lines.length;
-        dims[lines.length] = new DoubleDimension(maxWidth, fullHeight);
-        return dims;
+
+        ld.fullWidth = maxWidth;
+        ld.fullHeight = height * ld.lines.length;
+        return ld;
 	}
 
 	private static double horizontalOffset(double lineWidth, double spaceWidth, float justification) {

@@ -192,11 +192,24 @@ public abstract class Basic implements Glyph2D {
 			g.setStroke(DEBUG_STROKE);
 			g.draw(r);
 			
-			g.setPaint(DEBUG_COLOR.darker());
-			double scale=2;
-			double x = (Double) this.get("X", Double.class);
-			double y = (Double) this.get("Y", Double.class);
-			g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
+
+			try {
+				double x = (Double) this.get("X", Double.class);
+				double y = (Double) this.get("Y", Double.class);
+				double w = (Double) this.get("WIDTH", Double.class);
+				double h = (Double) this.get("HEIGHT", Double.class);
+				r = new Rectangle2D.Double(x,y,w,h);
+				g.draw(r);
+			} catch  (Exception e) {}
+
+			try {
+				g.setPaint(DEBUG_COLOR.darker());
+				double scale=2;
+				double x = (Double) this.get("X", Double.class);
+				double y = (Double) this.get("Y", Double.class);
+				g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
+			} catch  (Exception e) {}
+
 		}
 	}
 	

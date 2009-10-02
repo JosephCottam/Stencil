@@ -31,7 +31,7 @@ package stencil.explore.model;
 import java.awt.Color;
 import java.util.Map;
 
-import com.sun.tools.corba.se.idl.som.cff.Messages;
+import static stencil.explore.Application.reporter;
 
 import stencil.adapters.Adapter;
 
@@ -88,15 +88,16 @@ public final class AdapterOpts {
 		} catch (Exception e) {
 			throw new IllegalArgumentException(String.format("Could not select proper adapter for %1$s given class name %1$s.", adapterName, className) ,e);
 		}
+		
 		try {a.setDebugColor(debug);}
-		catch (UnsupportedOperationException e) {Messages.msg("Could not set debug color.");}
+		catch (UnsupportedOperationException e) {reporter.addError("Could not set debug color.");}
 		
 		try{a.setDefaultMouse(defaultMouse);}
-		catch (UnsupportedOperationException e) {Messages.msg("Could not set mouse handling.");}
+		catch (UnsupportedOperationException e) {reporter.addError("Could not set mouse handling.");}
 
 		try {a.setRenderQuality(renderQuality);}
-		catch (UnsupportedOperationException e) {Messages.msg("Could nto set render quality.");}
-		catch (IllegalArgumentException e) 		{Messages.msg("Rendre quality cannot be set to " + renderQuality + " for current adapter.");}
+		catch (UnsupportedOperationException e) {reporter.addError("Could not set render quality.");}
+		catch (IllegalArgumentException e) 		{reporter.addError("Render quality cannot be set to " + renderQuality + " for current adapter.");}
 		
 		return a;
 	}
