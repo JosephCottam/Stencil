@@ -4,3 +4,28 @@ Pens and "sigil types"
 @gradient(@color(RED), @color(BLUE), .95)		//Gradient from red to blue, but only covering 95% of the distance (solid red/blue on the last 2.5% each end)
 @gradient(@color(RED), @color(BLUE), .25, true) //Repeating gradient, will repeat 4 times over the course
 @gradient(@color(RED), @color(BLUE), 20, true)	//Repeating gradient, will repeat ever 20 pixels
+
+
+This could work for both pens and fills
+Would make patterns a type of sigil as well
+
+@pattern(Hatch, 3, @color(Green))
+@pattern(Solid, @color(blue))
+@pattern(Paisely) 
+
+
+Is there a difference between a stroke and a fill?  Maybe.  Look at these:
+//dot means plot solid in default color, space means leave blank.  3px on 3px off
+@stroke("...   ...   ...") 		
+
+//Named pattern, should be the same as above
+@stroke(DASH, 3, 3)
+
+//Two-phase stroke.  Top half and bottom half (can build as many layers as desired)
+@stroke("...   ...   ...", ".   ...   ...   ..")
+
+//1 means color from 1st argument, 2 from 2nd argument, 3 from 3rd...
+@stroke(@color(RED), @color(BLUE), @color(GREEN), "111   222   333")
+
+
+

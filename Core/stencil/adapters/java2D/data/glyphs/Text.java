@@ -24,7 +24,7 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 import stencil.util.DoubleDimension;
 
-public class Text extends Basic {
+public final class Text extends Basic {
 	
 	/**Results of computing a layout.*/
 	private static final class LayoutDescription {
@@ -160,7 +160,7 @@ public class Text extends Basic {
 
 			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));
 			renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
-			renderedText.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
+//			renderedText.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
 			layout.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
@@ -207,6 +207,21 @@ public class Text extends Basic {
 	public void render(Graphics2D g, AffineTransform base) {
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
+		
+		
+		//Figure out where to render the thing while potentially ignoring the view transform.
+		//The following guarantees that the registration point is at the same spot that it would have
+		//been had it been rendered exactly under the view transform
+		Point2D p = Registrations.topLeftToRegistration(registration, bounds);
+		Point2D p2 = new Point2D.Double();
+		fixScale(g);
+		
+		base.transform(p,p2);
+
+		try {g.getTransform().inverseTransform(p2, p2);}
+		catch (Exception e) {p2 = p;}
+		
+		g.translate(p2.getX(), p2.getY());
 		
 		g.fill(renderedText);
 		super.postRender(g, base);
