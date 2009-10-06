@@ -160,11 +160,10 @@ public final class Text extends Basic {
 
 			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));
 			renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
-//			renderedText.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
-			layout.transform(AffineTransform.getTranslateInstance(topLeft.getX(), topLeft.getY()));
-			drawBounds = renderedText.getBounds2D();
+			layout.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
+			drawBounds = layout.getBounds2D();
 		}
 	}
 

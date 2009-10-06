@@ -153,7 +153,6 @@ public class Interpreter {
 		while (needsGuides != null && needsGuides.check(program)) {
 			updateGuides.updateGuides(panel);
 		}
-		panel.repaint();
 	}
 
 	public StencilPanel getPanel() {return panel;}

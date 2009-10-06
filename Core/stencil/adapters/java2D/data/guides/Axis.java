@@ -23,15 +23,12 @@ public class Axis implements Guide2D {
 	private static final class Pair { 
 		String label;
 		float value;
-		boolean category;
 		
 		public Pair(Object label, float value) {
-			category = !(label instanceof Number);
 			this.label = label.toString();
 			this.value = value;
 		}
 		
-		public boolean category() {return category;}
 		public String toString() {return "(" + label + ", " + value + ")";}
 	}
 	

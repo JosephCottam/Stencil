@@ -26,7 +26,25 @@ public class TupleRef extends Value {
 	public boolean isTupleRef() {return true;}
 	
 	public boolean isNumericRef() {return getValue().isNumber();}
-	public boolean isNamedRef() {return getValue().isName();} 
+	public boolean isNamedRef() {return getValue().isName();}
+	
+	
+	/**Given the prototype, returns the numeric offset this represents in that prototype.
+	 * 
+	 * If this is a numeric reference, the prototype may safely be null, but a named 
+	 * reference requires the prototype to be non-null.
+	 * 
+	 * @param prototype
+	 * @return
+	 */
+	public int toNumericRef(List<String> prototype) {
+		if (isNumericRef()) {return ((StencilNumber) getValue()).getNumber().intValue();}
+		else {
+			String name = getValue().getValue().toString();
+			if (!prototype.contains(name)) {throw new IllegalArgumentException(String.format("Could not find %1$s in %2$s.", name, prototype.toString()));}			
+			return prototype.indexOf(name);
+		}
+	}
 	
 	/**Is the tuple-ref able to return a value from the given source?*/
 	public boolean canRef(Tuple source) {
@@ -47,7 +65,8 @@ public class TupleRef extends Value {
 		if (value.isName()) {
 			return source.get(((Id)value).getName());
 		} else if (value.isNumber()){
-			String field = source.getFields().get((Integer) ((StencilNumber) value).getNumber());
+			List<String> fields = source.getFields();
+			String field = fields.get(toNumericRef(fields));
 			return source.get(field);
 		} //TODO: Sub-tuples...
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
