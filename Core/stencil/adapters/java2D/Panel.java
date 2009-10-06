@@ -30,7 +30,6 @@ package stencil.adapters.java2D;
 
 import stencil.adapters.java2D.data.*;
 import stencil.adapters.java2D.util.DynamicUpdater;
-import stencil.adapters.java2D.util.Stopable;
 import stencil.display.StencilPanel;
 import stencil.interpreter.DynamicRule;
 import stencil.parser.tree.Program;
@@ -48,8 +47,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
-	List<Stopable> workers = new ArrayList<Stopable>();
-	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
 	} 
@@ -63,9 +60,16 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
+	@SuppressWarnings("deprecation")
 	public void dispose() {
 		canvas.dispose();
 		for (DynamicUpdater updater: updaters.values()) {updater.signalStop();}
+		
+		//Ensure threads stop
+		for (Thread t:updaterThreads) {
+			try {t.join(10000);}
+			catch (Exception e) {t.stop();}
+		}
 	}
 	
 	public void export(String filename, String type, Object info) throws Exception {
@@ -81,7 +85,8 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 
 	
 	//Dynamic updater and updater tracker...
-	private Map<Rule, DynamicUpdater> updaters = new HashMap();
+	private final Map<Rule, DynamicUpdater> updaters = new HashMap();
+	private final List<Thread> updaterThreads = new ArrayList();
 	public void addDynamic(Glyph2D g, Rule rule, Tuple source) {
 		DynamicUpdater updater;
 		DisplayLayer table = null;
@@ -93,8 +98,11 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 			Rule dynamicRule = DynamicRule.toDynamic(rule);
 			updater = new DynamicUpdater(table, dynamicRule);
 			updaters.put(rule, updater);
-			updater.start();
+			Thread thread = new Thread(updater);
+			updaterThreads.add(thread);
+			thread.start();
 		}
+
 		updater = updaters.get(rule);
 		updater.addUpdate(source, g);
 	}

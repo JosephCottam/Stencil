@@ -10,7 +10,7 @@ import stencil.operator.module.ModuleCache;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 
-public class GuideUpdater extends Thread implements Stopable {
+public class GuideUpdater implements Runnable, Stopable {
 	private boolean run = true;
 	
 	private final NeedsGuides needsGuides;

@@ -52,7 +52,8 @@ import stencil.parser.tree.Layer;
 /**Some of this is derived from Prefuse's display and related objects.*/
 
 public final class Canvas extends JComponent {	
-	final Painter painter;	
+	final Painter painter;
+	final Thread painterThread;
 	BufferedImage buffer;
 	
 	private AffineTransform viewTransform = new AffineTransform();
@@ -74,15 +75,21 @@ public final class Canvas extends JComponent {
 		for (int i=0;i< layers.size();i++) {
 			this.layers[i] = (DisplayLayer) layers.get(i).getDisplayLayer();
 		}
-		this.painter = new Painter(this.layers, this);
-		painter.start();
+		painter = new Painter(this.layers, this);
+		painterThread = new Thread(painter);
+		painterThread.start();
 
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
 		tablesTracker = new GenerationTracker(this.layers);		
 	}
 	
-	public void dispose() {painter.signalStop();}
+	@SuppressWarnings("deprecation")
+	public void dispose() {
+		painter.signalStop();
+		try {painterThread.join(10000);} //Wait for a while
+		catch (Exception e) {painterThread.stop();}	//Unsafe stop if it didn't stop yet
+	}
 		
 	public void paintComponent(Graphics g) {g.drawImage(buffer, 0, 0, null);}
 	

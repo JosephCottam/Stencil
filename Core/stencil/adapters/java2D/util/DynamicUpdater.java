@@ -10,7 +10,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.streams.Tuple;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
-public final class DynamicUpdater extends Thread implements Stopable {
+public final class DynamicUpdater implements Runnable, Stopable {
 	//Marked entry for storage in the mapping
 	private static final class Entry {
 		Tuple sourceData;

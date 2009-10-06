@@ -12,7 +12,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
 
-public final class Painter extends Thread implements Stopable {
+public final class Painter implements Runnable, Stopable {
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	private static final RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	
