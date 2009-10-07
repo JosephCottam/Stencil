@@ -28,6 +28,7 @@
  */
 package stencil.unittests.adapters;
 
+import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import stencil.unittests.adapters.examples.*;
 
@@ -48,10 +49,20 @@ public abstract class Examples extends TestCase {
 		imageTest.setUp();
 		
 		try {imageTest.testPNG();}
-		catch (Throwable e) {pngFail = e;}
+		catch (AssertionFailedError e1) {pngFail = e1;}
+		catch (Throwable e) {
+			pngFail = e;
+			System.err.println("Error creating test PNG:");
+			e.printStackTrace();
+		}
 		
 		try {imageTest.testTXT();} 
-		catch (Throwable e) {txtFail = e;}
+		catch (AssertionFailedError e1) {txtFail = e1;}
+		catch (Throwable e) {
+			txtFail = e;
+			System.err.println("Error creating test TXT:");
+			e.printStackTrace();
+		}
 		
 		if (pngFail == null && txtFail == null) {return;} //passed!
 		if (pngFail == null && txtFail != null) {throw txtFail;}

@@ -31,7 +31,7 @@ from MTTSource
 	filter(suite_name !~"trivial"): suite_name
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
 	(X,Y): Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
-	SIZE: 10
+	SIZE: 13
 	STROKE_WEIGHT: 3
 	STROKE_COLOR: RelativeFails(fail, pass) -> (C)
 	SLICE: fail

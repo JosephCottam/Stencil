@@ -42,7 +42,6 @@ import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
@@ -87,11 +86,11 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	private void exportPNG(String filename, Integer dpi) throws Exception { 
 		double scale;
 
-		try {scale =Math.ceil(dpi/java.awt.Toolkit.getDefaultToolkit().getScreenResolution());}
+		try {scale =Math.ceil(((double) dpi)/java.awt.Toolkit.getDefaultToolkit().getScreenResolution());}
 		catch (java.awt.HeadlessException e) {scale = Math.ceil(((double) dpi)/StencilPanel.ABSTRACT_SCREEN_RESOLUTION);}
 
-		int width =  (int) Math.round(Math.ceil(scale * this.getWidth()));
-		int height =  (int) Math.round(Math.ceil(scale * this.getHeight()));
+		long width = (int) Math.round(Math.ceil(scale * canvas.getWidth()));
+		long height = (int) Math.round(Math.ceil(scale * canvas.getHeight()));
 
 		AffineTransform viewTransform = canvas.getViewTransformRef(); 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);
@@ -101,6 +100,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 			width = (int) Math.round(Math.ceil(scale * viewBounds.width));
 			height = (int) Math.round(Math.ceil(scale * viewBounds.height));
 			topLeft = canvas.getContentBounds().getLocation();
+			topLeft = new Point2D.Double(-topLeft.getX(), -topLeft.getY());
 		}
 		
 		if (width ==0 || height ==0) {throw new RuntimeException("Cannot export a zero-sized image.");}
@@ -117,16 +117,19 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 			width = (int) Math.floor(Math.round(width / prop));
 		}
 		
-		BufferedImage buffer = (BufferedImage) canvas.createImage(width, height);
+		BufferedImage buffer = (BufferedImage) canvas.createImage((int) width, (int) height);
 		if (buffer == null) { //Happens in headless mode
-			buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+			buffer = new BufferedImage((int) width,  (int) height, BufferedImage.TYPE_INT_ARGB);
 		}
 		
-		AffineTransform exportViewTransform = AffineTransform.getScaleInstance(scale, scale);
-		exportViewTransform.translate(-topLeft.getX(), -topLeft.getY());
 		Graphics2D g = buffer.createGraphics();
 		g.setPaint(canvas.getBackground());
-		g.fill(new Rectangle(0,0, width, height));
+		g.fill(new Rectangle(0,0, (int) width, (int) height));
+
+		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
+		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
+//		AffineTransform exportViewTransform = AffineTransform.getScaleInstance(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
+//		exportViewTransform.translate(topLeft.getX(), topLeft.getY());
 		g.transform(exportViewTransform);
 		
 		canvas.painter.doDrawing(g, exportViewTransform);

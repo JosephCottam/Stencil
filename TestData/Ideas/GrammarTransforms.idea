@@ -1,0 +1,4 @@
+* Lift out constant settings to a defaults mechanism and set them in the layer prototype.  
+Then the rule doesn't need to be done at runtime.
+
+* Verify that only names that appear in the tupples are used in the arguments. 
