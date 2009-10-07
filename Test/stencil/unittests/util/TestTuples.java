@@ -1,7 +1,12 @@
 package stencil.unittests.util;
 
-import stencil.adapters.piccoloDynamic.NodeTuple;
-import stencil.adapters.piccoloDynamic.glyphs.Pie;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import stencil.adapters.java2D.data.glyphs.Pie;
+import stencil.streams.InvalidNameException;
 import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
@@ -12,9 +17,38 @@ import junit.framework.TestCase;
 
 
 public class TestTuples extends TestCase {
+	private static class MutableMapTuple implements MutableTuple {
+		private Map map;
+		
+		public MutableMapTuple(Map source) {this.map = source;}
+		
+		public Object get(String name) throws InvalidNameException {return map.get(name);}
+
+		public Object get(String name, Class<?> type)
+				throws IllegalArgumentException, InvalidNameException {
+			return Converter.convert(get(name), type);
+		}
+
+		public List<String> getFields() {return new ArrayList(map.keySet());}
+
+		public boolean hasField(String name) {return map.containsKey(name);}
+
+		public boolean isDefault(String name, Object value) {return false;}
+
+		public void set(String field, Object value) {map.put(field, value);}
+	};
+	
+	
 	public void testTransfer() throws Exception {
 		Tuple reference = new BasicTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.values);
-		MutableTuple target = new NodeTuple(new Pie("myID"));
+		HashMap map = new HashMap();
+		map.put("One", "One");
+		map.put("Two", 2);
+		map.put("Three", 3.0d);
+		map.put("Four", "four");
+		map.put("Five", "FIVE");
+		MutableTuple target = new MutableMapTuple(map);
+		
 		Tuples.transfer(reference, target, false);
 
 		for (String field:reference.getFields()) {
