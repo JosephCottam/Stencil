@@ -1,7 +1,7 @@
 package stencil.unittests.adapters;
 
 import stencil.adapters.TupleLoader;
-import stencil.adapters.piccoloDynamic.*;
+import stencil.adapters.java2D.*;
 import stencil.parser.tree.*;
 import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;

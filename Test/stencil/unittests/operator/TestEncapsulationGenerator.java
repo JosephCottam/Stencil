@@ -9,7 +9,7 @@ import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.operator.module.TestModuleCache;
-import stencil.adapters.piccoloDynamic.Adapter;
+import stencil.adapters.java2D.Adapter;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import junit.framework.*;

@@ -8,7 +8,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
-import stencil.adapters.piccoloDynamic.Adapter;
+import stencil.adapters.java2D.Adapter;
 import stencil.operator.module.Module;
 import stencil.operator.module.ModuleCache;
 import stencil.parser.string.AdHocOperators;

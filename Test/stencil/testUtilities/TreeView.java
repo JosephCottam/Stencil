@@ -7,7 +7,7 @@ import java.util.Properties;
 
 import org.antlr.runtime.tree.*;
 
-import stencil.adapters.piccoloDynamic.Adapter;
+import stencil.adapters.java2D.Adapter;
 import stencil.operator.module.util.*;
 import stencil.parser.string.*;
 

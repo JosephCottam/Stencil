@@ -1,7 +1,7 @@
 package stencil.unittests.adapters.java2D;
 
-import stencil.adapters.piccoloDynamic.Adapter;
-import stencil.adapters.piccoloDynamic.Panel;
+import stencil.adapters.java2D.Adapter;
+import stencil.adapters.java2D.Panel;
 
 public class TestGenerate extends stencil.unittests.adapters.TestGenerator {
 
