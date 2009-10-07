@@ -114,10 +114,15 @@ public class Axis implements Guide2D {
 	public synchronized void setElements(List<AutoguidePair> elements) {
 		List<Pair> listing = validate(elements);		
 		
-		marks = createLabeledTics(listing);
-		Glyph2D line = createLine(listing);
-		if (line !=null) {marks.add(line);}	
-		bounds = GuideUtils.fullBounds(marks);
+		if (listing.size() > 0) {
+			marks = createLabeledTics(listing);
+			Glyph2D line = createLine(listing);
+			if (line !=null) {marks.add(line);}	
+			bounds = GuideUtils.fullBounds(marks);
+		} else {
+			marks = new ArrayList<Glyph2D>();
+			bounds = null;
+		}
 	}
 
 	public Rectangle2D getBoundsReference() {return bounds;}

@@ -96,7 +96,9 @@ public class Temp extends BasicModule {
 			}
 		}
 
-		private TreeSet set = new TreeSet(new CompoundCompare());
+		//TODO: Move to a concurrent set
+		private SortedSet set = Collections.synchronizedSortedSet(new TreeSet(new CompoundCompare()));
+//		private TreeSet set = new TreeSet(new CompoundCompare());
 
 		public Tuple map(Object... values) {return rank(true, values);} 
 		public Tuple query(Object... values) {return rank(false, values);}

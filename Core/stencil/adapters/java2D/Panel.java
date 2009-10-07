@@ -83,22 +83,35 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		try {dynamicUpdaterThread.join(10000);}
 		catch (Exception e) {dynamicUpdaterThread.stop();}
 
-		guideUpdater.signalStop();
-		try {guideUpdaterThread.join(10000);}
-		catch (Exception e) {guideUpdaterThread.stop();}
+		if (guideUpdater !=null) {
+			guideUpdater.signalStop();
+			try {guideUpdaterThread.join(10000);}
+			catch (Exception e) {guideUpdaterThread.stop();}
+		}
 		
 		canvas.dispose();		
 	}
 	
 	public void export(String filename, String type, Object info) throws Exception {
+		prepForExport();
+
 		if (type.equals("PNG") || type.equals("RASTER")) {
 			exportPNG(filename, Converter.toInteger(info));
 		} else {super.export(filename, type, info);}
 	}
 	
+	/**Prep for export by running the guides and dynamic rules.
+	 * 
+	 * TODO: Dynamic rules need to be given a chance to quiesce, not just be run once....
+	 * */
+	private void prepForExport() {
+		if (guideUpdater != null) {guideUpdater.runOnce();}
+		if (dynamicUpdater != null) {dynamicUpdater.runOnce();}
+	}
+	
 	private void exportPNG(String filename, Integer dpi) throws Exception { 
 		double scale;
-
+		
 		try {scale =Math.ceil(((double) dpi)/java.awt.Toolkit.getDefaultToolkit().getScreenResolution());}
 		catch (java.awt.HeadlessException e) {scale = Math.ceil(((double) dpi)/StencilPanel.ABSTRACT_SCREEN_RESOLUTION);}
 

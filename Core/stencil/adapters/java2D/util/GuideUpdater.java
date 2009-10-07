@@ -46,14 +46,19 @@ public class GuideUpdater implements Runnable, Stopable {
 		if (!required()) {return;}
 		
 		while (run) {
-			//Refresh the guides (if required)!
-			//TODO: Is there a faster way to check needsGuides?--> Collect all guide chain operators in the constructor and just check them instead of a tree traversal every time?
-			while (needsGuides != null && needsGuides.check(program)) {
-				updateGuides.updateGuides(panel);
-			}
+			runOnce();
 			panel.repaint();
 		}
 	}
+	
+	public synchronized void runOnce() {
+		//Refresh the guides (if required)!
+		//TODO: Is there a faster way to check needsGuides?--> Collect all guide chain operators in the constructor and just check them instead of a tree traversal every time?
+		while (needsGuides != null && needsGuides.check(program)) {
+			updateGuides.updateGuides(panel);
+		}	
+	}
+	
 	
 	public void signalStop() {run = false;}
 	

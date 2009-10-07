@@ -118,8 +118,11 @@ options {
 			results[i] = new Object[p.getArguments().size()];
 			int j=0;
 			Value arg = p.getArguments().get(j); //TODO: Really need to handle the case where chain is setting more than one value
-   			if (arg instanceof TupleRef) {results[i][j] = val[prototype.indexOf(((TupleRef) arg).getChild(0).getText())];} //HACK: This is horrible!  Assumes the tuple ref is a name...
-			else {results[i][j] = arg.getValue();}
+			
+   	  if (arg instanceof TupleRef) {
+   	    int idx = ((TupleRef) arg).toNumericRef(prototype);
+        results[i][j] = val[idx]; 
+   	  }	else {results[i][j] = arg.getValue();}
    			i++;
 		}
 		return Arrays.asList(results);

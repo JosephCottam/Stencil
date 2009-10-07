@@ -52,9 +52,7 @@ public final class InvokeableLegend extends BasicProject {
 	public List guide(List<Value> formalArguments, List<Object[]> argumentSets,  List<String> prototype) {
 		if (!allowAutoGuide) {throw new UnsupportedOperationException(String.format("Cannot use synthetic legend %1$s in guide.", name));}
 		
-		if (argumentSets == null || argumentSets.size() ==0) {
-			throw new IllegalArgumentException("Argument list must be non-null and greater than zero length.");
-		}
+		if (argumentSets == null) {throw new IllegalArgumentException("Argument list must be non-null.");}
 		
 		Object[] results = new Object[argumentSets.size()];
 		

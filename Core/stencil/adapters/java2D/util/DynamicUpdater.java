@@ -29,10 +29,12 @@ public class DynamicUpdater implements Runnable, Stopable {
 	
 	public void run() {
 		while (run) {
-			for (DynamicUpdateTask task: tasks.values()) {task.runOnce();}
+			runOnce();
 			Thread.yield();
 		}		
 	}
+	
+	public void runOnce() {for (DynamicUpdateTask task: tasks.values()) {task.runOnce();}}
 
 	public void signalStop() {run = false;}
 
