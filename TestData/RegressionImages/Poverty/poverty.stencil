@@ -61,7 +61,7 @@ operator Reg base Mapping [1 .. n, "State", "Region", "Division", CaseInsensitiv
 operator Abr base Mapping [1 .. n, "id", CaseInsensitive=1]
 
 layer Children[TEXT]
-/*	sidebar[displayOn="FILL_COLOR", example.SHAPE="RECTANGLE", label.FONT_SIZE=10, example.SIZE=12,  X=350, Y=100]: FONT_COLOR*/
+	sidebar[displayOn="FILL_COLOR", example.SHAPE="RECTANGLE", label.FONT_SIZE=10, example.SIZE=12,  X=350, Y=100]: FONT_COLOR
 from Poverty
 	ID: State
 	TEXT: Abr(State)

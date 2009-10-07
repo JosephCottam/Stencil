@@ -14,7 +14,7 @@ public abstract class BasicProject implements StencilOperator {
 	
 	/**Invokes the 'query' function for each argument.*/
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {
-		if (sourceArguments == null || sourceArguments.size() ==0) {
+		if (sourceArguments == null) {
 			throw new IllegalArgumentException("Argument list must be non-null and greater than zero length.");
 		}
 		

@@ -1,0 +1,55 @@
+STREAM: File
+NAME: Stocks
+HEADER: Date,Open,High,Low,Close,Volume
+SEPARATOR: ,
+SOURCE: ./google_stocks.csv
+CHECKHEADER: true
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: 30
+
+external stream Stocks(Date, Open)
+external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
+
+
+layer Markers[POLY_LINE]
+	axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT"]: Y
+from Stocks
+	ID : "Google"
+	X.new : TimeStep(Date)
+	Y.new : Price(Open) #-> Price
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @color(BLUE)
+
+layer Lookup[SHAPE]
+from Stocks
+   ID : TimeStep(Date)
+   X : TimeStep(Date)
+   Y : Price(Open)
+   VISIBLE : "False"
+
+
+layer Selected[TEXT]
+from Mouse
+  ID : "Selected"
+  (X, Y) : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> (X, Y)
+  TEXT : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.Find(_) -> Mult(-1, Y)
+  SCALE_BY: "NONE"
+
+layer Highlight[LINE]
+from Mouse
+  ID : "Highlight"
+  (X.1, X.2) : Nearest(X, 3) -> (_, _)
+  Y.1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
+  Y.2 : Add(canvas.Y, 3)
+  STROKE_WEIGHT : 3
+  STROKE_COLOR : @color(BLUE, 100)
+
+
+  
+
+operator Price (Open) -> (Price)
+	all => (Price) : Mult(-1, Open) -> Add(300, _)
+
+operator TimeStep (T) -> (VALUE)
+	all => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE

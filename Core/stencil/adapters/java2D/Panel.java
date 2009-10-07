@@ -30,6 +30,7 @@ package stencil.adapters.java2D;
 
 import stencil.adapters.java2D.data.*;
 import stencil.adapters.java2D.util.DynamicUpdater;
+import stencil.adapters.java2D.util.GuideUpdater;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
@@ -50,9 +51,21 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	private final DynamicUpdater dynamicUpdater = new DynamicUpdater();
 	private Thread dynamicUpdaterThread = new Thread(dynamicUpdater);
 	
+	private final GuideUpdater guideUpdater;
+	private final Thread guideUpdaterThread;
 	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
+		
+		 GuideUpdater updater = new GuideUpdater(p, this);
+		 if (updater.required()) {
+			 guideUpdater = updater;
+			 guideUpdaterThread = new Thread(guideUpdater);
+			 guideUpdaterThread.start();
+		 } else {
+			 guideUpdater = null;
+			 guideUpdaterThread = null;
+		 }
 	} 
 	
 	/**Listening to the panel is really listening to its canvas.
@@ -70,6 +83,10 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		try {dynamicUpdaterThread.join(10000);}
 		catch (Exception e) {dynamicUpdaterThread.stop();}
 
+		guideUpdater.signalStop();
+		try {guideUpdaterThread.join(10000);}
+		catch (Exception e) {guideUpdaterThread.stop();}
+		
 		canvas.dispose();		
 	}
 	

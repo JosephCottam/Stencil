@@ -24,7 +24,7 @@ public class TestModuleCache extends TestCase {
 		
 		initCache();		
 		assertFalse("Module cache empty when not expected.", 0==ModuleCache.registeredModules().size());
-		assertEquals("Current modules: " + ModuleCache.registeredModules().keySet(), 8, ModuleCache.registeredModules().size());
+		assertEquals("Current modules: " + ModuleCache.registeredModules().keySet(), 9, ModuleCache.registeredModules().size());
 	}
 
 	public void testClear() throws Exception {

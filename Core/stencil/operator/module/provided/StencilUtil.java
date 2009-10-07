@@ -106,10 +106,9 @@ public class StencilUtil extends BasicModule {
 
 		private boolean useIntegers = false;
 		private int tickCount = 10;
-
 		
-		private double max = Double.MIN_VALUE;
-		private double min = Double.MAX_VALUE;
+		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
+		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
 		private boolean expanded = false;				//TODO: This strategy can result in a missed update. 
 		
 		protected EchoContinuous(String... names) {super(names);}
@@ -130,7 +129,7 @@ public class StencilUtil extends BasicModule {
 			expanded = false;
 			
 			List ranges = buildRange(max, min, tickCount, useIntegers);
-
+			
 			return ranges;
 		}
 

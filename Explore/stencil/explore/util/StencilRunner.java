@@ -139,6 +139,8 @@ public final class StencilRunner extends Thread {
 	@SuppressWarnings("deprecation")
 	public void signalStop() throws AbnormalTerminiationException{
 		keepRunning = false;
+		if (loader == null) {return;}
+		
 		loader.signalStop();
 		
 		try {Thread.sleep(500);}

@@ -1,7 +1,7 @@
 package stencil.adapters.java2D.util;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Glyph2D;
@@ -11,7 +11,7 @@ import stencil.streams.Tuple;
 
 public class DynamicUpdater implements Runnable, Stopable {
 	private boolean run = true;
-	private final Map<Rule, DynamicUpdateTask> tasks = new HashMap();
+	private final Map<Rule, DynamicUpdateTask> tasks = new ConcurrentHashMap();
 
 	public void addDynamicUpdate(Glyph2D glyph, Rule rule, Tuple source, DisplayLayer layer) {
 		DynamicUpdateTask updater;

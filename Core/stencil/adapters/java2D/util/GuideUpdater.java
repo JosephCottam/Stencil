@@ -43,7 +43,7 @@ public class GuideUpdater implements Runnable, Stopable {
 	}
 	
 	public void run() {
-		if (needsGuides == null) {return;}
+		if (!required()) {return;}
 		
 		while (run) {
 			//Refresh the guides (if required)!
@@ -55,5 +55,11 @@ public class GuideUpdater implements Runnable, Stopable {
 		}
 	}
 	
-	public void signalStop() {run = true;}
+	public void signalStop() {run = false;}
+	
+	/**Is this updater required for the program it was passed?
+	 * Returns false if there were no guides specified in the program.
+	 * @return
+	 */
+	public boolean required() {return  needsGuides != null;}
 }

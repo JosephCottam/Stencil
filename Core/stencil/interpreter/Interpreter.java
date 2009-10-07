@@ -28,13 +28,7 @@
  */
 package stencil.interpreter;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
-import org.antlr.runtime.tree.TreeNodeStream;
-
 import stencil.display.StencilPanel;
-import stencil.interpreter.NeedsGuides;
-import stencil.interpreter.UpdateGuides;
-import stencil.operator.module.ModuleCache;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.streams.Tuple;
@@ -45,33 +39,11 @@ public class Interpreter {
 	private final StencilPanel panel;
 	private final Program program;
 	
-	private final NeedsGuides needsGuides;
-	private final UpdateGuides updateGuides;
-	
 	private boolean abortOnError = false;
 	
 	public Interpreter(StencilPanel panel) {
 		this.panel = panel;
 		this.program = panel.getProgram();
-		
-		ModuleCache c = program.getModuleCache();
-
-		TreeNodeStream treeTokens = new CommonTreeNodeStream(program);
-		
-		NeedsGuides ng = null;
-		UpdateGuides ug = null;
-		
-		for (Layer l: program.getLayers()) {
-			if (l.getGuides().size() >0) {				
-				ng = new NeedsGuides(treeTokens);
-				ug = new UpdateGuides(treeTokens);
-				ug.setModuleCache(c);//TODO: Remove when all tuple references are positional
-				break;	
-			}
-		}
-		
-		needsGuides = ng;
-		updateGuides = ug;
 	}
 	
 	public void processTuple(Tuple source) throws Exception {
@@ -141,17 +113,15 @@ public class Interpreter {
 						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
 					
 					} catch (RuleAbortException ra) {
-						//TODO: Handle (at least report) rule aborts.
+						System.out.println("Rule aborted...");
+						System.out.println(ra.getMessage());
+						ra.printStackTrace();
+						//TODO: Handle rule aborts.
 					} catch (Exception e) {
 						throw new RuntimeException("Error apply rules in layer " + layer.getName(), e);
 					}
 				}
 			}
-		}
-		
-		//Refresh the guides (if required)!
-		while (needsGuides != null && needsGuides.check(program)) {
-			updateGuides.updateGuides(panel);
 		}
 	}
 

@@ -93,11 +93,15 @@ public class Sidebar implements Guide2D {
 		marks = createLabeledBoxes(listing);
 		
 		Rectangle2D bounds = GuideUtils.fullBounds(marks);
-		if (autoPlace) {
-			X = -1d * bounds.getWidth();
-			Y = -1d * bounds.getHeight();
+		if (bounds != null) {
+			if (autoPlace) {
+				X = -1d * bounds.getWidth();
+				Y = -1d * bounds.getHeight();
+			}
+			this.bounds = new Rectangle2D.Double(X,Y, bounds.getWidth(), bounds.getY());
+		} else {
+			this.bounds = null;
 		}
-		this.bounds = new Rectangle2D.Double(X,Y, bounds.getWidth(), bounds.getY());
 	}
 	
 	public Rectangle2D getBoundsReference() {return bounds;}

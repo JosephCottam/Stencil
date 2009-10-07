@@ -13,8 +13,12 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
 
 public final class Painter implements Runnable, Stopable {
+	public static final RenderingHints LOW_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	public static final RenderingHints HIGH_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+	
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
-	private static final RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+	public static RenderingHints renderQuality = HIGH_QUALITY;
+	
 	
 	
 	private boolean run = true;
@@ -50,7 +54,7 @@ public final class Painter implements Runnable, Stopable {
 	
 	/**Render glyphs immediately onto the passed graphics object.*/
 	public void doDrawing(Graphics2D g, AffineTransform base) {
-		g.addRenderingHints(rh);
+		g.addRenderingHints(renderQuality);
 		for (DisplayLayer<? extends Glyph2D> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
 			for (Glyph2D glyph: table) {

@@ -39,6 +39,7 @@ import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.data.guides.*;
+import stencil.adapters.java2D.util.Painter;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
@@ -59,8 +60,8 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	}
 
 	public Class getGuideClass(String name) {
-//		if (name.equals("axis")) {return Axis.class;}
-//		else if (name.equals("sidebar")) {return Sidebar.class;}
+		if (name.equals("axis")) {return Axis.class;}
+		else if (name.equals("sidebar")) {return Sidebar.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
@@ -71,7 +72,13 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
-		throw new UnsupportedOperationException("Not implemented");
+		if (value.equals("LOW")) {
+			Painter.renderQuality = Painter.LOW_QUALITY;
+		} else if (value.equals("HIGH")) {
+			Painter.renderQuality = Painter.LOW_QUALITY;
+		} else {
+			throw new IllegalArgumentException("Could not set render quality to unknown value: " + value);
+		}
 	}
 
 	public void finalize(StencilPanel panel) {/**No finalization required...yet**/}

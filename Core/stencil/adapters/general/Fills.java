@@ -200,8 +200,8 @@ public final class Fills {
 						case PATTERN: pattern = Converter.convertFor(value, pattern); break;
 						case PATTERN_SCALE: scale = Converter.convertFor(value, scale); break;
 						case PATTERN_WEIGHT: weight = Converter.convertFor(value, weight); break;
-						case PATTERN_BACK: back = Converter.convertFor(value, fore); break;
-						case FILL_COLOR:  fore = Converter.convertFor(value, back); break;
+						case PATTERN_BACK: back = Converter.convertFor(value, back); break;
+						case FILL_COLOR:  fore = Converter.convertFor(value, fore); break;
 					}
 				}
 			}
