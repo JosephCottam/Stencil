@@ -41,6 +41,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 
 public class Shape extends Filled {
 	private static final AttributeList ATTRIBUTES = new AttributeList(Filled.ATTRIBUTES);
@@ -153,7 +154,11 @@ public class Shape extends Filled {
 		super.postRender(g, null);
 	}
 
-	public Shape update(Tuple t) throws IllegalArgumentException {return new Shape(this, t);}
+	public Shape update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+		return new Shape(this, t);
+	}
+	
 	public Shape updateID(String id) {return new Shape(id, this);}	
 
 }

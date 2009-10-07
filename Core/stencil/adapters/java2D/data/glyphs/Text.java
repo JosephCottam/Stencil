@@ -23,6 +23,7 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
 import stencil.util.DoubleDimension;
+import stencil.util.Tuples;
 
 public final class Text extends Basic {
 	
@@ -137,7 +138,13 @@ public final class Text extends Basic {
 			autoWidth = (width <= AUTO_SIZE);
 		}else {autoWidth = source.autoWidth;}
 
-		if (text.equals(source.text)) {
+		//If there was no change to layout, just copy it; otherwise, recompute it
+		if (text.equals(source.text)
+			&& !option.hasField(X.name)
+			&& !option.hasField(Y.name) 
+			&& !option.hasField(WIDTH.name)
+			&& !option.hasField(HEIGHT.name)) {
+			
 			this.renderedText = source.renderedText;
 			this.drawBounds = source.drawBounds;
 			this.bounds = source.bounds;
@@ -289,6 +296,10 @@ public final class Text extends Basic {
 	public Rectangle2D getBoundsReference() {return drawBounds;}
 
 	
-	public Text update(Tuple t) throws IllegalArgumentException {return new Text(this, t);}
+	public Text update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+		
+		return new Text(this, t);
+	}
 	public Text updateID(String id) {return new Text(id, this);}
 }

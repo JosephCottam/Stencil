@@ -130,8 +130,8 @@ public final class Tuples {
 		return target;
 	}
 
-	/**Compares two tuples.  Tuples are considered transferNeutral
-	 * the target tuple would be functionally equivalent after a transfer.
+	/**Compares two tuples.  Tuples are considered transferNeutral if
+	 * the target tuple would be functionally equivalent after a transfer from the source.
 	 * This is done by testing the transferable values with .equals
 	 * (which is supposed to be symmetric, but may not be, so the target's value's
 	 * .equals is invoked on the source's value).
@@ -146,7 +146,8 @@ public final class Tuples {
 			if (!target.hasField(field)) {return false;}
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
-			if (!targetValue.equals(sourceValue)) {return false;}
+			if (targetValue == sourceValue ||
+				(targetValue != null && !targetValue.equals(sourceValue))) {return false;}
 		}
 		return true;
 	}

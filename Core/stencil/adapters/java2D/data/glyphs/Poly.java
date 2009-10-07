@@ -46,6 +46,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
@@ -60,6 +61,7 @@ public abstract class Poly extends Stroked {
 		public String getImplantation() {return IMPLANTATION;}
 		
 		public PolyLine update(Tuple t) throws IllegalArgumentException {
+			if (Tuples.transferNeutral(t, this)) {return this;}
 			return new PolyLine(this, t);
 		}
 
@@ -78,6 +80,7 @@ public abstract class Poly extends Stroked {
 		public String getImplantation() {return IMPLANTATION;}
 
 		public Polygon update(Tuple t) throws IllegalArgumentException {
+			if (Tuples.transferNeutral(t, this)) {return this;}
 			return new Polygon(this, t);
 		}
 

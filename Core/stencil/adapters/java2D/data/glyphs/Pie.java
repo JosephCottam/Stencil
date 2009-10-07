@@ -43,6 +43,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 
 public final class Pie extends Stroked {
 	private static final String IMPLANTATION = "PIE";
@@ -179,6 +180,9 @@ public final class Pie extends Stroked {
 		super.postRender(g, base);
 	}
 
-	public Pie update(Tuple t) throws IllegalArgumentException {return new Pie(this, t);}
+	public Pie update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+		return new Pie(this, t);
+	}
 	public Pie updateID(String id) {return new Pie(id, this);}
 }

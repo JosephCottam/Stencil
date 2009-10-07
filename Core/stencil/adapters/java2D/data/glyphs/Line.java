@@ -35,6 +35,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Strokes;
 import stencil.adapters.java2D.data.DisplayLayer;
@@ -140,6 +141,10 @@ public final class Line extends Stroked {
 		super.postRender(g, base);
 	}
 
-	public Line update(Tuple t) throws IllegalArgumentException {return new Line(this, t);}
+	public Line update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+
+		return new Line(this, t);
+	}
 	public Line updateID(String id) {return new Line(id, this);}
 }

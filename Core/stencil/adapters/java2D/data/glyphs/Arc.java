@@ -40,6 +40,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 
 public class Arc extends Stroked {
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
@@ -191,6 +192,10 @@ public class Arc extends Stroked {
 
 	@Override
 	public Rectangle2D getBoundsReference() {return bounds;}
-	public Arc update(Tuple t) throws IllegalArgumentException {return new Arc(this, t);}
+	public Arc update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+
+		return new Arc(this, t);
+	}
 	public Arc updateID(String id) {return new Arc(id, this);}
 }

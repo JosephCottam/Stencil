@@ -44,6 +44,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.util.Tuples;
 
 public final class Image extends Basic {
 	private static final double AUTO_SCALE = -1;
@@ -201,6 +202,10 @@ public final class Image extends Basic {
 
 	public Rectangle2D getBoundsReference() {return bounds;}
 
-	public Image update(Tuple t) throws IllegalArgumentException {return new Image(this, t);}
+	public Image update(Tuple t) throws IllegalArgumentException {
+		if (Tuples.transferNeutral(t, this)) {return this;}
+
+		return new Image(this, t);
+	}
 	public Image updateID(String id) {return new Image(id, this);}
 }

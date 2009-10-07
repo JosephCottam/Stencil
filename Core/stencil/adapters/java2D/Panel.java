@@ -31,7 +31,6 @@ package stencil.adapters.java2D;
 import stencil.adapters.java2D.data.*;
 import stencil.adapters.java2D.util.DynamicUpdater;
 import stencil.display.StencilPanel;
-import stencil.interpreter.DynamicRule;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
@@ -44,20 +43,20 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
 
 import javax.imageio.ImageIO;
 
 public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
+	private final DynamicUpdater dynamicUpdater = new DynamicUpdater();
+	private Thread dynamicUpdaterThread = new Thread(dynamicUpdater);
+	
+	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getLayers()));
 	} 
 	
 	/**Listening to the panel is really listening to its canvas.
-	 * HACK: How can you get events to bubble up automatically?  Do I need to use glass pane?
+	 * HACK: Combine panel and canvas when Piccolo goes away...
 	 */
 	public synchronized void addMouseListener(MouseListener l) {canvas.addMouseListener(l);}
 	public synchronized void addMouseMotionListener(MouseMotionListener l) {canvas.addMouseMotionListener(l);}
@@ -67,14 +66,11 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	
 	@SuppressWarnings("deprecation")
 	public void dispose() {
-		canvas.dispose();
-		for (DynamicUpdater updater: updaters.values()) {updater.signalStop();}
-		
-		//Ensure threads stop
-		for (Thread t:updaterThreads) {
-			try {t.join(10000);}
-			catch (Exception e) {t.stop();}
-		}
+		dynamicUpdater.signalStop();
+		try {dynamicUpdaterThread.join(10000);}
+		catch (Exception e) {dynamicUpdaterThread.stop();}
+
+		canvas.dispose();		
 	}
 	
 	public void export(String filename, String type, Object info) throws Exception {
@@ -128,8 +124,6 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
 		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
-//		AffineTransform exportViewTransform = AffineTransform.getScaleInstance(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
-//		exportViewTransform.translate(topLeft.getX(), topLeft.getY());
 		g.transform(exportViewTransform);
 		
 		canvas.painter.doDrawing(g, exportViewTransform);
@@ -137,27 +131,22 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	}
 
 	
-	//Dynamic updater and updater tracker...
-	private final Map<Rule, DynamicUpdater> updaters = new HashMap();
-	private final List<Thread> updaterThreads = new ArrayList();
-	public void addDynamic(Glyph2D g, Rule rule, Tuple source) {
-		DynamicUpdater updater;
-		DisplayLayer table = null;
+	public void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
+		DisplayLayer layer= null;
+		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getLayer().getName())) {layer = t; break;}}
+		assert layer != null : "Table null after name-based search.";
 		
-		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getLayer().getName())) {table = t; break;}}
-		assert table != null : "Table null after name-based search.";
+		dynamicUpdater.addDynamicUpdate(glyph, rule, source, layer);
 		
-		if (!updaters.containsKey(rule)) {
-			Rule dynamicRule = DynamicRule.toDynamic(rule);
-			updater = new DynamicUpdater(table, dynamicRule);
-			updaters.put(rule, updater);
-			Thread thread = new Thread(updater);
-			updaterThreads.add(thread);
-			thread.start();
+		if (!dynamicUpdaterThread.isAlive()) {
+			try {dynamicUpdaterThread.start();}
+			catch (IllegalThreadStateException e) {
+				/*Ignored. Happens if an attempt is made to
+				 * start a thread after it has been started once.
+				 * Multi-threading loading can incur multiple starts, the subsequent ones are ignored.
+				 */				
+			}
 		}
-
-		updater = updaters.get(rule);
-		updater.addUpdate(source, g);
 	}
 
 
