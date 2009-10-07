@@ -37,8 +37,14 @@ import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
 
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -79,8 +85,52 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	}
 	
 	private void exportPNG(String filename, Integer dpi) throws Exception { 
-		//TODO: DPI Scaling
-		ImageIO.write(canvas.buffer, "png", new java.io.File(filename));
+		double scale;
+
+		try {scale =Math.ceil(dpi/java.awt.Toolkit.getDefaultToolkit().getScreenResolution());}
+		catch (java.awt.HeadlessException e) {scale = Math.ceil(((double) dpi)/StencilPanel.ABSTRACT_SCREEN_RESOLUTION);}
+
+		int width =  (int) Math.round(Math.ceil(scale * this.getWidth()));
+		int height =  (int) Math.round(Math.ceil(scale * this.getHeight()));
+
+		AffineTransform viewTransform = canvas.getViewTransformRef(); 
+		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);
+		
+		if (width == 0 || height == 0) { //If nothing will display, then just show everything (usually batch mode)
+			Rectangle viewBounds = canvas.getContentBounds();
+			width = (int) Math.round(Math.ceil(scale * viewBounds.width));
+			height = (int) Math.round(Math.ceil(scale * viewBounds.height));
+			topLeft = canvas.getContentBounds().getLocation();
+		}
+		
+		if (width ==0 || height ==0) {throw new RuntimeException("Cannot export a zero-sized image.");}
+		double prop = width/height;
+
+		//Calculate trimmed dimension
+		if (width > Integer.MAX_VALUE) {
+			width = Integer.MAX_VALUE;
+			height = (int) Math.floor(Math.round(width * prop));
+		}
+
+		if (height > Integer.MAX_VALUE) {
+			height = Integer.MAX_VALUE;
+			width = (int) Math.floor(Math.round(width / prop));
+		}
+		
+		BufferedImage buffer = (BufferedImage) canvas.createImage(width, height);
+		if (buffer == null) { //Happens in headless mode
+			buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		}
+		
+		AffineTransform exportViewTransform = AffineTransform.getScaleInstance(scale, scale);
+		exportViewTransform.translate(-topLeft.getX(), -topLeft.getY());
+		Graphics2D g = buffer.createGraphics();
+		g.setPaint(canvas.getBackground());
+		g.fill(new Rectangle(0,0, width, height));
+		g.transform(exportViewTransform);
+		
+		canvas.painter.doDrawing(g, exportViewTransform);
+		ImageIO.write(buffer, "png", new java.io.File(filename));
 	}
 
 	

@@ -124,7 +124,8 @@ public class Arc extends Stroked {
 	public String getImplantation() {return IMPLANTATION;} 
 
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
-	
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 	public Object get(String name) {
 		if (X1.is(name)) 	  {return x1;}
 		else if (Y1.is(name)) {return y1;}

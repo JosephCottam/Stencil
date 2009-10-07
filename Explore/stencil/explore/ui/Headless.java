@@ -154,6 +154,8 @@ public class Headless {
 					}
 				}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		} finally {
 			model.getStencilPanel().dispose();
 		}

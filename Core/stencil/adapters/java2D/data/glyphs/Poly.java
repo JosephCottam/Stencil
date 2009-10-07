@@ -49,13 +49,15 @@ import stencil.streams.Tuple;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
+		private static final String IMPLANTATION = "POLY_LINE";
+		
 		public PolyLine(DisplayLayer layer, String id) {super(layer, id, false);}
 		protected PolyLine(String id, PolyLine source) {super(id, source);}
 		protected PolyLine(PolyLine source, Tuple option) {
 			super(source, option, false);
 		}
 		
-		public String getImplantation() {return "POLY_LINE";}
+		public String getImplantation() {return IMPLANTATION;}
 		
 		public PolyLine update(Tuple t) throws IllegalArgumentException {
 			return new PolyLine(this, t);
@@ -65,13 +67,15 @@ public abstract class Poly extends Stroked {
 		
 	}
 	public static class Polygon extends Poly {
+		public static final String IMPLANTATION = "POLYGON";
+		
 		public Polygon(DisplayLayer layer,String id) {super(layer, id, true);}
 		protected Polygon(String id, Polygon source) {super(id, source);}
 		protected Polygon(Polygon source, Tuple option) {
 			super(source, option, true);
 		}
 		
-		public String getImplantation() {return "POLYGON";}
+		public String getImplantation() {return IMPLANTATION;}
 
 		public Polygon update(Tuple t) throws IllegalArgumentException {
 			return new Polygon(this, t);
@@ -144,7 +148,9 @@ public abstract class Poly extends Stroked {
 	}
 	
 	
-	protected AttributeList getAttributes() {return ATTRIBUTES;}	
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public Object get(String name) {
@@ -156,11 +162,29 @@ public abstract class Poly extends Stroked {
 		if (Xn.is(base) || Yn.is(base)) {
 			int index = (int) index(points, name, true);
 			if (index == points.size()) {return UNITIAILZED_COORDINATE;}
+			if (index < 0) {
+				if (Xn.is(base)) {return halfPoints(true);}
+				else {return halfPoints(false);}
+			}
 			if (Xn.is(base)) {return points.get(index).getX();}
 			if (Yn.is(base)) {return points.get(index).getY();}
 		} 
 		return super.get(name);
 	}	
+
+	/**What are the X or Y half of points in this tuple?
+	 * 
+	 * @param x Return the x portion?  (false implies return the y portion)
+	 * @return
+	 */
+	private final Double[] halfPoints(boolean x) {
+		Double[] pts = new Double[points.size()];
+		for (int i=0; i< pts.length; i++) {
+			Point2D p = points.get(i);
+			pts[i] = x ? p.getX() : p.getY(); 
+		}
+		return pts;
+	}
 	
 	/**Does the given tuple have up point-related updates?*/
 	private static final boolean changesPoints(Tuple t) {

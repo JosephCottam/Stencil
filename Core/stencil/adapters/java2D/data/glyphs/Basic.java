@@ -70,6 +70,7 @@ public abstract class Basic implements Glyph2D {
 		ATTRIBUTES.add(LAYERNAME);
 		ATTRIBUTES.add(IMPLANTATION);
 		ATTRIBUTES.add(VISIBLE);
+		ATTRIBUTES.add(REGISTRATION);
 	}
 	
 	protected final String id;
@@ -113,6 +114,12 @@ public abstract class Basic implements Glyph2D {
 	/**Return a list of all of the attributes of this glyph.*/
 	protected abstract AttributeList getAttributes();
 	
+	/**Which of the attributes cannot be set?
+	 * Unsettable attributes are typically those derived from other attributes
+	 * (e.g. width/height on a shape are derived from the settable SIZE attribute).
+	 * */
+	protected abstract AttributeList getUnsettables();
+	
 	/**Render the glyph to the given graphics object.*/
 	public abstract void render(Graphics2D g, AffineTransform base);
 
@@ -151,8 +158,18 @@ public abstract class Basic implements Glyph2D {
 		Object def = getAttributes().getDefault(name);
 		return ((def == value) || (def != null) && def.equals(value));
 	}
+	
+	/**Outputs a string representation of this tuple.
+	 * Only reports settable fields.
+	 **/
+	public String toString() {
+		List<String> includeFields = getFields();
+		List<String> omitFields = getUnsettables().getNames();
 		
-	public String toString() {return Tuples.toString(this);}
+		includeFields.removeAll(omitFields);
+		
+		return Tuples.toString(this, includeFields);
+	}
 	
 	public DisplayLayer getLayer() {return layer;}
 	

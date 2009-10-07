@@ -125,6 +125,8 @@ public final class Image extends Basic {
 	private final Rectangle2D getBounds(Point2D p) {return new Rectangle2D.Double(p.getX(), p.getY(), getWidth(), getHeight());}
 
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 
 	public Object get(String name) {
 		if (HEIGHT.is(name)){return getHeight();}

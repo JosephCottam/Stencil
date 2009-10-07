@@ -117,8 +117,9 @@ public final class Line extends Stroked {
 	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public String getImplantation() {return IMPLANTATION;} 
-
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 	
 	public Object get(String name) {
 		if (X1.is(name)) 	  {return x1;}

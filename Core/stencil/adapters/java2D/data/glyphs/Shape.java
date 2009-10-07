@@ -140,6 +140,12 @@ public class Shape extends Filled {
 	}
 	
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+	
+	public String toString() {
+		return super.toString();
+	}
+	
 	public Rectangle2D getBoundsReference() {return bounds;}
 	public String getImplantation() {return IMPLANTATION;}
 

@@ -169,6 +169,8 @@ public final class Text extends Basic {
 
 	
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 	public String getImplantation() {return IMPLANTATION;}
 
 	

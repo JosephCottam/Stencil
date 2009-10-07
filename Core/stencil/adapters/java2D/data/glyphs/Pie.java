@@ -50,7 +50,7 @@ public final class Pie extends Stroked {
 	private static final Color DEFAULT_SLICE_COLOR  = Color.RED;
 	private static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
 
-	private static final AttributeList attributes = new AttributeList(Stroked.ATTRIBUTES);;
+	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
 	private static final AttributeList UNSETTABLES = new AttributeList();;
 
 	private static final Attribute<Double> X = new Attribute("X", 0d);
@@ -65,13 +65,13 @@ public final class Pie extends Stroked {
 	
 	
 	static {
-		attributes.add(PERCENT);
-		attributes.add(SLICE);
-		attributes.add(FIELD);
-		attributes.add(SLICE_COLOR);
-		attributes.add(ANGLE);
-		attributes.add(SIZE);
-		attributes.add(FIELD_COLOR);
+		ATTRIBUTES.add(PERCENT);
+		ATTRIBUTES.add(SLICE);
+		ATTRIBUTES.add(FIELD);
+		ATTRIBUTES.add(SLICE_COLOR);
+		ATTRIBUTES.add(ANGLE);
+		ATTRIBUTES.add(SIZE);
+		ATTRIBUTES.add(FIELD_COLOR);
 	}
 
 	private final double size;	
@@ -156,7 +156,9 @@ public final class Pie extends Stroked {
 		return super.get(name);
 	}
 	
-	protected AttributeList getAttributes() {return attributes;}
+	protected AttributeList getAttributes() {return ATTRIBUTES;}
+	protected AttributeList getUnsettables() {return UNSETTABLES;}
+
 
 	private double getPercent() {return slice/(slice+field);}
 	public String getImplantation() {return IMPLANTATION;}
