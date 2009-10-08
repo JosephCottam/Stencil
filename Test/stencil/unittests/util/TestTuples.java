@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import stencil.adapters.java2D.data.glyphs.Pie;
 import stencil.streams.InvalidNameException;
 import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;

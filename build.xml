@@ -200,6 +200,9 @@
  	 		<path id="library.Classpath">
  	 			<fileset dir="${runtimeLibrary}">
  	 				<include name="*.jar"/>
+ 	 				<exclude name="antlr-3.2.jar"/>
+ 	 				<exclude name="antlr3-ant.jar"/>
+ 	 				<exclude name="stringtemplate-3.2.jar"/>
  	 			</fileset>
  	 		</path>
  		</pathconvert>
@@ -221,14 +224,19 @@
  		<copy todir="${lib.app.dir}">
  			<fileset dir="${runtimeLibrary}">
  				<include name="*.jar"/>
- 				<exclude name="antrl3-ant.jar"/>
+ 				<exclude name="antlr3-ant.jar"/>
+				<exclude name="antlr-3.2.jar"/>
+ 				<exclude name="stringtemplate-3.2.jar"/>
  			</fileset>
  		</copy>
 
  		<copy file="./TestData/Stencil.properties" tofile="${release}/Stencil.properties" overwrite="true"/>
  		<copy file="./TestData/Explore.properties" tofile="${release}/Explore.properties" overwrite="true"/>
  		<copy todir="${release}/Examples/" overwrite="true">
- 			<fileset dir="./TestData/RegressionImages/" includes="**"/>
+ 			<fileset dir="./TestData/RegressionImages/">
+ 				<include name="**"/>
+ 				<exclude name="**/*.png"/>
+ 			</fileset>
  		</copy>
  		
  		<copy todir="${release}" overwrite="true">
