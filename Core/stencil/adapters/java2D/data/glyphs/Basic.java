@@ -219,7 +219,7 @@ public abstract class Basic implements Glyph2D {
 //				double h = (Double) this.get("HEIGHT", Double.class);
 //				r = new Rectangle2D.Double(x,y,w,h);
 //				g.draw(r);
-//			} catch  (Exception e) {}
+//			} catch  (Exception e) {/*Exception ignored, its just debug code.*/}
 
 			//Registration point
 			try {
@@ -228,7 +228,7 @@ public abstract class Basic implements Glyph2D {
 				double x = (Double) this.get("X", Double.class);
 				double y = (Double) this.get("Y", Double.class);
 				g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
-			} catch  (Exception e) {}
+			} catch  (Exception e) {/*Exception ignored, its just debug code.*/}
 
 		}
 	}

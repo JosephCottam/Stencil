@@ -190,8 +190,8 @@ public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C
 	
 	public void preRun() {
 		//TODO: Modify when view and canvas can have multiple instances
-		View.Global.setView(getView());
-		Canvas.Global.setCanvas(getCanvas());
+		View.global = getView();
+		Canvas.global = getCanvas();
 	}
 	
 	//------------------------------------------------------------------------------------------

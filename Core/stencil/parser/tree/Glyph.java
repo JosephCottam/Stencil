@@ -30,14 +30,6 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
-
 public final class Glyph extends Target {
 	public Glyph(Token source) {super(source);}
-
-	/**Same as SimpleFinalize*/
-	public Tuple finalize(Tuple source) {return simpleFinalize(source);}
-	
-	/**What properties of the target entity are being affected?*/
-	public final TuplePrototype getPrototype() {return super.getPrototype();}
 }

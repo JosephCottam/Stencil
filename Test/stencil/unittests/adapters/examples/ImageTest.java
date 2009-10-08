@@ -191,7 +191,10 @@ public abstract class ImageTest {
 			b.flush();
 			System.out.println("Writing to " + deltaFile);
 			ImageIO.write(b, "png", new java.io.File(deltaFile));
-			fail("Differences exist between reference and generated image: " + deltaCount + " differences");
+			
+			if (deltaCount/((double) o.getWidth()*o.getHeight()) > .02) {
+				fail("Generated image was greater than 2% different from reference image: " + deltaCount + " differences");
+			}
 		}
 	}
  

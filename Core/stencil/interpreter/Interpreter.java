@@ -56,7 +56,10 @@ public class Interpreter {
 				catch (Exception e) {throw new RuntimeException(String.format("Error applying filter in layer %1$s", layer.getName()), e);}
 
 				if (matches) {
-					Tuple buffer = null;
+					Tuple glyphBuffer = null;
+					Tuple viewBuffer = null;
+					Tuple canvasBuffer = null;
+					Tuple localBuffer = null;
 					
 					//Apply all rules
 					try {
@@ -75,8 +78,8 @@ public class Interpreter {
 							if (result == null) {
 								if (abortOnError) {throw new RuleAbortException(rule);}
 								else {
-									if (created && !preExisting && buffer !=null) {
-										String id = Converter.toString(buffer.get(ParserConstants.GLYPH_ID_FIELD));
+									if (created && !preExisting && glyphBuffer !=null) {
+										String id = Converter.toString(glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD));
 										layer.getDisplayLayer().remove(id);	 //This won't be possible if we remove the remove from layer in the compiled version...try a two-phase 'reserved' and 'created' hold if something requests a 'reserved' value
 									}
 									continue groups;
@@ -85,32 +88,31 @@ public class Interpreter {
 														
 							//Merge into final storage for glyph
 							if (rule.getTarget() instanceof Glyph) {
-								buffer = Tuples.merge(result, buffer);
+								glyphBuffer = Tuples.merge(result, glyphBuffer);
 
 								//We create the actual glyph early on in the process so we can refer to 'self' in 
 								//any rule.  This is especially important for dynamic bindings
-								if (!created && buffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-									String id = (String) buffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
+								if (!created && glyphBuffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
+									String id = (String) glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
 									preExisting = (layer.getDisplayLayer().find(id) != null); //TODO: This probably needs to be synchronzied with the creation...against what, I'm not sure
 									glyph = layer.getDisplayLayer().makeOrFind(id);	
 									created = true;
 								}
-							}
-
-							
+							} else if (rule.getTarget() instanceof View) {viewBuffer = Tuples.merge(result, viewBuffer);
+							} else if (rule.getTarget() instanceof Canvas) {canvasBuffer = Tuples.merge(result, canvasBuffer);
+							} else if (rule.getTarget() instanceof Local) {localBuffer = Tuples.merge(result, localBuffer);}
 						}
 						
-						if (buffer != null && buffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-							String id = (String) buffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
+						if (glyphBuffer != null && glyphBuffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
+							String id = (String) glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
 							glyph = layer.getDisplayLayer().makeOrFind(id);							
-							panel.transfer(buffer, glyph);
-						} else {
-							//If ID is not set, then it is an 'fyi' tuple, rule-set only ran for side-effects
-							//TODO: Remove when stream-stream transform works
-							continue;
-						}
+							panel.transfer(glyphBuffer, glyph);
+							
+							for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+						} 
 						
-						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+						if (viewBuffer != null) {Tuples.transfer(viewBuffer, View.global, false);}
+						if (canvasBuffer != null) {Tuples.transfer(viewBuffer, Canvas.global, false);}
 					
 					} catch (RuleAbortException ra) {
 						System.out.println("Rule aborted...");

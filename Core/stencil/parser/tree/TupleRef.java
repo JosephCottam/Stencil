@@ -104,10 +104,10 @@ public class TupleRef extends Value {
 			Id id = (Id) ref.getValue();
 			String name = id.getName();
 			
-			if (View.Global.isViewField(name)) {
-				return View.Global.getView().get(View.Global.regularField(name));
-			} else if (Canvas.Global.isCanvasField(name)) {
-				return Canvas.Global.getCanvas().get(Canvas.Global.regularField(name));
+			if (View.isViewField(name)) {
+				return View.global.get(View.regularField(name));
+			} else if (Canvas.isCanvasField(name)) {
+				return Canvas.global.get(Canvas.regularField(name));
 			}
 		} 
 		

@@ -51,11 +51,13 @@ public abstract class Target extends StencilTree {
 	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
 
 	/**Processes the values tuple relative to the prototype
-	 *
+	 * By default, this returns the result of a simple finalize.
+	 * 
 	 * @param source Source values for setting, ordered and of the same number as the prototype of this target
 	 * @return Potentially new tuple representing source after changes
+	 * @throws May throw an exception based on the nature of the finalize operation
 	 */
-	public abstract Tuple finalize(Tuple source) throws Exception;
+	public Tuple finalize(Tuple source) throws Exception {return simpleFinalize(source);}
 
 	/**Create a new tuple where the names are take from the tuple prototype and
 	 * values are take from the source.  Names are matched to values order-wise.

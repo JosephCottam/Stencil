@@ -66,14 +66,14 @@ public class Transform extends BasicModule {
 	public static Tuple screenToCanvasPoint(Object x, Object y) {
 		x = Converter.toDouble(x);
 		y = Converter.toDouble(y);
-		Point2D p = View.Global.getView().viewToCanvas(new Point2D.Double((Double)x,(Double)y));
+		Point2D p = View.global.viewToCanvas(new Point2D.Double((Double)x,(Double)y));
 		return new BasicTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
 	}
 
 	public static Tuple screenToCanvasDimension(Object width, Object height) {
 		width = Converter.toDouble(width);
 		height = Converter.toDouble(height);
-		Dimension2D p = View.Global.getView().viewToCanvas(new DoubleDimension((Double)width,(Double)height));
+		Dimension2D p = View.global.viewToCanvas(new DoubleDimension((Double)width,(Double)height));
 		return new BasicTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
 	}
 
@@ -81,14 +81,14 @@ public class Transform extends BasicModule {
 	public static Tuple canvasToScreenPoint(Object x, Object y) {
 		x = Converter.toDouble(x);
 		y = Converter.toDouble(y);
-		Point2D p = View.Global.getView().canvasToView(new Point2D.Double((Double)x,(Double)y));
+		Point2D p = View.global.canvasToView(new Point2D.Double((Double)x,(Double)y));
 		return new BasicTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
 	}
 
 	public static Tuple canvasToScreenDimension(Object width, Object height) {
 		width = Converter.toDouble(width);
 		height = Converter.toDouble(height);
-		Dimension2D p = View.Global.getView().canvasToView(new DoubleDimension((Double)width,(Double)height));
+		Dimension2D p = View.global.canvasToView(new DoubleDimension((Double)width,(Double)height));
 		return new BasicTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
 	}
 

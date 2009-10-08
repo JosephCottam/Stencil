@@ -31,45 +31,28 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.display.CanvasTuple;
+import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.streams.Tuple;
 
-public class Canvas extends Target{
+public final class Canvas extends Target{
+	public static CanvasTuple global;
+	
 	public Canvas(Token source) {super(source);}
 
-	/**Modify the global canvas, doing order-wise matching of fields from the source
-	 * to fields specified in the prototype.  Returns the canvas tuple.
-	 */
-	public Tuple finalize(Tuple source) {
-		source = simpleFinalize(source);
-		stencil.util.Tuples.transfer(source, Global.getCanvas(), false);
-		return Global.getCanvas();
+	public void applyChanges(Tuple changes, StencilPanel panel) {
+		stencil.util.Tuples.transfer(changes, panel.getCanvas(), false);
 	}
 
+	/**Converts a name identifiable as a 'canvsField' into a regular
+	 * field name.
+	 */
+	public static final String regularField(String name) {
+		return name.substring(ParserConstants.CANVAS_PREFIX.length()+1);
+	}
 
-	public static abstract class Global {
-		/**Global canvas object.  Only one is allowed per stencil right now.*/
-		//TODO: Make it so we can have multiple canvases
-		protected static CanvasTuple canvas;
-
-		/**Set the global canvas object.*/
-		public static void setCanvas(CanvasTuple canvas) {Global.canvas = canvas;}
-
-		/**Get the global canvas object.*/
-		public static CanvasTuple getCanvas() {return canvas;}
-
-
-		/**Converts a name identifiable as a 'viewField' into a regular
-		 * field name.
-		 */
-		public static final String regularField(String name) {
-			return name.substring(ParserConstants.CANVAS_PREFIX.length()+1);
-		}
-
-
-		/**Does the passed name indicate a field in the view tuple?*/
-		public static final boolean isCanvasField(String name) {
-			return name != null && name.startsWith(ParserConstants.CANVAS_PREFIX);
-		}
+	/**Does the passed name indicate a field in the view tuple?*/
+	public static final boolean isCanvasField(String name) {
+		return name != null && name.startsWith(ParserConstants.CANVAS_PREFIX);
 	}
 }
