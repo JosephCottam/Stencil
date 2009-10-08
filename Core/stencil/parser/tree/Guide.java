@@ -2,7 +2,9 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.streams.Tuple;
 import stencil.types.Converter;
+import stencil.util.Tuples;
 
 public class Guide extends StencilTree {
 	public static final String SAMPLE= "sample";	//HACK: Magic constant .... TODO: How can we tie this back to something
@@ -18,6 +20,7 @@ public class Guide extends StencilTree {
 			if (spec.getMap().containsKey(SAMPLE)) {
 				sampleType = spec.getMap().get(SAMPLE).getText();
 			} else {sampleType = "CATEGORICAL";}		//HACK: This should be gotten from the guide type somehow...
+
 			
 			if (spec.getMap().containsKey(TICKS)) {
 				tickCount = ((Number) spec.getMap().get(TICKS).getValue()).intValue();
@@ -34,15 +37,34 @@ public class Guide extends StencilTree {
 		public boolean isCategorical() {return sampleType.equals("CATEGORICAL");}
 	}
 	
-	
 	public Guide(Token token) {super(token);}
 	
-	public String getGuideType() {return getChild(0).getText();}
-	public Specializer getArguments() {return (Specializer) getChild(1);}
-	public String getAttribute() {return getChild(2).getText();}
-	public CallGroup getAction() {return (CallGroup) getChild(3);}
+
+	public String getAttribute() {return token.getText();}
+	public String getLayer() {return getChild(0).getText();}
+	public String getGuideType() {return getChild(1).getText();}
+	public Specializer getSpecializer() {return (Specializer) getChild(2);}
+	
+	/**Rules are applied to the action-generated tuples.*/
+	public List<Rule> getRules() {return (List<Rule>) getChild(3);}
+	
+	
+	/**Apply the rules of this guide to the tuple passed.
+	 * The result is a format descriptor for the guide position corresponding to the source tuple.
+	 */
+	public Tuple apply(Tuple source) throws Exception {
+		Tuple buffer = null;
+		for (Rule rule: getRules()) {
+			Tuple result = rule.apply(source);
+			buffer = Tuples.merge(result, buffer);
+		}
+		return buffer;
+	}
+	
+	/**CallGroup that will generate the tuples used to create the legend.*/
+	public CallGroup getActions() {return (CallGroup) getChild(4);}  
 	
 	public SampleStrategy strategy() {
-		return new SampleStrategy(getArguments());
+		return new SampleStrategy(getSpecializer());
 	}
 }

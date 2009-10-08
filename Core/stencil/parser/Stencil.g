@@ -41,8 +41,8 @@ options {
   CALL_GROUP;
   CALL_CHAIN;
   FUNCTION;
-  GUIDE;
   LIST;
+  CANVAS_DEF;
   NUMBER;
   OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
   OPERATOR_PROXY;    //Operator, specfied by base reference to an instance of an imported operator 
@@ -73,6 +73,7 @@ options {
   FILTER  = 'filter';
   FROM  = 'from';
   GLYPH = 'glyph';
+  GUIDE = 'guide';
   IMPORT  = 'import';
   LOCAL = 'local';  //Target to indicate temporary storage
   LAYER = 'layer';
@@ -148,10 +149,11 @@ options {
   public static enum RuleOpts {
     All,  //Anything is allowed 
     Simple, //Only argument lists (no split or range)
-    Empty}; //Must be empty
+    Empty
+  }; //Must be empty
 }
 
-program : imports* externals order (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+program : imports* externals order canvasLayer? (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           order 
@@ -184,6 +186,14 @@ externals: externalStream* -> ^(LIST["Externals"] externalStream*);
 externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] tuple);
 
 
+//////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
+
+canvasLayer: CANVAS name=ID canvasProperties guideDef+ -> ^(CANVAS_DEF[$name.text] canvasProperties guideDef+);
+
+guideDef: GUIDE type=ID spec=specializer[RuleOpt.Simple] FROM layer=ID attribute=ID rule["glyph"]* 
+			-> ^(GUIDE[$attribute.text] $layer $type $spec ^(LIST["Guides"] rule*));
+
+canvasProperties: specializer[RuleOpts.Simple]; 
 
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 
@@ -192,17 +202,13 @@ streamDef
     -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+))*;
 
 layerDef
-  : LAYER name=ID implantationDef guidesBlock consumesBlock["glyph"]+
-    -> ^(LAYER[$name.text] implantationDef guidesBlock ^(LIST["Consumes"] consumesBlock+));
+  : LAYER name=ID implantationDef consumesBlock["glyph"]+
+    -> ^(LAYER[$name.text] implantationDef ^(LIST["Consumes"] consumesBlock+));
   
 implantationDef
   : ARG type=ID CLOSE_ARG -> GLYPH[$type.text]
   | -> GLYPH[DEFAULT_GLYPH_TYPE];
-  
-guidesBlock
-  : (ID specializer[RuleOpts.Simple] DEFINE ID)* 
-    -> ^(LIST["Guides"] ^(GUIDE ID specializer ID)*);
-  
+    
 consumesBlock[String def]
   : FROM stream=ID filterRule* rule[def]+ 
     -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filterRule*) ^(LIST["Rules"] rule+));

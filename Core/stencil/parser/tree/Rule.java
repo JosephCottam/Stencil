@@ -31,9 +31,6 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-
-
-
 import stencil.streams.Tuple;
 import stencil.parser.string.StencilParser;
 
@@ -48,12 +45,19 @@ public class Rule extends StencilTree {
 
 	public Rule(Token source) {super(source);}
 
+	/**What is being modified by this rule?*/
 	public Target getTarget() {return (Target) getChild(0);}
+	
+	/**What actions are being taken in this rule*/
 	public CallGroup getAction() {return (CallGroup) getChild(1);}
 
+	/**Is the binding dynamic?*/
 	public boolean isDyanmic() {return getChild(2).getType() == StencilParser.DYNAMIC;}
+	
+	/**Is the binding static?*/
 	public boolean isStatic() {return getChild(2).getType() == StencilParser.DEFINE;}
 
+	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
 		Tree t = this.getAncestor(StencilParser.CONSUMES);
 		if (t == null) {throw new RuntimeException("Rules not part of a layer do not belong to a group.");}
@@ -88,6 +92,4 @@ public class Rule extends StencilTree {
 		if (t==null) {return null;}
 		else {return getTarget().finalize(t);}
 	}
-
-
 }
