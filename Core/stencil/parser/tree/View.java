@@ -27,28 +27,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package stencil.parser.tree;
-import org.antlr.runtime.Token;
+import org.antlr.runtime.Token; 
 
+import stencil.display.StencilPanel;
 import stencil.display.ViewTuple;
 import stencil.parser.ParserConstants;
 import stencil.streams.Tuple;
-import stencil.util.Tuples;
 
 public class View extends Target {
 	public static ViewTuple global;
-
 	
 	public View(Token source) {super(source);}
 
-	/**Modify the global view, doing order-wise matching of fields from the source
-	 * to fields specified in the prototype.  Returns the view tuple.
-	 */
-	public Tuple finalize(Tuple source) {
-		source = simpleFinalize(source);
-		Tuples.transfer(source, global, false);
-		return global;
+	public void applyChanges(Tuple changes, StencilPanel panel) {
+		stencil.util.Tuples.transfer(changes, panel.getView(), false);
 	}
-
+	
 	/**Converts a name identifiable as a 'viewField' into a regular field name.*/
 	public static final String regularField(String name) {
 		return name.substring(ParserConstants.VIEW_PREFIX.length()+1);

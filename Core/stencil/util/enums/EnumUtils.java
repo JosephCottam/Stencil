@@ -30,9 +30,13 @@ package stencil.util.enums;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class EnumUtils {
+	private static final Map<Class, List<String>> enumCache = new HashMap();
+	
 	/**The collection of 'is' functions return true if the value
 	 * of this enum equals the passed key by either address comparison (==) or
 	 * by comparing the enum name to the .toString() of the key.
@@ -54,8 +58,16 @@ public final class EnumUtils {
 	public static boolean contains(Enum source, String name) {return contains(source.getDeclaringClass(), name);}
 	public static boolean contains(Class source, String name) {
 		assert(Enum.class.isAssignableFrom(source));
-		try {Enum.valueOf(source, name); return true;}
-		catch (IllegalArgumentException e) {return false;}
+		
+		List<String> s;
+		if (!enumCache.containsKey(source)) {
+			s = allNames(source);
+			enumCache.put(source, s);
+		} else {
+			s = enumCache.get(source);
+		}
+		
+		return s.contains(name);
 	}
 
 

@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
@@ -52,15 +53,21 @@ public final class Painter implements Runnable, Stopable {
 		run=false;
 	}
 	
-	/**Render glyphs immediately onto the passed graphics object.*/
-	public void doDrawing(Graphics2D g, AffineTransform base) {
+	/**Render glyphs immediately onto the passed graphics object.
+	 * @param g Graphics object to render on
+	 * @param clipBounds Device-space size of the rendering area
+	 * */
+	public void doDrawing(Graphics2D g) {
 		g.addRenderingHints(renderQuality);
+		AffineTransform base = g.getTransform();
+
 		for (DisplayLayer<? extends Glyph2D> table: layers) {
 			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
 			for (Glyph2D glyph: table) {
-				Rectangle r = glyph.getBoundsReference().getBounds();
+				Rectangle2D r = glyph.getBoundsReference();
 				if (glyph.isVisible() 
-					&& g.hitClip(r.x, r.y, r.width, r.height)) {
+					&& g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {
+
 					glyph.render(g, base);
 				}
 			}
@@ -99,10 +106,11 @@ public final class Painter implements Runnable, Stopable {
 		try {
 			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
 			g.setPaint(target.getBackground());
-			g.fillRect(0, 0, size.width, size.height);
+			Rectangle bounds = new Rectangle(0,0, size.width, size.height);
+			g.fill(bounds);
 
 			g.setTransform(priorTransform);
-			doDrawing(g, priorTransform);
+			doDrawing(g);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

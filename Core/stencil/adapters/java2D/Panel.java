@@ -150,13 +150,14 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		
 		Graphics2D g = buffer.createGraphics();
 		g.setPaint(canvas.getBackground());
-		g.fill(new Rectangle(0,0, (int) width, (int) height));
+		Rectangle bounds = new Rectangle(0,0, (int) width, (int) height); 
+		g.fill(bounds);
 
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
 		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
 		g.transform(exportViewTransform);
 		
-		canvas.painter.doDrawing(g, exportViewTransform);
+		canvas.painter.doDrawing(g);
 		ImageIO.write(buffer, "png", new java.io.File(filename));
 	}
 

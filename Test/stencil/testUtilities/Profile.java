@@ -39,7 +39,7 @@ public class Profile {
 		String profileProperties = Profile.class.getResource("Profile.properties").getFile();
 
 		
-		ImageTest test = new Stocks(new String[]{profileProperties});
+		ImageTest test = new Sourceforge(new String[]{profileProperties});
 		
 		ImageTest.TestRecord r = test.getTestRecord();
 		
