@@ -38,17 +38,6 @@ import java.util.Iterator;
  *
  * */
 public interface TupleStream extends Iterator<Tuple> {
-	/**Reset the stream.  A reset does not imply that
-	 * the stream will be returned to the start, only that
-	 * it will be returned to a state as if it were created
-	 * right now.  This may be a return to stream start (possible
-	 * for files or database queries) but it may have no effect
-	 * (for un-cached data like network traffic).
-	 *
-	 * @throws Exception
-	 */
-	public void reset() throws Exception;
-
 	/**What is the next tuple in the stream?*/
 	public Tuple next();
 
@@ -59,7 +48,9 @@ public interface TupleStream extends Iterator<Tuple> {
 	public void close() throws Exception;
 
 	/**A stream is ready when it can return a tuple right away.
-	 * A cloased stream is never ready.
+	 * This is different from hasNext, in that a false hasNext value
+	 * indicates the stream will NEVER return more values.
+	 * A closed stream is never ready.
 	 * @return
 	 */
 	public boolean ready();

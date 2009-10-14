@@ -69,7 +69,7 @@ public class SourceElementRenderer extends JPanel implements ListCellRenderer {
 	public Component getListCellRendererComponent(JList list, Object element, int idx, boolean selected, boolean focused) {
 		StreamSource e = (StreamSource) element;
 
-		name.setText(e.getName());
+		name.setText(e.name());
 		type.setText("(" + e.getTypeName().substring(0,1) + ")");
 
 		if (!e.isReady() && selected) {this.setBackground(getNotReadySelectedColor(list));}

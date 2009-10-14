@@ -79,6 +79,7 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 		sourceType.addItem(DBSource.NAME);
 		sourceType.addItem(MouseSource.NAME);
 		sourceType.addItem(TwitterSource.NAME);
+		sourceType.addItem(WindowStateSource.NAME);
 
 		streamChangeEditor = new JPanel();
 		streamChangeEditor.setLayout(new BorderLayout());
@@ -92,12 +93,11 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 				if (internalUpdate) {return;}
 
 				String type  = (String) sourceType.getSelectedItem();
-				String name = ((StreamSource) streamSources.getSelectedValue()).getName();
+				String name = ((StreamSource) streamSources.getSelectedValue()).name();
 				int idx = streamSources.getSelectedIndex();
 				StreamSource source = StencilIO.getByType(name, type);
 
 				if (SourceCache.contains(source)) {source = SourceCache.get(source);}
-				else {SourceCache.put(source);}
 
 				listModel.setElementAt(source, idx);
 				fireSourcesChangedEvent();
@@ -112,7 +112,10 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 						streamChangeEditor.setVisible(false);
 					}
 
-					StreamSource source =((StreamSource) streamSources.getSelectedValue());
+					
+					StreamSource source = ((StreamSource) streamSources.getSelectedValue());
+					if (SourceCache.contains(source)) {source = SourceCache.get(source);}
+					
 					SourceEditor editor = source.getEditor();
 					changeEditorPanel(editor, getTypeName(source));
 				} else {
@@ -165,6 +168,7 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 		if (l instanceof ListModel) {
 			streamSources.setModel((ListModel) l);
 			streamSources.clearSelection();
+			listModel = (ListModel) l;
 			fireSourcesChangedEvent();
 		} else {
 			clearStreamList();
@@ -180,9 +184,13 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 	}
 
 	public void stateChanged(ChangeEvent e) {
+		for (int i=0; i< listModel.size(); i++) {
+			StreamSource s = listModel.get(i);
+			StreamSource s2 = SourceCache.get(s);
+			listModel.set(i, s2);
+		}
+		
 		streamSources.repaint();
-		StreamSource source =((StreamSource) streamSources.getSelectedValue());
-		if (source.isReady()) {SourceCache.put(source);}
 		fireSourcesChangedEvent();
 	}
 

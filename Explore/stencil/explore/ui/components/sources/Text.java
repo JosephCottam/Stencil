@@ -43,14 +43,12 @@ import javax.swing.ScrollPaneConstants;
 import stencil.explore.ui.interactive.Interactive;
 import stencil.explore.model.sources.TextSource;
 
-public class Text extends stencil.explore.ui.components.sources.SourceEditor {
+public final class Text extends stencil.explore.ui.components.sources.SourceEditor {
 	private static final long serialVersionUID = -6217403692229831654L;
 
-	protected TextSource saveTarget;
-
-	protected JTextArea data;
-	protected JTextField header;
-	protected JTextField separator;
+	private final JTextArea data;
+	private final JTextField header;
+	private final JTextField separator;
 
 	public Text(TextSource source) {
 		this();
@@ -58,6 +56,7 @@ public class Text extends stencil.explore.ui.components.sources.SourceEditor {
 	}
 
 	private Text() {
+		super("");
 		header = new JTextField();
 		separator = new JTextField();
 		data = new JTextArea();
@@ -109,29 +108,16 @@ public class Text extends stencil.explore.ui.components.sources.SourceEditor {
 		this.addFocusListener(fl);
 	}
 
-	public void saveValues() {
-		if (saveTarget!= null) {get(saveTarget);}
-		this.fireChangeEvent();
-	}
-
 	public void set(TextSource source) {
 		assert source != null : "Cannot pass a null to 1-argument set.";
-
-		this.saveTarget = source;
-
-		header.setText(source.getHeader());
-		separator.setText(source.getSeparator());
-		data.setText(source.getText());
+		super.set(source);
+		header.setText(source.header());
+		separator.setText(source.separator());
+		data.setText(source.text());
 	}
 
-	public TextSource get(TextSource source) {
-		if (source == null) {source = saveTarget;}
-
-		source.setHeader(header.getText());
-		source.setSeparator(separator.getText());
-		source.setText(data.getText());
-
-		return source;
+	public TextSource get() {
+		return new TextSource(name, header.getText(), separator.getText(), data.getText());
 	}
 
 }

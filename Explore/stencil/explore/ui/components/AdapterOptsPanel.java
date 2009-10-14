@@ -57,9 +57,9 @@ public final class AdapterOptsPanel extends JPanel implements StencilMutable.Con
 		COLORS.add("Orange");
 	}
 
-	protected JComboBox debug = new JComboBox();
-	protected JCheckBox defaultMouse = new JCheckBox();
-	protected JComboBox adapter = new JComboBox();
+	private final JComboBox debug = new JComboBox();
+	private final JCheckBox defaultMouse = new JCheckBox();
+	private final JComboBox adapter = new JComboBox();
 	
 	
 	public AdapterOptsPanel() {

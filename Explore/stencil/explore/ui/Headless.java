@@ -71,7 +71,7 @@ public class Headless {
 	private static StreamSource findSource(String name, Collection<StreamSource> sources) {
 		int i=0;
 		for (StreamSource s: sources) {
-			if (name.equals(s.getName())) {return s;}
+			if (name.equals(s.name())) {return s;}
 			i++;
 		}
 		return null;
@@ -118,12 +118,14 @@ public class Headless {
 			StreamSource source = findSource(sourceRewrites[i], sources);
 			if (source == null) {continue;}
 
-			if (source instanceof FileSource) {((FileSource) source).setFilename(prefix + sourceRewrites[i+1]);}
-			else {
-				FileSource newSource = new FileSource(source.getName());
-				newSource.setName(source.getName());
-				newSource.setHeader(source.getHeader());
-				newSource.setFilename(prefix + sourceRewrites[i+1]);
+			if (source instanceof FileSource) {
+				source = ((FileSource) source).filename(prefix + sourceRewrites[i+1]);
+				sources.add(source);
+			} else {
+				FileSource newSource = new FileSource(source.name());
+				newSource.name(source.name());
+				newSource.header(source.header());
+				newSource.filename(prefix + sourceRewrites[i+1]);
 				sources.add(source);
 			}
 		}

@@ -37,18 +37,23 @@ import java.util.Arrays;
 import javax.swing.JCheckBox;
 import javax.swing.JTextField;
 
-import stencil.streams.MouseStream;
+import stencil.explore.model.sources.MouseSource;
+import stencil.explore.model.sources.StreamSource;
 import stencil.util.enums.EnumUtils;
+import stencil.util.streams.ui.MouseStream;
 
 public final class Mouse extends SourceEditor {
 	private static final long serialVersionUID = 2763272640758576637L;
 
-	protected JTextField elements = new JTextField();;
-	protected JTextField frequency = new JTextField();;
-	protected JCheckBox onChange = new JCheckBox();;
+	protected String name;
 	protected int backupFreq = 30;
 
-	public Mouse() {
+	private final JTextField elements = new JTextField();
+	private final JTextField frequency = new JTextField();
+	private final JCheckBox onChange = new JCheckBox();
+
+	public Mouse(String name) {
+		super(name);
 		String names = Arrays.toString(EnumUtils.allNames(MouseStream.Names.class).toArray());
 		elements.setText(names.substring(1,names.length()-1).replace('\"', ' ') + " ");
 		elements.setEditable(false);
@@ -94,7 +99,11 @@ public final class Mouse extends SourceEditor {
 		int oldFrequency = backupFreq;
 		if (onChange.isSelected()) {oldFrequency = MouseStream.ON_CHANGE;}
 		MouseStream.frequency = oldFrequency;
+		super.saveValues();
 		this.fireChangeEvent();
 	}
+
+	@Override
+	protected StreamSource get() {return new MouseSource(name);}
 
 }

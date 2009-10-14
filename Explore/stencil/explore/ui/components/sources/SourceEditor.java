@@ -34,6 +34,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 
+import stencil.explore.model.sources.SourceCache;
+import stencil.explore.model.sources.StreamSource;
+
 /**Root of the source editors.  Provides default functionality and consistently look,
  * as well as utlities to preserve the consistent look.
  * 
@@ -45,9 +48,19 @@ import javax.swing.event.ChangeEvent;
  */
 @SuppressWarnings("serial")
 public abstract class SourceEditor extends JPanel {
+	protected String name;
 	
-	public SourceEditor() {
+	public SourceEditor(String name) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+		this.name =name;
+	}
+	
+	protected void set(StreamSource source) {this.name = source.name();}
+	protected abstract StreamSource get();
+	
+	protected void saveValues() {
+		SourceCache.put(get());
+		fireChangeEvent();
 	}
 	
 	protected void fireChangeEvent() {

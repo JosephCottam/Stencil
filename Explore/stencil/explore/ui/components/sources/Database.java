@@ -38,20 +38,19 @@ import stencil.explore.model.sources.DBSource;
 public class Database extends SourceEditor {
 	private static final long serialVersionUID = 4615703311382583200L;
 
-	private DBSource saveTarget;
-
-	private JTextField header = new JTextField();
-	private JTextField separator = new JTextField();
-	private JTextField query = new JTextField();
-	private JTextField connect = new JTextField();
-	private JTextField driver = new JTextField();
+	private final JTextField header = new JTextField();
+	private final JTextField separator = new JTextField();
+	private final JTextField query = new JTextField();
+	private final JTextField connect = new JTextField();
+	private final JTextField driver = new JTextField();
 
 	public Database(DBSource source) {
 		this();
-		setSaveTarget(source);
+		set(source);
 	}
 
 	private Database() {
+		super("");
 		this.add(labeledPanel("Header: ", header));
 		this.add(labeledPanel("Separator: ", separator));
 		this.add(labeledPanel("Query: ", query));
@@ -70,30 +69,10 @@ public class Database extends SourceEditor {
 		driver.addFocusListener(fl);
 	}
 
-	/**Automatically save to the given element when changes are made to the control state.*/
-	public void setSaveTarget(DBSource source) {
-		set(source);
-		saveTarget = source;
-		fireChangeEvent();
-	}
-
-	/**Perform an auto-save.*/
-	public void saveValues() {
-		if (saveTarget != null) {get(saveTarget);}
-		this.fireChangeEvent();
-	}
-
 	/**Sets the passed file source. Sources cannot be null.*/
-	public DBSource get(DBSource target) {
-		assert target != null : "Cannot pass a null to 1-argument get.";
-
-		target.setHeader(header.getText());
-		target.setSeparator(separator.getText());
-		target.setQuery(query.getText());
-		target.setConnect(connect.getText());
-		target.setDriver(driver.getText());
-
-		return target;
+	public DBSource get() {
+		DBSource s = new DBSource(name, header.getText(), separator.getText(), query.getText(), connect.getText(), driver.getText());
+		return s;
 	}
 
 	/**Set the current state to match the source passed.
@@ -101,11 +80,11 @@ public class Database extends SourceEditor {
 	 **/
 	public void set (DBSource source) {
 		assert source != null : "Cannot pass a null to set.";
-		
-		header.setText(source.getHeader());
-		separator.setText(source.getSeparator());
-		query.setText(source.getQuery());
-		connect.setText(source.getConnect());
-		driver.setText(source.getDriver());
+		super.set(source);
+		header.setText(source.header());
+		separator.setText(source.separator());
+		query.setText(source.query());
+		connect.setText(source.connect());
+		driver.setText(source.driver());
 	}
 }

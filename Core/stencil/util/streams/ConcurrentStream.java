@@ -71,10 +71,6 @@ public class ConcurrentStream implements TupleStream {
 		return nv;
 	}
 
-	public void reset() throws Exception {
-		for (TupleStream stream: streams) {stream.reset();}
-	}
-
 	public boolean ready() {
 		for (TupleStream stream: streams) {
 			if (stream.ready()) {return true;}

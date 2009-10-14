@@ -65,7 +65,7 @@ public abstract class StencilIO {
 					if (source != null) {sources.add(source);}
 					String type  = line.substring(line.indexOf(":") +2).trim();
 					source = getByType("temp", type);
-					source.restore(input);
+					source = source.restore(input);
 					SourceCache.put(source);
 				}
 				line = input.readLine();
@@ -128,7 +128,8 @@ public abstract class StencilIO {
 		else if (type.equals(DBSource.NAME)) {return new DBSource(name);}
 		else if (type.equals(MouseSource.NAME)) {return new MouseSource(name);}
 		else if (type.equals(TwitterSource.NAME)) {return new TwitterSource(name);}
-
+		else if (type.equals(WindowStateSource.NAME)) {return new WindowStateSource(name);}
+		
 		throw new RuntimeException("Could not find source mapping for " + type);
 	}
 }

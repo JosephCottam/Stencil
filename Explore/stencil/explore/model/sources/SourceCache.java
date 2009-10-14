@@ -35,10 +35,13 @@ import java.util.HashMap;
  * across iterations of a stencil.  The stencil may actually be in an invalid
  * state, so the stream source definitions may be erased during editing from
  * the main store.  To recover the stream definitions, we use some heuristics
- * in conjunction with this paint to help restore the state automatically.
+ * in conjunction with this cache to help restore the state automatically.
  */
 public final class SourceCache {
+	/**Storage by name and type.*/
 	private static Map<String, StreamSource> cache = new HashMap();
+	
+	/**Storage by name only.*/
 	private static Map<String, StreamSource> weakCache = new HashMap();
 
 

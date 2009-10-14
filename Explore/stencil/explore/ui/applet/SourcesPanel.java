@@ -39,7 +39,7 @@ public class SourcesPanel extends JTabbedPane implements StencilMutable.Sources<
 
 	public void clearSources() {this.removeAll();}
 	public void addSource(TextSource source) {
-		this.addTab(source.getName(), new Text(source));
+		this.addTab(source.name(), new Text(source));
 	}
 
 	public void setSources(Collection<? extends TextSource> sources) {

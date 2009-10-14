@@ -109,8 +109,8 @@ public final class DelimitedParser implements TupleStream {
 		open(filename);
 	}
 
-	/**Returns true if the tree is ready.  False if the tree is not
-	 * ready (tree is null, returns not ready or throws an exception).
+	/**Returns true if the stream is ready.  False if the stream is not
+	 * ready (stream is null, returns not ready or throws an exception).
 	 * This does not guarantees the next piece of input will validate, but
 	 * it guarantees that something can be read.
 	 */

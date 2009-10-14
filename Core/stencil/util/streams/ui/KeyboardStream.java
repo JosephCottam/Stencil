@@ -26,9 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.streams;
+package stencil.util.streams.ui;
 
 import javax.swing.JComponent;
+
+import stencil.streams.Tuple;
+import stencil.streams.TupleStream;
 
 import java.io.DataInputStream;
 import java.io.InputStream;

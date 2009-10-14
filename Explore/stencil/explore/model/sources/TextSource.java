@@ -40,14 +40,15 @@ import stencil.streams.TupleStream;
 import stencil.util.BasicTuple;
 
 
-public class TextSource extends StreamSource {
-	public static final class TextStream implements TupleStream {
-		private boolean closed = false;
-		private String separator;
-		private String name;
-		private String[] labels;
-		private String[] rows;
+public final class TextSource extends StreamSource {
+	/**Stream source from a string.*/
+	public final static class TextStream implements TupleStream {
+		private final String separator;
+		private final String name;
+		private final String[] labels;
+		private final String[] rows;
 		private int index =0;
+		private boolean closed = false;
 
 		public TextStream(String name, String header, String separator, String text) {
 			this.separator = separator;
@@ -81,25 +82,44 @@ public class TextSource extends StreamSource {
 
 	}
 
-	protected String header;
-	protected String separator;
-	protected String text;
+	private final String header;
+	private final String separator;
+	private final String text;
 
-	public TextSource(String name) {super(name);}
+	public TextSource(String name) {this(name, null, null, null);}
+	public TextSource(String name, String header, String separator, String text) {
+		super(name);
+		this.header = header;
+		this.separator = separator;
+		this.text = text;
+	}
 
-	@Override
 	public SourceEditor getEditor() {
 		return new Text(this);
 	}
 
-	public String getHeader() {return header;}
-	public void setHeader(String header) {this.header = header;}
+	public TextSource name(String name) {
+		if(this.name.equals(name)) {return this;}
+		return new TextSource(name, header, separator, text);		
+	}
+	
+	public String header() {return header;}
+	public TextSource header(String header) {
+		if(this.header.equals(header)) {return this;}
+		return new TextSource(name, header, separator, text);
+	}
 
-	public String getSeparator() {return separator;}
-	public void setSeparator(String separator) {this.separator = separator;}
+	public String separator() {return separator;}
+	public TextSource separator(String separator) {
+		if(this.separator.equals(separator)) {return this;}
+		return new TextSource(name, header, separator, text);
+	}
 
-	public String getText() {return text;}
-	public void setText(String text) {this.text = text;}
+	public String text() {return text;}
+	public TextSource text(String text) {
+		if(this.text.equals(text)) {return this;}
+		return new TextSource(name, header, separator, text);
+	}
 
 	public TupleStream getStream(Model context) throws Exception {return new TextStream(name, header, separator, text);}
 
@@ -109,7 +129,7 @@ public class TextSource extends StreamSource {
 	}
 
 	@Override
-	public void restore(BufferedReader input) throws IOException {
+	public TextSource restore(BufferedReader input) throws IOException {
 		throw new UnsupportedOperationException("Cannot restore a text stream.");
 	}
 

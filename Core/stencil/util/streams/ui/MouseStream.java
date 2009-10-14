@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.streams;
+package stencil.util.streams.ui;
 
 
 import java.util.Arrays;
@@ -37,6 +37,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.parser.tree.View;
+import stencil.streams.Tuple;
+import stencil.streams.TupleStream;
 import stencil.util.BasicTuple;
 import stencil.util.enums.EnumUtils;
 
@@ -180,8 +182,6 @@ public class MouseStream implements TupleStream {
 
 	/**Throws UnsupportedOpertaionException.*/
 	public void close() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
-	/**Throws UnsupportedOpertaionException.*/
-	public void reset() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	/**Throws UnsupportedOpertaionException.*/
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 

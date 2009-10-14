@@ -14,22 +14,44 @@ import stencil.util.streams.feed.TwitterTuples;
 public final class TwitterSource extends StreamSource {
 	public static final String NAME = "Twitter";
 	
-	private String feedURL;
-	private String username;
-	private String password;
+	private final String feedURL;
+	private final String username;
+	private final String password;
 	
-	public TwitterSource(String name) {super(name);}
+	public TwitterSource(String name) {this(name, null, null, null);}
+	public TwitterSource(String name, String feedURL, String username, String password) {
+		super(name);
+		this.feedURL = feedURL == null ? feedURL : feedURL.trim();
+		this.username = username == null ? username : username.trim();
+		this.password = password == null ? password : password.trim();
+	}
 
 	public SourceEditor getEditor() {return new Twitter(this);}
 
-	public String getHeader() {return TwitterTuples.HEADER;}
-	public String getFeedURL() {return feedURL;}
-	public String getUsername() {return username;}
-	public String getPassword() {return password;}
+	public String header() {return TwitterTuples.HEADER;}
+	public String feedURL() {return feedURL;}
+	public String username() {return username;}
+	public String password() {return password;}
 	
-	public void setPassword(String password) {this.password = password;}
-	public void setUsername(String username) {this.username = username==null?username:username.trim();}
-	public void setFeedURL(String feedURL) {this.feedURL = feedURL == null?feedURL:feedURL.trim();}
+	public TwitterSource name(String name) {
+		if (this.name.equals(name)) {return this;}
+		return new TwitterSource(name, feedURL, username, password);
+	}
+	
+	public TwitterSource password(String password) {
+		if (this.password.equals(password)) {return this;}
+		return new TwitterSource(name, feedURL, username, password);
+	}
+	
+	public TwitterSource username(String username) {
+		if (this.password.equals(username)) {return this;}
+		return new TwitterSource(name, feedURL, username, password);
+	}
+	
+	public TwitterSource feedURL(String feedURL) {
+		if (this.password.equals(feedURL)) {return this;}
+		return new TwitterSource(name, feedURL, username, password);
+	}
 	
 	public TupleStream getStream(Model context) throws Exception {
 		if (username !=null && !username.equals("")) {return new TwitterTuples(name, feedURL, username, password);}
@@ -41,23 +63,29 @@ public final class TwitterSource extends StreamSource {
 		return true;
 	}
 
-	public void restore(BufferedReader input) throws IOException {
+	public TwitterSource restore(BufferedReader input) throws IOException {
 		String line = input.readLine();
+		TwitterSource result = this;
 		
 		while (line != null && !line.startsWith("STREAM") && !line.equals("")) {
 			if (line.startsWith("NAME")) {
-				name = line.substring(line.indexOf(":") +2);
+				String name = line.substring(line.indexOf(":") +2);
+				result = result.name(name);
 			} else if (line.startsWith("FEED_URL")) {
-				feedURL = line.substring(line.indexOf(":") +2);
+				String feedURL = line.substring(line.indexOf(":") +2);
+				result = result.feedURL(feedURL);
 			} else if (line.startsWith("USERNAME")) {
-				username = line.substring(line.indexOf(":")+2);
+				String username = line.substring(line.indexOf(":")+2);
+				result = result.username(username);
 			} else if (line.startsWith("PASSWORD")) {
-				password = line.substring(line.indexOf(":") +2);
+				String password = line.substring(line.indexOf(":") +2);
+				result = result.password(password);
 			}
 			input.mark(100);
 			line = input.readLine();
 		}
 		input.reset();
+		return result;
 	}
 	
 	public String toString() {

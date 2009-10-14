@@ -59,9 +59,6 @@ public class MessagePanel extends JPanel implements MessageReporter {
 
 	/**Should messages added to this panel also be echoed on the corresponding System stream?*/
 	public static boolean ECHO = true;
-
-	protected int errorCount;
-	protected int messageCount;
 	
 	protected JList messages;
 	protected JButton clear;
@@ -126,12 +123,8 @@ public class MessagePanel extends JPanel implements MessageReporter {
 
 	public void clear() {
 		messages.setModel(new DefaultListModel()); 
-		errorCount=0; 
-		messageCount=0;
 	}
 
-	public int getErrorCount() {return errorCount;}
-	public int getMessageCount() {return messageCount;}
 	
 	public void addMessage(String message, Object...args) {
 		if (message == null) {throw new RuntimeException(String.format("Null message add requested (args are %1$s).", Arrays.deepToString(args)));}
@@ -150,9 +143,6 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		final String mssg = message;
 		message = message.trim();
 
-		if (error) {errorCount++;} 
-		else {messageCount++;}
-		
 		Entry e = new Entry(mssg, error);
 		((DefaultListModel) messages.getModel()).addElement(e);
 	}

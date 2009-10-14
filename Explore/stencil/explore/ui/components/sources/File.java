@@ -45,7 +45,6 @@ import stencil.WorkingDirectory;
 public class File extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
 
-	private FileSource saveTarget;
 	private final JTextField header = new JTextField();;
 	private final JCheckBox hasHeader = new JCheckBox();;
 	private final JTextField separator = new JTextField();;
@@ -59,6 +58,7 @@ public class File extends SourceEditor {
 	}
 
 	private File() {
+		super("");
 		hasHeader.setSelected(true);
 
 		fileChooser = new JFileChooser();
@@ -99,23 +99,10 @@ public class File extends SourceEditor {
 		hasHeader.addFocusListener(fl);
 	}
 
-	/**Perform an auto-save.*/
-	public void saveValues() {
-		if (saveTarget != null) {get(saveTarget);}
-		this.fireChangeEvent();
-	}
-
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
-	public FileSource get(FileSource source) {
-		if (source == null) {source = saveTarget;}
-
-		source.setHeader(header.getText());
-		source.setSeparator(separator.getText());
-		source.setFilename(filename.getText());
-		source.setCheckHeader(hasHeader.isSelected());
-
-		return source;
+	public FileSource get() {
+		return new FileSource(name, filename.getText(), header.getText(), separator.getText(), hasHeader.isSelected());
 	}
 
 	/**Set the current state to match the source passed.
@@ -125,13 +112,11 @@ public class File extends SourceEditor {
 	 **/
 	public void set (FileSource source) {
 		assert source != null : "Cannot pass a null to set.";
-
-		saveTarget = source;
-
-		header.setText(source.getHeader());
-		hasHeader.setSelected(source.isCheckHeader());
-		separator.setText(source.getSeparator());
-		filename.setText(WorkingDirectory.relativePath(source.getFilename()));
+		super.set(source);
+		header.setText(source.header());
+		hasHeader.setSelected(source.checkHeader());
+		separator.setText(source.separator());
+		filename.setText(WorkingDirectory.relativePath(source.filename()));
 	}
 
 }

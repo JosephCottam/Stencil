@@ -28,13 +28,15 @@
  */
 package stencil.explore.model;
 
- import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
 
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
+import stencil.explore.model.sources.SourceCache;
 import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.ListModel;
 import stencil.explore.util.StencilRunner;
@@ -67,13 +69,24 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	public String getStencil() {return stencil;}
 	public AdapterOpts getAdapterOpts() {return adapterOpts;}
-	public List<StreamSource> getSources() {return sources;}
+	public List<StreamSource> getSources() {refreshSources(); return sources;}
 	public Map<String, StreamSource> getSourcesMap() {
+		refreshSources(); 
 		Map<String, StreamSource> map = new HashMap();
 		for (StreamSource source: sources) {
-			map.put(source.getName(), source);
+			map.put(source.name(), source);
 		}
 		return map;
+	}
+	
+	private void refreshSources() {
+		List<StreamSource> newSources = new ArrayList();
+		for (StreamSource s1: sources) {
+			StreamSource s2 = SourceCache.get(s1);
+			newSources.add(s2!=null ? s2 : s1);
+		}
+		sources.clear();
+		sources.addAll(newSources);
 	}
 
 	public StencilPanel getStencilPanel() {return stencilPanel;}
@@ -147,7 +160,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	/**Remove all sources.*/
 	public void clearSources(boolean raise) {
 		sources.clear();
-		if (raise) {listeners.fireSourceChanged(this, sources);}
+		if (raise) {listeners.fireSourceChanged(this, getSources());}
 	}
 
 	/**Set all sources.  Discards any existing sources.
@@ -159,8 +172,10 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	public void setSources(Collection<? extends StreamSource> sources) {
 		if (this.sources.equals(sources) || this.sources.containsAll(sources)) {return;}
 		this.sources.clear();
-		this.sources.addAll(sources);
-		listeners.fireSourceChanged(this, this.sources);
+		for (StreamSource source: sources) {
+			this.sources.add(source);
+		}
+		listeners.fireSourceChanged(this, getSources());
 	}
 
 	/**Set the Stencil source text.*/
@@ -180,7 +195,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	public void fireAll() {
 		listeners.fireConfigChanged(this, adapterOpts);
-		listeners.fireSourceChanged(this, sources);
+		listeners.fireSourceChanged(this, getSources());
 		listeners.fireStencilChanged(this, stencil);
 	}
 

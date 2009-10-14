@@ -64,7 +64,8 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 		public Iterator<T> iterator() {
 			return new Iterator() {
 				int idx=offset;
-				public boolean hasNext() {return idx < root.getChildCount();}
+				final int max = root.getChildCount();
+				public boolean hasNext() {return idx < max;}
 				public Object next() {return root.getChild(idx++);}
 				public void remove() {throw new UnsupportedOperationException("Cannot remove from a Stencil Tree List.");}
 			};

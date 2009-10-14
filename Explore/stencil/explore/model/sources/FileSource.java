@@ -37,19 +37,24 @@ import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.streams.TupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 
-public class FileSource extends StreamSource {
+public final class FileSource extends StreamSource {
 	public static final String NAME = "File";
 
-	protected String filename = "";
-	protected String header = "";
-	protected String separator = "";
-	protected boolean checkHeader = true;
+	private final String filename;
+	private final String header;
+	private final String separator;
+	private final boolean checkHeader;
 
-	public FileSource(String name) {super(name);}
-
-	public SourceEditor getEditor() {
-		return new File(this);
+	public FileSource(String name) {this(name, "","","", true);}
+	public FileSource(String name,String filename, String header, String separator, boolean checkHeader) {
+		super(name);
+		this.filename = filename;
+		this.header = header;
+		this.separator = separator;
+		this.checkHeader = checkHeader;
 	}
+
+	public SourceEditor getEditor() {return new File(this);}
 
 	public boolean isReady() {
 		return filename != null && !filename.equals("") &&
@@ -94,36 +99,59 @@ public class FileSource extends StreamSource {
 		return b.toString();
 	}
 
-	public void restore(BufferedReader input) throws IOException {
+	public FileSource restore(BufferedReader input) throws IOException {
 		String line = input.readLine();
-
+		FileSource result = this;
 		while (line != null && !line.startsWith("STREAM") && !line.equals("")) {
 			if (line.startsWith("NAME")) {
-				name = line.substring(line.indexOf(":") +2);
+				String name = line.substring(line.indexOf(":") +2);
+				result = result.name(name);
 			} else if (line.startsWith("SEPARATOR")) {
-				separator = line.substring(line.indexOf(":") +2);
+				String separator = line.substring(line.indexOf(":") +2);
+				result = result.separator(separator);
 			} else if (line.startsWith("HEADER")) {
-				header = line.substring(line.indexOf(":")+2);
+				String header = line.substring(line.indexOf(":")+2);
+				result = result.header(header);
 			} else if (line.startsWith("SOURCE")) {
-				filename = line.substring(line.indexOf(":") +2);
+				String filename = line.substring(line.indexOf(":") +2);
+				result = result.filename(filename);
 			} else if (line.startsWith("CHECKHEADER")) {
-				checkHeader = (line.substring(line.indexOf(":") +2).toUpperCase().equals("TRUE"));
+				boolean checkHeader = (line.substring(line.indexOf(":") +2).toUpperCase().equals("TRUE"));
+				result = result.checkHeader(checkHeader);
 			}
 			input.mark(100);
 			line = input.readLine();
 		}
 		input.reset();
+		return result;
 	}
 
-	public String getFilename() {return filename;}
-	public void setFilename(String filename) {this.filename = filename;}
+	public FileSource name(String name) {
+		if (this.name.equals(name)) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader);
+	}
+	
+	public String filename() {return filename;}
+	public FileSource filename(String filename) {
+		if (this.filename.equals(filename)) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader);
+	}
 
-	public String getHeader() {return header;}
-	public void setHeader(String header) {this.header = header;}
+	public String header() {return header;}
+	public FileSource header(String header) {
+		if (this.header.equals(header)) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader);
+	}
 
-	public String getSeparator() {return separator;}
-	public void setSeparator(String separator) {this.separator = separator;}
+	public String separator() {return separator;}
+	public FileSource separator(String separator) {
+		if (this.separator.equals(separator)) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader);
+	}
 
-	public boolean isCheckHeader() {return checkHeader;}
-	public void setCheckHeader(boolean checkHeader) {this.checkHeader = checkHeader;}
+	public boolean checkHeader() {return checkHeader;}
+	public FileSource checkHeader(boolean checkHeader) {
+		if (this.checkHeader == checkHeader) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader);
+	}
 }

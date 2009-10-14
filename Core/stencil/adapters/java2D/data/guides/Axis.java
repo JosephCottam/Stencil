@@ -120,6 +120,7 @@ public class Axis implements Guide2D {
 			if (line !=null) {marks.add(line);}	
 			bounds = GuideUtils.fullBounds(marks);
 		} else {
+			System.out.println("Zero-length elements in guides");
 			marks = new ArrayList<Glyph2D>();
 			bounds = null;
 		}

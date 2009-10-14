@@ -39,11 +39,9 @@ import stencil.explore.ui.components.sources.SourceEditor;
 public abstract class StreamSource implements Comparable<StreamSource> {
 	public static String DEFAULT_SEPARATOR = ",";
 
-	protected String name;
+	protected final String name;
 
-	public StreamSource(String name) {
-		this.name = name;
-	}
+	protected StreamSource(String name) {this.name = name;}
 
 	/**Get an editor panel to be used to set properties on this source?
 	 * The panel returned should be linked into the source properly so no
@@ -58,8 +56,8 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 	/**What is the name of the stream in this source?
 	 * Name is the only property shared between all source types.
 	 * */
-	public String getName() {return name;}
-	public void setName(String name) {this.name = name;}
+	public String name() {return name;}
+	public abstract StreamSource name(String name);
 
 	/**What type of stream is this?
 	 * Looks for a static field called "NAME", if not
@@ -71,7 +69,7 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 		catch (Exception e) {return this.getClass().getName();}
 	}
 
-	public abstract String getHeader();
+	public abstract String header();
 
 	/**Create a tuple stream based on the information of the stream source.**/
 	public abstract TupleStream getStream(Model context) throws Exception;
@@ -79,13 +77,13 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 	/**Restore a stream source from its own 'toString' output.
 	 * TODO: Generalize with a reflection lookup of field names or setters (then you can remove the individual class methods...maybe learn about standard Java serialization?)
 	 * */
-	public abstract void restore(BufferedReader input) throws IOException;
+	public abstract StreamSource restore(BufferedReader input) throws IOException;
 
 	/**Stream sources are compared according to their names.  A null stream
 	 * source is considered less than an instantiated one.
 	 */
 	public int compareTo(StreamSource o) {
 		if (o == null) {return 1;}
-		return o.getName().compareTo(this.getName());
+		return o.name().compareTo(this.name());
 	}
 }

@@ -94,7 +94,7 @@ public final class StencilRunner extends Thread {
 
 					names = names + " and " + name.getValue();
 					StreamSource stream = streamSources.get(name.getValue());
-					if (stream instanceof FileSource) {resolvePaths(((FileSource) stream));}
+					if (stream instanceof FileSource) {stream=resolvePaths(((FileSource) stream));}
 					input = stream.getStream(model);
 					streams.add(input);
 				}
@@ -119,10 +119,10 @@ public final class StencilRunner extends Thread {
 	}
 
 	/**Make sure the filename is resolved relative to the working directory.*/
-	private void resolvePaths(FileSource source) {
-		String filename = source.getFilename();
+	private FileSource resolvePaths(FileSource source) {
+		String filename = source.filename();
 		filename =WorkingDirectory.resolvePath(filename);
-		source.setFilename(filename);
+		return source.filename(filename);
 	}
 
 	public boolean isRunning() {return isAlive() && running;}
