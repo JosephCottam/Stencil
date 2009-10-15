@@ -79,7 +79,7 @@ public final class ComponentEventStream implements TupleStream {
 	 *
 	 */
 	private final class ChangeStateSource implements TupleSource, ComponentListener {
-		private AtomicReference<Rectangle> lastState;
+		private AtomicReference<Rectangle> lastState = new AtomicReference(null);
 		private final String sourceName;
 		
 		public ChangeStateSource(String sourceName, JComponent source) {
@@ -106,9 +106,9 @@ public final class ComponentEventStream implements TupleStream {
 	public ComponentEventStream(String name, JComponent source, boolean onChange) {
 		assert source != null : "Cannot use a null frame";
 		if (onChange) {
-			tupleSource = new CurrentStateSource(name, source);
-		} else {
 			tupleSource = new ChangeStateSource(name, source);
+		} else {
+			tupleSource = new CurrentStateSource(name, source);
 		}
 	}
 	

@@ -96,7 +96,10 @@ public class TupleLoader extends Observable implements Runnable {
 
 		while(input.hasNext() && keepRunning) {
 			Tuple tuple;
-			try {tuple = input.next();}
+			try {
+				if (input.ready()) {tuple = input.next();}
+				else {continue;}
+			}
 			catch (InvalidInputLineException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
 			panel.processTuple(tuple); 

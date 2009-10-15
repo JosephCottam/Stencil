@@ -46,7 +46,7 @@ public class WindowStateSource extends StreamSource {
 	
 	
 	public TupleStream getStream(Model context) throws Exception {
-		return new ComponentEventStream(name, context.getStencilPanel(), true);
+		return new ComponentEventStream(name, context.getStencilPanel(), onChange);
 	}
 
 	public boolean isReady() {return true;}
