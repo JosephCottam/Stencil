@@ -44,9 +44,20 @@ public class Guide extends StencilTree {
 	public String getLayer() {return getChild(0).getText();}
 	public String getGuideType() {return getChild(1).getText();}
 	public Specializer getSpecializer() {return (Specializer) getChild(2);}
-	
-	/**Rules are applied to the action-generated tuples.*/
+		
+	/**Rules are applied to the generated tuples.*/
 	public List<Rule> getRules() {return (List<Rule>) getChild(3);}
+
+	/**The generator is used to create the guide descriptor.  It is linked
+	 * to a particular layer's attribute definition.  The generator call group
+	 * creates a set of tuples. To produce the guide, the rules are applied to
+	 * each resulting tuple.
+	 */
+	public CallGroup getGenerator() {
+		if (this.getChildCount() < 5) {throw new RuntimeException(String.format("Generator not set yet for guide %1$s on layer %2$s.", getAttribute(), getLayer()));}
+		return (CallGroup) getChild(4);
+	}
+
 	
 	
 	/**Apply the rules of this guide to the tuple passed.
@@ -61,10 +72,5 @@ public class Guide extends StencilTree {
 		return buffer;
 	}
 	
-	/**CallGroup that will generate the tuples used to create the legend.*/
-	public CallGroup getActions() {return (CallGroup) getChild(4);}  
-	
-	public SampleStrategy strategy() {
-		return new SampleStrategy(getSpecializer());
-	}
+	public SampleStrategy strategy() {return new SampleStrategy(getSpecializer());}
 }

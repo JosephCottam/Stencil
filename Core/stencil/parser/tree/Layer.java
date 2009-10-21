@@ -44,10 +44,7 @@ public class Layer extends StencilTree {
 	public DisplayLayer getDisplayLayer() {return displayLayer;}
 	public void setDisplayLayer(DisplayLayer displayLayer) {this.displayLayer= displayLayer;}
 
-	
-	public List<Guide> getGuides() {return (List<Guide>) this.getChild(1);}
-	
-	public List<Consumes> getGroups() {return (List<Consumes>) getChild(2);}
+	public List<Consumes> getGroups() {return (List<Consumes>) getChild(1);}
 
 
 }

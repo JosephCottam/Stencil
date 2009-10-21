@@ -53,7 +53,7 @@ options {
 	}
 }
 
-topdown: ^(GUIDE ID . ID callGroup);
+topdown: ^(GUIDE layer=. type=. spec=. rules=. callGroup);
 callGroup: ^(CALL_GROUP callChain);
 callChain: ^(CALL_CHAIN target);
 target

@@ -4,8 +4,15 @@
 	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="src" path="Core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Stencil Core"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Stencil"/>
+	<classpathentry kind="lib" path="Library/antlr-3.2.jar"/>
+	<classpathentry kind="lib" path="Library/antlr-runtime-3.2.jar"/>
+	<classpathentry kind="lib" path="Library/antlr3-ant.jar"/>
+	<classpathentry kind="lib" path="Library/jdom.jar"/>
+	<classpathentry kind="lib" path="Library/jython.jar"/>
+	<classpathentry kind="lib" path="Library/rome-1.0.jar"/>
+	<classpathentry kind="lib" path="Library/stringtemplate-3.2.jar"/>
+	<classpathentry kind="lib" path="Library/twitter4j-2.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

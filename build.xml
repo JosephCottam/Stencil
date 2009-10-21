@@ -4,21 +4,17 @@
  	<property name="target" location="bin" />
  	<property name="grammars" location ="${src}/stencil/parser/"/>
  	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
- 	<property name="runtimeLibrary" location="../Library/"/>
+ 	<property name="runtimeLibrary" location="./Library/"/>
  	
  	<target name="CurrentWorkingGrammar">
+ 		<property name="dest" location="${interpreter}"/>
+ 		<property name="lib" location="${grammars}/string"/>
+
  		<antlr
- 			target="${grammars}/Stencil.g"
-			outputdirectory="${grammars}/string/"
- 		/> 
- 		<antlr
- 			target="${grammars}/BaseSpecializers.g"
-			outputdirectory="${grammars}/string/"
- 		/> 
- 		<antlr
- 			target="${grammars}/DereferenceOperators.g"
-			outputdirectory="${grammars}/string/"
- 		/> 
+ 			target="${interpreter}/UpdateGuides.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
  	 	<antcall target="EclipseRefresh"/>
  	</target>
  	

@@ -50,17 +50,13 @@ options {
 }
 
 @members{
-	private String layerName; //What layer is currently being worked on
-	private String attribute; //What attribute is currently being considered
 	private StencilPanel panel; //Panel to take elements from
 	
 	private ModuleCache cache;
 		
 	public void updateGuides(StencilPanel panel) {
 		this.panel = panel;
-		layerName = null;
-		attribute = null;
-		
+				
 		downup(panel.getProgram());
 	}
 	
@@ -68,7 +64,7 @@ options {
 	public void setModuleCache(ModuleCache c) {this.cache = c;}
 
 	/**Update an actual guide on the current layer using the passed panel.*/
-    private void update(List<Object[]> categories, List<Object[]> results) {
+    private void update(String layerName, String attribute, List<Object[]> categories, List<Object[]> results) {
     	try {
        		List<AutoguidePair> pairs = zip(categories, results);
        		DisplayLayer l = panel.getLayer(layerName);
@@ -89,11 +85,7 @@ options {
 		}
 		return Arrays.asList(pairs);	
 	}	
-	
-	private final void setAttribute(String att) {attribute = att;}
-	
-	private final void setLayer(String layer) {layerName = layer;}
-	
+
 	private final List<String> getPrototype(Function f) {
 		MultiPartName name = new MultiPartName(f.getName());
 		Specializer spec = f.getSpecializer();
@@ -129,16 +121,15 @@ options {
 	}
 }
 
-topdown: ^(l=LAYER {setLayer($l.text);} . ^(LIST guide*) .);
-guide: ^(GUIDE ID . att=ID {setAttribute($att.text);} callGroup);
+topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callGroup[$layer.text, $att.text]);  //TODO: Add rules support...
 	
-callGroup: ^(CALL_GROUP callChain);
-callChain: ^(CALL_CHAIN categorize);  //Chains always start with prototypes by now
-categorize
-	@init{List<Object[]> cats = null;}
-	: ^(f=FUNCTION {cats = invokeGuide((Function) f, null, null);} . . . target[cats, cats, getPrototype((Function) f)]);
+callGroup[String layerName, String att]: ^(CALL_GROUP callChain[layerName, att]);
+callChain[String layerName, String att]: ^(CALL_CHAIN invoke[layerName, att]);
+invoke[String layerName, String att]
+	@init{List<Object[]> inputs = null;}
+	: ^(f=FUNCTION {inputs = invokeGuide((Function) f, null, null);} . . . target[layerName, att, inputs, inputs, getPrototype((Function) f)]);
 	
-target[List<Object[\]> cats, List<Object[\]> vals, List<String> prototype]  //TODO: Remove prototype when all tuple-references are positional
-	: ^(f=FUNCTION . . . target[cats, invokeGuide((Function) f, vals, prototype), getPrototype((Function) f)])
-	| ^(p=PACK .) {update(cats, packGuide((Pack) p, vals, prototype));};
+target[String layerName, String att, List<Object[\]> inputs, List<Object[\]> vals, List<String> prototype]  //TODO: Remove prototype when all tuple-references are positional
+	: ^(f=FUNCTION . . . target[layerName, att, inputs, invokeGuide((Function) f, vals, prototype), getPrototype((Function) f)])
+	| ^(p=PACK .) {update(layerName, att, inputs, packGuide((Pack) p, vals, prototype));};
 

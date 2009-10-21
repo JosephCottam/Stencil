@@ -153,11 +153,12 @@ options {
   }; //Must be empty
 }
 
-program : imports* externals order canvasLayer? (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+program : imports* externals order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           order 
           externals 
+          canvasLayer
           ^(LIST["Layers"] layerDef*) 
           ^(LIST["Operators"] operatorDef*) 
           ^(LIST["Pythons"] pythonDef*) 
@@ -188,10 +189,11 @@ externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] t
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 
-canvasLayer: CANVAS name=ID canvasProperties guideDef+ -> ^(CANVAS_DEF[$name.text] canvasProperties guideDef+);
+canvasLayer: CANVAS name=ID canvasProperties guideDef+ -> ^(CANVAS_DEF[$name.text] canvasProperties ^(LIST["Guides"] guideDef+))
+			| -> ^(CANVAS_DEF["default"] ^(SPECIALIZER) ^(LIST["Guides"]));
 
-guideDef: GUIDE type=ID spec=specializer[RuleOpt.Simple] FROM layer=ID attribute=ID rule["glyph"]* 
-			-> ^(GUIDE[$attribute.text] $layer $type $spec ^(LIST["Guides"] rule*));
+guideDef: GUIDE type=ID spec=specializer[RuleOpts.Simple] FROM layer=ID attribute=ID rule["glyph"]* 
+			-> ^(GUIDE[$attribute.text] $layer $type $spec ^(LIST["Rules"] rule*));
 
 canvasProperties: specializer[RuleOpts.Simple]; 
 

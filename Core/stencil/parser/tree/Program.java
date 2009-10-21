@@ -36,14 +36,23 @@ import stencil.operator.module.ModuleCache;
 import stencil.parser.string.StencilParser;
 
 public class Program extends StencilTree {
+	private static final int IMPORTS = 0;
+	private static final int ORDER = 1;
+	private static final int STREAMS = 2;
+	private static final int CANVAS_DEF = 3;
+	private static final int LAYERS = 4;
+	private static final int OPERATORS =5;
+	private static final int PYTHONS = 6;
+	private static final int TEMPLATES = 7;
+		
 	private ModuleCache mc;	//TODO: Remove when all tuple references are positional
 	
 	public Program(Token source) {super(source);}
 
 	/**What are the layers of this stencil?*/
 	public List<Layer> getLayers() {
-		assert verifyType(getChild(3), StencilParser.LIST);
-		return (List) getChild(3);
+		assert verifyType(getChild(LAYERS), StencilParser.LIST);
+		return (List) getChild(LAYERS);
 	}
 
 	/**Get the layer specified.
@@ -56,7 +65,7 @@ public class Program extends StencilTree {
 		throw new NoSuchElementException(String.format("Layer %1$s not known", name));
 	}
 	
-	public List<Import> getImports() {return (stencil.parser.tree.List<Import>) getChild(0);}
+	public List<Import> getImports() {return (stencil.parser.tree.List<Import>) getChild(IMPORTS);}
 
 	/**What order should streams be loaded in?
 	 *
@@ -66,30 +75,32 @@ public class Program extends StencilTree {
 	 *
 	 * @return
 	 */
-	public Order getStreamOrder() {return (Order) getChild(1);}
+	public Order getStreamOrder() {return (Order) getChild(ORDER);}
+	
+	public CanvasDef getCanvasDef() {return (CanvasDef) getChild(CANVAS_DEF);}
 
 	/**Get a list of all stream names used in this stencil.
 	 * TODO: Provide a method to get all streams (not just externals)
 	 * */
 	public List<External> getExternals() {
-		assert verifyType(getChild(2), StencilParser.LIST);
-		return (List<External>) getChild(2);
+		assert verifyType(getChild(STREAMS), StencilParser.LIST);
+		return (List<External>) getChild(STREAMS);
 	}
 
 	/**List of all operators defined by this stencil.*/
 	public List<Operator> getOperators() {
-		assert verifyType(getChild(4), StencilParser.LIST);
-		return (List<Operator>) getChild(4);
+		assert verifyType(getChild(OPERATORS), StencilParser.LIST);
+		return (List<Operator>) getChild(OPERATORS);
 	}
 	
 	public List<Python> getPythons() {
-		assert verifyType(getChild(5), StencilParser.LIST);
-		return (List<Python>) getChild(5);
+		assert verifyType(getChild(PYTHONS), StencilParser.LIST);
+		return (List<Python>) getChild(PYTHONS);
 	}
 	
 	public List<OperatorTemplate> getOperatorTemplates() {
-		assert verifyType(getChild(6), StencilParser.LIST);
-		return (List<OperatorTemplate>) getChild(6);
+		assert verifyType(getChild(TEMPLATES), StencilParser.LIST);
+		return (List<OperatorTemplate>) getChild(TEMPLATES);
 	}	
 	
 	public void setModuleCache(ModuleCache mc) {this.mc = mc;}//TODO: Remove when all tuple references are positional

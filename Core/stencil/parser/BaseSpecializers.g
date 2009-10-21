@@ -27,9 +27,6 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Make sure sensible specializers are present on every
- * mapping operator. 
- */
 tree grammar BaseSpecializers;
 options {
 	tokenVocab = Stencil;
@@ -40,6 +37,7 @@ options {
 
 @header{
 	/**  Make sure that every mapping operator has a specializer.
+	 *	 Make sure that every guide declaration has a specializer.
 	 *
 	 *
 	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
@@ -83,6 +81,6 @@ options {
 
 }
 
-topdown: ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) -> ^(OPERATOR_REFERENCE $base {getDefault($base.getText())});		
-
-//Instructions at http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching%2C+rewriting+a+reality
+topdown
+	: ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) -> ^(OPERATOR_REFERENCE $base {getDefault($base.getText())})
+	| ^(GUIDE layer=. type=. ^(SPECIALIZER DEFAULT) rules=.) -> ^(GUIDE $layer $type {SIMPLE_SPECIALIZER} $rules);

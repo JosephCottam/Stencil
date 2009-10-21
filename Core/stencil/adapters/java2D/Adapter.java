@@ -92,26 +92,24 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private void constructGuides(Panel panel, Program program) {
 		int sidebarCount = 0;//How many side-bars have been created?
 		
-		for (Layer layer: program.getLayers()) {
-			for (Guide guideDef: layer.getGuides()) {
-				String guideType = guideDef.getGuideType();
-				DisplayLayer l = panel.getLayer(layer.getName());
-				String attribute = guideDef.getAttribute();
+		for (Guide guideDef : program.getCanvasDef().getGuides()) {
+			DisplayLayer l = panel.getLayer(guideDef.getLayer());
+			String attribute = guideDef.getAttribute();
+			String guideType = guideDef.getGuideType();
+			
+			if (guideType.equals("axis")) {
+				Guide2D guide = new Axis(attribute, guideDef.getSpecializer());
+				l.addGuide(attribute, guide);
 				
-				if (guideType.equals("axis")) {
-					Guide2D guide = new Axis(attribute, guideDef.getSpecializer());
-					l.addGuide(attribute, guide);
-					
-					if (l.hasGuide("X") && l.hasGuide("Y")) {
-						((Axis) l.getGuide("X")).setConnect(true);
-						((Axis) l.getGuide("Y")).setConnect(true);
-					}
-				} else if (guideType.equals("sidebar")) {
-					Guide2D guide = new Sidebar(attribute, guideDef.getSpecializer(), sidebarCount++);
-					l.addGuide(attribute, guide);	
-				} else {
-					throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
+				if (l.hasGuide("X") && l.hasGuide("Y")) {
+					((Axis) l.getGuide("X")).setConnect(true);
+					((Axis) l.getGuide("Y")).setConnect(true);
 				}
+			} else if (guideType.equals("sidebar")) {
+				Guide2D guide = new Sidebar(attribute, guideDef.getSpecializer(), sidebarCount++);
+				l.addGuide(attribute, guide);	
+			} else {
+				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
 			}
 		}
 	}

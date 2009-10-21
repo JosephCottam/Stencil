@@ -7,7 +7,6 @@ import stencil.display.StencilPanel;
 import stencil.interpreter.NeedsGuides;
 import stencil.interpreter.UpdateGuides;
 import stencil.operator.module.ModuleCache;
-import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 
 public class GuideUpdater implements Runnable, Stopable {
@@ -29,13 +28,10 @@ public class GuideUpdater implements Runnable, Stopable {
 		ModuleCache c = program.getModuleCache();
 		TreeNodeStream treeTokens = new CommonTreeNodeStream(program);
 
-		for (Layer l: program.getLayers()) {
-			if (l.getGuides().size() >0) {				
-				ng = new NeedsGuides(treeTokens);
-				ug = new UpdateGuides(treeTokens);
-				ug.setModuleCache(c);//TODO: Remove when all tuple references are positional
-				break;	
-			}
+		if (program.getCanvasDef().getGuides().size() >0) {
+			ng = new NeedsGuides(treeTokens);
+			ug = new UpdateGuides(treeTokens);
+			ug.setModuleCache(c);//TODO: Remove when all tuple references are positional
 		}
 		
 		needsGuides = ng;

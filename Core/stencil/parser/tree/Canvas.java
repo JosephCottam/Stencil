@@ -39,7 +39,7 @@ public final class Canvas extends Target{
 	public static CanvasTuple global;
 	
 	public Canvas(Token source) {super(source);}
-
+	
 	public void applyChanges(Tuple changes, StencilPanel panel) {
 		stencil.util.Tuples.transfer(changes, panel.getCanvas(), false);
 	}

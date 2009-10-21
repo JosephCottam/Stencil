@@ -49,7 +49,7 @@ options {
 	import java.util.Set;
 	import java.util.HashSet;
 	import stencil.util.MultiPartName;
-  import stencil.operator.module.*;
+    import stencil.operator.module.*;
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	
@@ -58,7 +58,6 @@ options {
 	import static stencil.util.Tuples.stripQuotes;
 	import static stencil.parser.tree.Guide.SampleStrategy;
 	 //TODO: Extend so we can handle more than the first field in a mapping definition
-
 }
 
 @members {
@@ -96,7 +95,7 @@ options {
 		return r;
     }
     
-    /**Make sure that things which need guides have minimum necessary operators
+    /**Make sure that things which need guides have minimum necessary operators.
      *
      *@throws Exception Not all requested guides are found for ensuring
      */
@@ -121,12 +120,15 @@ options {
     
 
     /**Given a tree, how should it be looked up in the guides map?*/
+    private String key(Tree layer, Tree att) {return key(layer.getText(), att.getText());}
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
 	  private String key(String layer, String attribute) {
      	MultiPartName att = new MultiPartName(attribute);
     	String key= layer + BIND_OPERATOR + att.getName();	//Trim to just the attribute name
     	return key;
     } 
+    
+    
 
     /**What sample type is requested?
      * 
@@ -206,14 +208,14 @@ options {
      * @param field -- Field being constructor for
      * @param c -- Call group being operated on
      */
-	  private Tree newCall(String layer, String field, CommonTree c) {
-	 	  CallGroup call = (CallGroup) c; 
+	 private Tree newCall(String layer, String field, CommonTree c) {
+	 	CallGroup call = (CallGroup) c; 
     	String key = key(layer, field);
     	if (!requestedGuides.containsKey(key)) {return call;}
 
-      Guide.SampleStrategy strat = requestedGuides.get(key);
+        Guide.SampleStrategy strat = requestedGuides.get(key);
           
-      if (!requiresChanges(call, strat)) {return call;}
+        if (!requiresChanges(call, strat)) {return call;}
     	
     	String intialArgs = findInitialArgs(call);
     	
@@ -337,17 +339,15 @@ options {
     
 }
 
-//Identify requested guides for guides section
-//Scan associated mapping chains
-//  If a categorical exists, celebrate
-//  If a categorical does not exist, place one at start
-listRequirements: ^(name=LAYER . ^(LIST guide[$name.text]*) .);
-guide[String layer]: ^(GUIDE . spec=. field=ID) 	{requestedGuides.put(key(layer, field), getSampleStrategy(spec));};
+//Identify requested guides from canvas def
+listRequirements: ^(att=GUIDE layer=. type=. spec=. actions=.) 
+	{requestedGuides.put(key(layer, att), getSampleStrategy(spec));};
 
-ensure: ^(name=LAYER . . ^(LIST ^(CONSUMES . ^(LIST rule[$name.text]*))));
+
+ensure: ^(name=LAYER . ^(LIST ^(CONSUMES . ^(LIST rule[$name.text]*))));
 rule[String layer]: 
-	^(RULE field=glyphField  call=. bind=.)
-		->  ^(RULE $field {newCall(layer, $glyphField.field, call)} $bind);
+	^(RULE target=glyphField  call=. bind=.)
+		->  ^(RULE $target {newCall(layer, $glyphField.field, call)} $bind);
 
 //First field in a prototype list
 glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$f.text;};
