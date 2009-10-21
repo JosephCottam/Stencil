@@ -106,7 +106,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 					((Axis) l.getGuide("Y")).setConnect(true);
 				}
 			} else if (guideType.equals("sidebar")) {
-				Guide2D guide = new Sidebar(attribute, guideDef.getSpecializer(), sidebarCount++);
+				Guide2D guide = new Sidebar(attribute, guideDef, sidebarCount++);
 				l.addGuide(attribute, guide);	
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);

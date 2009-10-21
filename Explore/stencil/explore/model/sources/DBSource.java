@@ -141,7 +141,7 @@ public class DBSource extends StreamSource {
 		while (line != null && !line.startsWith("STREAM") && !line.equals("")) {
 			if (line.startsWith("NAME")) {
 				String name = line.substring(line.indexOf(":") +2);
-				result = (DBSource) result.name(name);
+				result = result.name(name);
 			} else if (line.startsWith("SEPARATOR")) {
 				String separator = line.substring(line.indexOf(":") +2);
 				result = result.separator(separator);

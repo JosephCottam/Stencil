@@ -28,100 +28,84 @@
  */
 package stencil.interpreter;
 
+import java.util.List;
 import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 import stencil.util.Tuples;
 
 public class Interpreter {
 	private final StencilPanel panel;
 	private final Program program;
 	
-	private boolean abortOnError = false;
+	private static boolean abortOnError = false;
 	
 	public Interpreter(StencilPanel panel) {
 		this.panel = panel;
 		this.program = panel.getProgram();
 	}
 	
-	public void processTuple(Tuple source) throws Exception {
-		for (Layer layer:program.getLayers()) {
-			
-			groups: for(Consumes group:layer.getGroups()) {
+	public static Tuple process(List<Rule> rules, Tuple source) throws Exception {
+		Tuple glyphBuffer = null;
+		Tuple viewBuffer = null;
+		Tuple canvasBuffer = null;
+		Tuple localBuffer = null;
+		
+		//Apply all rules
+		try {
+			for (Rule rule: rules) {
+				Tuple result;
 				
+				try {result = rule.apply(source);}
+				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
+				
+				//TODO: Have rules throw exception (instead of return null)
+				if (result == null) {
+					if (abortOnError) {throw new RuleAbortException(rule);}
+					else {return null;}
+				}
+											
+				//Merge into final storage for glyph
+				if (rule.getTarget() instanceof Glyph) {glyphBuffer = Tuples.merge(result, glyphBuffer);}
+				else if (rule.getTarget() instanceof View) {viewBuffer = Tuples.merge(result, viewBuffer);}
+				else if (rule.getTarget() instanceof Canvas) {canvasBuffer = Tuples.merge(result, canvasBuffer);}
+				else if (rule.getTarget() instanceof Local) {localBuffer = Tuples.merge(result, localBuffer);}
+			}
+			
+			
+			if (viewBuffer != null) {Tuples.transfer(viewBuffer, View.global, false);}
+			if (canvasBuffer != null) {Tuples.transfer(viewBuffer, Canvas.global, false);}
+		
+		} catch (RuleAbortException ra) {
+			System.out.println("Rule aborted...");
+			System.out.println(ra.getMessage());
+			ra.printStackTrace();
+			return null;			//TODO: Handle rule aborts.
+		}
+		return glyphBuffer;
+	}
+	
+	public void processTuple(Tuple source) throws Exception {
+		for (Layer layer:program.getLayers()) {			
+			for(Consumes group:layer.getGroups()) {
 				boolean matches;
 				try {matches = group.matches(source);}
 				catch (Exception e) {throw new RuntimeException(String.format("Error applying filter in layer %1$s", layer.getName()), e);}
 
 				if (matches) {
-					Tuple glyphBuffer = null;
-					Tuple viewBuffer = null;
-					Tuple canvasBuffer = null;
-					Tuple localBuffer = null;
-					
-					//Apply all rules
-					try {
-						stencil.adapters.Glyph glyph;
+					Tuple result;
+					try {result = process(group.getRules(), source);}
+					catch (Exception e) {throw new RuntimeException(String.format("Error processing in layer %1$s", layer.getName()));}
 
-						for (Rule rule: group.getRules()) {
-							boolean created = false;
-							boolean preExisting = false;
-							Tuple result;
-							
-							//Apply one rule
-							try {result = rule.apply(source);}
-							catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d on layer %2$s.", rule.getChildIndex()+1, layer.getName()), e);}
-							
-							//TODO: Have rules throw exception (instead of return null)
-							if (result == null) {
-								if (abortOnError) {throw new RuleAbortException(rule);}
-								else {
-									if (created && !preExisting && glyphBuffer !=null) {
-										String id = Converter.toString(glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD));
-										layer.getDisplayLayer().remove(id);	 //This won't be possible if we remove the remove from layer in the compiled version...try a two-phase 'reserved' and 'created' hold if something requests a 'reserved' value
-									}
-									continue groups;
-								}
-							}
-														
-							//Merge into final storage for glyph
-							if (rule.getTarget() instanceof Glyph) {
-								glyphBuffer = Tuples.merge(result, glyphBuffer);
-
-								//We create the actual glyph early on in the process so we can refer to 'self' in 
-								//any rule.  This is especially important for dynamic bindings
-								if (!created && glyphBuffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-									String id = (String) glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
-									preExisting = (layer.getDisplayLayer().find(id) != null); //TODO: This probably needs to be synchronzied with the creation...against what, I'm not sure
-									glyph = layer.getDisplayLayer().makeOrFind(id);	
-									created = true;
-								}
-							} else if (rule.getTarget() instanceof View) {viewBuffer = Tuples.merge(result, viewBuffer);
-							} else if (rule.getTarget() instanceof Canvas) {canvasBuffer = Tuples.merge(result, canvasBuffer);
-							} else if (rule.getTarget() instanceof Local) {localBuffer = Tuples.merge(result, localBuffer);}
-						}
-						
-						if (glyphBuffer != null && glyphBuffer.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-							String id = (String) glyphBuffer.get(ParserConstants.GLYPH_ID_FIELD, String.class);
-							glyph = layer.getDisplayLayer().makeOrFind(id);							
-							panel.transfer(glyphBuffer, glyph);
-							
-							for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
-						} 
-						
-						if (viewBuffer != null) {Tuples.transfer(viewBuffer, View.global, false);}
-						if (canvasBuffer != null) {Tuples.transfer(viewBuffer, Canvas.global, false);}
-					
-					} catch (RuleAbortException ra) {
-						System.out.println("Rule aborted...");
-						System.out.println(ra.getMessage());
-						ra.printStackTrace();
-						//TODO: Handle rule aborts.
-					} catch (Exception e) {
-						throw new RuntimeException("Error apply rules in layer " + layer.getName(), e);
-					}
+					if (result == null) {continue;} //Move on to the next group if the result was empty...
+ 
+					if (result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
+						String id = (String) result.get(ParserConstants.GLYPH_ID_FIELD, String.class);
+						stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(id);							
+						panel.transfer(result, glyph);
+						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+					} 
 				}
 			}
 		}

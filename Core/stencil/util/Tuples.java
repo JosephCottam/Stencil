@@ -80,7 +80,21 @@ public final class Tuples {
 		public boolean isDefault(String name, Object value) {return false;}
 	};
 
-	
+	/**Given a source tuple, returns a new tuple with only those fields that were
+	 * prefixed with the given prefix.  Fields no longer have the prefix.
+	 */
+	public static final Tuple sift(String prefix, Tuple source) {
+		List<String> fields = new ArrayList();
+		List<Object> values = new ArrayList();
+		for (String field:source.getFields()) {
+			if (field.startsWith(prefix)) {
+				values.add(source.get(field));
+				fields.add(field.substring(prefix.length()));
+			}
+		}
+		
+		return new BasicTuple(fields, values);
+	}
 
 	
 	/**Creates a read-only copy of the given tuple.  Values

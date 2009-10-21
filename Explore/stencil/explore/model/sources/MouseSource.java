@@ -73,7 +73,7 @@ public class MouseSource extends StreamSource {
 			input.mark(100);
 			if (line.startsWith("NAME")) {
 				String name = line.substring(line.indexOf(":") +2);
-				result = (MouseSource) result.name(name);
+				result = result.name(name);
 			} else if (line.startsWith("FREQUENCY:")) {
 				int freq = Integer.parseInt(line.split(": ")[1]);
 				MouseStream.frequency = freq;

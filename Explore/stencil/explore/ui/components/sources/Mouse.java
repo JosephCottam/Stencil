@@ -48,9 +48,9 @@ public final class Mouse extends SourceEditor {
 	protected String name;
 	protected int backupFreq = 30;
 
-	private final JTextField elements = new JTextField();
-	private final JTextField frequency = new JTextField();
-	private final JCheckBox onChange = new JCheckBox();
+	protected final JTextField elements = new JTextField();
+	protected final JTextField frequency = new JTextField();
+	protected final JCheckBox onChange = new JCheckBox();
 
 	public Mouse(String name) {
 		super(name);

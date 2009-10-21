@@ -217,10 +217,7 @@ public final class Canvas extends JComponent {
     public void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;
     	try {this.inverseViewTransform = transform.createInverse();}
-    	catch (NoninvertibleTransformException e) {
-    		System.out.println("HERE");
-    		throw e;
-    	}
+    	catch (NoninvertibleTransformException e) {throw e;}
     }
     
     
