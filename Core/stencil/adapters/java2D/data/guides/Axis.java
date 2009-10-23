@@ -14,24 +14,17 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
+import stencil.interpreter.Interpreter;
 import stencil.parser.string.ParseStencil;
+import stencil.parser.tree.Guide;
+import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
+import stencil.streams.Tuple;
 import stencil.util.AutoguidePair;
 import stencil.util.BasicTuple;
+import stencil.util.Tuples;
 
 public class Axis implements Guide2D {
-	private static final class Pair { 
-		String label;
-		float value;
-		
-		public Pair(Object label, float value) {
-			this.label = label.toString();
-			this.value = value;
-		}
-		
-		public String toString() {return "(" + label + ", " + value + ")";}
-	}
-	
 	/**In the axial specializer, map values that start with
 	 * this tag will be applied to the labels.
 	 */
@@ -84,6 +77,8 @@ public class Axis implements Guide2D {
 	 **/
 	public String sample;
 	
+	protected List<Rule> rules;
+	
 	protected AXIS axis;
 	
 	protected Glyph2D prototypeText = new Text(null, "prototype");
@@ -94,17 +89,19 @@ public class Axis implements Guide2D {
 	protected Rectangle2D bounds = new Rectangle2D.Double();
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
-	public Axis(String id, Specializer specializer) {
+	public Axis(String id, Guide guideDef) {
+		this.rules = guideDef.getRules();
+		
 		axis = AXIS.valueOf(id);
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
-		GuideUtils.setValues(specializer, this);
+		GuideUtils.setValues(guideDef.getSpecializer(), this);
 		
 		prototypeText = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LABEL_PROPERTY_TAG, prototypeText);
-		prototypeText = GuideUtils.applyDefaults(specializer, LABEL_PROPERTY_TAG, prototypeText);
+		prototypeText = GuideUtils.applyDefaults(guideDef.getSpecializer(), LABEL_PROPERTY_TAG, prototypeText);
 
 		prototypeLine = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LINE_PROPERTY_TAG, prototypeLine);
-		prototypeLine = GuideUtils.applyDefaults(specializer, LINE_PROPERTY_TAG, prototypeLine);
+		prototypeLine = GuideUtils.applyDefaults(guideDef.getSpecializer(), LINE_PROPERTY_TAG, prototypeLine);
 	}
 	
 	public void setConnect(boolean connect) {this.connect = connect;}
@@ -112,7 +109,7 @@ public class Axis implements Guide2D {
 	public AXIS getAxis() {return axis;} 
 	
 	public synchronized void setElements(List<AutoguidePair> elements) {
-		List<Pair> listing = validate(elements);		
+		List<GuidePair<Float>> listing = validate(elements);		
 		
 		if (listing.size() > 0) {
 			marks = createLabeledTics(listing);
@@ -128,14 +125,14 @@ public class Axis implements Guide2D {
 	public Rectangle2D getBoundsReference() {return bounds;}
 	
 	/**Create the major axial line for the axis.*/
-	private Glyph2D createLine(List<Pair> elements) {
+	private Glyph2D createLine(List<GuidePair<Float>> elements) {
 		if (stencil.types.color.Color.isTransparent((java.awt.Color) prototypeLine.get("STROKE_COLOR"))) {return null;}
 
 		String[] fields = new String[]{"X.1", "Y.1","X.2","Y.2"};
 		Double[] values = new Double[fields.length];
 				
-		double min = ((Number) elements.get(0).value).floatValue();
-		double max = ((Number) elements.get(elements.size()-1).value).floatValue(); 
+		double min = elements.get(0).output.doubleValue();
+		double max = elements.get(elements.size()-1).output.doubleValue(); 
 		
 		if (max >0 && min <0) {/*do nothing, doesn't matter what connect is set to if the origin is bridged.*/}
 		
@@ -157,21 +154,26 @@ public class Axis implements Guide2D {
 	}
 
 	/**Create the labeled tick marks around the major axis line.*/
-	private Collection<Glyph2D> createLabeledTics(List<Pair> elements) {
+	private Collection<Glyph2D> createLabeledTics(List<GuidePair<Float>> elements) {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);//One for tick, one for label
 		
-		for (Pair p: elements) {
-			double location = p.value;
-			Glyph2D tick = makeTick(location);
+		for (GuidePair<Float> p: elements) {
+			double location = p.output.doubleValue();
+			Tuple result;
+
+			try {result = Interpreter.process(rules, p);}
+			catch (Exception e) {throw new RuntimeException("Error updating guide with descriptor pair: " + p.toString(), e);}
+
+			Glyph2D tick = makeTick(location, Tuples.sift("line.", result));
 			if (tick != null) {marks.add(tick);}
-			Glyph2D label = makeLabel(p.label, location);
+			Glyph2D label = makeLabel(p.input, location, Tuples.sift("label.", result));
 			if (label !=null) {marks.add(label);}
 		}
 		return marks;
 	}
 	
 	/**Make a tick-mark label.*/
-	private Glyph2D makeLabel(String text, double value) {
+	private Glyph2D makeLabel(String text, double value, Tuple formatting) {
 		if (stencil.types.color.Color.isTransparent((java.awt.Color) prototypeText.get("FONT_COLOR"))) {return null;}
 
 		String[] fields =  new String[]{"TEXT", "X","Y", "ROTATION"};
@@ -189,11 +191,13 @@ public class Axis implements Guide2D {
 			values[3] =0;
 		}
 		
-		return prototypeText.update(new BasicTuple(fields, values));
+		Glyph2D result = prototypeText.update(new BasicTuple(fields, values));
+		result = result.update(formatting);
+		return result;
 	}
 	
 	/**Make an actual tick mark.*/
-	private Glyph2D makeTick(double offset) {
+	private Glyph2D makeTick(double offset, Tuple formatting) {
 		if (stencil.types.color.Color.isTransparent((java.awt.Color) prototypeLine.get("STROKE_COLOR"))) {return null;}
 	
 		String[] fields = new String[]{"X.1", "Y.1","X.2","Y.2"};
@@ -211,7 +215,9 @@ public class Axis implements Guide2D {
 			values[3] = offset;
 		}
 
-		return prototypeLine.update(new BasicTuple(fields, values));
+		Glyph2D result = prototypeLine.update(new BasicTuple(fields, values));
+		result = result.update(formatting);
+		return result;
 	}
 	
 	/**Verify that all Autoguide pairs have exactly one result, and that result
@@ -220,12 +226,12 @@ public class Axis implements Guide2D {
 	 * @param elements
 	 * @return
 	 */
-	private List<Pair> validate(Collection<AutoguidePair> elements) {
-		List<Pair> pairs = new ArrayList<Pair>(elements.size());
-		Comparator c = new Comparator<Pair>() {
-			public int compare(Pair p1, Pair p2) { 
-				double n1 = p1.value;
-				double n2 = p2.value;
+	private List<GuidePair<Float>> validate(Collection<AutoguidePair> elements) {
+		List<GuidePair<Float>> pairs = new ArrayList<GuidePair<Float>>(elements.size());
+		Comparator c = new Comparator<GuidePair<Float>>() {
+			public int compare(GuidePair<Float> p1, GuidePair<Float> p2) { 
+				Float n1 = p1.output;
+				Float n2 = p2.output;
 				
 				if (n1> n2) {return 1;}
 				if (n1 < n2) {return -1;}
@@ -238,7 +244,7 @@ public class Axis implements Guide2D {
 			if (p.getResult().length != 1 || !(p.getResult()[0] instanceof Number))  {
 				throw new IllegalArgumentException(String.format("Attempting to us a non-numeric result in an %1$s-axis legend: %2$s", axis.toString(), Arrays.deepToString(p.getResult())));
 			} 
-			Pair pair = new Pair(p.getInput()[0].toString(), ((Number) p.getResult()[0]).floatValue());
+			GuidePair<Float> pair = new GuidePair<Float>(p.getInput()[0].toString(), ((Number) p.getResult()[0]).floatValue());
 			pairs.add(pair);
 		}
 		

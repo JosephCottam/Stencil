@@ -98,7 +98,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			String guideType = guideDef.getGuideType();
 			
 			if (guideType.equals("axis")) {
-				Guide2D guide = new Axis(attribute, guideDef.getSpecializer());
+				Guide2D guide = new Axis(attribute, guideDef);
 				l.addGuide(attribute, guide);
 				
 				if (l.hasGuide("X") && l.hasGuide("Y")) {

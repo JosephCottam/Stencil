@@ -21,43 +21,12 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
-import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 import stencil.util.AutoguidePair;
 import stencil.util.BasicTuple;
 import stencil.util.Tuples;
 
 public class Sidebar implements Guide2D {
-	/**Actual result pair.  
-	 * Used instead of the autoguidePair because of direct access to the input and output as
-	 * fields instead of arrays.
-	 */
-	private static final class Pair implements Tuple {
-		private static final List<String> FIELDS = Arrays.asList("INPUT", "OUTPUT");
-		String input;
-		Object output;
-		
-		public Pair(String input, Object output) {
-			this.input = input;
-			this.output = output;
-		}
-		public Object get(String name) throws InvalidNameException {
-			if (name.equals("INPUT")) {return input;}
-			if (name.equals("OUTPUT")) {return output;}
-			throw new InvalidNameException(name, FIELDS);
-		}
-
-		public Object get(String name, Class<?> type)
-				throws IllegalArgumentException, InvalidNameException {
-			return Converter.convert(get(name), type);
-		}
-		
-		public List<String> getFields() {return FIELDS;}
-		public boolean hasField(String name) {return getFields().contains(name);}
-		public boolean isDefault(String name, Object value) {return false;}
-		public String toString() {return Tuples.toString(this);}
-	}
 	
 	public static final String IMPLANTATION_NAME = "SIDE_BAR";
 	public static final String LABEL_PROPERTY_TAG = "label";
@@ -89,9 +58,11 @@ public class Sidebar implements Guide2D {
 	private boolean autoPlace = true;
 	
 	//Public because of how the applyDefaualts system works
+	/**How far apart should elements be?**/
 	public float spacing = .25f;
 
 	//Public because of how the applyDefaualts system works
+	/**Which of the example graphic attributes should be used to display the attribute?**/
 	public String displayOn;
 	
 	public Sidebar(String id, Guide guideDef, int idx) {
@@ -118,7 +89,7 @@ public class Sidebar implements Guide2D {
 	}
 
 	public void setElements(List<AutoguidePair> elements) {
-		List<Pair> listing = validate(elements);
+		List<GuidePair<Object>> listing = validate(elements);
 		marks = createLabeledBoxes(listing);
 		
 		Rectangle2D bounds = GuideUtils.fullBounds(marks);
@@ -135,7 +106,7 @@ public class Sidebar implements Guide2D {
 	
 	public Rectangle2D getBoundsReference() {return bounds;}
 	
-	private Collection<Glyph2D> createLabeledBoxes(List<Pair> elements) {
+	private Collection<Glyph2D> createLabeledBoxes(List<GuidePair<Object>> elements) {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);
 		for (int i=0; i< elements.size(); i++) {
 			marks.addAll(createLabeledBox(elements.get(i), i));
@@ -143,20 +114,20 @@ public class Sidebar implements Guide2D {
 		return marks;
 	}
 	
-	private Collection<Glyph2D> createLabeledBox(Pair contents, int idx) {
+	private Collection<Glyph2D> createLabeledBox(GuidePair<Object> contents, int idx) {
 		float indexOffset = (idx *exampleHeight) + (idx * vSpacing);  
 		Tuple result;
 		
 		try {result = Interpreter.process(formatter, contents);}
 		catch (Exception e) {throw new RuntimeException("Error updating guide with descriptor pair: " + contents.toString(), e);}
 		
-		String[] labelFields = new String[]{"X","Y","TEXT"};
-		Object[] labelValues = new Object[]{exampleWidth + hSpacing, indexOffset, contents.input};
+		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
+		Object[] labelValues = new Object[]{exampleWidth + hSpacing, indexOffset, contents.input, "LEFT"};
 		Text label = prototypeLabel.update(new BasicTuple(labelFields, labelValues));
 		label = label.update(Tuples.sift("label.", result));
 		
-		String[] exampleFields = new String[]{"Y", displayOn};
-		Object[] exampleValues = new Object[]{indexOffset, contents.output};
+		String[] exampleFields = new String[]{"Y", displayOn, "REGISTRATION"};
+		Object[] exampleValues = new Object[]{indexOffset, contents.output, "RIGHT"};
 		Shape example = prototypeExample.update(new BasicTuple(exampleFields, exampleValues));
 		example = example.update(Tuples.sift("example.", result));
 		
@@ -169,10 +140,10 @@ public class Sidebar implements Guide2D {
 	 * @param elements
 	 * @return
 	 */
-	private List<Pair> validate(Collection<AutoguidePair> elements) {
-		List<Pair> pairs = new ArrayList<Pair>(elements.size());
-		Comparator c = new Comparator<Pair>() {
-			public int compare(Pair p1, Pair p2) { 
+	private List<GuidePair<Object>> validate(Collection<AutoguidePair> elements) {
+		List<GuidePair<Object>> pairs = new ArrayList<GuidePair<Object>>(elements.size());
+		Comparator c = new Comparator<GuidePair<Object>>() {
+			public int compare(GuidePair<Object> p1, GuidePair<Object> p2) { 
 				String l1 = p1.input;
 				String l2 = p2.input;
 				
@@ -183,7 +154,7 @@ public class Sidebar implements Guide2D {
 				
 		for (AutoguidePair p: elements) {
 			//TODO: Validate that the result is of the right type for the attribute it is to be applied to...
-			Pair pair = new Pair(p.getInput()[0].toString(), p.getResult()[0]);
+			GuidePair<Object> pair = new GuidePair<Object>(p.getInput()[0].toString(), p.getResult()[0]);
 			pairs.add(pair);
 		}
 		
@@ -196,7 +167,6 @@ public class Sidebar implements Guide2D {
 		AffineTransform localTransform = g.getTransform();
 		if (marks == null) {return;}
 		for (Glyph2D mark: marks) {
-			System.out.println(mark);
 			mark.render(g, localTransform);
 		}
 		g.setTransform(viewTransform);
