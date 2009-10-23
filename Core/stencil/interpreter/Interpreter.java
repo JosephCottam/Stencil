@@ -103,7 +103,8 @@ public class Interpreter {
 					if (result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
 						String id = (String) result.get(ParserConstants.GLYPH_ID_FIELD, String.class);
 						stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(id);							
-						panel.transfer(result, glyph);
+						glyph = panel.transfer(result, glyph);
+						
 						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
 					} 
 				}

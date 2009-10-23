@@ -36,7 +36,7 @@ options {
 }
 
 @header{
-	/** Creates the required rules to produce the guide descriptors used in automatic guide creation.
+	/** Performs the built of automatic guide mark generation.
 	 *
 	 * Precondition: To operate properly, this pass must be run after ensuring 
 	 * guide operators exist and after annotating function calls with their
@@ -67,8 +67,8 @@ options {
 @members{
 	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();
 	protected ModuleCache modules;
-    
-    public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
+ 
+  public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
     
 	public AutoGuide(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
@@ -83,32 +83,31 @@ options {
 		return t;
 	}	
 	
-	//Trim each mapping chain to its last categorical operator
-	private Object trim(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return trimGuide(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    return downup(t, down, up);
-	}
-
-	
-	//Build a mapping from the layer/attribute names to mapping trees
-	public Object build(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return buildMappings(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    return downup(t, down, up);
-    }
+	 //Build a mapping from the layer/attribute names to mapping trees
+	 private Object build(Object t) {
+      fptr down =	new fptr() {public Object rule() throws RecognitionException { return buildMappings(); }};
+    	fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+    	return downup(t, down, up);
+   }
     
     //Transfer appropriate mapping tree to the guide clause
     private Object transfer(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    return downup(t, down, up);
+		  fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
+   	  fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+   	  return downup(t, down, up);
+    }
+    
+    //Trim each mapping chain to its last categorical operator
+    private Object trim(Object t) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return trimGuide(); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+      return downup(t, down, up);
     }
     
     //Rename functions to use the guide channel
     private Object rename(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
-	   	fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+			fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
+	   	fptr up = new fptr() {public Object rule() throws RecognitionException { return  bottomup(); }};
 	   	return downup(t, down, up);		
     }
     
@@ -152,31 +151,30 @@ options {
 
 }
 
-//Build a list of potential mapping sources (comes from the layers)
-buildMappings: ^(name=LAYER . ^(LIST buildMappings_Consumes[$name.text]*));
-buildMappings_Consumes[String layerName]
-	: ^(CONSUMES . ^(LIST buildMappings_Rule[layerName]*));
-
-buildMappings_Rule[String layerName]
-	: ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .)	
+//Move mappings from the declarations in the consumes block up to the 
+//guides section
+buildMappings: ^(c=CONSUMES . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*));
+mapping[String layerName] 
+  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .) 
 		{attDefs.put(key(layerName, field), group);};
 
-//Set the 'generator' fields of the guides.
 transferMappings
-	: ^(att=GUIDE layer=ID type=ID spec=. rules=.)
-	 	{if (!attDefs.containsKey(key(layer, att))) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(layer, att));}}
-	 	-> ^(GUIDE $layer $type $spec $rules {adaptor.dupTree(attDefs.get(key(layer, att)))});
+	 : ^(field=GUIDE layerName=ID type=ID spec=. rules=.)
+	 	{
+	 	 if (!attDefs.containsKey(key(layerName,field))) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(layerName, field));}
+	 	}
+	 	-> ^($field $layerName $type $spec $rules {adaptor.dupTree(attDefs.get(key(layerName,field)))});
 	
 
 //trimMappings
-trimGuide : ^(GUIDE layer=. type=. spec=. rules=. trimGenerator);
-trimGenerator: ^(CALL_GROUP ^(CALL_CHAIN call=.)) -> ^(CALL_GROUP ^(CALL_CHAIN {trimCall((CallTarget) call)}));
+trimGuide : ^(GUIDE . . . . trimCallGroup);
+trimCallGroup: ^(CALL_GROUP ^(CALL_CHAIN call=.)) -> ^(CALL_GROUP ^(CALL_CHAIN {trimCall((CallTarget) call)}));
 
 
-
-//Pick the 'guide' function instead of whatever else was selected for each function
-renameMappingsDown: ^(field=GUIDE layer=. type=. rules=. renameGuideMapping);
-
+//Pick the 'guide' function instead of whatever else
+//was selected for each function
+renameMappingsDown: ^(GUIDE . . . . ^(CALL_GROUP ^(CALL_CHAIN renameGuideMapping)));
 renameGuideMapping
-	 @after{((Function) retval.tree).setOperator(((Function) f).getOperator());}
-	 : ^(f=FUNCTION spec=. args=. style=. call=.) -> ^(FUNCTION[guideName($f.text)] $spec $args $style $call);
+	 @after{if (retval.tree instanceof Function) {((Function) retval.tree).setOperator(((Function) f).getOperator());}}
+	 : ^(f=FUNCTION spec=. args=. style=. call=renameGuideMapping) -> ^(FUNCTION[guideName($f.text)] $spec $args $style $call)
+	 | ^(PACK .*);

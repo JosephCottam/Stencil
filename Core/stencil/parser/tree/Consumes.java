@@ -1,6 +1,8 @@
 package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
+
+import stencil.parser.string.StencilParser;
 import stencil.streams.Tuple;
 
 public class Consumes extends StencilTree {
@@ -10,7 +12,7 @@ public class Consumes extends StencilTree {
 	
 	public List<Filter> getFilters() {return (List<Filter>) getChild(0);}
 	public List<Rule> getRules() {return (List<Rule>) getChild(1);}
-	public Layer getLayer() {return (Layer) getParent().getParent();}
+	public Layer getLayer() {return (Layer) this.getAncestor(StencilParser.LAYER);}
 	
 	public boolean matches(Tuple tuple) {
 		//Check the tuple source and stream name

@@ -57,7 +57,7 @@ options {
 	public void updateGuides(StencilPanel panel) {
 		this.panel = panel;
 				
-		downup(panel.getProgram());
+		downup(panel.getProgram().getCanvasDef().getGuides());
 	}
 	
 	//TODO: Remove when all tuple references are positional
@@ -121,7 +121,7 @@ options {
 	}
 }
 
-topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callGroup[$layer.text, $att.text]);  //TODO: Add rules support...
+topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callGroup[$layer.text, $att.text]); 
 	
 callGroup[String layerName, String att]: ^(CALL_GROUP callChain[layerName, att]);
 callChain[String layerName, String att]: ^(CALL_CHAIN invoke[layerName, att]);

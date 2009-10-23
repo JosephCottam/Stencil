@@ -344,7 +344,7 @@ listRequirements: ^(att=GUIDE layer=. type=. spec=. actions=.)
 	{requestedGuides.put(key(layer, att), getSampleStrategy(spec));};
 
 
-ensure: ^(name=LAYER . ^(LIST ^(CONSUMES . ^(LIST rule[$name.text]*))));
+ensure: ^(c=CONSUMES . ^(LIST rule[((Consumes) c).getLayer().getName()]*));
 rule[String layer]: 
 	^(RULE target=glyphField  call=. bind=.)
 		->  ^(RULE $target {newCall(layer, $glyphField.field, call)} $bind);

@@ -83,4 +83,4 @@ options {
 
 topdown
 	: ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) -> ^(OPERATOR_REFERENCE $base {getDefault($base.getText())})
-	| ^(GUIDE layer=. type=. ^(SPECIALIZER DEFAULT) rules=.) -> ^(GUIDE $layer $type {SIMPLE_SPECIALIZER} $rules);
+	| ^(GUIDE layer=. type=. ^(SPECIALIZER DEFAULT) rules=.) -> ^(GUIDE $layer $type {adaptor.dupTree(SIMPLE_SPECIALIZER)} $rules);

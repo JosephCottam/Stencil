@@ -181,12 +181,13 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	}
 
 
-	@Override
-	public void transfer(Tuple source, Glyph2D target) throws Exception {
+	public Glyph2D transfer(Tuple source, Glyph2D target) throws Exception {
 		Glyph2D result = target.update(source);
-		if (result == source) {return;}
+		if (result == target) {return target;}
 		
 		DisplayLayer t = target.getLayer();
 		t.update(result);
+		return result;
 	}
+
 }

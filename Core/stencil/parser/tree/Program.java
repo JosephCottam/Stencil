@@ -83,7 +83,7 @@ public class Program extends StencilTree {
 	 * TODO: Provide a method to get all streams (not just externals)
 	 * */
 	public List<External> getExternals() {
-		assert verifyType(getChild(STREAMS), StencilParser.LIST);
+		assert verifyType(getChild(STREAMS), StencilParser.LIST) : typeName(getChild(STREAMS).getType());
 		return (List<External>) getChild(STREAMS);
 	}
 

@@ -107,7 +107,6 @@ public class Sidebar implements Guide2D {
 		prototypeExample = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		prototypeExample = GuideUtils.applyDefaults(specializer, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		
-		
 		exampleHeight = Math.max((Float) prototypeLabel.get(StandardAttribute.HEIGHT.name(), Float.class), (Float)  prototypeExample.get("SIZE", Float.class));
 		exampleWidth = (Float) prototypeExample.get("SIZE", Float.class);
 		vSpacing = spacing * exampleHeight;

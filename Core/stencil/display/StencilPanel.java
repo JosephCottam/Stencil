@@ -37,6 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import stencil.adapters.Glyph;
 import stencil.interpreter.Interpreter;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.Layer;
@@ -51,7 +52,7 @@ import stencil.streams.Tuple;
  * L -- The layer type
  * C -- The canvas type
  * */
-public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C extends Component> extends javax.swing.JPanel {
+public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C extends Component> extends javax.swing.JPanel {
 	/**Set flag to true when default interaction states are desired.
 	 * Set to false when all interaction should be handled in stencil rules.
 	 * Default state is true.
@@ -204,6 +205,9 @@ public abstract class StencilPanel<T extends Tuple, L extends DisplayLayer<T>, C
 	
 	/**Transfer the values of the source over to the target glyph.
 	 * Exceptions in the transfer process may be propagated out.
+	 * 
+	 * Returns the actually stored entity.  This may or may not be 
+	 * the same as the target.
 	 * */
-	public abstract void transfer(Tuple source, T target)  throws Exception; 	
+	public abstract <R extends T> R transfer(Tuple source, R target)  throws Exception; 	
 }
