@@ -115,10 +115,6 @@ public final class Text extends Basic {
 		this.drawBounds = source.drawBounds;
 		this.renderedText = source.renderedText;
 	}
-	
-	protected Text(Text source, Tuple option) {
-		this(source, option, UNSETTABLES);
-	}
 
 	protected Text(Text source, Tuple option, AttributeList unsettables) {
 		super(source, option, unsettables);
@@ -140,6 +136,7 @@ public final class Text extends Basic {
 
 		//If there was no change to layout, just copy it; otherwise, recompute it
 		if (text.equals(source.text)
+			&& format.equals(source.format)
 			&& !option.hasField(X.name)
 			&& !option.hasField(Y.name) 
 			&& !option.hasField(WIDTH.name)
@@ -198,12 +195,12 @@ public final class Text extends Basic {
 		
 		double scale = -1;
 		
-		if (scaleBy.equals("X")) {scale = trans.getScaleX();}
+		if (scaleBy.equals("ALL")) {return;} //Scale by all...do nothing to the current transform
+		else if (scaleBy.equals("X")) {scale = trans.getScaleX();}
 		else if (scaleBy.equals("Y")) {scale = trans.getScaleY();}
 		else if (scaleBy.equals("LARGEST")) {scale = Math.min(trans.getScaleX(), trans.getScaleY());}
 		else if (scaleBy.equals("NONE")) {scale = 1;}
 		else if (scaleBy.equals("SMALLEST")){scale = Math.min(trans.getScaleX(), trans.getScaleY());}
-		else if (scaleBy.equals("ALL")){return;} //Scale by all...do nothing to the current transform
 		else {throw new IllegalArgumentException("Attempted to use SCALE_BY of an unknown value " + scaleBy);}
 
 		double scaleXBy = trans.getScaleX() == 0 ? 1 : scale/trans.getScaleX();
@@ -224,14 +221,13 @@ public final class Text extends Basic {
 		Point2D p2 = new Point2D.Double();
 		fixScale(g);
 		
-		base.transform(p,p2);
-
+		base.transform(p,p2);	//Figure out where to render
 		try {g.getTransform().inverseTransform(p2, p2);}
-		catch (Exception e) {p2 = p;}
-		
+		catch (Exception e) {p2 = p;}		
 		g.translate(p2.getX(), p2.getY());
 		
-		g.fill(renderedText);
+		
+		g.fill(renderedText);	//Render
 		super.postRender(g, base);
 	}	
 	
@@ -299,7 +295,7 @@ public final class Text extends Basic {
 	public Text update(Tuple t) throws IllegalArgumentException {
 		if (Tuples.transferNeutral(t, this)) {return this;}
 		
-		return new Text(this, t);
+		return new Text(this, t, UNSETTABLES);
 	}
 	public Text updateID(String id) {return new Text(id, this);}
 }
