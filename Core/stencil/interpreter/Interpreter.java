@@ -47,6 +47,8 @@ public class Interpreter {
 	}
 	
 	public static Tuple process(List<Rule> rules, Tuple source) throws Exception {
+		if (rules == null || rules.size() ==0 || source == null) {return Tuples.EMPTY_TUPLE;}
+		
 		Tuple glyphBuffer = null;
 		Tuple viewBuffer = null;
 		Tuple canvasBuffer = null;
