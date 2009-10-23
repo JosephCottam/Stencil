@@ -55,7 +55,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	private final Thread guideUpdaterThread;
 	
 	public Panel(Program p) {
-		super(p, new Canvas(p.getLayers()));
+		super(p, new Canvas(p.getCanvasDef(), p.getLayers()));
 		
 		 GuideUpdater updater = new GuideUpdater(p, this);
 		 if (updater.required()) {
