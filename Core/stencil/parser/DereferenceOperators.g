@@ -104,5 +104,6 @@ options {
   }
 }
 
-topdown : 
-  ^(o=OPERATOR_REFERENCE base=. spec=.) -> {instantiate((OperatorReference) o)};
+topdown 
+  : ^(o=OPERATOR_REFERENCE base=. spec=.) 
+      -> {instantiate((OperatorReference) o)};

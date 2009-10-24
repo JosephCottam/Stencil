@@ -159,27 +159,25 @@ public abstract class ParseStencil {
 
 		//Add default specializers where required
 		treeTokens = new CommonTreeNodeStream(p);
-		BaseSpecializers baseSpecializers = new BaseSpecializers(treeTokens, modules);
-		baseSpecializers.setTreeAdaptor(treeAdaptor);
-		baseSpecializers.downup(p);
-
+		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules);
+		defaultSpecializers.setTreeAdaptor(treeAdaptor);
+		defaultSpecializers.misc(p);
 		
 		//Remove all operator references
 		treeTokens = new CommonTreeNodeStream(p);
 		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
 		opTemplates.setTreeAdaptor(treeAdaptor);
-		p = (Program) opTemplates.downup(p);
-		
-		
+		opTemplates.downup(p);
+
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
-		
+
+
+
 		//Add default specializers where required
-		treeTokens = new CommonTreeNodeStream(p);
-		Specializers specializers = new Specializers(treeTokens, modules);
-		specializers.setTreeAdaptor(treeAdaptor);
-		specializers.downup(p);
+		defaultSpecializers.function(p);
+		
 		
 		//Add default packs where required
 		treeTokens = new CommonTreeNodeStream(p);
@@ -194,14 +192,17 @@ public abstract class ParseStencil {
 		guideSpecailizers.setTreeAdaptor(treeAdaptor);
 		guideSpecailizers.downup(p);
 		
+		
 		//Ensure that auto-guide requirements are met
 		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
 		ensure.setTreeAdaptor(treeAdaptor);		
 		p = (Program) ensure.transform(p);
 		
+		
 		//Prime tree nodes with operators from the modules cache
 		SetOperators set = new SetOperators(treeTokens, modules);
 		set.downup(p);
+		
 		
 		treeTokens = new CommonTreeNodeStream(p);
 		AutoGuide ag = new AutoGuide(treeTokens, modules);

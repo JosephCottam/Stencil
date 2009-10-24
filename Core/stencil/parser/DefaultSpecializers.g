@@ -27,19 +27,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Make sure sensible specializers are present on every
- * mapping operator. 
+ /** Make sure sensible specializers are present on every mapping operator. 
  */
-tree grammar Specializers;
+tree grammar DefaultSpecializers;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = StencilTree;	
+	superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
 }
 
 @header{
 	/**  Make sure that every mapping operator has a specializer.
+	 *	 Make sure that every guide declaration has a specializer.
 	 *
 	 *
 	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
@@ -55,14 +56,35 @@ options {
 	
 }
 
-@members{
+ @members{
 	protected ModuleCache modules;
     
-	public Specializers(TreeNodeStream input, ModuleCache modules) {
+	public DefaultSpecializers(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
 		assert modules != null : "ModuleCache must not be null.";
 		this.modules = modules;
 	}
+	
+	  //Ensure specializers for operator references (must be done before references can be resolved in AdHoc creation)
+    public Object function(Object t) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return function(); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+      return downup(t, down, up);
+    }
+    
+
+    //Ensure specializers for all references before operator instantiation    
+    public Object misc(Object t) {
+      fptr down = new fptr() {public Object rule() throws RecognitionException { return misc(); }};
+      fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+      return downup(t, down, up);
+    }
+
+  public Specializer defaultCanvasSpecailizer() {
+    try {
+      return ParseStencil.parseSpecializer("[BACKGROUND_COLOR=@color(WHITE)]"); //TODO: Move this default some else...
+    } catch (Exception e) {throw new Error("Parse or pre-defined constant failed.", e);}
+  }
 
 	public Specializer getDefault(String fullName) {
 		MultiPartName name= new MultiPartName(fullName);
@@ -83,6 +105,14 @@ options {
 
 }
 
-topdown: ^(f=FUNCTION ^(SPECIALIZER DEFAULT) args=. op=. target=.) -> ^(FUNCTION {getDefault($f.getText())} $args $op $target);		
+function
+  : ^(f=FUNCTION ^(SPECIALIZER DEFAULT) args=. op=. target=.) 
+      -> ^(FUNCTION {getDefault($f.getText())} $args $op $target);
 
-//Instructions at http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching%2C+rewriting+a+reality
+misc
+	: ^(GUIDE layer=. type=. ^(SPECIALIZER DEFAULT) rules=.) 
+      -> ^(GUIDE $layer $type {adaptor.dupTree(SIMPLE_SPECIALIZER)} $rules)
+  |   ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) 
+      -> ^(OPERATOR_REFERENCE $base {getDefault($base.getText())})
+  |  ^(CANVAS_DEF ^(SPECIALIZER DEFAULT) rest=.*) 
+      -> ^(CANVAS_DEF {defaultCanvasSpecailizer()} $rest);

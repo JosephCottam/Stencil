@@ -189,8 +189,10 @@ externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] t
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 
-canvasLayer: CANVAS name=ID canvasProperties guideDef+ -> ^(CANVAS_DEF[$name.text] canvasProperties ^(LIST["Guides"] guideDef+))
-			| -> ^(CANVAS_DEF["default"] ^(SPECIALIZER) ^(LIST["Guides"]));
+canvasLayer
+  : CANVAS name=ID canvasProperties guideDef+ 
+    -> ^(CANVAS_DEF[$name.text] canvasProperties ^(LIST["Guides"] guideDef+))
+  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT) ^(LIST["Guides"]));
 
 guideDef: GUIDE type=ID spec=specializer[RuleOpts.Simple] FROM layer=ID attribute=ID rule["glyph"]* 
 			-> ^(GUIDE[$attribute.text] $layer $type $spec ^(LIST["Rules"] rule*));

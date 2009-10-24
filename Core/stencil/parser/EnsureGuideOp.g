@@ -333,7 +333,7 @@ options {
       
       SampleStrategy strat = requestedGuides.get(key(layer.getName(), field));
       
-      if (start == null || strat.isCategorical()) {return "EchoCategorize.Map";}
+      if (strat == null || strat.isCategorical()) {return "EchoCategorize.Map";}
       else {return "EchoContinuous.Map";}
     }
     
