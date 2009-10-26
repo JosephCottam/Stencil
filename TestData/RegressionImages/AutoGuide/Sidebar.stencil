@@ -8,15 +8,13 @@ CHECKHEADER: false
 external stream Values(Category)
 
 canvas Main
-	guide axis from Chart X
-		label.TEXT : Concatenate("X=", input) -> _
+	guide axis[tickSize=5, textOffset=6] from Chart X
+		label.TEXT : Concatenate("X=", INPUT) -> _
   		label.FONT_SIZE: 10
 		line.STROKE_WEIGHT: 1
-		textOffset: 6
-		tickSize: 5
 		label.REGISTRATION: "LEFT"
 
-	guide sidebar from Chart FILL_COLOR
+	guide sidebar[spacing=4] from Chart FILL_COLOR
 		label.FONT_SIZE : 10
 		example.SIZE: 9
 

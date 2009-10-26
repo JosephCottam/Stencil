@@ -75,8 +75,6 @@ public abstract class ImageTest {
 			for (int i=0; i< inputs.length; i++) {
 				b.append(SOURCE_FLAG);
 				b.append(" ");
-				b.append(SOURCE_FLAG);
-				b.append(" ");
 				b.append(names[i]);
 				b.append(" ");
 				b.append(inputs[i]);

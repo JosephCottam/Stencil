@@ -7,8 +7,12 @@ CHECKHEADER: true
 
 external stream Tweets(MESSAGE, LINK, TIME)
 
+canvas Main
+	guide axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6] 
+		from Counts X
+	
+
 layer Counts
-	axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6]: X
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
 	X<< firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) -> VALUE
@@ -16,7 +20,7 @@ from Tweets
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
 from Tweets
-	view(ZOOM) : Zoom(view.WIDTH, view.HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
+	view(ZOOM) : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
 	view(X,Y): (canvas.X, canvas.Y)
 	
 

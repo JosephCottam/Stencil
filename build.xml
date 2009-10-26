@@ -7,13 +7,9 @@
  	<property name="runtimeLibrary" location="./Library/"/>
  	
  	<target name="CurrentWorkingGrammar">
- 		<property name="dest" location="${interpreter}"/>
- 		<property name="lib" location="${grammars}/string"/>
-
  		<antlr
- 			target="${interpreter}/UpdateGuides.g"
-			outputdirectory="${dest}"
- 			libdirectory="${lib}"
+ 			target="${grammars}/AutoGuide.g"
+			outputdirectory="${grammars}/string/"
  		/>
  	 	<antcall target="EclipseRefresh"/>
  	</target>
@@ -72,7 +68,7 @@
 			outputdirectory="${grammars}/string/"
 		/>
  		<antlr
- 			target="${grammars}/Specializers.g"
+ 			target="${grammars}/DefaultSpecializers.g"
  			outputdirectory="${grammars}/string/"
  		/>
  		<antlr
@@ -103,10 +99,6 @@
  			target="${grammars}/DefaultPack.g"
  			outputdirectory="${grammars}/string/"
  		/>
- 		<antlr
- 			target="${grammars}/BaseSpecializers.g"
-			outputdirectory="${grammars}/string/"
- 		/> 
  		<antlr
  			target="${grammars}/DereferenceOperators.g"
 			outputdirectory="${grammars}/string/"

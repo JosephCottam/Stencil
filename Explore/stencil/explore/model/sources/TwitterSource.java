@@ -18,7 +18,7 @@ public final class TwitterSource extends StreamSource {
 	private final String username;
 	private final String password;
 	
-	public TwitterSource(String name) {this(name, null, null, null);}
+	public TwitterSource(String name) {this(name, "", "", "");}
 	public TwitterSource(String name, String feedURL, String username, String password) {
 		super(name);
 		this.feedURL = feedURL == null ? feedURL : feedURL.trim();
@@ -44,12 +44,12 @@ public final class TwitterSource extends StreamSource {
 	}
 	
 	public TwitterSource username(String username) {
-		if (this.password.equals(username)) {return this;}
+		if (this.username.equals(username)) {return this;}
 		return new TwitterSource(name, feedURL, username, password);
 	}
 	
 	public TwitterSource feedURL(String feedURL) {
-		if (this.password.equals(feedURL)) {return this;}
+		if (this.feedURL.equals(feedURL)) {return this;}
 		return new TwitterSource(name, feedURL, username, password);
 	}
 	

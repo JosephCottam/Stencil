@@ -118,6 +118,7 @@ public class Headless {
 			StreamSource source = findSource(sourceRewrites[i], sources);
 			if (source == null) {continue;}
 
+			sources.remove(source);
 			if (source instanceof FileSource) {
 				source = ((FileSource) source).filename(prefix + sourceRewrites[i+1]);
 				sources.add(source);

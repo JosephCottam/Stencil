@@ -187,8 +187,8 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 		for (int i=0; i< listModel.size(); i++) {
 			StreamSource s = listModel.get(i);
 			StreamSource s2 = SourceCache.get(s);
-			listModel.add(s2);
 			listModel.remove(s);
+			listModel.add(i, s2);
 		}
 		
 		streamSources.repaint();

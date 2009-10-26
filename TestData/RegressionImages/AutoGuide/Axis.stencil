@@ -6,12 +6,23 @@ SOURCE: ./Numbers.txt
 CHECKHEADER: false
 
 external stream Values(Category)
+external stream Values(Category)
 
+/*Left-hand side defines the legend type.  Right-hand side says what to create it for.*/
+/*Specializers (things in square brackets) define the graphic design*/
+canvas Main
+	guide axis[sample="LINEAR", tickCount=10, tickSize=5, textOffset=6] from Chart Y
+		label.SCALE_BY: "NONE"
+		label.FONT_SIZE: 10
+		line.STROKE_WEIGHT: 1
+		label.REGISTRATION: "RIGHT"
+
+	guide axis[sample="CATEGORICAL", tickSize=5, textOffset=6] from Chart X
+		label.REGISTRATION: "LEFT"
+		label.FONT_SIZE: 10
+		line.STROKE_WEIGHT: 1 
+		
 layer Chart
-  /*Left-hand side defines the leged type.  Right-hand side says what to create it for.*/
-  /*Specializers (things in square brackets) define the graphic design*/
-  axis[sample="LINEAR", tickCount=10, label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT"]: Y
-  axis[sample="CATEGORICAL", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="LEFT"]: X
 
 from Values
   ID : Count("") -> VALUE

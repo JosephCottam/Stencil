@@ -170,7 +170,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	 * @param raise
 	 */
 	public void setSources(Collection<? extends StreamSource> sources) {
-		if (this.sources.equals(sources) || this.sources.containsAll(sources)) {return;}
+		if (this.sources == sources) {return;}
 		this.sources.clear();
 		for (StreamSource source: sources) {
 			this.sources.add(source);

@@ -11,9 +11,15 @@ FREQUENCY: 30
 external stream Stocks(Date, Open)
 external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
 
+canvas Main
+	guide axis[sample="LINEAR", tickCount=10, , tickSize=5, textOffset=6] from Stocks Y 
+		label.SCALE_BY: "NONE"
+		label.FONT_SIZE: 10
+		line.STROKE_WEIGHT: 1
+		label.REGISTRATION="RIGHT"
+
 
 layer Markers[POLY_LINE]
-	axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT"]: Y
 from Stocks
 	ID : "Google"
 	X.new : TimeStep(Date)

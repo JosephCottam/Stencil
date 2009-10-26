@@ -41,7 +41,10 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 
 	protected final String name;
 
-	protected StreamSource(String name) {this.name = name;}
+	protected StreamSource(String name) {
+		this.name = name;
+		SourceCache.put(this);
+	}
 
 	/**Get an editor panel to be used to set properties on this source?
 	 * The panel returned should be linked into the source properly so no
@@ -84,6 +87,8 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 	 */
 	public int compareTo(StreamSource o) {
 		if (o == null) {return 1;}
+		if (this == o) {return 0;}
+		
 		return o.name().compareTo(this.name());
 	}
 }
