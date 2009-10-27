@@ -31,7 +31,6 @@ package stencil.util.streams.txt;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.io.EOFException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -48,9 +47,6 @@ import stencil.util.BasicTuple;
  *
  */
 public final class DelimitedParser implements TupleStream {
-	/**How far ahead can the parser read attempting to verify structure?*/
-	public static final int READ_AHEAD_LIMIT = 1000;
-
 	/**Reader to get tuples from*/
 	private BufferedReader source;
 
@@ -66,10 +62,19 @@ public final class DelimitedParser implements TupleStream {
 	/**Regular expression used to split incoming data.*/
 	private final Pattern splitter;
 	
-	public DelimitedParser(String name, String labels, String delimiter) throws Exception {
+	private final NextChannel channel;
+	
+	/**Stored tuple, returned before anything new will be read.
+	 * TODO: THIS IS NOT THREAD SAFE!!!!
+	 * */
+	private Tuple tupleCache;
+	
+	public DelimitedParser(String name, String labels, String delimiter, boolean strict) throws Exception {
 		splitter = Pattern.compile(delimiter);
 		this.name = name;
 		setLabels(labels);
+		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
+		else {this.channel = new LooseChannel(this.labels, delimiter);}
 	}
 
 	/**
@@ -87,12 +92,29 @@ public final class DelimitedParser implements TupleStream {
 
 		try {
 			source = new BufferedReader(new FileReader(filename));
-			v= validate(hasHeader);
+			v= channel.validate(source, hasHeader);
 			this.filename = filename;
 			return v;
 		} catch (Exception e) {throw new RuntimeException("Error opening " + filename + ".", e);}
 	}
 
+	public Tuple next() {
+		Tuple t;
+		if (tupleCache != null) {
+			t= tupleCache;
+			tupleCache = null;
+		}else {
+			
+			List<Object> values; 
+			try {values = channel.next(source);}
+			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
+			catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
+			
+			t = new BasicTuple(name, labels, values);
+		}
+
+		return t;
+	}
 
 	/**Close the tree stream.  The next operation will no longer work.
 	 * Has next will return false;
@@ -115,85 +137,17 @@ public final class DelimitedParser implements TupleStream {
 	 * it guarantees that something can be read.
 	 */
 	public boolean hasNext() {
-		try {
-			return (source != null && source.ready());
-		} catch (Exception e) {
-			return false;
-		}
+		if (source == null ) {return false;}
+		if (tupleCache != null) {return true;}
+
+		try {tupleCache = next();}
+		catch (Exception e) {return false;}
+		
+		return true;
 	}
 
 	/**Identical to hasNext. (Not the case for all streams, but it is here.)*/
 	public boolean ready() {return hasNext();}
-
-	/**Get the next tuple from this file.  Stream must be open and ready and not at the end of the file.
-	 * After reading the line, it will attempt to turn it into a tuple.  If the line does not
-	 * split into the correct number of values AND ingoreErrorLines is true (the default value),
-	 * it will try the next line until it finds one.  If ignoreErrorLines is false, it will throw
-	 * an exception.
-	 *
-	 */
-	public Tuple next() {
-		if (source == null) {throw new NoSuchElementException("Stream " + name + " not currently opened.");}
-
-		String line;
-
-		try {
-			line = source.readLine();
-		} catch (EOFException eof) {
-			throw new NoSuchElementException("Reached end of file: " + filename);
-		} catch (Exception e) {
-			throw new RuntimeException("Unknown error reading file.", e);
-		}
-
-		//TODO: Convert things by some type schema here.
-		List values = Arrays.asList(splitter.split(line));
-		if (values.size() != labels.size()) {throw new InvalidInputLineException("Could not treat line as full tuple: "+ line);}
-		return new BasicTuple(name, labels, values);
-	}
-
-	/**Verifies that the file has a format compatible with the labels list given.
-	 * File is considered 'compatible' if the file has the same number
-	 * of elements in its first row as header items.  If the first row also
-	 * matches the header, it will be consumed (and never returned as a tuple).
-	 * In order for a header to be identified, the field labels must
-	 * match the header labels passed.  Field label matching is case-insensitive and ignores surrounding white space.
-	 *
- 	 * If stream has not been initialized (via 'open') and if there are no labels
-	 * specified, an exception is also thrown.
-	 *
-	 * If the first line length exceeds READ_AHEAD_LIMIT, the first line will be consumed,
-	 * but never returned as a tuple.
-	 *
-	 * @return True if everything that is checked matches.
-	 * @throws Exception Thrown when column count does not match or stream is not open or does not have a labels list.
-	 */
-	public boolean validate(boolean hasHeader) throws Exception
-	{
-		if (source ==null) {throw new Exception("Parse file cannot be validated before reader has been intialized.");}
-		if (labels ==null) {throw new Exception("Parse file cannot be validated when there is no labels list.");}
-
-		source.mark(READ_AHEAD_LIMIT);
-		String line = source.readLine();
-		String[] parts = splitter.split(line);
-		List<String> header = Arrays.asList(parts);
-		if (header.size() != labels.size()) {throw new InvalidHeaderException("Column count does not match the length of the labels list (expected " + labels.size() + " but found " + header.size() + ")");}
-
-		if (!hasHeader) {
-			source.reset();
-			return true;
-		}
-
-		for (int i=0; i<header.size(); i++) {
-			String fieldHeader = header.get(i).trim().toUpperCase();
-			String label = labels.get(i).trim().toUpperCase();
-			if (!fieldHeader.equals(label)) {
-				source.reset();
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 	public List<String> getLabels() {return labels;}
 	public void setLabels(String value) {

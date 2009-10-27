@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
@@ -112,7 +113,8 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	public StencilRunner execute() throws Exception {
 		if (stencilPanel == null) {throw new RuntimeException("Cannot execute an application prior to successful compilation.");}
 		if (runner.isRunning()) {throw new RuntimeException("Model is already executing.  Cannot execute twice concurrently.");}
-
+		final long startTime= System.currentTimeMillis();
+		
 		reporter.addMessage("Starting executing.");
 
 		if (runner == null || !runner.isAlive()) {runner = new StencilRunner(this);}
@@ -123,12 +125,20 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 				try {runner.join();}
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
 
+				long endTime = System.currentTimeMillis();
+				long duration = endTime - startTime;
 				
-				if (runner.getThrowable() == null) {reporter.addMessage("Execution terminated.");}
+				if (runner.getThrowable() == null) {
+					reporter.addMessage("Execution terminated.");
+				}
 				else {
 					reporter.addMessage("Execution terminated abnormally.");
 					runner.getThrowable().printStackTrace();
 				}
+				reporter.addMessage("Approximate runtime: %02d:%02d:%02d", 
+										TimeUnit.MILLISECONDS.toHours(duration),
+										TimeUnit.MILLISECONDS.toMinutes(duration),
+										TimeUnit.MILLISECONDS.toSeconds(duration));
 			}
 		};
 

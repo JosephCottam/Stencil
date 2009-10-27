@@ -44,14 +44,16 @@ public final class FileSource extends StreamSource {
 	private final String header;
 	private final String separator;
 	private final boolean checkHeader;
-
-	public FileSource(String name) {this(name, "","","", true);}
-	public FileSource(String name,String filename, String header, String separator, boolean checkHeader) {
+	private final boolean strict;
+	
+	public FileSource(String name) {this(name, "","","", true, true);}
+	public FileSource(String name,String filename, String header, String separator, boolean checkHeader, boolean strict) {
 		super(name);
 		this.filename = filename;
 		this.header = header;
 		this.separator = separator;
 		this.checkHeader = checkHeader;
+		this.strict = strict;
 	}
 
 	public SourceEditor getEditor() {return new File(this);}
@@ -70,7 +72,7 @@ public final class FileSource extends StreamSource {
 	 * Header matching rules are specified in the DelimitedParser.
 	 */
 	public TupleStream getStream(Model context) throws Exception {
-		DelimitedParser input = new DelimitedParser(name, header, separator);
+		DelimitedParser input = new DelimitedParser(name, header, separator, strict);
 		boolean result = input.open(filename);
 		if (!result & checkHeader) {input.next();}//consume the header if it did not get consumed but did return and is marked as having a header
 		return input;
@@ -96,6 +98,9 @@ public final class FileSource extends StreamSource {
 		b.append("CHECKHEADER: ");
 		b.append(checkHeader);
 		b.append("\n");
+		b.append("STRICT: ");
+		b.append(strict);
+		b.append("\n");
 		return b.toString();
 	}
 
@@ -118,6 +123,9 @@ public final class FileSource extends StreamSource {
 			} else if (line.startsWith("CHECKHEADER")) {
 				boolean checkHeader = (line.substring(line.indexOf(":") +2).toUpperCase().equals("TRUE"));
 				result = result.checkHeader(checkHeader);
+			} else if (line.startsWith("STRICT")) {
+				boolean strict = (line.substring(line.indexOf(":") +2).toUpperCase().equals("TRUE"));
+				result = result.strict(strict);
 			}
 			input.mark(100);
 			line = input.readLine();
@@ -128,30 +136,36 @@ public final class FileSource extends StreamSource {
 
 	public FileSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new FileSource(name, filename, header, separator, checkHeader);
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
 	}
 	
 	public String filename() {return filename;}
 	public FileSource filename(String filename) {
 		if (this.filename.equals(filename)) {return this;}
-		return new FileSource(name, filename, header, separator, checkHeader);
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
 	}
 
 	public String header() {return header;}
 	public FileSource header(String header) {
 		if (this.header.equals(header)) {return this;}
-		return new FileSource(name, filename, header, separator, checkHeader);
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
 	}
 
 	public String separator() {return separator;}
 	public FileSource separator(String separator) {
 		if (this.separator.equals(separator)) {return this;}
-		return new FileSource(name, filename, header, separator, checkHeader);
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
 	}
 
 	public boolean checkHeader() {return checkHeader;}
 	public FileSource checkHeader(boolean checkHeader) {
 		if (this.checkHeader == checkHeader) {return this;}
-		return new FileSource(name, filename, header, separator, checkHeader);
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
+	}
+	
+	public boolean strict() {return strict;}
+	public FileSource strict(boolean strict) {
+		if (this.strict == strict) {return this;}
+		return new FileSource(name, filename, header, separator, checkHeader, strict);
 	}
 }

@@ -197,7 +197,7 @@ public final class NamedColor {
 	private NamedColor() {/*Utility class. Not instantiable.*/}
 	
 	static int create(List<Value> args) {
-		String name = Converter.toString(args.get(0));
+		String name = Converter.toString(args.get(0)).toUpperCase();
 		
 		int c;
 		//Named color

@@ -31,7 +31,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 		Program program = ParseStencil.parse(registerFailRule, adapter);
 		StencilPanel panel = adapter.generate(program);
 
-		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|");
+		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|", true);
 		stream.open(OVERLAY_SHORT);
 		TupleLoader loader = new TupleLoader(panel, stream);
 		loader.load();
@@ -45,7 +45,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 
 		Program program = ParseStencil.parse(source, adapter);
 		StencilPanel panel = adapter.generate(program);
-		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "\\s+\\|\\s+");
+		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "\\s+\\|\\s+", true);
 		stream.open("./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt");
 
 		TupleLoader loader = new TupleLoader(panel, stream);

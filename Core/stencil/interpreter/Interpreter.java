@@ -98,7 +98,7 @@ public class Interpreter {
 				if (matches) {
 					Tuple result;
 					try {result = process(group.getRules(), source);}
-					catch (Exception e) {throw new RuntimeException(String.format("Error processing in layer %1$s", layer.getName()));}
+					catch (Exception e) {throw new RuntimeException(String.format("Error processing in layer %1$s", layer.getName()), e);}
 
 					if (result == null) {continue;} //Move on to the next group if the result was empty...
  

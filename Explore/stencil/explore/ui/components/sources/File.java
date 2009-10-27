@@ -47,6 +47,7 @@ public class File extends SourceEditor {
 
 	private final JTextField header = new JTextField();;
 	private final JCheckBox hasHeader = new JCheckBox();;
+	private final JCheckBox strict = new JCheckBox();;
 	private final JTextField separator = new JTextField();;
 	private final JButton fileList = new JButton("\u2026");;
 	protected final JTextField filename = new JTextField();;
@@ -87,6 +88,9 @@ public class File extends SourceEditor {
 		this.add(labeledPanel("Separator: ", separator));
 		this.add(labeledPanel("File: ", filename, fileList));
 		this.add(labeledPanel("Has Header: ", hasHeader));
+		this.add(labeledPanel("Strict: ", strict));
+		
+
 
 		FocusListener fl = new FocusListener() {
 			public void focusGained(FocusEvent arg0) {/*No action.*/}
@@ -97,12 +101,13 @@ public class File extends SourceEditor {
 		separator.addFocusListener(fl);
 		filename.addFocusListener(fl);
 		hasHeader.addFocusListener(fl);
+		strict.addFocusListener(fl);
 	}
 
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public FileSource get() {
-		return new FileSource(name, filename.getText(), header.getText(), separator.getText(), hasHeader.isSelected());
+		return new FileSource(name, filename.getText(), header.getText(), separator.getText(), hasHeader.isSelected(), strict.isSelected());
 	}
 
 	/**Set the current state to match the source passed.
@@ -114,6 +119,7 @@ public class File extends SourceEditor {
 		assert source != null : "Cannot pass a null to set.";
 		super.set(source);
 		header.setText(source.header());
+		strict.setSelected(source.strict());
 		hasHeader.setSelected(source.checkHeader());
 		separator.setText(source.separator());
 		filename.setText(WorkingDirectory.relativePath(source.filename()));

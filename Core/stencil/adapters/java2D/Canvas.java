@@ -112,7 +112,9 @@ public final class Canvas extends JComponent {
 				for (Guide2D g: t.getGuides()) {bounds.add(g.getBoundsReference());}
 			}			
 		} 
-		return bounds.getBounds();
+		
+		if (bounds == null) {return new Rectangle(0,0,0,0);}
+		else {return bounds.getBounds();}
 	}
 	
 	/**Zooms anchored on the given screen point TO the given scale.*/

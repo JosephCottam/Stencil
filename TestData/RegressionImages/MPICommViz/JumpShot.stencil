@@ -1,0 +1,55 @@
+STREAM: File
+NAME: trans
+HEADER: op source dest start end size G r g b
+SEPARATOR: \s+
+SOURCE: ./diss_16.viz
+CHECKHEADER: false
+STRICT: false
+STREAM: File
+NAME: overheads
+HEADER: op rank cpu start end r g b
+SEPARATOR: \s+
+SOURCE: ./diss_16.viz
+CHECKHEADER: false
+STRICT: false
+
+external stream overheads(op, rank, cpu, start, end, r,g,b)
+external stream trans(op, source, dest, start, end, size, G, r,g,b) 
+
+layer labels[TEXT]
+from overheads
+	ID: rank
+	TEXT: Concatenate("Rank ", rank)
+	X: -10
+	Y: Layout(rank)
+	FONT_COLOR: @color(GRAY70)
+	REGISTRATION: "RIGHT"
+
+layer overhead[LINE]
+from overheads
+	ID: Count("")
+	(Y.1, Y.2): Layout(rank) -> (_,_)
+	X.1: Timescale(start)
+	X.2: Timescale(end)
+	STROKE_COLOR : ColorByOp(op)
+
+layer coms[LINE]
+from trans
+	ID: Count("")
+	Y.1: Layout(source)
+	Y.2: Layout(dest)
+	X.1: Timescale(start)
+	X.2: Timescale(end)
+	STROKE_COLOR : ColorByOp(op)
+
+operator ColorByOp(op) -> (C)
+   (op =~ "osend") => C: @color(SlateBlue)
+	(op =~ "orecv") => C: @color(MediumSlateBlue)
+	(op =~ "transmission") => C: @color(Maroon, .5)
+
+
+operator Layout (rank)->(Y)
+  all => (Y) : Index(rank) -> Mult(20, _)
+
+operator Timescale(time) -> (time)
+  all => time : Div(time, 20)
