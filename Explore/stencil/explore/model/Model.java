@@ -135,10 +135,8 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 					reporter.addMessage("Execution terminated abnormally.");
 					runner.getThrowable().printStackTrace();
 				}
-				reporter.addMessage("Approximate runtime: %02d:%02d:%02d", 
-										TimeUnit.MILLISECONDS.toHours(duration),
-										TimeUnit.MILLISECONDS.toMinutes(duration),
-										TimeUnit.MILLISECONDS.toSeconds(duration));
+				reporter.addMessage("Approximate runtime  %d seconds (%d ms).", 
+										TimeUnit.MILLISECONDS.toSeconds(duration), duration);
 			}
 		};
 

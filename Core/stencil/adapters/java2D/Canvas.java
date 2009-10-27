@@ -109,7 +109,13 @@ public final class Canvas extends JComponent {
 						bounds.add(g.getBoundsReference());
 					}
 				}
-				for (Guide2D g: t.getGuides()) {bounds.add(g.getBoundsReference());}
+				for (Guide2D g: t.getGuides()) {
+					if (bounds == null) {
+						bounds =(Rectangle2D) g.getBoundsReference().clone();
+					}else {
+						bounds.add(g.getBoundsReference());
+					}
+				}
 			}			
 		} 
 		

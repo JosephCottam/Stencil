@@ -116,8 +116,8 @@ options {
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
     private String key(String layer, String attribute) {
     	MultiPartName att = new MultiPartName(attribute);
-    	
-    	return layer + ":" + att.getName();	//Trim to just the attribute name
+		String key = layer + ":" + att.getName();	//Trim to just the attribute name
+		return key;
     }
     
     private String guideName(String name) {return new MultiPartName(name).modSuffix(GUIDE_BLOCK_TAG).toString();}       

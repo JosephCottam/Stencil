@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/ViewCanvas/google_stocks.csv
 CHECKHEADER: true
 STREAM: Mouse
 NAME: Mouse
@@ -12,11 +12,11 @@ external stream Stocks(Date, Open)
 external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
 
 canvas Main
-	guide axis[sample="LINEAR", tickCount=10, , tickSize=5, textOffset=6] from Stocks Y 
+	guide axis[sample="LINEAR", line.STROKE_WEIGHT=2, tickCount=10, tickSize=5, textOffset=6] from Markers Y 
 		label.SCALE_BY: "NONE"
 		label.FONT_SIZE: 10
 		line.STROKE_WEIGHT: 1
-		label.REGISTRATION="RIGHT"
+		label.REGISTRATION: "RIGHT"
 
 
 layer Markers[POLY_LINE]

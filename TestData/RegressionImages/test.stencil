@@ -1,23 +1,22 @@
-STREAM: Window State
-NAME: Window
-ON_CHANGE: false
 STREAM: File
 NAME: Stocks
-HEADER: 
-SEPARATOR: 
-SOURCE: 
+HEADER: Date,Open,High,Low,Close,Volume
+SEPARATOR: ,
+SOURCE: ./Stocks/google_stocks.csv
 CHECKHEADER: true
 STREAM: Mouse
 NAME: Mouse
-FREQUENCY: -2147483648
+FREQUENCY: 30
 
 external stream Stocks(Date, Open)
 external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
-external stream Window(X,Y, WIDTH, HEIGHT)
+
+
+canvas Main
+	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="LEFT", axisOffset=10] from Markers X
+	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT", axisOffset=-10] from Markers Y
 
 layer Markers[POLY_LINE]
-	axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="LEFT", axisOffset=10]: X
-	axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT", axisOffset=-10]: Y
 from Stocks
 	ID : "Google"
 	X.new : TimeStep(Date) #-> VALUE
@@ -25,9 +24,6 @@ from Stocks
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @color(BLUE)
    view(ZOOM, X, Y, HEIGHT) : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> (_, canvas.X, canvas.Y, canvas.HEIGHT)
-	/* view(ZOOM) : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT)
-	view(HEIGHT) : canvas.HEIGHT
-	view(X, Y) : (canvas.X, canvas.Y) */
 
 layer Lookup[SHAPE]
 from Stocks

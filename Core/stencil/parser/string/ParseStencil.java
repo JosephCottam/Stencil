@@ -203,7 +203,6 @@ public abstract class ParseStencil {
 		SetOperators set = new SetOperators(treeTokens, modules);
 		set.downup(p);
 		
-		
 		treeTokens = new CommonTreeNodeStream(p);
 		AutoGuide ag = new AutoGuide(treeTokens, modules);
 		ag.setTreeAdaptor(treeAdaptor);

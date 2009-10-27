@@ -41,7 +41,7 @@ public class Profile {
 		
 		ImageTest test = new VSM(new String[]{profileProperties});
 		
-		ImageTest.TestRecord r = test.getTestRecord();
+		TestRecord r = test.getTestRecord();
 		
 		stencil.explore.ui.Batch.preRun(null);
 		stencil.explore.ui.Batch.batchInvoke(r.getProfileCommand());

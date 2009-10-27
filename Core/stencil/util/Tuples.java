@@ -86,6 +86,9 @@ public final class Tuples {
 	public static final Tuple sift(String prefix, Tuple source) {
 		List<String> fields = new ArrayList();
 		List<Object> values = new ArrayList();
+		
+		if (source == null) {return EMPTY_TUPLE;}
+		
 		for (String field:source.getFields()) {
 			if (field.startsWith(prefix)) {
 				values.add(source.get(field));
