@@ -48,9 +48,9 @@ public abstract class BasicProject implements StencilOperator {
 
 		for (Value arg: formals) {
 			if (arg.isAtom()) {args[a++] = arg.getValue();}			//copy literals
-			else {
-				String ref = (String) ((TupleRef) arg).getValue().getValue(); //TODO: Will not work with positional tuple ref
-				int idx =prototype.indexOf(ref);
+			else if (arg.isTupleRef()){
+				TupleRef ref = (TupleRef)arg;
+				int idx = ref.toNumericRef(prototype);
 				if (idx ==-1) {throw new RuntimeException(String.format("Error locating field %1$s while working with guide creation (valid fields: %2$s).", ref, Arrays.deepToString(prototype.toArray())));}
 				args[a++] = valueSource[idx];
 			}	//lookup values in the valueSource

@@ -155,7 +155,7 @@ options {
 //guides section
 buildMappings: ^(c=CONSUMES . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*));
 mapping[String layerName] 
-  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .) 
+  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .)
 		{attDefs.put(key(layerName, field), group);};
 
 transferMappings

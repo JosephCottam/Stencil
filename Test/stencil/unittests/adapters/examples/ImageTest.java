@@ -13,9 +13,6 @@ import javax.imageio.*;
 
 import java.awt.image.BufferedImage;
 
-import static stencil.explore.Application.*;
-import static stencil.unittests.adapters.examples.TestRecord;
-
 public abstract class ImageTest {
 	private TestRecord record;
 	File testPNG;

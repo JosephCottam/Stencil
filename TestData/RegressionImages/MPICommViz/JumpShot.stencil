@@ -2,14 +2,14 @@ STREAM: File
 NAME: trans
 HEADER: op source dest start end size G r g b
 SEPARATOR: \s+
-SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
 CHECKHEADER: false
 STRICT: false
 STREAM: File
 NAME: overheads
 HEADER: op rank cpu start end r g b
 SEPARATOR: \s+
-SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
 CHECKHEADER: false
 STRICT: false
 
@@ -17,22 +17,23 @@ external stream overheads(op, rank, cpu, start, end, r,g,b)
 external stream trans(op, source, dest, start, end, size, G, r,g,b) 
 
 canvas Main
-	guide axis from baseline X
+	guide axis[tickSize=10] from baseline X
 		label.FONT_SIZE: 10
 		label.REGISTRATION: "RIGHT"
 
-layer baseline
+layer baseline[LINE]
 from overheads
 	ID: Count(" ")
-	Y: Layout(rank)
-	X: Add(0,end) #-> Timescale(VALUE) 
+	X.2: Add(0,end) #-> Timescale(VALUE) -> Max[1..n](_)
+	X.1: Add(0,start) #-> Timescale(VALUE) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
-	STROKE_COLOR: @color(Gray90)
+	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
 	ID: Count(" ")
-	Y: Layout(source)
-	X: Add(0,end) #-> Timescale(VALUE) 
+	X.2: Add(0,end) #-> Timescale(VALUE) -> Max[1..n](_)
+	X.1: Add(0,start) #-> Timescale(VALUE) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
+	(Y.1,Y.2): Layout(source) ->(_,_)
 
 
 /*
@@ -86,7 +87,7 @@ operator ColorByOp(op) -> (C)
 
 
 operator Layout (rank)->(Y)
-  all => (Y) : Index(rank) -> Mult(20, _)
+  all => (Y) : Index(rank) -> Mult(20, _) -> Add(10, _)
 
 operator Timescale(time) -> (time)
   all => time : Div(time, 30)

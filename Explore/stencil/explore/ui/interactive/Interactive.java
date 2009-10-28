@@ -226,8 +226,10 @@ public class Interactive implements Runnable {
 		save.setMnemonic(KeyEvent.VK_S);
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.META_MASK));
 
-		final JMenuItem exportPNG = new JMenuItem("Export PNG");
+		final JMenuItem exportPNG = new JMenuItem("Export Raster");
+		final JMenuItem exportEPS = new JMenuItem("Export Vector");
 		final JMenuItem exportTuples = new JMenuItem("Export Tuples");
+		
 
 		final JMenuItem close = new JMenuItem("Close");
 		close.setMnemonic(KeyEvent.VK_W);
@@ -284,6 +286,17 @@ public class Interactive implements Runnable {
 					} else if (stat == JFileChooser.ERROR_OPTION) {
 						java.awt.Toolkit.getDefaultToolkit().beep();
 					}
+				} else if (arg.getSource() == exportEPS) {
+					JFileChooser fc = new JFileChooser();
+					int stat = fc.showSaveDialog(editorFrame);
+					if (stat == JFileChooser.APPROVE_OPTION) {
+						String filename = fc.getSelectedFile().getAbsolutePath();
+
+						try {model.export(filename, "VECTOR", Application.EXPORT_RESOLUTION);}
+						catch(Exception e) {throw new RuntimeException("Error exporting image.", e);}
+					} else if (stat == JFileChooser.ERROR_OPTION) {
+						java.awt.Toolkit.getDefaultToolkit().beep();
+					}
 				} else if (arg.getSource() == close) {editorFrame.dispose();}
 			}
 		};
@@ -291,6 +304,7 @@ public class Interactive implements Runnable {
 		open.addActionListener(fileMenuListener);
 		save.addActionListener(fileMenuListener);
 		exportPNG.addActionListener(fileMenuListener);
+		exportEPS.addActionListener(fileMenuListener);
 		exportTuples.addActionListener(fileMenuListener);
 		close.addActionListener(fileMenuListener);
 
@@ -299,6 +313,7 @@ public class Interactive implements Runnable {
 		file.add(new JSeparator());
 		file.add(exportTuples);
 		file.add(exportPNG);
+		file.add(exportEPS);
 		file.add(new JSeparator());
 		file.add(close);
 

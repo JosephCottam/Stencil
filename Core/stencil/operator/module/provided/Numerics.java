@@ -62,8 +62,8 @@ public class Numerics extends BasicModule {
 			return BasicTuple.singleton(sum);
 		}
 
+		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			return BasicTuple.singleton(sum);
 		}
 
@@ -91,9 +91,9 @@ public class Numerics extends BasicModule {
  			min = Math.min(min, min(values));
 			return BasicTuple.singleton(min);
 		}
- 		
+
+		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			return BasicTuple.singleton(min);
 		}
 
@@ -122,6 +122,7 @@ public class Numerics extends BasicModule {
  			return BasicTuple.singleton(max);
 		}
 		
+		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			return BasicTuple.singleton(max);

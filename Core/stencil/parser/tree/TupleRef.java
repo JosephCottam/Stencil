@@ -23,6 +23,7 @@ public class TupleRef extends Value {
 		return externalValue(source);
 	}
 
+
 	public boolean isTupleRef() {return true;}
 	
 	public boolean isNumericRef() {return getValue().isNumber();}

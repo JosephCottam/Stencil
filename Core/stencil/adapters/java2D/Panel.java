@@ -36,6 +36,7 @@ import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
+import stencil.util.epsExport.EpsGraphics2D;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -44,6 +45,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.imageio.ImageIO;
 
@@ -97,9 +99,12 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 
 		if (type.equals("PNG") || type.equals("RASTER")) {
 			exportPNG(filename, Converter.toInteger(info));
+		} else if (type.equals("EPS") || type.equals("VECTOR")) {
+			exportEPS(filename);
 		} else {super.export(filename, type, info);}
 	}
 	
+		
 	/**Prep for export by running the guides and dynamic rules.
 	 * 
 	 * TODO: Dynamic rules need to be given a chance to quiesce, not just be run once....
@@ -108,6 +113,16 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		if (guideUpdater != null) {guideUpdater.runOnce();}
 		if (dynamicUpdater != null) {dynamicUpdater.runOnce();}
 	}
+	
+	private void exportEPS(String filename) throws Exception {
+		File f= new File(filename);
+		Rectangle bounds = canvas.getContentBounds();
+		EpsGraphics2D g = new EpsGraphics2D("Stencil Output", f, bounds.x, bounds.y, bounds.x+ bounds.width, bounds.y+ bounds.height);
+		canvas.painter.doDrawing(g);
+		g.close();
+		g.dispose();		
+	}
+
 	
 	private void exportPNG(String filename, Integer dpi) throws Exception { 
 		double scale;
