@@ -102,6 +102,7 @@ public class Sidebar implements Guide2D {
 		} else {
 			this.bounds = null;
 		}
+		System.out.println(bounds);
 	}
 	
 	public Rectangle2D getBoundsReference() {return bounds;}

@@ -10,5 +10,5 @@
 ./RegressionImages/SimpleLines/ -open Arcs.stencil -txt arcs.txt -png 200 arcs.png
 ./RegressionImages/Sourceforge/ -open Sourceforge.stencil -txt Sourceforge.txt -png 200 Sourceforge.png
 ./RegressionImages/Stocks/ -open Stocks.stencil -txt stocks.txt -png 200 stocks.png
-./RegressionImages/VSM/ -open VSM.stencil -source BFS er_100_0.005.bfs -source VertexList er_100_0.005.adj -txt VSM1.txt -png 200 VSM1.png
-./RegressionImages/VSM/ -open VSM.stencil -source BFS ws_400_12_0.1.bfs -source VertexList ws_400_12_0.1.adj -txt VSM2.txt -png 200 VSM2.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList er_100_0.005.adj -txt VSM1.txt -png 200 VSM1.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList ws_400_12_0.1.adj -txt VSM2.txt -png 200 VSM2.png

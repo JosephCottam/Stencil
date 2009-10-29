@@ -2,8 +2,10 @@ STREAM: File
 NAME: Edges
 HEADER: ID1  ID2
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/graph.txt
-CHECKHEADER: false
+SOURCE: ./graph.txt
+SKIP: 0
+STRICT: TRUE
+
 
 external stream Edges (ID1, ID2)
 

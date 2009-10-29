@@ -3,7 +3,9 @@ NAME: Tweets
 HEADER: MESSAGE
 SEPARATOR: ,
 SOURCE: ./Tweets.txt
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
+
 
 external stream Tweets(MESSAGE, LINK, TIME)
 

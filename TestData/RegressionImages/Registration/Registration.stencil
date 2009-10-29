@@ -3,13 +3,16 @@ NAME: Reg
 HEADER: Name
 SEPARATOR: \s+
 SOURCE: ./RegistrationData.txt
-CHECKHEADER: false
+STRICT: TRUE
+SKIP: 0
 STREAM: File
 NAME: Reg2
 HEADER: Name
 SEPARATOR: \s+
 SOURCE: ./RegistrationData.txt
-CHECKHEADER: false
+STRICT: TRUE
+SKIP: 0
+
 
 external stream Reg(Name)
 external stream Reg2(Name)

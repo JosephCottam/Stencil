@@ -46,7 +46,7 @@ public class File extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
 
 	private final JTextField header = new JTextField();;
-	private final JCheckBox hasHeader = new JCheckBox();;
+	private final JTextField skip = new JTextField();;
 	private final JCheckBox strict = new JCheckBox();;
 	private final JTextField separator = new JTextField();;
 	private final JButton fileList = new JButton("\u2026");;
@@ -60,7 +60,7 @@ public class File extends SourceEditor {
 
 	private File() {
 		super("");
-		hasHeader.setSelected(true);
+		skip.setText("0");
 
 		fileChooser = new JFileChooser();
 		fileChooser.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir() + "input.txt"));
@@ -87,7 +87,7 @@ public class File extends SourceEditor {
 		this.add(labeledPanel("Header: ", header));
 		this.add(labeledPanel("Separator: ", separator));
 		this.add(labeledPanel("File: ", filename, fileList));
-		this.add(labeledPanel("Has Header: ", hasHeader));
+		this.add(labeledPanel("Skip Lines: ", skip));
 		this.add(labeledPanel("Strict: ", strict));
 		
 
@@ -100,14 +100,14 @@ public class File extends SourceEditor {
 		header.addFocusListener(fl);
 		separator.addFocusListener(fl);
 		filename.addFocusListener(fl);
-		hasHeader.addFocusListener(fl);
+		skip.addFocusListener(fl);
 		strict.addFocusListener(fl);
 	}
 
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public FileSource get() {
-		return new FileSource(name, filename.getText(), header.getText(), separator.getText(), hasHeader.isSelected(), strict.isSelected());
+		return new FileSource(name, filename.getText(), header.getText(), separator.getText(), Integer.parseInt(skip.getText()), strict.isSelected());
 	}
 
 	/**Set the current state to match the source passed.
@@ -120,7 +120,7 @@ public class File extends SourceEditor {
 		super.set(source);
 		header.setText(source.header());
 		strict.setSelected(source.strict());
-		hasHeader.setSelected(source.checkHeader());
+		skip.setText(Integer.toString(source.skip()));
 		separator.setText(source.separator());
 		filename.setText(WorkingDirectory.relativePath(source.filename()));
 	}

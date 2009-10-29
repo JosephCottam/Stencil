@@ -3,13 +3,13 @@ NAME: Values
 HEADER: Category
 SEPARATOR: ,
 SOURCE: ./Fruits.txt
-CHECKHEADER: false
+SKIP: 0
+STRICT: TRUE
 
 external stream Values(Category)
 
 canvas Main
 	guide axis[tickSize=5, textOffset=6] from Chart X
-		label.TEXT : Concatenate("X=", INPUT) -> _
   		label.FONT_SIZE: 10
 		line.STROKE_WEIGHT: 1
 		label.REGISTRATION: "LEFT"

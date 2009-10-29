@@ -36,8 +36,8 @@ public abstract class TestGenerator extends junit.framework.TestCase {
 		String streamRules = StringUtils.getContents(sourceFile);
 		Program program = ParseStencil.parse(streamRules, adapter);
 		StencilPanel panel = adapter.generate(program);
-		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|", true);
-		stream.open(OVERLAY_SHORT);
+		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_SHORT, "\\|", true,1);
+		stream.open();
 		TupleLoader loader = new TupleLoader(panel, stream);
 
 		assertNotNull(loader);

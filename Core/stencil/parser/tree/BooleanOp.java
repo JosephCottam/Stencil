@@ -57,11 +57,11 @@ public final class BooleanOp extends StencilTree {
 
 			//Must do conversion here, since the tuples do not store types, just values.
 			try {l = Converter.toDouble(lhs.getValue());}
-			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing LHS of implicit numeric filter " + token.toString() + " with value " + lhs);}
+			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing LHS of implicit numeric filter " + token.getText() + " with value " + lhs);}
 
 			//Must do conversion here, since the tuples do not store types, just values.
 			try {r = Converter.toDouble(rhs.getValue());}
-			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing RHS of implicit numeric filter " + token.toString() + " with value " + rhs);}
+			catch (NumberFormatException e) {throw new NumberFormatException("Error parsing RHS of implicit numeric filter " + token.getText() + " with value " + rhs);}
 
 
 			if (token.getText().equals(ParserConstants.GT)) {return l >  r;}

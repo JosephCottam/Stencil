@@ -28,9 +28,9 @@
  */
 package stencil.util.streams.txt;
 
-public class InvalidHeaderException extends Exception {
+public class FileValidationException extends Exception {
 	private static final long serialVersionUID = 1L;
 
-	public InvalidHeaderException(String message) {this(message, null);}
-	public InvalidHeaderException(String message, Exception cause) {super(message, cause);}
+	public FileValidationException(String message) {this(message, null);}
+	public FileValidationException(String message, Exception cause) {super(message, cause);}
 }

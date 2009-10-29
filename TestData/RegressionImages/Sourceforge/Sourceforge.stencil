@@ -3,13 +3,15 @@ NAME: NodePositions
 HEADER: ID X Y
 SEPARATOR: \s+
 SOURCE: ./vx_cluster_0_8.6_min_cuts.coord
-CHECKHEADER: false
+SKIP: 0
+STRICT: TRUE
 STREAM: File
 NAME: Attributes
 HEADER: ID|ATT
 SEPARATOR: \|
 SOURCE: ./project_troves.txt
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
 
 external stream NodePositions(ID, X,Y)  /*Precomputed layout*/
 external stream Attributes(ID, ATT)		 /*Additional attributes*/

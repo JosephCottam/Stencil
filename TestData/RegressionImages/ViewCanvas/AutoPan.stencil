@@ -3,7 +3,8 @@ NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
 SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/ViewCanvas/google_stocks.csv
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
 STREAM: Mouse
 NAME: Mouse
 FREQUENCY: -2147483648

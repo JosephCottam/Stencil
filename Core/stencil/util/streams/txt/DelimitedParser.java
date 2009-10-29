@@ -29,7 +29,7 @@
 package stencil.util.streams.txt;
 
 
-import java.io.BufferedReader;
+import java .io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +39,8 @@ import java.util.regex.*;
 import stencil.streams.Tuple;
 import stencil.streams.TupleStream;
 import stencil.util.BasicTuple;
+
+import static java.lang.String.format;
 
 /**
  * TupleStream implementation that converts a delimited text file into a tuple
@@ -51,7 +53,7 @@ public final class DelimitedParser implements TupleStream {
 	private BufferedReader source;
 
 	/**File the reader is reading from*/
-	private String filename;
+	private final String filename;
 
 	/**Column labels*/
 	private List<String> labels;
@@ -61,6 +63,8 @@ public final class DelimitedParser implements TupleStream {
 
 	/**Regular expression used to split incoming data.*/
 	private final Pattern splitter;
+
+	private final int skip;
 	
 	private final NextChannel channel;
 	
@@ -69,42 +73,42 @@ public final class DelimitedParser implements TupleStream {
 	 * */
 	private Tuple tupleCache;
 	
-	public DelimitedParser(String name, String labels, String delimiter, boolean strict) throws Exception {
+	public DelimitedParser(String name, String labels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
 		this.name = name;
+		this.filename = filename;
+		this.skip = skip;
 		setLabels(labels);
 		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
 		else {this.channel = new LooseChannel(this.labels, delimiter);}
 	}
 
-	/**
-	 * Open the filename given.  Upon opening, the validate method is called
-	 * to ensure the file is consistent with the header description given.
+	/**Makes the stream ready to be read from.
 	 *
 	 * Unlike standard java filename resolution, this method will expand '~' to the user's home directory
 	 *
 	 * @param filename
 	 */
-	public boolean open(String filename) {return open(filename, true);}
-	public boolean open(String filename, boolean hasHeader) {
+	public void open() {
 		assert (filename != null && filename.trim() != "") : "Invalid filename supplied.  May not be null.  May not be empty.";
-		boolean v =false;
 
 		try {
 			source = new BufferedReader(new FileReader(filename));
-			v= channel.validate(source, hasHeader);
-			this.filename = filename;
-			return v;
+			int skip = this.skip;
+			try {while (skip-- > 0) {source.readLine();}}
+			catch (Exception e) {throw new RuntimeException("Error trying to skip indicated lines.", e);}
+			
+			channel.validate(source);
 		} catch (Exception e) {throw new RuntimeException("Error opening " + filename + ".", e);}
 	}
 
 	public Tuple next() {
 		Tuple t;
+		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
 		if (tupleCache != null) {
 			t= tupleCache;
 			tupleCache = null;
 		}else {
-			
 			List<Object> values; 
 			try {values = channel.next(source);}
 			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
@@ -121,23 +125,18 @@ public final class DelimitedParser implements TupleStream {
 	 */
 	public void close() throws Exception{
 		if (source != null && source.ready()) {
+			tupleCache = null;
 			source.close();
 			source = null;
 		}
 	}
 
-	public void reset() throws Exception {
-		close();
-		open(filename);
-	}
-
-	/**Returns true if the stream is ready.  False if the stream is not
-	 * ready (stream is null, returns not ready or throws an exception).
-	 * This does not guarantees the next piece of input will validate, but
-	 * it guarantees that something can be read.
+	/**Returns true if the stream has been opened
+	 * and there are more tuples on it.  False if there
+	 * are no more tuples (guaranteed to never be more).
 	 */
 	public boolean hasNext() {
-		if (source == null ) {return false;}
+		if (source == null ) {throw new RuntimeException("Stream not opened.");}
 		if (tupleCache != null) {return true;}
 
 		try {tupleCache = next();}
@@ -146,8 +145,12 @@ public final class DelimitedParser implements TupleStream {
 		return true;
 	}
 
-	/**Identical to hasNext. (Not the case for all streams, but it is here.)*/
-	public boolean ready() {return hasNext();}
+	
+	/**Is a tuple immediately available?*/
+	public boolean ready() {
+		hasNext();	
+		return tupleCache != null;
+	}
 
 	public List<String> getLabels() {return labels;}
 	public void setLabels(String value) {

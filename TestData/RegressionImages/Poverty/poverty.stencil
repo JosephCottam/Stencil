@@ -3,31 +3,36 @@ NAME: Region
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
 SOURCE: ./regions.txt
-CHECKHEADER: true
+STRICT: TRUE
+SKIP: 1
 STREAM: File
 NAME: Poverty
 HEADER: State,Children, Adults, Elderly, Total
 SEPARATOR: ,
 SOURCE: ./povertyPercent.csv
-CHECKHEADER: true
+STRICT: TRUE
+SKIP: 1
 STREAM: File
 NAME: Postal
 HEADER: State  ID
 SEPARATOR: \s\s+
 SOURCE: ./postal.txt
-CHECKHEADER: false
+STRICT: TRUE
+SKIP: 0
 STREAM: File
 NAME: Pop
 HEADER: State,Children,Adults,Elderly, Total
 SEPARATOR: ,
 SOURCE: ./povertyCounts.csv
-CHECKHEADER: true
+STRICT: TRUE
+SKIP: 1
 STREAM: File
 NAME: Items
 HEADER: Name
 SEPARATOR: ,
 SOURCE: ./items.txt
-CHECKHEADER: false
+STRICT: TRUE
+SKIP: 0
 
 external stream Items(Name)
 external stream Postal(State, ID)

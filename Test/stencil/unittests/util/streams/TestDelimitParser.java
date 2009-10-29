@@ -11,15 +11,15 @@ public class TestDelimitParser extends TestCase {
 	public static String header_coordFile = "./TestData/RegressionImages/Sourceforge/suppliments/header_coord.txt";
 
 	public void testOpen() throws Exception{
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
-		p.open(header_coordFile);
+		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		p.open();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 		Tuple t = p.next();
 		Assert.assertTrue("First tuple not as expected after open.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
 
 		
-		p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
-		p.open(header_coordFile);
+		p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		p.open();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 
 		t = p.next();
@@ -29,20 +29,14 @@ public class TestDelimitParser extends TestCase {
 	
 	
 	public void testHasNext() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
+		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true, 1);
 		Assert.assertFalse("HasNext true before open.", p.hasNext());
 
-		p.open(header_coordFile);
+		p.open();
 		Assert.assertTrue("HasNext false after open", p.hasNext());
 		
-		p.reset();
-		Assert.assertTrue("HasaNext false after pre-close reset.", p.hasNext());
-
 		p.close();
 		Assert.assertFalse("Hasnext true after close.", p.hasNext());
-		
-		p.reset();
-		Assert.assertTrue("HasaNext false after post-close reset.", p.hasNext());
 		
 		int i=0;
 		while (p.hasNext() && i< 1000) {p.next(); i++;}
@@ -50,9 +44,9 @@ public class TestDelimitParser extends TestCase {
 	}
 	
 	public void testNext() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
+		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
 
-		p.open(header_coordFile);
+		p.open();
 		
 		int i=0;
 		while (p.hasNext() && i< 1000) {p.next(); i++;}
@@ -60,8 +54,8 @@ public class TestDelimitParser extends TestCase {
 	}
 	
 	public void testClose() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
-		p.open(header_coordFile);
+		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		p.open();
 		Assert.assertTrue("Stream not ready after open.", p.hasNext());
 		p.close();
 		Assert.assertFalse("Stream did not close.", p.hasNext());
@@ -70,30 +64,6 @@ public class TestDelimitParser extends TestCase {
 			p.next();
 			Assert.fail("Next succeeded when object was closed.");
 		} catch (java.util.NoSuchElementException e) {/*Exception expected.*/}
-
-	}
-	
-	public void testReset() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", "\\s+", true);
-		Tuple t;
-
-		p.open(header_coordFile);
-		Assert.assertTrue("Stream not ready after open.", p.hasNext());
-		t = p.next();
-		Assert.assertTrue("First tuple not as expected after reset.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
-
-		
-		p.reset();
-		Assert.assertTrue("Stream not ready after reset.", p.hasNext());
-		t = p.next();
-		Assert.assertTrue("First tuple not as expected after reset.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
-
-		
-		p.close();
-		p.reset();
-		Assert.assertTrue("Stream not ready after close and reset.", p.hasNext());
-		t = p.next();
-		Assert.assertTrue("First tuple not as expected after reset.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
 
 	}
 }

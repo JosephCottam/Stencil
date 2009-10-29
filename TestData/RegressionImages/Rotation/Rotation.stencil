@@ -3,7 +3,9 @@ NAME: Elements
 HEADER: Name
 SEPARATOR: ,
 SOURCE: ./RotationData.txt
-CHECKHEADER: true
+STRICT: TRUE
+SKIP: 1
+
 
 external stream Elements(Name)
 

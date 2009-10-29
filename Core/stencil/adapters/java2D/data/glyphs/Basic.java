@@ -42,6 +42,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
+import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -227,7 +228,7 @@ public abstract class Basic implements Glyph2D {
 				double scale=2;
 				double x = (Double) this.get("X", Double.class);
 				double y = (Double) this.get("Y", Double.class);
-				g.fill(Shapes.cross(x-scale/2, y-scale/2, scale));
+				g.fill(Shapes.getShape(StandardShape.CROSS, x-scale/2, y-scale/2, scale, scale));
 			} catch  (Exception e) {/*Exception ignored, its just debug code.*/}
 
 		}

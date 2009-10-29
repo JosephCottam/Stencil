@@ -3,14 +3,14 @@ NAME: trans
 HEADER: op source dest start end size G r g b
 SEPARATOR: \s+
 SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
-CHECKHEADER: false
+SKIP: 0
 STRICT: false
 STREAM: File
 NAME: overheads
 HEADER: op rank cpu start end r g b
 SEPARATOR: \s+
 SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/MPICommViz/diss_16.viz
-CHECKHEADER: false
+SKIP: 0
 STRICT: false
 
 external stream overheads(op, rank, cpu, start, end, r,g,b)

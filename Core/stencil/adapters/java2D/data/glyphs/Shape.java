@@ -118,7 +118,7 @@ public class Shape extends Filled {
 		bounds = glyph.getBounds2D();
 	}
 
-	private GeneralPath initWork() {
+	private final GeneralPath initWork() {
 		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, size, size);
 		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), size, size);
 		

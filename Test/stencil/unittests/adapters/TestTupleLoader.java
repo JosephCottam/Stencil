@@ -23,8 +23,8 @@ public class TestTupleLoader extends TestCase {
 		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
 		Panel panel = Adapter.INSTANCE.generate(program);
 
-		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", "\\s+", true);
-		input.open(COORDS);
+		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
+		input.open();
 		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
@@ -37,8 +37,8 @@ public class TestTupleLoader extends TestCase {
 		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
 		Panel panel = Adapter.INSTANCE.generate(program);
 
-		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", "\\|", true);
-		input.open(OVERLAY_FULL);
+		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);
+		input.open();
 		TupleLoader loader = new TupleLoader(panel, input);
 
 		Thread thread = new Thread(loader);

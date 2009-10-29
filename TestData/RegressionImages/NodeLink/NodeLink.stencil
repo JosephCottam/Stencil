@@ -3,13 +3,15 @@ NAME: BFS
 HEADER: ID
 SEPARATOR: \s+
 SOURCE: ./er_100_0.005.bfs
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
 STREAM: File
 NAME: VertexList
 HEADER: ID1, ID2
 SEPARATOR: ,
 SOURCE: ./er_100_0.005.adj
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
 
 external stream BFS (ID) 
 external stream VertexList (ID1, ID2)

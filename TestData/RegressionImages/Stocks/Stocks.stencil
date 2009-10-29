@@ -3,7 +3,8 @@ NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
 SOURCE: ./google_stocks.csv
-CHECKHEADER: true
+SKIP: 1
+STRICT: TRUE
 
 external stream Stocks(Date, Open)
 

@@ -29,7 +29,7 @@
 package stencil.util.streams.txt;
 
 
-import java.io.BufferedReader;
+import java.io.BufferedReader; 
 import java.io.EOFException;
 import java.util.Arrays;
 import java.util.List;
@@ -85,5 +85,5 @@ final class LooseChannel implements NextChannel {
 	}
 
 	/**Always returns true (part of being loose).*/
-	public boolean validate(BufferedReader source, boolean hasHeader) throws Exception {return true;}
+	public void validate(BufferedReader source) throws Exception, FileValidationException {/*Does nothing.*/}
 }

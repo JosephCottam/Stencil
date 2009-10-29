@@ -63,32 +63,18 @@ final class StrictChannel implements NextChannel {
 	 * @return True if everything that is checked matches.
 	 * @throws Exception Thrown when column count does not match or stream is not open or does not have a labels list.
 	 */
-	public boolean validate(BufferedReader source, boolean hasHeader) throws Exception
+	public void validate(BufferedReader source) throws Exception, FileValidationException
 	{
 		if (source ==null) {throw new Exception("Parse file cannot be validated before reader has been intialized.");}
 		if (labels ==null) {throw new Exception("Parse file cannot be validated when there is no labels list.");}
 
 		source.mark(READ_AHEAD_LIMIT);
 		String line = source.readLine();
+		
 		String[] parts = splitter.split(line);
 		List<String> header = Arrays.asList(parts);
-		if (header.size() != labels.size()) {throw new InvalidHeaderException("Column count does not match the length of the labels list (expected " + labels.size() + " but found " + header.size() + ")");}
-
-		if (!hasHeader) {
-			source.reset();
-			return true;
-		}
-
-		for (int i=0; i<header.size(); i++) {
-			String fieldHeader = header.get(i).trim().toUpperCase();
-			String label = labels.get(i).trim().toUpperCase();
-			if (!fieldHeader.equals(label)) {
-				source.reset();
-				return false;
-			}
-		}
-
-		return true;
+		if (header.size() != labels.size()) {throw new FileValidationException("Column count does not match the length of the labels list (expected " + labels.size() + " but found " + header.size() + ")");}
+		source.reset();
 	}
 
 }

@@ -50,11 +50,6 @@ public final class Shapes {
 
 	private Shapes() {/*Utility class. Not instantiable.*/}
 
-
-	public static Shape getShape(StandardShape shapeType, Rectangle2D bounds) {
-		return getShape(shapeType, bounds.getX(), bounds.getY(), bounds.getWidth(), bounds.getHeight());
-	}
-	
 	public static Shape getShape(StandardShape shapeType, double x, double y, double width, double height) {		
 		Shape shape = null;
 
@@ -85,7 +80,7 @@ public final class Shapes {
     /**
      * Returns a rectangle of the given dimensions.
      */
-	public static Shape rectangle(double x, double y, double width, double height) {
+	static Shape rectangle(double x, double y, double width, double height) {
     	Rectangle2D m_rect = new Rectangle2D.Double();
         m_rect.setFrame(x, y, width, height);
         return m_rect;
@@ -94,7 +89,7 @@ public final class Shapes {
     /**
      * Returns an ellipse of the given dimensions.
      */
-	public static Shape ellipse(double x, double y, double width, double height) {
+	static Shape ellipse(double x, double y, double width, double height) {
     	Ellipse2D m_ellipse = new Ellipse2D.Double();
         m_ellipse.setFrame(x, y, width, height);
         return m_ellipse;
@@ -103,7 +98,7 @@ public final class Shapes {
     /**
      * Returns a up-pointing triangle of the given dimensions.
      */
-    public static Shape triangle_up(double xx, double yy, double hh) {
+	static Shape triangle_up(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -120,7 +115,7 @@ public final class Shapes {
     /**
      * Returns a down-pointing triangle of the given dimensions.
      */
-    public static Shape triangle_down(double xx, double yy, double hh) {
+	static Shape triangle_down(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -137,7 +132,7 @@ public final class Shapes {
     /**
      * Returns a left-pointing triangle of the given dimensions.
      */
-    public static Shape triangle_left(double xx, double yy, double hh) {
+	static Shape triangle_left(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -154,7 +149,7 @@ public final class Shapes {
     /**
      * Returns a right-pointing triangle of the given dimensions.
      */
-    public static Shape triangle_right(double xx, double yy, double hh)  {
+	static Shape triangle_right(double xx, double yy, double hh)  {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -173,7 +168,7 @@ public final class Shapes {
      * Resulting cross only has float precision, but doubles
      * are taken for consitancy with the rest of the framework.
      */
-    public static Shape cross(double xx, double yy, double hh) {
+	static Shape cross(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -200,7 +195,7 @@ public final class Shapes {
     /**
      * Returns a star shape of the given dimensions.
      */
-    public static Shape star(double xx, double yy, double hh) {
+	static Shape star(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -232,7 +227,7 @@ public final class Shapes {
     /**
      * Returns a hexagon shape of the given dimensions.
      */
-    public static Shape hexagon(double xx, double yy, double hh) {
+	 static Shape hexagon(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
@@ -254,7 +249,7 @@ public final class Shapes {
     /**
      * Returns a diamond shape of the given dimensions.
      */
-    public static Shape diamond(double xx, double yy, double hh) {
+	static Shape diamond(double xx, double yy, double hh) {
     	GeneralPath m_path = new GeneralPath();
     	float x = (float) xx;
     	float y = (float) yy;
