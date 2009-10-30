@@ -16,22 +16,17 @@ STRICT: false
 external stream overheads(op, rank, cpu, start, end, r,g,b)
 external stream trans(op, source, dest, start, end, size, G, r,g,b) 
 
-canvas Main
-	guide axis[tickSize=10] from baseline X
-		label.FONT_SIZE: 10
-		label.REGISTRATION: "RIGHT"
-
 layer baseline[LINE]
 from overheads
-	ID: Count(" ")
-	X.2: Add(0,end) #-> Timescale(VALUE) -> Max[1..n](_)
-	X.1: Add(0,start) #-> Timescale(VALUE) -> Min[1..n](_)
+	ID: rank
+	X.2: Timescale(VALUE) -> Max[1..n](_)
+	X.1: Timescale(VALUE) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
-	ID: Count(" ")
-	X.2: Add(0,end) #-> Timescale(VALUE) -> Max[1..n](_)
-	X.1: Add(0,start) #-> Timescale(VALUE) -> Min[1..n](_)
+	ID: start
+	X.2: Timescale(VALUE) -> Max[1..n](_)
+	X.1: Timescale(VALUE) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
