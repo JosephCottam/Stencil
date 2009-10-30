@@ -1,0 +1,29 @@
+<ModuleData grammarRev="2" name="Trigonometry">
+	<Class name="stencil.operator.module.provided.Trigonometry"/>
+	<Description><![CDATA[Trig functions functions.]]></Description>
+
+	<Defaults>
+		<Opts>
+			<Opt specializer="[n .. n]"/>
+		</Opts>
+		<Facets>
+			<Facet name="Map" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="Query" type="PROJECT" function="true" prototype="VALUE"/>
+		</Facets>
+	</Defaults>
+
+	<Operator name="ToRadians"/>
+	<Operator name="ToDegrees"/>
+	<Operator name="Cos"/>
+	<Operator name="Sin"/>
+	<Operator name="Tan"/>
+	<Operator name="ACos"/>
+	<Operator name="ASin"/>
+	<Operator name="ATan"/>
+	<Operator name="Cosine"/>
+	<Operator name="Sine"/>
+	<Operator name="Tangent"/>
+	<Operator name="Arccosine"/>
+	<Operator name="Arcsine"/>
+	<Operator name="Arctangent"/>
+</ModuleData>

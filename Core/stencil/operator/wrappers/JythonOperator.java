@@ -48,7 +48,7 @@ public class JythonOperator implements DynamicStencilOperator {
 	 * @return LegendData object reflecting the current state of the Jython Legend
 	 * @throws SpecializationException
 	 */
-	public OperatorData getLegendData(Specializer spec) throws SpecializationException {
+	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
 		if (spec !=null && !spec.equals(operatorData.getDefaultSpecializer())) {throw new SpecializationException(module, getName(), spec);}
 		return operatorData;		
 	}

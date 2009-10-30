@@ -56,7 +56,7 @@ options {
 	
 }
 
- @members{
+@members{
 	protected ModuleCache modules;
     
 	public DefaultSpecializers(TreeNodeStream input, ModuleCache modules) {

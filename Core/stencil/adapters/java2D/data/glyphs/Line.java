@@ -30,14 +30,19 @@ package stencil.adapters.java2D.data.glyphs;
 
 
  import java.awt.geom.AffineTransform;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
 import stencil.streams.Tuple;
 import stencil.util.Tuples;
 import stencil.adapters.general.Registrations;
+import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Strokes;
+import stencil.adapters.general.Registrations.Registration;
+import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -55,6 +60,8 @@ public final class Line extends Stroked {
 	private static final Attribute<Double> X2 = new Attribute("X.2", 0d);
 	private static final Attribute<Double> Y1 = new Attribute("Y.1", 0d);
 	private static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
+	private static final Attribute<String> CAP1 = new Attribute("CAP1", "NONE");
+	private static final Attribute<String> CAP2 = new Attribute("CAP2", "NONE");
 
 	static {
 		ATTRIBUTES.add(X1);
@@ -65,6 +72,8 @@ public final class Line extends Stroked {
 		ATTRIBUTES.add(Y);
 		ATTRIBUTES.add(WIDTH);
 		ATTRIBUTES.add(HEIGHT);
+		ATTRIBUTES.add(CAP1);
+		ATTRIBUTES.add(CAP2);
 
 		UNSETTABLES.add(X);
 		UNSETTABLES.add(Y);
@@ -77,6 +86,9 @@ public final class Line extends Stroked {
 	private final double x2;
 	private final double y2;
 	
+	private final String cap1;
+	private final String cap2;
+	
 	private final java.awt.Shape glyph;
 	private final java.awt.geom.Rectangle2D bounds;
 	
@@ -87,6 +99,9 @@ public final class Line extends Stroked {
 		x2 = X2.defaultValue;
 		y2 = Y1.defaultValue;	
 
+		cap1 = "NONE";
+		cap2 = "NONE";
+		
 		glyph = new Line2D.Double(x1,y1,x2,y2);		
 		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
 	}
@@ -101,6 +116,8 @@ public final class Line extends Stroked {
 		this.y2 = source.y2;
 		this.glyph = source.glyph;
 		this.bounds = source.bounds;
+		this.cap1 = source.cap1;
+		this.cap2 = source.cap2; 
 	}
 
 	private Line(Line source, Tuple option) {
@@ -110,6 +127,9 @@ public final class Line extends Stroked {
 		x2 = switchCopy(source.x2, safeGet(option, X2));
 		y1 = switchCopy(source.y1, safeGet(option, Y1));
 		y2 = switchCopy(source.y2, safeGet(option, Y2));
+		
+		cap1 = switchCopy(source.cap1, safeGet(option, CAP1));
+		cap2 = switchCopy(source.cap1, safeGet(option, CAP2));
 		
 		glyph = new Line2D.Double(x1,y1,x2,y2);		
 		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
@@ -131,16 +151,54 @@ public final class Line extends Stroked {
 		else if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
 		else if (WIDTH.is(name)) {return bounds.getWidth();}
 		else if (HEIGHT.is(name)) {return bounds.getHeight();}
+		else if (CAP1.is(name)) {return cap1;}
+		else if (CAP2.is(name)) {return cap2;}
 		else{return super.get(name);}		
 	}
 		
 	public void render(Graphics2D g, AffineTransform base) {
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 
-		super.render(g,glyph);	
+		super.render(g,glyph);
+		endPoints(g);
 		super.postRender(g, base);
 	}
 
+	private void endPoints(Graphics2D g) {
+		double weight = (Double) super.get("STROKE_WEIGHT", Double.class) ;
+		double scale = weight*6;
+		double offset = scale/2.0;
+		double slope = (y2-y1)/(x2-x1);
+		double rotation;
+		
+		if (slope ==0) {rotation =0;}
+		else if (slope > 0) {rotation = Math.atan(slope);}
+		else {rotation = Math.atan(slope) + Math.PI;}
+		
+		if ((x1 >= x2 && y1 > y2)
+			|| (x1 < x2 && y1 > y2)) {rotation = rotation + Math.PI;}
+		
+		if (cap1.equals("ARROW")) {
+			double x = x1-offset;
+			double y = y1-offset;
+			if (slope ==0 && x1 > x2) {rotation =Math.PI;}
+			Point2D pt = Registrations.topLeftToRegistration(Registration.CENTER, x,y,scale,scale);
+			GeneralPath p = new GeneralPath(Shapes.getShape(StandardShape.TRIANGLE_LEFT, x, y, scale, scale));
+			p.transform(AffineTransform.getRotateInstance(rotation, pt.getX(), pt.getY()));
+			g.fill(p);
+		}
+		
+		if (cap2.equals("ARROW")) {
+			double x = x2-offset;
+			double y = y2-offset;
+			rotation = rotation + Math.PI;
+			Point2D pt = Registrations.topLeftToRegistration(Registration.CENTER, x,y, scale, scale);
+			GeneralPath p = new GeneralPath(Shapes.getShape(StandardShape.TRIANGLE_LEFT, x,y, scale, scale));
+			p.transform(AffineTransform.getRotateInstance(rotation, pt.getX(), pt.getY()));
+			g.fill(p);
+		}
+	}
+	
 	public Line update(Tuple t) throws IllegalArgumentException {
 		if (Tuples.transferNeutral(t, this)) {return this;}
 

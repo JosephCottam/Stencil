@@ -20,12 +20,13 @@ public interface DynamicStencilOperator extends StencilOperator {
 	 */
 	public Invokeable getFacet(String name) throws IllegalArgumentException;
 	
-	/**What is the legend data for this legend?  
-	 * This method must accept a null specializer, which indicates that only
-	 * static legend data is required.
+	/**What is the meta-data for this Operator?
+	 *   
+	 * This method must accept a null specializer, which indicates that only static operator 
+	 * data is required.
 	 * @param spec
 	 * @return
 	 * @throws SpecializationException
 	 */
-	public OperatorData getLegendData(Specializer spec) throws SpecializationException;
+	public OperatorData getOperatorData(Specializer spec) throws SpecializationException;
  }

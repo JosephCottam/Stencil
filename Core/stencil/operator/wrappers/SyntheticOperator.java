@@ -30,7 +30,6 @@ package stencil.operator.wrappers;
 
 import java.util.Arrays;
 
-import static stencil.parser.ParserConstants.*;
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData;
@@ -104,8 +103,8 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 		return null;
 	}
 
-	public OperatorData getLegendData(Specializer spec) throws SpecializationException {
-		if (spec !=null && !spec.equals(SIMPLE_SPECIALIZER)) {throw new SpecializationException("", getName(), spec);}
+	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
+		if (spec !=null && !spec.isSimple()) {throw new SpecializationException("", getName(), spec);}
 		
 		return Modules.basicLegendData(module, getName(), OpType.PROJECT, source.getResults().getNames());
 	}

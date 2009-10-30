@@ -28,7 +28,9 @@ public class MutableModule implements Module {
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		if (!specializer.isSimple()) {
+		StencilOperator op = legends.get(name);
+		if (op instanceof DynamicStencilOperator 
+				&& !specializer.isSimple()) {
 			throw new SpecializationException(getName(),name, specializer);
 		}
 		
@@ -37,7 +39,7 @@ public class MutableModule implements Module {
 
 	public void addOperator(DynamicStencilOperator target) {
 		try {
-			addOperator(target, target.getLegendData(null));
+			addOperator(target, target.getOperatorData(null));
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("Error adding jython legend %1$s to module %2$s", target.getName(), getModuleData().getName()), e);
 		}
