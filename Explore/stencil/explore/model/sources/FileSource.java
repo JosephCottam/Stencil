@@ -73,8 +73,6 @@ public final class FileSource extends StreamSource {
 	 */
 	public TupleStream getStream(Model context) throws Exception {
 		DelimitedParser input = new DelimitedParser(name, header, filename, separator, strict, skip);
-		input.open();
-		
 		return input;
 	}
 

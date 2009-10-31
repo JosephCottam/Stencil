@@ -24,7 +24,6 @@ public class TestTupleLoader extends TestCase {
 		Panel panel = Adapter.INSTANCE.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
-		input.open();
 		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
@@ -38,7 +37,6 @@ public class TestTupleLoader extends TestCase {
 		Panel panel = Adapter.INSTANCE.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);
-		input.open();
 		TupleLoader loader = new TupleLoader(panel, input);
 
 		Thread thread = new Thread(loader);

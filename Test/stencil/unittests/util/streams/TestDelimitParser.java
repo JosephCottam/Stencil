@@ -12,14 +12,12 @@ public class TestDelimitParser extends TestCase {
 
 	public void testOpen() throws Exception{
 		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
-		p.open();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 		Tuple t = p.next();
 		Assert.assertTrue("First tuple not as expected after open.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
 
 		
 		p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
-		p.open();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 
 		t = p.next();
@@ -32,7 +30,6 @@ public class TestDelimitParser extends TestCase {
 		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true, 1);
 		Assert.assertFalse("HasNext true before open.", p.hasNext());
 
-		p.open();
 		Assert.assertTrue("HasNext false after open", p.hasNext());
 		
 		p.close();
@@ -45,8 +42,6 @@ public class TestDelimitParser extends TestCase {
 	
 	public void testNext() throws Exception {
 		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
-
-		p.open();
 		
 		int i=0;
 		while (p.hasNext() && i< 1000) {p.next(); i++;}
@@ -55,7 +50,6 @@ public class TestDelimitParser extends TestCase {
 	
 	public void testClose() throws Exception {
 		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
-		p.open();
 		Assert.assertTrue("Stream not ready after open.", p.hasNext());
 		p.close();
 		Assert.assertFalse("Stream did not close.", p.hasNext());

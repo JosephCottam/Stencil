@@ -47,7 +47,7 @@ from overheads
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 	X.1: Timescale(start)
 	X.2: Timescale(end)
-	STROKE_COLOR : @color(Gray80)
+	STROKE_COLOR : @color(Purple)
 	STROKE_WEIGHT: 15
 
 layer overhead[LINE]

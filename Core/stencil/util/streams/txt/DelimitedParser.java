@@ -81,6 +81,7 @@ public final class DelimitedParser implements TupleStream {
 		setLabels(labels);
 		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
 		else {this.channel = new LooseChannel(this.labels, delimiter);}
+		open();
 	}
 
 	/**Makes the stream ready to be read from.
@@ -89,7 +90,7 @@ public final class DelimitedParser implements TupleStream {
 	 *
 	 * @param filename
 	 */
-	public void open() {
+	private void open() {
 		assert (filename != null && filename.trim() != "") : "Invalid filename supplied.  May not be null.  May not be empty.";
 
 		try {
