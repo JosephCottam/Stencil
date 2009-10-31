@@ -124,7 +124,6 @@ public class Numerics extends BasicModule {
 		
 		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			return BasicTuple.singleton(max);
 		}
 

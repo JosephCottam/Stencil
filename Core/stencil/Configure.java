@@ -14,6 +14,11 @@ import java.net.URL;
  *
  */
 public class Configure {
+	private static final String DEFAULT_STENCIL_CONFIGURATION_FILE = "Stencil.properties";
+	
+	public static String stencilConfig = DEFAULT_STENCIL_CONFIGURATION_FILE;
+
+	
 	private Configure() {/*Utility, non-instantiable class.*/}
 
 	public static void loadProperties(Properties props) {

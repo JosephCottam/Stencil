@@ -40,12 +40,12 @@ import stencil.explore.model.AdapterOpts;
 import stencil.explore.ui.interactive.Interactive;
 import stencil.WorkingDirectory;
 
+
 public class PropertyManager {
-	private static final String DEFAULT_STENCIL_CONFIGURATION_FILE = "Stencil.properties";
-	private static final String DEFAULT_EXPLORE_CONFIGURATION_FILE = "Explore.properties";
 	private static final String DEFAULT_SESSION_CONFIGURATION_FILE = "ExploreSession.properties";
-	
-	public static String stencilConfig = DEFAULT_STENCIL_CONFIGURATION_FILE;
+	private static final String DEFAULT_EXPLORE_CONFIGURATION_FILE = "Explore.properties";
+
+	public static String stencilConfig = stencil.Configure.stencilConfig;
 	public static String exploreConfig = DEFAULT_EXPLORE_CONFIGURATION_FILE;
 	public static String sessionConfig = DEFAULT_SESSION_CONFIGURATION_FILE;
 

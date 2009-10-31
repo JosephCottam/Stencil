@@ -75,7 +75,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		if (value.equals("LOW")) {
 			Painter.renderQuality = Painter.LOW_QUALITY;
 		} else if (value.equals("HIGH")) {
-			Painter.renderQuality = Painter.LOW_QUALITY;
+			Painter.renderQuality = Painter.HIGH_QUALITY;
 		} else {
 			throw new IllegalArgumentException("Could not set render quality to unknown value: " + value);
 		}

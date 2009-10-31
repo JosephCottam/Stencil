@@ -240,7 +240,7 @@ public class Interactive implements Runnable {
 				if (arg.getSource() == open) {
 					JFileChooser fc = new JFileChooser();
 
-					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil")); //The 'a' is to force it to open in the directory, not the parent.
+					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil"));
 
 					int stat = fc.showOpenDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
@@ -253,7 +253,7 @@ public class Interactive implements Runnable {
 					}
 				} else if (arg.getSource() == save) {
 					JFileChooser fc = new JFileChooser();
-					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil")); //The 'a' is to force it to open in the directory, not the parent.
+					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil"));
 
 					int stat = fc.showSaveDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
