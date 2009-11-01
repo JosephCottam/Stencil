@@ -97,6 +97,11 @@ public final class Canvas extends JComponent {
 	
 	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
 	
+	/**What are the bounds of everything currently on this canvas 
+	 * (not just visible or in window).
+	 * 
+	 * @return
+	 */
 	public Rectangle getContentBounds() {
 		Rectangle2D bounds =contentBounds;
 		if (contentBounds == null || tablesTracker.changed()) {
@@ -223,6 +228,17 @@ public final class Canvas extends JComponent {
      * where it is significant, this is the X-scale).
      */
     public double getScale() {return viewTransform.getScaleX();}
+    
+	/**What is the current center of the screen
+	 * (in canvas coordinates).
+	 * .*/
+	public Point2D getPanAbs() {
+		Rectangle2D viewBounds = getInverseViewTransform().createTransformedShape(getBounds()).getBounds2D();
+
+		return new Point2D.Double(viewBounds.getCenterX(), viewBounds.getCenterY());
+	}
+	
+
     
     public void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;

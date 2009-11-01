@@ -143,6 +143,7 @@ public final class DelimitedParser implements TupleStream {
 		try {tupleCache = next();}
 		catch (Exception e) {return false;}
 		
+		assert tupleCache != null : "Null value cache after supposedly successful next.";		
 		return true;
 	}
 
