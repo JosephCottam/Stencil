@@ -229,13 +229,17 @@ public final class Canvas extends JComponent {
      */
     public double getScale() {return viewTransform.getScaleX();}
     
-	/**What is the current center of the screen
-	 * (in canvas coordinates).
-	 * .*/
-	public Point2D getPanAbs() {
+	/**What is the current center of the screen (in canvas coordinates).
+	 * 
+	 *  @param target Store in this point2D.  If null a new point2D will be created.
+	 **/
+	public Point2D getPanAbs(Point2D target) {
+		if (target == null) {target = new Point2D.Double();}
+		
 		Rectangle2D viewBounds = getInverseViewTransform().createTransformedShape(getBounds()).getBounds2D();
 
-		return new Point2D.Double(viewBounds.getCenterX(), viewBounds.getCenterY());
+		target.setLocation(viewBounds.getCenterX(), viewBounds.getCenterY());
+		return target; 
 	}
 	
 
