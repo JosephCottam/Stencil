@@ -40,8 +40,11 @@ import stencil.parser.string.StencilParser;
 
 
 public class StencilTree extends CommonTree {
-
-	public StencilTree(Token token) {super(token);}
+	protected final int type;
+	public StencilTree(Token token) {
+		super(token);
+		this.type = token.getType();
+	}
 
 	/**Gets the string name of the type given.
 	 * Note: This uses a relatively slow method for lookup.
@@ -102,7 +105,7 @@ public class StencilTree extends CommonTree {
 		return name.substring(name.indexOf(".")+1);
 	}
 	
-	public int getType() {return getToken().getType();}
+	public final int getType() {return type;}
 	
 	public StencilTree getParent() {return (StencilTree) super.getParent();}
 }

@@ -64,9 +64,10 @@ public class TuplePrototype extends StencilTree implements List<String> {
 
 	public Iterator<String> iterator() {
 		return new Iterator<String> () {
-			int index=0;
+			private int index=0;
+			final int size = getChildCount();
 			
-			public boolean hasNext() {return index < getChildCount();}
+			public boolean hasNext() {return index < size;}
 
 			public String next() {
 				String value = getChild(index).getText();

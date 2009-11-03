@@ -56,12 +56,9 @@ public class Function extends CallTarget {
 	}
 
 	protected StencilOperator operator;
+	protected Invokeable invokeable;
 		
 	public Function(Token source) {super(source);}
-	public Function(Token source, StencilOperator operator) throws NoSuchMethodException {
-		super(source);
-		setOperator(operator);
-	}
 	
 	public String getName() {return token.getText();}
 	public Specializer getSpecializer() {return (Specializer) getChild(0);}
@@ -93,7 +90,8 @@ public class Function extends CallTarget {
 
 	/**What actually needs to be invoked when a call is to be made?*/
 	private Invokeable<StencilOperator, Tuple> getInvokeable() throws NoSuchMethodException {
-		Invokeable invokeable;
+		if (invokeable != null) {return invokeable;}
+		
 		MultiPartName name = new MultiPartName(getName());
 		
 		if (operator instanceof DynamicStencilOperator) {
