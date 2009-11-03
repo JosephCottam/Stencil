@@ -116,6 +116,11 @@ public interface CanvasTuple extends MutableTuple {
 			throw new InvalidNameException(name);
 		}
 		
+		public double getX() {return getBounds().getX();}
+		public double getY() {return getBounds().getY();}
+		public double getWidth() {return getBounds().getWidth();}
+		public double getHeight() {return getBounds().getHeight();}
+
 		
 		public List<String> getFields() {return FIELDS;}
 		
@@ -139,5 +144,10 @@ public interface CanvasTuple extends MutableTuple {
 	
 	/**Return the actual backing component*/
 	public Component getComponent();
+
+	public double getX();
+	public double getY();
+	public double getWidth();
+	public double getHeight();
 
 }

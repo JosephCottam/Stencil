@@ -33,9 +33,11 @@ import java.awt.geom.Point2D;
 
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Registrations.Registration;
+import stencil.display.CanvasTuple;
 
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
+import stencil.parser.tree.Canvas;
 import stencil.parser.tree.View;
 import stencil.streams.Tuple;
 import stencil.types.Converter;
@@ -101,17 +103,44 @@ public class Transform extends BasicModule {
 	 * @param canvasHeight
 	 * @return
 	 */
-	public static Tuple zoom(Object viewWidth, Object viewHeight, Object canvasWidth, Object canvasHeight) {
-		double vw = Converter.toDouble(viewWidth);
-		double vh = Converter.toDouble(viewHeight);
-		double cw = Converter.toDouble(canvasWidth);
-		double ch = Converter.toDouble(canvasHeight);
+	public static Tuple zoom(Object portalWidth, Object portalHeight, Object canvasWidth, Object canvasHeight) {
+		return zoomPadded(portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
+	}
+	
+	/**Calculates a scale factor to keep values undistorted and all visible with a given amount of padding on all sides.
+	 * Padding is specified in canvas pixels. 
+	 * 
+	 */
+	public static Tuple zoomPadded(Object portalWidth, Object portalHeight, Object canvasWidth, Object canvasHeight, Object pad) {
+		CanvasTuple global = Canvas.global;
+
+		double p = Converter.toDouble(pad);
+		double pw = Converter.toDouble(portalWidth);
+		double ph = Converter.toDouble(portalHeight);
+		double cw = Converter.toDouble(canvasWidth) + 2 * p;
+		double ch = Converter.toDouble(canvasHeight) + 2 * p;
+		double x = global.getX() - p;
+		double y = global.getY() - p;
 		
-		double zy = ch !=0?vh/ch:1;
-		double zx = cw !=0?vw/cw:1;
+		double zy = ch !=0?ph/ch:1;
+		double zx = cw !=0?pw/cw:1;
 		double min = Math.min(zx, zy);
-		if (min ==0 || Double.isInfinite(min) || Double.isNaN(min)) {min =1;} //TODO: Is there a better value to return?  
-		return BasicTuple.singleton(min);		
+		if (min ==0 || Double.isInfinite(min) || Double.isNaN(min)) {min =1;}
+
+		if (min == zx) {
+			double newCanvasHeight = Converter.toDouble(canvasHeight)/min;
+			double newPortalHeight = Converter.toDouble(portalHeight)/min;
+			y = global.getY() + (newPortalHeight - newCanvasHeight)/2;
+		} else {
+			double newCanvasWidth = Converter.toDouble(canvasWidth)/min;
+			double newPortalWidth = Converter.toDouble(portalWidth)/min;
+			x = global.getX() - (newPortalWidth - newCanvasWidth)/2;
+		}
+			
+		
+		String[] names = new String[]{"zoom", "X", "Y", "width"};
+		Tuple t = new BasicTuple(names, new Object[]{min, x, y, cw});
+		return t;
 	}
 	
 	public Transform(ModuleData md) {super(md);}

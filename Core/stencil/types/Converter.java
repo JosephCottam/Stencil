@@ -15,21 +15,21 @@ public final class Converter {
 		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
 		
 		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getNumber().doubleValue());}
-		return new Double(Double.parseDouble(value.toString()));
+		return Double.parseDouble(value.toString());
 	}
 	
 	public static  Float toFloat(Object value) {
 		if (value instanceof Float) {return (Float) value;}
 		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getNumber().floatValue());}
-		return new Float(Float.parseFloat(value.toString()));	
+		return Float.parseFloat(value.toString());	
 	}
 	
 	public static Integer toInteger(Object value) {
 		if (value instanceof Integer) {return (Integer) value;}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getNumber().intValue());}
-		return new Integer(Integer.parseInt(value.toString()));
+		return toFloat(value).intValue();
 	}
 	
 	public static String toString(Object value) {

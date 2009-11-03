@@ -292,7 +292,7 @@ public class Interactive implements Runnable {
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
 
-						try {model.export(filename, "VECTOR", Application.EXPORT_RESOLUTION);}
+						try {model.export(filename, "VECTOR", null);}
 						catch(Exception e) {throw new RuntimeException("Error exporting image.", e);}
 					} else if (stat == JFileChooser.ERROR_OPTION) {
 						java.awt.Toolkit.getDefaultToolkit().beep();
@@ -336,7 +336,7 @@ public class Interactive implements Runnable {
 		messages.setMnemonic(KeyEvent.VK_M);
 		messages.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.META_MASK));
 
-		ActionListener windowMenuListener = new ActionListener() {
+ 		ActionListener windowMenuListener = new ActionListener() {
 			public void actionPerformed(ActionEvent arg) {
 				if (arg.getSource() == editor) {
 					editorFrame.setVisible(true);

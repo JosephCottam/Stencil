@@ -99,8 +99,10 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 
 		if (type.equals("PNG") || type.equals("RASTER")) {
 			exportPNG(filename, Converter.toInteger(info));
-		} else if (type.equals("EPS") || type.equals("VECTOR")) {
+		} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
 			exportEPS(filename);
+		} else if (type.equals("EPS") || type.equals("VECTOR")) {
+			exportEPS(filename, (Rectangle) info);
 		} else {super.export(filename, type, info);}
 	}
 	
@@ -114,13 +116,17 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		if (dynamicUpdater != null) {dynamicUpdater.runOnce();}
 	}
 	
-	private void exportEPS(String filename) throws Exception {
+	
+	private void exportEPS(String filename, Rectangle bounds) throws Exception {
 		File f= new File(filename);
-		Rectangle bounds = canvas.getContentBounds();
 		EpsGraphics2D g = new EpsGraphics2D("Stencil Output", f, bounds.x, bounds.y, bounds.x+ bounds.width, bounds.y+ bounds.height);
 		canvas.painter.doDrawing(g);
 		g.close();
 		g.dispose();		
+		
+	}
+	private void exportEPS(String filename) throws Exception {
+		exportEPS(filename, canvas.getContentBounds());
 	}
 
 	

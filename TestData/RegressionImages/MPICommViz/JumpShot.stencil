@@ -81,4 +81,4 @@ operator Layout (rank)->(Y)
   all => (Y) : Index(rank) -> Mult(20, _) -> Add(10, _)
 
 operator Timescale(time) -> (time)
-  all => time : Div(time, 500)
+  all => time : Div(time, 50)

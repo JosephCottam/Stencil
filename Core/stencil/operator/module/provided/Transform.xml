@@ -18,4 +18,5 @@
 	<Operator name="CanvasToScreenPoint" />
 	<Operator name="CanvasToScreenDimension" />
 	<Operator name="Zoom" />
+	<Operator name="ZoomPadded" />
 </ModuleData>
