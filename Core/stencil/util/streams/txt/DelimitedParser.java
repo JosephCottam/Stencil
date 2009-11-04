@@ -137,7 +137,7 @@ public final class DelimitedParser implements TupleStream {
 	 * are no more tuples (guaranteed to never be more).
 	 */
 	public boolean hasNext() {
-		if (source == null ) {throw new RuntimeException("Stream not opened.");}
+		if (source == null ) {return false;}
 		if (tupleCache != null) {return true;}
 
 		try {tupleCache = next();}

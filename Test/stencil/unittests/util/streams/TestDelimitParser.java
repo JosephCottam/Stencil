@@ -28,9 +28,7 @@ public class TestDelimitParser extends TestCase {
 	
 	public void testHasNext() throws Exception {
 		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true, 1);
-		Assert.assertFalse("HasNext true before open.", p.hasNext());
-
-		Assert.assertTrue("HasNext false after open", p.hasNext());
+		Assert.assertTrue("HasNext false after creation", p.hasNext());
 		
 		p.close();
 		Assert.assertFalse("Hasnext true after close.", p.hasNext());
