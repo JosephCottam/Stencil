@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -12,22 +12,23 @@ FREQUENCY: 30
 external stream Stocks(Date, Open)
 external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
 
-
 canvas Main
 	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="LEFT", axisOffset=10] from Markers X
+		label.TEXT: Date(_) -> Print(Date)
 	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT", axisOffset=-10] from Markers Y
+
 
 layer Markers[POLY_LINE]
 from Stocks
 	ID : "Google"
-	X.new : TimeStep(Date) #-> VALUE
+	X.new : TimeStep(Date) -> Date.Put(VALUE, VALUE, Date) #-> VALUE
 	Y.new : Add(Open, 0) #-> Price(VALUE) -> Price
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @color(BLUE)
 
 from Stocks
 	view(ZOOM, X,Y, HEIGHT) 
-		: ScreenToCanvasDimension(100, 100) -> (Width, Height)
+		: ScreenToCanvasDimension(20, 20) -> (Width, Height)
 		| Max(Width, Height) -> Rename["Pad"](VALUE) -> Pad
 		--> ZoomPadded(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT, Pad)
 	
@@ -50,16 +51,20 @@ from Mouse
 layer Highlight[LINE]
 from Mouse
   ID : "Highlight"
-  (X.1, X.2) : Nearest(X, 3) -> (_, _)
-  Y.1 : Add(view.Y, view.HEIGHT) -> Sub(_, 60)
-  Y.2 : Add(view.Y, 60)
+  (X.1, X.2) : Nearest(X, 3) -> Max(_, canvas.X) -> (_,_)			
+  Y.1 : 0
+  Y.2 : Add(canvas.Y, 3)
   STROKE_WEIGHT : 3
   STROKE_COLOR : @color(BLUE, 100)
 
-  
+operator Date base Mapping [1..n, "VALUE", "Date"]
 
 operator Price (Open) -> (Price)
 	all => (Price) : Mult(-1, Open)
 
-operator TimeStep (T) -> (VALUE)
-	all => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE
+operator TimeStep (T) -> (VALUE, Date)
+	all => (VALUE, Date) :  Index(T) -> Mult(VALUE, 3) -> VALUE
+								| Rename["Date"](T) -> Date
+								--> (VALUE, Date)
+
+

@@ -103,10 +103,14 @@ public final class Tuples {
 	/**Creates a read-only copy of the given tuple.  Values
 	 * are copied per the rules defined in Transfer.
 	 *
+	 * If the source is null, the copy will be the cannonical empty tuple.
+	 *
 	 * @param source
 	 * @return
 	 */
 	public static Tuple copy(Tuple source) {
+		if (source == null) {return Tuples.EMPTY_TUPLE;}
+		
 		List<String> attributes =  new ArrayList<String>();
 		attributes.addAll(source.getFields());
 
@@ -221,9 +225,10 @@ public final class Tuples {
 	 * fields of the two source tuples.  Values will be taken from
 	 * source1 first, then source2 (so last-write wins on shared fields).
 	 *
-	 * If source1 is null or source2 is null, a new tuple is still
-	 * returned, but containing a duplicate of the non-null tuple.
-	 * If both are null, an illegal argument exception is thrown.
+	 * If source1 is null or source2 is null, the other is returned.
+	 * Since a copy is not made when merging to a null tuple, this 
+	 * is not always safe to use with mutable tuples.  If safety must 
+	 * be guaranteed, then copy should be used on the arguments.
 	 *
 	 * @param sourceName Where should the resulting tuple indicate it is from?
 	 * @param source1
@@ -266,8 +271,8 @@ public final class Tuples {
 
 		if (source1 == null && source2 ==null) {throw new IllegalArgumentException("At least one source to merge must not be null.");}
 
-		if (source1 == null) {return Tuples.copy(source2);}
-		if (source2 == null) {return Tuples.copy(source1);}
+		if (source1 == null || source1 == EMPTY_TUPLE) {return source2;}
+		if (source2 == null || source2 == EMPTY_TUPLE) {return source1;}
 
 		IncrimentalTuple result = new IncrimentalTuple();
 		for (String name: source1.getFields()) {

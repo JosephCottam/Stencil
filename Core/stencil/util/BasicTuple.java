@@ -68,7 +68,7 @@ public final class BasicTuple implements Tuple {
 	 * @param values Values to be stored in the tuple.
 	 */
 	public BasicTuple(String source, String[] names, Object[] values) {
-		this(Arrays.asList(names), Arrays.asList(values));
+		this(source, Arrays.asList(names), Arrays.asList(values));
 	}
 	
 	/**Create a new tuple.
