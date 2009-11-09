@@ -43,7 +43,6 @@ import javax.swing.JComponent;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
-import stencil.adapters.java2D.util.LayerUpdate;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
@@ -269,5 +268,5 @@ public final class Canvas extends JComponent implements LayerUpdateListener {
 	public AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
 	public AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
 
-	public void layerUpdated(LayerUpdate update) {layerUpdates.update(update);}
+	public void layerUpdated(Rectangle update) {layerUpdates.update(update);}
 }

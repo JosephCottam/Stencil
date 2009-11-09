@@ -28,6 +28,7 @@
  */
 package stencil.adapters.java2D.data;
  
+import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
@@ -39,7 +40,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import stencil.adapters.java2D.data.glyphs.*;
-import stencil.adapters.java2D.util.LayerUpdate;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
@@ -150,7 +150,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		Rectangle2D bounds = elements[0].getBoundsReference().getBounds2D();
 		for (int i=1; i<elements.length;i++) {Rectangle2D.union(elements[i].getBoundsReference(), bounds, bounds);}
 		
-		LayerUpdate update = new LayerUpdate(this, bounds.getBounds());
+		Rectangle update = bounds.getBounds();
 		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}	//TODO: Should this dispatch to some other thread?		
 	}
 }

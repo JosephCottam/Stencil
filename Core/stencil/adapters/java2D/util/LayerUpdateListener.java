@@ -32,7 +32,7 @@ import java.awt.Rectangle;
 import java.util.concurrent.atomic.AtomicReference;
 
 public interface LayerUpdateListener {
-	public void layerUpdated(LayerUpdate update);
+	public void layerUpdated(Rectangle update);
 	
 	/**Helper class for storing updates in a thread-safe manner.
 	 * 
@@ -43,7 +43,6 @@ public interface LayerUpdateListener {
 	public final static class AtomicCompositeUpdate {
 		AtomicReference<Rectangle> bounds = new AtomicReference();
 
-		public void update(LayerUpdate update) {update(update.bounds);}
 		public void update(Rectangle r) {
 			Rectangle old, update;
 			do {

@@ -146,5 +146,5 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
     }
 	
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
-	public void layerUpdated(LayerUpdate update) {layerUpdates.update(update);}
+	public void layerUpdated(Rectangle update) {layerUpdates.update(update);}
 }
