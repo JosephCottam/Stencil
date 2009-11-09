@@ -28,7 +28,7 @@
  */
 package stencil.adapters.java2D;
 
-import java.awt.Color;
+ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
@@ -43,7 +43,8 @@ import javax.swing.JComponent;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
-import stencil.adapters.java2D.util.GenerationTracker;
+import stencil.adapters.java2D.util.LayerUpdate;
+import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
 import stencil.parser.tree.CanvasDef;
@@ -53,16 +54,15 @@ import stencil.types.Converter;
 
 /**Some of this is derived from Prefuse's display and related objects.*/
 
-public final class Canvas extends JComponent {	
+public final class Canvas extends JComponent implements LayerUpdateListener {	
 	final Painter painter;
 	final Thread painterThread;
 	BufferedImage buffer;
 	
 	private AffineTransform viewTransform = new AffineTransform();
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
-	
-	private final GenerationTracker tablesTracker;
-	
+	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
+
 	private Rectangle2D contentBounds;
 	final DisplayLayer<? extends Glyph2D>[] layers;
 
@@ -83,7 +83,10 @@ public final class Canvas extends JComponent {
 
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
-		tablesTracker = new GenerationTracker(this.layers);		
+		
+		for (DisplayLayer l: this.layers) {
+			l.addLayerUpdateListener(this);
+		}
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -104,9 +107,12 @@ public final class Canvas extends JComponent {
 	 */
 	public Rectangle getContentBounds() {
 		Rectangle2D bounds =contentBounds;
-		if (contentBounds == null || tablesTracker.changed()) {
+		Rectangle updateBounds = layerUpdates.clear();
+
+		if (contentBounds == null 
+			|| (updateBounds != null  && !contentBounds.contains(updateBounds))) 
+		{
 			for (DisplayLayer<? extends Glyph2D> t: layers) {
-				tablesTracker.fixGeneration(t);
 				for (Glyph2D g: t) {
 					if (bounds == null) {
 						bounds = (Rectangle2D) g.getBoundsReference().clone();
@@ -263,4 +269,5 @@ public final class Canvas extends JComponent {
 	public AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
 	public AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
 
+	public void layerUpdated(LayerUpdate update) {layerUpdates.update(update);}
 }

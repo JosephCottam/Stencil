@@ -28,47 +28,55 @@
  */
 package stencil.adapters.java2D.data;
  
+import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import stencil.adapters.java2D.data.glyphs.*;
+import stencil.adapters.java2D.util.LayerUpdate;
+import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import stencil.parser.tree.Layer;
+import stencil.util.collections.ListSet;
 
 public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
 	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
-	private int generation =0;
 	private final String name; 
 	private T prototypeGlyph;
 	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();
-	
+	private final Set<LayerUpdateListener> updateListeners = new ListSet();	
 
 	protected DisplayLayer(String name) {this.name = name;}
 	
 	public String getName() {return name;}
-	
-	public T find(String ID) {return index.get(ID);}
 
 	public Iterator<T> iterator() {return index.values().iterator();}
-
-	public T make(String ID) throws DuplicateIDException {
-		T glyph = (T) prototypeGlyph.updateID(ID);
-		index.put(ID, glyph);
-		return glyph;
-	}
+	
+	public T find(String ID) {return index.get(ID);}
 
 	public T makeOrFind(String ID) {
 		if (index.containsKey(ID)) {return index.get(ID);}
 		else {return make(ID);}
 	}
 
-	public void remove(String ID) {index.remove(ID);}
+	public T make(String ID) throws DuplicateIDException {
+		T glyph = (T) prototypeGlyph.updateID(ID);
+		index.put(ID, glyph);
+		fireLayerUpdate(glyph);
+		return glyph;
+	}
+
+	public void remove(String ID) {
+		T glyph = index.remove(ID);
+		if (glyph != null) {fireLayerUpdate(glyph);}
+	}
 
 	public int size() {return index.size();}
 	
@@ -81,27 +89,13 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
-		updateGeneration();
+		fireLayerUpdate(prior, glyph);
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 	}
 	
 	private void setPrototype(T prototypeGlyph) {this.prototypeGlyph = prototypeGlyph;}
 
-	/**What is the current edit generation of the data table?
-	 * Any edit should update the generation id.  Generations
-	 * ids do not have to be assigned sequentially, so that property
-	 * should not be relied on, however sufficient generation ids
-	 * should be used to keep the repeat rate low.
-	 * 
-	 * Generation id is not guaranteed to change in any timely manner,
-	 * only eventually after an update.
-	 */
-	public int getGeneration() {return generation;}
-	
-	/**Update the generation ID.**/ 
-	private void updateGeneration() {generation++;}
-	
 	/**Get the tuple prototype of this table.*/
 	public List<String> getPrototype() {return prototypeGlyph.getFields();}
 	
@@ -146,6 +140,17 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		if (layer == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
 
 		return layer;
-
+	}
+	
+	public void addLayerUpdateListener(LayerUpdateListener l) {updateListeners.add(l);}
+	
+	private void fireLayerUpdate(T... elements) {
+		if (elements.length == 0) {return;}
+		
+		Rectangle2D bounds = elements[0].getBoundsReference().getBounds2D();
+		for (int i=1; i<elements.length;i++) {Rectangle2D.union(elements[i].getBoundsReference(), bounds, bounds);}
+		
+		LayerUpdate update = new LayerUpdate(this, bounds.getBounds());
+		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}	//TODO: Should this dispatch to some other thread?		
 	}
 }

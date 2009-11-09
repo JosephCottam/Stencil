@@ -13,7 +13,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
 
-public final class Painter implements Runnable, Stopable {
+public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	public static final RenderingHints HIGH_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	public static final RenderingHints  LOW_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	
@@ -24,9 +24,10 @@ public final class Painter implements Runnable, Stopable {
 	
 	private boolean run = true;
 	private final DisplayLayer[] layers;
-	private final GenerationTracker generations;
 	private final Canvas target;
 	
+
+	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;
 	AffineTransform priorTransform=new AffineTransform();
@@ -35,7 +36,10 @@ public final class Painter implements Runnable, Stopable {
 	public Painter(DisplayLayer[] layers, Canvas target) {
 		this.layers = layers;
 		this.target = target;
-		generations = new GenerationTracker(layers);
+		
+		for (DisplayLayer l: layers) {
+			l.addLayerUpdateListener(this);
+		}
 	}
 	
 
@@ -43,7 +47,10 @@ public final class Painter implements Runnable, Stopable {
 	
 	public void run() {
 		while (run) {
-			if (generations.changed() || resized() || transformed()) {
+			Rectangle updateBounds = layerUpdates.clear();
+			if (resized() || transformed()
+				|| (updateBounds != null && updateBounds.intersects(target.getBounds()))) 
+			{	
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
 				target.repaint();
@@ -62,7 +69,6 @@ public final class Painter implements Runnable, Stopable {
 		AffineTransform base = g.getTransform();
 
 		for (DisplayLayer<? extends Glyph2D> table: layers) {
-			generations.fixGeneration(table);	//Prevents some types of unnecessary re-rendering, but not all of them
 			for (Glyph2D glyph: table) {
 				Rectangle2D r = glyph.getBoundsReference();
 				if (glyph.isVisible() 
@@ -79,6 +85,7 @@ public final class Painter implements Runnable, Stopable {
 	private boolean resized() {
 		BufferedImage i = buffers[nextBuffer];
 		if (i == null) {return false;}	//Has not been resized since last rendering, if there has been no last rendering.
+		
 		Rectangle target = this.target.getBounds();
 		return (target.getHeight() != i.getHeight()) || (target.getWidth() != i.getWidth()); 
 	}
@@ -87,7 +94,6 @@ public final class Painter implements Runnable, Stopable {
 	private boolean transformed() {return !priorTransform.equals(target.getViewTransformRef());}
 	
 	private BufferedImage selfBuffer() {
-		Graphics2D g =null;
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = target.getBounds();
 		priorTransform = target.getViewTransform();
@@ -103,6 +109,7 @@ public final class Painter implements Runnable, Stopable {
 			buffer= buffers[nextBuffer];
 		}
 		
+		Graphics2D g =null;
 		try {
 			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
 			g.setPaint(target.getBackground());
@@ -139,4 +146,5 @@ public final class Painter implements Runnable, Stopable {
     }
 	
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
+	public void layerUpdated(LayerUpdate update) {layerUpdates.update(update);}
 }

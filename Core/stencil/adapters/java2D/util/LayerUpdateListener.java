@@ -28,33 +28,31 @@
  */
 package stencil.adapters.java2D.util;
 
-import stencil.adapters.java2D.data.DisplayLayer;
+import java.awt.Rectangle;
+import java.util.concurrent.atomic.AtomicReference;
 
-public class GenerationTracker {
-	private final DisplayLayer[] tables;
-	private final int[] generations;
+public interface LayerUpdateListener {
+	public void layerUpdated(LayerUpdate update);
 	
-	public GenerationTracker(DisplayLayer[] layers) {
-		this.tables = layers;
-		this.generations = new int[layers.length];
-	}
-	
-	public boolean changed() {
-		for (int i=0; i<tables.length; i++) {
-			int gen =tables[i].getGeneration(); 
-			if (gen != generations[i]) {
-				generations[i] =gen;
-				return true;
-			}
+	/**Helper class for storing updates in a thread-safe manner.
+	 * 
+	 * This class can be used in the body of a layerUpdated method
+	 * to store the composite bounds of many updates.
+	 * 
+	 */
+	public final static class AtomicCompositeUpdate {
+		AtomicReference<Rectangle> bounds = new AtomicReference();
+
+		public void update(LayerUpdate update) {update(update.bounds);}
+		public void update(Rectangle r) {
+			Rectangle old, update;
+			do {
+				old = bounds.get();
+				update = old == null ? r : old.union(r);				
+			} while(!bounds.compareAndSet(old, update));
 		}
-		return false;
-	}
-
-	public void fixGeneration(DisplayLayer t) {
-		for (int i=0;i<tables.length; i++) {if (tables[i] == t) {generations[i] = t.getGeneration();}}
-	}
-	
-	public void fixGenerations() {
-		for (int i=0; i<tables.length; i++) {generations[i] = tables[i].getGeneration();}
+		
+		public Rectangle get() {return bounds.get();}		
+		public Rectangle clear() {return bounds.getAndSet(null);}
 	}
 }
