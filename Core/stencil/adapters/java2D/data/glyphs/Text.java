@@ -81,7 +81,6 @@ public final class Text extends Basic {
 	private final boolean autoWidth;
 	private final boolean autoHeight;
 	
-	private final Rectangle2D bounds;
 	private final double rotation;
 	
 	private final Rectangle2D drawBounds;
@@ -97,7 +96,7 @@ public final class Text extends Basic {
 		autoWidth = true;
 		autoHeight = true;
 
-		bounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
+		super.updateBoundsRef(new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue));
 		drawBounds  = (Rectangle2D) bounds.clone();
 		renderedText = new GeneralPath();
 	}
@@ -110,7 +109,6 @@ public final class Text extends Basic {
 		this.format = source.format;
 		this.autoHeight = source.autoHeight;
 		this.autoWidth = source.autoWidth;
-		this.bounds = source.bounds;
 		this.rotation = source.rotation;
 		this.drawBounds = source.drawBounds;
 		this.renderedText = source.renderedText;
@@ -144,7 +142,7 @@ public final class Text extends Basic {
 			
 			this.renderedText = source.renderedText;
 			this.drawBounds = source.drawBounds;
-			this.bounds = source.bounds;
+			super.updateBoundsRef(source.bounds);
 		} else {
 			LayoutDescription ld = computeLayout(text, format);
 			
@@ -159,7 +157,7 @@ public final class Text extends Basic {
 			renderedText = layoutText(text, ld, format);
 			
 			Point2D topLeft = mergeRegistrations(source, option, ld.fullWidth, ld.fullHeight, X, Y);
-			bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
+			super.updateBoundsRef(new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight));
 			Point2D reg = Registrations.topLeftToRegistration(registration, bounds);
 
 			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));
@@ -287,10 +285,6 @@ public final class Text extends Basic {
 		
 		throw new RuntimeException("Unknown justification value: " + justification);
 	}
-
-	
-	public Rectangle2D getBoundsReference() {return drawBounds;}
-
 	
 	public Text update(Tuple t) throws IllegalArgumentException {
 		if (Tuples.transferNeutral(t, this)) {return this;}

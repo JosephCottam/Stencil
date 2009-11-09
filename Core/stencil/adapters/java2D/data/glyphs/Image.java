@@ -73,7 +73,6 @@ public final class Image extends Basic {
 	private final double height;
 
 	private final double rotation;
-	private final Rectangle2D bounds;
 	
 	private double oldSX, oldSY;
 	private BufferedImage base;
@@ -90,7 +89,7 @@ public final class Image extends Basic {
 
 		Point2D topLeft = Registrations.registrationToTopLeft(registration, X.defaultValue, Y.defaultValue, height, width);
 		
-		bounds = getBounds(topLeft);
+		super.updateBoundsRef(getBounds(topLeft));
 	}
 	
 	
@@ -101,7 +100,6 @@ public final class Image extends Basic {
 		this.width = source.width;
 		this.height = source.height;
 		this.rotation = source.rotation;
-		this.bounds = source.bounds;
 		this.oldSX = source.oldSX;
 		this.oldSY = source.oldSY;
 		this.base = source.base;
@@ -119,8 +117,7 @@ public final class Image extends Basic {
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
 		Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
 
-		bounds = getBounds(topLeft);
-
+		super.updateBoundsRef(getBounds(topLeft));
 	}
 	
 	private final Rectangle2D getBounds(Point2D p) {return new Rectangle2D.Double(p.getX(), p.getY(), getWidth(), getHeight());}
@@ -199,8 +196,6 @@ public final class Image extends Basic {
 		g.drawRenderedImage(display, null);
 		super.postRender(g,baseTransform);
 	}
-
-	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public Image update(Tuple t) throws IllegalArgumentException {
 		if (Tuples.transferNeutral(t, this)) {return this;}

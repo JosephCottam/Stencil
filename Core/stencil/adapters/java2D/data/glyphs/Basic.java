@@ -82,7 +82,9 @@ public abstract class Basic implements Glyph2D {
 	protected final DisplayLayer layer;
 	
 	/**Should this glyph be drawn?**/
-	protected final boolean visible;		//TODO: Experiment with this as a mutable value...
+	protected final boolean visible;
+	
+	protected final Rectangle2D bounds = new Rectangle2D.Double();
 	
 	protected Basic(DisplayLayer layer, String id) {
 		this.layer = layer;
@@ -90,7 +92,6 @@ public abstract class Basic implements Glyph2D {
 		this.id = id;
 		visible = VISIBLE.defaultValue;
 		registration = REGISTRATION.defaultValue;
-		
 	}
 
 	protected Basic(String id, Basic source) {
@@ -98,6 +99,7 @@ public abstract class Basic implements Glyph2D {
 		this.layer = source.layer;
 		this.registration = source.registration;
 		this.visible = source.visible;
+		updateBoundsRef(source.bounds);
 	}
 	
 	protected Basic(Basic source, Tuple option, AttributeList unsettables) {
@@ -132,7 +134,16 @@ public abstract class Basic implements Glyph2D {
 	 * (which affects X and Y even if the registration point is the top left
 	 * and may modify height and width in the bounding box).
 	 */
-	public abstract Rectangle2D getBoundsReference();
+	public final Rectangle2D getBoundsReference() {return bounds;}
+	
+	/**Internal method for setting the bounds.  
+	 * Bounds are final, but it is often cumbersome to 
+	 * set them in the super constructor chain.  This method
+	 * allows an internal update to occur.  Good practice indicates
+	 * that this method should be called exactly once for each instance
+	 * of a glyph before the constructor completes.  
+	 */
+	protected final void updateBoundsRef(Rectangle2D r) {bounds.setRect(r);}
 	
 	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
 		return Converter.convert(get(name), type);
@@ -149,7 +160,6 @@ public abstract class Basic implements Glyph2D {
 
 
 	public String getLayerName() {return layer==null?null:layer.getName();}
-	
 	
 	public List<String> getFields() {return getAttributes().getNames();}
 

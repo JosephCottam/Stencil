@@ -36,7 +36,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,7 +109,6 @@ public abstract class Poly extends Stroked {
 	
 	private final List<Point2D> points;
 	private final GeneralPath path;	
-	private final Rectangle2D bounds;
 	private final boolean connect;
 	
 	public Poly(DisplayLayer layer, String id, boolean connect) {
@@ -119,7 +117,7 @@ public abstract class Poly extends Stroked {
 		
 		points = new ArrayList();
 		path = buildPath(points, this.connect);
-		bounds = path.getBounds2D();
+		super.updateBoundsRef(path.getBounds2D());
 	}
 	
 	
@@ -128,7 +126,6 @@ public abstract class Poly extends Stroked {
 		super(id, source);
 		this.points = source.points;
 		this.path = source.path;
-		this.bounds = source.bounds;
 		this.connect = source.connect;
 	}
 
@@ -147,14 +144,12 @@ public abstract class Poly extends Stroked {
 			path = source.path;
 		}
 		
-		bounds = path.getBounds2D();
+		super.updateBoundsRef(path.getBounds2D());
 	}
 	
 	
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
-
-	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public Object get(String name) {
 		String base = baseName(name);

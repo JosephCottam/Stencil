@@ -32,7 +32,6 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
-import java.awt.geom.Rectangle2D;
 
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Strokes;
@@ -82,7 +81,6 @@ public class Arc extends Stroked {
 	private final double arcHeight;
 
 	private final QuadCurve2D arc;
-	private final Rectangle2D bounds;
 	
 	public Arc(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
@@ -94,7 +92,7 @@ public class Arc extends Stroked {
 		arcHeight = ARC_HEIGHT.defaultValue;
 		
 		arc = validateArc();
-		bounds = arc.getBounds2D();
+		super.updateBoundsRef(arc.getBounds2D());
 	}
 	
 	protected Arc(String id, Arc source) {
@@ -106,7 +104,6 @@ public class Arc extends Stroked {
 		this.y2 = source.y2;
 		this.arcHeight = source.arcHeight;
 		this.arc = source.arc;
-		this.bounds = source.bounds;
 	}
 
 	private Arc(Arc source, Tuple option) {
@@ -119,7 +116,7 @@ public class Arc extends Stroked {
 		arcHeight = switchCopy(source.arcHeight, safeGet(option, ARC_HEIGHT));
 		
 		arc = validateArc();
-		bounds = arc.getBounds2D();
+		super.updateBoundsRef(arc.getBounds2D());
 	}
 		
 	public String getImplantation() {return IMPLANTATION;} 
@@ -190,8 +187,6 @@ public class Arc extends Stroked {
 		return new Point2D.Double(x, y);
 	}
 
-	@Override
-	public Rectangle2D getBoundsReference() {return bounds;}
 	public Arc update(Tuple t) throws IllegalArgumentException {
 		if (Tuples.transferNeutral(t, this)) {return this;}
 

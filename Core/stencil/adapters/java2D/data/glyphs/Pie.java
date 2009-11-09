@@ -33,7 +33,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 import stencil.adapters.general.Pies;
 import stencil.adapters.general.Registrations;
@@ -83,7 +82,6 @@ public final class Pie extends Stroked {
 	private final double field;
 	private final double slice;
 	
-	private final Rectangle2D bounds;
 	private final java.awt.Shape arc;
 	private final java.awt.Shape outline;
 	
@@ -100,7 +98,7 @@ public final class Pie extends Stroked {
 
 		arc = Pies.makeSlice(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
 		outline = Pies.makePieOutline(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
-		bounds = outline.getBounds2D();
+		super.updateBoundsRef(outline.getBounds2D());
 	}
 	
 	
@@ -114,7 +112,6 @@ public final class Pie extends Stroked {
 		this.angle = source.angle;
 		this.field = source.field;
 		this.slice = source.slice;
-		this.bounds = source.bounds;
 		this.arc = source.arc;
 		this.outline = source.outline;
 	}
@@ -141,7 +138,7 @@ public final class Pie extends Stroked {
 		
 		arc = Pies.makeSlice(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
 		outline = Pies.makePieOutline(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
-		bounds = outline.getBounds2D();
+		super.updateBoundsRef(outline.getBounds2D());
 	}
 	
 	public Object get(String name) {
@@ -164,9 +161,6 @@ public final class Pie extends Stroked {
 	private double getPercent() {return slice/(slice+field);}
 	public String getImplantation() {return IMPLANTATION;}
 	
-	public Rectangle2D getBoundsReference() {return bounds;}
-
-
 	public void render(Graphics2D g, AffineTransform base) {
 		g.setPaint(fieldPaint);
 		g.fill(outline);

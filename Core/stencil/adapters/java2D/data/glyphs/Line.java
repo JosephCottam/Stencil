@@ -29,11 +29,10 @@
 package stencil.adapters.java2D.data.glyphs;
 
 
- import java.awt.geom.AffineTransform;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.Graphics2D;
 
 import stencil.streams.Tuple;
@@ -90,7 +89,6 @@ public final class Line extends Stroked {
 	private final String cap2;
 	
 	private final java.awt.Shape glyph;
-	private final java.awt.geom.Rectangle2D bounds;
 	
 	public Line(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
@@ -103,7 +101,7 @@ public final class Line extends Stroked {
 		cap2 = "NONE";
 		
 		glyph = new Line2D.Double(x1,y1,x2,y2);		
-		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
+		super.updateBoundsRef(outlineStyle.createStrokedShape(glyph).getBounds2D());
 	}
 	
 	
@@ -115,7 +113,6 @@ public final class Line extends Stroked {
 		this.x2 = source.x2;
 		this.y2 = source.y2;
 		this.glyph = source.glyph;
-		this.bounds = source.bounds;
 		this.cap1 = source.cap1;
 		this.cap2 = source.cap2; 
 	}
@@ -132,10 +129,8 @@ public final class Line extends Stroked {
 		cap2 = switchCopy(source.cap1, safeGet(option, CAP2));
 		
 		glyph = new Line2D.Double(x1,y1,x2,y2);		
-		bounds = outlineStyle.createStrokedShape(glyph).getBounds2D();
+		super.updateBoundsRef(outlineStyle.createStrokedShape(glyph).getBounds2D());
 	}
-	
-	public Rectangle2D getBoundsReference() {return bounds;}
 
 	public String getImplantation() {return IMPLANTATION;} 
 	protected AttributeList getAttributes() {return ATTRIBUTES;}

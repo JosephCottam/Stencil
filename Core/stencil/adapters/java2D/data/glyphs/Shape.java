@@ -62,7 +62,6 @@ public class Shape extends Filled {
 		ATTRIBUTES.add(Y);
 	}
 	
-	private final Rectangle2D bounds;
 	private final GeneralPath glyph;
 
 	private final StandardShape shape;
@@ -82,7 +81,7 @@ public class Shape extends Filled {
 		rotation = ROTATION.defaultValue;	
 		
 		glyph  = initWork();
-		bounds = glyph.getBounds2D();
+		super.updateBoundsRef(glyph.getBounds2D());
 	}
 	
 	
@@ -90,7 +89,6 @@ public class Shape extends Filled {
 	private Shape(String id, Shape source) {
 		super(id, source);
 	
-		this.bounds = source.bounds;
 		this.glyph = source.glyph;
 		this.shape = source.shape;
 		this.size = source.size;
@@ -115,7 +113,7 @@ public class Shape extends Filled {
 		regY = reg.getY();
 
 		glyph =initWork();
-		bounds = glyph.getBounds2D();
+		super.updateBoundsRef(glyph.getBounds2D());
 	}
 
 	private final GeneralPath initWork() {
@@ -143,7 +141,6 @@ public class Shape extends Filled {
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 	
-	public Rectangle2D getBoundsReference() {return bounds;}
 	public String getImplantation() {return IMPLANTATION;}
 
 	@Override
