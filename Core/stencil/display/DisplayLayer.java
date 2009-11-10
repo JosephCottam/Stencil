@@ -42,22 +42,30 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**Return an iterator of the tuples of this layer*/
 	public Iterator<T> iterator();
 
-	/**Creates a new item of type T in this layer, associated with the ID.
+	/**Creates a new item of type T in this layer.
+	 * The properties of the new item are dictated by the values
+	 * passed.  This must include an ID field.
+	 *  
 	 * @throws DuplicateIDException Thrown when the ID already exists in the layer
 	 * */
-	public Glyph make(String ID) throws DuplicateIDException;
+	public Glyph make(Tuple values) throws DuplicateIDException;
 
 	/**Returns the item associated with the name on this layer.
 	 * Returns null if no item is associated.*/
 	public Glyph find(String ID);
 
 	/**Returns an item in the layer.
+	 * 
 	 * If an item with the given ID already exists, that item
-	 * is returned.  Otherwise, a new item is created with the given ID and returned.
+	 * is updated with the values passed. Otherwise, the item is created and
+	 * then updated.  
+	 * 
+	 * Values passed must include at least an ID field.
+	 * 
 	 * @param ID ID to search under
 	 * @return Tuple with the given ID
 	 */
-	public Glyph makeOrFind(String ID);
+	public Glyph makeOrFind(Tuple values);
 
 	/**Given an ID, remove the associated tuple from the layer*/
 	public void remove(String ID);

@@ -202,12 +202,4 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * to the passed glyph object. 
 	 */
 	public abstract void addDynamic(T g, Rule rule, Tuple source);
-	
-	/**Transfer the values of the source over to the target glyph.
-	 * Exceptions in the transfer process may be propagated out.
-	 * 
-	 * Returns the actually stored entity.  This may or may not be 
-	 * the same as the target.
-	 * */
-	public abstract <R extends T> R transfer(Tuple source, R target)  throws Exception; 	
 }

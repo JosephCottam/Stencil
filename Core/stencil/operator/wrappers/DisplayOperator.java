@@ -27,13 +27,11 @@ public final class DisplayOperator implements StencilOperator {
 	public String getName() {return layer.getName();}
 
 	public Tuple find(String ID) {return layer.find(ID);}
-	public Tuple makeOrFind(String ID) {return layer.makeOrFind(ID);}
-	public Tuple make(String ID) {return layer.make(ID);}
 	public Tuple remove(String ID) {layer.remove(ID); return null;}
 	
-	public Tuple map(Object... args) {return layer.makeOrFind((String) args[0]);}
+	public Tuple map(Object... args) {return layer.find((String) args[0]);}
 
-	public Tuple query(Object... args) {return layer.find((String) args[0]);}
+	public Tuple query(Object... args) {return map(args);}
 
 	public DisplayOperator duplicate() {throw new UnsupportedOperationException();}
 

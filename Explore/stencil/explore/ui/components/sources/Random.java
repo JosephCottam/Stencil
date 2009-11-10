@@ -26,64 +26,59 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.util.streams;
+package stencil.explore.ui.components.sources;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
-import java.util.Arrays;
-import java.util.List;
+import javax.swing.JTextField;
 
-/**Prototype concurrent loading stream.
- * 
- * All streams are given a round-robing chance to provide data.
- * Since the first stream passed in is given the first chance
- * to load data, it is somewhat dependent on the order.  However,
- * all other streams will be given a chance before that one is
- * given another chance.
- *
- */
-public class ConcurrentStream implements TupleStream {
-	protected List<TupleStream> streams;
+import stencil.explore.model.sources.RandomSource;
 
-	protected int offset;
-	
-	public ConcurrentStream(TupleStream... streams) {
-		this.streams = Arrays.asList(streams);
+public class Random extends SourceEditor {
+	private static final long serialVersionUID = 4349967365836435540L;
+
+	private final JTextField size = new JTextField();;
+	private final JTextField length = new JTextField();;
+
+	public Random(RandomSource source) {
+		this();
+		set(source);
 	}
 
-	public ConcurrentStream(List<TupleStream> streams) {
-		this.streams=streams;
-		offset = 0;
+	private Random() {
+		super("");
+		size.setText("2");
+		length.setText("-1");
+
+		this.add(labeledPanel("Size: ", size));
+		this.add(labeledPanel("Length: ", length));
+
+		FocusListener fl = new FocusListener() {
+			public void focusGained(FocusEvent arg0) {/*No action.*/}
+			public void focusLost(FocusEvent arg0) {saveValues();}
+		};
+
+		size.addFocusListener(fl);
+		length.addFocusListener(fl);
 	}
 
-	public Tuple next() {
-		//TODO: This is busy waiting...we should go with a listener architecture.
-		while (!streams.get(offset).ready()) {incrimentOffset();}
-
-		Tuple nv = streams.get(offset).next();
-		incrimentOffset();
-		return nv;
+	/**Sets the passed file source.
+	 * If source is null, the save target will be returned.*/
+	public RandomSource get() {
+		return new RandomSource(name, Integer.parseInt(size.getText()), Long.parseLong(length.getText()));
 	}
 
-	public boolean ready() {
-		for (TupleStream stream: streams) {
-			if (stream.ready()) {return true;}
-		}
-		return false;
+	/**Set the current state to match the source passed.
+	 * SourcesChanged will be remember for automatic saving as well.
+	 *
+	 * SourcesChanged cannot be null.
+	 **/
+	public void set (RandomSource source) {
+		assert source != null : "Cannot pass a null to set.";
+		super.set(source);
+		size.setText(Integer.toString(source.size()));
+		length.setText(Long.toString(source.length()));
 	}
 
-	public boolean hasNext() {
-		int initial = offset;
-		do {
-			if (streams.get(offset).hasNext()) {return true;}	
-			incrimentOffset();
-		} while (offset != initial);
-		
-		return false;
-	}
-
-	public void remove() {throw new UnsupportedOperationException("Remove not supported on ConcurrentStream.");}
-	
-	private void incrimentOffset() {offset = (offset+1) % streams.size();}
 }

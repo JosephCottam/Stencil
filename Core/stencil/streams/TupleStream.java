@@ -38,19 +38,9 @@ import java.util.Iterator;
  *
  * */
 public interface TupleStream extends Iterator<Tuple> {
-	/**What is the next tuple in the stream?*/
-	public Tuple next();
-
-	/**Shut down this stream.  Calling next after close is illegal.
-	 *
-	 * @throws Exception
-	 */
-	public void close() throws Exception;
-
 	/**A stream is ready when it can return a tuple right away.
 	 * This is different from hasNext, in that a false hasNext value
 	 * indicates the stream will NEVER return more values.
-	 * A closed stream is never ready.
 	 * @return
 	 */
 	public boolean ready();

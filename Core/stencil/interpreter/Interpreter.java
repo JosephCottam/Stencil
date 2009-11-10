@@ -103,10 +103,7 @@ public class Interpreter {
 					if (result == null) {continue;} //Move on to the next group if the result was empty...
  
 					if (result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-						String id = (String) result.get(ParserConstants.GLYPH_ID_FIELD, String.class);
-						stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(id);							
-						glyph = panel.transfer(result, glyph);
-						
+						stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);							
 						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
 					} 
 				}

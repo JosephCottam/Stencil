@@ -80,6 +80,8 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 		sourceType.addItem(MouseSource.NAME);
 		sourceType.addItem(TwitterSource.NAME);
 		sourceType.addItem(WindowStateSource.NAME);
+		sourceType.addItem(RandomSource.NAME);
+		sourceType.addItem(SequenceSource.NAME);
 
 		streamChangeEditor = new JPanel();
 		streamChangeEditor.setLayout(new BorderLayout());

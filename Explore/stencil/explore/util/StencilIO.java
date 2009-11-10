@@ -129,6 +129,8 @@ public abstract class StencilIO {
 		else if (type.equals(MouseSource.NAME)) {return new MouseSource(name);}
 		else if (type.equals(TwitterSource.NAME)) {return new TwitterSource(name);}
 		else if (type.equals(WindowStateSource.NAME)) {return new WindowStateSource(name);}
+		else if (type.equals(RandomSource.NAME)) {return new RandomSource(name);}
+		else if (type.equals(SequenceSource.NAME)) {return new SequenceSource(name);}
 		
 		throw new RuntimeException("Could not find source mapping for " + type);
 	}
