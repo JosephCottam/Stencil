@@ -41,13 +41,13 @@ public interface LayerUpdateListener {
 	 * 
 	 */
 	public final static class AtomicCompositeUpdate {
-		AtomicReference<Rectangle> bounds = new AtomicReference();
+		AtomicReference<Rectangle> bounds = new AtomicReference(null);
 
 		public void update(Rectangle r) {
 			Rectangle old, update;
 			do {
 				old = bounds.get();
-				update = old == null ? r : old.union(r);				
+				update = old == null ? r : old.union(r);	
 			} while(!bounds.compareAndSet(old, update));
 		}
 		

@@ -26,7 +26,6 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	private final DisplayLayer[] layers;
 	private final Canvas target;
 	
-
 	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;

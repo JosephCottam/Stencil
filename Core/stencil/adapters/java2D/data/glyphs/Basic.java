@@ -104,8 +104,8 @@ public abstract class Basic implements Glyph2D {
 	
 	protected Basic(Basic source, Tuple option, AttributeList unsettables) {
 		validateOptions(option, unsettables);
-
 		this.layer = source.layer;
+		updateBoundsRef(source.getBoundsReference());
 		id = switchCopy(source.id, (String) safeGet(option, ID));
 		visible = switchCopy(source.visible, safeGet(option, VISIBLE));
 		registration = switchCopy(source.registration, safeGet(option, REGISTRATION));		

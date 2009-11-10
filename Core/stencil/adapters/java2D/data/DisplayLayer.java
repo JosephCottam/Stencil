@@ -43,7 +43,9 @@ import stencil.adapters.java2D.data.glyphs.*;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.Layer;
+import stencil.streams.Tuple;
 import stencil.util.collections.ListSet;
 
 public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
@@ -61,14 +63,25 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	public T find(String ID) {return index.get(ID);}
 
-	public T makeOrFind(String ID) {
-		if (index.containsKey(ID)) {return index.get(ID);}
-		else {return make(ID);}
+	public T makeOrFind(Tuple values) {
+		String id = (String) values.get(ParserConstants.GLYPH_ID_FIELD, String.class);
+		T rv;
+		if (index.containsKey(id)) {
+			T old = index.get(id);
+			rv = old;
+			if (values.getFields().size()>1) {
+				rv = (T) rv.update(values);
+				index.put(id,rv);
+				fireLayerUpdate(old.getBoundsReference(), rv.getBoundsReference());
+			}
+		} else {rv = make(values);}
+		return rv;
 	}
 
-	public T make(String ID) throws DuplicateIDException {
-		T glyph = (T) prototypeGlyph.updateID(ID);
-		index.put(ID, glyph);
+	public T make(Tuple values) throws DuplicateIDException {
+		String id = (String) values.get(ParserConstants.GLYPH_ID_FIELD, String.class);
+		T glyph = (T) prototypeGlyph.update(values);
+		index.put(id, glyph);
 		fireLayerUpdate(glyph.getBoundsReference());
 		return glyph;
 	}

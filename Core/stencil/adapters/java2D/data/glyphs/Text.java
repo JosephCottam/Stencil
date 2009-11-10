@@ -81,9 +81,9 @@ public final class Text extends Basic {
 	private final boolean autoWidth;
 	private final boolean autoHeight;
 	
+	private final Rectangle2D horizontalBounds;
 	private final double rotation;
 	
-	private final Rectangle2D drawBounds;
 	private final GeneralPath renderedText;
 	
 	public Text(DisplayLayer layer, String id) {
@@ -96,8 +96,8 @@ public final class Text extends Basic {
 		autoWidth = true;
 		autoHeight = true;
 
-		super.updateBoundsRef(new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue));
-		drawBounds  = (Rectangle2D) bounds.clone();
+		horizontalBounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
+		super.updateBoundsRef((Rectangle2D) horizontalBounds.clone());
 		renderedText = new GeneralPath();
 	}
 	
@@ -109,8 +109,8 @@ public final class Text extends Basic {
 		this.format = source.format;
 		this.autoHeight = source.autoHeight;
 		this.autoWidth = source.autoWidth;
+		this.horizontalBounds = source.horizontalBounds;
 		this.rotation = source.rotation;
-		this.drawBounds = source.drawBounds;
 		this.renderedText = source.renderedText;
 	}
 
@@ -141,31 +141,31 @@ public final class Text extends Basic {
 			&& !option.hasField(HEIGHT.name)) {
 			
 			this.renderedText = source.renderedText;
-			this.drawBounds = source.drawBounds;
 			super.updateBoundsRef(source.bounds);
+			this.horizontalBounds = source.horizontalBounds;
 		} else {
 			LayoutDescription ld = computeLayout(text, format);
 			
 			if (!autoWidth) {
-				ld.fullWidth = switchCopy(source.bounds.getWidth(), safeGet(option, WIDTH));
+				ld.fullWidth = switchCopy(source.horizontalBounds.getWidth(), safeGet(option, WIDTH));
 			}
 			 
 			if (!autoHeight) { 
-				ld.fullHeight = switchCopy(source.bounds.getHeight(), safeGet(option, HEIGHT));
+				ld.fullHeight = switchCopy(source.horizontalBounds.getHeight(), safeGet(option, HEIGHT));
 			}
 
 			renderedText = layoutText(text, ld, format);
 			
 			Point2D topLeft = mergeRegistrations(source, option, ld.fullWidth, ld.fullHeight, X, Y);
-			super.updateBoundsRef(new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight));
-			Point2D reg = Registrations.topLeftToRegistration(registration, bounds);
+			horizontalBounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
+			Point2D reg = Registrations.topLeftToRegistration(registration, horizontalBounds);
 
-			renderedText.transform(AffineTransform.getTranslateInstance(bounds.getX()-reg.getX(), bounds.getY()-reg.getY()));
+			renderedText.transform(AffineTransform.getTranslateInstance(horizontalBounds.getX()-reg.getX(), horizontalBounds.getY()-reg.getY()));
 			renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
 			layout.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
-			drawBounds = layout.getBounds2D();
+			super.updateBoundsRef(layout.getBounds2D());
 		}
 	}
 
@@ -179,11 +179,11 @@ public final class Text extends Basic {
 	public Object get(String name) {
 		if (TEXT.is(name)) {return text;}
 		if (SCALE_BY.is(name)) {return scaleBy;}
-		if (X.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getX();}
-		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
+		if (X.is(name)) {return Registrations.topLeftToRegistration(registration, horizontalBounds).getX();}
+		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, horizontalBounds).getY();}
 		if (ROTATION.is(name)) {return rotation;}
-		if (HEIGHT.is(name)) {return bounds.getHeight();}
-		if (WIDTH.is(name)) {return bounds.getWidth();}
+		if (HEIGHT.is(name)) {return horizontalBounds.getHeight();}
+		if (WIDTH.is(name)) {return horizontalBounds.getWidth();}
 		if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
 		return super.get(name);
 	}
@@ -215,7 +215,7 @@ public final class Text extends Basic {
 		//Figure out where to render the thing while potentially ignoring the view transform.
 		//The following guarantees that the registration point is at the same spot that it would have
 		//been had it been rendered exactly under the view transform
-		Point2D p = Registrations.topLeftToRegistration(registration, bounds);
+		Point2D p = Registrations.topLeftToRegistration(registration, horizontalBounds);
 		Point2D p2 = new Point2D.Double();
 		fixScale(g);
 		
