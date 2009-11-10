@@ -98,7 +98,7 @@ public class Sidebar implements Guide2D {
 				X = -1d * bounds.getWidth();
 				Y = -1d * bounds.getHeight();
 			}
-			this.bounds = new Rectangle2D.Double(X,Y, bounds.getWidth(), bounds.getHeight());
+			this.bounds = new Rectangle2D.Double(bounds.getX()+X,bounds.getY()+Y, bounds.getWidth(), bounds.getHeight());
 		} else {
 			this.bounds = null;
 		}
