@@ -69,13 +69,13 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public T make(String ID) throws DuplicateIDException {
 		T glyph = (T) prototypeGlyph.updateID(ID);
 		index.put(ID, glyph);
-		fireLayerUpdate(glyph);
+		fireLayerUpdate(glyph.getBoundsReference());
 		return glyph;
 	}
 
 	public void remove(String ID) {
 		T glyph = index.remove(ID);
-		if (glyph != null) {fireLayerUpdate(glyph);}
+		if (glyph != null) {fireLayerUpdate(glyph.getBoundsReference());}
 	}
 
 	public int size() {return index.size();}
@@ -89,7 +89,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
-		fireLayerUpdate(prior, glyph);
+		fireLayerUpdate(prior.getBoundsReference(), glyph.getBoundsReference());
 		
 		if (prior == null) {throw new RuntimeException("Error updating " + ID);}
 	}
@@ -144,12 +144,13 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	public void addLayerUpdateListener(LayerUpdateListener l) {updateListeners.add(l);}
 	
-	private void fireLayerUpdate(T... elements) {
-		if (elements.length == 0) {return;}
-		
-		Rectangle2D bounds = elements[0].getBoundsReference().getBounds2D();
-		for (int i=1; i<elements.length;i++) {Rectangle2D.union(elements[i].getBoundsReference(), bounds, bounds);}
-		
+	private void fireLayerUpdate(Rectangle2D pre, Rectangle2D post) {
+		Rectangle2D bounds = new Rectangle2D.Double();
+		Rectangle2D.union(pre, post, bounds);
+		fireLayerUpdate(bounds);
+	}
+	
+	private void fireLayerUpdate(Rectangle2D bounds) {
 		Rectangle update = bounds.getBounds();
 		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}	//TODO: Should this dispatch to some other thread?		
 	}
