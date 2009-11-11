@@ -53,9 +53,9 @@ public class Guide extends StencilTree {
 	 * creates a set of tuples. To produce the guide, the rules are applied to
 	 * each resulting tuple.
 	 */
-	public CallGroup getGenerator() {
+	public CallChain getGenerator() {
 		if (this.getChildCount() < 5) {throw new RuntimeException(String.format("Generator not set yet for guide %1$s on layer %2$s.", getAttribute(), getLayer()));}
-		return (CallGroup) getChild(4);
+		return (CallChain) getChild(4);
 	}
 
 	

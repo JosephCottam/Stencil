@@ -148,9 +148,7 @@ options {
     * For continuous guides, always returns if EchoContinuous is not found.
     * 
     **/ 
-    private boolean requiresChanges(CallGroup group, SampleStrategy strat) {
-       if (group.getChildCount() >1) {throw new RuntimeException("Cannot support auto-guide ensure for compound call groups.");}
-       CallChain chain = group.getChains().get(0);
+    private boolean requiresChanges(CallChain chain, SampleStrategy strat) {
        CallTarget call = chain.getStart();
 
 
@@ -179,20 +177,18 @@ options {
 
     }
     
-    //Given a call group, what are the values retrieved from the tuple in the first round
+    //Given a call chain, what are the values retrieved from the tuple in the first round
     //of calls?
-    private String findInitialArgs(CallGroup call) {
+    private String findInitialArgs(CallChain call) {
     	StringBuilder args= new StringBuilder();
-    	for (CallChain chain: call.getChains()) {
-    		CallTarget t = chain.getStart();
-    		for (Value v: t.getArguments()) {
-    			if (v.isTupleRef()) {
-    				args.append("\"");
-    				args.append(v.getChild(0).toString());//TODO: HACK...won't admit indexed tuple-refs
-    				args.append("\"");
-    				args.append(",");
-    			}
-    		}
+   		CallTarget t = call.getStart();
+   		for (Value v: t.getArguments()) {
+   			if (v.isTupleRef()) {
+   				args.append("\"");
+   				args.append(v.getChild(0).toString());//TODO: HACK...won't admit indexed tuple-refs
+   				args.append("\"");
+   				args.append(",");
+   			}
     	}
     	if (args.length() ==0) {throw new RuntimeException("No tuple-dependent arguments found when creating guide operator.");}
     	args.deleteCharAt(args.length()-1); //Remove trailing comma
@@ -206,10 +202,10 @@ options {
      * 
      * @param layer -- Layer to build operator for 
      * @param field -- Field being constructor for
-     * @param c -- Call group being operated on
+     * @param c -- Call chaian being operated on
      */
 	 private Tree newCall(String layer, String field, CommonTree c) {
-	 	CallGroup call = (CallGroup) c; 
+	 	CallChain call = (CallChain) c; 
     	String key = key(layer, field);
     	if (!requestedGuides.containsKey(key)) {return call;}
 
@@ -252,26 +248,17 @@ options {
     	adaptor.addChild(functionNode, specializer);
     	adaptor.addChild(functionNode, args);
     	adaptor.addChild(functionNode, adaptor.create(YIELDS, "->"));
+		adaptor.addChild(functionNode, call.getStart());
 		
 		//Construct chain node
 		CallChain chainNode = (CallChain) adaptor.create(CALL_CHAIN, "CALL_CHAIN");
 		adaptor.addChild(chainNode, functionNode);
 		
-		CallGroup groupNode;
-		if (call.getChains().size() == 1) {
-			adaptor.addChild(functionNode, call.getChains().get(0).getStart());
-			groupNode = (CallGroup) adaptor.create(CALL_GROUP, "CALL_GROUP");
-			adaptor.addChild(groupNode, chainNode);
-		} else {
-			throw new Error("Auto guide with joined call chains not supported.");
-		}
-		
-		
-    	return groupNode;
+    	return chainNode;
     }
     
     
-    /**Construct the specializer for the echo operatation.
+    /**Construct the specializer for the echo operation.
      *
      * @param t Call target that will follow the new echo operator.
      */

@@ -4,10 +4,14 @@
  * Copyright 2007 Sun Microsystems, Inc. All rights reserved.
  * SUN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  * 
- * Taken ad added getAll method
+ * 
+ * Modifications by Joseph Cottam:
+ * 		 Added getAll method
+ * 		 Added simplEntry class (stolen from AbstractMap as it was package protected in 1.5)
  */
 
 package stencil.util.collections;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.*;
 import java.util.*;
@@ -72,10 +76,64 @@ import java.io.IOException;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  */
+@SuppressWarnings("all")
 public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
 
+    /**
+     * This should be made public as soon as possible.  It greatly simplifies
+     * the task of implementing Map.
+     */
+    static class SimpleEntry<K,V> implements Entry<K,V> {
+	K key;
+	V value;
+
+	public SimpleEntry(K key, V value) {
+	    this.key   = key;
+            this.value = value;
+	}
+
+	public SimpleEntry(Entry<K,V> e) {
+	    this.key   = e.getKey();
+            this.value = e.getValue();
+	}
+
+	public K getKey() {
+	    return key;
+	}
+
+	public V getValue() {
+	    return value;
+	}
+
+	public V setValue(V value) {
+	    V oldValue = this.value;
+	    this.value = value;
+	    return oldValue;
+	}
+
+	public boolean equals(Object o) {
+	    if (!(o instanceof Map.Entry))
+		return false;
+	    Map.Entry e = (Map.Entry)o;
+	    return eq(key, e.getKey()) && eq(value, e.getValue());
+	}
+
+	public int hashCode() {
+	    return ((key   == null)   ? 0 :   key.hashCode()) ^
+		   ((value == null)   ? 0 : value.hashCode());
+	}
+
+	public String toString() {
+	    return key + "=" + value;
+	}
+
+        private static boolean eq(Object o1, Object o2) {
+            return (o1 == null ? o2 == null : o1.equals(o2));
+        }
+    }
+    
     /*
      * The basic strategy is to subdivide the table among Segments,
      * each of which itself is a concurrently readable hash table.
@@ -1141,7 +1199,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * setValue changes to the underlying map.
      */
     final class WriteThroughEntry
-	extends AbstractMap.SimpleEntry<K,V>
+	extends SimpleEntry<K,V>
     {
         WriteThroughEntry(K k, V v) {
             super(k,v);

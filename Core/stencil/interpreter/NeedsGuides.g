@@ -53,8 +53,7 @@ options {
 	}
 }
 
-topdown: ^(GUIDE layer=. type=. spec=. rules=. callGroup);
-callGroup: ^(CALL_GROUP callChain);
+topdown: ^(GUIDE layer=. type=. spec=. rules=. callChain);
 callChain: ^(CALL_CHAIN target);
 target
 	: ^(f=FUNCTION {needsGuide = (needsGuide || ((Function) f).getOperator().refreshGuide());} . . . target)

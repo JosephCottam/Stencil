@@ -59,7 +59,7 @@ public class Filter extends Target {
 	}
 
 	/**What is the rule associated with this predicate?*/
-	public CallGroup rule() {return (CallGroup) getChild(1);}
+	public CallChain rule() {return (CallChain) getChild(1);}
 
 	/**Does the passed tuple match the given predicates?*/
 	public boolean matches(Tuple source) throws Exception {

@@ -121,9 +121,8 @@ options {
 	}
 }
 
-topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callGroup[$layer.text, $att.text]); 
+topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callChain[$layer.text, $att.text]); 
 	
-callGroup[String layerName, String att]: ^(CALL_GROUP callChain[layerName, att]);
 callChain[String layerName, String att]: ^(CALL_CHAIN invoke[layerName, att]);
 invoke[String layerName, String att]
 	@init{List<Object[]> inputs = null;}

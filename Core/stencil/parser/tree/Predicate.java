@@ -62,9 +62,9 @@ public class Predicate extends StencilTree {
 	private Atom getValue(Tree source, Tuple tuple) {
 		if (source instanceof Value) {
 			return Atom.Literal.instance(TupleRef.resolve((Value) source, tuple));
-		} else if (source instanceof CallGroup){
+		} else if (source instanceof CallChain){
 			Tuple result;
-			try {result =  ((CallGroup) source).apply(tuple);}
+			try {result =  ((CallChain) source).apply(tuple);}
 			catch (Exception e) {throw new RuntimeException("Error applying function in predicate.");}
 
 			if (result == null){return null;}

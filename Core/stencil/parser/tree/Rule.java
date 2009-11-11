@@ -49,7 +49,7 @@ public class Rule extends StencilTree {
 	public Target getTarget() {return (Target) getChild(0);}
 	
 	/**What actions are being taken in this rule*/
-	public CallGroup getAction() {return (CallGroup) getChild(1);}
+	public CallChain getAction() {return (CallChain) getChild(1);}
 
 	/**Is the binding dynamic?*/
 	public boolean isDyanmic() {return getChild(2).getType() == StencilParser.DYNAMIC;}

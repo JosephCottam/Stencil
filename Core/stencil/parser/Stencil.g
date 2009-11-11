@@ -38,7 +38,6 @@ options {
   BOOLEAN_OP;    //Boolean operator
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
-  CALL_GROUP;
   CALL_CHAIN;
   FUNCTION;
   LIST;
@@ -218,8 +217,8 @@ consumesBlock[String def]
     -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filterRule*) ^(LIST["Rules"] rule+));
 
 filterRule
-  : FILTER rulePredicate DEFINE callGroup
-    -> ^(FILTER rulePredicate callGroup);
+  : FILTER rulePredicate DEFINE callChain
+    -> ^(FILTER rulePredicate callChain);
 
 rulePredicate
   : GROUP ALL CLOSE_GROUP
@@ -267,25 +266,17 @@ predicate
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[String def]
-  : target[def] (DEFINE | DYNAMIC) callGroup
-    -> ^(RULE target callGroup DEFINE? DYNAMIC?);
+  : target[def] (DEFINE | DYNAMIC) callChain
+    -> ^(RULE target ^(CALL_CHAIN callChain) DEFINE? DYNAMIC?);
 
-callGroup
-  : (callChain SPLIT)=> callChain (SPLIT callChain)+ JOIN callChain
-    -> ^(CALL_GROUP callChain+)
-  | callChain
-    -> ^(CALL_GROUP callChain);
-
-callChain: callTarget -> ^(CALL_CHAIN callTarget);
-
-callTarget
+callChain
   : value -> ^(PACK value)
   | emptySet -> ^(PACK)
   | valueList -> ^(PACK valueList)
   | functionCallTarget;
   
 functionCallTarget
-  : (functionCall passOp)=> f1=functionCall passOp f2=callTarget 
+  : (functionCall passOp)=> f1=functionCall passOp f2=callChain 
      -> ^($f1 passOp $f2)
   | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT));
    
@@ -424,8 +415,11 @@ booleanOp
   | t= '!~' -> BOOLEAN_OP[t];
 
 
+namedYield: '-[' ID ']->';
+
 passOp  
   : YIELDS
+  | namedYield
   | GUIDE_YIELD; 
     //TODO: Add feed
 

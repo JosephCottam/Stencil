@@ -34,7 +34,7 @@ import org.antlr.runtime.Token;
 import stencil.streams.Tuple;
 
 /**A call target is something that can be on the right-hand-side
- * of a call operator (an arrow, typically).
+ * of a call operator (an yield variant).
  *
  * @author jcottam
  *
