@@ -19,14 +19,14 @@ external stream trans(op, source, dest, start, end, size, G, r,g,b)
 layer baseline[LINE]
 from overheads
 	ID: rank
-	X.2<< Timescale(start) -> Max[1..n](_)
-	X.1<< Timescale(start) -> Min[1..n](_)
+	X.2: Timescale(start) -> Max[1..n](_)
+	X.1: Timescale(start) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
-	ID: start
-	X.2<< Timescale(start) -> Max[1..n](_)
-	X.1<< Timescale(start) -> Min[1..n](_)
+	ID: source
+	X.2: Timescale(start) -> Max[1..n](_)
+	X.1: Timescale(start) -> Min[1..n](_)
 	STROKE_COLOR: @color(Gray90)
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
@@ -78,7 +78,8 @@ operator ColorByOp(op) -> (C)
 	all => C: @color(black)
 	
 operator Layout (rank)->(Y)
-  all => (Y) : Index(rank) -> Mult(20, _) -> Add(10, _)
+  all => (Y) : Mult(20, rank)
+ 
 
 operator Timescale(time) -> (time)
   all => time : Div(time, 50)
