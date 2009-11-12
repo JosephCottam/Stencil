@@ -34,7 +34,7 @@ import org.antlr.runtime.tree.Tree;
 import stencil.streams.Tuple;
 import stencil.parser.string.StencilParser;
 
-/** A rule is a CallGroup and a tuple prototype.
+/** A rule is a group of calls and a tuple prototype.
  * This is a complete, individual mapping definition.
  *
  * @author jcottam

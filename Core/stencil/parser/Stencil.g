@@ -267,16 +267,17 @@ predicate
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[String def]
   : target[def] (DEFINE | DYNAMIC) callChain
-    -> ^(RULE target ^(CALL_CHAIN callChain) DEFINE? DYNAMIC?);
+    -> ^(RULE target callChain DEFINE? DYNAMIC?);
 
-callChain
+callChain: callChainMember -> ^(CALL_CHAIN callChainMember);
+callChainMember
   : value -> ^(PACK value)
   | emptySet -> ^(PACK)
   | valueList -> ^(PACK valueList)
   | functionCallTarget;
   
 functionCallTarget
-  : (functionCall passOp)=> f1=functionCall passOp f2=callChain 
+  : (functionCall passOp)=> f1=functionCall passOp f2=callChainMember 
      -> ^($f1 passOp $f2)
   | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT));
    

@@ -167,13 +167,13 @@ transferMappings
 	
 
 //trimMappings
-trimGuide : ^(GUIDE . . . . trimCallGroup);
-trimCallGroup: ^(CALL_GROUP ^(CALL_CHAIN call=.)) -> ^(CALL_GROUP ^(CALL_CHAIN {trimCall((CallTarget) call)}));
+trimGuide : ^(GUIDE . . . . trimCallChain);
+trimCallChain: ^(CALL_CHAIN call=.) -> ^(CALL_CHAIN {trimCall((CallTarget) call)});
 
 
 //Pick the 'guide' function instead of whatever else
 //was selected for each function
-renameMappingsDown: ^(GUIDE . . . . ^(CALL_GROUP ^(CALL_CHAIN renameGuideMapping)));
+renameMappingsDown: ^(GUIDE . . . . ^(CALL_CHAIN renameGuideMapping));
 renameGuideMapping
 	 @after{if (retval.tree instanceof Function) {((Function) retval.tree).setOperator(((Function) f).getOperator());}}
 	 : ^(f=FUNCTION spec=. args=. style=. call=renameGuideMapping) -> ^(FUNCTION[guideName($f.text)] $spec $args $style $call)

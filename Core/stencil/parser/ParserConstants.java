@@ -72,8 +72,6 @@ public abstract class ParserConstants {
 	public static final String GUIDE_BLOCK_TAG = "Guide";
 	public static final String DO_GUIDE_BLOCK_TAG = "DoGuide";
 	
-	public static final String CALL_GROUP_LIST_TAG = "CallGroup";
-
 	public static final int RANGE_START_INT = 1;
 	public static final int RANGE_END_INT = 0;
 	public static final String RANGE_START = Integer.toString(RANGE_START_INT);
