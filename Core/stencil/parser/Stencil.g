@@ -33,12 +33,13 @@ options {
   output=AST;
 }
 
- tokens {
+tokens {
   ANNOTATION;
   BOOLEAN_OP;    //Boolean operator
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
+  DIRECT_YIELD;
   FUNCTION;
   LIST;
   CANVAS_DEF;
@@ -97,7 +98,6 @@ options {
 
   //Name manipulation
   NAMESPACE  = '::';
-  NAMESPLIT  = '.';
   
 
   //Bindings
@@ -384,21 +384,28 @@ range
 
 split[boolean pre]
   : ID  -> {pre}? ^(SPLIT BASIC PRE ID)
-      ->       ^(SPLIT BASIC POST ID)
+        ->        ^(SPLIT BASIC POST ID)
     | ORDER ID
-      -> {pre}? ^(SPLIT ORDER PRE ID)
-    ->       ^(SPLIT ORDER  POST ID);
+        -> {pre}? ^(SPLIT ORDER PRE ID)
+        ->        ^(SPLIT ORDER  POST ID);
 
 value : tupleRef |  atom;
 atom  : sigil | number | STRING | DEFAULT | ALL;  //TODO: Does this need to be here, now that there is separate filterRule branch?
 
 tupleRef
-  : ID -> ^(TUPLE_REF ID)
-  | '_' -> ^(TUPLE_REF NUMBER["0"])
-//  | qualifiedID ->  ^(TUPLE_REF qualifiedID)    //TODO: Implement sequences ([1][1][2]) and named (LOCAL[1])
-  | ARG number CLOSE_ARG -> ^(TUPLE_REF number);
+  : simpleRef
+  | simpleRef qualifiedRef ->  ^(simpleRef qualifiedRef)
+  | qualifiedRef;
 
-qualifiedID : ID^ ARG! number CLOSE_ARG!;
+private simpleRef
+  : ID -> ^(TUPLE_REF ID)
+  | '_' -> ^(TUPLE_REF NUMBER["0"]);
+
+private qualifiedRef //VIEW[_], [1][2][3], Local[X], Local[X][Y] 
+  : (ARG v=(simpleRef | number) CLOSE_ARG)+ ->  ^(TUPLE_REF $v);
+private moreRefs: qualifiedRef | ;  
+RIGHT HERE THERE ARE PROBLEMS!!!
+
 
 sigil: t=TAGGED_ID sValueList -> ^(SIGIL[$t.text] sValueList);
 private sValueList:  GROUP! sValue (SEPARATOR! sValue)* CLOSE_GROUP!;
@@ -416,13 +423,15 @@ booleanOp
   | t= '!~' -> BOOLEAN_OP[t];
 
 
-namedYield: '-[' ID ']->';
 
 passOp  
-  : YIELDS
-  | namedYield
+  : directYield
   | GUIDE_YIELD; 
     //TODO: Add feed
+
+directYield
+  : '-[' id=ID ']->' -> ^(DIRECT_YIELD[$id.text])
+  | YIELDS -> ^(DIRECT_YIELD[(String) null]);
 
 
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.

@@ -28,9 +28,13 @@
  */
 package stencil.parser.tree.util;
 
-import stencil.streams.Tuple;
+import java.util.List;
 
-public class Environment {
+import stencil.streams.InvalidNameException;
+import stencil.streams.Tuple;
+import stencil.types.Converter;
+
+public class Environment implements Tuple {
 	private static final String NO_NAME = "$$$$$$$INVALID ID$$$$$$$$";
 	private static final Environment EMPTY = new Environment() {
 		public Object resolve(int field) {throw new RuntimeException("Field not index not know: " + field);}
@@ -50,13 +54,13 @@ public class Environment {
 		update = null;
 	}
 	
-	public Environment(Tuple update) {this(NO_NAME, update);}
+	public Environment(Tuple update) {this((String) null, update);}
 	public Environment(String name, Tuple update) {this(EMPTY, name, update);}
 	
-	private Environment(Environment prior, Tuple update) {this(prior, NO_NAME, update);}
+	private Environment(Environment prior, Tuple update) {this(prior, null, update);}
 	private Environment(Environment prior, String name, Tuple update) {
 		this.parent = prior;
-		this.name = name;
+		this.name = name != null ? name : NO_NAME;
 		this.update = update;
 	}
 
@@ -82,4 +86,25 @@ public class Environment {
 		if (frame == 0) {return resolve(index);}
 		else {return parent.resolve(frame--, index);}
 	}
+
+	
+	public Object get(String name) throws InvalidNameException {return resolve(name);}
+
+	public Object get(String name, Class<?> type)
+			throws IllegalArgumentException, InvalidNameException {
+		return Converter.convert(get(name), type);
+	}
+
+	public List<String> getFields() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public boolean hasField(String name) {
+		try {resolve(name);}
+		catch (Exception e) {return false;}
+		return true;
+	}
+
+	public boolean isDefault(String name, Object value) {return false;}
 }

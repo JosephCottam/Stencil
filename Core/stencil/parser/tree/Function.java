@@ -35,7 +35,6 @@ import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
-import stencil.parser.string.StencilParser;
 import stencil.streams.Tuple;
 import stencil.util.MultiPartName;
 
@@ -46,14 +45,6 @@ public class Function extends CallTarget {
 			super("Error applying function " + f.getName(), e);
 		}
 	}
-	
-	/**How should values be collected from this call?  Is it a single value, or a feed of them?*/
-	public static final class Collect extends StencilTree{
-		public Collect(StencilTree tree) {super(tree.getToken());}
-
-		public boolean isFeed() {return getToken().getType() == StencilParser.FEED;}
-		public boolean isYields() {return getToken().getType() == StencilParser.YIELDS;}
-	}
 
 	protected StencilOperator operator;
 	protected Invokeable invokeable;
@@ -63,7 +54,7 @@ public class Function extends CallTarget {
 	public String getName() {return token.getText();}
 	public Specializer getSpecializer() {return (Specializer) getChild(0);}
 	public List<Value> getArguments() {return (List<Value>) getChild(1);}
-	public Collect getPass() {return new Collect((StencilTree) getChild(2));}
+	public Pass getPass() {return (Pass) getChild(2);}
 	public boolean isTerminal() {return false;}
 
 	public CallTarget getCall() {return (CallTarget) getChild(3);}

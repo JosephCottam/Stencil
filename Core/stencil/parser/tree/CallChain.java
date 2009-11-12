@@ -29,6 +29,8 @@
 package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
+
+import stencil.parser.tree.util.Environment;
 import stencil.streams.Tuple;
 
 /**A call chain is a linear group of calls, ending in a pack.
@@ -57,14 +59,19 @@ public class CallChain extends StencilTree {
 	public Tuple apply(Tuple source) throws Exception {
 		CallTarget target = getStart();
 
-		Tuple result = source;
+		Environment e = new Environment(source);
+		Tuple result = null;
 		while (target instanceof Function) {
-			result = target.apply(result);
+			Function func = (Function) target;
+			result = func.apply(e);
 			if (result == null) {return null;}
+			e = e.append(func.getPass().getName(), result);
 			target = ((Function) target).getCall();
 		}
 
 		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
+		assert (result != null) : "Call chain ended with null result.";
+		
 		result = target.apply(result);
 		return result;
 	}
