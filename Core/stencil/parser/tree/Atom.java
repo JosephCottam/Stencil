@@ -90,7 +90,7 @@ public abstract class Atom extends Value {
 
 	public static final List<Integer> BASE_TYPES;
 	static {
-		BASE_TYPES =  Arrays.asList(new Integer[]{ID, COLOR, STRING, NUMBER, ALL});
+		BASE_TYPES =  Arrays.asList(new Integer[]{ID, STRING, NUMBER, ALL});
 	}
 
 	protected Atom() {super(null);}
@@ -103,7 +103,6 @@ public abstract class Atom extends Value {
 	public boolean isName() {return getType() == ID;}
 	public boolean isString() {return getType() == STRING;}
 	public boolean isNumber() {return getType() == NUMBER;}
-	public boolean isColor() {return getType() == COLOR;}
 	public boolean isAll() {return getType() == ALL;}
 
 	/**Atoms ignore the getValue Tuple context.

@@ -67,7 +67,6 @@ tokens {
   ALL = 'all';  //Default pattern
   BASE  = 'base'; //Refer to the base entity
   CANVAS  = 'canvas';
-  COLOR = 'color';  //Refer to a color
   DEFAULT = 'default';//Use the default value (or revert to it...)
   EXTERNAL= 'external';
   FILTER  = 'filter';
@@ -135,13 +134,23 @@ tokens {
 
 @members {
   List<String> errors = new ArrayList<String>();
-
+  boolean poolErrors = false;
+  
   /**Buried IDs are strings that cannot be input as identifiers according to the
    * Stencil grammar, but are used internally as IDs.
    */
   public static String buryID(String input) {return "#" + input;}
   
-  public void emitErrorMessage(String msg) {errors.add(msg);}
+  /**Should error messages be collected up and reported all at once?
+   * If set to true, a list of errors will be returned after trying to parse.
+   * If set to false, the first error ends the parsing.
+   */
+  public void poolErrors(boolean pool) {this.poolErrors = pool;}
+  public void emitErrorMessage(String msg) {
+  	if (poolErrors) {errors.add(msg);}
+  	else {super.emitErrorMessage(msg);}
+  }
+  
   public List getErrors() {return errors;}
 
 
@@ -394,18 +403,20 @@ atom  : sigil | number | STRING | DEFAULT | ALL;  //TODO: Does this need to be h
 
 tupleRef
   : simpleRef
-  | simpleRef qualifiedRef ->  ^(simpleRef qualifiedRef)
-  | qualifiedRef;
+  | simpleRef qualifiedRef+ -> ^(simpleRef qualifiedRef+);
 
 private simpleRef
-  : ID -> ^(TUPLE_REF ID)
-  | '_' -> ^(TUPLE_REF NUMBER["0"]);
+  : ID  -> ^(TUPLE_REF ID)
+  | '_' -> ^(TUPLE_REF NUMBER["0"])
+  | ARG number CLOSE_ARG -> ^(TUPLE_REF number)
+  | c=CANVAS -> ^(TUPLE_REF ID[$c.text])
+  | l=LOCAL -> ^(TUPLE_REF ID[$l.text])
+  | v=VIEW -> ^(TUPLE_REF ID[$v.text]);
 
-private qualifiedRef //VIEW[_], [1][2][3], Local[X], Local[X][Y] 
-  : (ARG v=(simpleRef | number) CLOSE_ARG)+ ->  ^(TUPLE_REF $v);
-private moreRefs: qualifiedRef | ;  
-RIGHT HERE THERE ARE PROBLEMS!!!
-
+private qualifiedRef 
+  : ARG i=ID CLOSE_ARG -> ^(TUPLE_REF $i)
+  | ARG n=number CLOSE_ARG -> ^(TUPLE_REF $n)
+  | ARG '_' CLOSE_ARG -> ^(TUPLE_REF NUMBER["0"]);
 
 sigil: t=TAGGED_ID sValueList -> ^(SIGIL[$t.text] sValueList);
 private sValueList:  GROUP! sValue (SEPARATOR! sValue)* CLOSE_GROUP!;
@@ -421,8 +432,6 @@ booleanOp
   | t= '!=' -> BOOLEAN_OP[t]
   | t= '=~' -> BOOLEAN_OP[t]
   | t= '!~' -> BOOLEAN_OP[t];
-
-
 
 passOp  
   : directYield

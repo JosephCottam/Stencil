@@ -113,6 +113,8 @@ public abstract class ParseStencil {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		StencilParser parser = new StencilParser(tokens);
+		parser.poolErrors(true);
+		
 		parser.setTreeAdaptor(treeAdaptor);
 		Program p;
 		try {p = (Program) parser.program().getTree();}
@@ -207,6 +209,11 @@ public abstract class ParseStencil {
 		AutoGuide ag = new AutoGuide(treeTokens, modules);
 		ag.setTreeAdaptor(treeAdaptor);
 		p = (Program) ag.transform(p);
+		
+		treeTokens = new CommonTreeNodeStream(p);
+		TupleRefChain trc = new TupleRefChain(treeTokens);
+		trc.setTreeAdaptor(treeAdaptor);
+		p = (Program) trc.downup(p);
 		
 		validate(p);
 		
