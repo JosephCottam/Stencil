@@ -11,8 +11,6 @@ import stencil.util.BasicTuple;
 /**End-of-call-chain entity that create a new tuple in its
  * apply with all of the proper names aligned.
  *
- * TODO: Figure out how to support an implicit pack.  Currently, the pack must be made explicitly in the stencil.  Should it be derived by the compiler, or here by the interpreter?  Probably the compiler...positional or names-based?
- *
  * @author jcottam
  */
 public final class Pack extends CallTarget {

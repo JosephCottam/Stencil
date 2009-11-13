@@ -141,7 +141,7 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
 			canvas.panToAbs(center);
 		}
 		
-	} //TODO: Add zoom-fit
+	}
 
 	public void mouseEntered(MouseEvent e) {/*Ignored.*/}
 

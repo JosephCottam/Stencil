@@ -165,6 +165,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	private void fireLayerUpdate(Rectangle2D bounds) {
 		Rectangle update = bounds.getBounds();
-		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}	//TODO: Should this dispatch to some other thread?		
+		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}
 	}
 }

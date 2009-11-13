@@ -206,6 +206,8 @@ public class Interactive implements Runnable {
 		if (model.getStencilPanel() != null) {
 			stencilContentPanel.add(model.getStencilPanel(), BorderLayout.CENTER);
 		}
+		stencilContentPanel.revalidate();
+		stencilContentPanel.repaint();
 	}
 
 	

@@ -29,6 +29,8 @@
 package stencil.interpreter;
 
 import java.util.List;
+import static java.lang.String.format;
+
 import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
@@ -104,8 +106,13 @@ public class Interpreter {
 					if (result == null) {continue;} //Move on to the next group if the result was empty...
  
 					if (result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-						stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);							
-						for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+						try {
+							stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
+							for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+						} catch (Exception e) {
+							throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()));
+						}
+						
 					} 
 				}
 			}

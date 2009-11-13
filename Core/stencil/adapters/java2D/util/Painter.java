@@ -20,8 +20,6 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	public static RenderingHints renderQuality = HIGH_QUALITY;
 	
-	
-	
 	private boolean run = true;
 	private final DisplayLayer[] layers;
 	private final Canvas target;
@@ -29,7 +27,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;
-	AffineTransform priorTransform=new AffineTransform();
+	private AffineTransform priorTransform= new AffineTransform();
 	
 	
 	public Painter(DisplayLayer[] layers, Canvas target) {
@@ -47,16 +45,17 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	public void run() {
 		while (run) {
 			Rectangle updateBounds = layerUpdates.clear();
+			AffineTransform inverse = target.getInverseViewTransformRef();
+			
 			if (resized() || transformed()
-				|| (updateBounds != null && updateBounds.intersects(target.getBounds()))) 
+				|| (updateBounds != null && updateBounds.intersects(inverse.createTransformedShape(target.getBounds()).getBounds()))) 
 			{	
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
 				target.repaint();
-			}
-			Thread.yield();
+			} 
+			Thread.yield(); 
 		}
-		run=false;
 	}
 	
 	/**Render glyphs immediately onto the passed graphics object.

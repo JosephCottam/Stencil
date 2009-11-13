@@ -57,6 +57,5 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 			assertEquals(3.0, t.get("STROKE_WEIGHT"));
 			assertEquals(new java.awt.Color(.8f,.8f,.8f),t.get("STROKE_COLOR"));
 		}
-		//TODO: Test for individual values in each glyph
 	}
 }

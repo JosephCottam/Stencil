@@ -30,6 +30,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.util.Environment;
 import stencil.streams.Tuple;
 
@@ -59,8 +60,8 @@ public class CallChain extends StencilTree {
 	public Tuple apply(Tuple source) throws Exception {
 		CallTarget target = getStart();
 
-		Environment e = new Environment(Canvas.global);
-		e = e.append(View.global);
+		Environment e = new Environment(ParserConstants.CANVAS_PREFIX, Canvas.global);
+		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
 		
 		if (source.hasField(Tuple.SOURCE_KEY)) {
 			e = e.append((String) source.get(Tuple.SOURCE_KEY, String.class), source); //TODO: BAD JOSEPH.  Using named references			

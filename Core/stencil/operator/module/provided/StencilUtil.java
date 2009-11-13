@@ -217,7 +217,6 @@ public class StencilUtil extends BasicModule {
 			
 			priorCount = seen.size();
 			
-			//Duplicate list, for thread safety.  TODO: Should we use a thread safe container instead?
 			return new ArrayList(seen); 
 		}
 

@@ -55,7 +55,7 @@ public class TupleRef extends Value {
 	 * @return
 	 */
 	private final Object externalValue(Tuple source) {
-		assert source != null : "Cannot use null source to get value with a TupleRef";
+		if (source == null) {return null;}
 
 		Atom ref = getValue();
 		Object value = doRef(source, ref);

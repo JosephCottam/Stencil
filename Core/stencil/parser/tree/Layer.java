@@ -32,7 +32,6 @@ import java.util.List;
 import org.antlr.runtime.Token;
 import stencil.display.DisplayLayer;
 
-//TODO: The layer is basically just a list of streams right now.  Should it extend the stencil List class?
 public class Layer extends StencilTree {
 	protected DisplayLayer displayLayer;
 	
