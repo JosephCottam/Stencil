@@ -27,7 +27,8 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Ensure that there is a stream-order list. 
+/* Converts the list format tuple-refs into a chain format tuple ref.
+ * TODO: Eliminate this step by making chain for tuple refs from the start 
  */
 tree grammar TupleRefChain;
 options {
@@ -42,30 +43,10 @@ options {
 	
 	import stencil.parser.tree.*;
 }
-@members {
-  private CommonTree listToTree(CommonTree t) {
-    if (t == null) {return null;}
-    
-    CommonTree currentIn = t;
-    CommonTree root = (CommonTree) adaptor.dupNode(t);
-    CommonTree parent = (CommonTree) t.getParent();
-    CommonTree current = root;
-    
-    for(int i = t.getChildIndex(); i < parent.getChildCount(); i++) {
-       t = (CommonTree) parent.getChild(i);
-       CommonTree newTree = (CommonTree) adaptor.dupTree(t);
-       current.addChild(newTree);
-       current = newTree;
-    }
-    
-    return root; 
-  }
 
-}
-
-topdown : ^(TUPLE_REF {System.out.println("Match root");} r=. chain)  -> ^(TUPLE_REF $r chain);
-chain: (^(TUPLE_REF r=.) chain) {System.out.println("Match 1");} -> ^(TUPLE_REF $r chain)
-	 | ^(TUPLE_REF r=.) {System.out.println("Match 2");} -> ^(TUPLE_REF $r);
+topdown : ^(TUPLE_REF r=. chain)  -> ^(TUPLE_REF $r chain);
+chain: (^(TUPLE_REF r=.) chain) -> ^(TUPLE_REF $r chain)
+	 | ^(TUPLE_REF r=.) -> ^(TUPLE_REF $r);
 	 
 	 
 	 

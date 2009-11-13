@@ -247,7 +247,7 @@ options {
 
     	adaptor.addChild(functionNode, specializer);
     	adaptor.addChild(functionNode, args);
-    	adaptor.addChild(functionNode, adaptor.create(YIELDS, "->"));
+    	adaptor.addChild(functionNode, adaptor.create(DIRECT_YIELD, "->"));
 		adaptor.addChild(functionNode, call.getStart());
 		
 		//Construct chain node
@@ -342,4 +342,4 @@ glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$
 //Replace the #-> with an echo operator...
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a YIELDS ^(FUNCTION[selectOperator($f)] {autoEchoSpecializer($t)} {autoEchoArgs($t)} YIELDS {adaptor.dupTree($t)}));  
+		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {autoEchoSpecializer($t)} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  

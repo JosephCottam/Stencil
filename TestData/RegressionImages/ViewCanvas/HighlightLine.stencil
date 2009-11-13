@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
+SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -28,9 +28,8 @@ from Stocks
 
 from Stocks
 	view(ZOOM, X,Y, HEIGHT) 
-		: ScreenToCanvasDimension(20, 20) -> (Width, Height)
-		| Max(Width, Height) -> Rename["Pad"](VALUE) -> Pad
-		--> ZoomPadded(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT, Pad)
+		: ScreenToCanvasDimension(20, 20) -> Max(Width, Height) -[Pad]-> 
+		  ZoomPadded(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT, Pad[_])
 	
 layer Lookup[SHAPE]
 from Stocks
@@ -63,8 +62,5 @@ operator Price (Open) -> (Price)
 	all => (Price) : Mult(-1, Open)
 
 operator TimeStep (T) -> (VALUE, Date)
-	all => (VALUE, Date) :  Index(T) -> Mult(VALUE, 3) -> VALUE
-								| Rename["Date"](T) -> Date
-								--> (VALUE, Date)
-
-
+	all => VALUE : Index(T) -> Mult(VALUE, 3) -> VALUE
+			Date : T

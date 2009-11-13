@@ -28,6 +28,7 @@
  */
 package stencil.parser.tree.util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import stencil.streams.InvalidNameException;
@@ -36,21 +37,19 @@ import stencil.types.Converter;
 
 public class Environment implements Tuple {
 	private static final String NO_NAME = "$$$$$$$INVALID ID$$$$$$$$";
-	private static final Environment EMPTY = new Environment() {
-		public Object resolve(int field) {throw new RuntimeException("Field not index not know: " + field);}
-		public Object resolve(String field) {throw new RuntimeException("Field not index not know: " + field);}
-		public Object resolve(String frame, String field) {throw new RuntimeException("Frame/field reference not known:" + frame + "/" +field);}
-		public Object resolve(int frame, int field) {throw new RuntimeException("Frame/field reference not known:" + frame + "/" +field);}
+ 	private static final Environment EMPTY = new Environment() {
+ 		private final List<String> EMPTY_LIST = new ArrayList<String>();
+		public Object get(String field) {throw new RuntimeException("Field not know: " + field);}
+		public List<String> getFields() {return EMPTY_LIST;}
 	};
-
 	
 	final Environment parent;
-	final String name;
+	final String frameName;
 	final Tuple update;
 	
 	protected Environment() {
 		parent = null;
-		name = NO_NAME;
+		frameName = NO_NAME;
 		update = null;
 	}
 	
@@ -60,48 +59,36 @@ public class Environment implements Tuple {
 	private Environment(Environment prior, Tuple update) {this(prior, null, update);}
 	private Environment(Environment prior, String name, Tuple update) {
 		this.parent = prior;
-		this.name = name != null ? name : NO_NAME;
+		this.frameName = name != null ? name : NO_NAME;
 		this.update = update;
 	}
 
 	public Environment append(Tuple t) {return new Environment(this, t);}
 	public Environment append(String frame, Tuple t) {return new Environment(this, frame, t);}
 	public Environment pop() {return this.parent;}
-
-	public Object resolve(String field) {
-		if (update.hasField(field)) {return update.get(field);}
-		else {return parent.resolve(field);}
+			
+	public Object get(String name) throws InvalidNameException {
+		if (update.hasField(name)) {return update.get(name);}
+		else if (this.frameName.equals(name)){return update;}
+		else {return parent.get(name);}
 	}
-	
-	public Object resolve(String frame, String field) {
-		if (name.equals(frame)) {return resolve(field);}
-		else {return parent.resolve(frame, field);}
-	}
-	
-	public Object resolve(int index) {
-		return update.get(update.getFields().get(index));
-	}
-	
-	public Object resolve(int frame, int index) {
-		if (frame == 0) {return resolve(index);}
-		else {return parent.resolve(frame--, index);}
-	}
-
-	
-	public Object get(String name) throws InvalidNameException {return resolve(name);}
 
 	public Object get(String name, Class<?> type)
 			throws IllegalArgumentException, InvalidNameException {
 		return Converter.convert(get(name), type);
 	}
 
+	//TODO: This is mostly unsuitable for frame-dereferencing.  It will work for default-reference and error reporting though!
 	public List<String> getFields() {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList fields = new ArrayList();
+		fields.addAll(update.getFields());
+		if (frameName != NO_NAME) {fields.add(frameName);}
+		fields.addAll(parent.getFields());
+		return fields;
 	}
 
 	public boolean hasField(String name) {
-		try {resolve(name);}
+		try {get(name);}
 		catch (Exception e) {return false;}
 		return true;
 	}

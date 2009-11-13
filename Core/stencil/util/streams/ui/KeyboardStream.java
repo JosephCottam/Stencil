@@ -181,5 +181,7 @@ public abstract class KeyboardStream implements TupleStream {
 
 	public void reset() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
-
+	
+	/**Close stream, disposing of relevant resources.*/
+	public abstract void close() throws Exception;
 }

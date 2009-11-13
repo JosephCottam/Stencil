@@ -8,10 +8,10 @@
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
- 			target="${grammars}/AutoGuide.g"
+ 			target="${grammars}/Stencil.g"
 			outputdirectory="${grammars}/string/"
- 		/>
- 	 	<antcall target="EclipseRefresh"/>
+ 		/> 
+ 		<antcall target="EclipseRefresh"/>
  	</target>
  	
  	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
@@ -103,6 +103,10 @@
  			target="${grammars}/DereferenceOperators.g"
 			outputdirectory="${grammars}/string/"
  		/> 
+ 		<antlr
+ 			target="${grammars}/TupleRefChain.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 
@@ -191,6 +195,7 @@
  	 				<exclude name="antlr-3.2.jar"/>
  	 				<exclude name="antlr3-ant.jar"/>
  	 				<exclude name="stringtemplate-3.2.jar"/>
+ 	 				<exclude name="stencil.jar"/>
  	 			</fileset>
  	 		</path>
  		</pathconvert>
@@ -215,6 +220,7 @@
  				<exclude name="antlr3-ant.jar"/>
 				<exclude name="antlr-3.2.jar"/>
  				<exclude name="stringtemplate-3.2.jar"/>
+ 				<exclude name="stencil.jar"/>
  			</fileset>
  		</copy>
 
@@ -246,5 +252,25 @@
  		<delete dir="${release}"/>
  		<delete file="${JarFile}"/>
 	</target> 
- 
+ 	
+ 	
+	<!--GUnit tests--> 	
+ 	<target name="RunTests" depends="StencilGrammar"> 
+	 	<property name="testsLocation" location="bin/stencil/unittests/parser/string/" />
+
+		<jar jarfile="${runtimeLibrary}/Stencil.jar" includes="*.class" basedir=".">
+			<fileset dir="bin"/>
+		</jar>
+		<antcall target="EclipseRefresh"/>
+
+		<java classname="org.antlr.gunit.Interp" fork="yes" dir="${target}">
+			<classpath>
+				<pathelement path="${testsLocation}"/>
+				<pathelement path="${java.class.path}"/>
+				<pathelement path="."/>
+			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+			</classpath>
+			<arg value="${testsLocation}/Stencil.gunit"/>
+		</java>
+	</target>
  </project>

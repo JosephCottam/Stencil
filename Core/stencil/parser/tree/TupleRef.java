@@ -1,8 +1,6 @@
 package stencil.parser.tree;
 
 import java.util.List;
-import java.util.Arrays;
-
 import org.antlr.runtime.Token;
 import stencil.streams.Tuple;
 
@@ -11,23 +9,21 @@ public class TupleRef extends Value {
 
 	public TupleRef(Token source) {super(source);}
 
-	/**Get the value object that this tuple ref contains.
-	 * This is the name or the number or the qualified name/numbers.*/
-	public Atom getValue() {
-		//TODO: Handle non-atom references (like qualified names).
-		return (Atom) getChild(0);
-	}
+	/**Get the simple value portion of this reference (what will be used to de-reference the tuple)*/
+	public Atom getValue() {return (Atom) getChild(0);}
 
 	/**Get the value this reference holds with respect to the tuple.*/
-	public Object getValue(Tuple source) {
-		return externalValue(source);
+	public Object getValue(Tuple source) {return externalValue(source);}
+
+	public TupleRef getSubRef() {
+		if (!hasSubRef()) {throw new RuntimeException("Attempt to get subref where none is present.");}
+		return (TupleRef) getChild(1);
 	}
-
-
-	public boolean isTupleRef() {return true;}
 	
+	public boolean isTupleRef() {return true;}	
 	public boolean isNumericRef() {return getValue().isNumber();}
 	public boolean isNamedRef() {return getValue().isName();}
+	public boolean hasSubRef() {return this.getChildCount() >= 2;}
 	
 	
 	/**Given the prototype, returns the numeric offset this represents in that prototype.
@@ -58,21 +54,26 @@ public class TupleRef extends Value {
 	 * @param source
 	 * @return
 	 */
-	private Object externalValue(Tuple source) {
+	private final Object externalValue(Tuple source) {
 		assert source != null : "Cannot use null source to get value with a TupleRef";
 
-		Atom value = getValue();
+		Atom ref = getValue();
+		Object value = doRef(source, ref);
+		if (hasSubRef()) {return getSubRef().externalValue((Tuple) value);}
+		else {return value;}
+	}
 
-		if (value.isName()) {
-			return source.get(((Id)value).getName());
-		} else if (value.isNumber()){
+	private final Object doRef(Tuple source, Atom ref) {
+		if (ref.isName()) {
+			return source.get(((Id) ref).getName());
+		} else if (ref.isNumber()){
 			List<String> fields = source.getFields();
 			String field = fields.get(toNumericRef(fields));
 			return source.get(field);
-		} //TODO: Sub-tuples...
+		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}
-
+	
 	
 	/**Given a potential reference and source, gets a Java value.
 	 * Values are resolved in the following order of precedence:
@@ -92,27 +93,7 @@ public class TupleRef extends Value {
 		
 		if (!potentialRef.isTupleRef()) {throw new IllegalArgumentException("Can only handle literals and tuple references.");}
 		TupleRef ref = (TupleRef) potentialRef;
-		
-		//Check for local reference
-		//TODO: Make it so that valueSource is never null...
-		if (valueSource == null) {return null;} 
-		
-		if (ref.canRef(valueSource)) {return ref.getValue(valueSource);}
-		
-		//Check for global reference
-		if (ref.isNamedRef()) {
-			//Named value (needs further resolution because of global tuples)
-			Id id = (Id) ref.getValue();
-			String name = id.getName();
-			
-			if (View.isViewField(name)) {
-				return View.global.get(View.regularField(name));
-			} else if (Canvas.isCanvasField(name)) {
-				return Canvas.global.get(Canvas.regularField(name));
-			}
-		} 
-		
-		throw new IllegalArgumentException(String.format("Could not resolved %1$s to a value (valid local tuple fields are %2$s).", potentialRef.toStringTree(), Arrays.deepToString(valueSource.getFields().toArray())));
+		return ref.externalValue(valueSource);
 	}
 	
 	/**Given a list of candidates for resolution (e.g., lexical arguments),

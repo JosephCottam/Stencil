@@ -109,8 +109,11 @@ public abstract class ImageTest {
 			System.out.println("Writing to " + deltaFile);
 			ImageIO.write(b, "png", new java.io.File(deltaFile));
 			
-			if (deltaCount/((double) o.getWidth()*o.getHeight()) > .02) {
-				fail("Generated image was greater than 2% different from reference image: " + deltaCount + " differences");
+			
+			double deltaPercent = deltaCount/((double) o.getWidth()*o.getHeight());
+			double tolerance = .03;
+			if (deltaPercent > tolerance) {
+				fail(String.format("Difference exceed percent tolarance (actual: %1$f.3, toleraance: %2$f).", deltaPercent, tolerance));
 			}
 		}
 	}

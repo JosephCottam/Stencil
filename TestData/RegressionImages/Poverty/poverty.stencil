@@ -3,36 +3,36 @@ NAME: Region
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
 SOURCE: ./regions.txt
-STRICT: TRUE
 SKIP: 1
+STRICT: true
 STREAM: File
 NAME: Poverty
 HEADER: State,Children, Adults, Elderly, Total
 SEPARATOR: ,
 SOURCE: ./povertyPercent.csv
-STRICT: TRUE
 SKIP: 1
+STRICT: true
 STREAM: File
 NAME: Postal
 HEADER: State  ID
 SEPARATOR: \s\s+
 SOURCE: ./postal.txt
-STRICT: TRUE
 SKIP: 0
+STRICT: true
 STREAM: File
 NAME: Pop
 HEADER: State,Children,Adults,Elderly, Total
 SEPARATOR: ,
 SOURCE: ./povertyCounts.csv
-STRICT: TRUE
 SKIP: 1
+STRICT: true
 STREAM: File
 NAME: Items
 HEADER: Name
 SEPARATOR: ,
 SOURCE: ./items.txt
-STRICT: TRUE
 SKIP: 0
+STRICT: true
 
 external stream Items(Name)
 external stream Postal(State, ID)
@@ -85,11 +85,10 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Children") -> Add(30, X) -> (VALUE)
 	Y << Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
-					| Children2.Find(State) -> Rename["Y2"](Y) -> Y2
-					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
-					| Reg(State) -> Division
-					--> Color2(Division, VALUE) -> C
+	FONT_COLOR<< Children.Find(State) -[L1]->
+				  Children2.Find(State) -[L2]->
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 layer Total[TEXT]
@@ -106,11 +105,10 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> Add(30, X) -> (VALUE)
 	Y << Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
-					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
-					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
-					| Reg(State) -> Division
-					--> Color2(Division, VALUE) -> C
+	FONT_COLOR << Total.Find(State) -[L1]->
+				  Total2.Find(State) -[L2]->
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 layer Elderly[TEXT]
@@ -127,11 +125,10 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> Add(30, X) -> (VALUE)
 	Y << Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
-					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
-					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
-					| Reg(State) -> Division
-					--> Color2(Division, VALUE) -> C
+	FONT_COLOR << Elderly.Find(State) -[L1]->
+				  Elderly2.Find(State) -[L2]->
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 layer Adults[TEXT]
@@ -148,18 +145,16 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> Add(30, X) -> (VALUE)
 	Y << Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Children.Find(State) ->Rename["Y1"](Y) -> Y1
-					| Children2.Find(State) ->Rename["Y2"](Y) -> Y2
-					| Sub(Y1, Y2) -> Abs(VALUE) -> Div(VALUE,765) -> VALUE
-					| Reg(State) -> Division
-					--> Color2(Division, VALUE) -> C
+	FONT_COLOR << Adults.Find(State) -[L1]->
+				  Adults2.Find(State) -[L2]->
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 operator Color2 (State, Alpha) -> (C)
-(all) => (C): Color(State) -> C
-					| Mult(Alpha,.5) -> Add(.25, VALUE) -> VALUE  /*Squish ragne to .25-.75*/
-				  	| SetAlpha(VALUE, C) -> VALUE
-					--> VALUE
+(all) => (C): Color(State) -[Root]-> 
+					Mult(Alpha,.5) -> Add(.25, VALUE) ->
+				  	SetAlpha(VALUE, Root[C]) -> VALUE
 
 operator Color(Division) -> (C)
 (Division =~ "USA") => (C) : @color(GRAY40)

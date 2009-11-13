@@ -288,7 +288,7 @@ callChainMember
 functionCallTarget
   : (functionCall passOp)=> f1=functionCall passOp f2=callChainMember 
      -> ^($f1 passOp $f2)
-  | f1=functionCall -> ^($f1 YIELDS ^(PACK DEFAULT));
+  | f1=functionCall -> ^($f1 DIRECT_YIELD ^(PACK DEFAULT));
    
 
 functionCall

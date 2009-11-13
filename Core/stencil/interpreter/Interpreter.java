@@ -63,7 +63,8 @@ public class Interpreter {
 				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
 				
 				//TODO: Have rules throw exception (instead of return null)
-				if (result == null) {
+				//TODO: Fix the creation issue.  Right now errors in dynamic rules are ignored (they will be retried later in the dynamic system)
+				if (result == null && !rule.isDyanmic()) {
 					if (abortOnError) {throw new RuleAbortException(rule);}
 					else {return null;}
 				}
