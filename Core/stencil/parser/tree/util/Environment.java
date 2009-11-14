@@ -29,6 +29,7 @@
 package stencil.parser.tree.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import stencil.streams.InvalidNameException;
@@ -36,12 +37,34 @@ import stencil.streams.Tuple;
 import stencil.types.Converter;
 
 public class Environment implements Tuple {
+ 	private static final  class UnknownNameException extends RuntimeException {
+		String desired;
+		List<String> valid;
+		public UnknownNameException(String name, List<String> valid) {
+			this.desired = name;
+			this.valid = valid;
+		}
+		
+		public UnknownNameException(UnknownNameException base, String frame, List<String> valid) {
+			this.desired = base.desired;
+			this.valid = new ArrayList<String>();
+			this.valid.add(frame);
+			this.valid.addAll(valid);
+			this.valid.addAll(base.valid);
+		}
+		
+		public String getMessage() {return String.format("Could not find %1$s in %2$s", desired, Arrays.deepToString(valid.toArray()));}
+	}
+	
 	private static final String NO_NAME = "$$$$$$$INVALID ID$$$$$$$$";
- 	private static final Environment EMPTY = new Environment() {
- 		private final List<String> EMPTY_LIST = new ArrayList<String>();
-		public Object get(String field) {throw new RuntimeException("Field not know: " + field);}
-		public List<String> getFields() {return EMPTY_LIST;}
-	};
+ 	private static final Environment EMPTY;
+ 	static {
+ 		EMPTY = new Environment() {
+	 		private final List<String> EMPTY_LIST = new ArrayList<String>();
+			public Object get(String field) {throw new UnknownNameException(field, EMPTY_LIST);}
+			public List<String> getFields() {return EMPTY_LIST;}
+ 		};
+ 	}
 	
 	final Environment parent;
 	final String frameName;
@@ -70,7 +93,10 @@ public class Environment implements Tuple {
 	public Object get(String name) throws InvalidNameException {
 		if (update.hasField(name)) {return update.get(name);}
 		else if (this.frameName.equals(name)){return update;}
-		else {return parent.get(name);}
+		else {
+			try {return parent.get(name);}
+			catch (UnknownNameException e) {throw new UnknownNameException(e, frameName, update.getFields());}
+		}
 	}
 
 	public Object get(String name, Class<?> type)

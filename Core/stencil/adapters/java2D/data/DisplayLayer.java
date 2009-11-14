@@ -66,6 +66,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public T makeOrFind(Tuple values) {
 		String id = (String) values.get(ParserConstants.GLYPH_ID_FIELD, String.class);
 		T rv;
+
 		if (index.containsKey(id)) {
 			T old = index.get(id);
 			rv = old;
@@ -75,6 +76,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 				fireLayerUpdate(old.getBoundsReference(), rv.getBoundsReference());
 			}
 		} else {rv = make(values);}
+		
 		return rv;
 	}
 

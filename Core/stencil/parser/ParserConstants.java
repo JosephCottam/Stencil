@@ -86,6 +86,7 @@ public abstract class ParserConstants {
 	
 	public static final String VIEW_PREFIX = "view";
 	public static final String CANVAS_PREFIX = "canvas";
+	public static final String LOCAL_PREFIX = "local";
 
 	
 	public static final String BIND_OPERATOR = ":";

@@ -331,11 +331,6 @@ listRequirements: ^(att=GUIDE layer=. type=. spec=. actions=.)
 	{requestedGuides.put(key(layer, att), getSampleStrategy(spec));};
 
 
-ensure: ^(c=CONSUMES . ^(LIST rule[((Consumes) c).getLayer().getName()]*));
-rule[String layer]: 
-	^(RULE target=glyphField  call=. bind=.)
-		->  ^(RULE $target {newCall(layer, $glyphField.field, call)} $bind);
-
 //First field in a prototype list
 glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$f.text;};
 
@@ -343,3 +338,9 @@ glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
 		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {autoEchoSpecializer($t)} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
+
+		
+ensure: ^(c=CONSUMES . . ^(LIST rule[((Consumes) c).getLayer().getName()]*) . .);
+rule[String layer]: 
+	^(RULE target=glyphField  call=. bind=.)
+		->  ^(RULE $target {newCall(layer, $glyphField.field, call)} $bind);

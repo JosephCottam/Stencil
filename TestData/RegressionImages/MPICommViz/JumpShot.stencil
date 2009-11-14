@@ -58,7 +58,7 @@ from overheads
 	X.1: Timescale(start)
 	X.2: Timescale(end)
 	STROKE_COLOR : ColorByOp(op)
-
+    STROKE_WEIGHT: WeightByOp(op)
 
 
 layer coms[LINE]
@@ -72,10 +72,17 @@ from trans
 	CAP2: "ARROW"
 
 operator ColorByOp(op) -> (C)
-   (op =~ "osend") => C: @color(SlateBlue)
+	(op =~ "osend") => C: @color(SlateBlue)
 	(op =~ "orecv") => C: @color(MediumSlateBlue)
 	(op =~ "transmission") => C: @color(FireBrick)
-	all => C: @color(black)
+	all => C: @color(BLACK, .5)
+
+operator WeightByOp(op) -> (W)
+	(op =~ "osend") => W : 1
+ 	(op =~ "orecv") => W : 1
+	(op =~ "transmission") => W: .5
+	all => W: 2
+   
 	
 operator Layout (rank)->(Y)
   all => (Y) : Mult(20, rank)

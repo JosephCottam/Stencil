@@ -446,14 +446,15 @@ directYield
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.
 number  :  doubleNum | intNum;
 
-intNum
+private intNum
   : (n='-' | p='+') d=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text])
   | d=DIGITS -> ^(NUMBER[$d.text]);
 
-doubleNum
+private doubleNum
   : '.' d2=DIGITS -> ^(NUMBER["0." + $d2.text])
   | d=DIGITS '.' d2=DIGITS -> ^(NUMBER[$d.text + "." + $d2.text])
-  | (n='-' | p='+') d=DIGITS '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text]);
+  | (n='-' | p='+') d=DIGITS '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text])
+  | (n='-' | p='+') '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + "." + $d2.text]);
 
 
 TAGGED_ID: TAG ID;

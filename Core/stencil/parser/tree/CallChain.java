@@ -30,7 +30,6 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.parser.ParserConstants;
 import stencil.parser.tree.util.Environment;
 import stencil.streams.Tuple;
 
@@ -45,6 +44,8 @@ public class CallChain extends StencilTree {
 
 	public CallTarget getStart() {return (CallTarget) getChild(0);}
 
+	
+	
 	/**Execute the call chain, all the way through the pack.
 	 * 	 *
 	 * Short-circuiting occurs when the method invoked returns null.  If this is the case,
@@ -58,30 +59,26 @@ public class CallChain extends StencilTree {
 	 * @throws Exception
 	 */
 	public Tuple apply(Tuple source) throws Exception {
+		if (source instanceof Environment) {return apply((Environment) source);}
+		else {return apply(new Environment(source));}
+	}
+	
+	public Tuple apply(Environment source) throws Exception {		
 		CallTarget target = getStart();
 
-		Environment e = new Environment(ParserConstants.CANVAS_PREFIX, Canvas.global);
-		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
-		
-		if (source.hasField(Tuple.SOURCE_KEY)) {
-			e = e.append((String) source.get(Tuple.SOURCE_KEY, String.class), source); //TODO: BAD JOSEPH.  Using named references			
-		} else {
-			e = e.append(source);
-		}
-		
-		Tuple result = e;
+		Tuple result = source;
 		while (target instanceof Function) {
 			Function func = (Function) target;
-			result = func.apply(e);
+			result = func.apply(source);
 			if (result == null) {return null;}
-			e = e.append(func.getPass().getName(), result);
+			source = source.append(func.getPass().getName(), result);
 			target = ((Function) target).getCall();
 		}
 
 		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
 		assert (result != null) : "Call chain ended with null result.";
 		
-		result = target.apply(e);
+		result = target.apply(source);
 		return result;
 	}
 

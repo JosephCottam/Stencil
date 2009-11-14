@@ -153,7 +153,7 @@ options {
 
 //Move mappings from the declarations in the consumes block up to the 
 //guides section
-buildMappings: ^(c=CONSUMES . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*));
+buildMappings: ^(c=CONSUMES . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
 mapping[String layerName] 
   : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .)
 		{attDefs.put(key(layerName, field), group);};

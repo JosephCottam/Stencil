@@ -141,6 +141,13 @@ public abstract class ParseStencil {
 		CommonTreeNodeStream treeTokens;
 
 		Program p = checkParse(source);
+
+		//Group the operators
+		treeTokens = new CommonTreeNodeStream(p);
+		SeparateTargets targets = new SeparateTargets(treeTokens);
+		targets.setTreeAdaptor(treeAdaptor);
+		p = (Program) targets.downup(p);
+
 		
 		//Ensure the proper order blocks
 		treeTokens = new CommonTreeNodeStream(p);

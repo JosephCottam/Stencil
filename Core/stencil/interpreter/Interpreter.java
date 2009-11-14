@@ -34,6 +34,7 @@ import static java.lang.String.format;
 import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
+import stencil.parser.tree.util.Environment;
 import stencil.streams.Tuple;
 import stencil.util.Tuples;
 
@@ -51,10 +52,7 @@ public class Interpreter {
 	public static Tuple process(List<Rule> rules, Tuple source) throws Exception {
 		if (rules == null || rules.size() ==0 || source == null) {return Tuples.EMPTY_TUPLE;}
 		
-		Tuple glyphBuffer = null;
-		Tuple viewBuffer = null;
-		Tuple canvasBuffer = null;
-		Tuple localBuffer = null;
+		Tuple fullResult = null;
 		
 		//Apply all rules
 		try {
@@ -70,25 +68,17 @@ public class Interpreter {
 					if (abortOnError) {throw new RuleAbortException(rule);}
 					else {return null;}
 				}
-											
-				//Merge into final storage for glyph
-				if (rule.getTarget() instanceof Glyph) {glyphBuffer = Tuples.merge(result, glyphBuffer);}
-				else if (rule.getTarget() instanceof View) {viewBuffer = Tuples.merge(result, viewBuffer);}
-				else if (rule.getTarget() instanceof Canvas) {canvasBuffer = Tuples.merge(result, canvasBuffer);}
-				else if (rule.getTarget() instanceof Local) {localBuffer = Tuples.merge(result, localBuffer);}
+				
+				fullResult = Tuples.merge(result, fullResult);
 			}
 			
-			
-			if (viewBuffer != null) {Tuples.transfer(viewBuffer, View.global, false);}
-			if (canvasBuffer != null) {Tuples.transfer(viewBuffer, Canvas.global, false);}
-		
 		} catch (RuleAbortException ra) {
 			System.out.println("Rule aborted...");
 			System.out.println(ra.getMessage());
 			ra.printStackTrace();
 			return null;			//TODO: Handle rule aborts.
 		}
-		return glyphBuffer;
+		return fullResult;
 	}
 	
 	public void processTuple(Tuple source) throws Exception {
@@ -96,28 +86,62 @@ public class Interpreter {
 			for(Consumes group:layer.getGroups()) {
 				boolean matches;
 				try {matches = group.matches(source);}
-				catch (Exception e) {throw new RuntimeException(String.format("Error applying filter in layer %1$s", layer.getName()), e);}
-
+				catch (Exception e) {throw new RuntimeException(format("Error applying filter in layer %1$s", layer.getName()), e);}
+				
+				
 				if (matches) {
 					Tuple result;
-					try {result = process(group.getRules(), source);}
-					catch (Exception e) {throw new RuntimeException(String.format("Error processing in layer %1$s", layer.getName()), e);}
+					Tuple local;
+					
+					Environment env = buildEnvironment(source,  null);
+					try {local = process(group.getLocalRules(), env);}
+					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}
+					
+					env = buildEnvironment(source, local);
+					try {
+						result = process(group.getGlyphRules(), env);
+						if (result != null && result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
+							try {
+								//TODO: What about locals in a dynamic binding?
+								stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
+								for (Rule rule: group.getGlyphRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+							} catch (Exception e) {
+								throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()));
+							}
+						} 
+					}
+					catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in layer %1$s", layer.getName()), e);}
+					
+					try {
+						Tuple viewUpdate = process(group.getViewRules(), env);
+						if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global, false);}
+					}
+					catch (Exception e) {throw new RuntimeException(format("Error processing view rules in layer %1$s.", layer.getName()), e);}
+					
+					try{
+						Tuple canvasUpdate = process(group.getCanvasRules(), env);
+						if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global, false);}
+					} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in layer %1$s.", layer.getName()), e);}
 
-					if (result == null) {continue;} //Move on to the next group if the result was empty...
- 
-					if (result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
-						try {
-							stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
-							for (Rule rule: group.getRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
-						} catch (Exception e) {
-							throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()));
-						}
-						
-					} 
 				}
 			}
 		}
 	}
 
+	private static final Environment buildEnvironment(Tuple stream, Tuple local) {
+		Environment e = new Environment(ParserConstants.CANVAS_PREFIX, Canvas.global);
+		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
+		
+		if (stream.hasField(Tuple.SOURCE_KEY)) {
+			e = e.append((String) stream.get(Tuple.SOURCE_KEY, String.class), stream); //TODO: BAD JOSEPH.  Using named references			
+		} else {
+			e = e.append(stream);
+		}
+		
+		if (local != null) {e = e.append(ParserConstants.LOCAL_PREFIX, local);}
+		
+		return e;
+	}
+	
 	public StencilPanel getPanel() {return panel;}
 }
