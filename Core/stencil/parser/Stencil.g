@@ -101,7 +101,10 @@ tokens {
 
   //Bindings
   DEFINE    = ':';
-  DYNAMIC = '<<';//Rules that should be periodically re-evaluated
+  DYNAMIC = ':*';//Rules that should be periodically re-evaluated
+  ANIMATED = '<:';
+  ANIMATED_DYNAMIC = '<*';
+
 
   //Operators
   YIELDS  = '->';
@@ -385,9 +388,11 @@ valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;  //TODO: combine with
 range
   : number RANGE number
     -> ^(RANGE number number)
-  | number RANGE 'n'
+  | number RANGE i=ID
+    {$i.text.equals(FINAL_VALUE)}?
     -> ^(RANGE number NUMBER[RANGE_END])
-  | 'n' RANGE 'n'
+  | s=ID RANGE e=ID
+    {$s.text.equals(FINAL_VALUE) && $e.text.equals(FINAL_VALUE)}?
     -> ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]);
 
 
@@ -439,7 +444,7 @@ passOp
     //TODO: Add feed
 
 directYield
-  : '-[' id=ID ']->' -> ^(DIRECT_YIELD[$id.text])
+  : '-[' id=ID ']>' -> ^(DIRECT_YIELD[$id.text])
   | YIELDS -> ^(DIRECT_YIELD[(String) null]);
 
 

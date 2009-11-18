@@ -1,0 +1,32 @@
+STREAM: File
+NAME: NodePositions
+HEADER: ID X Y
+SEPARATOR: \s+
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
+SKIP: 0
+STRICT: true
+
+
+/*Layout for turning a linear sequence into a square.
+  Each number is assigned a 'shell' based on the square root of the value.
+  Shells are filled top-down, the right-to-left.
+*/
+
+external stream NodePositions(ID, X,Y)  /*Precomputed layout*/
+
+
+layer Nodes
+from NodePositions
+	ID: Count("")
+	(X,Y) : Count("") -> Sub(_,1) -[v]> Layout(_) 
+	SIZE: 1
+
+operator Layout (i) -> (X,Y) 
+	all => (X,Y): Sqrt(i) -> Floor(_) -[s]>
+				Add(1,_) -[n]>
+				Pow(n[_],2) -> Sub(_, n[_]) -[c]> ByOdds(i,s[_],c[_]) 
+
+operator ByOdds (i,s,c) -> (x,y)
+	(i < c) => (x,y) : Pow(s,2) -> Sub(i, _) -> (s,_)
+	(i > c) => (x,y) : Sub(i, c) -> Sub(s, _) -> (_,s)
+    (i = c) => (x,y) : (s,s)

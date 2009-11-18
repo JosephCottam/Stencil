@@ -107,6 +107,10 @@
  			target="${grammars}/TupleRefChain.g"
 			outputdirectory="${grammars}/string/"
  		/> 
+ 		<antlr
+ 			target="${grammars}/SeparateTargets.g"
+			outputdirectory="${grammars}/string/"
+		/> 	
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 

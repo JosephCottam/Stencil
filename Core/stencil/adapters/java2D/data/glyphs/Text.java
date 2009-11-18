@@ -273,6 +273,7 @@ public final class Text extends Basic {
 
         ld.fullWidth = maxWidth;
         ld.fullHeight = height * ld.lines.length;
+        
         return ld;
 	}
 

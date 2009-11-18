@@ -151,8 +151,8 @@ public class Numerics extends BasicModule {
 	public static Tuple divide(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)/validate(d2));}
 	public static Tuple mult(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)*validate(d2));}
 	public static Tuple negate(Object d) {return BasicTuple.singleton(-1 * validate(d));}
-	public static Tuple mod(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)%validate(d2));}
-	public static Tuple div(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)/validate(d2));}
+	public static Tuple mod(Object d1, Object d2) {return BasicTuple.singleton(Math.round(validate(d1))%Math.round(validate(d2)));}
+	public static Tuple div(Object d1, Object d2) {return BasicTuple.singleton(Math.round(validate(d1))/Math.round(validate(d2)));}
 
 	public static Tuple log(Object d1) {return  BasicTuple.singleton(Math.log(validate(d1)));}
 	public static Tuple log10(Object d1) {return  BasicTuple.singleton(Math.log10(validate(d1)));}

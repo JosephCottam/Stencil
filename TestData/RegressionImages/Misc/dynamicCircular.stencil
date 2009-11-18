@@ -8,23 +8,25 @@ CHECKHEADER: true
 external stream Edges (ID1, ID2)
 
 
+/*Layout values in a circle.  Circle radius grows as value count increases.*/
+
 layer Nodes
 from Edges
 	ID: ID1
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y)<< Ordering(ID1) -> Circular.Query(VALUE) -> (X,Y)
+	(X,Y):* Ordering(ID1) -> Circular.Query(VALUE) -> (X,Y)
 from Edges
 	ID: ID2
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y)<< Ordering(ID2) -> Circular.Query(VALUE) -> (X,Y)
+	(X,Y):* Ordering(ID2) -> Circular.Query(VALUE) -> (X,Y)
 
 layer Edges[LINE]
 from Edges 
 	ID: Concatenate(ID1,ID2) -> (VALUE)
-	(X.1, Y.1)<< Nodes.Find(ID1) -> (X,Y)
-	(X.2, Y.2)<< Nodes.Find(ID2) ->  (X,Y)
+	(X.1, Y.1):* Nodes.Find(ID1) -> (X,Y)
+	(X.2, Y.2):* Nodes.Find(ID2) ->  (X,Y)
 	STROKE_COLOR: @color(GRAY80, .8)
 	STROKE_WEIGHT: .25
 

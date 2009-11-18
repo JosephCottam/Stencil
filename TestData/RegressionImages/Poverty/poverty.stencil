@@ -76,7 +76,7 @@ from Poverty
 	ID: State
 	TEXT: Abr(State)
 	X: XLayout("Children")
-	Y<< Rank(Children, State) -> Mult(15, VALUE) 
+	Y:* Rank(Children, State) -> Mult(15, VALUE) 
 	FONT_COLOR:  Reg(State) #-> Color(Division)
 
 layer Children2[TEXT]
@@ -84,10 +84,10 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Children") -> Add(30, X) -> (VALUE)
-	Y << Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR<< Children.Find(State) -[L1]->
-				  Children2.Find(State) -[L2]->
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+	Y :* Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR :* Children.Find(State) -[L1]>
+				  Children2.Find(State) -[L2]>
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -96,7 +96,7 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> (X)
-	Y << Rank(Total, State) -> Mult(15, VALUE) -> VALUE
+	Y :* Rank(Total, State) -> Mult(15, VALUE) -> VALUE
 	FONT_COLOR: Reg(State) -> Color(Division) -> C
 
 layer Total2[TEXT]
@@ -104,10 +104,10 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> Add(30, X) -> (VALUE)
-	Y << Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Total.Find(State) -[L1]->
-				  Total2.Find(State) -[L2]->
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+	Y :* Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR :* Total.Find(State) -[L1]>
+				  Total2.Find(State) -[L2]>
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -116,7 +116,7 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> (X)
-	Y << Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
+	Y :* Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
 	FONT_COLOR: Reg(State) -> Color(Division) -> C
 
 layer Elderly2[TEXT]
@@ -124,10 +124,10 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> Add(30, X) -> (VALUE)
-	Y << Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Elderly.Find(State) -[L1]->
-				  Elderly2.Find(State) -[L2]->
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+	Y :* Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR :* Elderly.Find(State) -[L1]>
+				  Elderly2.Find(State) -[L2]>
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -136,7 +136,7 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> (X)
-	Y << Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
+	Y :* Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
 	FONT_COLOR: Reg(State) -> Color(Division) -> C
 
 layer Adults2[TEXT]
@@ -144,15 +144,15 @@ from Poverty
 	ID: State
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> Add(30, X) -> (VALUE)
-	Y << Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR << Adults.Find(State) -[L1]->
-				  Adults2.Find(State) -[L2]->
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]->
+	Y :* Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
+	FONT_COLOR :* Adults.Find(State) -[L1]>
+				  Adults2.Find(State) -[L2]>
+				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 operator Color2 (State, Alpha) -> (C)
-(all) => (C): Color(State) -[Root]-> 
+(all) => (C): Color(State) -[Root]> 
 					Mult(Alpha,.5) -> Add(.25, VALUE) ->
 				  	SetAlpha(VALUE, Root[C]) -> VALUE
 

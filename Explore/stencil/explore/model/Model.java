@@ -100,11 +100,11 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	public StencilRunner execute() throws Exception {
 		if (stencilPanel == null) {throw new RuntimeException("Cannot execute an application prior to successful compilation.");}
 		if (runner.isRunning()) {throw new RuntimeException("Model is already executing.  Cannot execute twice concurrently.");}
-		final long startTime= System.currentTimeMillis();
 		
 		reporter.addMessage("Starting executing.");
 
 		if (runner == null || !runner.isAlive()) {runner = new StencilRunner(this);}
+		final long startTime= System.currentTimeMillis();
 		runner.start();
 
 		Thread listener = new Thread() {

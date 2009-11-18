@@ -98,13 +98,13 @@ from MTTSource
 	ID : Concatenate(axis1A, axis1B) -> VALUE
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
 	Y.1 :-5
-	Y.2 << EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
+	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
 	STROKE_COLOR : Pallet("GRID") -> C
 from MTTSource
 	ID : Concatenate(axis2A, axis2B) -> VALUE
 	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
 	X.1 : -5
-	X.2 << EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
+	X.2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
 	STROKE_COLOR: Pallet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)

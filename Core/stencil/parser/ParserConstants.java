@@ -99,7 +99,7 @@ public abstract class ParserConstants {
 		
 	static {
 		try {
-			SIMPLE_SPECIALIZER = ParseStencil.parseSpecializer("[n .. n]");
+			SIMPLE_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[%1$s .. %1$s]",FINAL_VALUE));
 			if (!SIMPLE_SPECIALIZER.isSimple()) {throw new Error("Error creating simple specializer: does not return isSimple()==true");}			
 		} catch (Throwable e) {throw new Error("Error creating reference specializer.", e);}
 	}

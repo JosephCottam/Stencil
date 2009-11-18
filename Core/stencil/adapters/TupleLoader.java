@@ -28,8 +28,6 @@
  */
 package stencil.adapters;
 
-import java.util.Observable;
-
 import stencil.display.StencilPanel;
 import stencil.streams.Tuple;
 import stencil.streams.TupleStream;
@@ -38,7 +36,7 @@ import stencil.util.streams.txt.InvalidInputLineException;
 /**Load tuples from a stream source into the program
  * via the application engine.
  */
-public class TupleLoader extends Observable implements Runnable {
+public class TupleLoader implements Runnable {
 	private enum STATE {UNSTARTED, RUNNING, STOPPED, EXCEPTION};
 	private static final long DEFAULT_UPDATE_FREQUENCY = 10;
 
@@ -90,8 +88,6 @@ public class TupleLoader extends Observable implements Runnable {
 	 */
 	public void load() throws Exception {
 		state = STATE.RUNNING;
-		this.setChanged();
-		this.notifyObservers(recordsLoaded);
 		panel.preRun();
 
 		while(input.hasNext() && keepRunning) {
@@ -104,12 +100,8 @@ public class TupleLoader extends Observable implements Runnable {
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
 			panel.processTuple(tuple); 
 			recordsLoaded++;
-			this.setChanged();
-			if (recordsLoaded%updateFrequency == 0) {this.notifyObservers(recordsLoaded);}
 		}
 		state = STATE.STOPPED;
-		this.setChanged();
-		this.notifyObservers(recordsLoaded);
 	}
 
 	public boolean isRunning() {return state == STATE.RUNNING;}
@@ -124,12 +116,6 @@ public class TupleLoader extends Observable implements Runnable {
 
 	/**Find out how many records have been read by this loader*/
 	public long getRecordsLoaded() {return recordsLoaded;}
-
-	/**Find out how often the observer event fires (in terms of number of records loaded)*/
-	public long getUpdateFrequency() {return updateFrequency;}
-
-	/**Set how often the observer event fires (in terms of number of records loaded)*/
-	public void setUpdateFrequency(long uf) {updateFrequency = uf;}
 
 	/**Used to signal the loader to stop, even if it has not reached the end of the stream.
 	 * Passing a false will cause it to stop next time it iterates the loading loop, regardless of the 'hasNext' value

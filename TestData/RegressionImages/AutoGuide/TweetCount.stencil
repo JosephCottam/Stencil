@@ -14,7 +14,7 @@ canvas Main
 layer Counts
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
-	X<< firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) -> VALUE
+	X:* firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) -> VALUE
 	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE) -> VALUE
 	REGISTRATION: "BOTTOM"
 	SIZE: 10

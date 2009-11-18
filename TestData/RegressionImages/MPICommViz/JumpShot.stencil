@@ -13,8 +13,37 @@ SOURCE: ./diss_16.viz
 SKIP: 0
 STRICT: false
 
+external stream ranks(rank, label)
 external stream overheads(op, rank, cpu, start, end, r,g,b)
 external stream trans(op, source, dest, start, end, size, G, r,g,b) 
+
+order ranks > (overheads | trans)
+
+layer labels[TEXT]
+from ranks
+	ID: label
+	TEXT: label
+	X: -10
+	Y: Layout(rank)
+	FONT_COLOR: @color(GRAY70)
+	REGISTRATION: "RIGHT"
+from overheads
+	ID: start
+	TEXT: start
+	X: Timescale(start)
+	Y: -10    
+	FONT_COLOR: @color(GRAY70)
+	REGISTRATION: "LEFT"
+	ROTATION: "VERTICAL"
+from overheads
+	ID: end
+	TEXT: end
+	X: Timescale(end)
+	Y: -10    
+	FONT_COLOR: @color(GRAY70)
+	REGISTRATION: "LEFT"
+	ROTATION: "VERTICAL"
+
 
 layer baseline[LINE]
 from overheads
@@ -30,15 +59,6 @@ from trans
 	STROKE_COLOR: @color(Gray90)
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
-
-layer labels[TEXT]
-from overheads
-	ID: rank
-	TEXT: Concatenate("Rank ", rank)
-	X: -10
-	Y: Layout(rank)
-	FONT_COLOR: @color(GRAY70)
-	REGISTRATION: "RIGHT"
 
 layer compressions[LINE]
 from overheads
