@@ -35,9 +35,16 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 		private int toTree(int idx) {return idx+offset;}
 		
 		public boolean contains(Object o) {
-			if (!(o instanceof Tree)) {return false;}
+			if (!(o instanceof Tree)) {return containsValue(o);}
 			Tree t = (Tree) o;
 			for (T t2: this) {if (t.equals(t2)) {return true;}}
+			return false;
+		}
+		
+		public boolean containsValue(Object o) {
+			for (T t: this) {
+				if (t instanceof Value) {return ((Value) t).getValue().equals(o);}
+			}
 			return false;
 		}
 

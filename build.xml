@@ -8,7 +8,7 @@
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
- 			target="${grammars}/EnsureGuideOp.g"
+ 			target="${grammars}/Stencil.g"
 			outputdirectory="${grammars}/string/"
  		/> 
  		<antcall target="EclipseRefresh"/>

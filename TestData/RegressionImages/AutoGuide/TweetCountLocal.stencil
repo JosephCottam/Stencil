@@ -22,7 +22,7 @@ from Tweets
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
 from Tweets
-	view(ZOOM) : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT) -> VALUE
+	view(ZOOM) : Zoom(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT]) -> VALUE
 	view(X,Y): (canvas.X, canvas.Y)
 	
 

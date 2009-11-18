@@ -143,13 +143,17 @@ public class Specializer extends StencilTree {
 				return os;
 			}
 
-			public <T> T[] toArray(T[] a) {throw new UnsupportedOperationException();}
-
+			public boolean contains(Object o) {
+				for (Atom a: this) {
+					if (a.getValue().equals(o)) {return true;}
+				}
+				return false;
+			}
 			
+			public <T> T[] toArray(T[] a) {throw new UnsupportedOperationException();}
 			public boolean add(Atom o) {throw new UnsupportedOperationException();}
 			public boolean addAll(Collection<? extends Atom> c) {throw new UnsupportedOperationException();}
 			public void clear() {throw new UnsupportedOperationException();}
-			public boolean contains(Object o) {throw new UnsupportedOperationException();}
 			public boolean containsAll(Collection<?> c) {throw new UnsupportedOperationException();}
 			public boolean remove(Object o) {throw new UnsupportedOperationException();}
 			public boolean removeAll(Collection<?> c) {throw new UnsupportedOperationException();}

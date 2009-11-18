@@ -288,6 +288,7 @@ callChainMember
   | valueList -> ^(PACK valueList)
   | functionCallTarget;
   
+  
 functionCallTarget
   : (functionCall passOp)=> f1=functionCall passOp f2=callChainMember 
      -> ^($f1 passOp $f2)
@@ -295,8 +296,11 @@ functionCallTarget
    
 
 functionCall
-  : name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList
-    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList));
+  :(callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList) =>
+   name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] valueList
+    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList))
+  | name=callName[MAIN_BLOCK_TAG] specializer[RuleOpts.All] emptySet
+    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"]));  
 
 //Apply defaultCall to functions that have no explicit call
 callName[String defaultCall]
@@ -384,7 +388,7 @@ tuple[boolean allowEmpty]
 emptySet: GROUP! CLOSE_GROUP!;
 
 valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;  //TODO: combine with 'values' above...
-
+		
 range
   : number RANGE number
     -> ^(RANGE number number)

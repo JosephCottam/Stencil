@@ -30,6 +30,7 @@
 package stencil.operator.module.provided;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.awt.Color;
 
 import stencil.operator.StencilOperator;
@@ -44,7 +45,7 @@ public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
-	public static class HeatScale extends BasicProject {
+	public static final class HeatScale extends BasicProject {
 		public static final String NAME = "Heat";
 		public static final boolean DEFAULT_THROW_EXCEPTIONS = true;
 
@@ -152,7 +153,7 @@ public class Projection extends BasicModule {
 	 *
 	 * TODO: Update so it can use a comparator for arbitrary sorting orders, then have it default to 'natural' order
 	 */
-	public static class Index extends BasicProject {
+	public static final class Index extends BasicProject {
 		public static final String NAME = "Index";
 		List<String> labels = new ArrayList<String>();
 
@@ -182,7 +183,7 @@ public class Projection extends BasicModule {
 	 * For mapping, items that have not been seen before return 1 the first time, incremented there-after.
 	 * For query, items that have not been seen return 0 and are not added to the map.
 	 */
-	public static class Count extends BasicProject {
+	public static final class Count extends BasicProject {
 		Map<Object, Long> counts = new HashMap<Object, Long>();
 		
 		public String getName() {return "Count";}
@@ -214,21 +215,38 @@ public class Projection extends BasicModule {
 		public Count duplicate() {return new Count();}
 	}
 
+	public static final class SimpleCount extends BasicProject {
+		private final AtomicInteger count = new AtomicInteger(0);
+		
+		public StencilOperator duplicate() throws UnsupportedOperationException {return new SimpleCount();}
+
+		public String getName() {return "Count";}
+
+		public Tuple map(Object... args) {return BasicTuple.singleton(count.getAndAdd(1));}
+
+		public Tuple query(Object... args) {return BasicTuple.singleton(count.get());}		
+	}
+	
 	public Projection(ModuleData md) {super(md);}
 
 	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
 		
-		if (!specializer.equals(moduleData.getDefaultSpecializer(name))) {throw new SpecializationException(MODULE_NAME, name, specializer);}
+		if (specializer.equals(moduleData.getDefaultSpecializer(name))) {
 		
-		if (name.equals("Index")) {
-			return new Index();
-		} else if (name.equals("HeatScale")) {
-			 return new HeatScale(specializer);
-		} else if (name.equals("Count")) {
-			return new Count();
-		} else if (name.equals("Justify")) {
-			throw new RuntimeException("Justify doesn't work yet...sorry.");
+			if (name.equals("Index")) {
+				return new Index();
+			} else if (name.equals("HeatScale")) {
+				 return new HeatScale(specializer);
+			} else if (name.equals("Count")) {
+				return new Count();
+			} else if (name.equals("Justify")) {
+				throw new RuntimeException("Justify doesn't work yet...sorry.");
+			}
+			throw new IllegalArgumentException("Name not known : " + name);
+		} else if (name.equals("Count") && specializer.getArgs().contains(1)) {
+			return new SimpleCount();
+		} else {
+			throw new SpecializationException(MODULE_NAME, name, specializer);}
 		}
-		throw new IllegalArgumentException("Name not known : " + name);	}
 }
