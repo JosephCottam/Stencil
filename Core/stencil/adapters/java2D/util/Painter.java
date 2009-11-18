@@ -69,9 +69,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 		for (DisplayLayer<? extends Glyph2D> table: layers) {
 			for (Glyph2D glyph: table) {
 				Rectangle2D r = glyph.getBoundsReference();
-				if (glyph.isVisible() 
-					&& g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {
-
+				if (g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {
 					glyph.render(g, base);
 				}
 			}

@@ -139,6 +139,7 @@ public class Arc extends Stroked {
 	
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
 		super.render(g, arc);
 		super.postRender(g, null);
 	}

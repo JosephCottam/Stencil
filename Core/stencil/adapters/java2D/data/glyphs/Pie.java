@@ -162,6 +162,8 @@ public final class Pie extends Stroked {
 	public String getImplantation() {return IMPLANTATION;}
 	
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
+
 		g.setPaint(fieldPaint);
 		g.fill(outline);
 		

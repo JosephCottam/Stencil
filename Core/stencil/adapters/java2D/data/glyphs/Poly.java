@@ -211,6 +211,7 @@ public abstract class Poly extends Stroked {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
 		if (path == null) {return;}
 		
 		super.render(g, path);

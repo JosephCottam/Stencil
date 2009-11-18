@@ -20,7 +20,4 @@ public interface Glyph2D extends stencil.adapters.Glyph, Renderable {
 	/**Accessor method used in updates; provided to reduce indirection costs.*/
 	public DisplayLayer getLayer();
 
-	/**Accessor method used in drawing; provided to reduce indirection costs.*/
-	public boolean isVisible();
-
 }

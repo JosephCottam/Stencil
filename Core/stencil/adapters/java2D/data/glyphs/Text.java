@@ -208,6 +208,8 @@ public final class Text extends Basic {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
+		
 		g.setFont(format.font);
 		g.setPaint(format.textColor);
 		

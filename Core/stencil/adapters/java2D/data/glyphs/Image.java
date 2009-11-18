@@ -174,6 +174,7 @@ public final class Image extends Basic {
 
 	@Override
 	public void render(Graphics2D g, AffineTransform baseTransform) {
+		if (!visible) {return;}
 		verifyImage();
 		if (base == null) {return;}
 		
