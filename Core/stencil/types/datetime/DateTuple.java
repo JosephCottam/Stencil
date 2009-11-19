@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Calendar;
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 import stencil.util.enums.EnumUtils;
 
 public final class DateTuple implements Tuple {
@@ -33,11 +32,6 @@ public final class DateTuple implements Tuple {
 			}			
 		} catch (Exception e) {/*Exception thrown in next statement, if needed.*/}
 		throw new InvalidNameException(name, EnumUtils.allNames(FIELD.class));
-	}
-
-	public Object get(String name, Class<?> type)
-			throws IllegalArgumentException, InvalidNameException {
-		return Converter.convert(get(name), type);
 	}
 
 	public List<String> getFields() {return FIELDS;}

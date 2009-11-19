@@ -1,11 +1,10 @@
 package stencil.util;
 
-import java.util.Arrays;
+import java.util.Arrays; 
 import java.util.List;
 
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 
 //final because it is immutable
 public final class AutoguidePair<I,R> implements Tuple {
@@ -30,10 +29,6 @@ public final class AutoguidePair<I,R> implements Tuple {
 		if (name.equals("input")) {return input;}
 		if (name.equals("result")) {return result;}
 		throw new InvalidNameException(name);
-	}
-
-	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
-		return Converter.convert(get(name), type);
 	}
 
 	public List<String> getFields() {return FIELDS;}

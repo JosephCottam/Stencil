@@ -12,7 +12,6 @@ import javax.swing.JComponent;
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
 import stencil.streams.TupleStream;
-import stencil.types.Converter;
 
 public final class ComponentEventStream implements TupleStream {
 	public static final List<String> FIELDS = Arrays.asList("SOURCE", "X", "Y", "WIDTH", "HEIGHT");
@@ -41,11 +40,6 @@ public final class ComponentEventStream implements TupleStream {
 			if (name.equals("HEIGHT")) {return height;}
 			
 			throw new InvalidNameException(name, FIELDS);
-		}
-
-		public Object get(String name, Class<?> type)
-				throws IllegalArgumentException, InvalidNameException {
-			return Converter.convert(get(name), type);
 		}
 
 		public List<String> getFields() {return FIELDS;}

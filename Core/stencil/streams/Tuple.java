@@ -46,11 +46,6 @@ public interface Tuple {
 	 * @throws InvalidNameException The name passed is not valid for this tuple.*/
 	public abstract Object get(String name) throws InvalidNameException;
 
-	/**Returns the object stored under the name, in a form that may be cast to the type.
-	 * Types guaranteed to work are limited to the storage type and the types with designated getters.
-	 * If the item stored under the given name cannot be cast to the given type, an IllegalArgumentException should be thrown.*/
-	public abstract Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException;
-
 	/**Is this the default value for this field?*/
 	public abstract boolean isDefault(String name, Object value);
 

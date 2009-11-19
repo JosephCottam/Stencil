@@ -36,7 +36,6 @@ import stencil.adapters.general.Fills;
 import stencil.streams.MutableTuple;
 import stencil.streams.Tuple;
 import stencil.types.SigilType;
-import stencil.types.Converter;
 import stencil.types.TypesCache;
 
 /**Utility methods for working with tuples.*/
@@ -48,8 +47,6 @@ public final class Tuples {
 	 * is required but cannot be supplied.*/
 	public static final Tuple EMPTY_TUPLE = new Tuple() {
 		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
-		public Object get(String name, Class<?> type)
-				throws IllegalArgumentException, InvalidNameException {throw new InvalidNameException(name);}
 		public List<String> getFields() {return new ArrayList<String>();}
 		public boolean hasField(String name) {return false;}
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
@@ -67,11 +64,6 @@ public final class Tuples {
 		public MapTuple(Map<String, ?> source) {this.map = source;}
 		
 		public Object get(String name) throws InvalidNameException {return map.get(name);}
-
-		public Object get(String name, Class<?> type)
-				throws IllegalArgumentException, InvalidNameException {
-			return Converter.convert(get(name), type);
-		}
 
 		public List<String> getFields() {return new ArrayList(map.keySet());}
 
@@ -246,10 +238,6 @@ public final class Tuples {
 			public Object get(String name) throws InvalidNameException {
 				if (!values.containsKey(name)) {throw new InvalidNameException(name);}
 				return values.get(name);
-			}
-
-			public Object get(String name, Class<?> target) throws IllegalArgumentException {
-				return Converter.convert(values.get(name), target);
 			}
 
 			public List<String> getFields() {

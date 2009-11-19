@@ -32,9 +32,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 import static stencil.parser.ParserConstants.INITIATOR;
 import static stencil.parser.ParserConstants.TERMINATOR;
 import static stencil.parser.ParserConstants.SEPARATOR;
@@ -59,11 +59,6 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		
 	public ColorTuple(int color) {
 		super(color, true);
-	}
-
-	public Object get(String name, Class<?> type) throws IllegalArgumentException {
-		Object value = get(name);
-		return Converter.convert(value, type);
 	}
 	
 	public List<String> getFields() {return FIELDS;}

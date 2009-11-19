@@ -35,7 +35,6 @@ import java.util.Collections;
 
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 
 
 /***
@@ -125,10 +124,6 @@ public final class BasicTuple implements Tuple {
 	public Object get(String name) throws InvalidNameException {
 		if (!names.contains(name)) {throw new InvalidNameException(name, getFields());}
 		return values.get(names.indexOf(name));
-	}
-
-	public Object get(String name, Class desiredClass) throws ConversionException {
-		return Converter.convert(get(name), desiredClass);
 	}
 
 	public boolean isDefault(String name, Object value) {return false;}

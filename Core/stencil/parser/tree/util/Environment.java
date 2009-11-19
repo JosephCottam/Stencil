@@ -34,7 +34,6 @@ import java.util.List;
 
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 
 public class Environment implements Tuple {
  	private static final  class UnknownNameException extends RuntimeException {
@@ -97,11 +96,6 @@ public class Environment implements Tuple {
 			try {return parent.get(name);}
 			catch (UnknownNameException e) {throw new UnknownNameException(e, frameName, update.getFields());}
 		}
-	}
-
-	public Object get(String name, Class<?> type)
-			throws IllegalArgumentException, InvalidNameException {
-		return Converter.convert(get(name), type);
 	}
 
 	//TODO: This is mostly unsuitable for frame-dereferencing.  It will work for default-reference and error reporting though!

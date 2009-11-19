@@ -36,6 +36,7 @@ import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 
 public class Interpreter {
@@ -133,7 +134,7 @@ public class Interpreter {
 		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
 		
 		if (stream.hasField(Tuple.SOURCE_KEY)) {
-			e = e.append((String) stream.get(Tuple.SOURCE_KEY, String.class), stream); //TODO: BAD JOSEPH.  Using named references			
+			e = e.append(Converter.toString(stream.get(Tuple.SOURCE_KEY)), stream); //TODO: BAD JOSEPH.  Using named references			
 		} else {
 			e = e.append(stream);
 		}

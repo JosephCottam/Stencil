@@ -63,15 +63,6 @@ public abstract class KeyboardStream implements TupleStream {
 			this.source = source;
 		}
 
-		public Object get(String name, Class type) {
-			Object value = get(name);
-			if (value == null) {return null;}
-			else if (type.isAssignableFrom(value.getClass())) {return value;}
-			else {
-				throw new IllegalArgumentException("Cannot gurantee value conversion from storage type " + value.getClass().toString() + " to type " + type.toString());
-			}
-		}
-
 		public Object get(String name) {
 			name = name.toUpperCase(); //we're naming a key, not a field so upper case is correct
 			if (name.equals(KEY_FIELD)) {return key;}
