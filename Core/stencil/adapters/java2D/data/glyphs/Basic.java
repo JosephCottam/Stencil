@@ -145,10 +145,6 @@ public abstract class Basic implements Glyph2D {
 	 */
 	protected final void updateBoundsRef(Rectangle2D r) {bounds.setRect(r);}
 	
-	public Object get(String name, Class<?> type) throws IllegalArgumentException, InvalidNameException {
-		return Converter.convert(get(name), type);
-	}
-
 	public Object get(String name) {
 		if (ID.is(name)) {return id;}
 		if (LAYERNAME.is(name)) {return layer==null?null:layer.getName();}
@@ -236,8 +232,8 @@ public abstract class Basic implements Glyph2D {
 			try {
 				g.setPaint(DEBUG_COLOR.darker());
 				double scale=2;
-				double x = (Double) this.get("X", Double.class);
-				double y = (Double) this.get("Y", Double.class);
+				double x = Converter.toDouble(this.get("X"));
+				double y =  Converter.toDouble(this.get("Y"));
 				g.fill(Shapes.getShape(StandardShape.CROSS, x-scale/2, y-scale/2, scale, scale));
 			} catch  (Exception e) {/*Exception ignored, its just debug code.*/}
 
@@ -282,8 +278,8 @@ public abstract class Basic implements Glyph2D {
 	 * @param targetHeight The height of the newly formed thing
 	 */
 	public static Point2D mergeRegistrations(Basic source, Tuple option, double targetWidth, double targetHeight, Attribute<Double> X, Attribute<Double> Y) {
-		double x = switchCopy((Double) source.get(X.name, Double.class), safeGet(option, X));
-		double y = switchCopy((Double) source.get(Y.name, Double.class), safeGet(option, Y));			
+		double x = switchCopy(Converter.toDouble(source.get(X.name)), safeGet(option, X));
+		double y = switchCopy(Converter.toDouble(source.get(Y.name)), safeGet(option, Y));			
 		Registrations.Registration reg = switchCopy(source.registration, safeGet(option, REGISTRATION));
 		
 		//If registrations are split between before and after AND the coordinates are also split, take the old partial value to the new registration system

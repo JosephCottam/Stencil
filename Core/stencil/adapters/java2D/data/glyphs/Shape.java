@@ -30,9 +30,9 @@ package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.lang.ref.SoftReference;
 
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
@@ -62,7 +62,7 @@ public class Shape extends Filled {
 		ATTRIBUTES.add(Y);
 	}
 	
-	private final GeneralPath glyph;
+	private final SoftReference<java.awt.Shape> glyphRef;
 
 	private final StandardShape shape;
 	private final double size;
@@ -80,7 +80,8 @@ public class Shape extends Filled {
 		regY = Y.defaultValue;
 		rotation = ROTATION.defaultValue;	
 		
-		glyph  = initWork();
+		java.awt.Shape glyph = createShape();
+		glyphRef  = new SoftReference(glyph);
 		super.updateBoundsRef(glyph.getBounds2D());
 	}
 	
@@ -89,7 +90,7 @@ public class Shape extends Filled {
 	private Shape(String id, Shape source) {
 		super(id, source);
 	
-		this.glyph = source.glyph;
+		this.glyphRef = source.glyphRef;
 		this.shape = source.shape;
 		this.size = source.size;
 		this.rotation = source.rotation;
@@ -112,21 +113,20 @@ public class Shape extends Filled {
 		regX = reg.getX();
 		regY = reg.getY();
 
-		glyph =initWork();
+		java.awt.Shape glyph = createShape();
+		glyphRef = new SoftReference(glyph);
 		super.updateBoundsRef(glyph.getBounds2D());
 	}
 
-	private final GeneralPath initWork() {
+	private final java.awt.Shape createShape() {
 		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, size, size);
 		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), size, size);
 		
 		java.awt.Shape s = Shapes.getShape(shape, bounds.getX()-regX, bounds.getY()-regY, size, size);
-		GeneralPath p = new GeneralPath(s);
+		s = AffineTransform.getRotateInstance(Math.toRadians(rotation)).createTransformedShape(s);
+		s = AffineTransform.getTranslateInstance(regX, regY).createTransformedShape(s);
 		
-		p.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
-		p.transform(AffineTransform.getTranslateInstance(regX, regY));
-		
-		return p;
+		return s;
 	}
 	
 	public Object get(String name) {
@@ -146,7 +146,9 @@ public class Shape extends Filled {
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
-	
+		java.awt.Shape glyph = glyphRef.get();
+		if (glyph == null) {glyph = createShape();}
+		
 		super.render(g, glyph);
 		super.postRender(g, null);
 	}

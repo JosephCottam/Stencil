@@ -34,8 +34,10 @@ import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
+import java.lang.ref.SoftReference;
 
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
@@ -88,7 +90,7 @@ public final class Line extends Stroked {
 	private final String cap1;
 	private final String cap2;
 	
-	private final java.awt.Shape glyph;
+	private final SoftReference<Line2D> glyph;
 	
 	public Line(DisplayLayer layer, String id) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
@@ -100,10 +102,10 @@ public final class Line extends Stroked {
 		cap1 = "NONE";
 		cap2 = "NONE";
 		
-		glyph = new Line2D.Double(x1,y1,x2,y2);		
-		super.updateBoundsRef(outlineStyle.createStrokedShape(glyph).getBounds2D());
+		Line2D l = makeLine();
+		glyph = new SoftReference(l);		
+		super.updateBoundsRef(outlineStyle.createStrokedShape(l).getBounds2D());
 	}
-	
 	
 	
 	private Line(String id, Line source) {
@@ -128,14 +130,18 @@ public final class Line extends Stroked {
 		cap1 = switchCopy(source.cap1, safeGet(option, CAP1));
 		cap2 = switchCopy(source.cap1, safeGet(option, CAP2));
 		
-		glyph = new Line2D.Double(x1,y1,x2,y2);		
-		super.updateBoundsRef(outlineStyle.createStrokedShape(glyph).getBounds2D());
+		Line2D s = makeLine();
+		glyph = new SoftReference(s);		
+		super.updateBoundsRef(outlineStyle.createStrokedShape(s).getBounds2D());
 	}
 
 	public String getImplantation() {return IMPLANTATION;} 
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 
+	private Line2D makeLine() {
+		return new Line2D.Double(x1,y1,x2,y2);
+	}
 	
 	public Object get(String name) {
 		if (X1.is(name)) 	  {return x1;}
@@ -154,13 +160,17 @@ public final class Line extends Stroked {
 	public void render(Graphics2D g, AffineTransform base) {
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 
-		super.render(g,glyph);
+		Line2D l = glyph.get();
+		if (l == null) {l = makeLine();}
+		
+		
+		super.render(g,l);
 		endPoints(g);
 		super.postRender(g, base);
 	}
 
 	private void endPoints(Graphics2D g) {
-		double weight = (Double) super.get("STROKE_WEIGHT", Double.class) ;
+		double weight = Converter.toDouble(super.get("STROKE_WEIGHT")) ;
 		double scale = weight*6;
 		double offset = scale/2.0;
 		double slope = (y2-y1)/(x2-x1);

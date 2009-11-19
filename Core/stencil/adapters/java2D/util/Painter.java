@@ -27,7 +27,9 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0;
-	private AffineTransform priorTransform= new AffineTransform();
+	
+	//Cached transform, used to detect if a zoom/pan has occurred since the last render
+	private AffineTransform priorInverseTransform= new AffineTransform();
 	
 	
 	public Painter(DisplayLayer[] layers, Canvas target) {
@@ -47,7 +49,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 			Rectangle updateBounds = layerUpdates.clear();
 			AffineTransform inverse = target.getInverseViewTransformRef();
 			
-			if (resized() || transformed()
+			if (resized() || transformed(inverse)
 				|| (updateBounds != null && updateBounds.intersects(inverse.createTransformedShape(target.getBounds()).getBounds()))) 
 			{	
 				BufferedImage i = selfBuffer();
@@ -88,12 +90,13 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	}
 	
 	/**Has the target been transformed since it was last rendered?*/
-	private boolean transformed() {return !priorTransform.equals(target.getViewTransformRef());}
+	private final boolean transformed(AffineTransform updateCandidate) {return !priorInverseTransform.equals(updateCandidate);}
 	
 	private BufferedImage selfBuffer() {
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = target.getBounds();
-		priorTransform = target.getViewTransform();
+		AffineTransform priorTransform = target.getViewTransform();
+		priorInverseTransform = target.getInverseViewTransform();
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		

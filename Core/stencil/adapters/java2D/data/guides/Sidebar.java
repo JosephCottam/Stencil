@@ -22,6 +22,7 @@ import stencil.parser.tree.Guide;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.AutoguidePair;
 import stencil.util.BasicTuple;
 import stencil.util.Tuples;
@@ -78,8 +79,8 @@ public class Sidebar implements Guide2D {
 		prototypeExample = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		prototypeExample = GuideUtils.applyDefaults(specializer, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		
-		exampleHeight = Math.max((Float) prototypeLabel.get(StandardAttribute.HEIGHT.name(), Float.class), (Float)  prototypeExample.get("SIZE", Float.class));
-		exampleWidth = (Float) prototypeExample.get("SIZE", Float.class);
+		exampleHeight = Math.max(Converter.toFloat(prototypeLabel.get(StandardAttribute.HEIGHT.name())), Converter.toFloat(prototypeExample.get("SIZE")));
+		exampleWidth = Converter.toFloat(prototypeExample.get("SIZE"));
 		vSpacing = spacing * exampleHeight;
 		hSpacing = spacing * exampleWidth;
 		

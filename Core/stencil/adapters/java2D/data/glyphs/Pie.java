@@ -42,6 +42,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 
 public final class Pie extends Stroked {
@@ -127,7 +128,7 @@ public final class Pie extends Stroked {
 		angle = switchCopy(source.angle, safeGet(option, ANGLE));
 		
 		if (option.hasField(PERCENT.name)) {
-			slice = (Double) option.get(PERCENT.name, Double.class);
+			slice = Converter.toDouble(option.get(PERCENT.name));
 			field = 100 - slice;
 		} else {
 			field = switchCopy(source.field, safeGet(option, FIELD));

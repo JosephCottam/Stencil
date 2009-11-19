@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.GeneralPath;
+import java.lang.ref.SoftReference;
 import java.util.regex.Pattern;
 
 import static stencil.adapters.general.TextFormats.TextProperty;
@@ -22,6 +23,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 import stencil.util.Tuples;
 
@@ -84,7 +86,7 @@ public final class Text extends Basic {
 	private final Rectangle2D horizontalBounds;
 	private final double rotation;
 	
-	private final GeneralPath renderedText;
+	private final SoftReference<GeneralPath> renderedTextRef;
 	
 	public Text(DisplayLayer layer, String id) {
 		super(layer, id);
@@ -98,7 +100,7 @@ public final class Text extends Basic {
 
 		horizontalBounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
 		super.updateBoundsRef((Rectangle2D) horizontalBounds.clone());
-		renderedText = new GeneralPath();
+		renderedTextRef = new SoftReference(new GeneralPath());
 	}
 	
 	protected Text(String id, Text source) {
@@ -111,7 +113,7 @@ public final class Text extends Basic {
 		this.autoWidth = source.autoWidth;
 		this.horizontalBounds = source.horizontalBounds;
 		this.rotation = source.rotation;
-		this.renderedText = source.renderedText;
+		this.renderedTextRef = source.renderedTextRef;
 	}
 
 	protected Text(Text source, Tuple option, AttributeList unsettables) {
@@ -123,12 +125,12 @@ public final class Text extends Basic {
 		format = TextFormats.make(source, option);
 		
 		if (option.hasField(HEIGHT.name)) {
-			double height = (Double) option.get(HEIGHT.name, Double.class);
+			double height = Converter.toDouble(option.get(HEIGHT.name));
 			autoHeight = (height <= AUTO_SIZE);
 		} else {autoHeight = source.autoHeight;}
 		
 		if (option.hasField(WIDTH.name)) {
-			double width = (Double) option.get(WIDTH.name, Double.class);
+			double width = Converter.toDouble(option.get(WIDTH.name));
 			autoWidth = (width <= AUTO_SIZE);
 		}else {autoWidth = source.autoWidth;}
 
@@ -140,7 +142,7 @@ public final class Text extends Basic {
 			&& !option.hasField(WIDTH.name)
 			&& !option.hasField(HEIGHT.name)) {
 			
-			this.renderedText = source.renderedText;
+			this.renderedTextRef = source.renderedTextRef;
 			super.updateBoundsRef(source.bounds);
 			this.horizontalBounds = source.horizontalBounds;
 		} else {
@@ -153,22 +155,28 @@ public final class Text extends Basic {
 			if (!autoHeight) { 
 				ld.fullHeight = switchCopy(source.horizontalBounds.getHeight(), safeGet(option, HEIGHT));
 			}
-
-			renderedText = layoutText(text, ld, format);
 			
 			Point2D topLeft = mergeRegistrations(source, option, ld.fullWidth, ld.fullHeight, X, Y);
 			horizontalBounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
 			Point2D reg = Registrations.topLeftToRegistration(registration, horizontalBounds);
 
-			renderedText.transform(AffineTransform.getTranslateInstance(horizontalBounds.getX()-reg.getX(), horizontalBounds.getY()-reg.getY()));
-			renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+			GeneralPath renderedText = renderText();
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
 			layout.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
 			super.updateBoundsRef(layout.getBounds2D());
+			renderedTextRef = new SoftReference(renderedText);
 		}
 	}
-
+	
+	private GeneralPath renderText() {
+		LayoutDescription ld = computeLayout(text, format);
+		GeneralPath renderedText = layoutText(text, ld, format);
+		Point2D reg = new Point2D.Double((Double) get("X"), (Double) get("Y"));
+		renderedText.transform(AffineTransform.getTranslateInstance(horizontalBounds.getX()-reg.getX(), horizontalBounds.getY()-reg.getY()));
+		renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
+		return renderedText;
+	}
 	
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
@@ -224,6 +232,8 @@ public final class Text extends Basic {
 		catch (Exception e) {p2 = p;}		
 		g.translate(p2.getX(), p2.getY());
 		
+		GeneralPath renderedText = renderedTextRef.get();
+		if (renderedText == null) {renderedText = renderText();}
 		
 		g.fill(renderedText);	//Render
 		super.postRender(g, base);

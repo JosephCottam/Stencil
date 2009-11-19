@@ -5,7 +5,6 @@ import java.util.List;
 
 import stencil.streams.InvalidNameException;
 import stencil.streams.Tuple;
-import stencil.types.Converter;
 import stencil.util.Tuples;
 
 /**Result pair used to create a legend.
@@ -24,11 +23,6 @@ final class GuidePair<T> implements Tuple {
 		if (name.equals("INPUT")) {return input;}
 		if (name.equals("OUTPUT")) {return output;}
 		throw new InvalidNameException(name, FIELDS);
-	}
-
-	public Object get(String name, Class<?> type)
-			throws IllegalArgumentException, InvalidNameException {
-		return Converter.convert(get(name), type);
 	}
 	
 	public List<String> getFields() {return FIELDS;}

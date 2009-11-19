@@ -45,6 +45,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.util.Tuples;
 
 public abstract class Poly extends Stroked {
@@ -248,7 +249,7 @@ public abstract class Poly extends Stroked {
 			final String base = baseName(field);
 			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
 				double idx = index(points, field, false);
-				double value = (Double) option.get(field, Double.class);
+				double value = Converter.toDouble(option.get(field));
 				updates.add(new IdxValuePair(idx, value, Xn.is(base)));
 			}
 		}
