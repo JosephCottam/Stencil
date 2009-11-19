@@ -38,7 +38,6 @@ import java.util.List;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.streams.MutableTuple;
-import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 
 /** The ViewTuple is the interface to a view
@@ -98,8 +97,6 @@ public interface ViewTuple extends MutableTuple {
 		}
 		
 		public List<String> getFields() {return FIELDS;}
-		
-		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Converter.convert(get(name), type);}
 		
 		public boolean hasField(String name) {return getFields().contains(name);}
 

@@ -91,9 +91,6 @@ public interface CanvasTuple extends MutableTuple {
 		
 		protected abstract Rectangle getBounds();
 		
-		public Object get(String name, Class<?> type) throws IllegalArgumentException {return Converter.convert(get(name), type);}
-
-		
 		public Object get(String name) throws InvalidNameException {
 			Rectangle bounds = getBounds();
 			
