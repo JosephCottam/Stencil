@@ -28,22 +28,27 @@ from ranks
 	FONT_COLOR: @color(GRAY70)
 	REGISTRATION: "RIGHT"
 from overheads
+	filter (start > VALUE): Spacer.Query() -> Add(5000,_) -> (start, VALUE)
 	ID: start
-	TEXT: end
+	TEXT: start
 	X: Timescale(skewedStart)
 	Y: -10    
 	FONT_COLOR: @color(GRAY70)
-	REGISTRATION: "TOP_LEFT"
+	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
+	() : Spacer.Map(start)
 from overheads
+	filter (end > VALUE): Spacer.Query() -> Add(5000,_) -> (end, VALUE)
 	ID: end
 	TEXT: end
 	X: Timescale(skewedEnd)
 	Y: -10    
 	FONT_COLOR: @color(GRAY70)
-	REGISTRATION: "BOTTOM_LEFT"
+	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
+	() : Spacer.Map(end)
 
+operator Spacer base Max[1..n]
 
 layer baseline[LINE]
 from overheads
@@ -84,8 +89,8 @@ from trans
 	ID: Count[1]()
 	Y.1: Layout(source)
 	Y.2: Layout(dest)
-	X.1: Timescale(start)
-	X.2: Timescale(end)
+	X.1: Timescale(skewedStart)
+	X.2: Timescale(skewedEnd)
 	STROKE_COLOR : ColorByOp(op)
 	CAP2: "ARROW"
 
