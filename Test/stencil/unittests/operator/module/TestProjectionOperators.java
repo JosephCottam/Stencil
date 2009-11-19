@@ -5,6 +5,7 @@ import stencil.operator.module.provided.Projection;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.streams.Tuple;
+import stencil.types.Converter;
 import stencil.types.color.ColorTuple;
 
 import junit.framework.*;
@@ -57,10 +58,10 @@ public class TestProjectionOperators extends TestCase {
 		StencilOperator l = new Projection.Index();
 		String[] items = new String[] {"Hello", "Why", "What", "@color(12,39,2)"};
 		for (int i=0; i< items.length;i++) {
-			assertEquals(new Integer(i), l.map(items[i]).get(Tuple.DEFAULT_KEY, Integer.class));
+			assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(Tuple.DEFAULT_KEY)));
 		}
-		for (int i=0; i< items.length;i++) {assertEquals(new Integer(i), l.map(items[i]).get(Tuple.DEFAULT_KEY, Integer.class));}
-		for (int i=items.length-1; i>=0;i--) {assertEquals(new Integer(i), l.map(items[i]).get(Tuple.DEFAULT_KEY, Integer.class));}
+		for (int i=0; i< items.length;i++) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(Tuple.DEFAULT_KEY)));}
+		for (int i=items.length-1; i>=0;i--) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(Tuple.DEFAULT_KEY)));}
 
 		assertEquals(Projection.Index.NAME,l.getName());
 	}

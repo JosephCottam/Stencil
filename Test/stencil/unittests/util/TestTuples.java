@@ -23,11 +23,6 @@ public class TestTuples extends TestCase {
 		
 		public Object get(String name) throws InvalidNameException {return map.get(name);}
 
-		public Object get(String name, Class<?> type)
-				throws IllegalArgumentException, InvalidNameException {
-			return Converter.convert(get(name), type);
-		}
-
 		public List<String> getFields() {return new ArrayList(map.keySet());}
 
 		public boolean hasField(String name) {return map.containsKey(name);}
