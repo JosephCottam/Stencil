@@ -26,6 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 package stencil.adapters.java2D.data.glyphs;
 
 import java.awt.Graphics2D;
@@ -139,7 +140,6 @@ public class Arc extends Stroked {
 	
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
-		if (!visible) {return;}
 		super.render(g, arc);
 		super.postRender(g, null);
 	}

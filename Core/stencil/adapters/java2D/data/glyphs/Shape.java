@@ -145,7 +145,6 @@ public class Shape extends Filled {
 
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
-		if (!visible) {return;}
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 	
 		super.render(g, glyph);

@@ -14,10 +14,12 @@ public interface Glyph2D extends stencil.adapters.Glyph, Renderable {
 	/** Copy the current glyph, but replace its name.*/
 	public Glyph2D updateID(String id);
 	
-	/**Accessor method used in updates; provided to reduce indirection costs.*/
+	/**Accessor method used in updates; provided to reduce cost of name-based lookup.*/
 	public String getID();
 	
-	/**Accessor method used in updates; provided to reduce indirection costs.*/
+	/**Accessor method used in updates; provided to reduce cost of name-based lookup.*/
 	public DisplayLayer getLayer();
 
+	/**Is the glyph current toggeled for rendering?*/
+	public boolean isVisible();
 }
