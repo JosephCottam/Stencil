@@ -190,7 +190,7 @@ s	 */
 				Module m;
 				ModuleData md;
 				
-				BufferedReader stream = new BufferedReader(new InputStreamReader(key.getClass().getResourceAsStream(filename)));
+				BufferedReader stream = new BufferedReader(new InputStreamReader(ModuleCache.class.getResourceAsStream(filename)));
 				
 				try {md = ModuleDataParser.parse(stream);} 
 				catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}

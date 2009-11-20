@@ -23,7 +23,7 @@ public class TestTuples extends TestCase {
 		
 		public Object get(String name) throws InvalidNameException {return map.get(name);}
 
-		public List<String> getFields() {return new ArrayList(map.keySet());}
+		public List<String> getPrototype() {return new ArrayList(map.keySet());}
 
 		public boolean hasField(String name) {return map.containsKey(name);}
 
@@ -43,9 +43,9 @@ public class TestTuples extends TestCase {
 		map.put("Five", "FIVE");
 		MutableTuple target = new MutableMapTuple(map);
 		
-		Tuples.transfer(reference, target, false);
+		Tuples.transfer(reference, target);
 
-		for (String field:reference.getFields()) {
+		for (String field:reference.getPrototype()) {
 			assertEquals(field + " did not match in transfer", reference.get(field), target.get(field));
 		}
 	}

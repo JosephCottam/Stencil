@@ -127,7 +127,7 @@ public final class Pie extends Stroked {
 		fieldPaint = switchCopy(source.fieldPaint, safeGet(option, FIELD_COLOR));
 		angle = switchCopy(source.angle, safeGet(option, ANGLE));
 		
-		if (option.hasField(PERCENT.name)) {
+		if (option.getPrototype().contains(PERCENT.name)) {
 			slice = Converter.toDouble(option.get(PERCENT.name));
 			field = 100 - slice;
 		} else {

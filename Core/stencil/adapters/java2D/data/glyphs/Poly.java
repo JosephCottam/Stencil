@@ -187,7 +187,7 @@ public abstract class Poly extends Stroked {
 	
 	/**Does the given tuple have up point-related updates?*/
 	private static final boolean changesPoints(Tuple t) {
-		for (String field: t.getFields()) {
+		for (String field: t.getPrototype()) {
 			String base = baseName(field);
 			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {return true;}
 		}
@@ -243,9 +243,9 @@ public abstract class Poly extends Stroked {
 	}
 	
 	private static final void updatePoints(List<Point2D> points, Tuple option) {
-		List<IdxValuePair> updates = new ArrayList(option.getFields().size());
+		List<IdxValuePair> updates = new ArrayList(option.getPrototype().size());
 		
-		for (String field: option.getFields()) {
+		for (String field: option.getPrototype()) {
 			final String base = baseName(field);
 			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
 				double idx = index(points, field, false);

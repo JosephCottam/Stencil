@@ -73,7 +73,7 @@ public class JythonOperator implements DynamicStencilOperator {
 		
 		if (guideType == OpType.CATEGORIZE) {
 			Tuple t = inv.invoke(new Object[0]); //TODO: Verify somewhere that this block always takes zero arguments
-			return (List) t.get(t.getFields().get(0));	//TODO: Verify that this block always returns one value
+			return (List) t.get(t.getPrototype().get(0));	//TODO: Verify that this block always returns one value
 		} else if (guideType == OpType.PROJECT) {
 			Object[] results = new Object[sourceArguments.size()];
 			int i=0;
@@ -92,7 +92,7 @@ public class JythonOperator implements DynamicStencilOperator {
 	public boolean refreshGuide() {
 		if (invokeables.containsKey(DO_GUIDE_BLOCK_TAG) && invokeables.containsKey(GUIDE_BLOCK_TAG)) {
 			Tuple t = getFacet(DO_GUIDE_BLOCK_TAG).invoke(new Object[0]); //TODO: Verify somewhere that this block always takes zero arguments
-			return t.get(t.getFields().get(0)).equals("TRUE");	//TODO: Verify that this block always returns one value
+			return t.get(t.getPrototype().get(0)).equals("TRUE");	//TODO: Verify that this block always returns one value
 		}
 		throw new UnsupportedOperationException(String.format("Must supply '%1$s' and '%2$s' facets to use python block in a guide.", DO_GUIDE_BLOCK_TAG,GUIDE_BLOCK_TAG));
 	}

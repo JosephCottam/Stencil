@@ -124,12 +124,12 @@ public final class Text extends Basic {
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
 		format = TextFormats.make(source, option);
 		
-		if (option.hasField(HEIGHT.name)) {
+		if (option.getPrototype().contains(HEIGHT.name)) {
 			double height = Converter.toDouble(option.get(HEIGHT.name));
 			autoHeight = (height <= AUTO_SIZE);
 		} else {autoHeight = source.autoHeight;}
 		
-		if (option.hasField(WIDTH.name)) {
+		if (option.getPrototype().contains(WIDTH.name)) {
 			double width = Converter.toDouble(option.get(WIDTH.name));
 			autoWidth = (width <= AUTO_SIZE);
 		}else {autoWidth = source.autoWidth;}
@@ -137,10 +137,10 @@ public final class Text extends Basic {
 		//If there was no change to layout, just copy it; otherwise, recompute it
 		if (text.equals(source.text)
 			&& format.equals(source.format)
-			&& !option.hasField(X.name)
-			&& !option.hasField(Y.name) 
-			&& !option.hasField(WIDTH.name)
-			&& !option.hasField(HEIGHT.name)) {
+			&& !option.getPrototype().contains(X.name)
+			&& !option.getPrototype().contains(Y.name) 
+			&& !option.getPrototype().contains(WIDTH.name)
+			&& !option.getPrototype().contains(HEIGHT.name)) {
 			
 			this.renderedTextRef = source.renderedTextRef;
 			super.updateBoundsRef(source.bounds);

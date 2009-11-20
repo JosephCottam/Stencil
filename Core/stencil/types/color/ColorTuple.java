@@ -61,7 +61,7 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		super(color, true);
 	}
 	
-	public List<String> getFields() {return FIELDS;}
+	public List<String> getPrototype() {return FIELDS;}
 	public boolean hasField(String name) {return FIELDS.contains(name);}
 
 	public boolean isDefault(String fullName, Object value) {
@@ -109,7 +109,7 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		if (shortName == BLUE_FIELD) {return getBlue();}
 		if (shortName == ALPHA_FIELD) {return getAlpha();}
 		
-		throw new InvalidNameException(name, getFields());
+		throw new InvalidNameException(name, getPrototype());
 	}
 	
 	public ColorTuple modify(String name, Number value) {

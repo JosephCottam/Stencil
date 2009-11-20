@@ -66,7 +66,7 @@ public abstract class Target extends StencilTree {
 		List<String> fields = getPrototype();
 		List<Object> values = new java.util.ArrayList<Object>();
 
-		for (String name: source.getFields()) {
+		for (String name: source.getPrototype()) {
 			values.add(source.get(name));
 		}
 

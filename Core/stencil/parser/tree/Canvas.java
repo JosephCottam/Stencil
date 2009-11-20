@@ -41,7 +41,7 @@ public final class Canvas extends Target{
 	public Canvas(Token source) {super(source);}
 	
 	public void applyChanges(Tuple changes, StencilPanel panel) {
-		stencil.util.Tuples.transfer(changes, panel.getCanvas(), false);
+		stencil.util.Tuples.transfer(changes, panel.getCanvas());
 	}
 
 	/**Converts a name identifiable as a 'canvsField' into a regular

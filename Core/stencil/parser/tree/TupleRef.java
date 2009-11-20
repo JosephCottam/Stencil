@@ -67,7 +67,7 @@ public class TupleRef extends Value {
 		if (ref.isName()) {
 			return source.get(((Id) ref).getName());
 		} else if (ref.isNumber()){
-			List<String> fields = source.getFields();
+			List<String> fields = source.getPrototype();
 			String field = fields.get(toNumericRef(fields));
 			return source.get(field);
 		}

@@ -15,6 +15,11 @@ public final class Converter {
 		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
 		
 		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getNumber().doubleValue());}
+		
+		Class sourceClass = value.getClass();
+		if (TypesCache.hasTypeFor(sourceClass)) {return (Double) TypesCache.getType(sourceClass).convert(value, Double.class);}
+
+		
 		return Double.parseDouble(value.toString());
 	}
 	
@@ -22,6 +27,11 @@ public final class Converter {
 		if (value instanceof Float) {return (Float) value;}
 		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getNumber().floatValue());}
+		
+		Class sourceClass = value.getClass();
+		if (TypesCache.hasTypeFor(sourceClass)) {return (Float) TypesCache.getType(sourceClass).convert(value, Float.class);}
+
+		
 		return Float.parseFloat(value.toString());	
 	}
 	
@@ -29,6 +39,10 @@ public final class Converter {
 		if (value instanceof Integer) {return (Integer) value;}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getNumber().intValue());}
+
+		Class sourceClass = value.getClass();
+		if (TypesCache.hasTypeFor(sourceClass)) {return (Integer) TypesCache.getType(sourceClass).convert(value, Integer.class);}
+
 		return toFloat(value).intValue();
 	}
 	
@@ -38,6 +52,10 @@ public final class Converter {
 		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
 		if (value.getClass().isEnum()) {return ((Enum) value).name();}
 		if (value instanceof TupleRef && ((TupleRef) value).isNamedRef()) {return ((Id) ((TupleRef) value).getValue()).getName();}
+		
+		Class sourceClass = value.getClass();
+		if (TypesCache.hasTypeFor(sourceClass)) {return (String) TypesCache.getType(sourceClass).convert(value, String.class);}
+		
 		return value.toString();
 	}
 	
@@ -45,6 +63,10 @@ public final class Converter {
 		if (value instanceof Number) {return (Number)value;}
 		if (value instanceof ValueEnum) {return toNumber(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber();}
+		
+		Class sourceClass = value.getClass();
+		if (TypesCache.hasTypeFor(sourceClass)) {return (Number) TypesCache.getType(sourceClass).convert(value, Number.class);}
+
 		return toDouble(value); //TODO: have it try to figure if it is a whole number or a float..
 	}
 	

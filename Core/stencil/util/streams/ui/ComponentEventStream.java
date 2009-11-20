@@ -42,7 +42,7 @@ public final class ComponentEventStream implements TupleStream {
 			throw new InvalidNameException(name, FIELDS);
 		}
 
-		public List<String> getFields() {return FIELDS;}
+		public List<String> getPrototype() {return FIELDS;}
 		public boolean hasField(String name) {return FIELDS.contains(name);}
 		public boolean isDefault(String name, Object value) {return false;}		
 	}

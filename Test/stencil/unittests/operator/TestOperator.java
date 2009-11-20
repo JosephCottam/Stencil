@@ -39,7 +39,7 @@ public class TestOperator extends TestCase {
 		assertTrue("NoMatchException not thrown when expected.", error);
 
 		rv = legend.map("0", "1", "2");
-		assertEquals(3, rv.getFields().size());
+		assertEquals(3, rv.getPrototype().size());
 		assertEquals("0", rv.get("Z"));
 		assertEquals("1", rv.get("Y"));
 		assertEquals("2", rv.get("X"));

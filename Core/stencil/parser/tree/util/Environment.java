@@ -61,7 +61,7 @@ public class Environment implements Tuple {
  		EMPTY = new Environment() {
 	 		private final List<String> EMPTY_LIST = new ArrayList<String>();
 			public Object get(String field) {throw new UnknownNameException(field, EMPTY_LIST);}
-			public List<String> getFields() {return EMPTY_LIST;}
+			public List<String> getPrototype() {return EMPTY_LIST;}
  		};
  	}
 	
@@ -90,20 +90,20 @@ public class Environment implements Tuple {
 	public Environment pop() {return this.parent;}
 			
 	public Object get(String name) throws InvalidNameException {
-		if (update.hasField(name)) {return update.get(name);}
+		if (update.getPrototype().contains(name)) {return update.get(name);}
 		else if (this.frameName.equals(name)){return update;}
 		else {
 			try {return parent.get(name);}
-			catch (UnknownNameException e) {throw new UnknownNameException(e, frameName, update.getFields());}
+			catch (UnknownNameException e) {throw new UnknownNameException(e, frameName, update.getPrototype());}
 		}
 	}
 
 	//TODO: This is mostly unsuitable for frame-dereferencing.  It will work for default-reference and error reporting though!
-	public List<String> getFields() {
+	public List<String> getPrototype() {
 		ArrayList fields = new ArrayList();
-		fields.addAll(update.getFields());
+		fields.addAll(update.getPrototype());
 		if (frameName != NO_NAME) {fields.add(frameName);}
-		fields.addAll(parent.getFields());
+		fields.addAll(parent.getPrototype());
 		return fields;
 	}
 

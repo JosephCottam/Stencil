@@ -73,7 +73,7 @@ public abstract class KeyboardStream implements TupleStream {
 		public String getSource() {return source;}
 		public void setSource(String source) {this.source = source;}
 
-		public List<String> getFields() {
+		public List<String> getPrototype() {
 			if (fields == null) {
 				fields = new ArrayList<String>();
 				fields.add(KEY_FIELD);

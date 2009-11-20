@@ -1,6 +1,7 @@
 package stencil.unittests.types;
 
-import java.awt.Color;
+import java.awt.Color; 
+
 
 import stencil.types.Converter;
 import junit.framework.TestCase;
@@ -8,7 +9,10 @@ import junit.framework.TestCase;
 public class TestConverter extends TestCase {
 
 	public void testColor() {
-		assertEquals(Color.RED, Converter.convert("@color(1,0,0)", Color.class));
+		stencil.types.color.Color c = new stencil.types.color.Color();
+		
+		assertEquals(c.toTuple(Color.RED), Converter.convert("@color(1.0,0,0)", Color.class));
+		assertEquals(c.toTuple(Color.RED), Converter.convert("@color(255,0,0)", Color.class));
 	}
 	
 	public void testInteger() {
@@ -29,7 +33,7 @@ public class TestConverter extends TestCase {
 		assertEquals("1", Converter.toString(1));
 		assertEquals("203", Converter.toString(203));
 		assertEquals("1.0", Converter.toString(1.0));
-		assertEquals("@color(1,0,0)", Converter.toString(Color.RED));
+		assertEquals("@color(255,0,0)", Converter.toString(Color.RED));
 	}
 	
 }

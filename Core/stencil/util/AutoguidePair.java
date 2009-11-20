@@ -31,7 +31,7 @@ public final class AutoguidePair<I,R> implements Tuple {
 		throw new InvalidNameException(name);
 	}
 
-	public List<String> getFields() {return FIELDS;}
+	public List<String> getPrototype() {return FIELDS;}
 	public boolean hasField(String name) {return FIELDS.contains(name);}
 	public boolean isDefault(String name, Object value) {return false;}
 }

@@ -71,7 +71,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		if (index.containsKey(id)) {
 			T old = index.get(id);
 			rv = old;
-			if (values.getFields().size()>1) {
+			if (values.getPrototype().size()>1) {
 				rv = (T) rv.update(values);
 				index.put(id,rv);
 				fireLayerUpdate(old.getBoundsReference(), rv.getBoundsReference());
@@ -113,7 +113,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	private void setPrototype(T prototypeGlyph) {this.prototypeGlyph = prototypeGlyph;}
 
 	/**Get the tuple prototype of this table.*/
-	public List<String> getPrototype() {return prototypeGlyph.getFields();}
+	public List<String> getPrototype() {return prototypeGlyph.getPrototype();}
 	
 	public DisplayGuide getGuide(String attribute) {return guides.get(attribute);}
 	public void addGuide(String attribute, Guide2D guide) {guides.put(attribute, guide);}

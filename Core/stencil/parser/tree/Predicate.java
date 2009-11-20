@@ -68,7 +68,7 @@ public class Predicate extends StencilTree {
 			catch (Exception e) {throw new RuntimeException("Error applying function in predicate.");}
 
 			if (result == null){return null;}
-			String firstField = result.getFields().get(0);
+			String firstField = result.getPrototype().get(0);
 			return Atom.Literal.instance(result.get(firstField));
 		} else {
 			throw new RuntimeException("Unrecognized tree trying to extract values for filter.");

@@ -34,13 +34,10 @@ public interface Tuple {
 	public static final String DEFAULT_KEY = "VALUE";
 	public static final String SOURCE_KEY = "SOURCE";
 
-	/**Is this field known by this tuple?*/
-	public abstract boolean hasField(String name);
-
 	/**Get a listing of all fields known by this tuple (even if they are not set).
 	 * The order of the list corresponds to the index of the field number.
 	 * */
-	public abstract List<String> getFields();
+	public abstract List<String> getPrototype();
 
 	/**Returns the object as stored under the name.
 	 * @throws InvalidNameException The name passed is not valid for this tuple.*/

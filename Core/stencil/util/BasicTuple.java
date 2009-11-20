@@ -120,9 +120,9 @@ public final class BasicTuple implements Tuple {
 
 	public boolean hasField(String name) {return names.contains(name);}
 
-	public List<String> getFields() {return Collections.unmodifiableList(names);}
+	public List<String> getPrototype() {return Collections.unmodifiableList(names);}
 	public Object get(String name) throws InvalidNameException {
-		if (!names.contains(name)) {throw new InvalidNameException(name, getFields());}
+		if (!names.contains(name)) {throw new InvalidNameException(name, getPrototype());}
 		return values.get(names.indexOf(name));
 	}
 

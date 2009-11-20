@@ -47,8 +47,7 @@ public final class Tuples {
 	 * is required but cannot be supplied.*/
 	public static final Tuple EMPTY_TUPLE = new Tuple() {
 		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
-		public List<String> getFields() {return new ArrayList<String>();}
-		public boolean hasField(String name) {return false;}
+		public List<String> getPrototype() {return new ArrayList<String>();}
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
 	};
 
@@ -65,10 +64,8 @@ public final class Tuples {
 		
 		public Object get(String name) throws InvalidNameException {return map.get(name);}
 
-		public List<String> getFields() {return new ArrayList(map.keySet());}
-
-		public boolean hasField(String name) {return map.containsKey(name);}
-
+		public List<String> getPrototype() {return new ArrayList(map.keySet());}
+		
 		public boolean isDefault(String name, Object value) {return false;}
 	};
 
@@ -81,7 +78,7 @@ public final class Tuples {
 		
 		if (source == null) {return EMPTY_TUPLE;}
 		
-		for (String field:source.getFields()) {
+		for (String field:source.getPrototype()) {
 			if (field.startsWith(prefix)) {
 				values.add(source.get(field));
 				fields.add(field.substring(prefix.length()));
@@ -104,7 +101,7 @@ public final class Tuples {
 		if (source == null) {return Tuples.EMPTY_TUPLE;}
 		
 		List<String> attributes =  new ArrayList<String>();
-		attributes.addAll(source.getFields());
+		attributes.addAll(source.getPrototype());
 
 		Object[] values = new Object[attributes.size()];
 		for (int i=0; i< attributes.size(); i++) {
@@ -131,13 +128,13 @@ public final class Tuples {
 	 * 
 	 * TODO: Make it so it can optionally report errors
 	 */
-	public static final MutableTuple transfer(Tuple source, MutableTuple target, boolean defaults) {
-		for (String field:source.getFields()) {
+	public static final MutableTuple transfer(Tuple source, MutableTuple target) {
+		for (String field:source.getPrototype()) {
 			try {
 				Object sourceValue = source.get(field);
 				Object targetValue = target.get(field);
 				if (sourceValue == targetValue || sourceValue.equals(targetValue)) {continue;}	//Skip values that are equal.
-				if (defaults || !source.isDefault(field, sourceValue)) {target.set(field, sourceValue);}
+				if (!source.isDefault(field, sourceValue)) {target.set(field, sourceValue);}
 			} catch (Throwable e) {/*HACK: Errors are ignored, so transfer may not be successful but execution does not know that!*/}
 		}
 		return target;
@@ -155,8 +152,9 @@ public final class Tuples {
 	 * @return
 	 */
 	public static boolean transferNeutral(Tuple source, Tuple target) {
-		for (String field: source.getFields()) {
-			if (!target.hasField(field)) {return false;}
+		List<String> targetFields = target.getPrototype();
+		for (String field: source.getPrototype()) {
+			if (!targetFields.contains(field)) {return false;}
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
 			if (targetValue == sourceValue ||
@@ -175,7 +173,7 @@ public final class Tuples {
 	 * alphabetical order when using this method.
 	 *
 	 * **/
-	public static String toString(Tuple t) {return toString(t, t.getFields());}
+	public static String toString(Tuple t) {return toString(t, t.getPrototype());}
 	
 	/**Provide a string representation of the tuple, 
 	 * but only include the fields in the passed list.
@@ -240,13 +238,11 @@ public final class Tuples {
 				return values.get(name);
 			}
 
-			public List<String> getFields() {
+			public List<String> getPrototype() {
 				String[] names = values.keySet().toArray(new String[]{});
 				Arrays.sort(names);
 				return Arrays.asList(names);
 			}
-
-			public boolean hasField(String name) {return values.keySet().contains(name);}
 
 			public boolean isDefault(String name, Object value) {return false;}
 
@@ -263,11 +259,11 @@ public final class Tuples {
 		if (source2 == null || source2 == EMPTY_TUPLE) {return source1;}
 
 		IncrimentalTuple result = new IncrimentalTuple();
-		for (String name: source1.getFields()) {
+		for (String name: source1.getPrototype()) {
 			Object value = source1.get(name);
 			result.addField(name, value);
 		}
-		for (String name: source2.getFields()) {
+		for (String name: source2.getPrototype()) {
 			Object value = source2.get(name);
 			result.addField(name, value);
 		}
@@ -278,9 +274,9 @@ public final class Tuples {
 	
 	/**Produces an array version of a tuple.  Value are in the same order as the original tuple fields.**/
 	public static Object[] toArray(Tuple t) {
-		Object[] values = new Object[t.getFields().size()];
+		Object[] values = new Object[t.getPrototype().size()];
 		int i=0;
-		for (String field:t.getFields()) {values[i++] = t.get(field);}
+		for (String field:t.getPrototype()) {values[i++] = t.get(field);}
 		return values;
 	}
 	

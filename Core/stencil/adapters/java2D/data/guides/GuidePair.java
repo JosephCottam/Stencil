@@ -25,8 +25,8 @@ final class GuidePair<T> implements Tuple {
 		throw new InvalidNameException(name, FIELDS);
 	}
 	
-	public List<String> getFields() {return FIELDS;}
-	public boolean hasField(String name) {return getFields().contains(name);}
+	public List<String> getPrototype() {return FIELDS;}
+	public boolean hasField(String name) {return getPrototype().contains(name);}
 	public boolean isDefault(String name, Object value) {return false;}
 	public String toString() {return Tuples.toString(this);}
 

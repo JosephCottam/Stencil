@@ -36,7 +36,7 @@ public class TwitterTuples extends CacheFeed<HttpClient> {
 			throw new InvalidNameException(name);
 		}
 
-		public List<String> getFields() {return java.util.Arrays.asList(FIELDS);}
+		public List<String> getPrototype() {return java.util.Arrays.asList(FIELDS);}
 
 		public boolean hasField(String name) {
 			try {get(name);}

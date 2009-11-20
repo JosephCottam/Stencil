@@ -68,7 +68,7 @@ public class TupleUtil extends BasicModule {
 			int sum =0;
 			for (Object o: args) {
 				if (o instanceof Tuple) {
-					sum += ((Tuple) args[0]).getFields().size();
+					sum += ((Tuple) args[0]).getPrototype().size();
 				} else {sum++;}
 			}
 			return BasicTuple.singleton(sum);

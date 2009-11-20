@@ -192,7 +192,7 @@ public final class Fills {
 		Color back = (Color) FillProperty.PATTERN_BACK.defaultValue;
 		
 		for (Tuple t: sources) {
-			for (String f: t.getFields()) {
+			for (String f: t.getPrototype()) {
 				if (EnumUtils.contains(FillProperty.class, f)) {
 					FillProperty att = FillProperty.valueOf(f);
 					Object value = t.get(f);

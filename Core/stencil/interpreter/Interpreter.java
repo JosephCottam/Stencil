@@ -101,7 +101,7 @@ public class Interpreter {
 					env = buildEnvironment(source, local);
 					try {
 						result = process(group.getGlyphRules(), env);
-						if (result != null && result.hasField(ParserConstants.GLYPH_ID_FIELD)) {
+						if (result != null && result.getPrototype().contains(ParserConstants.GLYPH_ID_FIELD)) {
 							try {
 								//TODO: What about locals in a dynamic binding?
 								stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
@@ -115,13 +115,13 @@ public class Interpreter {
 					
 					try {
 						Tuple viewUpdate = process(group.getViewRules(), env);
-						if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global, false);}
+						if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global);}
 					}
 					catch (Exception e) {throw new RuntimeException(format("Error processing view rules in layer %1$s.", layer.getName()), e);}
 					
 					try{
 						Tuple canvasUpdate = process(group.getCanvasRules(), env);
-						if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global, false);}
+						if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global);}
 					} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in layer %1$s.", layer.getName()), e);}
 
 				}
@@ -133,7 +133,7 @@ public class Interpreter {
 		Environment e = new Environment(ParserConstants.CANVAS_PREFIX, Canvas.global);
 		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
 		
-		if (stream.hasField(Tuple.SOURCE_KEY)) {
+		if (stream.getPrototype().contains(Tuple.SOURCE_KEY)) {
 			e = e.append(Converter.toString(stream.get(Tuple.SOURCE_KEY)), stream); //TODO: BAD JOSEPH.  Using named references			
 		} else {
 			e = e.append(stream);

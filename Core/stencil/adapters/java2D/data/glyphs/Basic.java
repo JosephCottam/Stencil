@@ -151,13 +151,13 @@ public abstract class Basic implements Glyph2D {
 		if (IMPLANTATION.is(name)) {return getImplantation();}
 		if (REGISTRATION.is(name)) {return registration;}
 		if (VISIBLE.is(name)) {return visible;}
-		throw new InvalidNameException(name, getFields());
+		throw new InvalidNameException(name, getPrototype());
 	}
 
 
 	public String getLayerName() {return layer==null?null:layer.getName();}
 	
-	public List<String> getFields() {return getAttributes().getNames();}
+	public List<String> getPrototype() {return getAttributes().getNames();}
 
 	public boolean hasField(String name) {return getAttributes().getNames().contains(name);}
 
@@ -170,7 +170,7 @@ public abstract class Basic implements Glyph2D {
 	 * Only reports settable fields.
 	 **/
 	public String toString() {
-		List<String> includeFields = getFields();
+		List<String> includeFields = getPrototype();
 		List<String> omitFields = getUnsettables().getNames();
 		
 		includeFields.removeAll(omitFields);
@@ -187,7 +187,7 @@ public abstract class Basic implements Glyph2D {
 	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
 	protected static final <T> T safeGet(Tuple source, Attribute<T> att) {
 		String field = att.name;
-		return (!source.hasField(field)) ? null : (T) Converter.convert(source.get(field), att.type);
+		return (!source.getPrototype().contains(field)) ? null : (T) Converter.convert(source.get(field), att.type);
 	}
 	
 	/**REturn either the candidate value -or- if it is null, the defaultValue.*/
@@ -198,7 +198,7 @@ public abstract class Basic implements Glyph2D {
 	/**Ensure that the tuple passed does not have any of the listed 'unsettable' fields.*/
 	protected final void validateOptions(Tuple t, AttributeList unsettables) {
 		for (Attribute att: unsettables) {
-			if (t.hasField(att.name)) {
+			if (t.getPrototype().contains(att.name)) {
 				throw new IllegalArgumentException(String.format("Cannot set field %1$s on glyph of type %2$s", att.name, getImplantation()));
 			}
 		}
@@ -284,9 +284,9 @@ public abstract class Basic implements Glyph2D {
 		
 		//If registrations are split between before and after AND the coordinates are also split, take the old partial value to the new registration system
 		if (source.registration != reg) {
-			if (option.hasField(X.name) && !option.hasField(Y.name)) {	
+			if (option.getPrototype().contains(X.name) && !option.getPrototype().contains(Y.name)) {	
 				y = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getY();	
-			} else if (!option.hasField(X.name) && option.hasField(Y.name)) {
+			} else if (!option.getPrototype().contains(X.name) && option.getPrototype().contains(Y.name)) {
 				x = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getX();
 			}
 			//Any other case and both X and Y came from the same source, so it will be registration consistent.

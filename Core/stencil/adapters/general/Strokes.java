@@ -146,7 +146,7 @@ public final class Strokes {
 		Integer joinStyle = null;
 		
 		for (Tuple t: sources) {
-			for (String f: t.getFields()) {
+			for (String f: t.getPrototype()) {
 				if (EnumUtils.contains(StrokeProperty.class, f)) {
 					StrokeProperty p = StrokeProperty.valueOf(f);
 					Object value = t.get(f);

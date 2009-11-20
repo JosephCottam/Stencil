@@ -119,7 +119,7 @@ class MDTreeAdapter extends CommonTreeAdaptor {
 		public String getDescription() {return getChild(1).getText();}
 
 		public Class getModuleClass() throws Exception {
-			return ClassLoader.getSystemClassLoader().loadClass(getModuleClassName());
+			return MDTreeAdapter.class.getClassLoader().loadClass(getModuleClassName());
 		}
 		
 		public Module getModule() {

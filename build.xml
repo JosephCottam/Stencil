@@ -1,4 +1,6 @@
-
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
  <project name="Stencil" default="Stencil" basedir=".">
  	<property name="src" location="Core" />
  	<property name="target" location="bin" />
@@ -239,17 +241,18 @@
  		
  		<copy todir="${release}" overwrite="true">
  			<fileset dir="./ReleaseIncludes/" includes="**"/>
- 			<fileset dir="." includes="build.xml"/>
  		</copy>
  		
  		<!--Create the zip files-->
- 		<zip destfile="${result}" basedir="${release}" update="true"/>
+ 		<zip destfile="${result}" basedir="${release}"/>
  		
- 		<zip destfile="src_${today}.zip" >
- 			<fileset dir="Core"/>
- 			<fileset dir="Explore"/>
- 			<fileset dir="Test"/>
- 			<fileset dir="ReleaseIncludes"/>
+ 		<zip destfile="src_${today}.zip" basedir=".">
+ 			<exclude name="**/jrat.output/**" />
+ 			<exclude name="**/TestData/**" />
+ 			<exclude name="**/bin/**" />
+ 			<exclude name="**/${release}/**" />
+ 			<exclude name="jrat.xml"/>
+ 			<exclude name="*.zip"/>
  		</zip>
  		
  		<!--Clean up temporaries-->

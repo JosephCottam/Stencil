@@ -130,7 +130,7 @@ public final class TextFormats {
 		Justification just = (Justification) TextProperty.JUSTIFY.defaultValue;
 		
 		for (Tuple t: sources) {
-			for (String field: t.getFields()) {
+			for (String field: t.getPrototype()) {
 				if (EnumUtils.contains(TextProperty.class, field)) {
 					TextProperty p = TextProperty.valueOf(field);
 					Object value = t.get(field);

@@ -40,7 +40,7 @@ public class View extends Target {
 	public View(Token source) {super(source);}
 
 	public void applyChanges(Tuple changes, StencilPanel panel) {
-		stencil.util.Tuples.transfer(changes, panel.getView(), false);
+		stencil.util.Tuples.transfer(changes, panel.getView());
 	}
 	
 	/**Converts a name identifiable as a 'viewField' into a regular field name.*/

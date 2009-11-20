@@ -34,7 +34,7 @@ public final class DateTuple implements Tuple {
 		throw new InvalidNameException(name, EnumUtils.allNames(FIELD.class));
 	}
 
-	public List<String> getFields() {return FIELDS;}
+	public List<String> getPrototype() {return FIELDS;}
 
 	public boolean hasField(String name) {return FIELDS.contains(name);}
 

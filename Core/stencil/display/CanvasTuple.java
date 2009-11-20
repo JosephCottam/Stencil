@@ -119,9 +119,9 @@ public interface CanvasTuple extends MutableTuple {
 		public double getHeight() {return getBounds().getHeight();}
 
 		
-		public List<String> getFields() {return FIELDS;}
+		public List<String> getPrototype() {return FIELDS;}
 		
-		public boolean hasField(String name) {return getFields().contains(name);}
+		public boolean hasField(String name) {return getPrototype().contains(name);}
 
 		public String toString() {return stencil.util.Tuples.toString(this);}
 		
