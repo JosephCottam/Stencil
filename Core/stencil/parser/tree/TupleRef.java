@@ -2,7 +2,8 @@ package stencil.parser.tree;
 
 import java.util.List;
 import org.antlr.runtime.Token;
-import stencil.streams.Tuple;
+
+import stencil.tuple.Tuple;
 
 /**Unpack a tuple reference.*/
 public class TupleRef extends Value {

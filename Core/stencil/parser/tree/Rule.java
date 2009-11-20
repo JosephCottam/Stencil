@@ -31,7 +31,7 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.parser.string.StencilParser;
 
 /** A rule is a group of calls and a tuple prototype.

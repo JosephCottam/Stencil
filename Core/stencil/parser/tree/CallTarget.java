@@ -31,7 +31,7 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**A call target is something that can be on the right-hand-side
  * of a call operator (an yield variant).

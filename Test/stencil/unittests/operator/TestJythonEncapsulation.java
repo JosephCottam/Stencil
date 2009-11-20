@@ -4,7 +4,7 @@ import stencil.operator.module.ModuleCache;
 import stencil.operator.wrappers.EncapsulationGenerator;
 import stencil.operator.wrappers.JythonEncapsulation;
 import stencil.parser.tree.Python;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import junit.framework.TestCase;
 import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;

@@ -43,8 +43,8 @@ import stencil.adapters.general.Registrations;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 public final class Image extends Basic {
 	private static final double AUTO_SCALE = -1;

@@ -3,7 +3,7 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public class Consumes extends StencilTree {
 	public Consumes(Token source) {super(source);}

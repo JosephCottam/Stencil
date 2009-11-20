@@ -33,8 +33,8 @@ import org.python.core.*;
 
 import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 
 import java.util.List;

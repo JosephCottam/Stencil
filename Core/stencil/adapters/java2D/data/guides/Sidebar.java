@@ -21,11 +21,11 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
 import stencil.util.AutoguidePair;
-import stencil.util.BasicTuple;
-import stencil.util.Tuples;
 
 public class Sidebar implements Guide2D {
 	

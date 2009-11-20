@@ -10,8 +10,8 @@ import twitter4j.http.Response;
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.io.SyndFeedInput;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
 import stencil.util.collections.*;
 
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)

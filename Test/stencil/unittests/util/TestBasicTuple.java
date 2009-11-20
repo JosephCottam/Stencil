@@ -4,8 +4,8 @@ import junit.framework.TestCase;
 import java.util.List;
 import java.util.Arrays;
 
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public class TestBasicTuple extends TestCase {
 	private Tuple reference;

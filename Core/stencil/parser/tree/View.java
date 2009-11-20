@@ -32,7 +32,7 @@ import org.antlr.runtime.Token;
 import stencil.display.StencilPanel;
 import stencil.display.ViewTuple;
 import stencil.parser.ParserConstants;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public class View extends Target {
 	public static ViewTuple global;
@@ -40,7 +40,7 @@ public class View extends Target {
 	public View(Token source) {super(source);}
 
 	public void applyChanges(Tuple changes, StencilPanel panel) {
-		stencil.util.Tuples.transfer(changes, panel.getView());
+		stencil.tuple.Tuples.transfer(changes, panel.getView());
 	}
 	
 	/**Converts a name identifiable as a 'viewField' into a regular field name.*/

@@ -2,9 +2,9 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.Tuples;
 
 public class Guide extends StencilTree {
 	public static final String SAMPLE= "sample";	//HACK: Magic constant .... TODO: How can we tie this back to something

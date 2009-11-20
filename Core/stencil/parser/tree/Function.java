@@ -35,7 +35,7 @@ import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.util.MultiPartName;
 
 

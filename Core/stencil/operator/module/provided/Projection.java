@@ -38,8 +38,8 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";

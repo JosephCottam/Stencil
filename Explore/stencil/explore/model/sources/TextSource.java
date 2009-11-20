@@ -35,9 +35,9 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Text;
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 
 public final class TextSource extends StreamSource {

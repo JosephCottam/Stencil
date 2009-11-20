@@ -6,7 +6,7 @@ import stencil.operator.wrappers.SyntheticOperator;
 import stencil.operator.wrappers.SyntheticOperator.NoMatchException;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import junit.framework.TestCase;
 
 public class TestOperator extends TestCase {

@@ -29,8 +29,8 @@
 package stencil.adapters;
 
 import stencil.display.StencilPanel;
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 import stencil.util.streams.txt.InvalidInputLineException;
 
 /**Load tuples from a stream source into the program

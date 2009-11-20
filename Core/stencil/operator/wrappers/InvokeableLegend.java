@@ -7,8 +7,8 @@ import java.util.Arrays;
 import stencil.operator.util.BasicProject;
 import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Value;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 
 /**Wraps a Method/Target pair as a legend.

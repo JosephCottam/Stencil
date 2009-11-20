@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 /**End-of-call-chain entity that create a new tuple in its
  * apply with all of the proper names aligned.

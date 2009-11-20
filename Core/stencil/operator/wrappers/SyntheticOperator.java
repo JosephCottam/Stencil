@@ -39,8 +39,8 @@ import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 /**Legend defined through a stencil definition.
  * TODO: Add compiler step to fold these legends directly into the call chains if only has one rule predicate on ALL and has no specialization

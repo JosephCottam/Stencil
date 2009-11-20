@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 import static java.lang.String.format;
 

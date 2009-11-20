@@ -28,7 +28,7 @@
  */
 package stencil.types;
 
-import stencil.streams.MutableTuple;
+import stencil.tuple.MutableTuple;
 
 /**Sigil type that indicates its tuples are mutable.*/
 public interface MutableSigilType<E, I extends MutableTuple> extends SigilType<E, I>{

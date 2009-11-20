@@ -37,9 +37,9 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.parser.tree.View;
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 import stencil.util.enums.EnumUtils;
 
 /**A way to track the mouse position/state at all points in time.

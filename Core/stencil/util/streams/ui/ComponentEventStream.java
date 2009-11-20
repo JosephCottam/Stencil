@@ -9,9 +9,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 public final class ComponentEventStream implements TupleStream {
 	public static final List<String> FIELDS = Arrays.asList("SOURCE", "X", "Y", "WIDTH", "HEIGHT");

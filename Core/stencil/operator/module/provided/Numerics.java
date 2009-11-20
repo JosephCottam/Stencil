@@ -36,8 +36,8 @@ import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Range;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public class Numerics extends BasicModule {
 

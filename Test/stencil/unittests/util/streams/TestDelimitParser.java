@@ -1,6 +1,6 @@
 package stencil.unittests.util.streams;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.util.streams.txt.*;
 import junit.framework.TestCase;
 import junit.framework.Assert;

@@ -2,9 +2,9 @@ package stencil.util.streams.sql;
 
 import java.sql.*;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,

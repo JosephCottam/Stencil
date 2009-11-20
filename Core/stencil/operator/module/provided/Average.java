@@ -37,9 +37,9 @@ import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import stencil.util.BasicTuple;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)

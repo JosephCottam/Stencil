@@ -32,8 +32,8 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 
 /**A legend action is a filter plus a rule.

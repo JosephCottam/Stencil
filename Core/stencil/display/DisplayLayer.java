@@ -31,7 +31,7 @@ package stencil.display;
 import java.util.Iterator;
 import java.util.List;
 import stencil.adapters.Glyph;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**Name of the method that should be invoked by clients wanting to use this legend*/

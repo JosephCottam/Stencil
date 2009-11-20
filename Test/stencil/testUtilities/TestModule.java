@@ -7,8 +7,8 @@ import stencil.operator.module.util.*;
 import stencil.operator.wrappers.InvokeableLegend;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import java.lang.reflect.*;
 
 public class TestModule implements Module {

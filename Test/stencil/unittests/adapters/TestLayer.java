@@ -7,8 +7,8 @@ import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public abstract class TestLayer extends junit.framework.TestCase {
 	String ruleSources ="external stream Stream1(A,B,C) layer Layer1 from Stream1 X: A";

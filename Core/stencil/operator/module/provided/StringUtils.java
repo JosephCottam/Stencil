@@ -30,9 +30,9 @@ package stencil.operator.module.provided;
 
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import stencil.util.BasicTuple;
 
 public class StringUtils extends BasicModule {
 	/**Print the passed tuple. Replaces names with new names.*/

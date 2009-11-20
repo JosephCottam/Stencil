@@ -2,8 +2,8 @@ package stencil.util.streams.feed;
 
 import java.util.*;
 
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import stencil.util.collections.MarkSweepSet;
 
 import com.sun.syndication.feed.synd.*;

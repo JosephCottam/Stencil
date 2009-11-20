@@ -33,8 +33,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
 import static stencil.parser.ParserConstants.INITIATOR;
 import static stencil.parser.ParserConstants.TERMINATOR;
 import static stencil.parser.ParserConstants.SEPARATOR;

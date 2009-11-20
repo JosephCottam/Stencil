@@ -28,8 +28,8 @@
  */
 package stencil.util.streams;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 import java.util.Arrays;
 import java.util.List;

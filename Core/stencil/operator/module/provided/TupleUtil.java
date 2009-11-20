@@ -8,8 +8,8 @@ import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 
 public class TupleUtil extends BasicModule {

@@ -40,7 +40,7 @@ import stencil.adapters.general.Fills.FillProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.color.Color;
 
 public abstract class Filled extends Stroked {

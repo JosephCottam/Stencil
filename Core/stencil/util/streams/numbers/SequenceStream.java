@@ -4,9 +4,9 @@ import static java.lang.String.format;
 
 import java.util.NoSuchElementException;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 public class SequenceStream implements TupleStream {
 	private final long length;

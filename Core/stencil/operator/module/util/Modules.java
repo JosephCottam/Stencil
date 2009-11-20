@@ -36,7 +36,7 @@ import java.lang.reflect.Modifier;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.wrappers.InvokeableLegend;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
@@ -122,7 +122,7 @@ public final class Modules {
 
 	/**Verify that the passed method could be used as stencil legend.*/
 	public static boolean isFacet(Method m) {
-		return stencil.streams.Tuple.class.isAssignableFrom(m.getReturnType());
+		return stencil.tuple.Tuple.class.isAssignableFrom(m.getReturnType());
 	}
 	
 	/**Return a mutableLegendData object with the default facets and specializer.

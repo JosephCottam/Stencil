@@ -9,8 +9,8 @@ import java.util.List;
 import static stencil.operator.util.BasicProject.packArguments;
 import static stencil.parser.ParserConstants.*;
 
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.OperatorData.OpType;

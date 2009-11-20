@@ -31,7 +31,7 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.parser.tree.util.Environment;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**A call chain is a linear group of calls, ending in a pack.
  * Call chains MAY start with any call target.

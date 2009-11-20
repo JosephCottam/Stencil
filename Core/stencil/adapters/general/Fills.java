@@ -42,7 +42,7 @@ import java.awt.TexturePaint;
 import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.EnumUtils;

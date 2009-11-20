@@ -36,9 +36,9 @@ import java.awt.geom.Point2D;
 import java.awt.Graphics2D;
 import java.lang.ref.SoftReference;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.Tuples;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Strokes;

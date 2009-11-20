@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.MutableTuple;
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.MutableTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.BasicTuple;
-import stencil.util.Tuples;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 

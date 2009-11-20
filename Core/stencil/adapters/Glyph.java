@@ -1,6 +1,6 @@
 package stencil.adapters;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**Tagging interface for the glyph representation of an adapter.
  * It is suggested that each 

@@ -39,9 +39,9 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.View;
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import stencil.util.BasicTuple;
 import stencil.util.DoubleDimension;
 
 public class Transform extends BasicModule {

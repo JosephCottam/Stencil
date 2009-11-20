@@ -37,9 +37,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
-import stencil.streams.InvalidNameException;
-import stencil.streams.MutableTuple;
-import stencil.types.Converter;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.MutableTuple;
 import stencil.util.enums.Attribute;
 
 /**The CanvasTuple represents an actual drawing surface
@@ -123,7 +122,7 @@ public interface CanvasTuple extends MutableTuple {
 		
 		public boolean hasField(String name) {return getPrototype().contains(name);}
 
-		public String toString() {return stencil.util.Tuples.toString(this);}
+		public String toString() {return stencil.tuple.Tuples.toString(this);}
 		
 		/**Gets the default value for the named property.
 		 * If the named property has no defined default, it is assumed to be 'null'.

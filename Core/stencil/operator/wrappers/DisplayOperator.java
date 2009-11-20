@@ -8,7 +8,7 @@ import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData;
 import stencil.operator.module.util.Modules;
 import stencil.parser.tree.Value;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**Wraps a layer as a legend. 
  * Exposes find, makeOrFind, make and remove.

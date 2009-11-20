@@ -31,7 +31,8 @@ package stencil.parser.tree;
 import java.util.Arrays;
 import java.util.List;
 import org.antlr.runtime.Token;
-import stencil.streams.Tuple;
+
+import stencil.tuple.Tuple;
 import static stencil.parser.string.StencilParser.*;
 
 public abstract class Atom extends Value {

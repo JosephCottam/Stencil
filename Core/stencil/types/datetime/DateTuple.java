@@ -2,8 +2,9 @@ package stencil.types.datetime;
 
 import java.util.List;
 import java.util.Calendar;
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
 import stencil.util.enums.EnumUtils;
 
 public final class DateTuple implements Tuple {

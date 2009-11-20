@@ -45,9 +45,9 @@ import stencil.parser.tree.Specializer;
 import stencil.parser.tree.StencilNumber;
 import stencil.parser.tree.StencilString;
 import stencil.parser.tree.Value;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
-import stencil.util.Tuples;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 public class StencilUtil extends BasicModule {
 	private static abstract class EchoBase implements StencilOperator{

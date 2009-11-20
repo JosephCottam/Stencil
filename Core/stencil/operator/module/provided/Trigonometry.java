@@ -2,8 +2,8 @@ package stencil.operator.module.provided;
 
 import stencil.operator.module.ModuleData;
 import stencil.operator.module.util.BasicModule;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public class Trigonometry extends BasicModule {
 	public Trigonometry(ModuleData md) {super(md);}

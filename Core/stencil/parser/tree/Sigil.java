@@ -29,7 +29,8 @@
 package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
-import stencil.streams.Tuple;
+
+import stencil.tuple.Tuple;
 import stencil.types.TypesCache;
 import stencil.types.SigilType;
 

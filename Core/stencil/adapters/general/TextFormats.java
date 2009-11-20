@@ -34,7 +34,7 @@ import java.awt.Paint;
 import java.awt.Color;
 import java.awt.Font;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.EnumUtils;

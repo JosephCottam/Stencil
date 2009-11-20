@@ -32,8 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
 
 public class Environment implements Tuple {
  	private static final  class UnknownNameException extends RuntimeException {

@@ -7,7 +7,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.interpreter.DynamicRule;
 import stencil.parser.tree.Rule;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public class DynamicUpdater implements Runnable, Stopable {
 	private boolean run = true;

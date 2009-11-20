@@ -3,7 +3,8 @@ package stencil.parser.tree;
 import static stencil.parser.string.StencilParser.TUPLE_REF;
 
 import org.antlr.runtime.Token;
-import stencil.streams.Tuple;
+
+import stencil.tuple.Tuple;
 
 /**Base class of all Value objects.
  *

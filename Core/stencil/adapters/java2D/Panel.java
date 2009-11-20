@@ -34,7 +34,7 @@ import stencil.adapters.java2D.util.GuideUpdater;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.epsExport.EpsGraphics2D;
 

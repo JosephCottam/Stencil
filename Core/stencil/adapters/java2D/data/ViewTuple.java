@@ -35,7 +35,7 @@ import java.awt.geom.Point2D;
 
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.Panel;
-import stencil.streams.InvalidNameException;
+import stencil.tuple.InvalidNameException;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 import stencil.util.enums.EnumUtils;

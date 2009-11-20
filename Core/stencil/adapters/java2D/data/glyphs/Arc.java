@@ -39,8 +39,8 @@ import stencil.adapters.general.Strokes;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 public class Arc extends Stroked {
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);

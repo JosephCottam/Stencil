@@ -2,7 +2,7 @@ package stencil.util;
 
 import java.util.Comparator;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**Sorts tuples based on a given field.
  * 

@@ -22,10 +22,10 @@ import stencil.adapters.general.TextFormats;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
-import stencil.util.Tuples;
 
 public final class Text extends Basic {
 	

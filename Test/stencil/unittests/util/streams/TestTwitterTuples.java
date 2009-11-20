@@ -2,8 +2,8 @@ package stencil.unittests.util.streams;
 
 import java.util.HashSet;
 import junit.framework.*;
+import stencil.tuple.Tuple;
 import stencil.util.streams.feed.*;
-import stencil.streams.Tuple;
 
 
 public class TestTwitterTuples extends TestCase {

@@ -6,7 +6,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Twitter;
-import stencil.streams.TupleStream;
+import stencil.tuple.TupleStream;
 import stencil.util.streams.feed.TwitterTuples;
 
 

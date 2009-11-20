@@ -35,9 +35,9 @@ import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.Tuples;
 
 public class Interpreter {
 	private final StencilPanel panel;

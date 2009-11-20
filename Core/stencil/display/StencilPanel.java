@@ -44,7 +44,7 @@ import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.View;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**Wraps the layers and glyphs to tie them to a display context.
  * 

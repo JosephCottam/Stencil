@@ -26,37 +26,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.types;
+package stencil.tuple;
 
-import stencil.tuple.Tuple;
+import java.util.*;
 
-import java.util.List;
-import stencil.parser.tree.Value;
+/**Thrown to indicate that a name has been requested that could not be found in the tuple.
+ *
+ * @author jcottam
+ *
+ */
+public class InvalidNameException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-public interface SigilType<E, T extends Tuple> {	
-	/**Convert an external representation to an tuple representation.*/
-	public E toExternal(T source);
+	public InvalidNameException(String name) {this(name, Arrays.asList(new String[0]));}
+	public InvalidNameException(String name, Collection<String> valid) {this(name, valid, null);}
 	
-	/**Convert a tuple representation to an external representation.*/
-	public T toTuple(E source);
-	
-	/**Convert the source to a string representation.  The
-	 * string representation should be stencil-language compatible
-	 * to reconstruct the external value passed.
-	 */
-	public String toString(E source);
-	
-	/**General conversion that convert to or from 
-	 * the tuple and external representations.
-	 * 
-	 * @param value
-	 * @param target
-	 * @return
-	 */
-	public Object convert(Object value, Class target);
-	
-	
-	/**Create a new instance of the tuple representaiton.*/
-	public T create(List<Value> args) throws TypeCreationException;
-	
+	public InvalidNameException(String name, Collection<String> valid, Throwable e) {
+		super(String.format("Could not find field of name \"%1$s\" in tuple (valid names: %2$s).", name, Arrays.deepToString(valid.toArray())), e);
+	}
 }

@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 import stencil.util.collections.ConditionSet;
 
 public abstract class CacheFeed<T> implements TupleStream {

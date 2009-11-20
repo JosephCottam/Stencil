@@ -3,8 +3,8 @@ package stencil.operator.util;
 import java.util.Arrays;
 import java.util.List;
 
-import stencil.util.Tuples;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.operator.StencilOperator;
 import stencil.parser.tree.TupleRef;
 import stencil.parser.tree.Value;

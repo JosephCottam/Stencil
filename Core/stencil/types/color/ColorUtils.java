@@ -28,12 +28,12 @@
  */
 package stencil.types.color;
 
-import stencil.streams.Tuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.operator.module.ModuleData;
 import stencil.operator.module.util.BasicModule;
 import stencil.parser.tree.Value;
-import stencil.util.BasicTuple;
 
 public final class ColorUtils extends BasicModule {
 	//TODO: Somehow tie these utilities to the color type instantiated.

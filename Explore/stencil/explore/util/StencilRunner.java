@@ -40,7 +40,7 @@ import stencil.explore.model.Model;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.adapters.Adapter;
-import stencil.streams.TupleStream;
+import stencil.tuple.TupleStream;
 import stencil.util.streams.ConcurrentStream;
 import stencil.parser.tree.Order;
 import stencil.parser.tree.Atom;

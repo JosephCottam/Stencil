@@ -30,8 +30,8 @@ package stencil.util.streams.ui;
 
 import javax.swing.JComponent;
 
-import stencil.streams.Tuple;
-import stencil.streams.TupleStream;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 
 import java.io.DataInputStream;
 import java.io.InputStream;

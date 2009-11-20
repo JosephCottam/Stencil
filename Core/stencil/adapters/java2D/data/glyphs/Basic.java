@@ -46,10 +46,10 @@ import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.Tuples;
 import static stencil.adapters.general.Registrations.*;
 
 public abstract class Basic implements Glyph2D {

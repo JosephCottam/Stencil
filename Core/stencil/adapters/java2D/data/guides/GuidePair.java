@@ -3,9 +3,9 @@ package stencil.adapters.java2D.data.guides;
 import java.util.Arrays;
 import java.util.List;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
-import stencil.util.Tuples;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 /**Result pair used to create a legend.
  * AutoGuide pairs are converted into these input/output pairs.

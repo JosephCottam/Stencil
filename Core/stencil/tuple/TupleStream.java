@@ -26,37 +26,22 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.types;
+package stencil.tuple;
 
-import stencil.tuple.Tuple;
+import java.util.Iterator;
 
-import java.util.List;
-import stencil.parser.tree.Value;
-
-public interface SigilType<E, T extends Tuple> {	
-	/**Convert an external representation to an tuple representation.*/
-	public E toExternal(T source);
-	
-	/**Convert a tuple representation to an external representation.*/
-	public T toTuple(E source);
-	
-	/**Convert the source to a string representation.  The
-	 * string representation should be stencil-language compatible
-	 * to reconstruct the external value passed.
-	 */
-	public String toString(E source);
-	
-	/**General conversion that convert to or from 
-	 * the tuple and external representations.
-	 * 
-	 * @param value
-	 * @param target
+/**An iterator that generates tuples.
+ *
+ * HasNext should return false ONLY if the stream is definitely exhausted.
+ * Calling 'next' should always immediately return, but it may return null
+ * if there is nothing ready, but the stream is not yet terminated.
+ *
+ * */
+public interface TupleStream extends Iterator<Tuple> {
+	/**A stream is ready when it can return a tuple right away.
+	 * This is different from hasNext, in that a false hasNext value
+	 * indicates the stream will NEVER return more values.
 	 * @return
 	 */
-	public Object convert(Object value, Class target);
-	
-	
-	/**Create a new instance of the tuple representaiton.*/
-	public T create(List<Value> args) throws TypeCreationException;
-	
+	public boolean ready();
 }

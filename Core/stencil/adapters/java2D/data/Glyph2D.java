@@ -1,6 +1,6 @@
 package stencil.adapters.java2D.data;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public interface Glyph2D extends stencil.adapters.Glyph, Renderable {
 	/**Calculate an updated version of this glyph based on the passed tuple.

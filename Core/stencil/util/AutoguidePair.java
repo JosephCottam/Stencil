@@ -3,8 +3,8 @@ package stencil.util;
 import java.util.Arrays; 
 import java.util.List;
 
-import stencil.streams.InvalidNameException;
-import stencil.streams.Tuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
 
 //final because it is immutable
 public final class AutoguidePair<I,R> implements Tuple {

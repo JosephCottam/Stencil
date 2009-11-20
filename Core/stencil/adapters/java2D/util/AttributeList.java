@@ -31,7 +31,7 @@ package stencil.adapters.java2D.util;
 import java.util.*;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
-import stencil.streams.InvalidNameException;
+import stencil.tuple.InvalidNameException;
 
 public final class AttributeList implements Iterable<Attribute>{
 	private final Map<String, Attribute> attributes;

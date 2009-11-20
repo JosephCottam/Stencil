@@ -1,6 +1,6 @@
 package stencil.operator.wrappers;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.operator.StencilOperator;
 import stencil.parser.tree.Split;
 import stencil.parser.tree.Value;

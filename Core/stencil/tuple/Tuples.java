@@ -26,15 +26,12 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.util;
+package stencil.tuple;
 
 
 import java.util.*;
 
-import stencil.streams.InvalidNameException;
 import stencil.adapters.general.Fills;
-import stencil.streams.MutableTuple;
-import stencil.streams.Tuple;
 import stencil.types.SigilType;
 import stencil.types.TypesCache;
 

@@ -37,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
-import stencil.streams.MutableTuple;
+import stencil.tuple.MutableTuple;
 import stencil.util.enums.Attribute;
 
 /** The ViewTuple is the interface to a view
@@ -113,7 +113,7 @@ public interface ViewTuple extends MutableTuple {
 			return def == value || (def != null && def.equals(value));
 		}
 		
-		public String toString() {return stencil.util.Tuples.toString(this);}
+		public String toString() {return stencil.tuple.Tuples.toString(this);}
 	}
 	
 	/**Given a point in the canvas, where is it in the view?

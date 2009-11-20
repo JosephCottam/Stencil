@@ -8,9 +8,9 @@ import stencil.display.StencilPanel;
 import stencil.operator.module.ModuleCache;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
-import stencil.streams.Tuple;
 import stencil.testUtilities.StringUtils;
 import stencil.testUtilities.TestModule;
+import stencil.tuple.Tuple;
 import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class TestInterpreter extends junit.framework.TestCase{

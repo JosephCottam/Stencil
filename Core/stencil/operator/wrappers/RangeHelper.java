@@ -31,7 +31,7 @@ package stencil.operator.wrappers;
 import stencil.operator.StencilOperator;
 import stencil.parser.tree.Range;
 import stencil.parser.tree.Value;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 import java.util.ArrayList;

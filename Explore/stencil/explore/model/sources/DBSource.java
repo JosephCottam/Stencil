@@ -34,7 +34,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.Database;
 import stencil.explore.ui.components.sources.SourceEditor;
-import stencil.streams.TupleStream;
+import stencil.tuple.TupleStream;
 import stencil.util.streams.sql.QueryTuples;
 
 public class DBSource extends StreamSource {

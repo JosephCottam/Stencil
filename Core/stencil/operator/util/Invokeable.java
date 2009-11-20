@@ -2,7 +2,7 @@ package stencil.operator.util;
 
 import java.lang.reflect.*;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 

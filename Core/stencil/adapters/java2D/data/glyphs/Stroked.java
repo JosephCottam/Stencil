@@ -41,7 +41,7 @@ import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.color.Color;
 
 public abstract class Stroked extends Basic {

@@ -4,7 +4,7 @@ import stencil.operator.*;
 import stencil.operator.module.provided.Projection;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.types.color.ColorTuple;
 

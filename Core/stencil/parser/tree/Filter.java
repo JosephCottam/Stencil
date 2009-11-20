@@ -32,8 +32,8 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 public class Filter extends Target {
 	public static final Tuple PASS = BasicTuple.singleton(true);

@@ -30,7 +30,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 public class Local extends Target {
 	public Local(Token source) {super(source);}

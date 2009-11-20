@@ -26,37 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.types;
-
-import stencil.tuple.Tuple;
+package stencil.tuple;
 
 import java.util.List;
-import stencil.parser.tree.Value;
 
-public interface SigilType<E, T extends Tuple> {	
-	/**Convert an external representation to an tuple representation.*/
-	public E toExternal(T source);
-	
-	/**Convert a tuple representation to an external representation.*/
-	public T toTuple(E source);
-	
-	/**Convert the source to a string representation.  The
-	 * string representation should be stencil-language compatible
-	 * to reconstruct the external value passed.
-	 */
-	public String toString(E source);
-	
-	/**General conversion that convert to or from 
-	 * the tuple and external representations.
-	 * 
-	 * @param value
-	 * @param target
-	 * @return
-	 */
-	public Object convert(Object value, Class target);
-	
-	
-	/**Create a new instance of the tuple representaiton.*/
-	public T create(List<Value> args) throws TypeCreationException;
-	
+public interface Tuple {
+	public static final String DEFAULT_KEY = "VALUE";
+	public static final String SOURCE_KEY = "SOURCE";
+
+	/**Get a listing of all fields known by this tuple (even if they are not set).
+	 * The order of the list corresponds to the index of the field number.
+	 * */
+	public abstract List<String> getPrototype();
+
+	/**Returns the object as stored under the name.
+	 * @throws InvalidNameException The name passed is not valid for this tuple.*/
+	public abstract Object get(String name) throws InvalidNameException;
+
+	/**Is this the default value for this field?*/
+	public abstract boolean isDefault(String name, Object value);
 }

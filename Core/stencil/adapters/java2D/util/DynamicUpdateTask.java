@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import stencil.parser.tree.Rule;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
 final class DynamicUpdateTask implements Runnable, Stopable {

@@ -31,8 +31,9 @@ package stencil.parser.tree;
 import java.util.List;
 
 import org.antlr.runtime.Token;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 /**Targets are things that can be on the left-hand-side
  * of a rule.  They consist of a target-type and

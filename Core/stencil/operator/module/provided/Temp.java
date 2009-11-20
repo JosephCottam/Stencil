@@ -36,8 +36,8 @@ import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
-import stencil.streams.Tuple;
-import stencil.util.BasicTuple;
+import stencil.tuple.BasicTuple;
+import stencil.tuple.Tuple;
 
 /**
  * A module of misc utilities that I haven't figured out where they really belong yet.

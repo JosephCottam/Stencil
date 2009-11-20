@@ -41,9 +41,9 @@ import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
-import stencil.util.Tuples;
 
 public final class Pie extends Stroked {
 	private static final String IMPLANTATION = "PIE";

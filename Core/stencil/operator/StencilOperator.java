@@ -30,7 +30,8 @@ package stencil.operator;
 
 
 import stencil.parser.tree.Value;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
+
 import java.util.List;
 
 

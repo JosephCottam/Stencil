@@ -32,7 +32,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.parser.string.StencilParser;
-import stencil.streams.Tuple;
+import stencil.tuple.Tuple;
 
 
 public class Predicate extends StencilTree {
