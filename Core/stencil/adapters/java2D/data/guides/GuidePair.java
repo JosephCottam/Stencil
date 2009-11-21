@@ -3,15 +3,20 @@ package stencil.adapters.java2D.data.guides;
 import java.util.Arrays;
 import java.util.List;
 
-import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
 
 /**Result pair used to create a legend.
  * AutoGuide pairs are converted into these input/output pairs.
  */
 final class GuidePair<T> implements Tuple {
-	private static final List<String> FIELDS = Arrays.asList("INPUT", "OUTPUT");
+	private static final String INPUT_FIELD = "input";
+	private static final String RESULT_FIELD = "output";
+	private static final List<String> PROTOTYPE = Arrays.asList(INPUT_FIELD, RESULT_FIELD);
+	public static final int INPUT = PROTOTYPE.indexOf(INPUT_FIELD);
+	public static final int OUTPUT = PROTOTYPE.indexOf(RESULT_FIELD);
+
 	String input;
 	T output;
 	
@@ -19,14 +24,17 @@ final class GuidePair<T> implements Tuple {
 		this.input = input;
 		this.output = output;
 	}
-	public Object get(String name) throws InvalidNameException {
-		if (name.equals("INPUT")) {return input;}
-		if (name.equals("OUTPUT")) {return output;}
-		throw new InvalidNameException(name, FIELDS);
-	}
 	
-	public List<String> getPrototype() {return FIELDS;}
-	public boolean hasField(String name) {return getPrototype().contains(name);}
+	public Object get(String name) {return Tuples.namedDereference(name, this);}
+
+	public int size() {return PROTOTYPE.size();}
+	public Object get(int idx) {
+		if (idx == INPUT) {return input;}
+		if (idx == OUTPUT) {return output;}
+		throw new TupleBoundsException(idx, size());
+	}
+
+	public List<String> getPrototype() {return PROTOTYPE;}
 	public boolean isDefault(String name, Object value) {return false;}
 	public String toString() {return Tuples.toString(this);}
 

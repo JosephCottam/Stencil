@@ -89,18 +89,15 @@ public interface ViewTuple extends MutableTuple {
 	}
 
 	public static abstract class Simple implements ViewTuple {
-		protected static final List<String> FIELDS;
+		protected static final List<String> PROTOTYPE;
 		static {
 			HashSet<String> s = new HashSet<String>();
 			for (ViewAttribute a: EnumSet.allOf(ViewAttribute.class)) {s.add(a.name());}
-			FIELDS = Collections.unmodifiableList(new ArrayList(s));
+			PROTOTYPE = Collections.unmodifiableList(new ArrayList(s));
 		}
 		
-		public List<String> getPrototype() {return FIELDS;}
-		
-		public boolean hasField(String name) {return getPrototype().contains(name);}
-
-		
+		public List<String> getPrototype() {return PROTOTYPE;}
+		public int size() {return PROTOTYPE.size();}		
 		/**Gets the default value for the named property.
 		 * If the named property has no defined default, it is assumed to be 'null'.
 		 *
@@ -108,7 +105,7 @@ public interface ViewTuple extends MutableTuple {
 		 * @return Default value of property.
 		 */
 		public boolean isDefault(String name, Object value) {
-			if (!hasField(name)) {return false;}
+			if (PROTOTYPE.contains(name)) {return false;}
 			Object def = ViewAttribute.valueOf(name).defaultValue;
 			return def == value || (def != null && def.equals(value));
 		}

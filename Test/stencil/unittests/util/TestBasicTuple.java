@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import java.util.List;
 import java.util.Arrays;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public class TestBasicTuple extends TestCase {
@@ -15,7 +15,7 @@ public class TestBasicTuple extends TestCase {
 	public static final List<Object> values = Arrays.asList(new Object[]{"String", 2, 3.14, "Value4", "@color(100,10,10)"}); 
 
 	public void setUp() {
-		reference = new BasicTuple(source, names, values);
+		reference = new PrototypedTuple(source, names, values);
 	}
 		
 	public void testGet()
@@ -27,7 +27,7 @@ public class TestBasicTuple extends TestCase {
 	}
 	
 	public void testSingleton() {
-		Tuple t = BasicTuple.singleton("MyValue");
+		Tuple t = PrototypedTuple.singleton("MyValue");
 		assertEquals("MyValue", t.get(Tuple.DEFAULT_KEY));
 	}
 }

@@ -45,7 +45,7 @@ import stencil.parser.tree.Specializer;
 import stencil.parser.tree.StencilNumber;
 import stencil.parser.tree.StencilString;
 import stencil.parser.tree.Value;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
@@ -147,10 +147,10 @@ public class StencilUtil extends BasicModule {
 			
 			expanded = expanded || (max != oldMax) || (min != oldMin);
 			
-			return new BasicTuple(names, args);
+			return new PrototypedTuple(names, args);
 		}
 
-		public Tuple query(Object... args) {return new BasicTuple(names, args);}
+		public Tuple query(Object... args) {return new PrototypedTuple(names, args);}
 
 		public boolean refreshGuide() {return expanded;}
 		
@@ -222,7 +222,7 @@ public class StencilUtil extends BasicModule {
 
 		public Tuple map(Object... args) {
 			if (!deepContains(seen, args)) {seen.add(args);}
-			return new BasicTuple(names, args);
+			return new PrototypedTuple(names, args);
 		}
 		
 		private static final boolean deepContains(List<Object[]> list, Object[] candidate) {
@@ -231,7 +231,7 @@ public class StencilUtil extends BasicModule {
 		}
 
 		public Tuple query(Object... args) {
-			return new BasicTuple(names, args);
+			return new PrototypedTuple(names, args);
 		}
 
 		public synchronized boolean refreshGuide() {

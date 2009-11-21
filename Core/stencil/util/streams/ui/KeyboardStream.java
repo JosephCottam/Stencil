@@ -31,7 +31,9 @@ package stencil.util.streams.ui;
 import javax.swing.JComponent;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
+import stencil.tuple.Tuples;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -40,6 +42,7 @@ import java.util.NoSuchElementException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class KeyboardStream implements TupleStream {
@@ -49,8 +52,13 @@ public abstract class KeyboardStream implements TupleStream {
 	 * using a modifier field of 0 and the raw characters will suffice.
 	 */
 	public static class KeysTuple implements Tuple {
-		public static final String KEY_FIELD= Tuple.DEFAULT_KEY;
-		public static final String MODIFIER_FIELD="MODIFIER";
+		private static final String KEY_FIELD = "key";
+		private static final String MODIFIER_FIELD="modifier";
+		private static final String SOURCE_FIELD = "source";
+		private static final List<String> PROTOTYPE = Arrays.asList(KEY_FIELD, MODIFIER_FIELD, SOURCE_FIELD);
+		public static final int KEY = PROTOTYPE.indexOf(KEY_FIELD);
+		public static final int MODIFIER = PROTOTYPE.indexOf(MODIFIER_FIELD);
+		public static final int SOURCE = PROTOTYPE.indexOf(SOURCE_FIELD);
 
 		private static List<String> fields = null;
 		private Character key = null;
@@ -63,12 +71,15 @@ public abstract class KeyboardStream implements TupleStream {
 			this.source = source;
 		}
 
-		public Object get(String name) {
-			name = name.toUpperCase(); //we're naming a key, not a field so upper case is correct
-			if (name.equals(KEY_FIELD)) {return key;}
-			else if (name.equals(MODIFIER_FIELD)) {return modifiers;}
-			return null;
-		}
+		public Object get(String name) {return Tuples.namedDereference(name, this);}
+		
+		public int size() {return PROTOTYPE.size();}
+		public Object get(int idx) {
+			if (idx == KEY) {return key;}
+			if (idx == MODIFIER) {return modifiers;}
+			if (idx == SOURCE) {return source;}
+			throw new TupleBoundsException(idx, size());
+ 		}
 
 		public String getSource() {return source;}
 		public void setSource(String source) {this.source = source;}

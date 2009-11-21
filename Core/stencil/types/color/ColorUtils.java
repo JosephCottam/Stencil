@@ -28,7 +28,7 @@
  */
 package stencil.types.color;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.operator.module.ModuleData;
@@ -76,7 +76,7 @@ public final class ColorUtils extends BasicModule {
 		if (value instanceof Float) {value = rangeValue((Float) value);}
 		else if (value instanceof Double) {value = rangeValue(((Double) value).floatValue());}
 		
-		return BasicTuple.singleton(color.modify(comp.name(), value)); //TODO: Change so just the color tuple is returned
+		return PrototypedTuple.singleton(color.modify(comp.name(), value)); //TODO: Change so just the color tuple is returned
 	}
 
 	private static Tuple mod(Object source, ColorUtils.COMP comp, ColorUtils.DIR dir, String name) {
@@ -98,23 +98,23 @@ public final class ColorUtils extends BasicModule {
 		return mod(source, comp, value, name);
 	}
 
-	public static Tuple darker(Object o) {return BasicTuple.singleton(validate(o).darker());}
-	public static Tuple brighter(Object o) {return BasicTuple.singleton(validate(o).brighter());}
+	public static Tuple darker(Object o) {return PrototypedTuple.singleton(validate(o).darker());}
+	public static Tuple brighter(Object o) {return PrototypedTuple.singleton(validate(o).brighter());}
 	
-	public static Tuple getBlue(Object v) {return BasicTuple.singleton(validate(v).getBlue());}
-	public static Tuple getIntBlue(Object v) {return BasicTuple.singleton(validate(v).getBlue());}
+	public static Tuple getBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
+	public static Tuple getIntBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
 	public static Tuple setBlue(Object v, Object o) {return mod(o, COMP.Blue, v, "SetBlue");}
 
-	public static Tuple getRed(Object v) {return BasicTuple.singleton(validate(v).getRed());}
-	public static Tuple getIntRed(Object v) {return BasicTuple.singleton(validate(v).getRed());}
+	public static Tuple getRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
+	public static Tuple getIntRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
 	public static Tuple setRed(Object v, Object o) {return mod(o, COMP.Red, v, "SetRed");}
 
-	public static Tuple getGreen(Object v) {return BasicTuple.singleton(validate(v).getGreen());}
-	public static Tuple getIntGreen(Object v) {return BasicTuple.singleton(validate(v).getGreen());}
+	public static Tuple getGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
+	public static Tuple getIntGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
 	public static Tuple setGreen(Object v, Object o) {return mod(o, COMP.Green, v, "setGreen");}
 
-	public static Tuple getAlpha(Object v) {return BasicTuple.singleton(validate(v).getAlpha());}
-	public static Tuple getIntAlpha(Object v) {return BasicTuple.singleton(validate(v).getAlpha());}
+	public static Tuple getAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
+	public static Tuple getIntAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
 	public static Tuple setAlpha(Object v, Object o) {return mod(o, COMP.Alpha, v, "setAlpha");}
 	public static Tuple opaque(Object o) {return mod(o, COMP.Alpha, DIR.full, "Opque");}
 

@@ -7,7 +7,7 @@ import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public abstract class TestLayer extends junit.framework.TestCase {
@@ -21,7 +21,7 @@ public abstract class TestLayer extends junit.framework.TestCase {
 		DisplayLayer layer = panel.getLayer("Layer1");
 
 		for (int i=0; i<100; i++) {
-			Tuple values = new BasicTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
+			Tuple values = new PrototypedTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
 			layer.make(values);
 		}
 		return layer;
@@ -36,7 +36,7 @@ public abstract class TestLayer extends junit.framework.TestCase {
 		for (int i=0; i<100; i++) {
 			String id = Integer.toString(i);
 			assertEquals(i, layer.size());
-			Tuple t = layer.make(BasicTuple.singleton("ID", id));
+			Tuple t = layer.make(PrototypedTuple.singleton("ID", id));
 			assertEquals(id, t.get(StandardAttribute.ID.name()));
 		}
 	}

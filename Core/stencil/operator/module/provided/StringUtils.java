@@ -30,7 +30,7 @@ package stencil.operator.module.provided;
 
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -45,23 +45,23 @@ public class StringUtils extends BasicModule {
 			if (i!=os.length-1) {System.out.print(",");}
 		}
 		System.out.println();
-		return new BasicTuple(labels, os);
+		return new PrototypedTuple(labels, os);
 	}
 	
 	/**Converts a value to a string value.*/
-	public static Tuple toString(Object s) {return BasicTuple.singleton(s.toString());}
+	public static Tuple toString(Object s) {return PrototypedTuple.singleton(s.toString());}
 	
 	
 	//TODO: Add range support to concatenate
 	public static Tuple concatenate(Object... os) {
 		StringBuilder b = new StringBuilder();
 		for (Object o:os) {b.append(o.toString());}
-		return BasicTuple.singleton(b.toString());
+		return PrototypedTuple.singleton(b.toString());
 	}
 
 	public static Tuple format(Object v, Object f) {
 		String rv = String.format(f.toString(), v);
-		return BasicTuple.singleton(rv);
+		return PrototypedTuple.singleton(rv);
 	}
 	
 	public static Tuple substring(Object str, Object s, Object e) {
@@ -69,13 +69,13 @@ public class StringUtils extends BasicModule {
 		int start = Converter.toInteger(s);
 		int end = Converter.toInteger(e);
 		
-		if (end >= 0) {return BasicTuple.singleton(string.substring(start, end));}
-		else {return BasicTuple.singleton(string.substring(start));}
+		if (end >= 0) {return PrototypedTuple.singleton(string.substring(start, end));}
+		else {return PrototypedTuple.singleton(string.substring(start));}
 	}
 	
 	public static Tuple trim(Object str) {
 		String string = Converter.toString(str);
-		return BasicTuple.singleton(string.trim());
+		return PrototypedTuple.singleton(string.trim());
 	}
 
 	public StringUtils(ModuleData md) {super(md);}

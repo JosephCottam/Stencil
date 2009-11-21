@@ -38,7 +38,7 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public class Projection extends BasicModule {
@@ -82,7 +82,7 @@ public class Projection extends BasicModule {
 				d = Float.parseFloat(keys[0].toString());
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + keys[0].toString(), e);}
-				else {return BasicTuple.singleton(new Color(0,0,0));}			
+				else {return PrototypedTuple.singleton(new Color(0,0,0));}			
 			} 
 
 				
@@ -91,11 +91,11 @@ public class Projection extends BasicModule {
 				if (d<min || Double.isNaN(min)) {min = d;}
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
-				t = BasicTuple.singleton(averageColors(p));
+				t = PrototypedTuple.singleton(averageColors(p));
 //				t = BasicTuple.singleton(new Color(1.0f,p,p));
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Error creating colors with range point:" + p, e);}
-				else {t= BasicTuple.singleton(new Color(0,0,0));}
+				else {t= PrototypedTuple.singleton(new Color(0,0,0));}
 			}
 			
 			return t;
@@ -133,7 +133,7 @@ public class Projection extends BasicModule {
 			float d = Float.parseFloat(keys[0].toString());
 			
 			if (d >= min && d<= max) {return map(keys);}
-			else {return BasicTuple.singleton(null);}
+			else {return PrototypedTuple.singleton(null);}
 		}
 
 		public String getName() {return NAME;}
@@ -159,8 +159,8 @@ public class Projection extends BasicModule {
 
 		public Tuple query(Object... keys) {
 			Object key = keys[0];
-			if (labels.contains(key)) {return BasicTuple.singleton(labels.indexOf(key));}
-			return BasicTuple.singleton(null);
+			if (labels.contains(key)) {return PrototypedTuple.singleton(labels.indexOf(key));}
+			return PrototypedTuple.singleton(null);
 		}
 
 		public Tuple map(Object... keys) {
@@ -169,7 +169,7 @@ public class Projection extends BasicModule {
 			//TODO: Handle more than just the first value...concatenate the values or something, like compound keys in Rank operator
 			key = keys[0];
 			if (!labels.contains(key)) {labels.add(key.toString());}
-			rv = BasicTuple.singleton(labels.indexOf(key));
+			rv = PrototypedTuple.singleton(labels.indexOf(key));
 			return rv;
 		}
 
@@ -200,7 +200,7 @@ public class Projection extends BasicModule {
 				value = 1;
 				counts.put(key, value);
 			}
-			return BasicTuple.singleton(value);
+			return PrototypedTuple.singleton(value);
 		}
 
 		public Tuple query(Object... args) {
@@ -209,7 +209,7 @@ public class Projection extends BasicModule {
 			if (counts.containsKey(key)) {
 				value = counts.get(key);
 			}
-			return BasicTuple.singleton(value);
+			return PrototypedTuple.singleton(value);
 		}
 
 		public Count duplicate() {return new Count();}
@@ -222,9 +222,9 @@ public class Projection extends BasicModule {
 
 		public String getName() {return "Count";}
 
-		public Tuple map(Object... args) {return BasicTuple.singleton(count.getAndAdd(1));}
+		public Tuple map(Object... args) {return PrototypedTuple.singleton(count.getAndAdd(1));}
 
-		public Tuple query(Object... args) {return BasicTuple.singleton(count.get());}		
+		public Tuple query(Object... args) {return PrototypedTuple.singleton(count.get());}		
 	}
 	
 	public Projection(ModuleData md) {super(md);}

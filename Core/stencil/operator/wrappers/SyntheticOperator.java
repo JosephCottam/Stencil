@@ -39,7 +39,7 @@ import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 /**Legend defined through a stencil definition.
@@ -75,7 +75,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", args, values.length));
 		}
 
-		Tuple tuple = new BasicTuple(source.getArguments(), Arrays.asList(values));
+		Tuple tuple = new PrototypedTuple(source.getArguments(), Arrays.asList(values));
 		OperatorRule action = matchingAction(tuple);
 
 		if (action != null) {

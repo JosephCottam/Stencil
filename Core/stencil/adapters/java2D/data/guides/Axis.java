@@ -19,7 +19,7 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.util.AutoguidePair;
@@ -150,7 +150,7 @@ public class Axis implements Guide2D {
 			values[2] = axisOffset;
 			values[3] = max;
 		}
-		return prototypeLine.update(new BasicTuple(fields, values));
+		return prototypeLine.update(new PrototypedTuple(fields, values));
 	}
 
 	/**Create the labeled tick marks around the major axis line.*/
@@ -191,7 +191,7 @@ public class Axis implements Guide2D {
 			values[3] =0;
 		}
 		
-		Glyph2D result = prototypeText.update(new BasicTuple(fields, values));
+		Glyph2D result = prototypeText.update(new PrototypedTuple(fields, values));
 		result = result.update(formatting);
 		return result;
 	}
@@ -215,7 +215,7 @@ public class Axis implements Guide2D {
 			values[3] = offset;
 		}
 
-		Glyph2D result = prototypeLine.update(new BasicTuple(fields, values));
+		Glyph2D result = prototypeLine.update(new PrototypedTuple(fields, values));
 		result = result.update(formatting);
 		return result;
 	}

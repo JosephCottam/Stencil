@@ -1,12 +1,8 @@
 package stencil.unittests.util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import stencil.tuple.BasicTuple;
-import stencil.tuple.InvalidNameException;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.MutableTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -16,32 +12,15 @@ import junit.framework.TestCase;
 
 
 public class TestTuples extends TestCase {
-	private static class MutableMapTuple implements MutableTuple {
-		private Map map;
-		
-		public MutableMapTuple(Map source) {this.map = source;}
-		
-		public Object get(String name) throws InvalidNameException {return map.get(name);}
-
-		public List<String> getPrototype() {return new ArrayList(map.keySet());}
-
-		public boolean hasField(String name) {return map.containsKey(name);}
-
-		public boolean isDefault(String name, Object value) {return false;}
-
-		public void set(String field, Object value) {map.put(field, value);}
-	};
-	
-	
 	public void testTransfer() throws Exception {
-		Tuple reference = new BasicTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.values);
+		Tuple reference = new PrototypedTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.values);
 		HashMap map = new HashMap();
 		map.put("One", "One");
 		map.put("Two", 2);
 		map.put("Three", 3.0d);
 		map.put("Four", "four");
 		map.put("Five", "FIVE");
-		MutableTuple target = new MutableMapTuple(map);
+		MutableTuple target = new Tuples.MapTuple(map);
 		
 		Tuples.transfer(reference, target);
 
@@ -80,7 +59,7 @@ public class TestTuples extends TestCase {
 	}
 
 	public void testToString() {
-		Tuple reference = new BasicTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.values);
+		Tuple reference = new PrototypedTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.values);
 		String value = Tuples.toString(reference);
 		Assert.assertTrue(value.contains("String"));
 		Assert.assertTrue(value.contains("StringField"));

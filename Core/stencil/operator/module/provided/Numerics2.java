@@ -36,7 +36,7 @@ import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Range;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public class Numerics2 extends BasicModule {
@@ -58,12 +58,12 @@ public class Numerics2 extends BasicModule {
  		
 		public Tuple map(double... args) {
 			sum += sum(args);
-			return BasicTuple.singleton(sum);
+			return PrototypedTuple.singleton(sum);
 		}
 
 		public Tuple query(double... args) {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
-			return BasicTuple.singleton(sum);
+			return PrototypedTuple.singleton(sum);
 		}
 
 
@@ -87,12 +87,12 @@ public class Numerics2 extends BasicModule {
  		}
  		public Tuple map(double... values) {
  			min = Math.min(min, min(values));
-			return BasicTuple.singleton(min);
+			return PrototypedTuple.singleton(min);
 		}
  		
 		public Tuple query(double... args) {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
-			return BasicTuple.singleton(min);
+			return PrototypedTuple.singleton(min);
 		}
 
 		public String getName() {return NAME;}
@@ -116,12 +116,12 @@ public class Numerics2 extends BasicModule {
  		
 		public Tuple map(double... values) {
  			max = Math.max(max, max(values));
- 			return BasicTuple.singleton(max);
+ 			return PrototypedTuple.singleton(max);
 		}
 		
 		public Tuple query(double... args) {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
-			return BasicTuple.singleton(max);
+			return PrototypedTuple.singleton(max);
 		}
 
 		public String getName() {return NAME;}
@@ -129,35 +129,35 @@ public class Numerics2 extends BasicModule {
 
 	}
 
-	public static Tuple add1(double d) {return BasicTuple.singleton(d+1);}
-	public static Tuple sub1(double d) {return BasicTuple.singleton(d-1);}
+	public static Tuple add1(double d) {return PrototypedTuple.singleton(d+1);}
+	public static Tuple sub1(double d) {return PrototypedTuple.singleton(d-1);}
 
 
-	public static Tuple abs(double d) {return BasicTuple.singleton(Math.abs(d));}
-	public static Tuple sum(double...ds) {return BasicTuple.singleton(FullSum.sum(ds));}
-	public static Tuple add(double d, double d2) {return BasicTuple.singleton(d+d2);}
-	public static Tuple sub(double d, double d2) {return BasicTuple.singleton(d-d2);}
-	public static Tuple divide(double d1, double d2) {return BasicTuple.singleton(d1/d2);}
-	public static Tuple mult(double d1, double d2) {return BasicTuple.singleton(d1*d2);}
-	public static Tuple negate(double d) {return BasicTuple.singleton(-1 * d);}
-	public static Tuple mod(double d1, double d2) {return BasicTuple.singleton(d1%d2);}
-	public static Tuple div(double d1, double d2) {return BasicTuple.singleton(d1/d2);}
+	public static Tuple abs(double d) {return PrototypedTuple.singleton(Math.abs(d));}
+	public static Tuple sum(double...ds) {return PrototypedTuple.singleton(FullSum.sum(ds));}
+	public static Tuple add(double d, double d2) {return PrototypedTuple.singleton(d+d2);}
+	public static Tuple sub(double d, double d2) {return PrototypedTuple.singleton(d-d2);}
+	public static Tuple divide(double d1, double d2) {return PrototypedTuple.singleton(d1/d2);}
+	public static Tuple mult(double d1, double d2) {return PrototypedTuple.singleton(d1*d2);}
+	public static Tuple negate(double d) {return PrototypedTuple.singleton(-1 * d);}
+	public static Tuple mod(double d1, double d2) {return PrototypedTuple.singleton(d1%d2);}
+	public static Tuple div(double d1, double d2) {return PrototypedTuple.singleton(d1/d2);}
 
-	public static Tuple log(double d1) {return  BasicTuple.singleton(Math.log(d1));}
-	public static Tuple log10(double d1) {return  BasicTuple.singleton(Math.log10(d1));}
+	public static Tuple log(double d1) {return  PrototypedTuple.singleton(Math.log(d1));}
+	public static Tuple log10(double d1) {return  PrototypedTuple.singleton(Math.log10(d1));}
 	
-	public static Tuple max(double... ds) {return BasicTuple.singleton(FullMax.max(ds));}
-	public static Tuple min(double... ds) {return BasicTuple.singleton(FullMin.min(ds));}
+	public static Tuple max(double... ds) {return PrototypedTuple.singleton(FullMax.max(ds));}
+	public static Tuple min(double... ds) {return PrototypedTuple.singleton(FullMin.min(ds));}
 
-	public static Tuple floor(double d1) {return BasicTuple.singleton(Math.floor(d1));}
-	public static Tuple ceil(double d1) {return BasicTuple.singleton(Math.ceil(d1));}
- 	public static Tuple round(double d1) {return BasicTuple.singleton(Math.round(d1));}
+	public static Tuple floor(double d1) {return PrototypedTuple.singleton(Math.floor(d1));}
+	public static Tuple ceil(double d1) {return PrototypedTuple.singleton(Math.ceil(d1));}
+ 	public static Tuple round(double d1) {return PrototypedTuple.singleton(Math.round(d1));}
  	public static Tuple nearest(double d1, double d2) {
  		long m = (long) d1;
  		long n = (long) d2;
  		//Round m to the nearest multiple of n (per http://mindprod.com/jgloss/round.html)
  		long near = ( m + n/2 ) / n * n;
- 		return BasicTuple.singleton(near);
+ 		return PrototypedTuple.singleton(near);
  	}
  	
  	public static Tuple asNumber(Object v) {
@@ -167,11 +167,11 @@ public class Numerics2 extends BasicModule {
  		else if (v instanceof Number) {d = ((Number) v).doubleValue();}
  		else {d = Double.NaN;}
 
- 		return BasicTuple.singleton(d);
+ 		return PrototypedTuple.singleton(d);
  	}
 
- 	public static Tuple sqrt(double d) {return BasicTuple.singleton(Math.sqrt(d));}
- 	public static Tuple pow(double d1, double d2) {return BasicTuple.singleton(Math.pow(d1, d2));}
+ 	public static Tuple sqrt(double d) {return PrototypedTuple.singleton(Math.sqrt(d));}
+ 	public static Tuple pow(double d1, double d2) {return PrototypedTuple.singleton(Math.pow(d1, d2));}
  	
  	public Numerics2(ModuleData md) {super(md);}
  	

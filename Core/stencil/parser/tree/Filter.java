@@ -32,12 +32,12 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public class Filter extends Target {
-	public static final Tuple PASS = BasicTuple.singleton(true);
-	public static final Tuple FAIL = BasicTuple.singleton(false);
+	public static final Tuple PASS = PrototypedTuple.singleton(true);
+	public static final Tuple FAIL = PrototypedTuple.singleton(false);
 
 	public Filter(Token source) {super(source);}
 

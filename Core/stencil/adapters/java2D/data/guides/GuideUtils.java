@@ -38,7 +38,7 @@ import java.lang.reflect.*;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
@@ -59,7 +59,7 @@ public abstract class GuideUtils {
 			values.add(source.getMap().get(name));
 		}
 		
-		return (T) target.update(new BasicTuple(names, values));
+		return (T) target.update(new PrototypedTuple(names, values));
 	}
 	
 	private static final String getRootName(final String name) {

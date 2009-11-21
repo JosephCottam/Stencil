@@ -39,7 +39,7 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.View;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
@@ -61,7 +61,7 @@ public class Transform extends BasicModule {
 		
 		String[] names = new String[]{"X", "Y"};
 		Double[] values = new Double[]{targetValue.getX(), targetValue.getY()};
-		return new BasicTuple(names, values);
+		return new PrototypedTuple(names, values);
 	}
 	
 	
@@ -69,14 +69,14 @@ public class Transform extends BasicModule {
 		x = Converter.toDouble(x);
 		y = Converter.toDouble(y);
 		Point2D p = View.global.viewToCanvas(new Point2D.Double((Double)x,(Double)y));
-		return new BasicTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
+		return new PrototypedTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
 	}
 
 	public static Tuple screenToCanvasDimension(Object width, Object height) {
 		width = Converter.toDouble(width);
 		height = Converter.toDouble(height);
 		Dimension2D p = View.global.viewToCanvas(new DoubleDimension((Double)width,(Double)height));
-		return new BasicTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
+		return new PrototypedTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
 	}
 
 
@@ -84,14 +84,14 @@ public class Transform extends BasicModule {
 		x = Converter.toDouble(x);
 		y = Converter.toDouble(y);
 		Point2D p = View.global.canvasToView(new Point2D.Double((Double)x,(Double)y));
-		return new BasicTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
+		return new PrototypedTuple(new String[]{"X","Y"}, new Double[]{p.getX(), p.getY()});
 	}
 
 	public static Tuple canvasToScreenDimension(Object width, Object height) {
 		width = Converter.toDouble(width);
 		height = Converter.toDouble(height);
 		Dimension2D p = View.global.canvasToView(new DoubleDimension((Double)width,(Double)height));
-		return new BasicTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
+		return new PrototypedTuple(new String[]{"Width","Height"}, new Double[]{p.getWidth(), p.getHeight()});
 	}
 
 	/**Calculates the scale factor to keep values undistorted but all objects visible.
@@ -139,7 +139,7 @@ public class Transform extends BasicModule {
 			
 		
 		String[] names = new String[]{"zoom", "X", "Y", "width"};
-		Tuple t = new BasicTuple(names, new Object[]{min, x, y, cw});
+		Tuple t = new PrototypedTuple(names, new Object[]{min, x, y, cw});
 		return t;
 	}
 	

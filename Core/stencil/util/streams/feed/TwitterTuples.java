@@ -12,6 +12,7 @@ import com.sun.syndication.io.SyndFeedInput;
 
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 import stencil.util.collections.*;
 
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)
@@ -36,14 +37,14 @@ public class TwitterTuples extends CacheFeed<HttpClient> {
 			throw new InvalidNameException(name);
 		}
 
-		public List<String> getPrototype() {return java.util.Arrays.asList(FIELDS);}
-
-		public boolean hasField(String name) {
-			try {get(name);}
-			catch(Exception e) {return false;}
-			return true;
+		public Object get(int idx) {
+			try {return values[idx];}
+			catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
 		}
-
+		
+		public List<String> getPrototype() {return java.util.Arrays.asList(FIELDS);}
+		public int size() {return FIELDS.length;}
+		
 		public boolean isDefault(String name, Object value) {return "".equals(value);}
 	}
 

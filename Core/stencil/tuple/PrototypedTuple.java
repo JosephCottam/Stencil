@@ -45,17 +45,17 @@ import java.util.Collections;
  *
  * @author jcottam
  */
-public final class BasicTuple implements Tuple {
+public final class PrototypedTuple implements Tuple {
 	protected List<String> names;
 	protected List values;
 	
 	/**Create a Tuple with a single value in it.  If key is left unspecified, the default key is used.*/
-	public static BasicTuple singleton(Object value) {
+	public static PrototypedTuple singleton(Object value) {
 		return singleton(DEFAULT_KEY, value);
 	}
 	
-	public static BasicTuple singleton(String key, Object value) {
-		return new BasicTuple(Arrays.asList(new String[]{key}), Arrays.asList(value));
+	public static PrototypedTuple singleton(String key, Object value) {
+		return new PrototypedTuple(Arrays.asList(new String[]{key}), Arrays.asList(value));
 	}
 
 	/**Create a new tuple.
@@ -64,7 +64,7 @@ public final class BasicTuple implements Tuple {
 	 * @param names Names of the values present in the tuple.
 	 * @param values Values to be stored in the tuple.
 	 */
-	public BasicTuple(String source, String[] names, Object[] values) {
+	public PrototypedTuple(String source, String[] names, Object[] values) {
 		this(source, Arrays.asList(names), Arrays.asList(values));
 	}
 	
@@ -74,7 +74,7 @@ public final class BasicTuple implements Tuple {
 	 * @param names Names of the values present in the tuple.
 	 * @param values Values to be stored in the tuple.
 	 */
-	public BasicTuple(String source, List<String> names, List values) {
+	public PrototypedTuple(String source, List<String> names, List values) {
 		this(appendValue(names, SOURCE_KEY), appendValue(values, source));
 	}
 
@@ -91,8 +91,8 @@ public final class BasicTuple implements Tuple {
 	 * @param names Names of the values present in the tuple.
 	 * @param values Values to be stored in the tuple.
 	 */
-	public BasicTuple(String[] names, Object[] values) {this(Arrays.asList(names), Arrays.asList(values));}
-	public BasicTuple(List<String> names, List values) {
+	public PrototypedTuple(String[] names, Object[] values) {this(Arrays.asList(names), Arrays.asList(values));}
+	public PrototypedTuple(List<String> names, List values) {
 		assert names != null : "Names may not be null.";
 		assert values != null : "Values may not be null.";
 		assert names.size() == values.size() : "Value and name list not of the same length." + names + " vs. " + values;
@@ -119,10 +119,10 @@ public final class BasicTuple implements Tuple {
 	public boolean hasField(String name) {return names.contains(name);}
 
 	public List<String> getPrototype() {return Collections.unmodifiableList(names);}
-	public Object get(String name) throws InvalidNameException {
-		if (!names.contains(name)) {throw new InvalidNameException(name, getPrototype());}
-		return values.get(names.indexOf(name));
-	}
+	
+	public Object get(String name) {return Tuples.namedDereference(name, this);}
+	public Object get(int idx) {return values.get(idx);}
+	public int size() {return values.size();}
 
 	public boolean isDefault(String name, Object value) {return false;}
 }

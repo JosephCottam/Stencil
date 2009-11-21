@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 import java.util.NoSuchElementException;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 
@@ -34,7 +34,7 @@ public class SequenceStream implements TupleStream {
 		long value = (count * increment) + start;
 		count++;
 		
-		return new BasicTuple(name, FIELDS, new Long[]{value});
+		return new PrototypedTuple(name, FIELDS, new Long[]{value});
 	}
 
 	public boolean ready() {return hasNext();}

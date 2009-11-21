@@ -36,7 +36,7 @@ import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Range;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public class Numerics extends BasicModule {
@@ -59,12 +59,12 @@ public class Numerics extends BasicModule {
  		
 		public Tuple map(Object... args) {
 			sum += sum(args);
-			return BasicTuple.singleton(sum);
+			return PrototypedTuple.singleton(sum);
 		}
 
 		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			return BasicTuple.singleton(sum);
+			return PrototypedTuple.singleton(sum);
 		}
 
 
@@ -89,12 +89,12 @@ public class Numerics extends BasicModule {
  		}
  		public Tuple map(Object... values) {
  			min = Math.min(min, min(values));
-			return BasicTuple.singleton(min);
+			return PrototypedTuple.singleton(min);
 		}
 
 		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			return BasicTuple.singleton(min);
+			return PrototypedTuple.singleton(min);
 		}
 
 		public String getName() {return NAME;}
@@ -119,12 +119,12 @@ public class Numerics extends BasicModule {
  		
 		public Tuple map(Object... values) {
  			max = Math.max(max, max(values));
- 			return BasicTuple.singleton(max);
+ 			return PrototypedTuple.singleton(max);
 		}
 		
 		/**Arguments are ignored.*/
 		public Tuple query(Object... args) {
-			return BasicTuple.singleton(max);
+			return PrototypedTuple.singleton(max);
 		}
 
 		public String getName() {return NAME;}
@@ -140,41 +140,41 @@ public class Numerics extends BasicModule {
 		return ((Number) d).doubleValue();
 	}
 
-	public static Tuple add1(Object d) {return BasicTuple.singleton(validate(d)+1);}
-	public static Tuple sub1(Object d) {return BasicTuple.singleton(validate(d)-1);}
+	public static Tuple add1(Object d) {return PrototypedTuple.singleton(validate(d)+1);}
+	public static Tuple sub1(Object d) {return PrototypedTuple.singleton(validate(d)-1);}
 
 
-	public static Tuple abs(Object d) {return BasicTuple.singleton(Math.abs(validate(d)));}
-	public static Tuple sum(Object...ds) {return BasicTuple.singleton(FullSum.sum(ds));}
-	public static Tuple add(Object d, Object d2) {return BasicTuple.singleton(validate(d)+validate(d2));}
-	public static Tuple sub(Object d, Object d2) {return BasicTuple.singleton(validate(d)-validate(d2));}
-	public static Tuple divide(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)/validate(d2));}
-	public static Tuple mult(Object d1, Object d2) {return BasicTuple.singleton(validate(d1)*validate(d2));}
-	public static Tuple negate(Object d) {return BasicTuple.singleton(-1 * validate(d));}
-	public static Tuple mod(Object d1, Object d2) {return BasicTuple.singleton(Math.round(validate(d1))%Math.round(validate(d2)));}
-	public static Tuple div(Object d1, Object d2) {return BasicTuple.singleton(Math.round(validate(d1))/Math.round(validate(d2)));}
+	public static Tuple abs(Object d) {return PrototypedTuple.singleton(Math.abs(validate(d)));}
+	public static Tuple sum(Object...ds) {return PrototypedTuple.singleton(FullSum.sum(ds));}
+	public static Tuple add(Object d, Object d2) {return PrototypedTuple.singleton(validate(d)+validate(d2));}
+	public static Tuple sub(Object d, Object d2) {return PrototypedTuple.singleton(validate(d)-validate(d2));}
+	public static Tuple divide(Object d1, Object d2) {return PrototypedTuple.singleton(validate(d1)/validate(d2));}
+	public static Tuple mult(Object d1, Object d2) {return PrototypedTuple.singleton(validate(d1)*validate(d2));}
+	public static Tuple negate(Object d) {return PrototypedTuple.singleton(-1 * validate(d));}
+	public static Tuple mod(Object d1, Object d2) {return PrototypedTuple.singleton(Math.round(validate(d1))%Math.round(validate(d2)));}
+	public static Tuple div(Object d1, Object d2) {return PrototypedTuple.singleton(Math.round(validate(d1))/Math.round(validate(d2)));}
 
-	public static Tuple log(Object d1) {return  BasicTuple.singleton(Math.log(validate(d1)));}
-	public static Tuple log10(Object d1) {return  BasicTuple.singleton(Math.log10(validate(d1)));}
+	public static Tuple log(Object d1) {return  PrototypedTuple.singleton(Math.log(validate(d1)));}
+	public static Tuple log10(Object d1) {return  PrototypedTuple.singleton(Math.log10(validate(d1)));}
 	
-	public static Tuple max(Object... ds) {return BasicTuple.singleton(FullMax.max(ds));}
-	public static Tuple min(Object... ds) {return BasicTuple.singleton(FullMin.min(ds));}
+	public static Tuple max(Object... ds) {return PrototypedTuple.singleton(FullMax.max(ds));}
+	public static Tuple min(Object... ds) {return PrototypedTuple.singleton(FullMin.min(ds));}
 
-	public static Tuple floor(Object d1) {return BasicTuple.singleton(Math.floor(validate(d1)));}
-	public static Tuple ceil(Object d1) {return BasicTuple.singleton(Math.ceil(validate(d1)));}
- 	public static Tuple round(Object d1) {return BasicTuple.singleton(Math.round(validate(d1)));}
+	public static Tuple floor(Object d1) {return PrototypedTuple.singleton(Math.floor(validate(d1)));}
+	public static Tuple ceil(Object d1) {return PrototypedTuple.singleton(Math.ceil(validate(d1)));}
+ 	public static Tuple round(Object d1) {return PrototypedTuple.singleton(Math.round(validate(d1)));}
  	public static Tuple nearest(Object d1, Object d2) {
  		long m = (long) validate(d1);
  		long n = (long) validate(d2);
  		//Round m to the nearest multiple of n (per http://mindprod.com/jgloss/round.html)
  		long near = ( m + n/2 ) / n * n;
- 		return BasicTuple.singleton(near);
+ 		return PrototypedTuple.singleton(near);
  	}
  	
- 	public static Tuple asNumber(Object d) {return BasicTuple.singleton(validate(d));}
+ 	public static Tuple asNumber(Object d) {return PrototypedTuple.singleton(validate(d));}
 
- 	public static Tuple sqrt(Object d) {return BasicTuple.singleton(Math.sqrt(validate(d)));}
- 	public static Tuple pow(Object d1, Object d2) {return BasicTuple.singleton(Math.pow(validate(d1), validate(d2)));}
+ 	public static Tuple sqrt(Object d) {return PrototypedTuple.singleton(Math.sqrt(validate(d)));}
+ 	public static Tuple pow(Object d1, Object d2) {return PrototypedTuple.singleton(Math.pow(validate(d1), validate(d2)));}
  	
  	public Numerics(ModuleData md) {super(md);}
  	

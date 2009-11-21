@@ -34,6 +34,7 @@ import java.util.List;
 
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 
 public class Environment implements Tuple {
  	private static final  class UnknownNameException extends RuntimeException {
@@ -56,21 +57,24 @@ public class Environment implements Tuple {
 	}
 	
 	private static final String NO_NAME = "$$$$$$$INVALID ID$$$$$$$$";
- 	private static final Environment EMPTY;
- 	static {
- 		EMPTY = new Environment() {
+ 	private static final Environment EMPTY = new Environment() {
 	 		private final List<String> EMPTY_LIST = new ArrayList<String>();
 			public Object get(String field) {throw new UnknownNameException(field, EMPTY_LIST);}
+			public Object get(int idx) {throw new TupleBoundsException(idx, size());}
+			public Environment popTo(int idx) {throw new RuntimeException("Cannot pop past an empty environment.");}
+			public Environment pop() {throw new RuntimeException("Cannot pop past an empty environment.");}
 			public List<String> getPrototype() {return EMPTY_LIST;}
- 		};
- 	}
-	
+			public int size() {return 0;}
+			protected int depth() {return 0;} 
+		};
+
+		
 	final Environment parent;
 	final String frameName;
 	final Tuple update;
 	
 	protected Environment() {
-		parent = null;
+		parent = EMPTY;
 		frameName = NO_NAME;
 		update = null;
 	}
@@ -88,7 +92,16 @@ public class Environment implements Tuple {
 	public Environment append(Tuple t) {return new Environment(this, t);}
 	public Environment append(String frame, Tuple t) {return new Environment(this, frame, t);}
 	public Environment pop() {return this.parent;}
+	public Environment popTo(int depth) {
+		if (depth ==0) {return this;}
+		else {return popTo(depth--);}
+	}
 			
+	public Object get(int idx) {
+		if (idx < update.size()) {return update.get(idx);}
+		else {return popTo(idx-update.size());}
+	}
+
 	public Object get(String name) throws InvalidNameException {
 		if (update.getPrototype().contains(name)) {return update.get(name);}
 		else if (this.frameName.equals(name)){return update;}
@@ -113,5 +126,8 @@ public class Environment implements Tuple {
 		return true;
 	}
 
+	public int size() {return depth() + update.size();}
+	protected int depth() {return 1 + parent.depth();}
+	
 	public boolean isDefault(String name, Object value) {return false;}
 }

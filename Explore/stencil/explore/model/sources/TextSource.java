@@ -35,7 +35,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Text;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 
@@ -63,7 +63,7 @@ public final class TextSource extends StreamSource {
 		public Tuple next() {
 			if (!hasNext()) {throw new RuntimeException("Cannot call next when hasNext is false.");}
 			String[] values = rows[index].split(separator);
-			Tuple rv = new BasicTuple(name, labels, values);
+			Tuple rv = new PrototypedTuple(name, labels, values);
 			index++;
 			return rv;
 		}

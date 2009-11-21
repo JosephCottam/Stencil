@@ -7,7 +7,7 @@ import stencil.operator.module.util.*;
 import stencil.operator.wrappers.InvokeableLegend;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import java.lang.reflect.*;
 
@@ -32,7 +32,7 @@ public class TestModule implements Module {
 		public static Tuple doFilter(String ID) {
 			count++;
 			if (count ==10) {count =0; return null;}
-			return BasicTuple.singleton(ID);
+			return PrototypedTuple.singleton(ID);
 		}
 	}
 	

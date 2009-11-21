@@ -33,7 +33,7 @@ import org.python.core.*;
 
 import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 
@@ -83,13 +83,13 @@ public final class JythonEncapsulation {
 			environment.exec(codeCache);
 	
 			if (getReturnLabels().size() == 1) {
-				return new BasicTuple(getReturnLabels(), Arrays.asList(new Object[]{pyToJava(environment.get(getReturnLabels().get(0)))}));
+				return new PrototypedTuple(getReturnLabels(), Arrays.asList(new Object[]{pyToJava(environment.get(getReturnLabels().get(0)))}));
 			} else if (getReturnLabels().size() >1) {
 				Object[] vals = new Object[getReturnLabels().size()];
 				for (int i=0; i< getReturnLabels().size(); i++) {
 					vals[i] = pyToJava(environment.get(getReturnLabels().get(i)));
 				}
-				return new BasicTuple(getReturnLabels(), Arrays.asList(vals));
+				return new PrototypedTuple(getReturnLabels(), Arrays.asList(vals));
 			} else {
 				throw new RuntimeException("Zero return value python encapuslation not supported.");
 			}

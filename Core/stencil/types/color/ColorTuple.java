@@ -35,6 +35,7 @@ import java.util.Collections;
 
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 import static stencil.parser.ParserConstants.INITIATOR;
 import static stencil.parser.ParserConstants.TERMINATOR;
 import static stencil.parser.ParserConstants.SEPARATOR;
@@ -42,11 +43,17 @@ import static stencil.parser.ParserConstants.SIGIL;
 import static stencil.types.color.Color.OPAQUE_INT;
 
 public final class ColorTuple extends java.awt.Color implements Tuple {
-	private static final char RED_FIELD = 'R';
-	private static final char GREEN_FIELD = 'G';
-	private static final char BLUE_FIELD = 'B';
-	private static final char ALPHA_FIELD = 'A';
+	private static final String RED_FIELD = "R";
+	private static final String GREEN_FIELD = "G";
+	private static final String BLUE_FIELD = "B";
+	private static final String ALPHA_FIELD = "A";
+	private static final List<String>PROTOTYPE = Arrays.asList(RED_FIELD, GREEN_FIELD, BLUE_FIELD, ALPHA_FIELD);
 
+	public static final int RED = PROTOTYPE.indexOf(RED_FIELD);
+	public static final int GREEN = PROTOTYPE.indexOf(GREEN_FIELD);
+	public static final int BLUE = PROTOTYPE.indexOf(BLUE_FIELD);
+	public static final int ALPHA = PROTOTYPE.indexOf(ALPHA_FIELD);
+	
 	private static final List<String> FIELDS;
 	private static final List<String> SIMPLE_FIELDS;
 
@@ -64,17 +71,16 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 	public List<String> getPrototype() {return FIELDS;}
 	public boolean hasField(String name) {return FIELDS.contains(name);}
 
-	public boolean isDefault(String fullName, Object value) {
-		char name = shortName(fullName);
+	public boolean isDefault(String name, Object value) {
 		if (!(value instanceof Number)) {return false;}
 		
 		if (value instanceof Double) {
 			double v = ((Double) value).doubleValue();
-			if (name == ALPHA_FIELD) {return v == 1.0;}
+			if (name.equals(ALPHA_FIELD)) {return v == 1.0;}
 			else {return v == 0.0;}
 		} else {
 			int v = ((Number) value).intValue();
-			if (name == ALPHA_FIELD) {return v == 255;}
+			if (name.equals(ALPHA_FIELD)) {return v == 255;}
 			else {return v == 0;}
 		}		
 	}
@@ -103,26 +109,28 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 	public String toString() {return toString(this);}
 	
 	public Object get(String name) {
-		char shortName = shortName(name);
-		if (shortName == RED_FIELD) {return getRed();}
-		if (shortName == GREEN_FIELD) {return getGreen();}
-		if (shortName == BLUE_FIELD) {return getBlue();}
-		if (shortName == ALPHA_FIELD) {return getAlpha();}
-		
-		throw new InvalidNameException(name, getPrototype());
+		int idx = PROTOTYPE.indexOf(name);
+		try {return get(idx);}
+		catch (IndexOutOfBoundsException e) {throw new InvalidNameException(name, getPrototype());}
+	}
+	
+	public int size() {return PROTOTYPE.size();}
+	public Object get(int idx) {
+		if (idx == RED) {return getRed();}
+		if (idx == GREEN) {return getGreen();}
+		if (idx == BLUE) {return getBlue();}
+		if (idx == ALPHA) {return getAlpha();}
+		throw new TupleBoundsException(idx, size());
 	}
 	
 	public ColorTuple modify(String name, Number value) {
 		int c = this.getRGB();
-		char shortName = shortName(name);
 		
-		if (shortName == RED_FIELD) {c = IntColor.modifyRed(c, value.intValue());}
-		if (shortName == GREEN_FIELD) {c = IntColor.modifyGreen(c, value.intValue());}
-		if (shortName == BLUE_FIELD) {c = IntColor.modifyBlue(c, value.intValue());}
-		if (shortName == ALPHA_FIELD) {c = IntColor.modifyAlpha(c, value.intValue());}
+		if (name.equals(RED_FIELD))   {c = IntColor.modifyRed(c, value.intValue());}
+		if (name.equals(GREEN_FIELD)) {c = IntColor.modifyGreen(c, value.intValue());}
+		if (name.equals(BLUE_FIELD))  {c = IntColor.modifyBlue(c, value.intValue());}
+		if (name.equals(ALPHA_FIELD)) {c = IntColor.modifyAlpha(c, value.intValue());}
 		
 		return Color.internalToTuple(c);
 	}
-	
-	private static final char shortName(String name) {return name.charAt(0);}
 }

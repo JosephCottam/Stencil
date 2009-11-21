@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 
@@ -115,7 +115,7 @@ public final class DelimitedParser implements TupleStream {
 			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
 			catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 			
-			t = new BasicTuple(name, labels, values);
+			t = new PrototypedTuple(name, labels, values);
 		}
 
 		return t;

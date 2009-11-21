@@ -68,9 +68,7 @@ public class TupleRef extends Value {
 		if (ref.isName()) {
 			return source.get(((Id) ref).getName());
 		} else if (ref.isNumber()){
-			List<String> fields = source.getPrototype();
-			String field = fields.get(toNumericRef(fields));
-			return source.get(field);
+			return source.get(((StencilNumber) getValue()).getNumber().intValue());
 		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}

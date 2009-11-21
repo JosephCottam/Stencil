@@ -9,15 +9,28 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 
-import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
+import stencil.tuple.Tuples;
 
 public final class ComponentEventStream implements TupleStream {
 	public static final List<String> FIELDS = Arrays.asList("SOURCE", "X", "Y", "WIDTH", "HEIGHT");
 	
 	/**Tuple to represent a state of a frame.*/
 	private static final class ComponentState implements Tuple {
+		private static final String SOURCE_FIELD = "SOURCE";
+		private static final String X_FIELD = "X";
+		private static final String Y_FIELD = "Y";
+		private static final String WIDTH_FIELD = "WIDTH";
+		private static final String HEIGHT_FIELD = "HEIGHT";
+		private static final List<String> PROTOTYPE = Arrays.asList(SOURCE_FIELD, X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD);
+		public static final int SOURCE = PROTOTYPE.indexOf(SOURCE_FIELD);
+		public static final int X = PROTOTYPE.indexOf(X_FIELD);
+		public static final int Y = PROTOTYPE.indexOf(Y_FIELD);
+		public static final int WIDTH = PROTOTYPE.indexOf(WIDTH_FIELD);
+		public static final int HEIGHT = PROTOTYPE.indexOf(HEIGHT_FIELD);
+		
 		private final String source;
 		private final int x;
 		private final int y;
@@ -32,18 +45,19 @@ public final class ComponentEventStream implements TupleStream {
 			this.height = r.height;
 		}
 		
-		public Object get(String name) throws InvalidNameException {
-			if (name.equals("SOURCE")) {return source;}
-			if (name.equals("X")) {return x;}
-			if (name.equals("Y")) {return y;}
-			if (name.equals("WIDTH")) {return width;}
-			if (name.equals("HEIGHT")) {return height;}
-			
-			throw new InvalidNameException(name, FIELDS);
+		public Object get(String name) {return Tuples.namedDereference(name, this);}
+		
+		public Object get(int idx) {
+			if (idx == SOURCE) {return source;}
+			if (idx == X) {return x;}
+			if (idx == Y) {return y;}
+			if (idx == HEIGHT) {return height;}
+			if (idx == WIDTH) {return width;}
+			throw new TupleBoundsException(idx, size());
 		}
-
-		public List<String> getPrototype() {return FIELDS;}
-		public boolean hasField(String name) {return FIELDS.contains(name);}
+		
+		public int size() {return PROTOTYPE.size();}
+		public List<String> getPrototype() {return PROTOTYPE;}
 		public boolean isDefault(String name, Object value) {return false;}		
 	}
 	

@@ -21,7 +21,7 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.types.Converter;
@@ -124,12 +124,12 @@ public class Sidebar implements Guide2D {
 		
 		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
 		Object[] labelValues = new Object[]{exampleWidth + hSpacing, indexOffset, contents.input, "LEFT"};
-		Text label = prototypeLabel.update(new BasicTuple(labelFields, labelValues));
+		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
 		label = label.update(Tuples.sift("label.", result));
 		
 		String[] exampleFields = new String[]{"Y", displayOn, "REGISTRATION"};
 		Object[] exampleValues = new Object[]{indexOffset, contents.output, "RIGHT"};
-		Shape example = prototypeExample.update(new BasicTuple(exampleFields, exampleValues));
+		Shape example = prototypeExample.update(new PrototypedTuple(exampleFields, exampleValues));
 		example = example.update(Tuples.sift("example.", result));
 		
 		return Arrays.asList(new Glyph2D[]{label, example});

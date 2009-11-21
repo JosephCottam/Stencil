@@ -37,7 +37,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.parser.tree.View;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 import stencil.util.enums.EnumUtils;
@@ -166,7 +166,7 @@ public class MouseStream implements TupleStream {
 
 			mouse.prior = mouse.current;
 		}
-		Tuple t= new BasicTuple("Mouse", EnumUtils.allNames(Names.class), Arrays.asList(values));
+		Tuple t= new PrototypedTuple("Mouse", EnumUtils.allNames(Names.class), Arrays.asList(values));
 		return t;
 	}
 

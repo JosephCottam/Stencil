@@ -36,7 +36,7 @@ import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 /**
@@ -121,7 +121,7 @@ public class Temp extends BasicModule {
 				rank =-1;
 			}
 			
-			return BasicTuple.singleton(rank);
+			return PrototypedTuple.singleton(rank);
 		}
 		
 		public Rank duplicate() {return new Rank();}
@@ -152,7 +152,7 @@ public class Temp extends BasicModule {
 			} else {
 				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
 			}
-			return new BasicTuple(names, objects);
+			return new PrototypedTuple(names, objects);
 		}
 
 		public Tuple map(Object... args) {return query(args);}
@@ -163,7 +163,7 @@ public class Temp extends BasicModule {
 			
 			Object[] results = map.get(key);
 			if (results == null) {return null;}			
-			return new BasicTuple(names, results);
+			return new PrototypedTuple(names, results);
 		}
 		
 		public static OperatorData getLegendData(String moduleName, String name, Specializer specializer) throws SpecializationException{

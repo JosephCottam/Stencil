@@ -44,23 +44,42 @@ public final class Tuples {
 	 * is required but cannot be supplied.*/
 	public static final Tuple EMPTY_TUPLE = new Tuple() {
 		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
+		public Object get(int idx) {throw new TupleBoundsException(idx, size());}
 		public List<String> getPrototype() {return new ArrayList<String>();}
+		public int size() {return 0;}
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
 	};
 
 	
-	/**Tuple backed by a map.  The tuple is immutable, but the backing
-	 * map may not be.  Updates to the map WILL be represented in the tuple.
+	/**Tuple backed by a map.  
+	 * Updates to the backing map WILL be represented in the tuple.
+	 * 
+	 * If an immutable map is passed, the set method will throw an UnsupportedOperationException.
+	 * 
 	 * @author jcottam
 	 *
 	 */
-	public static final class MapTuple implements Tuple {
-		private Map<String, ?> map;
+	public static class MapTuple implements MutableTuple {
+		protected Map<String, Object> map;
 		
-		public MapTuple(Map<String, ?> source) {this.map = source;}
+		public MapTuple(Map<String, Object> source) {this.map = source;}
 		
 		public Object get(String name) throws InvalidNameException {return map.get(name);}
-
+		public Object get(int idx) {
+			int index = idx;
+			for (String key: map.keySet()) {
+				if (index==0) {return get(key);}
+				index--;
+			}
+			throw new TupleBoundsException(idx, size());
+		}
+		public int size() {return map.size();}
+		
+		public void set(String key, Object value) {
+			try{map.put(key, value);}
+			catch (UnsupportedOperationException e) {throw new UnsupportedOperationException("Cannot modify map tuple with immutable backing map.");}
+		}
+		
 		public List<String> getPrototype() {return new ArrayList(map.keySet());}
 		
 		public boolean isDefault(String name, Object value) {return false;}
@@ -82,7 +101,7 @@ public final class Tuples {
 			}
 		}
 		
-		return new BasicTuple(fields, values);
+		return new PrototypedTuple(fields, values);
 	}
 
 	
@@ -106,7 +125,7 @@ public final class Tuples {
 			if (v != null) {values[i] = v;}
 		}
 
-		return new BasicTuple(attributes, Arrays.asList(values));
+		return new PrototypedTuple(attributes, Arrays.asList(values));
 	}
 
 	/**Copies all of the field of the source to the target.
@@ -122,17 +141,14 @@ public final class Tuples {
 	 * @param target Target for values.  Existing values may be overwritten.
 	 * @param defaults Should default values be transfered (false will skip any value currently set to the default on the source)
 	 * @return The target passed in (after the transfer).
-	 * 
-	 * TODO: Make it so it can optionally report errors
 	 */
 	public static final MutableTuple transfer(Tuple source, MutableTuple target) {
 		for (String field:source.getPrototype()) {
-			try {
-				Object sourceValue = source.get(field);
-				Object targetValue = target.get(field);
-				if (sourceValue == targetValue || sourceValue.equals(targetValue)) {continue;}	//Skip values that are equal.
-				if (!source.isDefault(field, sourceValue)) {target.set(field, sourceValue);}
-			} catch (Throwable e) {/*HACK: Errors are ignored, so transfer may not be successful but execution does not know that!*/}
+			Object sourceValue = source.get(field);
+			Object targetValue = target.get(field);
+			if (sourceValue == targetValue || sourceValue.equals(targetValue)) {continue;}	//Skip values that are equal.
+			try {if (!source.isDefault(field, sourceValue)) {target.set(field, sourceValue);}}
+			catch (Exception e) {target.set(field, sourceValue);}	//If there was an error, assume it was not the default value
 		}
 		return target;
 	}
@@ -223,48 +239,22 @@ public final class Tuples {
 	 * @return
 	 */
 	public static Tuple merge(Tuple source1, Tuple source2) throws IllegalArgumentException {
-		class IncrimentalTuple implements Tuple {
-			private java.util.Map<String, Object> values;
-
-			public IncrimentalTuple() {
-				values = new HashMap<String, Object>();
-			}
-
-			public Object get(String name) throws InvalidNameException {
-				if (!values.containsKey(name)) {throw new InvalidNameException(name);}
-				return values.get(name);
-			}
-
-			public List<String> getPrototype() {
-				String[] names = values.keySet().toArray(new String[]{});
-				Arrays.sort(names);
-				return Arrays.asList(names);
-			}
-
-			public boolean isDefault(String name, Object value) {return false;}
-
-			public void addField(String name, Object value) {
-				values.put(name, value);
-			}
-
-			public String toString() {return Tuples.toString(this);}
-		}
-
 		if (source1 == null && source2 ==null) {throw new IllegalArgumentException("At least one source to merge must not be null.");}
 
 		if (source1 == null || source1 == EMPTY_TUPLE) {return source2;}
 		if (source2 == null || source2 == EMPTY_TUPLE) {return source1;}
 
-		IncrimentalTuple result = new IncrimentalTuple();
+		Map<String, Object> backing = new HashMap();
+		
 		for (String name: source1.getPrototype()) {
 			Object value = source1.get(name);
-			result.addField(name, value);
+			backing.put(name, value);
 		}
 		for (String name: source2.getPrototype()) {
 			Object value = source2.get(name);
-			result.addField(name, value);
+			backing.put(name, value);
 		}
-		return result;
+		return new MapTuple(Collections.unmodifiableMap(backing));
 	}
 
 
@@ -295,6 +285,12 @@ public final class Tuples {
 		return names;
 	}
 	
+	
+	public static final Object namedDereference(String name, Tuple source) {
+		int idx = source.getPrototype().indexOf(name);
+		if (idx >=0) {return source.get(idx);}
+		throw new InvalidNameException(name, source.getPrototype());
+	}
 	
 	/**Remove quotes from around a value (if present).*/
 	public static final String stripQuotes(String s) {

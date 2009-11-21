@@ -26,52 +26,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.parser.tree;
+package stencil.tuple;
 
-import java.util.List;
-
-import org.antlr.runtime.Token;
-
-import stencil.tuple.PrototypedTuple;
-import stencil.tuple.Tuple;
-
-/**Targets are things that can be on the left-hand-side
- * of a rule.  They consist of a target-type and
- * a tuple prototype.
+/**Thrown to indicate that an out-of-bounds tuple index was requested
  *
  * @author jcottam
  *
  */
-public abstract class Target extends StencilTree {
-	protected Target(Token source) {super(source);}
-
-	/**What is the name of this target (Glyph or Return, etc).*/
-	public String getName() {return token.getText();}
-
-	/**What properties of the target entity are being affected?*/
-	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
-
-	/**Processes the values tuple relative to the prototype
-	 * By default, this returns the result of a simple finalize.
-	 * 
-	 * @param source Source values for setting, ordered and of the same number as the prototype of this target
-	 * @return Potentially new tuple representing source after changes
-	 * @throws May throw an exception based on the nature of the finalize operation
-	 */
-	public Tuple finalize(Tuple source) throws Exception {return simpleFinalize(source);}
-
-	/**Create a new tuple where the names are take from the tuple prototype and
-	 * values are take from the source.  Names are matched to values order-wise.
-	 */
-	protected final Tuple simpleFinalize(Tuple source) {
-		List<String> fields = getPrototype();
-		List<Object> values = new java.util.ArrayList<Object>();
-
-		for (String name: source.getPrototype()) {
-			values.add(source.get(name));
-		}
-
-		Tuple rv = new PrototypedTuple(fields, values);
-		return rv;
+public class TupleBoundsException extends IndexOutOfBoundsException {
+	private static final long serialVersionUID = 1L;
+	public TupleBoundsException(int idx, int size) {
+		super(String.format("Index %1$d invalid in tuple of size %2$d.", idx, size));
 	}
 }

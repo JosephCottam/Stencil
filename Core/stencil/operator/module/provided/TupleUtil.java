@@ -8,7 +8,7 @@ import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 
@@ -40,7 +40,7 @@ public class TupleUtil extends BasicModule {
 		public Tuple map(Object... values) {
 			assert keys.length == values.length : "Keys and values lengths do not match.";
 			
-			return new BasicTuple(keys, values);
+			return new PrototypedTuple(keys, values);
 		}
 		public String getName() {return NAME;}
 
@@ -71,7 +71,7 @@ public class TupleUtil extends BasicModule {
 					sum += ((Tuple) args[0]).getPrototype().size();
 				} else {sum++;}
 			}
-			return BasicTuple.singleton(sum);
+			return PrototypedTuple.singleton(sum);
 		}
 		
 		public static boolean accepts(Specializer specializer) {return specializer.isSimple();}

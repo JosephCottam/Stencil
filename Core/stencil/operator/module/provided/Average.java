@@ -37,7 +37,7 @@ import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -64,7 +64,7 @@ public class Average extends BasicModule {
 				for (double d: values) {sum += d;}
 				mean = sum/values.length;
 			}
-			return BasicTuple.singleton(mean);
+			return PrototypedTuple.singleton(mean);
 		}
 		public String getName() {return NAME;}
 		public Tuple query(Object... args) {return map(args);}
@@ -98,7 +98,7 @@ public class Average extends BasicModule {
 
 		public Tuple map(Object... values) {
 			if (start >0) {start--;}
-			if (start >0) {return BasicTuple.singleton(0);}
+			if (start >0) {return PrototypedTuple.singleton(0);}
 
 			Double sum=0d;
 			for (Object value: values) {
@@ -108,7 +108,7 @@ public class Average extends BasicModule {
 
 			count += values.length;
 			total += sum;
-			return BasicTuple.singleton(total/count);
+			return PrototypedTuple.singleton(total/count);
 		}
 		
 		public String getName() {return NAME;}
@@ -117,7 +117,7 @@ public class Average extends BasicModule {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			double value =0;
 			if (count > 0) {value = total/count;}
-			return BasicTuple.singleton(value);
+			return PrototypedTuple.singleton(value);
 		}
 		
 		public FullMean duplicate() {return new FullMean(start);}
@@ -141,9 +141,9 @@ public class Average extends BasicModule {
 			int idx = (int) Math.floor(values.length/2);
 
 			if (idx != values.length/2) {
-				return BasicTuple.singleton((values[idx] + values[idx+1])/2);
+				return PrototypedTuple.singleton((values[idx] + values[idx+1])/2);
 			}
-			return BasicTuple.singleton(values[idx]);
+			return PrototypedTuple.singleton(values[idx]);
 		}
 		public String getName() {return NAME;}
 
@@ -183,7 +183,7 @@ public class Average extends BasicModule {
 			if (max == -1) {throw new RuntimeException("Cannot compute mode on empty set.");}
 
 			//return max value as a tuple
-			return BasicTuple.singleton(value);
+			return PrototypedTuple.singleton(value);
 		}
 		public String getName() {return NAME;}
 

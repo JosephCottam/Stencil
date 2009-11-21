@@ -43,6 +43,13 @@ public interface Tuple {
 	 * @throws InvalidNameException The name passed is not valid for this tuple.*/
 	public abstract Object get(String name) throws InvalidNameException;
 
+	
+	/**Get an item by index from a tuple.*/
+	public abstract Object get(int idx);
+
+	public abstract int size();
+	
 	/**Is this the default value for this field?*/
 	public abstract boolean isDefault(String name, Object value);
+	
 }

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 /**End-of-call-chain entity that create a new tuple in its
@@ -47,7 +47,7 @@ public final class Pack extends CallTarget {
 				names[i] = generateName(i);
 			}
 		}
-		return new BasicTuple(names, values);
+		return new PrototypedTuple(names, values);
 	}
 
 	private static final String generateName(int seed) {return Integer.toString(seed);} //TODO: Updated autogen name when numerical de-referencing is the game

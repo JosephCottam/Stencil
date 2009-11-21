@@ -2,7 +2,7 @@ package stencil.util.streams.sql;
 
 import java.sql.*;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 
@@ -58,7 +58,7 @@ public class QueryTuples implements TupleStream {
 			try {values[i-1] = results.getString(i);}
 			catch (Exception e) {throw new RuntimeException(String.format("Error retrieving value %1$d for tuples.", i),e);}
 		}
-		return new BasicTuple(name, fields, values);
+		return new PrototypedTuple(name, fields, values);
 	}
 
 	public void reset() throws Exception {

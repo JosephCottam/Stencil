@@ -39,6 +39,7 @@ import java.util.List;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.MutableTuple;
+import stencil.tuple.TupleBoundsException;
 import stencil.util.enums.Attribute;
 
 /**The CanvasTuple represents an actual drawing surface
@@ -81,14 +82,20 @@ public interface CanvasTuple extends MutableTuple {
 	 * Most canvas tuples need only extend this class and provide the mission (relatively simple) methods.
 	 */
 	public static abstract class SimpleCanvasTuple implements CanvasTuple {
-		public static final List<String> FIELDS;
+		public static final List<String> PROTOTYPE;
 		static {
 			HashSet<String> s = new HashSet<String>();
 			for (CanvasAttribute a: EnumSet.allOf(CanvasAttribute.class)) {s.add(a.name());}
-			FIELDS = Collections.unmodifiableList(new ArrayList(s));
+			PROTOTYPE = Collections.unmodifiableList(new ArrayList(s));
 		}
 		
 		protected abstract Rectangle getBounds();
+		
+		//TODO: Convert so the indexed de-reference is the principle one
+		public Object get(int idx) {
+			try {return get(PROTOTYPE.get(idx));} 
+			catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
+		}
 		
 		public Object get(String name) throws InvalidNameException {
 			Rectangle bounds = getBounds();
@@ -117,11 +124,9 @@ public interface CanvasTuple extends MutableTuple {
 		public double getWidth() {return getBounds().getWidth();}
 		public double getHeight() {return getBounds().getHeight();}
 
+		public int size() {return PROTOTYPE.size();}
+		public List<String> getPrototype() {return PROTOTYPE;}
 		
-		public List<String> getPrototype() {return FIELDS;}
-		
-		public boolean hasField(String name) {return getPrototype().contains(name);}
-
 		public String toString() {return stencil.tuple.Tuples.toString(this);}
 		
 		/**Gets the default value for the named property.
@@ -131,7 +136,7 @@ public interface CanvasTuple extends MutableTuple {
 		 * @return Default value of property.
 		 */
 		public boolean isDefault(String name, Object value) {
-			if (!hasField(name)) {return false;}
+			if (PROTOTYPE.contains(name)) {return false;}
 			Object def = CanvasAttribute.valueOf(name).defaultValue;
 			return def == value || (def != null && def.equals(value));
 		}

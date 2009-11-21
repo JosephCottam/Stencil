@@ -2,7 +2,7 @@ package stencil.util.streams.feed;
 
 import java.util.*;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.util.collections.MarkSweepSet;
 
@@ -51,7 +51,7 @@ public class FeedTuples extends CacheFeed<SyndFeedInput> {
         		values[i] = fieldValues.get(fields[i]);
         	}
 
-        	Tuple tuple = new BasicTuple(name, fields, values);
+        	Tuple tuple = new PrototypedTuple(name, fields, values);
             entryCache.offer(tuple);
             idCache.add(key);
         }

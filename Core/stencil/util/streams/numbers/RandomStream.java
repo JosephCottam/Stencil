@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 import java.util.NoSuchElementException;
 
-import stencil.tuple.BasicTuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 
@@ -32,7 +32,7 @@ public class RandomStream implements TupleStream {
 		
 		Double[] values = new Double[size];
 		for (int i =0; i<size; i++) {values[i] = Math.random();}
-		return new BasicTuple(name, fields, values);
+		return new PrototypedTuple(name, fields, values);
 	}
 
 	public boolean ready() {return hasNext();}
