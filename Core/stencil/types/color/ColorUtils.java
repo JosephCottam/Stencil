@@ -36,11 +36,10 @@ import stencil.operator.module.util.BasicModule;
 import stencil.parser.tree.Value;
 
 public final class ColorUtils extends BasicModule {
-	//TODO: Somehow tie these utilities to the color type instantiated.
+	//TODO: Try to make more static methods in sigils so this instance doesn't need to exist
 	private static final stencil.types.color.Color colorType = new stencil.types.color.Color();
 	
 	private enum DIR {up, down, full, none};
-	private enum COMP {Red, Blue, Green, Alpha}
 
 	static Integer rangeValue(Value value) {
 		Integer v;
@@ -69,21 +68,19 @@ public final class ColorUtils extends BasicModule {
 		return (ColorTuple) colorType.convert(o, ColorTuple.class);
 	}
 
-	private static Tuple mod(Object source, ColorUtils.COMP comp, Object v, String name) {
+	private static Tuple mod(Object source, int comp, Object v, String name) {
 		ColorTuple color = validate(source);
 		
 		Number value = Converter.toNumber(v);
 		if (value instanceof Float) {value = rangeValue((Float) value);}
 		else if (value instanceof Double) {value = rangeValue(((Double) value).floatValue());}
 		
-		return PrototypedTuple.singleton(color.modify(comp.name(), value)); //TODO: Change so just the color tuple is returned
+		return PrototypedTuple.singleton(color.modify(comp, value)); //TODO: Change so just the color tuple is returned
 	}
 
-	private static Tuple mod(Object source, ColorUtils.COMP comp, ColorUtils.DIR dir, String name) {
+	private static Tuple mod(Object source, int comp, ColorUtils.DIR dir, String name) {
 		ColorTuple color = validate(source);
-		float value;
-		float[] values =color.getComponents(null);
-		value = values[comp.ordinal()];
+		float value = ((Integer) color.get(comp))/255f;
 
 		switch (dir){
 			case up: value = value  + ((1-value) /2); break; //Up by half the distance to full
@@ -103,20 +100,20 @@ public final class ColorUtils extends BasicModule {
 	
 	public static Tuple getBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
 	public static Tuple getIntBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
-	public static Tuple setBlue(Object v, Object o) {return mod(o, COMP.Blue, v, "SetBlue");}
+	public static Tuple setBlue(Object v, Object o) {return mod(o, ColorTuple.BLUE, v, "SetBlue");}
 
 	public static Tuple getRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
 	public static Tuple getIntRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
-	public static Tuple setRed(Object v, Object o) {return mod(o, COMP.Red, v, "SetRed");}
+	public static Tuple setRed(Object v, Object o) {return mod(o, ColorTuple.RED, v, "SetRed");}
 
 	public static Tuple getGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
 	public static Tuple getIntGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
-	public static Tuple setGreen(Object v, Object o) {return mod(o, COMP.Green, v, "setGreen");}
+	public static Tuple setGreen(Object v, Object o) {return mod(o, ColorTuple.GREEN, v, "setGreen");}
 
 	public static Tuple getAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
 	public static Tuple getIntAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
-	public static Tuple setAlpha(Object v, Object o) {return mod(o, COMP.Alpha, v, "setAlpha");}
-	public static Tuple opaque(Object o) {return mod(o, COMP.Alpha, DIR.full, "Opque");}
+	public static Tuple setAlpha(Object v, Object o) {return mod(o, ColorTuple.ALPHA, v, "setAlpha");}
+	public static Tuple opaque(Object o) {return mod(o, ColorTuple.ALPHA, DIR.full, "Opque");}
 
 	
 	public ColorUtils(ModuleData md) {super(md);}

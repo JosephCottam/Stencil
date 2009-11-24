@@ -54,6 +54,15 @@ public final class AttributeList implements Iterable<Attribute>{
 		names = null;
 	}
 	
+	public int size() {return attributes.size();}
+	
+	/**Get the nth item from the attribute list.
+	 * Order is stable as long as the attribute listing does not change.
+	 * @param idx
+	 * @return
+	 */
+	public Attribute get(int idx) {return attributes.get(names.get(idx));}
+	
 	public Attribute get(Enum name) {return get(name.name());}
 	
 	/**Get the given attribute.*/

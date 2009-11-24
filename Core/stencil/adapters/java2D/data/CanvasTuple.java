@@ -51,5 +51,14 @@ public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
 		}
 	}
 
-
+	
+	public boolean isDefault(String name, Object value) {
+		if (CanvasAttribute.BACKGROUND_COLOR.name().equals(name)) {
+			return CanvasAttribute.BACKGROUND_COLOR.getDefaultValue().equals(canvas.getBackground());
+		} else if (CanvasAttribute.X.name().equals(name) ||
+					CanvasAttribute.Y.name().equals(name)) {
+			return (value instanceof Number && ((Number) value).intValue() ==0);
+		}
+		return super.isDefault(name, value);
+	}
 }

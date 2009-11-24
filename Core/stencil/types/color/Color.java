@@ -114,10 +114,8 @@ public final class Color implements SigilType<java.awt.Color, ColorTuple> {
 		return toTuple(rgb);
 	}
 	
-	
 	/**Gets a string representation of an AWT color.*/
 	public String toString(java.awt.Color source) {return toTuple(source.getRGB()).toString();}
-	
 	
 	/**Converts to/from color objects.*/
 	public Object convert(Object value, Class target) {

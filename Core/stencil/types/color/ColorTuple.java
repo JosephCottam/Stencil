@@ -49,9 +49,9 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 	private static final String ALPHA_FIELD = "A";
 	private static final List<String>PROTOTYPE = Arrays.asList(RED_FIELD, GREEN_FIELD, BLUE_FIELD, ALPHA_FIELD);
 
-	public static final int RED = PROTOTYPE.indexOf(RED_FIELD);
+	public static final int RED   = PROTOTYPE.indexOf(RED_FIELD);
 	public static final int GREEN = PROTOTYPE.indexOf(GREEN_FIELD);
-	public static final int BLUE = PROTOTYPE.indexOf(BLUE_FIELD);
+	public static final int BLUE  = PROTOTYPE.indexOf(BLUE_FIELD);
 	public static final int ALPHA = PROTOTYPE.indexOf(ALPHA_FIELD);
 	
 	private static final List<String> FIELDS;
@@ -123,13 +123,13 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		throw new TupleBoundsException(idx, size());
 	}
 	
-	public ColorTuple modify(String name, Number value) {
+	public ColorTuple modify(int field, Number value) {
 		int c = this.getRGB();
 		
-		if (name.equals(RED_FIELD))   {c = IntColor.modifyRed(c, value.intValue());}
-		if (name.equals(GREEN_FIELD)) {c = IntColor.modifyGreen(c, value.intValue());}
-		if (name.equals(BLUE_FIELD))  {c = IntColor.modifyBlue(c, value.intValue());}
-		if (name.equals(ALPHA_FIELD)) {c = IntColor.modifyAlpha(c, value.intValue());}
+		if (field == RED)   {c = IntColor.modifyRed(c, value.intValue());}
+		if (field == GREEN) {c = IntColor.modifyGreen(c, value.intValue());}
+		if (field == BLUE)  {c = IntColor.modifyBlue(c, value.intValue());}
+		if (field == ALPHA) {c = IntColor.modifyAlpha(c, value.intValue());}
 		
 		return Color.internalToTuple(c);
 	}

@@ -144,6 +144,12 @@ public abstract class Basic implements Glyph2D {
 	 * of a glyph before the constructor completes.  
 	 */
 	protected final void updateBoundsRef(Rectangle2D r) {bounds.setRect(r);}
+
+	public int size() {return getAttributes().size();}
+	public Object get(int idx) {
+		Attribute a = getAttributes().get(idx);
+		return get(a.name);
+	}
 	
 	public Object get(String name) {
 		if (ID.is(name)) {return id;}
