@@ -6,7 +6,7 @@ import org.antlr.runtime.Token;
 import stencil.tuple.Tuple;
 
 /**Unpack a tuple reference.*/
-public class TupleRef extends Value {
+public final class TupleRef extends Value {
 
 	public TupleRef(Token source) {super(source);}
 
@@ -43,12 +43,6 @@ public class TupleRef extends Value {
 			return prototype.indexOf(name);
 		}
 	}
-	
-	/**Is the tuple-ref able to return a value from the given source?*/
-	public boolean canRef(Tuple source) {
-		try {externalValue(source); return true;}
-		catch (Exception e) {return false;}
-	}
 
 	/**Get the java-type-value of this tuple-ref, relative to the passed tuple.
 	 *
@@ -60,6 +54,7 @@ public class TupleRef extends Value {
 
 		Atom ref = getValue();
 		Object value = doRef(source, ref);
+		
 		if (hasSubRef()) {return getSubRef().externalValue((Tuple) value);}
 		else {return value;}
 	}

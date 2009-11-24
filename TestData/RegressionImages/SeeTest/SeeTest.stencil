@@ -2,14 +2,14 @@ STREAM: File
 NAME: MTTSource
 HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
 SEPARATOR: \s*\|\s*
-SOURCE: ./18049-arch-compiler.output.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/SeeTest/18049-arch-compiler.output.txt
 SKIP: 2
 STRICT: false
 STREAM: File
 NAME: MTTNotApplicable
 HEADER: axis1A, axis1B, axis2A, axis2B
 SEPARATOR: ,\s*
-SOURCE: ./NoData-Comp.txt
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/SeeTest/NoData-Comp.txt
 SKIP: 1
 STRICT: true
 
@@ -35,10 +35,10 @@ from MTTSource
 	(X,Y): Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
 	SIZE: 13
 	STROKE_WEIGHT: 3
-	STROKE_COLOR: RelativeFails(fail, pass) -> (C)
+	STROKE_COLOR: RelativeFails(fail, pass)
 	SLICE: fail
 	FIELD: pass
-	SLICE_COLOR: Pallet("FAIL") -> (C)
+	SLICE_COLOR: Pallet("FAIL")
 	FIELD_COLOR: @color(WHITE)
 
 layer NotApplicable
@@ -99,7 +99,7 @@ from MTTSource
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
 	Y.1 :-5
 	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
-	STROKE_COLOR : Pallet("GRID") -> C
+	STROKE_COLOR : Pallet("GRID")
 from MTTSource
 	ID : Concatenate(axis2A, axis2B) -> VALUE
 	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
@@ -108,23 +108,23 @@ from MTTSource
 	STROKE_COLOR: Pallet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE) -> VALUE
+	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-	all => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[1 .. n](VALUE) -> VALUE
+	all => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[1 .. n](VALUE)
 
 
 operator NamesIndex(ID) -> (VALUE)
 	all => VALUE: Index(ID) -> (VALUE)
 
 operator BasicFails(fails) -> (C)
-	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C) -> (VALUE)
-	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
+	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C)
+	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C)
 
 operator RelativeFails(fails, passes) -> (C)
 	(passes= 0) => C: @color(BLACK)
-	(fails = 0) => C: Pallet("PASS") -> (C)
-	(fails > 0) => C: Pallet("FAIL") -> (C)
+	(fails = 0) => C: Pallet("PASS")
+	(fails > 0) => C: Pallet("FAIL")
 
 operator Pallet(Name) -> (C)
 	(Name =~"FAIL")    => C: @color(200,30,30)

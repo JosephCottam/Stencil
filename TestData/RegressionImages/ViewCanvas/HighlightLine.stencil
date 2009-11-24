@@ -27,7 +27,7 @@ from Stocks
 	STROKE_COLOR: @color(BLUE)
 
 from Stocks
-	view(ZOOM, X,Y, HEIGHT) 
+	view(ZOOM, X,Y, WIDTH) 
 		: ScreenToCanvasDimension(20, 20) -> Max(Width, Height) -[Pad]> 
 		  ZoomPadded(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT], Pad[_])
 	

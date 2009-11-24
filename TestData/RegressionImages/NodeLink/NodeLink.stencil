@@ -1,17 +1,17 @@
 STREAM: File
-NAME: BFS
-HEADER: ID
-SEPARATOR: \s+
-SOURCE: ./er_100_0.005.bfs
-SKIP: 1
-STRICT: TRUE
-STREAM: File
 NAME: VertexList
 HEADER: ID1, ID2
 SEPARATOR: ,
-SOURCE: ./er_100_0.005.adj
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/er_100_0.005.adj
 SKIP: 1
-STRICT: TRUE
+STRICT: true
+STREAM: File
+NAME: BFS
+HEADER: ID
+SEPARATOR: \s+
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/er_100_0.005.bfs
+SKIP: 1
+STRICT: true
 
 external stream BFS (ID) 
 external stream VertexList (ID1, ID2)
@@ -23,7 +23,7 @@ from BFS
 	ID: ID
 	REGISTRATION : "CENTER"
 	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(BLUE), 10)
-	(X,Y) : Ordering(ID) -> Squarify(VALUE) -> (X,Y)
+	(X,Y) : Ordering(ID) -> Triangular(VALUE) -> (X,Y)
 	 
 
 layer Labels[TEXT]				/*Changes the glyph type. All layers have only one glyph type.*/
@@ -31,7 +31,6 @@ from BFS
 	ID : ID
 	(X,Y): Nodes.Find(ID) -> (X,Y)
 	(TEXT, FONT_SIZE, FONT_COLOR): (ID, 10, @color(GRAY60))
-
 
 layer Edges[LINE]
 from VertexList 
@@ -44,7 +43,7 @@ from VertexList
 operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
-python Squarify
+python Triangular
 facet Init {
 	from math import sqrt
 	from math import ceil

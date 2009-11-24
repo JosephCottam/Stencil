@@ -28,4 +28,3 @@ Is there a difference between a stroke and a fill?  Maybe.  Look at these:
 @stroke(@color(RED), @color(BLUE), @color(GREEN), "111   222   333")
 
 
-

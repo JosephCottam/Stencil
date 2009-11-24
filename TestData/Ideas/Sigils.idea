@@ -3,3 +3,16 @@ How to improve sigils:
 Sigil has its own grammar, but provide a standard splitter (same syntax as specializers that don't do split or range).
 Entire text block is passed to sigil with an environment.
 Unquote-values are denoted with an @ inside the sigil.  @@ may be sigil value from the environment?
+
+
+Sigils needed:
+	* Pens
+		* Color
+		* Gradient
+		* Stroke
+		* Fill
+	* Date
+	* Font/Text formats
+	
+After color, fill and Font are sigils, then then glyphs are simpler tuples (since all these attributes are sub-tuples).  
+	--> Will need the ability to assign to sub-tuples in targets (might be able to already...hopefully) 

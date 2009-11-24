@@ -1,13 +1,17 @@
-Move some of the argumens from the axis specializer to the operator specializer when the operator is constructed
-	* tickCount
-	* sample
-	* sampleBy
-	
-Move guide update to paint loop instead of data load loop.
-
 Different sample strategies for double, int and sigils
 	--> Sigils need to provide a sample strategy operation
 
 Force guide to certain bounds?
 	-> Provide min/max as arguments to guide specializer
 	-> Error in op if an input exceeds the bounds
+	
+Different types of operators: 
+	Categorical guides only needed to know that something was categorical or not, continuous guides need more
+	Sampling means that some values of the guide are not present in the input, as such some guide mappings are not as simple...
+		Adding a reverse facet solves the problem sometimes
+		
+What do you do with summarizing operations (like max[1..n])?
+	Have a special guide facet?  This multiplies facets on operators, complicating the interface.
+		--> Could cascade them use guide then query then map
+		Ability to specify special guide target
+		 

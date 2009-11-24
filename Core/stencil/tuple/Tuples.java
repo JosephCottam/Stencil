@@ -286,6 +286,16 @@ public final class Tuples {
 	}
 	
 	
+	/**A straightforward way of doing named de-reference on a tuple.
+	 * 
+	 * Specific tuple types may have faster ways of performing a named de-reference,
+	 * however this method uses only the features of the Tuple interface and
+	 * may as such be used with any Tuple.
+	 * 
+	 * @param name
+	 * @param source
+	 * @return
+	 */
 	public static final Object namedDereference(String name, Tuple source) {
 		int idx = source.getPrototype().indexOf(name);
 		if (idx >=0) {return source.get(idx);}

@@ -4,9 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**Tuple that is intedned primarily for positional dereference.
- * Field cannot be supplied for this tuple, but get-by-name can be used
- * with indices prefixed by the word 'Value'.
+/**Tuple that is primarily for positional dereference.
+ * 
+ * Fields cannot be supplied for this tuple, but get-by-name can be used
+ * with indices prefixed by the word 'Value' if needed.
  *  
  * @author jcottam
  *

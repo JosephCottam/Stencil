@@ -36,13 +36,10 @@ import java.util.Collections;
 
 
 /***
- * Principally a unit for passing information around.  Conceptually, this is a map from names to values,
- * but with some special properties.  Principally, the original order of the keys
- * is retained (so positional seeking can be used).
- *
- * All values are stored as the object type they were presented as, but calling specified
- * routines will attempt conversion.
- *
+ * Principally a unit for passing information around.  
+ * Conceptually, this is a map from names to values,
+ * but with some special properties.
+ *   
  * @author jcottam
  */
 public final class PrototypedTuple implements Tuple {
@@ -98,7 +95,7 @@ public final class PrototypedTuple implements Tuple {
 		assert names.size() == values.size() : "Value and name list not of the same length." + names + " vs. " + values;
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 		
-		this.names = names;
+		this.names = Collections.unmodifiableList(names);
 		this.values = values;
 	}
 
@@ -116,9 +113,7 @@ public final class PrototypedTuple implements Tuple {
 	/**Returns a string as-per the static toString() method.**/
 	public String toString() {return Tuples.toString(this);}
 
-	public boolean hasField(String name) {return names.contains(name);}
-
-	public List<String> getPrototype() {return Collections.unmodifiableList(names);}
+	public List<String> getPrototype() {return names;}
 	
 	public Object get(String name) {return Tuples.namedDereference(name, this);}
 	public Object get(int idx) {return values.get(idx);}
