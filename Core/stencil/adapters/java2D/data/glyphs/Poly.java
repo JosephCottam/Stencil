@@ -97,12 +97,14 @@ public abstract class Poly extends Stroked {
 	protected static final Attribute<Double> Yn = new Attribute("Yn", 0d, double.class);
 	protected static final Attribute<Double> X = new Attribute("X", 0d, double.class);
 	protected static final Attribute<Double> Y = new Attribute("Y", 0d, double.class);
+	protected static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "ALL");
 
 	static {
 		ATTRIBUTES.add(Xn);
 		ATTRIBUTES.add(Yn);
 		ATTRIBUTES.add(X);
 		ATTRIBUTES.add(Y);
+		ATTRIBUTES.add(SCALE_BY);
 		
 		UNSETTABLES.add(X);
 		UNSETTABLES.add(Y);
@@ -111,6 +113,7 @@ public abstract class Poly extends Stroked {
 	private final List<Point2D> points;
 	private final GeneralPath path;	
 	private final boolean connect;
+	private final String scaleBy;
 	
 	public Poly(DisplayLayer layer, String id, boolean connect) {
 		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
@@ -118,6 +121,7 @@ public abstract class Poly extends Stroked {
 		
 		points = new ArrayList();
 		path = buildPath(points, this.connect);
+		scaleBy = SCALE_BY.defaultValue;
 		super.updateBoundsRef(path.getBounds2D());
 	}
 	
@@ -128,6 +132,7 @@ public abstract class Poly extends Stroked {
 		this.points = source.points;
 		this.path = source.path;
 		this.connect = source.connect;
+		this.scaleBy = source.scaleBy;
 	}
 
 
@@ -135,6 +140,8 @@ public abstract class Poly extends Stroked {
 	protected Poly(Poly source, Tuple option, boolean connect) {
 		super(source, option, UNSETTABLES);
 		this.connect = connect;
+		
+		this.scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
 		
 		if (changesPoints(option)) {
 			points = new ArrayList(source.points);
@@ -153,7 +160,7 @@ public abstract class Poly extends Stroked {
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 
 	public Object get(String name) {
-		String base = baseName(name);
+		String base = baseName(name); 
 		
 		if (X.is(name)) {return bounds.getX();}
 		if (Y.is(name)) {return bounds.getY();}
@@ -168,6 +175,9 @@ public abstract class Poly extends Stroked {
 			if (Xn.is(base)) {return points.get(index).getX();}
 			if (Yn.is(base)) {return points.get(index).getY();}
 		} 
+		
+		if (SCALE_BY.is(name)) {return scaleBy;}
+		
 		return super.get(name);
 	}	
 
@@ -211,11 +221,31 @@ public abstract class Poly extends Stroked {
 		return p;
 	}
 	
+	//TODO: Combine with LINE fixTransform for a more general line-implantation scaling
+	private GeneralPath fixTransform(Graphics2D g) {
+		if (scaleBy.equals("ALL")) {return path;}
+		
+		if (scaleBy.equals("NONE")) {
+			AffineTransform vt = g.getTransform();
+			List newPoints = new ArrayList(points.size());
+			
+			for (Point2D oldPoint: points) {
+				Point2D newPoint = vt.transform(oldPoint, null);
+				newPoints.add(newPoint);
+			}
+			g.setTransform(IDENTITY_TRANSFORM);
+			return buildPath(newPoints, connect);
+		}
+		throw new IllegalArgumentException("Can only scale polyline by ALL or NONE.");
+		
+	}
+	
 	public void render(Graphics2D g, AffineTransform base) {
 		if (path == null) {return;}
 		
-		super.render(g, path);
-		super.postRender(g, null);
+		GeneralPath p = fixTransform(g);
+		super.render(g, p);
+		super.postRender(g, base);
 	}
 	
 	private static final class IdxValuePair {

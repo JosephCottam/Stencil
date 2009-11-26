@@ -55,6 +55,7 @@ import static stencil.adapters.general.Registrations.*;
 public abstract class Basic implements Glyph2D {
 	public static Color DEBUG_COLOR = null;
 	private static final Stroke DEBUG_STROKE = new BasicStroke(.25f);
+	protected static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
 	
 	protected static final Attribute ID = new Attribute(StandardAttribute.ID);
 	protected static final Attribute LAYERNAME = new Attribute(StandardAttribute.LAYERNAME);

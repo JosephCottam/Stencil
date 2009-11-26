@@ -196,6 +196,8 @@ public final class Text extends Basic {
 		return super.get(name);
 	}
 
+	
+	//TODO: Convert this to a more general POINT scaling method, look at line/polyline for inspiration
 	protected void fixScale(Graphics2D g) {
 		AffineTransform trans = g.getTransform();
 		

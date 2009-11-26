@@ -63,6 +63,7 @@ public final class Line extends Stroked {
 	private static final Attribute<Double> Y2 = new Attribute("Y.2", 0d);
 	private static final Attribute<String> CAP1 = new Attribute("CAP1", "NONE");
 	private static final Attribute<String> CAP2 = new Attribute("CAP2", "NONE");
+	private static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "ALL");
 
 	static {
 		ATTRIBUTES.add(X1);
@@ -75,6 +76,7 @@ public final class Line extends Stroked {
 		ATTRIBUTES.add(HEIGHT);
 		ATTRIBUTES.add(CAP1);
 		ATTRIBUTES.add(CAP2);
+		ATTRIBUTES.add(SCALE_BY);
 
 		UNSETTABLES.add(X);
 		UNSETTABLES.add(Y);
@@ -82,6 +84,8 @@ public final class Line extends Stroked {
 		UNSETTABLES.add(HEIGHT);
 	}
 
+	private final String scaleBy;
+	
 	private final double x1;
 	private final double y1;
 	private final double x2;
@@ -99,8 +103,10 @@ public final class Line extends Stroked {
 		x2 = X2.defaultValue;
 		y2 = Y1.defaultValue;	
 
-		cap1 = "NONE";
-		cap2 = "NONE";
+		cap1 = CAP1.defaultValue;
+		cap2 = CAP2.defaultValue;
+		
+		scaleBy = SCALE_BY.defaultValue;
 		
 		Line2D l = makeLine();
 		glyph = new SoftReference(l);		
@@ -116,7 +122,8 @@ public final class Line extends Stroked {
 		this.y2 = source.y2;
 		this.glyph = source.glyph;
 		this.cap1 = source.cap1;
-		this.cap2 = source.cap2; 
+		this.cap2 = source.cap2;
+		this.scaleBy = source.scaleBy;
 	}
 
 	private Line(Line source, Tuple option) {
@@ -129,6 +136,8 @@ public final class Line extends Stroked {
 		
 		cap1 = switchCopy(source.cap1, safeGet(option, CAP1));
 		cap2 = switchCopy(source.cap1, safeGet(option, CAP2));
+		
+		scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
 		
 		Line2D s = makeLine();
 		glyph = new SoftReference(s);		
@@ -154,23 +163,52 @@ public final class Line extends Stroked {
 		else if (HEIGHT.is(name)) {return bounds.getHeight();}
 		else if (CAP1.is(name)) {return cap1;}
 		else if (CAP2.is(name)) {return cap2;}
+		else if (SCALE_BY.is(name)) {return scaleBy;}
+		else if (SCALE_BY.is(name)) {return scaleBy;}
 		else{return super.get(name);}		
 	}
+
+	
+	/**Modify the graphcis 2D transform and passed line
+	 * to suit the scale-by parameters.
+	 * 
+	 * @param g
+	 * @param l
+	 * @return
+	 */
+	private static final Line2D fixTransform(String scaleBy, Graphics2D g, Line2D l) {
+		if (scaleBy.equals("ALL")) {return l;}
 		
+		if (scaleBy.equals("NONE")) {
+			AffineTransform vt = g.getTransform();
+			Point2D start = vt.transform(l.getP1(), null);
+			Point2D end = vt.transform(l.getP2(), null);
+			g.setTransform(IDENTITY_TRANSFORM);
+			return new Line2D.Double(start, end);
+		}
+		
+		throw new IllegalArgumentException("Can only scale line by ALL or NONE");
+	}
+	
 	public void render(Graphics2D g, AffineTransform base) {
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 
 		Line2D l = glyph.get();
 		if (l == null) {l = makeLine();}
 		
+		Line2D toRender = fixTransform(scaleBy, g,l);
 		
-		super.render(g,l);
-		endPoints(g);
+		super.render(g,toRender);
+		endPoints(g, toRender, Converter.toDouble(super.get("STROKE_WEIGHT")), cap1, cap2);
 		super.postRender(g, base);
 	}
 
-	private void endPoints(Graphics2D g) {
-		double weight = Converter.toDouble(super.get("STROKE_WEIGHT")) ;
+	private static void endPoints(Graphics2D g, Line2D l, double weight, String cap1, String cap2) {
+		double x1 = l.getX1();
+		double x2 = l.getX2();
+		double y1 = l.getY1();
+		double y2 = l.getY2();
+		
 		double scale = weight*6;
 		double offset = scale/2.0;
 		double slope = (y2-y1)/(x2-x1);
