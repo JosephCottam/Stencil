@@ -36,6 +36,7 @@ import stencil.operator.module.SpecializationException;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
+import stencil.operator.wrappers.SplitHelper;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
@@ -80,7 +81,7 @@ public class Average extends BasicModule {
 	 * TODO: Implement the 'calculate but do not render' message to handle case where minimum range has not bee reached
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
-	protected static class FullMean extends BasicProject {
+	public static class FullMean extends BasicProject {
 		private static final String NAME = "Mean";
 		int start;
 		double total =0;
@@ -228,6 +229,8 @@ public class Average extends BasicModule {
 
 		} catch(Exception e) {throw new Error("Error locating method to invoke in Average package.", e);}
 
+		target = SplitHelper.makeOperator(specializer.getSplit(), target);
+		
 		return target;
 	}
 

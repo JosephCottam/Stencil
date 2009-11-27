@@ -63,7 +63,7 @@ tokens {
 	import java.io.*;
 	import stencil.parser.string.ParseStencil;	
 	import stencil.operator.module.ModuleData;
-	import static stencil.util.Tuples.stripQuotes;	
+	import static stencil.tuple.Tuples.stripQuotes;	
 }
 
 @lexer::header{

@@ -63,3 +63,29 @@ number:
 "-.1"			OK
 "-4.1"			OK
 "-0.586234"		OK
+
+valueList:
+""				FAIL
+"A"				FAIL
+"1"				FAIL
+"ref[1]"		FAIL
+"\"String s\""	FAIL
+"(_)"			OK
+"(1)"			OK
+"(A)"			OK
+"(\"A String\")"OK
+"(ref[1])"		OK
+"(ref[A])"		OK
+"(1,2,3)" 		OK
+"(A,B,C)"		OK
+"(1,A,2)"		OK
+"(A,1,B)"		OK
+"()"			FAIL	//Fails, it would be nice if this was allowed
+
+
+
+
+
+
+
+

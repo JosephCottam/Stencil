@@ -55,7 +55,7 @@ options {
 	
 	import static stencil.parser.ParserConstants.BIND_OPERATOR;
 	import static stencil.operator.module.OperatorData.OpType;
-	import static stencil.util.Tuples.stripQuotes;
+	import static stencil.tuple.Tuples.stripQuotes;	
 	import static stencil.parser.tree.Guide.SampleStrategy;
 	 //TODO: Extend so we can handle more than the first field in a mapping definition
 }

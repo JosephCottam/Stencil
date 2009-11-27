@@ -14,7 +14,7 @@ public abstract class SplitHelper implements StencilOperator {
 	protected Split split;
 
 	/**Handle unordered split cases (default case).*/
-	private static class UnorderedHelper extends SplitHelper {
+	public static class UnorderedHelper extends SplitHelper {
 		protected Map<Object, StencilOperator> operators = new HashMap();
 		
 		public UnorderedHelper(Split split, StencilOperator operator) {super(split, operator);}
@@ -50,7 +50,7 @@ public abstract class SplitHelper implements StencilOperator {
 	}
 	
 	/**Handle ordered split cases in a more memory efficient way.*/
-	private static class OrderedHelper extends SplitHelper {
+	public static class OrderedHelper extends SplitHelper {
 		private Object oldKey;
 		
 		public OrderedHelper(Split split, StencilOperator operator) {
@@ -110,16 +110,16 @@ public abstract class SplitHelper implements StencilOperator {
 	protected static final Object getKey(Object... args) {return args[0];}
 	
 	//final because it is a utility method
-	public static final StencilOperator makeLegend(Split split, StencilOperator legend) {
-		if (!split.hasSplitField()) {return legend;}
-		if (split.isOrdered()) {return new OrderedHelper(split, legend);}
-		return new UnorderedHelper(split, legend);
+	public static final StencilOperator makeOperator(Split split, StencilOperator operator) {
+		if (!split.hasSplitField()) {return operator;}
+		if (split.isOrdered()) {return new OrderedHelper(split, operator);}
+		return new UnorderedHelper(split, operator);
 	}
 
 	
 	public StencilOperator duplicate() {
 		StencilOperator op = operator.duplicate();
-		return makeLegend(split, op);
+		return makeOperator(split, op);
 	}
 	
 	//TODO: Support compound operator types.  Then split is a combined categorize followed by a project.

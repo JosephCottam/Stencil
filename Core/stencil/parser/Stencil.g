@@ -132,7 +132,7 @@ tokens {
 
 @lexer::header{
 	package stencil.parser.string;
-	import static stencil.util.Tuples.stripQuotes;
+	import static stencil.tuple.Tuples.stripQuotes;	
 }
 
 @members {
