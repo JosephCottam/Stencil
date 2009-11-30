@@ -28,6 +28,7 @@
  */
 package stencil.operator.module.provided;
 
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,6 +49,7 @@ import stencil.parser.tree.Value;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.types.Converter;
 
 public class StencilUtil extends BasicModule {
 	private static abstract class EchoBase implements StencilOperator{
@@ -135,15 +137,15 @@ public class StencilUtil extends BasicModule {
 
 		public Tuple map(Object... args) {
 			assert args.length == 1;
-			assert args[0] instanceof Number : "Expected Number, recieved " + args[0].getClass().getName();
-			
-			double value = ((Number) args[0]).doubleValue();
+			double value = Converter.toNumber(args[0]).doubleValue();  //TODO: Remove when typed calls work
 			
 			double oldMax = max;
 			double oldMin = min;
 			
-			max = Math.max(value, max);
-			min = Math.min(value, min);
+			synchronized(this) {
+				max = Math.max(value, max);
+				min = Math.min(value, min);
+			}
 			
 			expanded = expanded || (max != oldMax) || (min != oldMin);
 			
@@ -203,7 +205,7 @@ public class StencilUtil extends BasicModule {
 	 * TODO: Merge with a generalized echo. Requires better 'split' semantics
 	 */
 	public static final class EchoCategorize extends EchoBase {
-		private final List<Object[]> seen = new ArrayList();
+		private final List<Object[]> seen = Collections.synchronizedList(new ArrayList());
 		private int priorCount;								//TODO: This strategy can result in a missed update.
 				
 		public EchoCategorize(String...names) {super(names);}
