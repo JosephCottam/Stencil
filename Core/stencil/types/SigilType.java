@@ -56,7 +56,7 @@ public interface SigilType<E, T extends Tuple> {
 	public Object convert(Object value, Class target);
 	
 	
-	/**Create a new instance of the tuple representaiton.*/
+	/**Create a new instance of the tuple representation.*/
 	public T create(List<Value> args) throws TypeCreationException;
 	
 }

@@ -1,4 +1,4 @@
-package stencil.unittests.types.color;
+package stencil.unittests.types;
 
 import junit.framework.TestCase;
 import java.awt.Color;

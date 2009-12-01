@@ -26,8 +26,9 @@ public final class DateTuple implements Tuple {
 	public static final int YEAR = PROTOTYPE.indexOf(YEAR_FIELD);
 	
 	
-	private Calendar cal;
+	final Calendar cal;
 	
+	public DateTuple(long millis) {this(new java.util.Date(millis));}
 	public DateTuple(Calendar cal) {this.cal = cal;}
 	public DateTuple(java.util.Date date) {
 		cal = Calendar.getInstance();
@@ -51,5 +52,11 @@ public final class DateTuple implements Tuple {
 
 	/**There is no default date/time, so all fields have no default value.*/
 	public boolean isDefault(String name, Object value) {return false;}
+	
+	public int hashCode() {return cal.hashCode();}
+	
+	public boolean equals(Object other) {
+		return other instanceof DateTuple && ((DateTuple) other).cal.equals(cal);
+	}
 
 }

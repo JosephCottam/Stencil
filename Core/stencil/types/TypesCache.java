@@ -50,12 +50,17 @@ public final class TypesCache {
 	}
 	
 	static {
-		SigilType t = new stencil.types.color.Color();
+		SigilType color = new stencil.types.color.Color();
+		names.put("@color", color);
+		externals.put(java.awt.Color.class, color);
+		externals.put(java.awt.Paint.class, color);
+		internals.put(stencil.types.color.ColorTuple.class, color);
 		
-		names.put("@color", t);
-		externals.put(java.awt.Color.class, t);
-		externals.put(java.awt.Paint.class, t);
-		internals.put(stencil.types.color.ColorTuple.class, t);
+		SigilType date = new stencil.types.datetime.Date();
+		names.put("@date", date);
+		externals.put(java.util.Date.class, date);
+		internals.put(stencil.types.datetime.DateTuple.class, date);
+
 	}
 
 	public static boolean hasTypeFor(Object value)  {return hasTypeFor(value.getClass());}

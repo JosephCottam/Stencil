@@ -2,6 +2,7 @@ package stencil.unittests.util;
 
 import java.util.HashMap;
 
+import stencil.tuple.MapTuple;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.MutableTuple;
 import stencil.tuple.Tuple;
@@ -20,7 +21,7 @@ public class TestTuples extends TestCase {
 		map.put("Three", 3.0d);
 		map.put("Four", "four");
 		map.put("Five", "FIVE");
-		MutableTuple target = new Tuples.MapTuple(map);
+		MutableTuple target = new MapTuple(map);
 		
 		Tuples.transfer(reference, target);
 
