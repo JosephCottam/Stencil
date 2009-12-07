@@ -1,0 +1,62 @@
+glyph BarChart
+  stream values(Cat, Value)
+  stream title(Title)
+
+  item Title[Text]
+  from title(Title)
+       TEXT: Title
+
+  layer Lines[Line]
+  from values(Cat, Value)
+      ID: Cat
+      (X1, X2) : Index(ID) -> (_,_)
+      (Y1, Y2) : (0, value)
+
+stream values(Type, Cat, Value)
+
+layer Mutliples[BarChart]
+  from values
+      ID: Type
+      Title: Type          //If I got uber fancy,
+      Cat: Cat
+      Value: Value
+      (X,Y): layout(Type)
+
+A glyph will define a compound object.  It automatically gets what 
+all glyphs do: X,Y,ID.  Any additional properties are defined in 
+the 'stream' statements.  These statements basically define the 
+smallest unit updates that can be made on a glyph.  You may satisfy 
+more than one stream statement in an update, but you have to satisfy 
+all of the fields in the stream to have an update occur.  Partial 
+satisfaction of any stream is ignored UNLESS no stream is satisfied, 
+then an error occurs.  A glyph may have either 'layer' elements or 'item' 
+elements.  Item elements are singletons.  Their ID on the layer is their name.  
+They retain all other properties.  Layers are groups per before.  Both 'layer' 
+and 'item' elements consume streams and have update rules, per regular layers.  
+Notice also that the stream names inside the glyph are completely independent 
+of those outside the glyph.
+
+
+Here is a labeled shape glyph:
+glyph LabeledShape
+  stream input(Text?, Color?, Size?)
+ 
+   item Label[Text]
+   from input
+       TEXT: Text
+       FONT_COLOR: Color
+       FONT_SIZE: Size
+ 
+   item Shape[Shape]
+   from input
+       SIZE: Size
+       (X,Y): Left(LabeledShape[Label])    //Left is an imaginary function right now. 
+                //It gives the left-registration position of the named object
+
+This time, the stream definition is slightly extended with 'optional' tags, 
+just like in regular expressions its a '?'.  If any value is not 
+supplied but marked with a '?', it will have a special value put in its 
+place.  Rules that depend on those fields will not be run. (This last thing 
+may be tricky to implement, especially with the new scoping ruels.  It 
+will require some real work in the AST at a minimum...but that isn't 
+you're problem).

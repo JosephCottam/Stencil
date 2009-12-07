@@ -1,0 +1,22 @@
+merge Output(A,B,C,D,E,F)
+   from Foo[1..n], Bar[-5..n]
+   emit consuming[Bar]
+        filter(Foo.A == Bar.D)
+       (A,B,C,D,E,F): Foo.A, Foo.B, Foo.C, Bar.D, Bar.E, Bar.F
+       
+   consume
+
+merge Zipped(A,B,C,D,E,F)
+   from Foo, Bar
+   emit consuming[Foo,Bar]
+       (A,B,C,D,E,F): Foo.A, Foo.B, Foo.C, Bar.D, Bar.E, Bar.F
+
+
+merge Tagged(T,A,B,C)
+   from Foo, Bar
+   emit consuming[Foo]
+       (T,A,B,C): ("Foo", Foo.A, Foo.B, Foo.C)
+
+   emit consuming[Bar]
+       (T,A,B,C): ("Bar", Bar.A, Bar.B, Bar.C)
+
