@@ -45,7 +45,7 @@ public interface Tuple {
 
 	
 	/**Get an item by index from a tuple.*/
-	public abstract Object get(int idx);
+	public abstract Object get(int idx) throws TupleBoundsException;
 
 	public abstract int size();
 	

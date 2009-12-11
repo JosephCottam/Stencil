@@ -71,7 +71,7 @@ public class CallChain extends StencilTree {
 			Function func = (Function) target;
 			result = func.apply(source);
 			if (result == null) {return null;}
-			source = source.append(func.getPass().getName(), result);
+			source = source.append(result);
 			target = ((Function) target).getCall();
 		}
 

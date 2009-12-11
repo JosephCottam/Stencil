@@ -241,14 +241,14 @@ public final class Tuples {
 	 * @param prefix
 	 * @return
 	 */
-	public static String[] defaultNames(int count, String prefix) {
+	public static List<String> defaultNames(int count, String prefix) {
 		if (prefix == null) {prefix = Tuple.DEFAULT_KEY;}
 		String[] names= new String[count];
 		names[0]=prefix;
 		for (int i=1; i< count; i++) {
 			names[i] = prefix + count;
 		}
-		return names;
+		return Arrays.asList(names);
 	}
 	
 	
@@ -274,4 +274,30 @@ public final class Tuples {
         if (s.endsWith("\"")) {s = s.substring(0,s.length()-1);}
         return s;
     }
+	
+	
+	
+	/**Extract a list of the field names from the given prototype.*/
+	public static List<String> getNames(TuplePrototype prototype) {
+		String[] s = new String[prototype.size()];
+		for (int i=0; i<s.length; i++) {
+			s[i] = prototype.get(i).getFieldName();
+		}
+		return Arrays.asList(s);
+	}
+	
+	/**Extract a list of the field types from the given prototype.*/
+	public static List<Class> getTypes(TuplePrototype prototype) {
+		Class[] s = new Class[prototype.size()];
+		for (int i=0; i<s.length; i++) {
+			s[i] = prototype.get(i).getFieldType();
+		}
+		return Arrays.asList(s);
+	}
+	
+	public static List<Class> defaultTypes(int size) {
+		Class[] types = new Class[size];
+		Arrays.fill(types, Object.class);
+		return Arrays.asList(types);
+	}
 }

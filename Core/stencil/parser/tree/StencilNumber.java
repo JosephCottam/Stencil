@@ -14,7 +14,7 @@ public class StencilNumber extends Atom {
 	public Number getNumber() {return getValue();}
 	public Number getValue() {return value;}
 
-	public static Number parseValue(String value) throws NumberFormatException {
+	private static final Number parseValue(String value) throws NumberFormatException {
 		try {return new Integer(value);}
 		catch (NumberFormatException e) {/*Error permitted, and ignored.*/}
 

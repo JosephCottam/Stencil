@@ -32,6 +32,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+	 superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -73,7 +74,7 @@ options {
 		this.modules = modules;
 	}
 
-   	public Object transform(Object t) throws Exception {
+  public Object transform(Object t) throws Exception {
 		build(t);
 		t = replace(t);
 		t = ensure(t);
@@ -88,35 +89,23 @@ options {
     }
     
     /**Replace the auto-categorize operator.**/
-    private Object replace(Object t) throws Exception {
+  private Object replace(Object t) throws Exception {
 		fptr down =	new fptr() {public Object rule() throws RecognitionException { return replaceCompactForm(); }};
    	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
    	    Object r = downup(t, down, up);
 		return r;
-    }
+  }
     
     /**Make sure that things which need guides have minimum necessary operators.
      *
      *@throws Exception Not all requested guides are found for ensuring
      */
     private Object ensure(Object t) throws Exception {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return ensure(); }};
+		    fptr down =	new fptr() {public Object rule() throws RecognitionException { return ensure(); }};
    	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
    	    Object r = downup(t, down, up);
    	    return r;
     }
-
-
-    private Object downup(Object t, final fptr down, final fptr up) {
-        TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
-        TreeVisitorAction actions = new TreeVisitorAction() {
-            public Object pre(Object t)  { return applyOnce(t, down); }
-            public Object post(Object t) { return applyRepeatedly(t, up); }
-        };
-        t = v.visit(t, actions);
-        return t;    
-    }
-    
     
 
     /**Given a tree, how should it be looked up in the guides map?*/

@@ -49,22 +49,16 @@ public abstract class Target extends StencilTree {
 	public String getName() {return token.getText();}
 
 	/**What properties of the target entity are being affected?*/
-	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
-
-	/**Processes the values tuple relative to the prototype
-	 * By default, this returns the result of a simple finalize.
-	 * 
-	 * @param source Source values for setting, ordered and of the same number as the prototype of this target
-	 * @return Potentially new tuple representing source after changes
-	 * @throws May throw an exception based on the nature of the finalize operation
-	 */
-	public Tuple finalize(Tuple source) throws Exception {return simpleFinalize(source);}
+	public List<String> getFields() {return (List<String>) getChild(0);}
 
 	/**Create a new tuple where the names are take from the tuple prototype and
-	 * values are take from the source.  Names are matched to values order-wise.
+	 * values are take from the source.
+	 * 
+	 * The resulting tuple should is able to update a real target 
+	 * (such as a glyph, view or canvas) via merge.
 	 */
-	protected final Tuple simpleFinalize(Tuple source) {
-		List<String> fields = getPrototype();
+	public final Tuple finalize(Tuple source) {
+		List<String> fields = getFields();
 		List<Object> values = new java.util.ArrayList<Object>();
 
 		for (String name: source.getPrototype()) {

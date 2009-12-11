@@ -53,7 +53,7 @@ import stencil.types.Converter;
 
 public class StencilUtil extends BasicModule {
 	private static abstract class EchoBase implements StencilOperator{
-		final String[] names;
+		final List<String> names;
 		
 		protected EchoBase(String... names) {this.names = names;}
 		protected EchoBase(Specializer s) throws SpecializationException {

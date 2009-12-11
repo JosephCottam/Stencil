@@ -39,6 +39,7 @@ import java.util.regex.*;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.Tuples;
 
 import static java.lang.String.format;
 
@@ -56,10 +57,12 @@ public final class DelimitedParser implements TupleStream {
 	private final String filename;
 
 	/**Column labels*/
-	private List<String> labels;
+	private final List<String> labels;
+
+	private final List<Class> types;
 
 	/**Name of the stream*/
-	private String name;
+	private final String name;
 
 	/**Regular expression used to split incoming data.*/
 	private final Pattern splitter;
@@ -78,12 +81,22 @@ public final class DelimitedParser implements TupleStream {
 		this.name = name;
 		this.filename = filename;
 		this.skip = skip;
-		setLabels(labels);
+		this.labels = parseLabels(labels, splitter);
+		this.types = Tuples.defaultTypes(this.labels.size());
 		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
 		else {this.channel = new LooseChannel(this.labels, delimiter);}
 		open();
 	}
 
+	private static List<String> parseLabels(String value, Pattern splitter) {
+		List<String> labels = Arrays.asList(splitter.split(value));
+		for (int i=0; i< labels.size(); i++) {
+			labels.set(i, labels.get(i).trim());
+		}
+		return labels;
+	}
+
+	
 	/**Makes the stream ready to be read from.
 	 *
 	 * Unlike standard java filename resolution, this method will expand '~' to the user's home directory
@@ -115,7 +128,7 @@ public final class DelimitedParser implements TupleStream {
 			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
 			catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 			
-			t = new PrototypedTuple(name, labels, values);
+			t = new PrototypedTuple(name, labels, types, values);
 		}
 
 		return t;
@@ -155,13 +168,6 @@ public final class DelimitedParser implements TupleStream {
 	}
 
 	public List<String> getLabels() {return labels;}
-	public void setLabels(String value) {
-		this.labels = Arrays.asList(splitter.split(value));
-		for (int i=0; i< labels.size(); i++) {
-			labels.set(i, labels.get(i).trim());
-		}
-	}
-	public void setLabels(List<String> value) {this.labels = value;}
 
 	public String getName() {return name;}
 

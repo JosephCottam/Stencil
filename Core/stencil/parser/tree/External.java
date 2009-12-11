@@ -6,5 +6,5 @@ public class External extends StencilTree {
 	public External(Token source) {super(source);}
 
 	public String getName() {return token.getText();}
-	public TuplePrototype getPrototype() {return (TuplePrototype) parent.getChild(0);}
+	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
 }

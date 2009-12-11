@@ -2,6 +2,8 @@ package stencil.util.streams.numbers;
 
 import static java.lang.String.format;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import stencil.tuple.PrototypedTuple;
@@ -16,9 +18,9 @@ public class SequenceStream implements TupleStream {
 	private final long increment;	
 	private final String name;	//Name of the stream
 	
-	private static final String[] FIELDS = new String[]{"VALUE"};
+	private static final List<String> FIELDS = Arrays.asList("VALUE");
+	private static final List<Class> types = Arrays.asList((Class) Long.class);
 	                                               
-	
 	public SequenceStream(String name) {this(name, 0,1, -1);}
 	
 	public SequenceStream(String name, long start, long increment, long length) {
@@ -34,7 +36,7 @@ public class SequenceStream implements TupleStream {
 		long value = (count * increment) + start;
 		count++;
 		
-		return new PrototypedTuple(name, FIELDS, new Long[]{value});
+		return new PrototypedTuple(name, FIELDS, types, Arrays.asList(value));
 	}
 
 	public boolean ready() {return hasNext();}
@@ -42,5 +44,5 @@ public class SequenceStream implements TupleStream {
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}
-	public String[] getFields() {return FIELDS;}
+	public List<String> getFields() {return FIELDS;}
 }

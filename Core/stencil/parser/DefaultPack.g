@@ -57,14 +57,6 @@ options {
     public DefaultPackExpansionException(String msg) {super(msg);}
   }
 
-	protected ModuleCache modules;
-    
-	public DefaultPack(TreeNodeStream input, ModuleCache modules) {
-		super(input, new RecognizerSharedState());
-		assert modules != null : "ModuleCache must not be null.";
-		this.modules = modules;
-	}
-
 	public Pack fromDefault(Pack pack) {
 	  Rule rule = pack.getRule();
 	  Target target = rule.getTarget();
@@ -79,7 +71,7 @@ options {
     Pack newPack = (Pack) adaptor.dupNode(pack);
         
     for (int i=0; i< targetPrototype.size(); i++) {
-       TupleRef ref = (TupleRef) adaptor.create(TUPLE_REF,"");
+       TupleRef ref = (TupleRef) adaptor.create(TUPLE_REF,"<autogen>");
        adaptor.addChild(ref, adaptor.create(NUMBER, Integer.toString(i)));
        adaptor.addChild(newPack, ref);
     }

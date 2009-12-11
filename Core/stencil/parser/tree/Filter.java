@@ -51,7 +51,7 @@ public class Filter extends Target {
 	 * @returns The special tuple FAIL if any member filer fails,
 	 * or the special tuple PASS if all member filter pass.
 	 */
-	public Tuple finalize(Tuple source) throws Exception {
+	private Tuple passFail(Tuple source) {
 		for (Predicate pred: getPredicates()) {
 			if (!pred.matches(source)) {return FAIL;}
 		}
@@ -64,6 +64,6 @@ public class Filter extends Target {
 	/**Does the passed tuple match the given predicates?*/
 	public boolean matches(Tuple source) throws Exception {
 		Tuple result = rule().apply(source);
-		return finalize(result) == PASS;
+		return passFail(result) == PASS;
 	}
 }

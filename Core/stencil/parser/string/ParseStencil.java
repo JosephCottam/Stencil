@@ -182,47 +182,50 @@ public abstract class ParseStencil {
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
 
-
-
-		//Add default specializers where required
+		//Add default specializers where required (yes, again)
 		defaultSpecializers.function(p);
 		
-		
-		//Add default packs where required
+		//Numeralize all tuple references
 		treeTokens = new CommonTreeNodeStream(p);
-		DefaultPack defaultPack = new DefaultPack(treeTokens, modules);
-		defaultPack.setTreeAdaptor(treeAdaptor);
-		defaultPack.downup(p);
+		NumeralizeTuples numeralize = new NumeralizeTuples(treeTokens, modules);
+		numeralize.setTreeAdaptor(treeAdaptor);
+		numeralize.downup(p);
 		
-		
-		//Insert guide specializers
-		treeTokens = new CommonTreeNodeStream(p);
-		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
-		guideSpecailizers.setTreeAdaptor(treeAdaptor);
-		guideSpecailizers.downup(p);
-		
-		
-		//Ensure that auto-guide requirements are met
-		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
-		ensure.setTreeAdaptor(treeAdaptor);		
-		p = (Program) ensure.transform(p);
-		
-		
-		//Prime tree nodes with operators from the modules cache
-		SetOperators set = new SetOperators(treeTokens, modules);
-		set.downup(p);
-		
-		treeTokens = new CommonTreeNodeStream(p);
-		AutoGuide ag = new AutoGuide(treeTokens, modules);
-		ag.setTreeAdaptor(treeAdaptor);
-		p = (Program) ag.transform(p);
-		
-		treeTokens = new CommonTreeNodeStream(p);
-		TupleRefChain trc = new TupleRefChain(treeTokens);
-		trc.setTreeAdaptor(treeAdaptor);
-		p = (Program) trc.downup(p);
-		
-		validate(p);
+//		//Add default packs where required
+//		treeTokens = new CommonTreeNodeStream(p);
+//		DefaultPack defaultPack = new DefaultPack(treeTokens);
+//		defaultPack.setTreeAdaptor(treeAdaptor);
+//		defaultPack.downup(p);
+//		
+//		
+//		//Insert guide specializers
+//		treeTokens = new CommonTreeNodeStream(p);
+//		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
+//		guideSpecailizers.setTreeAdaptor(treeAdaptor);
+//		guideSpecailizers.downup(p);
+//		
+//		
+//		//Ensure that auto-guide requirements are met
+//		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
+//		ensure.setTreeAdaptor(treeAdaptor);		
+//		p = (Program) ensure.transform(p);
+//		
+//		
+//		//Prime tree nodes with operators from the modules cache
+//		SetOperators set = new SetOperators(treeTokens, modules);
+//		set.downup(p);
+//		
+//		treeTokens = new CommonTreeNodeStream(p);
+//		AutoGuide ag = new AutoGuide(treeTokens, modules);
+//		ag.setTreeAdaptor(treeAdaptor);
+//		p = (Program) ag.transform(p);
+//		
+//		treeTokens = new CommonTreeNodeStream(p);
+//		TupleRefChain trc = new TupleRefChain(treeTokens);
+//		trc.setTreeAdaptor(treeAdaptor);
+//		p = (Program) trc.downup(p);
+//		
+//		validate(p);
 		
 		return p;
 	}

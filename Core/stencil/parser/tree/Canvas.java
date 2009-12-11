@@ -31,18 +31,12 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.display.CanvasTuple;
-import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
-import stencil.tuple.Tuple;
 
 public final class Canvas extends Target{
 	public static CanvasTuple global;
 	
 	public Canvas(Token source) {super(source);}
-	
-	public void applyChanges(Tuple changes, StencilPanel panel) {
-		stencil.tuple.Tuples.transfer(changes, panel.getCanvas());
-	}
 
 	/**Converts a name identifiable as a 'canvsField' into a regular
 	 * field name.

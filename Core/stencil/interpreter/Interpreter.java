@@ -37,7 +37,6 @@ import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.types.Converter;
 
 public class Interpreter {
 	private final StencilPanel panel;
@@ -130,17 +129,10 @@ public class Interpreter {
 	}
 
 	private static final Environment buildEnvironment(Tuple stream, Tuple local) {
-		Environment e = new Environment(ParserConstants.CANVAS_PREFIX, Canvas.global);
-		e = e.append(ParserConstants.VIEW_PREFIX, View.global);
-		
-		if (stream.getPrototype().contains(Tuple.SOURCE_KEY)) {
-			e = e.append(Converter.toString(stream.get(Tuple.SOURCE_KEY)), stream); //TODO: BAD JOSEPH.  Using named references			
-		} else {
-			e = e.append(stream);
-		}
-		
-		if (local != null) {e = e.append(ParserConstants.LOCAL_PREFIX, local);}
-		
+		Environment e = new Environment(Canvas.global);
+		e = e.append(View.global);
+		e = e.append(stream);			
+		e.append(local);	//Even if its null, it needs to be there to keep the indexes straight!
 		return e;
 	}
 	

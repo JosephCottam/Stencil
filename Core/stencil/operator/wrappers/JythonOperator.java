@@ -56,7 +56,7 @@ public class JythonOperator implements DynamicStencilOperator {
 	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new Invokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
 		
-		FacetData data = new BasicFacetData(f.getName(), f.getAnnotation("Type"),  enc.getReturnLabels());
+		FacetData data = new BasicFacetData(f.getName(), f.getAnnotation("Type"),  enc.getReturns());
 		operatorData.addFacet(data);		
 	}
 

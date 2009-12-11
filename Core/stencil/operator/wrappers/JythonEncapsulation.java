@@ -35,9 +35,9 @@ import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.TuplePrototype;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 
-import java.util.List;
 import java.util.Arrays;
 import java.lang.reflect.Method;
 
@@ -69,27 +69,32 @@ public final class JythonEncapsulation {
 	}
 	
 	public Tuple invoke(Object... args) {
-		if (args.length != getArgumentLabels().size()) {throw new IllegalArgumentException(String.format("Must call with argument count equal to expected count.  Received %1$d but expected %2$d.", args.length, getArgumentLabels().size()));}
+		if (args.length != getArguments().size()) {throw new IllegalArgumentException(String.format("Must call with argument count equal to expected count.  Received %1$d but expected %2$d.", args.length, getArguments().size()));}
 		assert environment != null;
 		
 		synchronized(environment) {
 		
 			//Stock the Python interpreter with the appropriate values
 			for (int i=0; i< args.length; i++) {
-				environment.set(getArgumentLabels().get(i), args[i]);
+				String name = getArguments().get(i).getFieldName();
+				environment.set(name, args[i]);
 			}
 	
 			//Invoke the pre-compiled body
 			environment.exec(codeCache);
 	
-			if (getReturnLabels().size() == 1) {
-				return new PrototypedTuple(getReturnLabels(), Arrays.asList(new Object[]{pyToJava(environment.get(getReturnLabels().get(0)))}));
-			} else if (getReturnLabels().size() >1) {
-				Object[] vals = new Object[getReturnLabels().size()];
-				for (int i=0; i< getReturnLabels().size(); i++) {
-					vals[i] = pyToJava(environment.get(getReturnLabels().get(i)));
+			TuplePrototype returns = getReturns();
+			int returnCount = returns.size();
+			if (returnCount == 1) {
+				String name = returns.get(0).getFieldName();
+				return new PrototypedTuple(getReturns(), Arrays.asList(new Object[]{pyToJava(environment.get(name))}));
+			} else if (returnCount >1) {
+				Object[] vals = new Object[returnCount];
+				for (int i=0; i< returnCount; i++) {
+					String name = returns.get(i).getFieldName();
+					vals[i] = pyToJava(environment.get(name));
 				}
-				return new PrototypedTuple(getReturnLabels(), Arrays.asList(vals));
+				return new PrototypedTuple(getReturns(), Arrays.asList(vals));
 			} else {
 				throw new RuntimeException("Zero return value python encapuslation not supported.");
 			}
@@ -116,8 +121,8 @@ public final class JythonEncapsulation {
 	}
 
 	public String getName() {return facet.getName();}
-	public List<String> getArgumentLabels() {return facet.getArguments();}
-	public List<String> getReturnLabels() {return facet.getResults();}
+	public TuplePrototype getArguments() {return facet.getArguments();}
+	public TuplePrototype getReturns() {return facet.getResults();}
 	public String getAnnotation(String name) {return facet.getAnnotation(name);}
 	
 	

@@ -33,6 +33,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 
+import stencil.types.Converter;
+
 
 
 /***
@@ -52,36 +54,22 @@ public final class PrototypedTuple implements Tuple {
 	}
 	
 	public static PrototypedTuple singleton(String key, Object value) {
-		return new PrototypedTuple(Arrays.asList(new String[]{key}), Arrays.asList(value));
-	}
-
-	/**Create a new tuple.
-	 *
-	 * @param source Name of the stream it came from.
-	 * @param names Names of the values present in the tuple.
-	 * @param values Values to be stored in the tuple.
-	 */
-	public PrototypedTuple(String source, String[] names, Object[] values) {
-		this(source, Arrays.asList(names), Arrays.asList(values));
+		return new PrototypedTuple(Arrays.asList(key), Arrays.asList(value));
 	}
 	
-	/**Create a new tuple.
-	 *
-	 * @param source Name of the stream it came from.
-	 * @param names Names of the values present in the tuple.
-	 * @param values Values to be stored in the tuple.
-	 */
-	public PrototypedTuple(String source, List<String> names, List values) {
-		this(appendValue(names, SOURCE_KEY), appendValue(values, source));
-	}
-
-	//Appends a value to a list, allocating an append-able list if needed
-	private static List appendValue(List list, Object value) {
-		if (!(list instanceof ArrayList)) {list = new ArrayList(list);} //Allocates a new list if the old one can't be appended to
-		list.add(value);
-		return list;
+	public static PrototypedTuple singleton(String key, Class type, Object value) {
+		return new PrototypedTuple(Arrays.asList(key), Arrays.asList(type), Arrays.asList(value));
 	}
 	
+	
+	public PrototypedTuple(String source, List<String> names, List<Class> types, List values) {
+		this(prepend(SOURCE_KEY, names), prepend(String.class, types), prepend(source, values));
+	}
+	
+	public static <T> List<T> prepend(T value, List<T> original) {
+		original.add(0, value);
+		return original;
+	}
 	
 	/**Create a new tuple.
 	 *
@@ -89,14 +77,38 @@ public final class PrototypedTuple implements Tuple {
 	 * @param values Values to be stored in the tuple.
 	 */
 	public PrototypedTuple(String[] names, Object[] values) {this(Arrays.asList(names), Arrays.asList(values));}
-	public PrototypedTuple(List<String> names, List values) {
+	
+	
+	public PrototypedTuple(List<String> names, List values) {this(names, null, values);}
+	
+	public PrototypedTuple(TuplePrototype prototype, List values) {this(Tuples.getNames(prototype), Tuples.getTypes(prototype), values);}
+	
+	public PrototypedTuple(List<String> names, List<Class> types, List<Object> values) {
 		assert names != null : "Names may not be null.";
 		assert values != null : "Values may not be null.";
 		assert names.size() == values.size() : "Value and name list not of the same length." + names + " vs. " + values;
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
-		
+
 		this.names = Collections.unmodifiableList(names);
-		this.values = values;
+		this.values = validate(types, values);
+	}
+	
+	private static final List<Object> validate(List<Class> types, List<Object> values) {
+		if (types == null) {return values;}
+		if (types.size() != values.size()) {throw new TypeValidationException("Type list and value list are of different lengths");}
+		List<Object> newValues = new ArrayList<Object>(values.size());
+		
+		for (int i=0; i< types.size(); i++) {
+			Class target = types.get(i);
+			Object value = values.get(i);
+			if (!target.isInstance(value)) {
+				try {newValues.set(i, Converter.convert(value, target));}
+				catch (Exception e) {throw new TypeValidationException(types.get(i), values.get(i), e);}
+			} else {
+				newValues.set(i, value);
+			}
+		}
+		return newValues;
 	}
 
 	/**Verify that the names list contains no duplicates.*/

@@ -30,9 +30,6 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.Tuple;
-
 public class Local extends Target {
 	public Local(Token source) {super(source);}
-	public Tuple finalize(Tuple source) {return simpleFinalize(source);}
 }

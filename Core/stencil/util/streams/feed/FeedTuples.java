@@ -4,6 +4,7 @@ import java.util.*;
 
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.util.collections.MarkSweepSet;
 
 import com.sun.syndication.feed.synd.*;
@@ -13,15 +14,16 @@ import com.sun.syndication.io.XmlReader;
 import java.net.URL;
 
 public class FeedTuples extends CacheFeed<SyndFeedInput> {
-	protected String keyField;
-	protected String[] fields;
-
+	protected final String keyField;
+	protected final List<String> fields;
+	protected final List<Class> types;
 	public FeedTuples(String name, String url, String keyField, String[] fields) throws Exception {this(name, new URL(url), keyField, fields);}
 
 	public FeedTuples(String name, URL url, String keyField, String[] fields) throws Exception {
 		super(name, url, new MarkSweepSet(), new SyndFeedInput());
 		this.keyField = keyField;
-		this.fields = fields;
+		this.fields = Arrays.asList(fields);
+		this.types = Tuples.defaultTypes(fields.length);
 	}
 
 	protected void updateEntryCache() {
@@ -46,12 +48,12 @@ public class FeedTuples extends CacheFeed<SyndFeedInput> {
         	String key = fieldValues.get(keyField);
         	if (idCache.contains(key)) {continue;}
 
-        	String[] values = new String[fields.length];
-        	for(int i=0; i< fields.length; i++) {
-        		values[i] = fieldValues.get(fields[i]);
+        	String[] values = new String[fields.size()];
+        	for(int i=0; i< fields.size(); i++) {
+        		values[i] = fieldValues.get(fields.get(i));
         	}
 
-        	Tuple tuple = new PrototypedTuple(name, fields, values);
+        	Tuple tuple = new PrototypedTuple(name, fields, types, Arrays.asList(values));
             entryCache.offer(tuple);
             idCache.add(key);
         }

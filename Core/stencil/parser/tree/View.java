@@ -29,19 +29,13 @@
 package stencil.parser.tree;
 import org.antlr.runtime.Token; 
 
-import stencil.display.StencilPanel;
 import stencil.display.ViewTuple;
 import stencil.parser.ParserConstants;
-import stencil.tuple.Tuple;
 
 public class View extends Target {
 	public static ViewTuple global;
 	
 	public View(Token source) {super(source);}
-
-	public void applyChanges(Tuple changes, StencilPanel panel) {
-		stencil.tuple.Tuples.transfer(changes, panel.getView());
-	}
 	
 	/**Converts a name identifiable as a 'viewField' into a regular field name.*/
 	public static final String regularField(String name) {

@@ -106,7 +106,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
 		if (spec !=null && !spec.isSimple()) {throw new SpecializationException("", getName(), spec);}
 		
-		return Modules.basicLegendData(module, getName(), OpType.PROJECT, source.getResults().getNames());
+		return Modules.basicLegendData(module, getName(), OpType.PROJECT, source.getResults());
 	}
 
 	public Invokeable getFacet(String name) throws IllegalArgumentException {

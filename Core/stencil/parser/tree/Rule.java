@@ -89,7 +89,7 @@ public class Rule extends StencilTree {
 	 */
 	public Tuple apply(Tuple source) throws Exception {
 		Tuple t = getAction().apply(source);
-		if (t==null) {return null;}
-		else {return getTarget().finalize(t);}
+		if (t == null) {return t;}
+		return getTarget().finalize(t);
 	}
 }
