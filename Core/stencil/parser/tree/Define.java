@@ -2,7 +2,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.TupleFieldDef;
+import stencil.tuple.prototype.TupleFieldDef;
 public class Define extends StencilTree {
 
 	public Define(Token token) {super(token);}

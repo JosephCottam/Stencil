@@ -31,8 +31,10 @@ package stencil.tuple;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Collections;
 
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 
 
@@ -45,7 +47,7 @@ import stencil.types.Converter;
  * @author jcottam
  */
 public final class PrototypedTuple implements Tuple {
-	protected List<String> names;
+	protected TuplePrototype prototype;
 	protected List values;
 	
 	/**Create a Tuple with a single value in it.  If key is left unspecified, the default key is used.*/
@@ -60,7 +62,6 @@ public final class PrototypedTuple implements Tuple {
 	public static PrototypedTuple singleton(String key, Class type, Object value) {
 		return new PrototypedTuple(Arrays.asList(key), Arrays.asList(type), Arrays.asList(value));
 	}
-	
 	
 	public PrototypedTuple(String source, List<String> names, List<Class> types, List values) {
 		this(prepend(SOURCE_KEY, names), prepend(String.class, types), prepend(source, values));
@@ -81,16 +82,19 @@ public final class PrototypedTuple implements Tuple {
 	
 	public PrototypedTuple(List<String> names, List values) {this(names, null, values);}
 	
-	public PrototypedTuple(TuplePrototype prototype, List values) {this(Tuples.getNames(prototype), Tuples.getTypes(prototype), values);}
-	
 	public PrototypedTuple(List<String> names, List<Class> types, List<Object> values) {
 		assert names != null : "Names may not be null.";
 		assert values != null : "Values may not be null.";
 		assert names.size() == values.size() : "Value and name list not of the same length." + names + " vs. " + values;
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 
-		this.names = Collections.unmodifiableList(names);
+		this.prototype = new SimplePrototype(names, types);
 		this.values = validate(types, values);
+	}
+
+	public PrototypedTuple(TuplePrototype prototype, List values) {
+		this.prototype = prototype;
+		this.values = validate(TuplePrototypes.getTypes(prototype), values);
 	}
 	
 	private static final List<Object> validate(List<Class> types, List<Object> values) {
@@ -125,7 +129,7 @@ public final class PrototypedTuple implements Tuple {
 	/**Returns a string as-per the static toString() method.**/
 	public String toString() {return Tuples.toString(this);}
 
-	public List<String> getPrototype() {return names;}
+	public TuplePrototype getPrototype() {return prototype;}
 	
 	public Object get(String name) {return Tuples.namedDereference(name, this);}
 	public Object get(int idx) {return values.get(idx);}

@@ -31,6 +31,7 @@ package stencil.display;
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -38,6 +39,9 @@ import java.util.List;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.tuple.MutableTuple;
+import stencil.tuple.TupleBoundsException;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.Attribute;
 
 /** The ViewTuple is the interface to a view
@@ -63,9 +67,7 @@ import stencil.util.enums.Attribute;
  * @author jcottam
  *
  */
-public interface ViewTuple extends MutableTuple {
-	public static final String VIEW_IMPLANTATION = "STENCIL_VIEW";
-
+public abstract class ViewTuple implements MutableTuple {
 	public enum ViewAttribute implements Attribute{
 		IMPLANTATION (null, String.class),
 		ZOOM (0, Double.class),
@@ -88,44 +90,59 @@ public interface ViewTuple extends MutableTuple {
 		public Object getDefaultValue() {return defaultValue;}
 	}
 
-	public static abstract class Simple implements ViewTuple {
-		protected static final List<String> PROTOTYPE;
-		static {
-			HashSet<String> s = new HashSet<String>();
-			for (ViewAttribute a: EnumSet.allOf(ViewAttribute.class)) {s.add(a.name());}
-			PROTOTYPE = Collections.unmodifiableList(new ArrayList(s));
+	public static final String VIEW_IMPLANTATION = "STENCIL_VIEW";
+	public static final TuplePrototype PROTOTYPE;
+	protected static final List<String> FIELDS;
+	protected static final Class[] TYPES;
+
+	static {
+		HashSet<String> s = new HashSet<String>();
+		for (ViewAttribute a: EnumSet.allOf(ViewAttribute.class)) {s.add(a.name());}
+		FIELDS = Collections.unmodifiableList(new ArrayList(s));
+
+		TYPES = new Class[FIELDS.size()];
+		for (int i=0; i< FIELDS.size(); i++) {
+			TYPES[i] = ViewAttribute.valueOf(FIELDS.get(i)).type;
 		}
-		
-		public List<String> getPrototype() {return PROTOTYPE;}
-		public int size() {return PROTOTYPE.size();}		
-		/**Gets the default value for the named property.
-		 * If the named property has no defined default, it is assumed to be 'null'.
-		 *
-		 * @param name Property to look up default value of.
-		 * @return Default value of property.
-		 */
-		public boolean isDefault(String name, Object value) {
-			if (PROTOTYPE.contains(name)) {return false;}
-			Object def = ViewAttribute.valueOf(name).defaultValue;
-			return def == value || (def != null && def.equals(value));
-		}
-		
-		public String toString() {return stencil.tuple.Tuples.toString(this);}
+
+		PROTOTYPE = new SimplePrototype(FIELDS, Arrays.asList(TYPES));
 	}
-	
+
+	//TODO: Convert so the numeric de-reference is the primary one
+	public Object get(int idx) {
+		try {return get(FIELDS.get(idx));}
+		catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
+	}
+
+	public TuplePrototype getPrototype() {return PROTOTYPE;}
+	public int size() {return PROTOTYPE.size();}		
+	/**Gets the default value for the named property.
+	 * If the named property has no defined default, it is assumed to be 'null'.
+	 *
+	 * @param name Property to look up default value of.
+	 * @return Default value of property.
+	 */
+	public boolean isDefault(String name, Object value) {
+		if (PROTOTYPE.contains(name)) {return false;}
+		Object def = ViewAttribute.valueOf(name).defaultValue;
+		return def == value || (def != null && def.equals(value));
+	}
+
+	public String toString() {return stencil.tuple.Tuples.toString(this);}
+
 	/**Given a point in the canvas, where is it in the view?
 	 * This method may return negative values in the points, indicating
 	 * that the source point is not actually in the view right now.
 	 */
-	public Point2D canvasToView(Point2D p);
+	public abstract Point2D canvasToView(Point2D p);
 
 	/**Given a point in the view, what is the corresponding canvas coordinate?*/
-	public Point2D viewToCanvas(Point2D p);
+	public abstract Point2D viewToCanvas(Point2D p);
 
 	/**Given a distance in the view, what is the corresponding distance in the canvas?*/
-	public Dimension2D viewToCanvas(Dimension2D p);
+	public abstract Dimension2D viewToCanvas(Dimension2D p);
 
 	/**Given a distance in the canvas, what is the corresponding distance in the view?*/
-	public Dimension2D canvasToView(Dimension2D p);
+	public abstract Dimension2D canvasToView(Dimension2D p);
 
 }

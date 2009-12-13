@@ -49,6 +49,7 @@ import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import static stencil.adapters.general.Registrations.*;
 
@@ -115,7 +116,9 @@ public abstract class Basic implements Glyph2D {
 	/**What is the name of this implantation?*/
 	public abstract String getImplantation();
 
-	/**Return a list of all of the attributes of this glyph.*/
+	/**Return a list of all of the attributes of this glyph.
+	 * NOTE: This is almost always the same as the prototype...
+	 * */
 	protected abstract AttributeList getAttributes();
 	
 	/**Which of the attributes cannot be set?
@@ -164,8 +167,6 @@ public abstract class Basic implements Glyph2D {
 
 	public String getLayerName() {return layer==null?null:layer.getName();}
 	
-	public List<String> getPrototype() {return getAttributes().getNames();}
-
 	public boolean hasField(String name) {return getAttributes().getNames().contains(name);}
 
 	public boolean isDefault(String name, Object value) {
@@ -177,7 +178,7 @@ public abstract class Basic implements Glyph2D {
 	 * Only reports settable fields.
 	 **/
 	public String toString() {
-		List<String> includeFields = getPrototype();
+		List<String> includeFields = TuplePrototypes.getNames(getPrototype());
 		List<String> omitFields = getUnsettables().getNames();
 		
 		includeFields.removeAll(omitFields);

@@ -9,7 +9,7 @@ import java.util.List;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 
 public class RandomStream implements TupleStream {
 	private final long length; //How many tuples to produce
@@ -27,8 +27,8 @@ public class RandomStream implements TupleStream {
 		this.size =size;
 
 		count =0;
-		this.fields = Tuples.defaultNames(size, "VALUE");
-		this.types = Tuples.defaultTypes(size);
+		this.fields = TuplePrototypes.defaultNames(size, "VALUE");
+		this.types = TuplePrototypes.defaultTypes(size);
 	}
 	
 	public Tuple next() {

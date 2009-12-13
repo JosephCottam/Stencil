@@ -32,6 +32,9 @@ package stencil.tuple;
 import java.util.*;
 
 import stencil.adapters.general.Fills;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.SigilType;
 import stencil.types.TypesCache;
 
@@ -45,7 +48,7 @@ public final class Tuples {
 	public static final Tuple EMPTY_TUPLE = new Tuple() {
 		public Object get(String name) throws InvalidNameException {throw new InvalidNameException(name);}
 		public Object get(int idx) {throw new TupleBoundsException(idx, size());}
-		public List<String> getPrototype() {return new ArrayList<String>();}
+		public TuplePrototype getPrototype() {return new SimplePrototype();}
 		public int size() {return 0;}
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
 	};
@@ -60,7 +63,7 @@ public final class Tuples {
 		
 		if (source == null) {return EMPTY_TUPLE;}
 		
-		for (String field:source.getPrototype()) {
+		for (String field:TuplePrototypes.getNames(source)) {
 			if (field.startsWith(prefix)) {
 				values.add(source.get(field));
 				fields.add(field.substring(prefix.length()));
@@ -83,7 +86,7 @@ public final class Tuples {
 		if (source == null) {return Tuples.EMPTY_TUPLE;}
 		
 		List<String> attributes =  new ArrayList<String>();
-		attributes.addAll(source.getPrototype());
+		attributes.addAll(TuplePrototypes.getNames(source));
 
 		Object[] values = new Object[attributes.size()];
 		for (int i=0; i< attributes.size(); i++) {
@@ -109,7 +112,7 @@ public final class Tuples {
 	 * @return The target passed in (after the transfer).
 	 */
 	public static final MutableTuple transfer(Tuple source, MutableTuple target) {
-		for (String field:source.getPrototype()) {
+		for (String field:TuplePrototypes.getNames(source)) {
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
 			if (sourceValue == targetValue || sourceValue.equals(targetValue)) {continue;}	//Skip values that are equal.
@@ -131,8 +134,9 @@ public final class Tuples {
 	 * @return
 	 */
 	public static boolean transferNeutral(Tuple source, Tuple target) {
-		List<String> targetFields = target.getPrototype();
-		for (String field: source.getPrototype()) {
+		List<String> targetFields = TuplePrototypes.getNames(target);
+		List<String> sourceFields = TuplePrototypes.getNames(source);
+		for (String field: sourceFields) {
 			if (!targetFields.contains(field)) {return false;}
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
@@ -152,7 +156,7 @@ public final class Tuples {
 	 * alphabetical order when using this method.
 	 *
 	 * **/
-	public static String toString(Tuple t) {return toString(t, t.getPrototype());}
+	public static String toString(Tuple t) {return toString(t, TuplePrototypes.getNames(t));}
 	
 	/**Provide a string representation of the tuple, 
 	 * but only include the fields in the passed list.
@@ -210,17 +214,21 @@ public final class Tuples {
 		if (source1 == null || source1 == EMPTY_TUPLE) {return source2;}
 		if (source2 == null || source2 == EMPTY_TUPLE) {return source1;}
 
-		Map<String, Object> backing = new HashMap();
+		Map<String, Object> store = new HashMap();
 		
-		for (String name: source1.getPrototype()) {
+		for (String name: TuplePrototypes.getNames(source1)) {
 			Object value = source1.get(name);
-			backing.put(name, value);
+			store.put(name, value);
 		}
-		for (String name: source2.getPrototype()) {
+		for (String name: TuplePrototypes.getNames(source2)) {
 			Object value = source2.get(name);
-			backing.put(name, value);
+			store.put(name, value);
 		}
-		return new MapTuple(Collections.unmodifiableMap(backing));
+		
+		List<String> names = new ArrayList(store.keySet());
+		List<Object> values = new ArrayList(store.entrySet()); 
+		
+		return new PrototypedTuple(names, values);
 	}
 
 
@@ -229,28 +237,9 @@ public final class Tuples {
 	public static Object[] toArray(Tuple t) {
 		Object[] values = new Object[t.getPrototype().size()];
 		int i=0;
-		for (String field:t.getPrototype()) {values[i++] = t.get(field);}
+		for (String field:TuplePrototypes.getNames(t)) {values[i++] = t.get(field);}
 		return values;
 	}
-	
-	/**Create a list of default names.  Default names are derived
-	 * from the prefix in a consistent manner.  If the prefix is null,
-	 * the global tuple-default-key is used instead.
-	 * 
-	 * @param count
-	 * @param prefix
-	 * @return
-	 */
-	public static List<String> defaultNames(int count, String prefix) {
-		if (prefix == null) {prefix = Tuple.DEFAULT_KEY;}
-		String[] names= new String[count];
-		names[0]=prefix;
-		for (int i=1; i< count; i++) {
-			names[i] = prefix + count;
-		}
-		return Arrays.asList(names);
-	}
-	
 	
 	/**A straightforward way of doing named de-reference on a tuple.
 	 * 
@@ -274,30 +263,4 @@ public final class Tuples {
         if (s.endsWith("\"")) {s = s.substring(0,s.length()-1);}
         return s;
     }
-	
-	
-	
-	/**Extract a list of the field names from the given prototype.*/
-	public static List<String> getNames(TuplePrototype prototype) {
-		String[] s = new String[prototype.size()];
-		for (int i=0; i<s.length; i++) {
-			s[i] = prototype.get(i).getFieldName();
-		}
-		return Arrays.asList(s);
-	}
-	
-	/**Extract a list of the field types from the given prototype.*/
-	public static List<Class> getTypes(TuplePrototype prototype) {
-		Class[] s = new Class[prototype.size()];
-		for (int i=0; i<s.length; i++) {
-			s[i] = prototype.get(i).getFieldType();
-		}
-		return Arrays.asList(s);
-	}
-	
-	public static List<Class> defaultTypes(int size) {
-		Class[] types = new Class[size];
-		Arrays.fill(types, Object.class);
-		return Arrays.asList(types);
-	}
 }

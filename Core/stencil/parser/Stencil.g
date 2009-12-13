@@ -60,6 +60,7 @@ tokens {
   SIGIL;
   SPECIALIZER;
   TUPLE_PROTOTYPE;
+  TUPLE_FIELD_DEF;
   TUPLE_REF;
   MAP_ENTRY;
 
@@ -376,14 +377,13 @@ mapList
 mapEntry 
   : k=ID '=' v=atom -> ^(MAP_ENTRY[$k.text] $v);
 
-tuple[boolean allowEmpty]
+tuple[boolean allowEmpty] //TODO: Add optionally permitted types [boolean allowEmpty]
   : emptySet {allowEmpty}?
     -> ^(TUPLE_PROTOTYPE)
   | ID
-    -> ^(TUPLE_PROTOTYPE ID)
+    -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT))
   | GROUP ID (SEPARATOR ID)* CLOSE_GROUP
-    -> ^(TUPLE_PROTOTYPE ID+);
-
+    -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT)+);
 
 emptySet: GROUP! CLOSE_GROUP!;
 

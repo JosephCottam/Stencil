@@ -63,22 +63,22 @@ public class CallChain extends StencilTree {
 		else {return apply(new Environment(source));}
 	}
 	
-	public Tuple apply(Environment source) throws Exception {		
+	public Tuple apply(Environment env) throws Exception {		
 		CallTarget target = getStart();
 
-		Tuple result = source;
+		Tuple result = env;
 		while (target instanceof Function) {
 			Function func = (Function) target;
-			result = func.apply(source);
+			result = func.apply(env);
 			if (result == null) {return null;}
-			source = source.append(result);
+			env = env.append(result);
 			target = ((Function) target).getCall();
 		}
 
 		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
 		assert (result != null) : "Call chain ended with null result.";
 		
-		result = target.apply(source);
+		result = target.apply(env);
 		return result;
 	}
 

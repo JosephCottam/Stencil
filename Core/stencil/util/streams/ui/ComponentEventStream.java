@@ -13,6 +13,8 @@ import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 public final class ComponentEventStream implements TupleStream {
 	public static final List<String> FIELDS = Arrays.asList("SOURCE", "X", "Y", "WIDTH", "HEIGHT");
@@ -24,7 +26,9 @@ public final class ComponentEventStream implements TupleStream {
 		private static final String Y_FIELD = "Y";
 		private static final String WIDTH_FIELD = "WIDTH";
 		private static final String HEIGHT_FIELD = "HEIGHT";
-		private static final List<String> PROTOTYPE = Arrays.asList(SOURCE_FIELD, X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD);
+		private static final String[] FIELDS = new String[]{SOURCE_FIELD, X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD};
+		private static final Class[] TYPES = new Class[]{String.class, int.class, int.class, int.class, int.class};
+		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
 		public static final int SOURCE = PROTOTYPE.indexOf(SOURCE_FIELD);
 		public static final int X = PROTOTYPE.indexOf(X_FIELD);
 		public static final int Y = PROTOTYPE.indexOf(Y_FIELD);
@@ -57,7 +61,7 @@ public final class ComponentEventStream implements TupleStream {
 		}
 		
 		public int size() {return PROTOTYPE.size();}
-		public List<String> getPrototype() {return PROTOTYPE;}
+		public TuplePrototype getPrototype() {return PROTOTYPE;}
 		public boolean isDefault(String name, Object value) {return false;}		
 	}
 	

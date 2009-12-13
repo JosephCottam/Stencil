@@ -28,7 +28,7 @@
  */
 package stencil.tuple;
 
-import java.util.List;
+import stencil.tuple.prototype.TuplePrototype;
 
 public interface Tuple {
 	public static final String DEFAULT_KEY = "VALUE";
@@ -37,7 +37,7 @@ public interface Tuple {
 	/**Get a listing of all fields known by this tuple (even if they are not set).
 	 * The order of the list corresponds to the index of the field number.
 	 * */
-	public abstract List<String> getPrototype();
+	public abstract TuplePrototype getPrototype();
 
 	/**Returns the object as stored under the name.
 	 * @throws InvalidNameException The name passed is not valid for this tuple.*/

@@ -32,10 +32,13 @@ import java.util.*;
 
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.tuple.InvalidNameException;
+import stencil.tuple.prototype.TupleFieldDef;
+import stencil.tuple.prototype.TuplePrototype;
 
-public final class AttributeList implements Iterable<Attribute>{
+public final class AttributeList implements Iterable<Attribute>, TuplePrototype<Attribute> {
 	private final Map<String, Attribute> attributes;
 	private List<String> names = null;
+	private List<Class> types = null;
 
 	public AttributeList() {attributes = new TreeMap();}
 	
@@ -83,6 +86,17 @@ public final class AttributeList implements Iterable<Attribute>{
 		return names;
 	}
 	
+	public List<Class> getTypes() {
+		if (types == null) {
+			types = new ArrayList(attributes.size());
+			for (String name: getNames()) {
+				Attribute a = attributes.get(name);
+				types.add(a.type);
+			}
+		}
+		return types;
+	}
+	
 	/**Get the default value of the attribute of the given  name
 	 * @throws InvalidNameException Requested name not found in this collection
 	 */
@@ -100,4 +114,8 @@ public final class AttributeList implements Iterable<Attribute>{
 	}
 	
 	public void remove(StandardAttribute att) {remove(att.name());}
+
+	public boolean contains(String name) {return attributes.containsKey(name);}
+	public int indexOf(String name) {return names.indexOf(name);}
+	public TupleFieldDef getField(int idx) {return get(idx);}
 }

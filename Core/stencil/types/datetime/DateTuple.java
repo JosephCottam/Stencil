@@ -1,12 +1,13 @@
 package stencil.types.datetime;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Calendar;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 public final class DateTuple implements Tuple {
 	private static final String HOUR_FIELD = "hour";
@@ -16,14 +17,17 @@ public final class DateTuple implements Tuple {
 	private static final String MONTH_FIELD = "month";
 	private static final String YEAR_FIELD = "year";
 	
-	private static final List<String> PROTOTYPE = Arrays.asList(HOUR_FIELD, MINUTE_FIELD, SECOND_FIELD, DAY_FIELD, MONTH_FIELD, YEAR_FIELD);
+	private static final String[] FIELDS = new String[]{HOUR_FIELD, MINUTE_FIELD, SECOND_FIELD, DAY_FIELD, MONTH_FIELD, YEAR_FIELD};
+	private static final Class[] TYPES   = new Class[]{Integer.class, Integer.class, Integer.class, Integer.class, Integer.class, Integer.class};
 	
-	public static final int HOUR = PROTOTYPE.indexOf(HOUR_FIELD);
-	public static final int MINUTE = PROTOTYPE.indexOf(MINUTE_FIELD);
-	public static final int SECOND = PROTOTYPE.indexOf(SECOND_FIELD);
-	public static final int DAY = PROTOTYPE.indexOf(DAY_FIELD);
-	public static final int MONTH = PROTOTYPE.indexOf(MONTH_FIELD);
-	public static final int YEAR = PROTOTYPE.indexOf(YEAR_FIELD);
+	private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+	
+	public static final int HOUR   = Arrays.asList(PROTOTYPE).indexOf(HOUR_FIELD);
+	public static final int SECOND = Arrays.asList(PROTOTYPE).indexOf(SECOND_FIELD);
+	public static final int MINUTE = Arrays.asList(PROTOTYPE).indexOf(MINUTE_FIELD);
+	public static final int DAY    = Arrays.asList(PROTOTYPE).indexOf(DAY_FIELD);
+	public static final int MONTH  = Arrays.asList(PROTOTYPE).indexOf(MONTH_FIELD);
+	public static final int YEAR   = Arrays.asList(PROTOTYPE).indexOf(YEAR_FIELD);
 	
 	
 	final Calendar cal;
@@ -46,9 +50,9 @@ public final class DateTuple implements Tuple {
 		if (idx == YEAR)   {return cal.get(Calendar.YEAR);}
 		throw new TupleBoundsException(idx, size());
 	}
-	public int size() {return PROTOTYPE.size();}
+	public int size() {return FIELDS.length;}
 
-	public List<String> getPrototype() {return PROTOTYPE;}
+	public TuplePrototype getPrototype() {return PROTOTYPE;}
 
 	/**There is no default date/time, so all fields have no default value.*/
 	public boolean isDefault(String name, Object value) {return false;}

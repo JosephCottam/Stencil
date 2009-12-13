@@ -29,6 +29,7 @@
 package stencil.operator.wrappers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
@@ -41,6 +42,7 @@ import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototypes;
 
 /**Legend defined through a stencil definition.
  * TODO: Add compiler step to fold these legends directly into the call chains if only has one rule predicate on ALL and has no specialization
@@ -71,8 +73,8 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	 */
 	public Tuple map(Object... values) {
 		if (source.getArguments().size() != values.length) {
-			String args = Arrays.deepToString(source.getArguments().toArray());
-			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", args, values.length));
+			int expected = source.getArguments().size();
+			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
 		}
 
 		Tuple tuple = new PrototypedTuple(source.getArguments(), Arrays.asList(values));
@@ -106,7 +108,8 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
 		if (spec !=null && !spec.isSimple()) {throw new SpecializationException("", getName(), spec);}
 		
-		return Modules.basicLegendData(module, getName(), OpType.PROJECT, source.getResults());
+		List<String> names = TuplePrototypes.getNames(source.getResults());
+		return Modules.basicLegendData(module, getName(), OpType.PROJECT, names);
 	}
 
 	public Invokeable getFacet(String name) throws IllegalArgumentException {

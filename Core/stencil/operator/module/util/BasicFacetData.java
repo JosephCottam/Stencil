@@ -8,11 +8,13 @@ import stencil.operator.module.FacetData;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.StencilString;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 public class BasicFacetData implements FacetData {
-	protected String name;
-	protected OpType type;
-	protected List<String> fields;
+	protected final String name;
+	protected final OpType type;
+	protected final TuplePrototype prototype;
 
 	public BasicFacetData(String name, OpType type, Collection<Atom> fields) {this(name, type, convertFields(fields));}
 	public BasicFacetData(String name, String type, String...fields) {this(name, OpType.valueOf(type), fields);}
@@ -21,12 +23,12 @@ public class BasicFacetData implements FacetData {
 	public BasicFacetData(String name, OpType type, List<String> fields) {
 		this.name = name;
 		this.type = type;
-		this.fields = fields;
+		prototype = new SimplePrototype(fields);	//TODO: Actually get the types from somewhere and use them, instead of just giving up on all types!
 	}
 	
 	public String getName() {return name;}
 	public OpType getFacetType() {return type;}
-	public List<String> tupleFields() {return fields;}
+	public TuplePrototype getPrototype() {return prototype;}
 	
 	private static String[] convertFields(Collection<Atom> fields) {
 		String[] names = new String[fields.size()];

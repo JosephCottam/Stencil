@@ -50,11 +50,12 @@ options {
 	import java.util.Set;
 	import java.util.HashSet;
 	import stencil.util.MultiPartName;
-    import stencil.operator.module.*;
+  import stencil.operator.module.*;
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	
 	import static stencil.parser.ParserConstants.BIND_OPERATOR;
+	import static stencil.parser.ParserConstants.SIMPLE_SPECIALIZER;
 	import static stencil.operator.module.OperatorData.OpType;
 	import static stencil.tuple.Tuples.stripQuotes;	
 	import static stencil.parser.tree.Guide.SampleStrategy;
@@ -67,6 +68,13 @@ options {
   //Mapping from requested guides to descriptor construction strategy.  This is populated by the 'build' pass
   protected HashMap<String, SampleStrategy> requestedGuides = new HashMap<String, SampleStrategy>();
 
+
+
+  /**Provide the appropriate specializer
+   */
+  public Specializer specializer() {
+    return (Specializer) adaptor.dupTree(SIMPLE_SPECIALIZER);
+  }
     
 	public EnsureGuideOp(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
@@ -237,52 +245,14 @@ options {
     	adaptor.addChild(functionNode, specializer);
     	adaptor.addChild(functionNode, args);
     	adaptor.addChild(functionNode, adaptor.create(DIRECT_YIELD, "->"));
-		adaptor.addChild(functionNode, call.getStart());
+		  adaptor.addChild(functionNode, call.getStart());
 		
-		//Construct chain node
-		CallChain chainNode = (CallChain) adaptor.create(CALL_CHAIN, "CALL_CHAIN");
-		adaptor.addChild(chainNode, functionNode);
+		  //Construct chain node
+		  CallChain chainNode = (CallChain) adaptor.create(CALL_CHAIN, "CALL_CHAIN");
+		  adaptor.addChild(chainNode, functionNode);
 		
     	return chainNode;
     }
-    
-    
-    /**Construct the specializer for the echo operation.
-     *
-     * @param t Call target that will follow the new echo operator.
-     */
-	public Specializer autoEchoSpecializer(CommonTree t) {
-    	//Switch on the target type
-    	//Get the names out of its arguments list
-    	//Remember those names in the echo categorize
-    
-    	String specializerTemplate = "[1 .. n, \%1\$s]";
-    	StringBuilder refs = new StringBuilder();
-    	 
-    	if (t instanceof Pack || t instanceof Function) {
-    		CallTarget target = (CallTarget) t;
-    		for (Value v:target.getArguments()) {
-    			if (v.isAtom()) {continue;} //Skip all the atoms, we only want tuple-refs
-    			refs.append("\"");
-    			refs.append(v.getValue());
-    			refs.append("\"");
-    			refs.append(",");
-    		}
-    		refs.deleteCharAt(refs.length()-1); //Remove the last comma
-    	} else {
-    		throw new IllegalArgumentException("Attempt to use target of uknown type: " + t.getClass().getName());
-    	}
-    	
-    	
-		  String specSource =String.format(specializerTemplate, refs);
-    	try {
-    		Specializer spec = ParseStencil.parseSpecializer(specSource);
-    		return spec;
-    	} catch (Exception e) {
-    		throw new RuntimeException("Error creating default catgorical operator with specialzier " + specSource, e);
-    	}
-    }
-    
     
     /**Construct the arguments section of an echo call block.
      *
@@ -305,7 +275,7 @@ options {
       Layer layer = (Layer) f.getAncestor(StencilParser.LAYER);
       Consumes consumes = (Consumes) f.getAncestor(StencilParser.CONSUMES);
       Rule r = (Rule) f.getAncestor(StencilParser.RULE);
-      String field = r.getTarget().getPrototype().get(0);
+      String field = r.getTarget().getPrototype().get(0).getFieldName();
       
       SampleStrategy strat = requestedGuides.get(key(layer.getName(), field));
       
@@ -326,7 +296,7 @@ glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$
 //Replace the #-> with an echo operator...
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {autoEchoSpecializer($t)} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
+		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {specializer()} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
 
 		
 ensure: ^(c=CONSUMES . . ^(LIST rule[((Consumes) c).getLayer().getName()]*) . .);

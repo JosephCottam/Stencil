@@ -30,20 +30,9 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token; 
 
 import stencil.display.ViewTuple;
-import stencil.parser.ParserConstants;
 
 public class View extends Target {
 	public static ViewTuple global;
 	
 	public View(Token source) {super(source);}
-	
-	/**Converts a name identifiable as a 'viewField' into a regular field name.*/
-	public static final String regularField(String name) {
-		return name.substring(ParserConstants.VIEW_PREFIX.length()+1);
-	}
-
-	/**Does the passed name indicate a field in the view tuple?*/
-	public static final boolean isViewField(String name) {
-		return name != null && name.startsWith(ParserConstants.VIEW_PREFIX);
-	}
 }

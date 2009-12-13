@@ -4,7 +4,7 @@ import java.util.*;
 
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.collections.MarkSweepSet;
 
 import com.sun.syndication.feed.synd.*;
@@ -23,7 +23,7 @@ public class FeedTuples extends CacheFeed<SyndFeedInput> {
 		super(name, url, new MarkSweepSet(), new SyndFeedInput());
 		this.keyField = keyField;
 		this.fields = Arrays.asList(fields);
-		this.types = Tuples.defaultTypes(fields.length);
+		this.types = TuplePrototypes.defaultTypes(fields.length);
 	}
 
 	protected void updateEntryCache() {

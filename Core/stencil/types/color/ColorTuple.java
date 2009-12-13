@@ -28,14 +28,13 @@
  */
 package stencil.types.color;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import static stencil.parser.ParserConstants.INITIATOR;
 import static stencil.parser.ParserConstants.TERMINATOR;
 import static stencil.parser.ParserConstants.SEPARATOR;
@@ -43,33 +42,24 @@ import static stencil.parser.ParserConstants.SIGIL;
 import static stencil.types.color.Color.OPAQUE_INT;
 
 public final class ColorTuple extends java.awt.Color implements Tuple {
-	private static final String RED_FIELD = "R";
-	private static final String GREEN_FIELD = "G";
-	private static final String BLUE_FIELD = "B";
-	private static final String ALPHA_FIELD = "A";
-	private static final List<String>PROTOTYPE = Arrays.asList(RED_FIELD, GREEN_FIELD, BLUE_FIELD, ALPHA_FIELD);
+	private static final String RED_FIELD = "Red";
+	private static final String GREEN_FIELD = "Green";
+	private static final String BLUE_FIELD = "Blue";
+	private static final String ALPHA_FIELD = "Alpha";
+	private static final String[] FIELDS = new String[]{RED_FIELD, GREEN_FIELD, BLUE_FIELD, ALPHA_FIELD};
+	private static final Class[] TYPES = new Class[]{Integer.class, Integer.class, Integer.class, Integer.class};
+	private static final TuplePrototype PROTOTPYE = new SimplePrototype(FIELDS, TYPES);
 
-	public static final int RED   = PROTOTYPE.indexOf(RED_FIELD);
-	public static final int GREEN = PROTOTYPE.indexOf(GREEN_FIELD);
-	public static final int BLUE  = PROTOTYPE.indexOf(BLUE_FIELD);
-	public static final int ALPHA = PROTOTYPE.indexOf(ALPHA_FIELD);
-	
-	private static final List<String> FIELDS;
-	private static final List<String> SIMPLE_FIELDS;
-
-	static {	
-		SIMPLE_FIELDS = Arrays.asList("Red", "Green", "Blue", "Alpha");
-		List<String> temp = new ArrayList(Arrays.asList(RED_FIELD, GREEN_FIELD, BLUE_FIELD, ALPHA_FIELD));
-		temp.addAll(SIMPLE_FIELDS);
-		FIELDS = Collections.unmodifiableList(temp);
-	}
+	public static final int RED   = Arrays.asList(FIELDS).indexOf(RED_FIELD);
+	public static final int GREEN = Arrays.asList(FIELDS).indexOf(GREEN_FIELD);
+	public static final int BLUE  = Arrays.asList(FIELDS).indexOf(BLUE_FIELD);
+	public static final int ALPHA = Arrays.asList(FIELDS).indexOf(ALPHA_FIELD);
 		
 	public ColorTuple(int color) {
 		super(color, true);
 	}
 	
-	public List<String> getPrototype() {return FIELDS;}
-	public boolean hasField(String name) {return FIELDS.contains(name);}
+	public TuplePrototype getPrototype() {return PROTOTPYE;}
 
 	public boolean isDefault(String name, Object value) {
 		if (!(value instanceof Number)) {return false;}
@@ -109,12 +99,13 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 	public String toString() {return toString(this);}
 	
 	public Object get(String name) {
-		int idx = PROTOTYPE.indexOf(name);
-		try {return get(idx);}
-		catch (IndexOutOfBoundsException e) {throw new InvalidNameException(name, getPrototype());}
+		if (RED_FIELD.equals(name)) {return get(RED);}
+		if (GREEN_FIELD.equals(name)) {return get(GREEN);}
+		if (BLUE_FIELD.equals(name)) {return get(BLUE);}
+		throw new InvalidNameException(name, getPrototype());
 	}
 	
-	public int size() {return PROTOTYPE.size();}
+	public int size() {return FIELDS.length;}
 	public Object get(int idx) {
 		if (idx == RED) {return getRed();}
 		if (idx == GREEN) {return getGreen();}

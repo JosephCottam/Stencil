@@ -32,7 +32,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,6 +45,7 @@ import stencil.display.DuplicateIDException;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.Layer;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.util.collections.ListSet;
 
@@ -113,7 +113,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	private void setPrototype(T prototypeGlyph) {this.prototypeGlyph = prototypeGlyph;}
 
 	/**Get the tuple prototype of this table.*/
-	public List<String> getPrototype() {return prototypeGlyph.getPrototype();}
+	public TuplePrototype getPrototype() {return prototypeGlyph.getPrototype();}
 	
 	public DisplayGuide getGuide(String attribute) {return guides.get(attribute);}
 	public void addGuide(String attribute, Guide2D guide) {guides.put(attribute, guide);}

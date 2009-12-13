@@ -84,9 +84,9 @@ public abstract class ParserConstants {
 	public static final String NAME_SEPARATOR_PATTERN  = "\\.";
 	public static final String DEFAULT_GLYPH_TYPE = "SHAPE";
 	
-	public static final String VIEW_PREFIX = "view";
-	public static final String CANVAS_PREFIX = "canvas";
-	public static final String LOCAL_PREFIX = "local";
+	public static final String VIEW_FRAME = "view";
+	public static final String CANVAS_FRAME = "canvas";
+	public static final String LOCAL_FRAME = "local";
 
 	
 	public static final String BIND_OPERATOR = ":";

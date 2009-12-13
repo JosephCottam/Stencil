@@ -145,6 +145,7 @@ public final class Line extends Stroked {
 	}
 
 	public String getImplantation() {return IMPLANTATION;} 
+	public AttributeList getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 

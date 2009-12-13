@@ -32,6 +32,8 @@ import static stencil.parser.ParserConstants.*;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
+import java.util.List;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData.OpType;
@@ -146,6 +148,10 @@ public final class Modules {
 	 * @return
 	 */
 	public static MutableOperatorData basicLegendData(String module, String name, OpType type, String...fields) {
+		return basicLegendData(module, name, type, Arrays.asList(fields));
+	}
+	
+	public static MutableOperatorData basicLegendData(String module, String name, OpType type, List<String> fields) {
 		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
 		legendData.addFacet(new BasicFacetData("Map", type, fields));
 		legendData.addFacet(new BasicFacetData("Query", type, fields));

@@ -34,7 +34,7 @@ import stencil.adapters.java2D.Canvas;
 import stencil.types.Converter;
 
 
-public class CanvasTuple extends stencil.display.CanvasTuple.SimpleCanvasTuple {
+public class CanvasTuple extends stencil.display.CanvasTuple {
 	private Canvas  canvas;
 	
 	public CanvasTuple(Canvas c) {canvas = c;}

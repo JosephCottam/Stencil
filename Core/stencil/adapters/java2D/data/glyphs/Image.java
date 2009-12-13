@@ -45,6 +45,7 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototype;
 
 public final class Image extends Basic {
 	private static final double AUTO_SCALE = -1;
@@ -122,6 +123,7 @@ public final class Image extends Basic {
 	
 	private final Rectangle2D getBounds(Point2D p) {return new Rectangle2D.Double(p.getX(), p.getY(), getWidth(), getHeight());}
 
+	public TuplePrototype getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 

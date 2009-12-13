@@ -43,13 +43,45 @@ options {
    
   package stencil.parser.string;
   
+  import java.util.Arrays;
+  
   import stencil.parser.ParserConstants;
   import stencil.parser.tree.*;
   import stencil.operator.module.*;
   import stencil.util.MultiPartName;
+  import stencil.tuple.prototype.TuplePrototype;
+  import stencil.tuple.prototype.SimplePrototype;
+  import stencil.tuple.prototype.TuplePrototypes;
+  
 }
 
 @members {
+  public static final class FrameException extends RuntimeException {
+    private String frame;
+    private TuplePrototype contents;
+    private FrameException prior;
+    
+    public FrameException(String name, String frame, TuplePrototype contents) {
+      this(name, frame, contents, null);
+    }
+    
+    public FrameException(String name, String frame, TuplePrototype contents, FrameException prior) {
+      super("Could not find field '" + name + "'.\n" + briefMessage(frame, contents, prior));
+      this.frame = frame;
+      this.contents= contents;
+      this.prior = prior;
+    }
+    
+    private static String briefMessage(String frame, TuplePrototype contents, FrameException prior) {
+      StringBuilder b = new StringBuilder();
+      b.append(String.format("\tSearched in frame \%1\$s (fields: \%2\$s).\n", frame, Arrays.deepToString(TuplePrototypes.getNames(contents).toArray())));
+      if (prior != null) {
+        b.append(briefMessage(prior.frame, prior.contents, prior.prior));
+      }
+      return b.toString();
+    }
+  }
+
  private static final class EnvironmentProxy {
      final EnvironmentProxy parent;
      final TuplePrototype names;
@@ -64,9 +96,15 @@ options {
 
      public int frameRefFor(String name) {return frameRefFor(name, 0);}
      private int frameRefFor(String name, int offset) {
-       if (names.contains(name)) {return offset;}
-       if (label.equals(name)) {return offset;}
-       else {return parent.frameRefFor(name, offset);}     
+      if (names.contains(name)) {return offset;}
+      if (label.equals(name)) {return offset;}
+      if (parent == null) {
+        throw new FrameException(name, label, names);
+      }
+      try {return parent.frameRefFor(name, offset+1);}
+      catch (FrameException e) {
+        throw new FrameException(name, label, names, e);
+      }
      }
      
      public boolean isFrameRef(String name) {
@@ -101,17 +139,19 @@ options {
     
     try {
       OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-      TuplePrototype prototype = od.getFacetData(name.getFacet()).tupleFields();
+      TuplePrototype prototype = od.getFacetData(name.getFacet()).getPrototype();
       return env.push(label, prototype);
     } catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);} 
   } 
   
   protected EnvironmentProxy initialEnv(CommonTree t) {
-    External ex = (External) t;
-    return new EnvironmentProxy(ParserConstants.CANVAS_PREFIX, Canvas.global.getPrototype())
-              .push(ParserConstants.VIEW_PREFIX, View.global.getPrototype())
+    Consumes c = (Consumes) t;
+    Program p = (Program) c.getAncestor(StencilParser.PROGRAM);
+    External ex = External.find(c.getStream(), p.getExternals());
+    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
+              .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
               .push(ex.getName(), ex.getPrototype())
-              .push(ParserConstants.LOCAL_PREFIX, null);                   //TOOD: need to calculate the local tuple!
+              .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
   }
   
   protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
@@ -122,11 +162,10 @@ options {
       if (env.isFrameRef(name)) {return ref;}
 
       int frameIdx = env.frameRefFor(name);
-      TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, (Token) null);
+      TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<autogen>");
       StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
       adaptor.addChild(newRef, frame);
-      adaptor.addChild(newRef, ref);
-      adaptor.setParent(ref, newRef);
+      adaptor.addChild(newRef, adaptor.dupTree(ref));
       return newRef;
     }
     return ref;

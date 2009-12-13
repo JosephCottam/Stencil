@@ -34,6 +34,8 @@ import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
@@ -54,13 +56,14 @@ public abstract class KeyboardStream implements TupleStream {
 	public static class KeysTuple implements Tuple {
 		private static final String KEY_FIELD = "key";
 		private static final String MODIFIER_FIELD="modifier";
-		private static final String SOURCE_FIELD = "source";
-		private static final List<String> PROTOTYPE = Arrays.asList(KEY_FIELD, MODIFIER_FIELD, SOURCE_FIELD);
-		public static final int KEY = PROTOTYPE.indexOf(KEY_FIELD);
-		public static final int MODIFIER = PROTOTYPE.indexOf(MODIFIER_FIELD);
-		public static final int SOURCE = PROTOTYPE.indexOf(SOURCE_FIELD);
+		private static final String SOURCE_FIELD = Tuple.SOURCE_KEY;
+		private static final String[] FIELDS = new String[]{SOURCE_FIELD, KEY_FIELD, MODIFIER_FIELD};
+		private static final Class[] TYPES = new Class[]{String.class, Character.class, Integer.class};
+		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+		public static final int KEY = Arrays.asList(FIELDS).indexOf(KEY_FIELD); 
+		public static final int MODIFIER = Arrays.asList(FIELDS).indexOf(MODIFIER_FIELD);
+		public static final int SOURCE = Arrays.asList(FIELDS).indexOf(SOURCE_FIELD);
 
-		private static List<String> fields = null;
 		private Character key = null;
 		private Integer modifiers = null;
 		private String source = null;
@@ -84,14 +87,7 @@ public abstract class KeyboardStream implements TupleStream {
 		public String getSource() {return source;}
 		public void setSource(String source) {this.source = source;}
 
-		public List<String> getPrototype() {
-			if (fields == null) {
-				fields = new ArrayList<String>();
-				fields.add(KEY_FIELD);
-				fields.add(MODIFIER_FIELD);
-			}
-			return fields;
-		}
+		public TuplePrototype getPrototype() {return PROTOTYPE;}
 
 		public boolean hasField(String name) {
 			name = name.toUpperCase();

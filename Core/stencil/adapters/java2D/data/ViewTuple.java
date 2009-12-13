@@ -36,12 +36,11 @@ import java.awt.geom.Point2D;
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.Panel;
 import stencil.tuple.InvalidNameException;
-import stencil.tuple.TupleBoundsException;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 import stencil.util.enums.EnumUtils;
 
-public final class ViewTuple extends stencil.display.ViewTuple.Simple {
+public final class ViewTuple extends stencil.display.ViewTuple {
 	private Panel view;
 	private Canvas canvas;
 	public ViewTuple(Panel view) {
@@ -109,12 +108,6 @@ public final class ViewTuple extends stencil.display.ViewTuple.Simple {
 		throw new IllegalArgumentException(String.format("Cannot set %1$s on view.", name));
 	}
 
-	//TODO: Convert so the numeric de-reference is the primary one
-	public Object get(int idx) {
-		try {return get(PROTOTYPE.get(idx));}
-		catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
-	}
-	
 	public Object get(String name) throws InvalidNameException {
 		if (EnumUtils.contains(ViewAttribute.class, name)) {
 			AffineTransform t = canvas.getInverseViewTransform();

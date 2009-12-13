@@ -154,10 +154,10 @@ public final class Pie extends Stroked {
 		if (Y.is(name)) {return Registrations.topLeftToRegistration(registration, bounds).getY();}
 		return super.get(name);
 	}
-	
+
+	public AttributeList getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
-
 
 	private double getPercent() {return slice/(slice+field);}
 	public String getImplantation() {return IMPLANTATION;}

@@ -39,7 +39,7 @@ import java.util.regex.*;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 
 import static java.lang.String.format;
 
@@ -82,7 +82,7 @@ public final class DelimitedParser implements TupleStream {
 		this.filename = filename;
 		this.skip = skip;
 		this.labels = parseLabels(labels, splitter);
-		this.types = Tuples.defaultTypes(this.labels.size());
+		this.types = TuplePrototypes.defaultTypes(this.labels.size());
 		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
 		else {this.channel = new LooseChannel(this.labels, delimiter);}
 		open();

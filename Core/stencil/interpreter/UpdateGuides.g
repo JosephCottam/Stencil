@@ -47,6 +47,9 @@ options {
 	import stencil.util.MultiPartName;
 	import stencil.display.*;
 	import stencil.operator.module.*;
+	import stencil.tuple.prototype.*;
+	import stencil.tuple.prototype.TuplePrototype;
+	
 }
 
 @members{
@@ -86,23 +89,24 @@ options {
 		return Arrays.asList(pairs);	
 	}	
 
-	private final List<String> getPrototype(Function f) {
+	private final TuplePrototype getPrototype(Function f) {
 		MultiPartName name = new MultiPartName(f.getName());
 		Specializer spec = f.getSpecializer();
 		try {
    			Module m = cache.findModuleForOperator(name.prefixedName()).module;
    			OperatorData ld = m.getOperatorData(name.getName(), spec);
    			FacetData fd = ld.getFacetData("Query");//TODO: This is not always query...we need to add guide facet data
-   			assert fd.tupleFields() != null : "Unexpected null prototype tuple.";
-   			return fd.tupleFields();
+   			assert fd.getPrototype() != null : "Unexpected null prototype tuple.";
+   			return fd.getPrototype();
    		} catch (Exception e) {throw new RuntimeException("Error Specailizing", e);}
 	}
 	
-	private final List<Object[]> invokeGuide(Function f, List<Object[]> vals, List<String> prototype) {
-		return f.getOperator().guide(f.getArguments(), vals, prototype);
+	private final List<Object[]> invokeGuide(Function f, List<Object[]> vals, TuplePrototype prototype) {
+		//TODO: Remove prototype call when numeralize works
+		return f.getOperator().guide(f.getArguments(), vals, TuplePrototypes.getNames(prototype));
 	}
 	
-  	private final List<Object[]> packGuide(Pack p, List<Object[]> vals, List<String> prototype) {
+  	private final List<Object[]> packGuide(Pack p, List<Object[]> vals, TuplePrototype prototype) {
 		Object[][] results = new Object[vals.size()][];
 		
 		int i=0;
@@ -112,7 +116,7 @@ options {
 			Value arg = p.getArguments().get(j); //TODO: Really need to handle the case where chain is setting more than one value
 			
    	  if (arg instanceof TupleRef) {
-   	    int idx = ((TupleRef) arg).toNumericRef(prototype);
+   	    int idx = ((TupleRef) arg).toNumericRef(TuplePrototypes.getNames(prototype)); //TODO: Remove prototype call when numeralize works
         results[i][j] = val[idx]; 
    	  }	else {results[i][j] = arg.getValue();}
    			i++;
@@ -128,7 +132,8 @@ invoke[String layerName, String att]
 	@init{List<Object[]> inputs = null;}
 	: ^(f=FUNCTION {inputs = invokeGuide((Function) f, null, null);} . . . target[layerName, att, inputs, inputs, getPrototype((Function) f)]);
 	
-target[String layerName, String att, List<Object[\]> inputs, List<Object[\]> vals, List<String> prototype]  //TODO: Remove prototype when all tuple-references are positional
+//TODO: Remove prototype call when numeralize works
+target[String layerName, String att, List<Object[\]> inputs, List<Object[\]> vals, TuplePrototype prototype]  //TODO: Remove prototype when all tuple-references are positional
 	: ^(f=FUNCTION . . . target[layerName, att, inputs, invokeGuide((Function) f, vals, prototype), getPrototype((Function) f)])
 	| ^(p=PACK .) {update(layerName, att, inputs, packGuide((Pack) p, vals, prototype));};
 

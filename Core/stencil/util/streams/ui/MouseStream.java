@@ -41,7 +41,7 @@ import stencil.parser.tree.View;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.enums.EnumUtils;
 
 /**A way to track the mouse position/state at all points in time.
@@ -111,7 +111,7 @@ public class MouseStream implements TupleStream {
 	 * TYPE: Click/Press/Move/Drag
 	 */
 	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE};
-	private static final List<Class> fieldTypes = Tuples.defaultTypes(Names.values().length);
+	private static final List<Class> fieldTypes = TuplePrototypes.defaultTypes(Names.values().length);
 
 	
 	public static enum Types {CLICK, PRESS, RELEASE, MOVE, DRAG;

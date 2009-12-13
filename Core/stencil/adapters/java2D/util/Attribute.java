@@ -28,7 +28,9 @@
  */
 package stencil.adapters.java2D.util;
 
-public class Attribute<T> {
+import stencil.tuple.prototype.TupleFieldDef;
+
+public class Attribute<T> implements TupleFieldDef{
 	public String name;
 	public Class type;
 	public T defaultValue;
@@ -53,4 +55,8 @@ public class Attribute<T> {
 	
 	public boolean is(String name) {return this.name.equals(name);}
 	public boolean is(Enum candidate) {return this.name.equals(candidate.name());}
+
+	public String getFieldName() {return name;}
+	public Class getFieldType() {return type;}
+
 }

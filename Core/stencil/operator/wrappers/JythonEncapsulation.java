@@ -35,7 +35,7 @@ import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
 
 import java.util.Arrays;

@@ -46,6 +46,7 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 
 public abstract class Poly extends Stroked {
@@ -156,6 +157,7 @@ public abstract class Poly extends Stroked {
 	}
 	
 	
+	public AttributeList getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 
@@ -197,7 +199,7 @@ public abstract class Poly extends Stroked {
 	
 	/**Does the given tuple have up point-related updates?*/
 	private static final boolean changesPoints(Tuple t) {
-		for (String field: t.getPrototype()) {
+		for (String field: TuplePrototypes.getNames(t.getPrototype())) {
 			String base = baseName(field);
 			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {return true;}
 		}
@@ -275,7 +277,7 @@ public abstract class Poly extends Stroked {
 	private static final void updatePoints(List<Point2D> points, Tuple option) {
 		List<IdxValuePair> updates = new ArrayList(option.getPrototype().size());
 		
-		for (String field: option.getPrototype()) {
+		for (String field: TuplePrototypes.getNames(option.getPrototype())) {
 			final String base = baseName(field);
 			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
 				double idx = index(points, field, false);

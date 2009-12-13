@@ -31,22 +31,9 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.display.CanvasTuple;
-import stencil.parser.ParserConstants;
 
 public final class Canvas extends Target{
 	public static CanvasTuple global;
 	
-	public Canvas(Token source) {super(source);}
-
-	/**Converts a name identifiable as a 'canvsField' into a regular
-	 * field name.
-	 */
-	public static final String regularField(String name) {
-		return name.substring(ParserConstants.CANVAS_PREFIX.length()+1);
-	}
-
-	/**Does the passed name indicate a field in the view tuple?*/
-	public static final boolean isCanvasField(String name) {
-		return name != null && name.startsWith(ParserConstants.CANVAS_PREFIX);
-	}
+	public Canvas(Token source) {super(source);} 
 }

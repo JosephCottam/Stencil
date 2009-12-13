@@ -35,6 +35,7 @@ import java.awt.Paint;
 import java.awt.Stroke;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.EnumUtils;
@@ -146,7 +147,7 @@ public final class Strokes {
 		Integer joinStyle = null;
 		
 		for (Tuple t: sources) {
-			for (String f: t.getPrototype()) {
+			for (String f: TuplePrototypes.getNames(t.getPrototype())) {
 				if (EnumUtils.contains(StrokeProperty.class, f)) {
 					StrokeProperty p = StrokeProperty.valueOf(f);
 					Object value = t.get(f);

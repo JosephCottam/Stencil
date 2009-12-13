@@ -13,15 +13,19 @@ import com.sun.syndication.io.SyndFeedInput;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.collections.*;
 
 //Based on FeedMonitor (http://yusuke.homeip.net/twitter4j/en/javadoc/twitter4j/examples/FeedMonitor.html)
 public class TwitterTuples extends CacheFeed<HttpClient> {
 	public static final String HEADER = "MESSAGE, LINK, SOURCE, TIME";
 	protected static final String[] FIELDS = HEADER.split(", ");
+	protected static final Class[] TYPES = new Class[]{String.class, String.class, String.class, String.class};
+	protected static final TuplePrototype prototype = new SimplePrototype(FIELDS, TYPES);
 	
 	private static class TwitterTuple implements Tuple {
-		private String[] values = new String[FIELDS.length];
+		private final String[] values = new String[FIELDS.length];
 
 		public TwitterTuple(String feed, String message, String link, String time) {
 			values[0] = message;
@@ -42,7 +46,7 @@ public class TwitterTuples extends CacheFeed<HttpClient> {
 			catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
 		}
 		
-		public List<String> getPrototype() {return java.util.Arrays.asList(FIELDS);}
+		public TuplePrototype getPrototype() {return prototype;}
 		public int size() {return FIELDS.length;}
 		
 		public boolean isDefault(String name, Object value) {return "".equals(value);}

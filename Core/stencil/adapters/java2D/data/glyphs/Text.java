@@ -24,6 +24,8 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 
@@ -48,7 +50,7 @@ public final class Text extends Basic {
 			dims = new DoubleDimension[lines.length];
 		}		
 	}
-	
+	protected static final TuplePrototype PROTOTYPE;
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
 	private static final String IMPLANTATION = "TEXT";
@@ -74,6 +76,7 @@ public final class Text extends Basic {
 		ATTRIBUTES.add(WIDTH);
 		
 		for (TextProperty p:TextProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
+		PROTOTYPE = new SimplePrototype(ATTRIBUTES.getNames(), ATTRIBUTES.getTypes());
 	}
 
 	private final String text;
@@ -178,6 +181,7 @@ public final class Text extends Basic {
 		return renderedText;
 	}
 	
+	public AttributeList getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 

@@ -8,7 +8,7 @@ import java.util.List;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
@@ -28,7 +28,7 @@ public class QueryTuples implements TupleStream {
 
 	public QueryTuples(String name, String driver, String connect, String query, String header, String separator) throws Exception {
 		this.fields = Arrays.asList(header.split(separator));
-		this.types = Tuples.defaultTypes(fields.size());
+		this.types = TuplePrototypes.defaultTypes(fields.size());
 		this.name = name;
 
 		connection = DriverManager.connect(driver, connect);

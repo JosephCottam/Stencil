@@ -11,6 +11,9 @@ import stencil.operator.module.OperatorData.OpType;
 import stencil.parser.ProgramParseException;
 import stencil.parser.tree.Specializer;
 import stencil.parser.string.ParseStencil;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.ANTLRTree;
 import stencil.util.ANTLRTree.NameNotFoundException;
 
@@ -39,7 +42,11 @@ class MDTreeAdapter extends CommonTreeAdaptor {
 		public OpType getFacetType() {return OpType.valueOf(search("type").getChild(0).getText());}
 		public boolean isProject() {return getFacetType().equals("project");}		
 		public boolean isCategorize() {return getFacetType().equals("categorize");}
-		public List<String> tupleFields() {return Arrays.asList(search("prototype").getChild(0).getText().split(","));}
+		public TuplePrototype getPrototype() {
+			List<String> names = Arrays.asList(search("prototype").getChild(0).getText().split(","));
+			List<Class> types = TuplePrototypes.defaultTypes(names.size());
+			return new SimplePrototype(names, types);
+		}
 		
 		/**Complete if nothing depends on the operator specializer 
 		 * (indicated by a SPECIALIZATION_DEPENDENT_VALUE instead of a normal value).*/

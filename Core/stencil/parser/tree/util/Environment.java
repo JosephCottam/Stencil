@@ -28,31 +28,57 @@
  */
 package stencil.parser.tree.util;
 
-import java.util.Arrays;
-import java.util.List;
-
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 
 public class Environment implements Tuple {
+	/**Proxy object that indicates that the return value should be ignored
+	 * an no new environment frame should be crated.
+	 * 
+	 * THIS SHOULD ONLY BE RETURNED BY STENCIL INTERNAL METHODS.  Stencil semantics
+	 * cannot be guaranteed if this is returned by other methods.  It is public
+	 * so the internal operators can have access to it.  Utility methods of
+	 * stencil use this return value so utility operators can be inserted
+	 * in call chains without interfering with literal positional values
+	 * de-referenced on the environment.
+	 */
+	public static Tuple NO_NEW_FRAME = new Tuple() {
+		public Object get(String name) {throw new Error("Should never be invoked.");}
+		public Object get(int idx) {throw new Error("Should never be invoked.");}
+		public TuplePrototype getPrototype() {throw new Error("Should never be invoked.");}
+		public boolean isDefault(String name, Object value) {throw new Error("Should never be invoked.");}
+		public int size() {throw new Error("Should never be invoked.");}		
+	};
+	
 	private final Tuple[] frames;
+	private final TuplePrototype prototype;
 	
 	protected Environment() {this(null);}	
-	public Environment(Tuple update) {frames = new Tuple[]{update};}
+	public Environment(Tuple update) {
+		frames = new Tuple[]{update};
+		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length, "Frame"));
+	}
 	
 	private Environment(Environment prior, Tuple update) {
 		Tuple[] source = prior.frames;
 		frames = new Tuple[source.length+1];
 		frames[0] = update;
 		System.arraycopy(source, 0, frames, 1, source.length);
+		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length, "Frame"));
 	}
 
-	public Environment append(Tuple t) {return new Environment(this, t);}
+	public Environment append(Tuple t) {
+		if (t == NO_NEW_FRAME) {return this;}
+		else {return new Environment(this, t);}
+	}
 
 	public Tuple get(int idx) {return frames[idx];}
 
-	public List<String> getPrototype() {return Arrays.asList(Tuples.defaultNames(frames.length, "Frame"));}
+	public TuplePrototype getPrototype() {return prototype;}
 	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 	public boolean hasField(String name) {return getPrototype().contains(name);}
 

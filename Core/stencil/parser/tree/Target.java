@@ -34,6 +34,7 @@ import org.antlr.runtime.Token;
 
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototypes;
 
 /**Targets are things that can be on the left-hand-side
  * of a rule.  They consist of a target-type and
@@ -48,8 +49,8 @@ public abstract class Target extends StencilTree {
 	/**What is the name of this target (Glyph or Return, etc).*/
 	public String getName() {return token.getText();}
 
-	/**What properties of the target entity are being affected?*/
-	public List<String> getFields() {return (List<String>) getChild(0);}
+	
+	public TuplePrototype getPrototype() {return (TuplePrototype) getChild(0);}
 
 	/**Create a new tuple where the names are take from the tuple prototype and
 	 * values are take from the source.
@@ -58,12 +59,11 @@ public abstract class Target extends StencilTree {
 	 * (such as a glyph, view or canvas) via merge.
 	 */
 	public final Tuple finalize(Tuple source) {
-		List<String> fields = getFields();
+		List<String> fields = TuplePrototypes.getNames(getPrototype());
 		List<Object> values = new java.util.ArrayList<Object>();
 
-		for (String name: source.getPrototype()) {
-			values.add(source.get(name));
-		}
+		int size = fields.size();
+		for (int i=0; i< size; i++) {values.add(source.get(i));}
 
 		Tuple rv = new PrototypedTuple(fields, values);
 		return rv;

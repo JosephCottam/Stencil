@@ -138,6 +138,7 @@ public class Shape extends Filled {
 		else {return super.get(name);}
 	}
 	
+	public AttributeList getPrototype() {return ATTRIBUTES;}
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 	

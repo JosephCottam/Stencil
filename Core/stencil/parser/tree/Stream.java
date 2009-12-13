@@ -32,7 +32,7 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.TupleFieldDef;
+import stencil.tuple.prototype.TupleFieldDef;
 
 public class Stream extends StencilTree {
 	public Stream(Token source) {super(source);}

@@ -35,6 +35,7 @@ import java.awt.Color;
 import java.awt.Font;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.EnumUtils;
@@ -130,7 +131,7 @@ public final class TextFormats {
 		Justification just = (Justification) TextProperty.JUSTIFY.defaultValue;
 		
 		for (Tuple t: sources) {
-			for (String field: t.getPrototype()) {
+			for (String field: TuplePrototypes.getNames(t.getPrototype())) {
 				if (EnumUtils.contains(TextProperty.class, field)) {
 					TextProperty p = TextProperty.valueOf(field);
 					Object value = t.get(field);

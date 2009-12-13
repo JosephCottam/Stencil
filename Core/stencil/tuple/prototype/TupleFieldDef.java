@@ -1,4 +1,4 @@
-package stencil.tuple;
+package stencil.tuple.prototype;
 
 public interface TupleFieldDef {
 	public String getFieldName();

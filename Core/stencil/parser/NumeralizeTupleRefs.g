@@ -46,6 +46,7 @@ options {
   import stencil.parser.tree.*;
   import stencil.operator.module.*;
   import stencil.util.MultiPartName;
+  import stencil.tuple.prototype.TuplePrototype;
 }
 
 @members {
@@ -66,6 +67,7 @@ options {
      final String label;
      
      public EnvironmentProxy(External root) {this(root.getName(), root.getPrototype(), null);}
+     private EnvironmentProxy(String label, TuplePrototype prototype) {this(label, prototype, null);}
      private EnvironmentProxy(String label, TuplePrototype prototype, EnvironmentProxy parent) {
         this.label = label;
         this.prototype = prototype;
@@ -108,32 +110,26 @@ options {
     
       try {
         OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-        List<String> prototype = od.getFacetData(name.getFacet()).tupleFields();
+        TuplePrototype prototype = od.getFacetData(name.getFacet()).getPrototype();
         return env.push(label, prototype);
       } catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);} 
      } 
-     
-  private External findStreamFor(Consumes consumes) {
-    Program program = (Program) consumes.getAncestor(StencilParser.PROGRAM);
-    String streamName = consumes.getStream();
-    for (External s: program.getExternals()) {
-      if (s.getName().equals(streamName)) {return s;}
-    }
-    throw new RuntimeException("Could not find stream of name " + streamName + ".");
-  }
 
-
-  private EnvironmentProxy initialEnv(CommonTree consumes) {
-    External ex = findStreamFor((Consumes) consumes);
-    return new EnvironmentProxy(ParserConstants.CANVAS_PREFIX, Canvas.global.getPrototype())
-        .push(ParserConstants.VIEW_PREFIX, View.global.getPrototype())
+  private EnvironmentProxy initialEnv(CommonTree t) {
+    Consumes consumes = (Consumes) t;
+    Program p = (Program) consumes.getAncestor(StencilParser.PROGRAM);
+    External ex = External.find(consumes.getStream(), p.getExternals());
+    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
+        .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
         .push(ex.getName(), ex.getPrototype())
-        .push(ParserConstants.LOCAL_PREFIX, null);                   //TOOD: need to calculate the local tuple!
+        .push(ParserConstants.LOCAL_FRAME, null);                   //TOOD: need to calculate the local tuple!
   }
+  
   
   private TupleRef resolve(TupleRef ref, String prototype) {
     throw new RuntimeException("Tuple sub-ref numeralization not complete.");
   }
+  
   
   private TupleRef resolve(TupleRef ref, TuplePrototype prototype) {
     TupleRef newRef = (TupleRef) adaptor.dupNode(ref);
@@ -150,7 +146,7 @@ options {
     }
     
     if (ref.hasSubRef()) {
-      adaptor.addChild(newRef, resolve(ref, prototype.get(idx)));
+      adaptor.addChild(newRef, resolve(ref, prototype.get(idx).getFieldName()));
     }
     return newRef;
   }

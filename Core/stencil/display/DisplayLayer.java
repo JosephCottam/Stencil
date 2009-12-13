@@ -29,9 +29,9 @@
 package stencil.display;
 
 import java.util.Iterator;
-import java.util.List;
 import stencil.adapters.Glyph;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototype;
 
 public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**Name of the method that should be invoked by clients wanting to use this legend*/
@@ -78,8 +78,8 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	
 	/**What is the tuple prototype for this layer?
 	 * This is derived directly from the implantation type.
-	 * TODO: Should this be a stencil.parser.tree.TuplePrototype??  Can we derive this in the compiler somehow?*/
-	public List<String> getPrototype();
+	 */
+	public TuplePrototype getPrototype();
 
 	/**Return a guide for the specified attribute.
 	 * @throws IllegalArgumentException The attribute named is either not valid for this layer (may be due to implantation type) 

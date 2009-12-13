@@ -11,6 +11,7 @@ import static stencil.parser.ParserConstants.*;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.OperatorData.OpType;
@@ -55,8 +56,9 @@ public class JythonOperator implements DynamicStencilOperator {
 	
 	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new Invokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
-		
-		FacetData data = new BasicFacetData(f.getName(), f.getAnnotation("Type"),  enc.getReturns());
+		OpType opType = OpType.valueOf(f.getAnnotation("Type")); //TODO: Cannonize this name somewhere better
+		List<String> fields = TuplePrototypes.getNames(enc.getReturns());
+		FacetData data = new BasicFacetData(f.getName(), opType,  fields); //TODO: Add type information
 		operatorData.addFacet(data);		
 	}
 
@@ -72,8 +74,8 @@ public class JythonOperator implements DynamicStencilOperator {
 		OpType guideType = OpType.valueOf(enc.getAnnotation("TYPE"));
 		
 		if (guideType == OpType.CATEGORIZE) {
-			Tuple t = inv.invoke(new Object[0]); //TODO: Verify somewhere that this block always takes zero arguments
-			return (List) t.get(t.getPrototype().get(0));	//TODO: Verify that this block always returns one value
+			Tuple t = inv.invoke(new Object[0]); 			//TODO: Verify somewhere that this block always takes zero arguments
+			return (List) t.get(0);	//TODO: Verify that this block always returns exactly one value
 		} else if (guideType == OpType.PROJECT) {
 			Object[] results = new Object[sourceArguments.size()];
 			int i=0;
@@ -92,7 +94,7 @@ public class JythonOperator implements DynamicStencilOperator {
 	public boolean refreshGuide() {
 		if (invokeables.containsKey(DO_GUIDE_BLOCK_TAG) && invokeables.containsKey(GUIDE_BLOCK_TAG)) {
 			Tuple t = getFacet(DO_GUIDE_BLOCK_TAG).invoke(new Object[0]); //TODO: Verify somewhere that this block always takes zero arguments
-			return t.get(t.getPrototype().get(0)).equals("TRUE");	//TODO: Verify that this block always returns one value
+			return t.get(0).equals("TRUE");	//TODO: Verify that this block always returns one value
 		}
 		throw new UnsupportedOperationException(String.format("Must supply '%1$s' and '%2$s' facets to use python block in a guide.", DO_GUIDE_BLOCK_TAG,GUIDE_BLOCK_TAG));
 	}

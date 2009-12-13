@@ -43,6 +43,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.ColorModel;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.util.enums.Attribute;
 import stencil.util.enums.EnumUtils;
@@ -192,7 +193,7 @@ public final class Fills {
 		Color back = (Color) FillProperty.PATTERN_BACK.defaultValue;
 		
 		for (Tuple t: sources) {
-			for (String f: t.getPrototype()) {
+			for (String f: TuplePrototypes.getNames(t.getPrototype())) {
 				if (EnumUtils.contains(FillProperty.class, f)) {
 					FillProperty att = FillProperty.valueOf(f);
 					Object value = t.get(f);

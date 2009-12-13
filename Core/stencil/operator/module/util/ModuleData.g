@@ -58,6 +58,8 @@ tokens {
 }
 
 @header{
+  //TODO: Extend to handle types
+
 	package stencil.operator.module.util;
 	
 	import java.io.*;
