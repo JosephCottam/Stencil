@@ -19,65 +19,12 @@ import java.io.Serializable;
 import java.io.IOException;
 
 /**
- * A hash table supporting full concurrency of retrievals and
- * adjustable expected concurrency for updates. This class obeys the
- * same functional specification as {@link java.util.Hashtable}, and
- * includes versions of methods corresponding to each method of
- * <tt>Hashtable</tt>. However, even though all operations are
- * thread-safe, retrieval operations do <em>not</em> entail locking,
- * and there is <em>not</em> any support for locking the entire table
- * in a way that prevents all access.  This class is fully
- * interoperable with <tt>Hashtable</tt> in programs that rely on its
- * thread safety but not on its synchronization details.
- *
- * <p> Retrieval operations (including <tt>get</tt>) generally do not
- * block, so may overlap with update operations (including
- * <tt>put</tt> and <tt>remove</tt>). Retrievals reflect the results
- * of the most recently <em>completed</em> update operations holding
- * upon their onset.  For aggregate operations such as <tt>putAll</tt>
- * and <tt>clear</tt>, concurrent retrievals may reflect insertion or
- * removal of only some entries.  Similarly, Iterators and
- * Enumerations return elements reflecting the state of the hash table
- * at some point at or since the creation of the iterator/enumeration.
- * They do <em>not</em> throw {@link ConcurrentModificationException}.
- * However, iterators are designed to be used by only one thread at a time.
- *
- * <p> The allowed concurrency among update operations is guided by
- * the optional <tt>concurrencyLevel</tt> constructor argument
- * (default <tt>16</tt>), which is used as a hint for internal sizing.  The
- * table is internally partitioned to try to permit the indicated
- * number of concurrent updates without contention. Because placement
- * in hash tables is essentially random, the actual concurrency will
- * vary.  Ideally, you should choose a value to accommodate as many
- * threads as will ever concurrently modify the table. Using a
- * significantly higher value than you need can waste space and time,
- * and a significantly lower value can lead to thread contention. But
- * overestimates and underestimates within an order of magnitude do
- * not usually have much noticeable impact. A value of one is
- * appropriate when it is known that only one thread will modify and
- * all others will only read. Also, resizing this or any other kind of
- * hash table is a relatively slow operation, so, when possible, it is
- * a good idea to provide estimates of expected table sizes in
- * constructors.
- *
- * <p>This class and its views and iterators implement all of the
- * <em>optional</em> methods of the {@link Map} and {@link Iterator}
- * interfaces.
- *
- * <p> Like {@link Hashtable} but unlike {@link HashMap}, this class
- * does <em>not</em> allow <tt>null</tt> to be used as a key or value.
- *
- * <p>This class is a member of the
- * <a href="{@docRoot}/../technotes/guides/collections/index.html">
- * Java Collections Framework</a>.
- *
- * @since 1.5
- * @author Doug Lea
- * @param <K> the type of keys maintained by this map
- * @param <V> the type of mapped values
+ * Taken wholesale from the ConcurrentHashMap class.  Adds a getAll(long code)
+ * to retrieve items directly by their hashcode (originally used for picking,
+ * but flexible).
  */
 @SuppressWarnings("all")
-public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
+public class BackdoorMap<K, V> extends AbstractMap<K, V>
         implements ConcurrentMap<K, V>, Serializable {
     private static final long serialVersionUID = 7249069246763182397L;
 
@@ -641,7 +588,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * negative or the load factor or concurrencyLevel are
      * nonpositive.
      */
-    public ConcurrentHashMap(int initialCapacity,
+    public BackdoorMap(int initialCapacity,
                              float loadFactor, int concurrencyLevel) {
         if (!(loadFactor > 0) || initialCapacity < 0 || concurrencyLevel <= 0)
             throw new IllegalArgumentException();
@@ -687,7 +634,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      *
      * @since 1.6
      */
-    public ConcurrentHashMap(int initialCapacity, float loadFactor) {
+    public BackdoorMap(int initialCapacity, float loadFactor) {
         this(initialCapacity, loadFactor, DEFAULT_CONCURRENCY_LEVEL);
     }
 
@@ -700,7 +647,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * @throws IllegalArgumentException if the initial capacity of
      * elements is negative.
      */
-    public ConcurrentHashMap(int initialCapacity) {
+    public BackdoorMap(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 
@@ -708,7 +655,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      * Creates a new, empty map with a default initial capacity (16),
      * load factor (0.75) and concurrencyLevel (16).
      */
-    public ConcurrentHashMap() {
+    public BackdoorMap() {
         this(DEFAULT_INITIAL_CAPACITY, DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
     }
 
@@ -720,7 +667,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
      *
      * @param m the map
      */
-    public ConcurrentHashMap(Map<? extends K, ? extends V> m) {
+    public BackdoorMap(Map<? extends K, ? extends V> m) {
         this(Math.max((int) (m.size() / DEFAULT_LOAD_FACTOR) + 1,
                       DEFAULT_INITIAL_CAPACITY),
              DEFAULT_LOAD_FACTOR, DEFAULT_CONCURRENCY_LEVEL);
@@ -1173,7 +1120,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
         public void remove() {
             if (lastReturned == null)
                 throw new IllegalStateException();
-            ConcurrentHashMap.this.remove(lastReturned.key);
+            BackdoorMap.this.remove(lastReturned.key);
             lastReturned = null;
         }
     }
@@ -1217,7 +1164,7 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
 	public V setValue(V value) {
             if (value == null) throw new NullPointerException();
             V v = super.setValue(value);
-            ConcurrentHashMap.this.put(getKey(), value);
+            BackdoorMap.this.put(getKey(), value);
             return v;
         }
     }
@@ -1237,16 +1184,16 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             return new KeyIterator();
         }
         public int size() {
-            return ConcurrentHashMap.this.size();
+            return BackdoorMap.this.size();
         }
         public boolean contains(Object o) {
-            return ConcurrentHashMap.this.containsKey(o);
+            return BackdoorMap.this.containsKey(o);
         }
         public boolean remove(Object o) {
-            return ConcurrentHashMap.this.remove(o) != null;
+            return BackdoorMap.this.remove(o) != null;
         }
         public void clear() {
-            ConcurrentHashMap.this.clear();
+            BackdoorMap.this.clear();
         }
     }
 
@@ -1255,13 +1202,13 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             return new ValueIterator();
         }
         public int size() {
-            return ConcurrentHashMap.this.size();
+            return BackdoorMap.this.size();
         }
         public boolean contains(Object o) {
-            return ConcurrentHashMap.this.containsValue(o);
+            return BackdoorMap.this.containsValue(o);
         }
         public void clear() {
-            ConcurrentHashMap.this.clear();
+            BackdoorMap.this.clear();
         }
     }
 
@@ -1273,20 +1220,20 @@ public class ConcurrentHashMap<K, V> extends AbstractMap<K, V>
             if (!(o instanceof Map.Entry))
                 return false;
             Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-            V v = ConcurrentHashMap.this.get(e.getKey());
+            V v = BackdoorMap.this.get(e.getKey());
             return v != null && v.equals(e.getValue());
         }
         public boolean remove(Object o) {
             if (!(o instanceof Map.Entry))
                 return false;
             Map.Entry<?,?> e = (Map.Entry<?,?>)o;
-            return ConcurrentHashMap.this.remove(e.getKey(), e.getValue());
+            return BackdoorMap.this.remove(e.getKey(), e.getValue());
         }
         public int size() {
-            return ConcurrentHashMap.this.size();
+            return BackdoorMap.this.size();
         }
         public void clear() {
-            ConcurrentHashMap.this.clear();
+            BackdoorMap.this.clear();
         }
     }
 
