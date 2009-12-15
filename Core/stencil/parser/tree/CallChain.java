@@ -58,11 +58,6 @@ public class CallChain extends StencilTree {
 	 * @return
 	 * @throws Exception
 	 */
-	public Tuple apply(Tuple source) throws Exception {
-		if (source instanceof Environment) {return apply((Environment) source);}
-		else {return apply(new Environment(source));}
-	}
-	
 	public Tuple apply(Environment env) throws Exception {		
 		CallTarget target = getStart();
 
@@ -71,7 +66,7 @@ public class CallChain extends StencilTree {
 			Function func = (Function) target;
 			result = func.apply(env);
 			if (result == null) {return null;}
-			env = env.append(result);
+			env = env.push(result);
 			target = ((Function) target).getCall();
 		}
 

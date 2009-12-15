@@ -49,8 +49,15 @@ public class Interpreter {
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple process(List<Rule> rules, Tuple source) throws Exception {
-		if (rules == null || rules.size() ==0 || source == null) {return Tuples.EMPTY_TUPLE;}
+	public static Tuple process(List<Rule> rules, Tuple streamTuple) throws Exception {
+		Environment env = initialEnv(streamTuple);
+		env.push(null);	//Local
+		
+		return process(rules, env);
+	}
+	
+	public static Tuple process(List<Rule> rules, Environment env) throws Exception {
+		if (rules == null || rules.size() ==0 || env == null) {return Tuples.EMPTY_TUPLE;}
 		
 		Tuple fullResult = null;
 		
@@ -59,7 +66,7 @@ public class Interpreter {
 			for (Rule rule: rules) {
 				Tuple result;
 				
-				try {result = rule.apply(source);}
+				try {result = rule.apply(env);}
 				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
 				
 				//TODO: Have rules throw exception (instead of return null)
@@ -85,7 +92,9 @@ public class Interpreter {
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
 				boolean matches;
-				try {matches = group.matches(source);}
+				Environment env = initialEnv(source);
+				
+				try {matches = group.matches(env);}
 				catch (Exception e) {throw new RuntimeException(format("Error applying filter in layer %1$s", layer.getName()), e);}
 				
 				
@@ -93,11 +102,10 @@ public class Interpreter {
 					Tuple result;
 					Tuple local;
 					
-					Environment env = buildEnvironment(source,  null);
 					try {local = process(group.getLocalRules(), env);}
 					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}
 					
-					env = buildEnvironment(source, local);
+					env = env.push(local);
 					try {
 						result = process(group.getGlyphRules(), env);
 						if (result != null && result.getPrototype().contains(ParserConstants.GLYPH_ID_FIELD)) {
@@ -128,11 +136,11 @@ public class Interpreter {
 		}
 	}
 
-	private static final Environment buildEnvironment(Tuple stream, Tuple local) {
-		Environment e = new Environment(Canvas.global);
-		e = e.append(View.global);
-		e = e.append(stream);			
-		e.append(local);	//Even if its null, it needs to be there to keep the indexes straight!
+	private static final Environment initialEnv(Tuple stream) {
+		Environment e;
+		e = new Environment(Canvas.global)
+			.push(View.global)
+			.push(stream);
 		return e;
 	}
 	

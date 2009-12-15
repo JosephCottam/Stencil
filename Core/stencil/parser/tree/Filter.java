@@ -32,6 +32,7 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
@@ -62,7 +63,7 @@ public class Filter extends Target {
 	public CallChain rule() {return (CallChain) getChild(1);}
 
 	/**Does the passed tuple match the given predicates?*/
-	public boolean matches(Tuple source) throws Exception {
+	public boolean matches(Environment source) throws Exception {
 		Tuple result = rule().apply(source);
 		return passFail(result) == PASS;
 	}

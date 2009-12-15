@@ -71,7 +71,7 @@ public class Environment implements Tuple {
 		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length, "Frame"));
 	}
 
-	public Environment append(Tuple t) {
+	public Environment push(Tuple t) {
 		if (t == NO_NEW_FRAME) {return this;}
 		else {return new Environment(this, t);}
 	}

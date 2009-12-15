@@ -21,7 +21,7 @@ public final class TuplePrototypes {
 		String[] names= new String[count];
 		names[0]=prefix;
 		for (int i=1; i< count; i++) {
-			names[i] = prefix + count;
+			names[i] = prefix + i;
 		}
 		return Arrays.asList(names);
 	}

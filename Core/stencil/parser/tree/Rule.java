@@ -33,6 +33,7 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.tuple.Tuple;
 import stencil.parser.string.StencilParser;
+import stencil.parser.tree.util.Environment;
 
 /** A rule is a group of calls and a tuple prototype.
  * This is a complete, individual mapping definition.
@@ -87,8 +88,8 @@ public class Rule extends StencilTree {
 	 * @param source
 	 * @return
 	 */
-	public Tuple apply(Tuple source) throws Exception {
-		Tuple t = getAction().apply(source);
+	public Tuple apply(Environment env) throws Exception {
+		Tuple t = getAction().apply(env);
 		if (t == null) {return t;}
 		return getTarget().finalize(t);
 	}

@@ -68,7 +68,11 @@ public final class PrototypedTuple implements Tuple {
 	}
 	
 	public static <T> List<T> prepend(T value, List<T> original) {
-		original.add(0, value);
+		try {original.add(0, value);}
+		catch (UnsupportedOperationException e) {
+			original = new ArrayList(original);
+			original.add(0, value);
+		}
 		return original;
 	}
 	
@@ -80,11 +84,11 @@ public final class PrototypedTuple implements Tuple {
 	public PrototypedTuple(String[] names, Object[] values) {this(Arrays.asList(names), Arrays.asList(values));}
 	
 	
-	public PrototypedTuple(List<String> names, List values) {this(names, null, values);}
+	public PrototypedTuple(List<String> names, List values) {this(names, TuplePrototypes.defaultTypes(names.size()), values);}
 	
 	public PrototypedTuple(List<String> names, List<Class> types, List<Object> values) {
+		assert types != null : "Types may not be null";
 		assert names != null : "Names may not be null.";
-		assert values != null : "Values may not be null.";
 		assert names.size() == values.size() : "Value and name list not of the same length." + names + " vs. " + values;
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 
@@ -98,21 +102,20 @@ public final class PrototypedTuple implements Tuple {
 	}
 	
 	private static final List<Object> validate(List<Class> types, List<Object> values) {
-		if (types == null) {return values;}
 		if (types.size() != values.size()) {throw new TypeValidationException("Type list and value list are of different lengths");}
-		List<Object> newValues = new ArrayList<Object>(values.size());
+		Object[] newValues = new Object[values.size()];
 		
 		for (int i=0; i< types.size(); i++) {
 			Class target = types.get(i);
 			Object value = values.get(i);
 			if (!target.isInstance(value)) {
-				try {newValues.set(i, Converter.convert(value, target));}
+				try {newValues[i] = Converter.convert(value, target);}
 				catch (Exception e) {throw new TypeValidationException(types.get(i), values.get(i), e);}
 			} else {
-				newValues.set(i, value);
+				newValues[i] = value;
 			}
 		}
-		return newValues;
+		return Arrays.asList(newValues);
 	}
 
 	/**Verify that the names list contains no duplicates.*/

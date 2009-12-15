@@ -64,7 +64,7 @@ public final class AttributeList implements Iterable<Attribute>, TuplePrototype<
 	 * @param idx
 	 * @return
 	 */
-	public Attribute get(int idx) {return attributes.get(names.get(idx));}
+	public Attribute get(int idx) {return attributes.get(getNames().get(idx));}
 	
 	public Attribute get(Enum name) {return get(name.name());}
 	

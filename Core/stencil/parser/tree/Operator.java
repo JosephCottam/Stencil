@@ -36,7 +36,7 @@ public class Operator extends StencilTree {
 
 	public String getName() {return token.getText();}
 
-	protected Yields getYields() {return (Yields) getChild(0);}
+	public Yields getYields() {return (Yields) getChild(0);}
 
 	public TuplePrototype getArguments() {return getYields().getInput();}
 

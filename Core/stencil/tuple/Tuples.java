@@ -50,7 +50,8 @@ public final class Tuples {
 		public Object get(int idx) {throw new TupleBoundsException(idx, size());}
 		public TuplePrototype getPrototype() {return new SimplePrototype();}
 		public int size() {return 0;}
-		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}	
+		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}
+		public String toString() {return Tuples.toString(this);}
 	};
 
 	
@@ -213,6 +214,7 @@ public final class Tuples {
 
 		if (source1 == null || source1 == EMPTY_TUPLE) {return source2;}
 		if (source2 == null || source2 == EMPTY_TUPLE) {return source1;}
+		if (source1 == source2) {return source1;}
 
 		Map<String, Object> store = new HashMap();
 		
@@ -226,7 +228,7 @@ public final class Tuples {
 		}
 		
 		List<String> names = new ArrayList(store.keySet());
-		List<Object> values = new ArrayList(store.entrySet()); 
+		List<Object> values = new ArrayList(store.values()); 
 		
 		return new PrototypedTuple(names, values);
 	}

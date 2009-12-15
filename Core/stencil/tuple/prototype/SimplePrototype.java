@@ -17,7 +17,8 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 	public SimplePrototype(String[] names, Class[] types) {this(Arrays.asList(names), Arrays.asList(types));}
 	public SimplePrototype(List<String> names, List<Class> types) {
 		super();
-
+		assert names != null : "Must supply names";
+		assert types != null : "Must supply types";
 		assert names.size() == types.size() : "Must supply the same number of names as types: ";
 		
 		int count = names.size();

@@ -144,14 +144,26 @@ options {
     } catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);} 
   } 
   
-  protected EnvironmentProxy initialEnv(CommonTree t) {
-    Consumes c = (Consumes) t;
+  
+  protected EnvironmentProxy initialEnv(Tree t) {
+    Consumes c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
+    Operator o = (Operator) t.getAncestor(StencilParser.OPERATOR);
+    if (c != null) {return initialEnv(c);}
+    if (o != null) {return initialEnv(o);}
+    throw new RuntimeException("Found rule with unknown initial envivronment: " + t.toStringTree());
+  }
+  
+  protected EnvironmentProxy initialEnv(Consumes c) {
     Program p = (Program) c.getAncestor(StencilParser.PROGRAM);
     External ex = External.find(c.getStream(), p.getExternals());
     return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
               .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
               .push(ex.getName(), ex.getPrototype())
               .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
+  }
+  
+  protected EnvironmentProxy initialEnv(Operator o) {
+    return new EnvironmentProxy(o.getName(), o.getYields().getInput());
   }
   
   protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
@@ -173,11 +185,11 @@ options {
 }
 
 
-topdown: consumes;
-consumes: ^(c=CONSUMES list[initialEnv($c)]+);
-list[EnvironmentProxy env]:  ^(l=LIST rule[env]*);
-rule[EnvironmentProxy env] 
-  : ^(r=RULE target=. action[env] binding=.);
+topdown: rule | filter;
+
+filter: ^(f=FILTER . action[initialEnv($f)]);
+
+rule: ^(r=RULE target=. action[initialEnv($r)] binding=.);
   
 action[EnvironmentProxy env]
   : ^(CALL_CHAIN callTarget[env]);
