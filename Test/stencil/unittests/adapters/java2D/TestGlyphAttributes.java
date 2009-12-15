@@ -8,6 +8,7 @@ import java.util.List;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.glyphs.*;
+import stencil.tuple.prototype.TuplePrototypes;
 
 //TODO: Add tests for failure cases
 public class TestGlyphAttributes extends TestCase{
@@ -16,13 +17,13 @@ public class TestGlyphAttributes extends TestCase{
 		ignore.add("ID");
 		ignore.add("IMPLANTATION");
 		
-		for(String att : node.getPrototype()) {
+		for(String att : TuplePrototypes.getNames(node.getPrototype())) {
 			if (ignore.contains(att)) {continue;} 
 			Object value = node.get(att);
 			assertTrue(String.format("Default value not returned for %1$s when expected (got %2$s)", att, value), node.isDefault(att, value));
 		}
 		
-		for (String att: node.getPrototype()) {
+		for (String att: TuplePrototypes.getNames(node.getPrototype())) {
 			assertTrue(String.format("Expected to find %1$s in glyph of type %2$s", att, node.get("IMPLANTATION")), node.getPrototype().contains(att));
 		}
 	}

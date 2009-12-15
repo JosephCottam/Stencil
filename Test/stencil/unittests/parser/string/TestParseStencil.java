@@ -43,7 +43,6 @@ public class TestParseStencil extends TestCase {
 
 	public void testParseAllStored() throws Exception {
 		ArrayList errors = new ArrayList();
-
 		
 		Map<String, String> programs = StringUtils.allPrograms(StringUtils.STENCIL_CACHE_DIRECTORY);
 		assertTrue("Insufficient programs found to conduct test.", programs.size() >0);
@@ -53,7 +52,7 @@ public class TestParseStencil extends TestCase {
 				ParseStencil.parse(programs.get(name), ADAPTER);
 			}
 			catch (Throwable e) {
-				errors.add(name);
+				errors.add(name +  ":"+ e.getClass().getSimpleName());
 			}			
 		}
 

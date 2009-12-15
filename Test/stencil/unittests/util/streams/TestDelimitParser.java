@@ -44,6 +44,7 @@ public class TestDelimitParser extends TestCase {
 		int i=0;
 		while (p.hasNext() && i< 1000) {p.next(); i++;}
 		Assert.assertTrue("Next iteration count exceeded.", i<1000);
+		Assert.assertTrue("Next iteration count insufficient.", i>10);
 	}
 	
 	public void testClose() throws Exception {
