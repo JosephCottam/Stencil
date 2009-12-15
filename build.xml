@@ -10,7 +10,11 @@
  	
  	<target name="CurrentWorkingGrammar">
  		<antlr
- 			target="${grammars}/Stencil.g"
+ 			target="${grammars}/NumeralizeTupleRefs.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/FrameTupleRefs.g"
 			outputdirectory="${grammars}/string/"
  		/> 
  		<antcall target="EclipseRefresh"/>
@@ -113,6 +117,14 @@
  			target="${grammars}/SeparateTargets.g"
 			outputdirectory="${grammars}/string/"
 		/> 	
+ 		<antlr
+ 			target="${grammars}/NumeralizeTupleRefs.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/FrameTupleRefs.g"
+			outputdirectory="${grammars}/string/"
+ 		/> 
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 

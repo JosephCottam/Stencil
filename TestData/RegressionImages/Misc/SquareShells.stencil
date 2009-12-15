@@ -22,11 +22,12 @@ from NodePositions
 	SIZE: 1
 
 operator Layout (i) -> (X,Y) 
-	all => (X,Y): Sqrt(i) -> Floor(_) -[s]>
+	all => (X,Y): Sqrt(i) -> Floor(_) -[shell]>
 				Add(1,_) -[n]>
-				Pow(n[_],2) -> Sub(_, n[_]) -[c]> ByOdds(i,s[_],c[_]) 
+				Pow(n[_],2) -> Sub(_, n[_]) -[center]> 
+				ByOdds(i,shell[_],center[_]) 
 
-operator ByOdds (i,s,c) -> (x,y)
-	(i < c) => (x,y) : Pow(s,2) -> Sub(i, _) -> (s,_)
-	(i > c) => (x,y) : Sub(i, c) -> Sub(s, _) -> (_,s)
-    (i = c) => (x,y) : (s,s)
+operator ByOdds (i,shell,center) -> (x,y)
+	(i < c) => (x,y) : Pow(shell,2) -> Sub(i, _) -> (shell,_)
+	(i > c) => (x,y) : Sub(i, center) -> Sub(shell, _) -> (_,shell)
+	(i = c) => (x,y) : (shell,shell)
