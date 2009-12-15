@@ -2,6 +2,7 @@ package stencil.explore.model.sources;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.List;
 
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.Random;
@@ -38,7 +39,7 @@ public class RandomSource extends StreamSource {
 			return null;	//Temporary condition
 		}
 	}
-	private String asHeader(String[] fields) {
+	private String asHeader(List<String> fields) {
 		StringBuilder b =new StringBuilder();
 		for (String s: fields) {
 			b.append(s);
