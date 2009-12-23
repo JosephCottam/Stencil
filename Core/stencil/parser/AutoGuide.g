@@ -51,15 +51,15 @@ options {
 	import java.util.Map;
 	import java.util.HashMap;
 
-  import org.antlr.runtime.tree.*;
+	import org.antlr.runtime.tree.*;
 
 	import stencil.parser.tree.*;
 	import stencil.util.MultiPartName;
-  import stencil.operator.module.*;
-  import stencil.operator.module.util.*;
+	import stencil.operator.module.*;
+	import stencil.operator.module.util.*;
 	import stencil.operator.module.OperatorData.OpType;
 
-  import static stencil.parser.ParserConstants.GUIDE_BLOCK_TAG;
+	import static stencil.parser.ParserConstants.GUIDE_BLOCK_TAG;
 
 	
 }
@@ -68,7 +68,7 @@ options {
 	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();
 	protected ModuleCache modules;
  
-  public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
+	public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
     
 	public AutoGuide(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
@@ -85,16 +85,16 @@ options {
 	
 	 //Build a mapping from the layer/attribute names to mapping trees
 	 private Object build(Object t) {
-      fptr down =	new fptr() {public Object rule() throws RecognitionException { return buildMappings(); }};
-    	fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-    	return downup(t, down, up);
-   }
+		fptr down =	new fptr() {public Object rule() throws RecognitionException { return buildMappings(); }};
+		fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+		return downup(t, down, up);
+	}
     
     //Transfer appropriate mapping tree to the guide clause
     private Object transfer(Object t) {
-		  fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
-   	  fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	  return downup(t, down, up);
+		fptr down =	new fptr() {public Object rule() throws RecognitionException { return transferMappings(); }};
+		fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
+		return downup(t, down, up);
     }
     
     //Trim each mapping chain to its last categorical operator
@@ -106,7 +106,7 @@ options {
     
     //Rename functions to use the guide channel
     private Object rename(Object t) {
-			fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
+		fptr down =	new fptr() {public Object rule() throws RecognitionException { return renameMappingsDown(); }};
 	   	fptr up = new fptr() {public Object rule() throws RecognitionException { return  bottomup(); }};
 	   	return downup(t, down, up);		
     }
@@ -145,7 +145,7 @@ options {
    		try {
    			OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();;
    			return (opType == OpType.CATEGORIZE);
-   		} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.");}
+   		} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.",e);}
 
 	}
 
@@ -155,7 +155,7 @@ options {
 //guides section
 buildMappings: ^(c=CONSUMES . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
 mapping[String layerName] 
-  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE field=.)) group=. .)
+  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
 		{attDefs.put(key(layerName, field), group);};
 
 transferMappings

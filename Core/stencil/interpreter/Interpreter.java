@@ -50,9 +50,7 @@ public class Interpreter {
 	}
 	
 	public static Tuple process(List<Rule> rules, Tuple streamTuple) throws Exception {
-		Environment env = initialEnv(streamTuple);
-		env.push(null);	//Local
-		
+		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple, null);
 		return process(rules, env);
 	}
 	
@@ -92,7 +90,7 @@ public class Interpreter {
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
 				boolean matches;
-				Environment env = initialEnv(source);
+				Environment env = Environment.getDefault(Canvas.global, View.global, source);
 				
 				try {matches = group.matches(env);}
 				catch (Exception e) {throw new RuntimeException(format("Error applying filter in layer %1$s", layer.getName()), e);}
@@ -136,13 +134,5 @@ public class Interpreter {
 		}
 	}
 
-	private static final Environment initialEnv(Tuple stream) {
-		Environment e;
-		e = new Environment(Canvas.global)
-			.push(View.global)
-			.push(stream);
-		return e;
-	}
-	
 	public StencilPanel getPanel() {return panel;}
 }

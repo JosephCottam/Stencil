@@ -72,7 +72,7 @@ public class StencilUtil extends BasicModule {
 	 * 
 	 */
 	public static final class EchoContinuous extends EchoBase {
-		public static final String NAME = EchoContinuous.class.getName();
+		public static final String NAME = EchoContinuous.class.getSimpleName();
 
 		private boolean useIntegers = false;
 		private int tickCount = 10;
@@ -167,7 +167,7 @@ public class StencilUtil extends BasicModule {
 	 * TODO: Merge with a generalized echo. Requires better 'split' semantics
 	 */
 	public static final class EchoCategorize extends EchoBase {
-		public static final String NAME = EchoCategorize.class.getName();
+		public static final String NAME = EchoCategorize.class.getSimpleName();
 		
 		private final List<Object[]> seen = Collections.synchronizedList(new ArrayList());
 		private int priorCount;								//TODO: This strategy can result in a missed update.
@@ -217,7 +217,8 @@ public class StencilUtil extends BasicModule {
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		if (!(name.equals(EchoCategorize.NAME) || name.equals(EchoContinuous.NAME))) {throw new IllegalArgumentException("Name not known :" + name);}
-		if (!specializer.isSimple()) {throw new SpecializationException(moduleData.getName(), name, specializer);}
+		Specializer defaultSpec = moduleData.getDefaultSpecializer(name);
+		if (!defaultSpec.equals(specializer)) {throw new SpecializationException(moduleData.getName(), name, specializer);}
 		
 		if (name.equals("EchoCategorize")) {return new EchoCategorize();}
 		else if (name.equals("EchoContinuous")) {return new EchoContinuous();}

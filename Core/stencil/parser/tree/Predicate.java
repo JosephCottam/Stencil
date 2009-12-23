@@ -32,6 +32,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.parser.string.StencilParser;
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 
 
@@ -64,7 +65,8 @@ public class Predicate extends StencilTree {
 			return Atom.Literal.instance(TupleRef.resolve((Value) source, tuple));
 		} else if (source instanceof CallChain){
 			Tuple result;
-			try {result =  ((CallChain) source).apply(tuple);}
+			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
+			try {result =  ((CallChain) source).apply(env);}
 			catch (Exception e) {throw new RuntimeException("Error applying function in predicate.");}
 
 			if (result == null){return null;}

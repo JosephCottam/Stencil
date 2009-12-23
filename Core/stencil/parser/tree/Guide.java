@@ -2,6 +2,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.types.Converter;
@@ -65,8 +66,9 @@ public class Guide extends StencilTree {
 	 */
 	public Tuple apply(Tuple source) throws Exception {
 		Tuple buffer = null;
+		Environment env = Environment.getDefault(Canvas.global, View.global, source);
 		for (Rule rule: getRules()) {
-			Tuple result = rule.apply(source);
+			Tuple result = rule.apply(env);
 			buffer = Tuples.merge(result, buffer);
 		}
 		return buffer;

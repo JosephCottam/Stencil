@@ -20,10 +20,16 @@ public class BasicFacetData implements FacetData {
 	public BasicFacetData(String name, String type, String...fields) {this(name, OpType.valueOf(type), fields);}
 	public BasicFacetData(String name, OpType type, String...fields) {this(name, type, Arrays.asList(fields));}
 	public BasicFacetData(String name, String type, List<String> fields) {this(name, OpType.valueOf(type), fields);}
+	public BasicFacetData(String name, String type, TuplePrototype prototype) {this(name, OpType.valueOf(type), prototype);}
 	public BasicFacetData(String name, OpType type, List<String> fields) {
 		this.name = name;
 		this.type = type;
 		prototype = new SimplePrototype(fields);	//TODO: Actually get the types from somewhere and use them, instead of just giving up on all types!
+	}
+	public BasicFacetData(String name, OpType type, TuplePrototype prototype) {
+		this.name = name;
+		this.type = type;
+		this.prototype = prototype;
 	}
 	
 	public String getName() {return name;}

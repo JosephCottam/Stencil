@@ -94,14 +94,13 @@ options {
         this.parent = parent;
      }
 
-     public int frameRefFor(String name) {return frameRefFor(name, 0);}
-     private int frameRefFor(String name, int offset) {
-      if (names.contains(name)) {return offset;}
-      if (label.equals(name)) {return offset;}
+     private int frameRefFor(String name) {
+      if (names.contains(name)) {return currentIndex();}
+      if (label.equals(name)) {return currentIndex();}
       if (parent == null) {
         throw new FrameException(name, label, names);
       }
-      try {return parent.frameRefFor(name, offset+1);}
+      try {return parent.frameRefFor(name);}
       catch (FrameException e) {
         throw new FrameException(name, label, names, e);
       }
@@ -115,6 +114,17 @@ options {
      public EnvironmentProxy push(String label, TuplePrototype t) {
         return new EnvironmentProxy(label, t, this);
      }    
+     
+     public int currentIndex() {
+     	int index =0;
+     	EnvironmentProxy prior=parent;
+     	while (prior != null) {
+     		prior = prior.parent;
+     		index++;
+     	}
+     	return index;
+     }
+     
   }
 
   private ModuleCache modules;
@@ -150,7 +160,7 @@ options {
     Operator o = (Operator) t.getAncestor(StencilParser.OPERATOR);
     if (c != null) {return initialEnv(c);}
     if (o != null) {return initialEnv(o);}
-    throw new RuntimeException("Found rule with unknown initial envivronment: " + t.toStringTree());
+    throw new RuntimeException("Found rule with unknown initial environment: " + t.toStringTree());
   }
   
   protected EnvironmentProxy initialEnv(Consumes c) {
@@ -163,24 +173,30 @@ options {
   }
   
   protected EnvironmentProxy initialEnv(Operator o) {
-    return new EnvironmentProxy(o.getName(), o.getYields().getInput());
+    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
+              .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
+              .push(o.getName(), o.getYields().getInput())
+              .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
   }
   
   protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
     TupleRef ref = (TupleRef) t;
     
+    int frameIdx;
     if (!ref.isNumericRef()) {
-      String name = ((Id) ref.getValue()).getName();
-      if (env.isFrameRef(name)) {return ref;}
-
-      int frameIdx = env.frameRefFor(name);
-      TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<autogen>");
-      StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
-      adaptor.addChild(newRef, frame);
-      adaptor.addChild(newRef, adaptor.dupTree(ref));
-      return newRef;
+		String name = ((Id) ref.getValue()).getName();
+		if (env.isFrameRef(name)) {return ref;}	//No need to frame, already uses a frame ref
+		
+		frameIdx = env.frameRefFor(name);
+    } else {
+    	frameIdx =env.currentIndex();
     }
-    return ref;
+	
+	TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<autogen>");
+	StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
+	adaptor.addChild(newRef, frame);
+	adaptor.addChild(newRef, adaptor.dupTree(ref));
+	return newRef;
   }
 }
 

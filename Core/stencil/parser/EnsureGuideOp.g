@@ -72,9 +72,11 @@ options {
 
   /**Provide the appropriate specializer
    */
-  public Specializer specializer() {
-    return (Specializer) adaptor.dupTree(SIMPLE_SPECIALIZER);
-  }
+	public Specializer specializer(String op) {
+    	ModuleData md = modules.getModule("StencilUtil").getModuleData();
+		MultiPartName name = new MultiPartName(op);
+		return (Specializer) adaptor.dupTree(md.getDefaultSpecializer(name.getName()));
+	}
     
 	public EnsureGuideOp(TreeNodeStream input, ModuleCache modules) {
 		super(input, new RecognizerSharedState());
@@ -296,7 +298,7 @@ glyphField returns [String field]: ^(GLYPH ^(TUPLE_PROTOTYPE f=ID .*)) {$field=$
 //Replace the #-> with an echo operator...
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {specializer()} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
+		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {specializer(selectOperator($f))} {autoEchoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
 
 		
 ensure: ^(c=CONSUMES . . ^(LIST rule[((Consumes) c).getLayer().getName()]*) . .);

@@ -6,7 +6,10 @@ import java.util.List;
 import stencil.display.DisplayLayer;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.OperatorData;
+import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.Modules;
+import stencil.operator.module.util.BasicFacetData;
+import stencil.operator.module.util.MutableOperatorData;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 
@@ -51,6 +54,9 @@ public final class DisplayOperator implements StencilOperator {
 	public boolean refreshGuide() {return cachedSize != layer.size();}
 	
 	public OperatorData getOperatorData(String module) {
-		return Modules.basicLegendData(module, getName());
+		MutableOperatorData od = Modules.basicLegendData(module, getName());
+		od.addFacet(new BasicFacetData("Find", OpType.NA, layer.getPrototype()));
+		od.addFacet(new BasicFacetData("Remove", OpType.NA, layer.getPrototype()));
+		return od;
 	}
 }

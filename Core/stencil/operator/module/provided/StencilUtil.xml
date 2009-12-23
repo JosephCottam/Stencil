@@ -4,7 +4,7 @@
 
 	<Defaults>
 		<Opts>
-			<Opt specializer="[1 .. n, 1]"/>
+			<Opt specializer="[1 .. n]"/>
 		</Opts>
 		<Facets>
 			<Facet name="Map"  function="true" type="PROJECT" prototype="VALUE"/>

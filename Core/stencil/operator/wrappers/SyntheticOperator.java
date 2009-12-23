@@ -38,10 +38,14 @@ import stencil.operator.module.SpecializationException;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
+import stencil.parser.tree.Canvas;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.Specializer;
+import stencil.parser.tree.View;
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototypes;
 
 /**Legend defined through a stencil definition.
@@ -69,8 +73,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	}
 
 
-	/**Returns the mapping set in this legend.  
-	 */
+	/**Returns the mapping set in this legend.*/
 	public Tuple map(Object... values) {
 		if (source.getArguments().size() != values.length) {
 			int expected = source.getArguments().size();
@@ -78,11 +81,13 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 		}
 
 		Tuple tuple = new PrototypedTuple(source.getArguments(), Arrays.asList(values));
-		OperatorRule action = matchingAction(tuple);
+		Environment env = Environment.getDefault(Canvas.global, View.global, tuple, Tuples.EMPTY_TUPLE);	//TODO: Handle local!
+		
+		OperatorRule action = matchingAction(env);
 
 		if (action != null) {
 			try {
-				 return action.invoke(tuple);
+				 return action.invoke(env);
 			} catch (Exception e) {
 				throw new RuntimeException ("Error executing method.",e);
 			}
@@ -96,7 +101,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	public Tuple query(Object... values) {return map(values);}
 
 	/**Find the action that matches the given tuple.  If none does, return null.*/
-	private OperatorRule matchingAction(Tuple tuple) {
+	private OperatorRule matchingAction(Environment tuple) {
 		for (OperatorRule action: source.getRules()) {
 			if (action.matches(tuple)) {
 				return action;

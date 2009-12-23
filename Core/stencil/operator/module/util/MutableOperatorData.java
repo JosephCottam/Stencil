@@ -1,5 +1,6 @@
 package stencil.operator.module.util;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.HashMap;
@@ -9,6 +10,17 @@ import stencil.operator.module.OperatorData;
 import stencil.parser.tree.Specializer;
 
 public class MutableOperatorData implements OperatorData {
+	private static class UnknownFacetException extends RuntimeException {
+		final String message;
+		public UnknownFacetException(String facet, String operator, Collection<String> validFacets) {
+			String[] valids = validFacets.toArray(new String[validFacets.size()]);
+			String valid = Arrays.deepToString(valids);
+			message = String.format("Facet '%1$s' not know in operator '%2$s' (valid facets: %3$s.", facet, operator, valid);
+		}
+		
+		public String getMessage() {return message;}
+	}
+	
 	protected Map<String, FacetData> facetData = new HashMap<String, FacetData>();
 	protected Map<String, String> attributes = new HashMap<String, String>();
 	protected String module;
@@ -49,7 +61,7 @@ public class MutableOperatorData implements OperatorData {
 	public void removeFacet(String name) {if (facetData.containsKey(name)) {facetData.remove(name);}}
 	
 	public FacetData getFacetData(String name) {
-		if (!facetData.containsKey(name)) {throw new IllegalArgumentException(String.format("Facet '%1$s' not know in operator '%2$s'.", name, getName()));}
+		if (!facetData.containsKey(name)) {throw new UnknownFacetException(name, getName(), facetData.keySet());}
 		
 		return facetData.get(name);
 	}

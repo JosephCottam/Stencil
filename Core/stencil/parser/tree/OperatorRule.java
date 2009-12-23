@@ -32,6 +32,7 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
@@ -67,13 +68,13 @@ public class OperatorRule extends StencilTree {
 	 * @param source
 	 * @return
 	 */
-	public Tuple invoke(Tuple source) throws Exception {
+	public Tuple invoke(Environment env) throws Exception {
 		int ruleCount = 0;
 		String legendName = getParent().getText();
 		Tuple result = null;
 		for (Rule rule: getRules()) {
 			Tuple buffer;
-			try {buffer = rule.apply(source);}
+			try {buffer = rule.apply(env);}
 			catch (Exception e) {throw new RuntimeException(String.format("Error invoking sub rule %1$d on operator %2$s.", ruleCount, legendName),e);}
 
 			if (buffer == null) {result = null; break;}

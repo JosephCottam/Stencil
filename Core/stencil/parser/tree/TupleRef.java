@@ -60,10 +60,11 @@ public final class TupleRef extends Value {
 	}
 
 	private final Object doRef(Tuple source, Atom ref) {
-		if (ref.isName()) {
+		if (ref.isNumber()){
+			int val = ((StencilNumber) getValue()).getNumber().intValue();
+			return source.get(val);
+		} else if (ref.isName()) {
 			return source.get(((Id) ref).getName());
-		} else if (ref.isNumber()){
-			return source.get(((StencilNumber) getValue()).getNumber().intValue());
 		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}

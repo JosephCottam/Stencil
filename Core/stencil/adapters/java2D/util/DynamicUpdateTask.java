@@ -4,7 +4,10 @@ package stencil.adapters.java2D.util;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import stencil.parser.tree.Canvas;
+import stencil.parser.tree.View;
 import stencil.parser.tree.Rule;
+import stencil.parser.tree.util.Environment;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.tuple.Tuple;
@@ -32,6 +35,7 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 			
 	private void updateAll() {	
 		//TODO: Query to see if this rule needs to be run (has something in the rule changed its state?)
+		//TODO: Add support for Local!
 		
 		//Update each element 
 		for (Glyph2D glyph: table) {
@@ -39,7 +43,8 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
 			
 			try {
-				Tuple result = rule.apply(source);
+				Environment env = Environment.getDefault(Canvas.global, View.global, source);
+				Tuple result = rule.apply(env);
 				Glyph2D newGlyph = glyph.update(result);
 				if (newGlyph != glyph) {
 					table.update(newGlyph);
