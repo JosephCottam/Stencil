@@ -166,12 +166,18 @@ public class Temp extends BasicModule {
 			return new PrototypedTuple(names, results);
 		}
 		
-		public static OperatorData getLegendData(String moduleName, String name, Specializer specializer) throws SpecializationException{
+		public static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
+			String module = basic.getModule();
+			String name = basic.getName();
 			String[] fields;
 			try {fields = getNames(specializer);}
-			catch (Exception e) {throw new SpecializationException(moduleName, name, specializer, e);}
+			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 			
-			return Modules.basicLegendData(moduleName, name, OpType.PROJECT, fields);
+			MutableOperatorData od = new MutableOperatorData(basic);
+			od.addFacet(new BasicFacetData("Put", OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData("Map", OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData("Query", OpType.PROJECT, fields));
+			return od;
 		}
 
 		public static StencilOperator instance(String moduleName, String name, Specializer specializer) throws SpecializationException, NoSuchMethodException {
@@ -216,7 +222,7 @@ public class Temp extends BasicModule {
 		throws SpecializationException {
 
 		if(name.equals("Mapping")) {
-			return Mapping.getLegendData(getModuleData().getName(), name, specializer);
+			return Mapping.getOperatorData(getModuleData().getOperatorData(name), specializer);
 		}
 
 		return super.getOperatorData(name, specializer);

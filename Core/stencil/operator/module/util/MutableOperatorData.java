@@ -27,11 +27,12 @@ public class MutableOperatorData implements OperatorData {
 	protected String operatorName;
 	protected Specializer defaultSpecializer;
 	
-	public MutableOperatorData(OperatorData basis) {
+	public MutableOperatorData(OperatorData basis) {this(basis.getModule(), basis);}
+	public MutableOperatorData(String newModule, OperatorData basis) {
 		this.defaultSpecializer = basis.getDefaultSpecializer();
-		this.module = basis.getModule();
+		this.module = newModule;
 		this.operatorName = basis.getName();
-		
+
 		for (String facet: basis.getFacets()) {
 			facetData.put(facet, basis.getFacetData(facet));
 		}

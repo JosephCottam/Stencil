@@ -42,6 +42,8 @@ public class Guide extends StencilTree {
 	
 
 	public String getAttribute() {return token.getText();}
+	
+	/**What layer is the guide data comming from?*/
 	public String getLayer() {return getChild(0).getText();}
 	public String getGuideType() {return getChild(1).getText();}
 	public Specializer getSpecializer() {return (Specializer) getChild(2);}

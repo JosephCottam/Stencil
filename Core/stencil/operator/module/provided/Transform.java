@@ -138,7 +138,7 @@ public class Transform extends BasicModule {
 		}
 			
 		
-		String[] names = new String[]{"zoom", "X", "Y", "width"};
+		String[] names = new String[]{"Zoom", "X", "Y", "Width"};
 		Tuple t = new PrototypedTuple(names, new Object[]{min, x, y, cw});
 		return t;
 	}

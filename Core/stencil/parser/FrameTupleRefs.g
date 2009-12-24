@@ -49,6 +49,7 @@ options {
   import stencil.parser.tree.*;
   import stencil.operator.module.*;
   import stencil.util.MultiPartName;
+  import stencil.util.AutoguidePair;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.tuple.prototype.SimplePrototype;
   import stencil.tuple.prototype.TuplePrototypes;
@@ -83,33 +84,33 @@ options {
   }
 
  private static final class EnvironmentProxy {
-     final EnvironmentProxy parent;
-     final TuplePrototype names;
-     final String label;
+	final EnvironmentProxy parent;
+	final TuplePrototype names;
+	final String label;
      
-     public EnvironmentProxy(String label, TuplePrototype names) {this(label, names, null);}
-     private EnvironmentProxy(String label, TuplePrototype names, EnvironmentProxy parent) {
-        this.label = label;
-        this.names = names;
-        this.parent = parent;
-     }
+	public EnvironmentProxy(String label, TuplePrototype names) {this(label, names, null);}
+	private EnvironmentProxy(String label, TuplePrototype names, EnvironmentProxy parent) {
+		this.label = label;
+		this.names = names;
+		this.parent = parent;
+	}
 
-     private int frameRefFor(String name) {
-      if (names.contains(name)) {return currentIndex();}
-      if (label.equals(name)) {return currentIndex();}
-      if (parent == null) {
-        throw new FrameException(name, label, names);
-      }
-      try {return parent.frameRefFor(name);}
-      catch (FrameException e) {
-        throw new FrameException(name, label, names, e);
-      }
-     }
+	private int frameRefFor(String name) {
+		if (names.contains(name)) {return currentIndex();}
+		if (label != null && label.equals(name)) {return currentIndex();}
+		if (parent == null) {
+			throw new FrameException(name, label, names);
+		}
+		try {return parent.frameRefFor(name);}
+		catch (FrameException e) {
+			throw new FrameException(name, label, names, e);
+		}
+	}
      
-     public boolean isFrameRef(String name) {
-      return (label!= null && label.equals(name)) 
-              || (parent != null && parent.isFrameRef(name));
-     }
+	public boolean isFrameRef(String name) {
+		return (label!= null && label.equals(name)) 
+				|| (parent != null && parent.isFrameRef(name));
+	}
 
      public EnvironmentProxy push(String label, TuplePrototype t) {
         return new EnvironmentProxy(label, t, this);
@@ -158,26 +159,35 @@ options {
   protected EnvironmentProxy initialEnv(Tree t) {
     Consumes c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
     Operator o = (Operator) t.getAncestor(StencilParser.OPERATOR);
+    Guide g = (Guide) t.getAncestor(StencilParser.GUIDE);
     if (c != null) {return initialEnv(c);}
     if (o != null) {return initialEnv(o);}
+    if (g != null) {return initialEnv(g);}
     throw new RuntimeException("Found rule with unknown initial environment: " + t.toStringTree());
   }
   
   protected EnvironmentProxy initialEnv(Consumes c) {
     Program p = (Program) c.getAncestor(StencilParser.PROGRAM);
     External ex = External.find(c.getStream(), p.getExternals());
-    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
-              .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
-              .push(ex.getName(), ex.getPrototype())
-              .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
+    return makeInitialEnv(ex.getName(), ex.getPrototype());
   }
   
   protected EnvironmentProxy initialEnv(Operator o) {
+  	return makeInitialEnv(o.getName(), o.getYields().getInput());
+  }
+  
+  protected EnvironmentProxy initialEnv(Guide g) {
+  	return makeInitialEnv(g.getLayer(), AutoguidePair.GENERIC_PROTOTYPE);
+  }
+
+  protected EnvironmentProxy makeInitialEnv(String name, TuplePrototype prototype) {
     return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
               .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
-              .push(o.getName(), o.getYields().getInput())
+              .push(name, prototype)
               .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
   }
+  
+
   
   protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
     TupleRef ref = (TupleRef) t;

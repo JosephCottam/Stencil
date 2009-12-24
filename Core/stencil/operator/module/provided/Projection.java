@@ -229,6 +229,14 @@ public class Projection extends BasicModule {
 	
 	public Projection(ModuleData md) {super(md);}
 
+	protected void validate(String name, Specializer specializer) throws SpecializationException {
+		if (name.equals("Count") && specializer.getArgs().size() == 1) {
+			return;
+		} else {
+			super.validate(name, specializer);
+		}
+	}
+	
 	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
 		

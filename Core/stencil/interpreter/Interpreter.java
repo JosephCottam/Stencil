@@ -50,7 +50,7 @@ public class Interpreter {
 	}
 	
 	public static Tuple process(List<Rule> rules, Tuple streamTuple) throws Exception {
-		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple, null);
+		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
 		return process(rules, env);
 	}
 	

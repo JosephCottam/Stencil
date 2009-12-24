@@ -43,8 +43,6 @@ import stencil.tuple.Tuple;
 /**A utility group for working with modules. Cannot be instantiated.*/
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
 public final class Modules {
-	public static final String MODULE_FIELD_NAME = "MODULE_FIELD";
-
 	private Modules() {/*Utility class. Not instantiable.*/}
 	
 	/**Convert a method name to the standard case structure used by Stencil from the Java standard. */
@@ -135,7 +133,7 @@ public final class Modules {
 	 * 
 	 **/
 	public static MutableOperatorData basicLegendData(String module, String name) {
-		return basicLegendData(module, name, OpType.PROJECT, "VALUE");
+		return basicOperatorData(module, name, OpType.PROJECT, "VALUE");
 	}
 	
 	/**Produce a mutable operator meta-data object with the names, op-type and operator fields
@@ -147,11 +145,11 @@ public final class Modules {
 	 * @param fields
 	 * @return
 	 */
-	public static MutableOperatorData basicLegendData(String module, String name, OpType type, String...fields) {
-		return basicLegendData(module, name, type, Arrays.asList(fields));
+	public static MutableOperatorData basicOperatorData(String module, String name, OpType type, String...fields) {
+		return basicOperatorData(module, name, type, Arrays.asList(fields));
 	}
 	
-	public static MutableOperatorData basicLegendData(String module, String name, OpType type, List<String> fields) {
+	public static MutableOperatorData basicOperatorData(String module, String name, OpType type, List<String> fields) {
 		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
 		legendData.addFacet(new BasicFacetData("Map", type, fields));
 		legendData.addFacet(new BasicFacetData("Query", type, fields));

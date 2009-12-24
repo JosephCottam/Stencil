@@ -7,6 +7,7 @@ import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 
 //final because it is immutable
 public final class AutoguidePair<I,R> implements Tuple {
@@ -15,6 +16,9 @@ public final class AutoguidePair<I,R> implements Tuple {
 	private static final String[] FIELDS = new String[]{INPUT_FIELD, RESULT_FIELD};
 	public static final int INPUT = Arrays.asList(FIELDS).indexOf(INPUT_FIELD);
 	public static final int RESULT = Arrays.asList(FIELDS).indexOf(RESULT_FIELD);
+	public static final TuplePrototype GENERIC_PROTOTYPE = new SimplePrototype(FIELDS, TuplePrototypes.defaultTypes(FIELDS.length).toArray(new Class[0]));
+	
+	
 	
 	private I[] input;
 	private R[] result;
