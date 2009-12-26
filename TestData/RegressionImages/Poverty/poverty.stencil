@@ -7,7 +7,7 @@ SKIP: 1
 STRICT: true
 STREAM: File
 NAME: Poverty
-HEADER: State,Children, Adults, Elderly, Total
+HEADER: State, Children, Adults, Elderly, Total
 SEPARATOR: ,
 SOURCE: ./povertyPercent.csv
 SKIP: 1
@@ -38,7 +38,7 @@ external stream Items(Name)
 external stream Postal(State, ID)
 external stream Region(State, Region, Division)
 external stream Pop(State,Total,Children,Adults,Elderly)
-external stream Poverty(State,Children)
+external stream Poverty(State,Children, Adults, Elderly, Total)
 
 order (Items | Postal | Region | Pop) > Poverty
 

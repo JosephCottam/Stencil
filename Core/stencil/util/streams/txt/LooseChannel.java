@@ -85,5 +85,5 @@ final class LooseChannel implements NextChannel {
 	}
 
 	/**Always returns true (part of being loose).*/
-	public void validate(BufferedReader source) throws Exception, FileValidationException {/*Does nothing.*/}
+	public void validate(BufferedReader source) throws Exception {/*Does nothing.*/}
 }

@@ -3,20 +3,25 @@ NAME: MTTSource
 HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
 SEPARATOR: \s*\|\s*
 SOURCE: ./18049-arch-compiler.output.txt
-CHECKHEADER: true
+SKIP: 0
+STRICT: true
 STREAM: File
 NAME: MTTNotApplicable
 HEADER: axis1A, axis1B, axis2A, axis2B
 SEPARATOR: ,\s*
 SOURCE: ./NoData-Comp.txt
-CHECKHEADER: true
+SKIP: 0
+STRICT: true
 
 external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
 external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
 
+canvas main
+	guide axis from Trivial Y
+	guide axis from Trivial X
+
+
 layer Trivial
-	axis: Y
-	axis: X
 from MTTSource
 	filter (suite_name =~ "trivial"): suite_name
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE

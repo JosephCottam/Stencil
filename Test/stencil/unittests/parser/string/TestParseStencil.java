@@ -56,7 +56,7 @@ public class TestParseStencil extends TestCase {
 			}			
 		}
 
-		assertEquals("Errors found parsing file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
+		assertEquals("Errors found parsing " + errors.size() + " file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
 
 	}
 }

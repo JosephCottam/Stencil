@@ -2,14 +2,14 @@ STREAM: File
 NAME: MTTSource
 HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
 SEPARATOR: \s*\|\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/SeeTest/18049-arch-compiler.output.txt
+SOURCE: ./18049-arch-compiler.output.txt
 SKIP: 2
 STRICT: false
 STREAM: File
 NAME: MTTNotApplicable
 HEADER: axis1A, axis1B, axis2A, axis2B
 SEPARATOR: ,\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/SeeTest/NoData-Comp.txt
+SOURCE:./NoData-Comp.txt
 SKIP: 1
 STRICT: true
 

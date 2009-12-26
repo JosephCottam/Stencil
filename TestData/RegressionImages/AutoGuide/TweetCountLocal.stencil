@@ -17,13 +17,13 @@ canvas Main
 layer Counts
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
-	X:* firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) -> VALUE
-	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE) -> VALUE
+	X:* firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE)
+	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE)
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
 from Tweets
-	view(ZOOM) : Zoom(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT]) -> VALUE
-	view(X,Y): (canvas.X, canvas.Y)
+	view(ZOOM) : Zoom(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT]) -> _
+	view(X,Y): (canvas[X], canvas[Y])
 	
 
 operator firstLetter(Phrase) -> (Letter)

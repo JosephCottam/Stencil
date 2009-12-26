@@ -2,13 +2,13 @@ STREAM: File
 NAME: Degrees
 HEADER: Deg
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/SimpleLines/degrees.txt
+SOURCE: ./degrees.txt
 SKIP: 1
 STRICT: true
 
 import Trigonometry
 
-external stream Degrees(deg)
+external stream Degrees(Deg)
 
 layer DoubleLines[LINE]
 from Degrees

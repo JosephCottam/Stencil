@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/ViewCanvas/google_stocks.csv
+SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: TRUE
 STREAM: Mouse
@@ -10,7 +10,7 @@ NAME: Mouse
 FREQUENCY: -2147483648
 
 external stream Stocks(Date, Open)
-external stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
+external stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
 order (Stocks | Mouse)
 
@@ -22,25 +22,25 @@ from Stocks
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @color(BLUE)
 from Stocks
-	view(HEIGHT, Y) :(canvas.HEIGHT, canvas.Y)
+	view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
 from Stocks
-	filter(VALUE < 50): TimeStep(Date) -> Sub(view.RIGHT, VALUE) -> VALUE
-	filter(VALUE < view.RIGHT): TimeStep(Date) -> VALUE
-	view(X): Add(3, view.X)
+	filter(VALUE < 50): TimeStep(Date) -> Sub(view[RIGHT], VALUE) -> VALUE
+	filter(VALUE < view[RIGHT]): TimeStep(Date) -> VALUE
+	view(X): Add(3, view[X])
 
 layer Nav
 from Mouse
 	filter(BUTTON = 1): BUTTON
 	filter(SHIFT !~ "true"): SHIFT
-	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, Width)
+	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
 from Mouse
 	filter(BUTTON = 1): BUTTON
 	filter(SHIFT =~ "true"): SHIFT
-	view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height,view.Y)
+	view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height, view[Y])
 from Mouse
 	filter(CLICK_COUNT = 3): CLICK_COUNT
 	filter(BUTTON = 1): BUTTON
-	view(X, Y, WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+	view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
 
 operator TimeStep (Date) -> (VALUE)
 	all => VALUE : Index(Date) -> Mult(3, VALUE)

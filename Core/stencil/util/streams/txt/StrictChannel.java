@@ -73,7 +73,9 @@ final class StrictChannel implements NextChannel {
 		
 		String[] parts = splitter.split(line);
 		List<String> header = Arrays.asList(parts);
-		if (header.size() != labels.size()) {throw new FileValidationException("Column count does not match the length of the labels list (expected " + labels.size() + " but found " + header.size() + ")");}
+		if (header.size() != labels.size()) {
+			throw new FileValidationException(labels, header.size());
+		}
 		source.reset();
 	}
 
