@@ -26,11 +26,11 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 			SimpleFieldDef d = new SimpleFieldDef(names.get(i), types.get(i));
 			this.add(d);
 		}
-		validateNames();
+		assert validateNames() : "Name validation ended in exception.";
 	}
 
 	/**Ensure there are no duplicate names.*/
-	protected void validateNames() {
+	protected boolean validateNames() {
 		Set<String> fields = new HashSet();
 		for (TupleFieldDef def: this) {
 			String name = def.getFieldName();
@@ -40,6 +40,7 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 				throw new IllegalArgumentException(message);
 			}
 		}
+		return true;
 	}
 
 	public boolean contains(String name) {

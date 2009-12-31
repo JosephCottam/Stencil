@@ -24,7 +24,7 @@ public class Consumes extends StencilTree {
 	public boolean matches(Environment env) {
 		//Check the tuple source and stream name
 		
-		Tuple stream = env.get(Environment.DEFAULT_FRAME.STREAM);
+		Tuple stream = env.get(Environment.STREAM_FRAME);
 		Object source= stream.get(ParserConstants.SOURCE_FIELD);	//TODO: Make this a standard filter rule then the matching is consistent (and made positional in the standard way...)
 		if ((getStream() != null) &&
 			((source == null) ||

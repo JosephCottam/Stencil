@@ -28,16 +28,18 @@
  */
 package stencil.parser.tree.util;
 
-import stencil.tuple.InvalidNameException;
+ import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
-import static stencil.parser.tree.util.Environment.DEFAULT_FRAME.*;
 
 public class Environment implements Tuple {
-	public static enum DEFAULT_FRAME {CANVAS, VIEW, STREAM}
+	private static final int DEFAULT_FRAME_SIZE = 3;
+	public static final int CANVAS_FRAME = 0;
+	public static final int VIEW_FRAME = 1;
+	public static final int STREAM_FRAME =2;
 	
 	private final Tuple[] frames;
 	private final TuplePrototype prototype;
@@ -59,7 +61,6 @@ public class Environment implements Tuple {
 		return new Environment(this, t);
 	}
 
-	public Tuple get(DEFAULT_FRAME frame) {return frames[frame.ordinal()];}
 	public Tuple get(int idx) {return frames[idx];}
 
 	public TuplePrototype getPrototype() {return prototype;}
@@ -74,10 +75,10 @@ public class Environment implements Tuple {
 
 	/**Create the default environment from the passed tuples.*/
 	public final static Environment getDefault(Tuple canvas, Tuple view, Tuple stream) {
-		Environment e = new Environment(DEFAULT_FRAME.values().length);
-		e.frames[CANVAS.ordinal()] = canvas;
-		e.frames[VIEW.ordinal()] = view;
-		e.frames[STREAM.ordinal()] = stream;
+		Environment e = new Environment(DEFAULT_FRAME_SIZE);
+		e.frames[CANVAS_FRAME] = canvas;
+		e.frames[VIEW_FRAME] = view;
+		e.frames[STREAM_FRAME] = stream;
 
 		return e;
 	}
