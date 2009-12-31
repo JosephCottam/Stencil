@@ -10,6 +10,7 @@
 		<Facets>
 			<Facet name="Map" type="PROJECT" function="true" prototype="VALUE"/>
 			<Facet name="Query" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="Guide" function="true" type="PROJECT" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 
@@ -39,6 +40,7 @@
 		<Opt specializer="[1 .. n]"/>
 		<Facet name="Map"  type="PROJECT" function="false" />
 		<Facet name="Query" type="PROJECT" function="false" />
+		<Facet name="Guide" function="false" type="PROJECT" prototype="VALUE"/>
 	</Operator>
 
 </ModuleData>

@@ -34,32 +34,10 @@ import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+import static stencil.parser.tree.util.Environment.DEFAULT_FRAME.*;
 
 public class Environment implements Tuple {
-	public static final int CANVAS = 0;
-	public static final int VIEW = 1;
-	public static final int STREAM = 2;
-	public static final int LOCAL = 3;
-	
-	/**Proxy object that indicates that the return value should be ignored
-	 * an no new environment frame should be created.
-	 * 
-	 * THIS SHOULD ONLY BE RETURNED BY STENCIL INTERNAL METHODS.  Stencil semantics
-	 * cannot be guaranteed if this is returned by other methods.  It is public
-	 * so the internal operators can have access to it.  Utility methods of
-	 * stencil use this return value so utility operators can be inserted
-	 * in call chains without interfering with literal positional values
-	 * de-referenced on the environment.
-	 * 
-	 * TODO: REMOVE!!!  Do not allow positional de-referencing to environment frames and translate names after conversions, autoguide, etc. that may add frames run
-	 */
-	public static Tuple NO_NEW_FRAME = new Tuple() {
-		public Object get(String name) {throw new Error("Should never be invoked.");}
-		public Object get(int idx) {throw new Error("Should never be invoked.");}
-		public TuplePrototype getPrototype() {throw new Error("Should never be invoked.");}
-		public boolean isDefault(String name, Object value) {throw new Error("Should never be invoked.");}
-		public int size() {throw new Error("Should never be invoked.");}		
-	};
+	public static enum DEFAULT_FRAME {CANVAS, VIEW, STREAM}
 	
 	private final Tuple[] frames;
 	private final TuplePrototype prototype;
@@ -81,6 +59,7 @@ public class Environment implements Tuple {
 		return new Environment(this, t);
 	}
 
+	public Tuple get(DEFAULT_FRAME frame) {return frames[frame.ordinal()];}
 	public Tuple get(int idx) {return frames[idx];}
 
 	public TuplePrototype getPrototype() {return prototype;}
@@ -95,16 +74,11 @@ public class Environment implements Tuple {
 
 	/**Create the default environment from the passed tuples.*/
 	public final static Environment getDefault(Tuple canvas, Tuple view, Tuple stream) {
-		return getDefault(canvas, view, stream, null);
-	}
-	
-	public final static Environment getDefault(Tuple canvas, Tuple view, Tuple stream, Tuple local) {
-		int size = (local == null ? 3 :4);
-		Environment e = new Environment(size);
-		e.frames[CANVAS] = canvas;
-		e.frames[VIEW] = view;
-		e.frames[STREAM] = stream;
-		if (local != null) {e.frames[LOCAL] = local;}
-		return e;		
+		Environment e = new Environment(DEFAULT_FRAME.values().length);
+		e.frames[CANVAS.ordinal()] = canvas;
+		e.frames[VIEW.ordinal()] = view;
+		e.frames[STREAM.ordinal()] = stream;
+
+		return e;
 	}
 }

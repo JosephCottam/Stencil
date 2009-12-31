@@ -60,10 +60,11 @@ options {
    protected StencilTree glyph(CommonTree source) {return sift((List<Rule>) source, GLYPH);}
    protected StencilTree canvas(CommonTree source) {return sift((List<Rule>) source, CANVAS);}
    protected StencilTree view(CommonTree source) {return sift((List<Rule>) source, VIEW);}
+   protected StencilTree prefilter(CommonTree source) {return sift((List<Rule>) source, PREFILTER);}
 }
 
 topdown : ^(CONSUMES filters=. rules=.) 
-	-> ^(CONSUMES $filters {local(rules)} {glyph(rules)} {view(rules)} {canvas(rules)});
+	-> ^(CONSUMES $filters {prefilter(rules)} {local(rules)} {glyph(rules)} {view(rules)} {canvas(rules)});
 	 
 	 
 	 

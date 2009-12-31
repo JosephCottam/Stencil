@@ -2,19 +2,21 @@ STREAM: File
 NAME: VertexList
 HEADER: ID1,ID2
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/VSM/ws_400_12_0.1.adj
+SOURCE: ./er_100_0.005.adj
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: BFS
 HEADER: ID
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/VSM/ws_400_12_0.1.bfs
+SOURCE: ./er_100_0.005.bfs
 SKIP: 1
 STRICT: true
 
-external stream VertexList(ID1, ID2)
-external stream BFS(ID)
+external stream VertexList(Source, ID1, ID2)
+external stream BFS(Source, ID)
+
+order BFS > VertexList
 
 layer VSM
 from VertexList

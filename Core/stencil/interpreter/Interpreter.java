@@ -90,20 +90,21 @@ public class Interpreter {
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
 				boolean matches;
+				Tuple prefilter, local, result;
 				Environment env = Environment.getDefault(Canvas.global, View.global, source);
 				
-				try {matches = group.matches(env);}
-				catch (Exception e) {throw new RuntimeException(format("Error applying filter in layer %1$s", layer.getName()), e);}
+				try {prefilter = process(group.getPrefilterRules(), env);}
+				catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", layer.getName()),e);}
+				env = env.push(prefilter);
 				
+				try {matches = group.matches(env);}
+				catch (Exception e) {throw new RuntimeException(format("Error processing predicates in layer %1$s", layer.getName()), e);}				
 				
 				if (matches) {
-					Tuple result;
-					Tuple local;
-					
 					try {local = process(group.getLocalRules(), env);}
-					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}
-					
+					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}	
 					env = env.push(local);
+					
 					try {
 						result = process(group.getGlyphRules(), env);
 						if (result != null && result.getPrototype().contains(ParserConstants.GLYPH_ID_FIELD)) {

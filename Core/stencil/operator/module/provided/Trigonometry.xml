@@ -9,6 +9,7 @@
 		<Facets>
 			<Facet name="Map" type="PROJECT" function="true" prototype="VALUE"/>
 			<Facet name="Query" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="Guide" function="true" type="PROJECT" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 

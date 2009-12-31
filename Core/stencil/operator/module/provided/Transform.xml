@@ -9,43 +9,51 @@
 		<Facets>
 			<Facet name="Map" type="PROJECT" function="false" prototype="VALUE"/>
 			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="Guide" function="true" type="PROJECT" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 	
 	<Operator name="TranslateRegistration"> 
 		<Facet name="Map" type="PROJECT" function="false" prototype="X,Y"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="X,Y"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="X,Y"/>
 	</Operator>
 	
 	<Operator name="ScreenToCanvasPoint">
 		<Facet name="Map" type="PROJECT" function="false" prototype="X,Y"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="X,Y"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="X,Y"/>
 	</Operator>
 	
 	<Operator name="ScreenToCanvasDimension">
 		<Facet name="Map" type="PROJECT" function="false" prototype="Width,Height"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="Width,Height"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="Width,Height"/>
 	</Operator>
 	
 	<Operator name="CanvasToScreenPoint">
 		<Facet name="Map" type="PROJECT" function="false" prototype="X,Y"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="X,Y"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="X,Y"/>
 	</Operator>
 	
 	<Operator name="CanvasToScreenDimension">
 		<Facet name="Map" type="PROJECT" function="false" prototype="Width,Height"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="Width,Height"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="Width,Height"/>
 	</Operator>
 	
 	<Operator name="Zoom">
 		<Facet name="Map" type="PROJECT" function="false" prototype="zoom,X,Y,width"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="zoom,X,Y,width"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="zoom,X,Y,width"/>
 	</Operator>
 	
 	
 	<Operator name="ZoomPadded">
 		<Facet name="Map" type="PROJECT" function="false" prototype="Zoom,X,Y,Width"/>
 		<Facet name="Query" type="PROJECT" function="false" prototype="Zoom,X,Y,Width"/>
+		<Facet name="Guide" function="true" type="PROJECT" prototype="Zoom,X,Y,Width"/>
 	</Operator>
 	
 </ModuleData>

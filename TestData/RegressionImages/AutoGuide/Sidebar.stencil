@@ -6,7 +6,7 @@ SOURCE: ./Fruits.txt
 SKIP: 0
 STRICT: TRUE
 
-external stream Values(Category)
+external stream Values(Source, Category)
 
 canvas Main
 	guide axis[tickSize=5, textOffset=6] from Chart X

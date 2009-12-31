@@ -2,7 +2,7 @@ STREAM: File
 NAME: NodePositions
 HEADER: ID X Y
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
+SOURCE: ../Sourceforge/vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
 STRICT: true
 
@@ -12,7 +12,7 @@ STRICT: true
   Shells are filled top-down, the right-to-left.
 */
 
-external stream NodePositions(ID, X,Y)  /*Precomputed layout*/
+external stream NodePositions(Source, ID, X,Y)  /*Precomputed layout*/
 
 
 layer Nodes
@@ -28,6 +28,6 @@ operator Layout (i) -> (X,Y)
 				ByOdds(i,shell[_],center[_]) 
 
 operator ByOdds (i,shell,center) -> (x,y)
-	(i < c) => (x,y) : Pow(shell,2) -> Sub(i, _) -> (shell,_)
-	(i > c) => (x,y) : Sub(i, center) -> Sub(shell, _) -> (_,shell)
-	(i = c) => (x,y) : (shell,shell)
+	(i < center) => (x,y) : Pow(shell,2) -> Sub(i, _) -> (shell,_)
+	(i > center) => (x,y) : Sub(i, center) -> Sub(shell, _) -> (_,shell)
+	(i = center) => (x,y) : (shell,shell)

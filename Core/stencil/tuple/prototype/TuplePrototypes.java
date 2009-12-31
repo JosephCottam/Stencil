@@ -26,7 +26,7 @@ public final class TuplePrototypes {
 		return Arrays.asList(names);
 	}
 
-	/**Extract a list of the field names from the given prototype.*/
+	/**Extract a list of the field names.*/
 	public static List<String> getNames(Tuple tuple) {return getNames(tuple.getPrototype());}
 	public static List<String> getNames(TuplePrototype prototype) {
 		String[] s = new String[prototype.size()];
@@ -36,6 +36,15 @@ public final class TuplePrototypes {
 		return Arrays.asList(s);
 	}
 
+	public static List<String> getNames(List<? extends TupleFieldDef> defs) {
+		String[] c = new String[defs.size()];
+		for (int i =0; i< c.length; i++) {
+			c[i] = defs.get(i).getFieldName(); 
+		}
+		return Arrays.asList(c);
+	}
+
+	
 	/**Extract a list of the field types from the given prototype.*/
 	public static List<Class> getTypes(Tuple tuple) {return getTypes(tuple.getPrototype());}
 	public static List<Class> getTypes(TuplePrototype prototype) {
@@ -45,6 +54,15 @@ public final class TuplePrototypes {
 		}
 		return Arrays.asList(s);
 	}
+	
+	public static List<Class> getTypes(List<? extends TupleFieldDef> defs) {
+		Class[] c = new Class[defs.size()];
+		for (int i =0; i< c.length; i++) {
+			c[i] = defs.get(i).getFieldType(); 
+		}
+		return Arrays.asList(c);
+	}
+	
 
 	public static List<Class> defaultTypes(int size) {
 		Class[] types = new Class[size];

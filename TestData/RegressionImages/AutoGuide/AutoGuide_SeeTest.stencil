@@ -13,8 +13,8 @@ SOURCE: ./NoData-Comp.txt
 SKIP: 0
 STRICT: true
 
-external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
-external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+external stream MTTSource(Source, graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+external stream MTTNotApplicable(Source, axis1A, axis1B, axis2A, axis2B)
 
 canvas main
 	guide axis from Trivial Y
@@ -23,7 +23,7 @@ canvas main
 
 layer Trivial
 from MTTSource
-	filter (suite_name =~ "trivial"): suite_name
+	filter (suite_name =~ "trivial")
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE
 	X: Layout(axis1A, axis1B, axis2A, axis2B) -> X
 	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Y

@@ -102,8 +102,10 @@ options {
 	}
 	
 	private final List<Object[]> invokeGuide(Function f, List<Object[]> vals, TuplePrototype prototype) {
-		//TODO: Remove prototype call when numeralize works
-		return f.getOperator().guide(f.getArguments(), vals, TuplePrototypes.getNames(prototype));
+		//TODO: Remove prototype call when numeralize works...
+		List<String> names = null;
+    if (prototype != null) {names = TuplePrototypes.getNames(prototype);}
+		return f.getOperator().guide(f.getArguments(), vals, names);
 	}
 	
   	private final List<Object[]> packGuide(Pack p, List<Object[]> vals, TuplePrototype prototype) {

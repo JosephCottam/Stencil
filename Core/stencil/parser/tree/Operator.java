@@ -45,5 +45,9 @@ public class Operator extends StencilTree {
 	public List<OperatorRule> getRules() {
 		return (List<OperatorRule>) getChild(1);
 	}
+	
+	public List<Rule> getPrefilterRules() {
+		return new java.util.ArrayList();
+	}
 
 }

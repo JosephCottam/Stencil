@@ -41,6 +41,7 @@ tokens {
   CALL_CHAIN;
   DIRECT_YIELD;
   FUNCTION;
+  GLYPH;        //Indicates the target is a layer's glyph (can only be derived, not specified)
   LIST;
   CANVAS_DEF;
   NUMBER;
@@ -56,6 +57,7 @@ tokens {
   PROGRAM;
   PACK;
   PYTHON_FACET;
+  RETURN;       //Inidicates the target is an operator return value (can only be derived, not specified)
   RULE;
   SIGIL;
   SPECIALIZER;
@@ -65,27 +67,26 @@ tokens {
   MAP_ENTRY;
 
   //General Keywords
-  ALL = 'all';  //Default pattern
+  ALL = 'all'; //Default pattern
+  AS  = 'as'; //used in imports
   BASE  = 'base'; //Refer to the base entity
   CANVAS  = 'canvas';
   DEFAULT = 'default';//Use the default value (or revert to it...)
   EXTERNAL= 'external';
+  FACET = 'facet';
   FILTER  = 'filter';
   FROM  = 'from';
-  GLYPH = 'glyph';
   GUIDE = 'guide';
   IMPORT  = 'import';
-  LOCAL = 'local';  //Target to indicate temporary storage
+  LOCAL = 'local';  //Target to indicate temporary storage after filtering
   LAYER = 'layer';
   OPERATOR= 'operator';
-  TEMPLATE= 'template';
   ORDER = 'order';
+  PREFILTER = 'prefilter'; //Target to indicate actions that occure before filters
   PYTHON  = 'python';
-  RETURN  = 'return';
+  TEMPLATE= 'template';
   STREAM  = 'stream';
   VIEW  = 'view';
-  AS  = 'as'; //used in imports
-  FACET = 'facet';
 
   //Markers
   GROUP   = '(';
@@ -226,20 +227,10 @@ implantationDef
   | -> GLYPH[DEFAULT_GLYPH_TYPE];
     
 consumesBlock[String def]
-  : FROM stream=ID filterRule* rule[def]+ 
-    -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filterRule*) ^(LIST["Rules"] rule+));
+  : FROM stream=ID filter* rule[def]+ 
+    -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filter*) ^(LIST["Rules"] rule+));
 
-filterRule
-  : FILTER rulePredicate DEFINE callChain
-    -> ^(FILTER rulePredicate callChain);
-
-rulePredicate
-  : GROUP ALL CLOSE_GROUP
-    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
-  | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
-    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
-
-
+filter: FILTER! predicate;
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
 
@@ -250,32 +241,10 @@ operatorDef
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
   | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
-
-//TODO: For operator facets
-//  : OPERATOR name=ID operatorFacet+
-//    -> (OPERATOR[$name.text] operatorFacet+)
-//  | OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
-//    ->  ^(OPERATOR[$name.text] ^(OPERATOR_FACET[DEFAULT_FACET] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+)))
-//  | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
-//    -> ^(OPERATOR[$name.text] BASE[$base.text] specializer);
-// 
-//operatorFacet
-//  : FACET name=ID tuple[false] YIELDS tuple[false] operatorRule+
-//    -> ^(OPERATOR_FACET[$name.text] ^(YIELDS tuple tuple) operatorRule+); 
   	  
 operatorRule
   : predicate GATE rule["return"]+
     -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
-
-predicate
-  : GROUP? ALL CLOSE_GROUP?
-    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
-  | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
-    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
-//TODO : Permit call groups in predicates again...or come up with a better mechanism, like the one used in filter targets....
-//  | GROUP callGroup booleanOp callGroup (SEPARATOR callGroup booleanOp callGroup)* CLOSE_GROUP
-//    -> ^(LIST["Predicates"] ^(PREDICATE callGroup booleanOp callGroup)+);
-
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[String def]
@@ -313,8 +282,7 @@ callName[String defaultCall]
     ->                    ID[$name.text + "." + defaultCall];
 
 target[String def]
-  : GLYPH^ tuple[false]
-  | RETURN^ tuple[false]
+  : PREFILTER^ tuple[false]
   | CANVAS^ tuple[false]
   | LOCAL^ tuple[false]
   | VIEW^ tuple[false]
@@ -344,6 +312,11 @@ annotations
 annotation: t=TAGGED_ID -> ANNOTATION["JUNK"]; //Remove the tag and convert to upper case
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
+predicate
+  : GROUP? ALL CLOSE_GROUP?
+    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
+  | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
+    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
 
 specializer[RuleOpts opts]
   : ARG range sepArgList CLOSE_ARG
@@ -364,9 +337,9 @@ sepArgList
    
 argList
   : -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"])
+  | (values SEPARATOR mapList)=> values SEPARATOR! mapList
   | values -> values ^(LIST["Map Arguments"])
-  | mapList -> ^(LIST["Value Arguments"]) mapList
-  | values SEPARATOR! mapList;
+  | mapList -> ^(LIST["Value Arguments"]) mapList;
 
 values
   : atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);

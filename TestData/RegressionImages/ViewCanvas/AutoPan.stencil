@@ -9,8 +9,8 @@ STREAM: Mouse
 NAME: Mouse
 FREQUENCY: -2147483648
 
-external stream Stocks(Date, Open)
-external stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+external stream Stocks(Source, Date, Open)
+external stream Mouse(Source, X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
 order (Stocks | Mouse)
 
@@ -24,22 +24,24 @@ from Stocks
 from Stocks
 	view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
 from Stocks
-	filter(VALUE < 50): TimeStep(Date) -> Sub(view[RIGHT], VALUE) -> VALUE
-	filter(VALUE < view[RIGHT]): TimeStep(Date) -> VALUE
+	filter(Margin < 50)
+	filter(TimeStep < view[RIGHT])
+	prefilter(TimeStep, Margin) : TimeStep(Date) -[Time]> Sub(view[RIGHT], _) -> (Time[VALUE], VALUE) 
+	
 	view(X): Add(3, view[X])
 
 layer Nav
 from Mouse
-	filter(BUTTON = 1): BUTTON
-	filter(SHIFT !~ "true"): SHIFT
+	filter(BUTTON = 1)
+	filter(SHIFT !~ "true")
 	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
 from Mouse
-	filter(BUTTON = 1): BUTTON
-	filter(SHIFT =~ "true"): SHIFT
+	filter(BUTTON = 1)
+	filter(SHIFT =~ "true")
 	view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height, view[Y])
 from Mouse
-	filter(CLICK_COUNT = 3): CLICK_COUNT
-	filter(BUTTON = 1): BUTTON
+	filter(CLICK_COUNT = 3)
+	filter(BUTTON = 1)
 	view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
 
 operator TimeStep (Date) -> (VALUE)

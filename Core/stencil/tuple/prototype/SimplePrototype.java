@@ -34,10 +34,11 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 		Set<String> fields = new HashSet();
 		for (TupleFieldDef def: this) {
 			String name = def.getFieldName();
-			if (fields.contains(name)) {
-				throw new IllegalArgumentException("Cannot have two fields with the same name: " + Arrays.deepToString(TuplePrototypes.getNames(this).toArray()));
+			if (!fields.add(name)) {
+				String names = Arrays.deepToString(TuplePrototypes.getNames((List) this).toArray());
+				String message = String.format("Attempt to add %1$s, a duplicate name (all names: %2$s).", name, names);
+				throw new IllegalArgumentException(message);
 			}
-			fields.add(name);
 		}
 	}
 

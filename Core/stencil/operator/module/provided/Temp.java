@@ -177,6 +177,7 @@ public class Temp extends BasicModule {
 			od.addFacet(new BasicFacetData("Put", OpType.PROJECT, fields));
 			od.addFacet(new BasicFacetData("Map", OpType.PROJECT, fields));
 			od.addFacet(new BasicFacetData("Query", OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData("Guide", OpType.PROJECT, fields));
 			return od;
 		}
 

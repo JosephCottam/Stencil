@@ -2,7 +2,6 @@ package stencil.unittests.tuple;
 
 import java.util.HashMap;
 
-import stencil.tuple.MapTuple;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.MutableTuple;
 import stencil.tuple.Tuple;
@@ -82,7 +81,7 @@ public class TestTuples extends TestCase {
 		
 		assertSame(Tuples.merge(t1,t1), t1);
 		assertSame(Tuples.merge(t1,null), t1);
-		assertSame(Tuples.merge(null, null), t1);
+		assertSame(Tuples.merge(null, t1), t1);
 		
 		boolean failed=false;
 		try {Tuples.merge(null, null);}

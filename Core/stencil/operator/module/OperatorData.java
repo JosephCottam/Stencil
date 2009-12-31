@@ -40,7 +40,7 @@ import stencil.parser.tree.Specializer;
  * the instance.
  * */
 public interface OperatorData {
-	public static enum OpType {PROJECT, CATEGORIZE, BOTH, NA};
+	public static enum OpType {PROJECT, CATEGORIZE, BOTH, OTHER, NA};
 	
 	/**What is the legend's name?*/
 	public String getName();

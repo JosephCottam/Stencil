@@ -39,16 +39,16 @@ import stencil.tuple.Tuple;
 public class Predicate extends StencilTree {
 	public Predicate(Token source) {super(source);}
 
-	public Atom getLHSValue(Tuple tuple) {return getValue(getChild(0), tuple);}
+	public Atom getLHSValue(Environment env) {return getValue(getChild(0), env);}
 
-	public Atom getRHSValue(Tuple tuple) {return getValue(getChild(2), tuple);}
+	public Atom getRHSValue(Environment env) {return getValue(getChild(2), env);}
 
 	public BooleanOp getOperator() {return (BooleanOp) getChild(1);}
 
-	public boolean matches(Tuple source) {
+	public boolean matches(Environment env) {
 		if (getChild(0).getType() == StencilParser.ALL) {return true;}
 
-		return getOperator().evaluate(getLHSValue(source), getRHSValue(source));
+		return getOperator().evaluate(getLHSValue(env), getRHSValue(env));
 	}
 
 	/**Gets the value of the source AST.  The source AST may represent a number, quote string or name.
@@ -60,13 +60,12 @@ public class Predicate extends StencilTree {
 	 * @param tuple
 	 * @return
 	 */
-	private Atom getValue(Tree source, Tuple tuple) {
+	private Atom getValue(Tree source, Environment env) {
 		if (source instanceof Value) {
-			return Atom.Literal.instance(TupleRef.resolve((Value) source, tuple));
+			return Atom.Literal.instance(TupleRef.resolve((Value) source, env));
 		} else if (source instanceof CallChain){
 			Tuple result;
-			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
-			try {result =  ((CallChain) source).apply(env);}
+			try {result = ((CallChain) source).apply(env);}
 			catch (Exception e) {throw new RuntimeException("Error applying function in predicate.");}
 
 			if (result == null){return null;}
@@ -76,5 +75,13 @@ public class Predicate extends StencilTree {
 		}
 	}
 
+	
+	/**Does the passed tuple match the given predicates?*/
+	public static boolean matches(java.util.List<Predicate> predicates, Environment env) {
+		for (Predicate pred: predicates) {
+			if (!pred.matches(env)) {return false;}
+		}
+		return true;
+	}
 
 }

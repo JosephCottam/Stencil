@@ -34,11 +34,11 @@ SOURCE: ./items.txt
 SKIP: 0
 STRICT: true
 
-external stream Items(Name)
-external stream Postal(State, ID)
-external stream Region(State, Region, Division)
-external stream Pop(State,Total,Children,Adults,Elderly)
-external stream Poverty(State,Children, Adults, Elderly, Total)
+external stream Items(Source, Name)
+external stream Postal(Source, State, ID)
+external stream Regions(Source, State, Region, Division)
+external stream Pop(Source, State,Total,Children,Adults,Elderly)
+external stream Poverty(Source, State,Children, Adults, Elderly, Total)
 
 order (Items | Postal | Region | Pop) > Poverty
 
@@ -61,7 +61,7 @@ from Items
 layer Prime
 from Postal
 	() : Abr.Put(State, ID) -> ()
-from Region
+from Regions
 	() : Reg.Put(State, State, Region, Division) -> ()
 from Pop
 	() : Pop.Put(State, State, Total,Children,Adults,Elderly) -> ()

@@ -52,13 +52,8 @@ public class OperatorRule extends StencilTree {
 	public List<Rule> getRules() {return (List<Rule>) getChild(1);}
 
 	/**Legend actions 'match' when all of their predicates do.*/
-	public boolean matches(Tuple source) {
-		boolean passes =true;
-		for (Predicate p: getFilters()){
-			passes = passes && p.matches(source);
-			if (!passes) {break;}
-		}
-		return passes;
+	public boolean matches(Environment env) {
+		return Predicate.matches(getFilters(), env);
 	}
 
 	/**Apply the rules of this legend action to the passed tuple.

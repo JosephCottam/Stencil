@@ -53,81 +53,11 @@ options {
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.tuple.prototype.SimplePrototype;
   import stencil.tuple.prototype.TuplePrototypes;
-  
+  import static stencil.parser.string.EnvironmentProxy.initialEnv;
+  import static stencil.parser.string.EnvironmentProxy.extend;
 }
 
 @members {
-  public static final class FrameException extends RuntimeException {
-    private String frame;
-    private TuplePrototype contents;
-    private FrameException prior;
-    
-    public FrameException(String name, String frame, TuplePrototype contents) {
-      this(name, frame, contents, null);
-    }
-    
-    public FrameException(String name, String frame, TuplePrototype contents, FrameException prior) {
-      super("Could not find field '" + name + "'.\n" + briefMessage(frame, contents, prior));
-      this.frame = frame;
-      this.contents= contents;
-      this.prior = prior;
-    }
-    
-    private static String briefMessage(String frame, TuplePrototype contents, FrameException prior) {
-      StringBuilder b = new StringBuilder();
-      b.append(String.format("\tSearched in frame \%1\$s (fields: \%2\$s).\n", frame, Arrays.deepToString(TuplePrototypes.getNames(contents).toArray())));
-      if (prior != null) {
-        b.append(briefMessage(prior.frame, prior.contents, prior.prior));
-      }
-      return b.toString();
-    }
-  }
-
- private static final class EnvironmentProxy {
-	final EnvironmentProxy parent;
-	final TuplePrototype names;
-	final String label;
-     
-	public EnvironmentProxy(String label, TuplePrototype names) {this(label, names, null);}
-	private EnvironmentProxy(String label, TuplePrototype names, EnvironmentProxy parent) {
-		this.label = label;
-		this.names = names;
-		this.parent = parent;
-	}
-
-	private int frameRefFor(String name) {
-		if (names.contains(name)) {return currentIndex();}
-		if (label != null && label.equals(name)) {return currentIndex();}
-		if (parent == null) {
-			throw new FrameException(name, label, names);
-		}
-		try {return parent.frameRefFor(name);}
-		catch (FrameException e) {
-			throw new FrameException(name, label, names, e);
-		}
-	}
-     
-	public boolean isFrameRef(String name) {
-		return (label!= null && label.equals(name)) 
-				|| (parent != null && parent.isFrameRef(name));
-	}
-
-     public EnvironmentProxy push(String label, TuplePrototype t) {
-        return new EnvironmentProxy(label, t, this);
-     }    
-     
-     public int currentIndex() {
-     	int index =0;
-     	EnvironmentProxy prior=parent;
-     	while (prior != null) {
-     		prior = prior.parent;
-     		index++;
-     	}
-     	return index;
-     }
-     
-  }
-
   private ModuleCache modules;
   
   public FrameTupleRefs(TreeNodeStream input, ModuleCache modules) {
@@ -136,59 +66,6 @@ options {
     this.modules = modules;
   }
 
-  public EnvironmentProxy extend(EnvironmentProxy env, CommonTree pass, CommonTree callTree) {
-    String label = ((Pass) pass).getName();
-    Function call = (Function) callTree;
-      
-    MultiPartName name= new MultiPartName(call.getName());
-    Module m;
-    try{
-      m = modules.findModuleForOperator(name.prefixedName()).module;
-    } catch (Exception e) {
-      throw new RuntimeException("Error getting module information for operator " + name, e);
-    }
-    
-    try {
-      OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-      TuplePrototype prototype = od.getFacetData(name.getFacet()).getPrototype();
-      return env.push(label, prototype);
-    } catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);} 
-  } 
-  
-  
-  protected EnvironmentProxy initialEnv(Tree t) {
-    Consumes c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
-    Operator o = (Operator) t.getAncestor(StencilParser.OPERATOR);
-    Guide g = (Guide) t.getAncestor(StencilParser.GUIDE);
-    if (c != null) {return initialEnv(c);}
-    if (o != null) {return initialEnv(o);}
-    if (g != null) {return initialEnv(g);}
-    throw new RuntimeException("Found rule with unknown initial environment: " + t.toStringTree());
-  }
-  
-  protected EnvironmentProxy initialEnv(Consumes c) {
-    Program p = (Program) c.getAncestor(StencilParser.PROGRAM);
-    External ex = External.find(c.getStream(), p.getExternals());
-    return makeInitialEnv(ex.getName(), ex.getPrototype());
-  }
-  
-  protected EnvironmentProxy initialEnv(Operator o) {
-  	return makeInitialEnv(o.getName(), o.getYields().getInput());
-  }
-  
-  protected EnvironmentProxy initialEnv(Guide g) {
-  	return makeInitialEnv(g.getLayer(), AutoguidePair.GENERIC_PROTOTYPE);
-  }
-
-  protected EnvironmentProxy makeInitialEnv(String name, TuplePrototype prototype) {
-    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
-              .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
-              .push(name, prototype)
-              .push(ParserConstants.LOCAL_FRAME, new SimplePrototype());                   //TOOD: need to calculate the local tuple!
-  }
-  
-
-  
   protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
     TupleRef ref = (TupleRef) t;
     
@@ -202,7 +79,7 @@ options {
     	frameIdx =env.currentIndex();
     }
 	
-	TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<autogen>");
+	TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
 	StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
 	adaptor.addChild(newRef, frame);
 	adaptor.addChild(newRef, adaptor.dupTree(ref));
@@ -211,18 +88,16 @@ options {
 }
 
 
-topdown: rule | filter;
+topdown: action | predicate;
 
-filter: ^(f=FILTER . action[initialEnv($f)]);
+predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
 
-rule: ^(r=RULE target=. action[initialEnv($r)] binding=.);
-  
-action[EnvironmentProxy env]
-  : ^(CALL_CHAIN callTarget[env]);
+action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION . ^(LIST (tupleRef[env] | .)*) c=. callTarget[extend(env, $c, $f)])
-  | ^(PACK tupleRef[env]+);
+  : ^(f=FUNCTION s=. ^(LIST value[env]*) c=. callTarget[extend(env, $c, $f, modules)])
+  | ^(PACK value[env]+);
           
-tupleRef[EnvironmentProxy env]
-  : ^(t=TUPLE_REF .+) -> {frame($t, env)};
+value[EnvironmentProxy env] 
+  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {frame($t, env)}
+  | .;

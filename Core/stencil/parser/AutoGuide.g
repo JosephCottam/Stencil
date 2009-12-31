@@ -115,9 +115,9 @@ options {
     private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
     private String key(String layer, String attribute) {
-    	MultiPartName att = new MultiPartName(attribute);
-		String key = layer + ":" + att.getName();	//Trim to just the attribute name
-		return key;
+      MultiPartName att = new MultiPartName(attribute);
+      String key = layer + ":" + att.getName();	//Trim to just the attribute name
+      return key;
     }
     
     private String guideName(String name) {return new MultiPartName(name).modSuffix(GUIDE_BLOCK_TAG).toString();}       
@@ -129,7 +129,7 @@ options {
 
     	try {
     		Tree trimmed = trimCall(((Function) tree).getCall());
-        	if (trimmed != null) {return trimmed;}
+        if (trimmed != null) {return trimmed;}
     	} catch (Exception e) {
     		throw new RuntimeException("Error trimming: " + tree.getText(),e);
     	}
@@ -153,7 +153,7 @@ options {
 
 //Move mappings from the declarations in the consumes block up to the 
 //guides section
-buildMappings: ^(c=CONSUMES . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
+buildMappings: ^(c=CONSUMES . . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
 mapping[String layerName] 
   : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
 		{attDefs.put(key(layerName, field), group);};

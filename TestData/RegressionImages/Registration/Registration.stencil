@@ -14,8 +14,8 @@ STRICT: TRUE
 SKIP: 0
 
 
-external stream Reg(Name)
-external stream Reg2(Name)
+external stream Reg(Source, Name)
+external stream Reg2(Source, Name)
 
 order Reg > Reg2
 

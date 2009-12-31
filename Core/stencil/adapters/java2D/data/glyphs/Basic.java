@@ -35,6 +35,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -178,7 +179,7 @@ public abstract class Basic implements Glyph2D {
 	 * Only reports settable fields.
 	 **/
 	public String toString() {
-		List<String> includeFields = TuplePrototypes.getNames(getPrototype());
+		List<String> includeFields = new ArrayList(TuplePrototypes.getNames(getPrototype()));
 		List<String> omitFields = getUnsettables().getNames();
 		
 		includeFields.removeAll(omitFields);

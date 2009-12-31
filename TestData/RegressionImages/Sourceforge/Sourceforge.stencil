@@ -4,17 +4,17 @@ HEADER: ID X Y
 SEPARATOR: \s+
 SOURCE: ./vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
-STRICT: TRUE
+STRICT: true
 STREAM: File
 NAME: Attributes
 HEADER: ID|ATT
 SEPARATOR: \|
 SOURCE: ./project_troves.txt
 SKIP: 1
-STRICT: TRUE
+STRICT: true
 
-external stream NodePositions(ID, X,Y)  /*Precomputed layout*/
-external stream Attributes(ID, ATT)		 /*Additional attributes*/
+external stream NodePositions(Source, ID, X,Y)  /*Precomputed layout*/
+external stream Attributes(Source, ID, ATT)		 /*Additional attributes*/
 
 order NodePositions > Attributes 		 /*Load the NodePositions first*/
 
@@ -28,8 +28,9 @@ from NodePositions
 
 layer Overlay
 from Attributes
-	filter (ATT =~ "C|Java|Python") : ATT					/*Only continue with specific attributes*/
-	filter (ID !~ "[null]") : Nodes.Find(ID) -> (ID)	/*...and with things in the other layer.*/
+	filter (ATT =~ "C|Java|Python")				/*Only continue with specific attributes*/
+	filter (NodesID !~ "[null]") 				/*...and with things in the other layer.*/
+	prefilter(NodesID) :  Nodes.Find(ID) -> ID
 
 	ID : ID
 	(X,Y) : Nodes.Find(ID) -> (X,Y)

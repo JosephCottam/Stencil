@@ -153,6 +153,7 @@ public final class Modules {
 		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
 		legendData.addFacet(new BasicFacetData("Map", type, fields));
 		legendData.addFacet(new BasicFacetData("Query", type, fields));
+		legendData.addFacet(new BasicFacetData("Guide", type, fields));
 		return legendData;
 	}
 }

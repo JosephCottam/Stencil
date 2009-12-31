@@ -9,18 +9,18 @@ STREAM: File
 NAME: MTTNotApplicable
 HEADER: axis1A, axis1B, axis2A, axis2B
 SEPARATOR: ,\s*
-SOURCE:./NoData-Comp.txt
+SOURCE: ./NoData-Comp.txt
 SKIP: 1
 STRICT: true
 
-external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
-external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+external stream MTTSource(Source, graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+external stream MTTNotApplicable(Source, axis1A, axis1B, axis2A, axis2B)
 
 order MTTSource > MTTNotApplicable
 
 layer Trivial
 from MTTSource
-	filter (suite_name =~ "trivial"): suite_name
+	filter (suite_name =~ "trivial")
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE
 	(X,Y): Layout(axis1A, axis1B, axis2A, axis2B) ->(X,Y)
  	FILL_COLOR : BasicFails(fail) -> (C)
@@ -30,7 +30,7 @@ from MTTSource
 
 layer Others[PIE]
 from MTTSource
-	filter(suite_name !~"trivial"): suite_name
+	filter(suite_name !~"trivial")
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
 	(X,Y): Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
 	SIZE: 13
@@ -38,14 +38,14 @@ from MTTSource
 	STROKE_COLOR: RelativeFails(fail, pass)
 	SLICE: fail
 	FIELD: pass
-	SLICE_COLOR: Pallet("FAIL")
+	SLICE_COLOR: Palet("FAIL")
 	FIELD_COLOR: @color(WHITE)
 
 layer NotApplicable
 from MTTNotApplicable
-	ID: Concatenate(axis1A, axis1B, axis2A, axis2B) -> Print(_) 
+	ID: Concatenate(axis1A, axis1B, axis2A, axis2B) 
 	(X,Y) : Layout.Query(axis1A, axis1B, axis2A, axis2B) -> (X,Y)
-	FILL_COLOR: Pallet("N/A") -> (C)
+	FILL_COLOR: Palet("N/A") -> (C)
 	SIZE: 50
 	SHAPE: "RECTANGLE"
 	REGISTRATION: "TOP_LEFT"
@@ -54,7 +54,7 @@ from MTTNotApplicable
 
 layer SubLabels[TEXT]
 from MTTSource
-	filter(suite_name !~"trivial"): suite_name
+	filter(suite_name !~"trivial")
 	ID: Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> (VALUE)
 	X: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(X, -10) -> (VALUE)
 	Y: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(Y,11) -> (VALUE)
@@ -99,13 +99,13 @@ from MTTSource
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
 	Y.1 :-5
 	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
-	STROKE_COLOR : Pallet("GRID")
+	STROKE_COLOR : Palet("GRID")
 from MTTSource
 	ID : Concatenate(axis2A, axis2B) -> VALUE
 	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
 	X.1 : -5
 	X.2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
-	STROKE_COLOR: Pallet("GRID") -> (C)
+	STROKE_COLOR: Palet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
 	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE)
@@ -118,15 +118,15 @@ operator NamesIndex(ID) -> (VALUE)
 	all => VALUE: Index(ID) -> (VALUE)
 
 operator BasicFails(fails) -> (C)
-	(fails = 0) => C: Pallet("PASS") -> SetAlpha(.2, C)
-	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C)
+	(fails = 0) => C: Palet("PASS") -> SetAlpha(.2, C)
+	(fails > 0) => C: Palet("FAIL") -> SetAlpha(.4,C)
 
 operator RelativeFails(fails, passes) -> (C)
 	(passes= 0) => C: @color(BLACK)
-	(fails = 0) => C: Pallet("PASS")
-	(fails > 0) => C: Pallet("FAIL")
+	(fails = 0) => C: Palet("PASS")
+	(fails > 0) => C: Palet("FAIL")
 
-operator Pallet(Name) -> (C)
+operator Palet(Name) -> (C)
 	(Name =~"FAIL")    => C: @color(200,30,30)
 	(Name =~"PASS")    => C: @color(0,180,0)
 	(Name =~"MISSING") => C: @color(WHITE)

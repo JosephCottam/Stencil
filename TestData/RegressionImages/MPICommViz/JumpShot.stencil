@@ -13,9 +13,9 @@ SOURCE: ./diss_16.viz
 SKIP: 0
 STRICT: false
 
-external stream ranks(rank, label)
-external stream overheads(op, rank, cpu, start, end, skewedStart, skewedEnd, r,g,b)
-external stream trans(op, source, dest, start, end, skewedStart, skewedEnd, size, G, r,g,b) 
+external stream ranks(Source, rank, label)
+external stream overheads(Source, op, rank, cpu, start, end, skewedStart, skewedEnd, r,g,b)
+external stream trans(Source, op, source, dest, start, end, skewedStart, skewedEnd, size, G, r,g,b) 
 
 order ranks > (overheads | trans)
 
@@ -28,7 +28,9 @@ from ranks
 	FONT_COLOR: @color(GRAY70)
 	REGISTRATION: "RIGHT"
 from overheads
-	filter (start > VALUE): Spacer.Query() -> Add(5000,_) -> (start, VALUE)
+	filter (start > margin)
+	prefilter(start, margin): Spacer.Query() -> Add(5000,_) -> (start, VALUE)
+	
 	ID: start
 	TEXT: start
 	X: Timescale(skewedStart)
@@ -38,7 +40,9 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.Map(start)
 from overheads
-	filter (end > VALUE): Spacer.Query() -> Add(5000,_) -> (end, VALUE)
+	filter (end > margin)
+	prefilter(end, margin): Spacer.Query() -> Add(5000,_) -> (end, VALUE)
+	
 	ID: end
 	TEXT: end
 	X: Timescale(skewedEnd)
@@ -65,7 +69,7 @@ from trans
 
 layer compressions[SHAPE]
 from overheads
-	filter(op =~ "clocalop") : op
+	filter(op =~ "clocalop")
 	ID: Count[1]()
 	Y: Layout(rank) 
 	X: Timescale(skewedStart)
@@ -75,7 +79,7 @@ from overheads
 	
 layer overhead[LINE]
 from overheads
-	filter(op !~ "clocalop") : op
+	filter(op !~ "clocalop") 
 	ID: Count[1]()
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 	X.1: Timescale(skewedStart)

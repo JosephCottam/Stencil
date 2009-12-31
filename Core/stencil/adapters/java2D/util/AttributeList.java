@@ -116,6 +116,6 @@ public final class AttributeList implements Iterable<Attribute>, TuplePrototype<
 	public void remove(StandardAttribute att) {remove(att.name());}
 
 	public boolean contains(String name) {return attributes.containsKey(name);}
-	public int indexOf(String name) {return names.indexOf(name);}
+	public int indexOf(String name) {return getNames().indexOf(name);}
 	public TupleFieldDef getField(int idx) {return get(idx);}
 }

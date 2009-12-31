@@ -23,7 +23,7 @@
  	<target name="Stencil" depends="StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
-			<!--compilerarg value="-Xlint"/-->
+			<!-- compilerarg value="-Xlint"/ -->
 		</javac>
  	 	<antcall target="EclipseRefresh"/>
  	</target>
@@ -142,7 +142,11 @@
  			outputdirectory="${validators}"
  			libdirectory="${lib}"
  		/>
-
+ 		<antlr
+			target="${validators}/StreamDeclarationValidator.g"
+			outputdirectory="${validators}"
+			libdirectory="${lib}"
+		/>
  	</target>
  		
  	

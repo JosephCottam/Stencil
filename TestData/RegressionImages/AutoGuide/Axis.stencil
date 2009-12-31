@@ -6,7 +6,7 @@ SOURCE: ./Fruits.txt
 SKIP: 0
 STRICT: TRUE
 
-external stream Values(Category)
+external stream Values(Source, Category)
 
 /*Left-hand side defines the legend type.  Right-hand side says what to create it for.*/
 /*Specializers (things in square brackets) define the graphic design*/
@@ -22,7 +22,6 @@ canvas Main
 		line.STROKE_WEIGHT: 1 
 		
 layer Chart
-
 from Values
   ID : Count("") -> VALUE
   X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE

@@ -32,9 +32,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import stencil.parser.ParserConstants;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+
 import stencil.types.Converter;
 
 
@@ -64,7 +66,7 @@ public final class PrototypedTuple implements Tuple {
 	}
 	
 	public PrototypedTuple(String source, List<String> names, List<Class> types, List values) {
-		this(prepend(SOURCE_KEY, names), prepend(String.class, types), prepend(source, values));
+		this(prepend(ParserConstants.SOURCE_FIELD, names), prepend(String.class, types), prepend(source, values));
 	}
 	
 	public static <T> List<T> prepend(T value, List<T> original) {

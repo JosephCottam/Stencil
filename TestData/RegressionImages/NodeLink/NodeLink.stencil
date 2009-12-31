@@ -2,19 +2,19 @@ STREAM: File
 NAME: VertexList
 HEADER: ID1, ID2
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/er_100_0.005.adj
+SOURCE: ./er_100_0.005.adj
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: BFS
 HEADER: ID
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/NodeLink/er_100_0.005.bfs
+SOURCE: ./er_100_0.005.bfs
 SKIP: 1
 STRICT: true
 
-external stream BFS (ID) 
-external stream VertexList (ID1, ID2)
+external stream BFS (Source, ID) 
+external stream VertexList (Source, ID1, ID2)
 
 order BFS > VertexList			/*Load the node list before the vertex list.*/
 

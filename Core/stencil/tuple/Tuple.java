@@ -32,7 +32,6 @@ import stencil.tuple.prototype.TuplePrototype;
 
 public interface Tuple {
 	public static final String DEFAULT_KEY = "VALUE";
-	public static final String SOURCE_KEY = "SOURCE";
 
 	/**Get a listing of all fields known by this tuple (even if they are not set).
 	 * The order of the list corresponds to the index of the field number.

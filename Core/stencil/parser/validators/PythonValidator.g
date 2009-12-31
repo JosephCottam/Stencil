@@ -39,7 +39,7 @@ options {
 }
 
 @header {
-  /** Validates that ranges make sense.**/
+  /** Validates that python entities have proper syntax.**/
    
 
   package stencil.parser.validators;

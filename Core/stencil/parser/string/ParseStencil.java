@@ -219,28 +219,23 @@ public abstract class ParseStencil {
 		trc.setTreeAdaptor(treeAdaptor);
 		p = (Program) trc.downup(p);
 
-		//Numeralize all tuple references
+		//Ensure that all tuple references have a frame reference
 		treeTokens = new CommonTreeNodeStream(p);
 		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
 		frameRefs.setTreeAdaptor(treeAdaptor);
 		frameRefs.downup(p);
 		
-		//p = optimize(p, modules);
+		//Numeralize all tuple references
+		treeTokens = new CommonTreeNodeStream(p);
+		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
+		numeralize.setTreeAdaptor(treeAdaptor);
+		numeralize.downup(p);
 		
 		validate(p);
 		
 		return p;
 	}
 	
-	private static Program optimize(Program p, ModuleCache modules) {
-//		//Numeralize all tuple references
-//		treeTokens = new CommonTreeNodeStream(p);
-//		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
-//		numeralize.setTreeAdaptor(treeAdaptor);
-//		numeralize.downup(p);
-		
-		return p;
-	}
 	
 	//Run common validators.
 	private static void validate(StencilTree t) {
@@ -249,5 +244,8 @@ public abstract class ParseStencil {
 		
 		RangeValidator rangeValidator = new RangeValidator(treeTokens);
 		rangeValidator.downup(t);
+		
+		StreamDeclarationValidator streamValidator = new StreamDeclarationValidator(treeTokens);
+		streamValidator.downup(t);
 	}
 }

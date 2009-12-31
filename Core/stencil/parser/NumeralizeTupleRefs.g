@@ -47,6 +47,8 @@ options {
   import stencil.operator.module.*;
   import stencil.util.MultiPartName;
   import stencil.tuple.prototype.TuplePrototype;
+  import static stencil.parser.string.EnvironmentProxy.initialEnv;
+  import static stencil.parser.string.EnvironmentProxy.extend;
 }
 
 @members {
@@ -58,102 +60,34 @@ options {
     this.modules = modules;
   }
 
-  
-  
-
-  private static final class EnvironmentProxy {
-     final EnvironmentProxy parent;
-     final TuplePrototype prototype;
-     final String label;
-     
-     public EnvironmentProxy(External root) {this(root.getName(), root.getPrototype(), null);}
-     private EnvironmentProxy(String label, TuplePrototype prototype) {this(label, prototype, null);}
-     private EnvironmentProxy(String label, TuplePrototype prototype, EnvironmentProxy parent) {
-        this.label = label;
-        this.prototype = prototype;
-        this.parent = parent;
-     }
-     
-     private int search(String name, int offset) {
-       if (label != null && this.label.equals(name)) {return offset;}
-       else {return parent.search(name, offset+1);}
-     }
-
-    //Convert the name to a numeric ref (can be either a frame or tuple ref)
-     public int getFrameIndex(String name) {
-      int idx = prototype.indexOf(name);
-      if (idx <0) {idx = parent.search(name, 0);}
-      return idx;
-     }
-     
-     public TuplePrototype get(int idx) {
-      if (idx == 0) {return prototype;}
-      else {return parent.get(idx--);}
-     }
-     
-     public EnvironmentProxy push(String label, TuplePrototype prototype) {
-        return new EnvironmentProxy(label, prototype, this);
-     }    
-  }
-
-     public EnvironmentProxy extend(EnvironmentProxy env, CommonTree pass, CommonTree callTree) {
-      String label = ((Pass) pass).getName();
-      Function call = (Function) callTree;
-      
-      MultiPartName name= new MultiPartName(call.getName());
-      Module m;
-      try{
-        m = modules.findModuleForOperator(name.prefixedName()).module;
-      } catch (Exception e) {
-        throw new RuntimeException("Error getting module information for operator " + name, e);
-      }
-    
-      try {
-        OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-        TuplePrototype prototype = od.getFacetData(name.getFacet()).getPrototype();
-        return env.push(label, prototype);
-      } catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);} 
-     } 
-
-  private EnvironmentProxy initialEnv(CommonTree t) {
-    Consumes consumes = (Consumes) t;
-    Program p = (Program) consumes.getAncestor(StencilParser.PROGRAM);
-    External ex = External.find(consumes.getStream(), p.getExternals());
-    return new EnvironmentProxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
-        .push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
-        .push(ex.getName(), ex.getPrototype())
-        .push(ParserConstants.LOCAL_FRAME, null);                   //TOOD: need to calculate the local tuple!
-  }
-  
-  
   private TupleRef resolve(TupleRef ref, String prototype) {
     throw new RuntimeException("Tuple sub-ref numeralization not complete.");
   }
   
   
   private TupleRef resolve(TupleRef ref, TuplePrototype prototype) {
-    TupleRef newRef = (TupleRef) adaptor.dupNode(ref);
-    
+    TupleRef newRef = (TupleRef) adaptor.dupNode(ref);    
+
     int idx;
     if (!ref.isNumericRef()) {
       String name = ((Id) ref.getValue()).getName();
       idx = prototype.indexOf(name);
-      StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-      newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, (Token) null);
-      adaptor.addChild(newRef, num);
     } else {
       idx = ((StencilNumber) ref.getValue()).getNumber().intValue();
     }
+
+    StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
+    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
+    adaptor.addChild(newRef, num);
     
     if (ref.hasSubRef()) {
-      adaptor.addChild(newRef, resolve(ref, prototype.get(idx).getFieldName()));
+      adaptor.addChild(newRef, resolve(ref.getSubRef(), prototype.get(idx).getFieldName()));
     }
     return newRef;
   }
   
   private TupleRef resolve(CommonTree r, EnvironmentProxy env) {
     TupleRef ref = (TupleRef) r;
-    System.out.println("Identified for resolution: " + ref.toStringTree());
     int idx;
     
     if (!ref.isNumericRef()) {
@@ -164,34 +98,30 @@ options {
     }
     
     StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-    TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, (Token) null);
+    TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
     adaptor.addChild(newRef, num);
     
     if (ref.hasSubRef()) {
-      adaptor.addChild(newRef, resolve(ref, env.get(idx)));
+      adaptor.addChild(newRef, resolve(ref.getSubRef(), env.get(idx)));
     }
-    
+        
     return newRef;
   }
 
 }
 
-topdown: consumes;
+topdown: action | predicate;
 
-consumes: ^(c=CONSUMES list[initialEnv($c)]+);
+predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
 
-list[EnvironmentProxy env]:  ^(l=LIST rule[env]*);
-
-rule[EnvironmentProxy env] 
-  : ^(r=RULE target=. action[env] binding=.);
-  
-action[EnvironmentProxy env]
-  : ^(CALL_CHAIN callTarget[env]);
+action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION . ^(LIST (tupleRef[env] | .)*) c=. callTarget[extend(env, $c, $f)])
-  | ^(PACK tupleRef[env]+);
+  : ^(f=FUNCTION . ^(LIST value[env]*) c=. callTarget[extend(env, $c, $f, modules)])
+  | ^(PACK value[env]+);
           
-tupleRef[EnvironmentProxy env]
-  : ^(t=TUPLE_REF .+) -> {resolve($t, env)};
- 
+      
+value[EnvironmentProxy env] 
+  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {resolve($t, env)}
+  | .;
+          

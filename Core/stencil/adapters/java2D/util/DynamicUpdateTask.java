@@ -11,6 +11,7 @@ import stencil.parser.tree.util.Environment;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
 final class DynamicUpdateTask implements Runnable, Stopable {
@@ -44,6 +45,9 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 			
 			try {
 				Environment env = Environment.getDefault(Canvas.global, View.global, source);
+				env = env.push(Tuples.EMPTY_TUPLE);	//TODO: Handle prefilter
+				env = env.push(Tuples.EMPTY_TUPLE); //TODO: Handle local
+				
 				Tuple result = rule.apply(env);
 				Glyph2D newGlyph = glyph.update(result);
 				if (newGlyph != glyph) {
