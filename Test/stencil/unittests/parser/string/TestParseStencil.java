@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.antlr.runtime.tree.Tree;
+
 import stencil.adapters.Adapter;
 import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
@@ -49,7 +51,8 @@ public class TestParseStencil extends TestCase {
 
 		for (String name: programs.keySet()) {
 			try {
-				ParseStencil.parse(programs.get(name), ADAPTER);
+				Program p = ParseStencil.parse(programs.get(name), ADAPTER);
+				ancestryCheck(p);
 			}
 			catch (Throwable e) {
 				errors.add(name +  ":"+ e.getClass().getSimpleName());
@@ -57,6 +60,26 @@ public class TestParseStencil extends TestCase {
 		}
 
 		assertEquals("Errors found parsing " + errors.size() + " file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
-
 	}
+	
+
+	/**Checks that children/parents agree on their relationship.
+	 * 
+	 * Throws an exception if any root has a child that does not identify the root as its parent.
+	 */
+	public static final void ancestryCheck(Tree root) {
+		for (int i=0; i< root.getChildCount(); i++) {
+			Tree child = root.getChild(i);
+			if (child.getParent() != root) {throw new AncestryException(child);}
+			ancestryCheck(child);
+		}
+	}
+
+	private static final class AncestryException extends RuntimeException {
+		public AncestryException(Tree child) {
+			super("Parent/Child mis-match at " + child.toStringTree());
+		}
+		
+	}
+	
 }

@@ -10,10 +10,11 @@ import org.antlr.runtime.tree.*;
 import stencil.adapters.java2D.Adapter;
 import stencil.operator.module.util.*;
 import stencil.parser.string.*;
+import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
 public class TreeView {
 	public static String HEADER_FLAG = "-header";
-
+	
 	public static String test = "LEGEND Justify(max, current) -> (just)\n" +
 //								"(current = 0) => just : CENTER\n" +
 //								"(current = divide(max, 2) -> (div)) => just : CENTER\n" +
@@ -57,7 +58,13 @@ public class TreeView {
 			f = new stencil.testUtilities.TreeFrame(tree, new StencilParser(null));
 		}
 		f.setVisible(true);
-
+		
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		try {ancestryCheck(tree);}
+		catch (Exception e) {
+			System.err.println("Error checking ancestory:");
+			System.err.println(e.getMessage());
+		}
+
 	}
 }
