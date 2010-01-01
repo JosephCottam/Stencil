@@ -68,17 +68,11 @@ public class EnvironmentProxy {
 		this.parent = parent;
 	}
 
-	private int search(String name, int offset) {
-		if (label != null && this.label.equals(name)) {return offset;}
-		else if (parent == null) {throw new FrameException("Could not find frame named: " + name);}
-		else {return parent.search(name, offset+1);}
-	}
-
 	//Convert the name to a numeric ref (can be either a frame or tuple ref)
 	public int getFrameIndex(String name) {
-		int idx = prototype.indexOf(name);
-		if (idx <0) {idx = search(name, 0);}
-		return idx;
+		if (label != null && label.equals(name)) {return this.currentIndex();}
+		else if (parent == null) {throw new FrameException("Could not find frame named: " + name);}
+		else {return parent.getFrameIndex(name);}
 	}
 
 	public TuplePrototype get(int idx) {

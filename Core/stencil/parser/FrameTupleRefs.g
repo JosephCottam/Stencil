@@ -71,19 +71,19 @@ options {
     
     int frameIdx;
     if (!ref.isNumericRef()) {
-		String name = ((Id) ref.getValue()).getName();
-		if (env.isFrameRef(name)) {return ref;}	//No need to frame, already uses a frame ref
+      String name = ((Id) ref.getValue()).getName();
+      if (env.isFrameRef(name)) {return (TupleRef) adaptor.dupTree(ref);}	//No need to frame, already uses a frame ref
 		
-		frameIdx = env.frameRefFor(name);
+      frameIdx = env.frameRefFor(name);
     } else {
-    	frameIdx =env.currentIndex();
+      frameIdx =env.currentIndex();
     }
 	
-	TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
-	StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
-	adaptor.addChild(newRef, frame);
-	adaptor.addChild(newRef, adaptor.dupTree(ref));
-	return newRef;
+    TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
+    StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
+    adaptor.addChild(newRef, frame);
+    adaptor.addChild(newRef, adaptor.dupTree(ref));
+    return newRef;
   }
 }
 

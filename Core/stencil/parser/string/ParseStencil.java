@@ -223,13 +223,13 @@ public abstract class ParseStencil {
 		treeTokens = new CommonTreeNodeStream(p);
 		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
 		frameRefs.setTreeAdaptor(treeAdaptor);
-		frameRefs.downup(p);
+		p = (Program) frameRefs.downup(p);
 		
 		//Numeralize all tuple references
 		treeTokens = new CommonTreeNodeStream(p);
 		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
 		numeralize.setTreeAdaptor(treeAdaptor);
-		numeralize.downup(p);
+		p = (Program) numeralize.downup(p);
 		
 		validate(p);
 		

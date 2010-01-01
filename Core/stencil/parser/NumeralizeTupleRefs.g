@@ -66,7 +66,7 @@ options {
   
   
   private TupleRef resolve(TupleRef ref, TuplePrototype prototype) {
-    TupleRef newRef = (TupleRef) adaptor.dupNode(ref);    
+    TupleRef newRef;    
 
     int idx;
     if (!ref.isNumericRef()) {
@@ -77,7 +77,7 @@ options {
     }
 
     StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
+    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
     adaptor.addChild(newRef, num);
     
     if (ref.hasSubRef()) {
@@ -88,6 +88,7 @@ options {
   
   private TupleRef resolve(CommonTree r, EnvironmentProxy env) {
     TupleRef ref = (TupleRef) r;
+    TupleRef newRef;
     int idx;
     
     if (!ref.isNumericRef()) {
@@ -98,17 +99,18 @@ options {
     }
     
     StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-    TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
+    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
     adaptor.addChild(newRef, num);
     
     if (ref.hasSubRef()) {
       adaptor.addChild(newRef, resolve(ref.getSubRef(), env.get(idx)));
     }
-        
+
     return newRef;
   }
 
 }
+
 
 topdown: action | predicate;
 
@@ -117,11 +119,10 @@ predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p
 action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION . ^(LIST value[env]*) c=. callTarget[extend(env, $c, $f, modules)])
-  | ^(PACK value[env]+);
-          
+  : ^(f=FUNCTION s=. ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  | ^(PACK value[env]+);    
       
-value[EnvironmentProxy env] 
+value[EnvironmentProxy env]
   : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {resolve($t, env)}
   | .;
           
