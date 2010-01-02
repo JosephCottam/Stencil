@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 
 public class TestTuples extends TestCase {
 	public void testTransfer() throws Exception {
-		Tuple reference = new PrototypedTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.types, TestBasicTuple.values);
+		Tuple reference = new PrototypedTuple(TestBasicTuple.names, TestBasicTuple.types, TestBasicTuple.values);
 		HashMap map = new HashMap();
 		map.put("One", "One");
 		map.put("Two", 2);
@@ -61,7 +61,7 @@ public class TestTuples extends TestCase {
 	}
 
 	public void testToString() {
-		Tuple reference = new PrototypedTuple(TestBasicTuple.source, TestBasicTuple.names, TestBasicTuple.types, TestBasicTuple.values);
+		Tuple reference = new PrototypedTuple(TestBasicTuple.names, TestBasicTuple.types, TestBasicTuple.values);
 		String value = Tuples.toString(reference);
 		Assert.assertTrue(value.contains("String"));
 		Assert.assertTrue(value.contains("StringField"));

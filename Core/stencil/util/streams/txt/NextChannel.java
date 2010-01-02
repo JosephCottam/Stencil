@@ -23,7 +23,7 @@ public interface NextChannel {
 	}
 	
 	/**What is the next tuple?*/
-	public List<Object> next(BufferedReader source) throws Exception;
+	public String[] next(BufferedReader source) throws Exception;
 	
 	/**Does the source validate according to the needs of this channel?
 	 * @return

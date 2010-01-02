@@ -34,11 +34,11 @@ SOURCE: ./items.txt
 SKIP: 0
 STRICT: true
 
-external stream Items(Source, Name)
-external stream Postal(Source, State, ID)
-external stream Regions(Source, State, Region, Division)
-external stream Pop(Source, State,Total,Children,Adults,Elderly)
-external stream Poverty(Source, State,Children, Adults, Elderly, Total)
+external stream Items(Name, Source)
+external stream Postal(State, ID, Source)
+external stream Regions(State, Region, Division, Source)
+external stream Pop(State,Total,Children,Adults,Elderly, Source)
+external stream Poverty(State,Children, Adults, Elderly, Total, Source)
 
 order (Items | Postal | Region | Pop) > Poverty
 

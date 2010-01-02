@@ -31,7 +31,6 @@ package stencil.util.streams.txt;
 
 import java.io.BufferedReader; 
 import java.io.EOFException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
@@ -60,13 +59,13 @@ final class LooseChannel implements NextChannel {
 	 * an exception.
 	 *
 	 */
-	public List<Object> next(BufferedReader source) {
-		List<Object> rv = null;
+	public String[] next(BufferedReader source) {
+		String[] rv = null;
 		while (rv == null) {rv= softNext(source);}
 		return rv;
 	}
 	
-	private List<Object> softNext(BufferedReader source) {
+	private String[] softNext(BufferedReader source) {
 		String line;
 
 		try {
@@ -79,8 +78,8 @@ final class LooseChannel implements NextChannel {
 		if (line == null) {throw new NoSuchElementException("Reached end of file.");}
 
 		
-		List values = Arrays.asList(splitter.split(line));
-		if (values.size() != labels.size()) {return null;}
+		String[] values = splitter.split(line);
+		if (values.length != labels.size()) {return null;}
 		else {return values;}
 	}
 

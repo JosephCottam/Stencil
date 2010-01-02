@@ -28,8 +28,6 @@
  */
 package stencil.util.streams.ui;
 
-
-import java.util.Arrays;
 import java.util.List;
 
 import java.awt.Point;
@@ -37,12 +35,15 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.View;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.prototype.TuplePrototypes;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.EnumUtils;
+import static stencil.util.collections.ArrayUtil.arrayAppend;
 
 /**A way to track the mouse position/state at all points in time.
  *
@@ -98,8 +99,6 @@ public class MouseStream implements TupleStream {
 	/**How often should the mouse values be updated?  This should be expressed as updates per second.*/
 	public static int frequency = ON_CHANGE;
 
-	
-	
 	/**Values in the mouse tuple
 	 *
 	 * X,Y: Canvas position of the mouse
@@ -111,8 +110,13 @@ public class MouseStream implements TupleStream {
 	 * TYPE: Click/Press/Move/Drag
 	 */
 	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE};
-	private static final List<Class> fieldTypes = TuplePrototypes.defaultTypes(Names.values().length);
-
+	private static final TuplePrototype PROTOTYPE; 
+	static {
+		List<String> fieldNames = EnumUtils.allNames(Names.class);
+		fieldNames.add(ParserConstants.SOURCE_FIELD);
+		PROTOTYPE = new SimplePrototype(fieldNames);
+	}
+	
 	
 	public static enum Types {CLICK, PRESS, RELEASE, MOVE, DRAG;
 
@@ -173,7 +177,8 @@ public class MouseStream implements TupleStream {
 
 			mouse.prior = mouse.current;
 		}
-		Tuple t= new PrototypedTuple("Mouse", EnumUtils.allNames(Names.class), fieldTypes, Arrays.asList(values));
+		values = arrayAppend(values, "Mouse");
+		Tuple t= new PrototypedTuple(PROTOTYPE, values);
 		return t;
 	}
 

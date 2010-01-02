@@ -39,6 +39,8 @@ import stencil.explore.ui.components.sources.Text;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 
 
@@ -47,7 +49,7 @@ public final class TextSource extends StreamSource {
 	public final static class TextStream implements TupleStream {
 		private final String separator;
 		private final String name;
-		private final String[] labels;
+		private final TuplePrototype prototype;
 		private final String[] rows;
 		private int index =0;
 		private boolean closed = false;
@@ -56,7 +58,9 @@ public final class TextSource extends StreamSource {
 			this.separator = separator;
 			this.name = name;
 
-			labels = header.split(separator);
+			String[] labels = header.split(separator);
+			this.prototype = new SimplePrototype(Arrays.asList(labels), TuplePrototypes.defaultTypes(labels.length));
+			
 			rows = text.split("\n");
 		}
 
@@ -65,7 +69,11 @@ public final class TextSource extends StreamSource {
 		public Tuple next() {
 			if (!hasNext()) {throw new RuntimeException("Cannot call next when hasNext is false.");}
 			String[] values = rows[index].split(separator);
-			Tuple rv = new PrototypedTuple(name, Arrays.asList(labels), TuplePrototypes.defaultTypes(labels.length), Arrays.asList(values));
+			String[] sourced = new String[values.length +1];
+			System.arraycopy(values, 0, sourced, 0, values.length);
+			sourced[sourced.length-1] = name;
+			
+			Tuple rv = new PrototypedTuple(prototype, sourced);
 			index++;
 			return rv;
 		}

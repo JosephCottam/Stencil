@@ -6,7 +6,7 @@ SOURCE: ./18049-arch-compiler.output.txt
 SKIP: 1
 STRICT: TRUE
 
-external stream LineSource(Source, axis1A, axis1B)
+external stream LineSource(axis1A, axis1B, Source)
 
 layer Vertical[ARC]
 from LineSource

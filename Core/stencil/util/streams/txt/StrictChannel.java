@@ -30,7 +30,7 @@ final class StrictChannel implements NextChannel {
 	 * an exception.
 	 *
 	 */
-	public List<Object> next(BufferedReader source) throws NoSuchElementException, RuntimeException {
+	public String[] next(BufferedReader source) throws NoSuchElementException, RuntimeException {
 		String line;
 
 		try {
@@ -41,9 +41,11 @@ final class StrictChannel implements NextChannel {
 			throw new RuntimeException("Unknown error reading file.", e);
 		}
 
+		if (line == null) {throw new NoSuchElementException("Reached end of file.");}
+		
 		//TODO: Convert things by some type schema here.
-		List values = Arrays.asList(splitter.split(line));
-		if (values.size() != labels.size()) {throw new InvalidInputLineException("Could not treat line as full tuple: "+ line);}
+		String[] values = splitter.split(line);
+		if (values.length != labels.size()) {throw new InvalidInputLineException("Could not treat line as full tuple: "+ line);}
 		return values;
 	}
 	

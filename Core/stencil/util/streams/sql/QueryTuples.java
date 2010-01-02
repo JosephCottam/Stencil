@@ -2,13 +2,15 @@ package stencil.util.streams.sql;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.prototype.TuplePrototypes;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
+import static stencil.util.collections.ArrayUtil.arrayAppend;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
@@ -19,16 +21,16 @@ public class QueryTuples implements TupleStream {
 	protected Statement statement;
 
 	protected final String name;
-	protected final List<String> fields;
-	protected final List<Class> types;
+	protected final TuplePrototype prototype;
+	protected final String[] fields;
 	protected final String query;
 	protected int columnCount =0;
 	protected ResultSet results;
 
 
 	public QueryTuples(String name, String driver, String connect, String query, String header, String separator) throws Exception {
-		this.fields = Arrays.asList(header.split(separator));
-		this.types = TuplePrototypes.defaultTypes(fields.size());
+		this.fields = header.split(separator);
+		this.prototype = new SimplePrototype(arrayAppend(fields, ParserConstants.SOURCE_FIELD)); 
 		this.name = name;
 
 		connection = DriverManager.connect(driver, connect);
@@ -37,7 +39,7 @@ public class QueryTuples implements TupleStream {
 
 		reset();
 
-		if (results.getMetaData().getColumnCount() != fields.size()) {throw new RuntimeException("Query does not return as many columns as field specified in header.");}
+		if (results.getMetaData().getColumnCount() != fields.length) {throw new RuntimeException("Query does not return as many columns as field specified in header.");}
 	}
 
 	/**Closes connection.
@@ -63,7 +65,7 @@ public class QueryTuples implements TupleStream {
 			try {values.set(i-1, results.getString(i));}
 			catch (Exception e) {throw new RuntimeException(String.format("Error retrieving value %1$d for tuples.", i),e);}
 		}
-		return new PrototypedTuple(name, fields, types, values);
+		return new PrototypedTuple(prototype, values);
 	}
 
 	public void reset() throws Exception {

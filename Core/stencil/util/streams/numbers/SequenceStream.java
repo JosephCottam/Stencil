@@ -6,9 +6,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 public class SequenceStream implements TupleStream {
 	private final long length;
@@ -17,9 +20,13 @@ public class SequenceStream implements TupleStream {
 	private final long start; 	
 	private final long increment;	
 	private final String name;	//Name of the stream
-	
-	private static final List<String> FIELDS = Arrays.asList("VALUE");
-	private static final List<Class> types = Arrays.asList((Class) Long.class);
+
+	private static final TuplePrototype PROTOTYPE;
+	static {
+		List<String> fields = Arrays.asList("VALUE", ParserConstants.SOURCE_FIELD);
+		List types = Arrays.asList(Long.class, String.class);
+		PROTOTYPE = new SimplePrototype(fields, types);
+	}
 	                                               
 	public SequenceStream(String name) {this(name, 0,1, -1);}
 	
@@ -36,7 +43,7 @@ public class SequenceStream implements TupleStream {
 		long value = (count * increment) + start;
 		count++;
 		
-		return new PrototypedTuple(name, FIELDS, types, Arrays.asList(value));
+		return new PrototypedTuple(PROTOTYPE, Arrays.asList(value));
 	}
 
 	public boolean ready() {return hasNext();}
@@ -44,5 +51,4 @@ public class SequenceStream implements TupleStream {
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}
-	public List<String> getFields() {return FIELDS;}
 }

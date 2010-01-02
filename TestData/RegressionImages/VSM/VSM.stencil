@@ -13,8 +13,8 @@ SOURCE: ./er_100_0.005.bfs
 SKIP: 1
 STRICT: true
 
-external stream VertexList(Source, ID1, ID2)
-external stream BFS(Source, ID)
+external stream VertexList(ID1, ID2, Source)
+external stream BFS(ID, Source)
 
 order BFS > VertexList
 

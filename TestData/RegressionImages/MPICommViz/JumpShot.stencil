@@ -13,9 +13,9 @@ SOURCE: ./diss_16.viz
 SKIP: 0
 STRICT: false
 
-external stream ranks(Source, rank, label)
-external stream overheads(Source, op, rank, cpu, start, end, skewedStart, skewedEnd, r,g,b)
-external stream trans(Source, op, source, dest, start, end, skewedStart, skewedEnd, size, G, r,g,b) 
+external stream ranks(rank, label, Source)
+external stream overheads(op, rank, cpu, start, end, skewedStart, skewedEnd, r,g,b, Source)
+external stream trans(op, source, dest, start, end, skewedStart, skewedEnd, size, G, r,g,b, Source) 
 
 order ranks > (overheads | trans)
 

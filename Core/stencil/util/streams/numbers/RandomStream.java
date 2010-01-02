@@ -6,9 +6,12 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.List;
 
+import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 
 public class RandomStream implements TupleStream {
@@ -16,8 +19,7 @@ public class RandomStream implements TupleStream {
 	private long count;			//How many tuples have been produced
 	private final String name;	//Name of thes tream
 	private final int size;		//How many fields per tuple
-	private final List<String> fields;//Field names
-	private final List<Class> types;
+	private final TuplePrototype prototype;
 	
 	public RandomStream(String name) {this(name, 2, Integer.MIN_VALUE);}
 	
@@ -27,8 +29,14 @@ public class RandomStream implements TupleStream {
 		this.size =size;
 
 		count =0;
-		this.fields = TuplePrototypes.defaultNames(size, "VALUE");
-		this.types = TuplePrototypes.defaultTypes(size);
+		List<String> fields = TuplePrototypes.defaultNames(size, "VALUE");
+		fields = new ArrayList(fields);
+		fields.add(ParserConstants.SOURCE_FIELD);
+
+		List<Class> types = TuplePrototypes.defaultTypes(fields.size());
+		
+		prototype = new SimplePrototype(fields, types);
+
 	}
 	
 	public Tuple next() {
@@ -37,7 +45,7 @@ public class RandomStream implements TupleStream {
 		
 		List<Double> values = new ArrayList(size);
 		for (int i =0; i<size; i++) {values.add(Math.random());}
-		return new PrototypedTuple(name, fields, types, values);
+		return new PrototypedTuple(prototype, values);
 	}
 
 	public boolean ready() {return hasNext();}
@@ -45,5 +53,5 @@ public class RandomStream implements TupleStream {
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}
-	public List<String> getFields() {return fields;}
+	public List<String> getFields() {return TuplePrototypes.getNames(prototype);}
 }

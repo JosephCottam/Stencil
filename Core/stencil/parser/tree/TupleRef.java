@@ -14,7 +14,15 @@ public final class TupleRef extends Value {
 	public Atom getValue() {return (Atom) getChild(0);}
 
 	/**Get the value this reference holds with respect to the tuple.*/
-	public Object getValue(Tuple source) {return externalValue(source);}
+	public Object getValue(Tuple source) {
+		if (source == null) {return null;}
+
+		Atom ref = getValue();
+		Object value = doRef(source, ref);
+		
+		if (hasSubRef()) {return getSubRef().getValue((Tuple) value);}
+		else {return value;}
+	}
 
 	public TupleRef getSubRef() {
 		if (!hasSubRef()) {throw new RuntimeException("Attempt to get subref where none is present.");}
@@ -44,21 +52,13 @@ public final class TupleRef extends Value {
 		}
 	}
 
-	/**Get the java-type-value of this tuple-ref, relative to the passed tuple.
-	 *
+	/**Perform recursive de-referencing of this tuple against the passed 
+	 * tuple.
+	 * 
 	 * @param source
+	 * @param ref
 	 * @return
 	 */
-	private final Object externalValue(Tuple source) {
-		if (source == null) {return null;}
-
-		Atom ref = getValue();
-		Object value = doRef(source, ref);
-		
-		if (hasSubRef()) {return getSubRef().externalValue((Tuple) value);}
-		else {return value;}
-	}
-
 	private final Object doRef(Tuple source, Atom ref) {
 		if (ref.isNumber()){
 			int val = ((StencilNumber) getValue()).getNumber().intValue();
@@ -88,7 +88,7 @@ public final class TupleRef extends Value {
 		
 		if (!potentialRef.isTupleRef()) {throw new IllegalArgumentException("Can only handle literals and tuple references.");}
 		TupleRef ref = (TupleRef) potentialRef;
-		return ref.externalValue(valueSource);
+		return ref.getValue(valueSource);
 	}
 	
 	/**Given a list of candidates for resolution (e.g., lexical arguments),

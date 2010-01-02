@@ -13,8 +13,8 @@ SOURCE: ./project_troves.txt
 SKIP: 1
 STRICT: true
 
-external stream NodePositions(Source, ID, X,Y)  /*Precomputed layout*/
-external stream Attributes(Source, ID, ATT)		 /*Additional attributes*/
+external stream NodePositions(ID, X,Y, Source)  /*Precomputed layout*/
+external stream Attributes(ID, ATT, Source)		 /*Additional attributes*/
 
 order NodePositions > Attributes 		 /*Load the NodePositions first*/
 

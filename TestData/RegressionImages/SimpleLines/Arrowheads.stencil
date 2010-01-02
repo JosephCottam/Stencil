@@ -8,7 +8,7 @@ STRICT: true
 
 import Trigonometry
 
-external stream Degrees(Source, Deg)
+external stream Degrees(Deg, Source)
 
 layer DoubleLines[LINE]
 from Degrees

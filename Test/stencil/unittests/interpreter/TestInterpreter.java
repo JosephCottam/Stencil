@@ -15,7 +15,7 @@ import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class TestInterpreter extends junit.framework.TestCase{
 	public static String registerFailRule = "import TestModule " +
-											"external stream NodeAttributes(Source, ID, ATT)"+
+											"external stream NodeAttributes(ID, ATT, Source)"+
 											"layer Overlay from NodeAttributes" +
 											"   filter(ATT =~ \"C\")" +
 											"   ID: FilterFail(ID) -> (VALUE)";
@@ -44,7 +44,7 @@ public abstract class TestInterpreter extends junit.framework.TestCase{
 
 		Program program = ParseStencil.parse(source, adapter);
 		StencilPanel panel = adapter.generate(program);
-		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt", "\\s+\\|\\s+", true, 0);
+		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt", "\\s+\\|\\s+", false, 0);
 
 		TupleLoader loader = new TupleLoader(panel, stream);
 		loader.load();

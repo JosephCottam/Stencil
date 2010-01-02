@@ -29,17 +29,19 @@
 package stencil.util.streams.txt;
 
 
-import java .io.BufferedReader;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
+import static stencil.util.collections.ArrayUtil.arrayAppend;
+import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
-import stencil.tuple.prototype.TuplePrototypes;
+import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.SimplePrototype;
 
 import static java.lang.String.format;
 
@@ -57,9 +59,7 @@ public final class DelimitedParser implements TupleStream {
 	private final String filename;
 
 	/**Column labels*/
-	private final List<String> labels;
-
-	private final List<Class> types;
+	private final TuplePrototype prototype;
 
 	/**Name of the stream*/
 	private final String name;
@@ -76,22 +76,26 @@ public final class DelimitedParser implements TupleStream {
 	 * */
 	private Tuple tupleCache;
 	
-	public DelimitedParser(String name, String labels, String filename, String delimiter, boolean strict, int skip) throws Exception {
+	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
 		this.name = name;
 		this.filename = filename;
 		this.skip = skip;
-		this.labels = parseLabels(labels, splitter);
-		this.types = TuplePrototypes.defaultTypes(this.labels.size());
-		if (strict) {this.channel = new StrictChannel(this.labels, delimiter);}
-		else {this.channel = new LooseChannel(this.labels, delimiter);}
+		
+		String[] labels = parseLabels(delimitedLabels, splitter);
+
+		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), delimiter);}
+		else {this.channel = new LooseChannel(Arrays.asList(labels), delimiter);}
+
+		prototype = new SimplePrototype(arrayAppend(labels, ParserConstants.SOURCE_FIELD));
+
 		open();
 	}
 
-	private static List<String> parseLabels(String value, Pattern splitter) {
-		List<String> labels = Arrays.asList(splitter.split(value));
-		for (int i=0; i< labels.size(); i++) {
-			labels.set(i, labels.get(i).trim());
+	private static String[] parseLabels(String value, Pattern splitter) {
+		String[] labels = splitter.split(value);
+		for (int i=0; i< labels.length; i++) {
+			labels[i] = labels[i].trim();
 		}
 		return labels;
 	}
@@ -123,12 +127,13 @@ public final class DelimitedParser implements TupleStream {
 			t= tupleCache;
 			tupleCache = null;
 		}else {
-			List<Object> values; 
+			Object[] values; 
 			try {values = channel.next(source);}
 			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
 			catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 			
-			t = new PrototypedTuple(name, labels, types, values);
+			values = arrayAppend(values, name);			
+			t = new PrototypedTuple(prototype, values);
 		}
 
 		return t;
@@ -154,7 +159,8 @@ public final class DelimitedParser implements TupleStream {
 		if (tupleCache != null) {return true;}
 
 		try {tupleCache = next();}
-		catch (Exception e) {return false;}
+		catch (NoSuchElementException e) {return false;}
+		
 		
 		assert tupleCache != null : "Null value cache after supposedly successful next.";		
 		return true;
@@ -166,8 +172,6 @@ public final class DelimitedParser implements TupleStream {
 		hasNext();	
 		return tupleCache != null;
 	}
-
-	public List<String> getLabels() {return labels;}
 
 	public String getName() {return name;}
 
