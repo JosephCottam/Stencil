@@ -27,21 +27,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 package stencil.explore.model.sources;
-
+ 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
 
 
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Text;
 import stencil.tuple.PrototypedTuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
 
 
 public final class TextSource extends StreamSource {
@@ -59,23 +58,20 @@ public final class TextSource extends StreamSource {
 			this.name = name;
 
 			String[] labels = header.split(separator);
-			this.prototype = new SimplePrototype(Arrays.asList(labels), TuplePrototypes.defaultTypes(labels.length));
+			this.prototype = new SimplePrototype(labels);
 			
 			rows = text.split("\n");
 		}
 
 		public void close() throws Exception {closed = true;}
 
-		public Tuple next() {
+		public SourcedTuple next() {
 			if (!hasNext()) {throw new RuntimeException("Cannot call next when hasNext is false.");}
 			String[] values = rows[index].split(separator);
-			String[] sourced = new String[values.length +1];
-			System.arraycopy(values, 0, sourced, 0, values.length);
-			sourced[sourced.length-1] = name;
 			
-			Tuple rv = new PrototypedTuple(prototype, sourced);
+			Tuple rv = new PrototypedTuple(prototype, values);
 			index++;
-			return rv;
+			return new SourcedTuple.Wrapper(name, rv);
 		}
 
 		public void reset() throws Exception {
