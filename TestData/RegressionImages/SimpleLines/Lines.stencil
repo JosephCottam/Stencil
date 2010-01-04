@@ -8,7 +8,7 @@ STRICT: false
 
 /*Dead simple test.  Just draws some lines.*/
 
-external stream LineSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail, Source)
+external stream LineSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
  
 layer GridLines[LINE]
 from LineSource

@@ -12,7 +12,7 @@ STRICT: true
   Shells are filled top-down, the right-to-left.
 */
 
-external stream EntityFeed(ID, X,Y, Source)  /*Precomputed layout*/
+external stream EntityFeed(ID, X,Y)  /*Precomputed layout*/
 
 
 layer Nodes

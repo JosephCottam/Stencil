@@ -7,7 +7,7 @@ STRICT: TRUE
 SKIP: 1
 
 
-external stream Elements(Name, Source)
+external stream Elements(Name)
 
 layer Text[TEXT]
 from Elements

@@ -13,8 +13,8 @@ SOURCE: ./NoData-Comp.txt
 SKIP: 0
 STRICT: true
 
-external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail, Source)
-external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B, Source)
+external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
 
 canvas main
 	guide axis from Trivial Y

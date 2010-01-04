@@ -5,7 +5,7 @@ SEPARATOR: ,
 SOURCE: ./er_100_0.005.adj
 CHECKHEADER: true
 
-external stream Edges (ID1, ID2, Source)
+external stream Edges (ID1, ID2)
 
 
 /*Layout values in a circle.  Circle radius grows as value count increases.*/

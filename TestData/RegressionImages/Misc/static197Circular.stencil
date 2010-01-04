@@ -8,7 +8,7 @@ STRICT: TRUE
 
 /**Based on dynamic circular, but fixes number of nodes (so dynamic is no longer required).*/
 
-external stream Edges (ID1, ID2, Source)
+external stream Edges (ID1, ID2)
 
 layer Nodes
 from Edges
