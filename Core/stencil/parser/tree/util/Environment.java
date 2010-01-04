@@ -61,7 +61,10 @@ public class Environment implements Tuple {
 		return new Environment(this, t);
 	}
 
-	public Tuple get(int idx) {return frames[idx];}
+	public Tuple get(int idx) {
+		try {return frames[idx];}
+		catch (Exception e) {throw new Error("Error de-referencing environment of size " + frames.length, e);}
+	}
 
 	public TuplePrototype getPrototype() {return prototype;}
 	public Object get(String name) throws InvalidNameException {

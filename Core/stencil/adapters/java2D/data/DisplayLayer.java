@@ -35,9 +35,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.display.DisplayGuide;
@@ -47,10 +44,13 @@ import stencil.parser.tree.Layer;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.*;
 import stencil.util.collections.ListSet;
 
 public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
-	private ConcurrentMap<String, T> index = new ConcurrentHashMap<String, T>();
+	private ConcurrentHashMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private final String name; 
 	private T prototypeGlyph;
 	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();

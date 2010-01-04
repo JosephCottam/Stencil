@@ -6,9 +6,8 @@ import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.List;
 
-import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
-import stencil.tuple.Tuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
@@ -30,22 +29,16 @@ public class RandomStream implements TupleStream {
 
 		count =0;
 		List<String> fields = TuplePrototypes.defaultNames(size, "VALUE");
-		fields = new ArrayList(fields);
-		fields.add(ParserConstants.SOURCE_FIELD);
-
-		List<Class> types = TuplePrototypes.defaultTypes(fields.size());
-		
-		prototype = new SimplePrototype(fields, types);
-
+		prototype = new SimplePrototype(fields);
 	}
 	
-	public Tuple next() {
+	public SourcedTuple next() {
 		if (length > 0 && count >= length) {throw new NoSuchElementException(format("Stream %1$s exhausted.", name));}
 		count++;
 		
 		List<Double> values = new ArrayList(size);
 		for (int i =0; i<size; i++) {values.add(Math.random());}
-		return new PrototypedTuple(prototype, values);
+		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
 	}
 
 	public boolean ready() {return hasNext();}

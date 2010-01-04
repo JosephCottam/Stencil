@@ -2,13 +2,12 @@ package stencil.util.streams.feed;
 
 import java.util.*;
 
-import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.collections.MarkSweepSet;
-import static stencil.util.collections.ArrayUtil.arrayAppend;
 
 import com.sun.syndication.feed.synd.*;
 import com.sun.syndication.io.SyndFeedInput;
@@ -19,14 +18,12 @@ import java.net.URL;
 public class FeedTuples extends CacheFeed<SyndFeedInput> {
 	protected final String keyField;
 	protected final TuplePrototype prototype;
-	protected final String[] fields;
 	public FeedTuples(String name, String url, String keyField, String[] fields) throws Exception {this(name, new URL(url), keyField, fields);}
 
 	public FeedTuples(String name, URL url, String keyField, String[] fields) throws Exception {
 		super(name, url, new MarkSweepSet(), new SyndFeedInput());
 		this.keyField = keyField;
-		this.fields = fields;
-		prototype = new SimplePrototype(arrayAppend(fields, ParserConstants.SOURCE_FIELD));  
+		prototype = new SimplePrototype(fields);  
 	}
 
 	protected void updateEntryCache() {
@@ -51,12 +48,12 @@ public class FeedTuples extends CacheFeed<SyndFeedInput> {
         	String key = fieldValues.get(keyField);
         	if (idCache.contains(key)) {continue;}
 
+        	String[] fields = (String[]) TuplePrototypes.getNames(prototype).toArray();
         	String[] values = new String[fields.length];
         	for(int i=0; i< fields.length; i++) {
         		values[i] = fieldValues.get(fields[i]);
         	}
         	
-        	values = arrayAppend(values, name);
         	Tuple tuple = new PrototypedTuple(prototype, values);
             entryCache.offer(tuple);
             idCache.add(key);

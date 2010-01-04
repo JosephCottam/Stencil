@@ -28,7 +28,7 @@
  */
 package stencil.util.streams;
 
-import stencil.tuple.Tuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
 
 import java.util.Arrays;
@@ -57,11 +57,11 @@ public class ConcurrentStream implements TupleStream {
 		offset = 0;
 	}
 
-	public Tuple next() {
+	public SourcedTuple next() {
 		//TODO: This is busy waiting...we should go with a listener architecture.
 		while (!streams.get(offset).ready()) {incrimentOffset();}
 
-		Tuple nv = streams.get(offset).next();
+		SourcedTuple nv = streams.get(offset).next();
 		incrimentOffset();
 		return nv;
 	}

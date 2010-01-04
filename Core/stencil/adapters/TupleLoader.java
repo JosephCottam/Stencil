@@ -29,7 +29,7 @@
 package stencil.adapters;
 
 import stencil.display.StencilPanel;
-import stencil.tuple.Tuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.txt.InvalidInputLineException;
 
@@ -91,7 +91,7 @@ public class TupleLoader implements Runnable {
 		panel.preRun();
 
 		while(input.hasNext() && keepRunning) {
-			Tuple tuple;
+			SourcedTuple tuple;
 			try {
 				if (input.ready()) {tuple = input.next();}
 				else {continue;}

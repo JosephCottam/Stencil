@@ -30,7 +30,7 @@ package stencil.util.streams.ui;
 
 import javax.swing.JComponent;
 
-import stencil.parser.ParserConstants;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
@@ -57,22 +57,18 @@ public abstract class KeyboardStream implements TupleStream {
 	public static class KeysTuple implements Tuple {
 		private static final String KEY_FIELD = "key";
 		private static final String MODIFIER_FIELD="modifier";
-		private static final String SOURCE_FIELD = ParserConstants.SOURCE_FIELD;
-		private static final String[] FIELDS = new String[]{SOURCE_FIELD, KEY_FIELD, MODIFIER_FIELD};
-		private static final Class[] TYPES = new Class[]{String.class, Character.class, Integer.class};
+		private static final String[] FIELDS = new String[]{KEY_FIELD, MODIFIER_FIELD};
+		private static final Class[] TYPES = new Class[]{Character.class, Integer.class};
 		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
 		public static final int KEY = Arrays.asList(FIELDS).indexOf(KEY_FIELD); 
 		public static final int MODIFIER = Arrays.asList(FIELDS).indexOf(MODIFIER_FIELD);
-		public static final int SOURCE = Arrays.asList(FIELDS).indexOf(SOURCE_FIELD);
 
 		private Character key = null;
 		private Integer modifiers = null;
-		private String source = null;
 
-		public KeysTuple(Character key, Integer modifiers, String source) {
+		public KeysTuple(Character key, Integer modifiers) {
 			this.key = key;
 			this.modifiers = modifiers;
-			this.source = source;
 		}
 
 		public Object get(String name) {return Tuples.namedDereference(name, this);}
@@ -81,12 +77,8 @@ public abstract class KeyboardStream implements TupleStream {
 		public Object get(int idx) {
 			if (idx == KEY) {return key;}
 			if (idx == MODIFIER) {return modifiers;}
-			if (idx == SOURCE) {return source;}
 			throw new TupleBoundsException(idx, size());
  		}
-
-		public String getSource() {return source;}
-		public void setSource(String source) {this.source = source;}
 
 		public TuplePrototype getPrototype() {return PROTOTYPE;}
 
@@ -114,7 +106,7 @@ public abstract class KeyboardStream implements TupleStream {
 				if (buffer == -1) {buffer = stream.readChar();}
 				if (buffer == -1) {return null;}
 				buffer = stream.readChar();
-				return new KeysTuple(buffer, 0, source);
+				return new KeysTuple(buffer, 0);
 			} catch (Exception e) {
 				throw new NoSuchElementException("InputStream identified as " + source + " has reached its end (is returning -1)");
 			}
@@ -122,7 +114,7 @@ public abstract class KeyboardStream implements TupleStream {
 
 		public boolean hasNext() {return buffer != -1;}
 		public void close() throws IOException {stream.close(); buffer=(char)-1;}
-		public Tuple next() {return read();}
+		public SourcedTuple next() {return new SourcedTuple.Wrapper(source, read());}
 		public boolean ready() {return buffer >0;}
 	}
 
@@ -144,16 +136,16 @@ public abstract class KeyboardStream implements TupleStream {
 		public void keyPressed(KeyEvent arg0) {/*No action taken on event.*/}
 		public void keyReleased(KeyEvent arg0) {/*No action taken on event.*/}
 		public void keyTyped(KeyEvent evt) {
-			KeysTuple t = new KeysTuple(evt.getKeyChar(), evt.getModifiers(), source);
+			KeysTuple t = new KeysTuple(evt.getKeyChar(), evt.getModifiers());
 			buffer.add(t);
 		}
 
 		public boolean hasNext() {return buffer.size()>0;}
 
-		public KeysTuple next() {
+		public SourcedTuple next() {
 			KeysTuple t = buffer.get(0);
 			buffer.remove(0);
-			return t;
+			return new SourcedTuple.Wrapper(source, t);
 		}
 
 		public void close() {

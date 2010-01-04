@@ -28,28 +28,27 @@
  */
 package stencil.util.streams.ui;
 
-import java.util.List;
-
 import java.awt.Point;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-import stencil.parser.ParserConstants;
 import stencil.parser.tree.View;
 import stencil.tuple.PrototypedTuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.EnumUtils;
-import static stencil.util.collections.ArrayUtil.arrayAppend;
 
 /**A way to track the mouse position/state at all points in time.
  *
  * @author jcottam
  */
 public class MouseStream implements TupleStream {
+	public static String NAME = "Mouse";
+	
 	/**Internal utility for capturing mouse information.*/
 	private static class Mouse implements java.awt.event.MouseListener, java.awt.event.MouseMotionListener {
 		/**Screen coordinate of the current event*/
@@ -110,12 +109,7 @@ public class MouseStream implements TupleStream {
 	 * TYPE: Click/Press/Move/Drag
 	 */
 	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE};
-	private static final TuplePrototype PROTOTYPE; 
-	static {
-		List<String> fieldNames = EnumUtils.allNames(Names.class);
-		fieldNames.add(ParserConstants.SOURCE_FIELD);
-		PROTOTYPE = new SimplePrototype(fieldNames);
-	}
+	private static final TuplePrototype PROTOTYPE = new SimplePrototype(EnumUtils.allNames(Names.class)); 
 	
 	
 	public static enum Types {CLICK, PRESS, RELEASE, MOVE, DRAG;
@@ -150,7 +144,7 @@ public class MouseStream implements TupleStream {
 	}
 
 	/**What is the current mouse state?*/
-	public Tuple next() {
+	public SourcedTuple next() {
 		Object[] values = new Object[Names.values().length];
 
 		synchronized(mouse) {
@@ -177,9 +171,9 @@ public class MouseStream implements TupleStream {
 
 			mouse.prior = mouse.current;
 		}
-		values = arrayAppend(values, "Mouse");
+
 		Tuple t= new PrototypedTuple(PROTOTYPE, values);
-		return t;
+		return new SourcedTuple.Wrapper(NAME, t);
 	}
 
 	/**Returns true, unless the display is headless.*/
@@ -196,5 +190,4 @@ public class MouseStream implements TupleStream {
 	public void close() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	/**Throws UnsupportedOpertaionException.*/
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
-
 }

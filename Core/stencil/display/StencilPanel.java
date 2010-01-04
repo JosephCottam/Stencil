@@ -44,6 +44,7 @@ import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
 import stencil.parser.tree.View;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 
 /**Wraps the layers and glyphs to tie them to a display context.
@@ -187,7 +188,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	
 	//------------------------------------------------------------------------------------------
 	//Interpreter Operators
-	public void processTuple(Tuple source) throws Exception {interpreter.processTuple(source);}
+	public void processTuple(SourcedTuple source) throws Exception {interpreter.processTuple(source);}
 	
 	public void preRun() {
 		//TODO: Modify when view and canvas can have multiple instances

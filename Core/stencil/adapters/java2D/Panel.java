@@ -39,6 +39,7 @@ import stencil.types.Converter;
 import stencil.util.epsExport.EpsGraphics2D;
 
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -209,6 +210,18 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		DisplayLayer t = target.getLayer();
 		t.update(result);
 		return result;
+	}
+	
+	public Rectangle getInsetBounds() {
+		if (this.getBorder() == null) {return this.getBounds();}
+		
+		Rectangle bounds = this.getBounds();
+		Insets insets = this.getInsets();
+		
+		return new Rectangle(bounds.x-insets.left, 
+							bounds.y-insets.top,
+							bounds.width-(insets.left+insets.right),
+							bounds.height-(insets.top+insets.bottom));
 	}
 
 }

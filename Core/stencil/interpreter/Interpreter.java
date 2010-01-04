@@ -35,6 +35,7 @@ import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
@@ -86,12 +87,15 @@ public class Interpreter {
 		return fullResult;
 	}
 	
-	public void processTuple(Tuple source) throws Exception {
+	public void processTuple(SourcedTuple source) throws Exception {
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
+				if (!group.getStream().equals(source.getSource())) {break;}
+
 				boolean matches;
 				Tuple prefilter, local, result;
-				Environment env = Environment.getDefault(Canvas.global, View.global, source);
+				
+				Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues());
 				
 				try {prefilter = process(group.getPrefilterRules(), env);}
 				catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", layer.getName()),e);}
@@ -101,6 +105,7 @@ public class Interpreter {
 				catch (Exception e) {throw new RuntimeException(format("Error processing predicates in layer %1$s", layer.getName()), e);}				
 				
 				if (matches) {
+					
 					try {local = process(group.getLocalRules(), env);}
 					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}	
 					env = env.push(local);
@@ -111,7 +116,7 @@ public class Interpreter {
 							try {
 								//TODO: What about locals in a dynamic binding?
 								stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
-								for (Rule rule: group.getGlyphRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source);}}
+								for (Rule rule: group.getGlyphRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source.getValues());}}
 							} catch (Exception e) {
 								throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);
 							}

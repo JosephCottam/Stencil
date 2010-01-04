@@ -119,10 +119,10 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 				case IMPLANTATION: return VIEW_IMPLANTATION;
 				case X: return getX();
 				case Y: return getY();
-				case PORTAL_WIDTH: return view.getBounds().getWidth();
-				case PORTAL_HEIGHT: return view.getBounds().getHeight();
+				case PORTAL_WIDTH: return view.getInsetBounds().getWidth();
+				case PORTAL_HEIGHT: return view.getInsetBounds().getHeight();
 				case WIDTH: 
-					p = new Point2D.Double(view.getBounds().getWidth(), 0);
+					p = new Point2D.Double(view.getInsetBounds().getWidth(), 0);
 					return t.deltaTransform(p,p).getX();
 				case HEIGHT: 
 					p = new Point2D.Double(0,view.getBounds().getHeight());

@@ -37,7 +37,7 @@ import java.util.Iterator;
  * if there is nothing ready, but the stream is not yet terminated.
  *
  * */
-public interface TupleStream extends Iterator<Tuple> {
+public interface TupleStream extends Iterator<SourcedTuple> {
 	/**A stream is ready when it can return a tuple right away.
 	 * This is different from hasNext, in that a false hasNext value
 	 * indicates the stream will NEVER return more values.

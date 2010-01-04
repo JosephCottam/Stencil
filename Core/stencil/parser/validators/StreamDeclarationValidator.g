@@ -58,15 +58,6 @@ options {
   import static stencil.parser.ParserConstants.SOURCE_FIELD;
 }
 @members {
-  
-  public void hasSource(External e, TuplePrototype prototype) {
-    for (TupleFieldDef def: prototype) {
-      if (SOURCE_FIELD.equals(def.getFieldName())) {return;}  
-    }
-     
-    throw new ValidationException(format("Stream declaration \%1\$s does not include required field '\%2\$s' in prototype (common position is as the first field).", e.getName(), SOURCE_FIELD));
-  }
-  
   public void uniqueFieldNames(External e, TuplePrototype prototype) {
     String field = null;
     Set<String> fields = new HashSet<String>();
@@ -92,5 +83,4 @@ options {
 topdown: ^(e=EXTERNAL ^(p=TUPLE_PROTOTYPE .*)) 
          {
             uniqueFieldNames((External) e, (TuplePrototype) p);
-            hasSource((External) e, (TuplePrototype) p);
          };

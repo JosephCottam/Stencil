@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 import stencil.util.collections.ConditionSet;
@@ -43,7 +44,7 @@ public abstract class CacheFeed<T> implements TupleStream {
 		feed=null;
 	}
 
-	public synchronized Tuple next() {
+	public synchronized SourcedTuple next() {
 		if (feed == null) {throw new NoSuchElementException("Feed stream not ready.");}
 
 		if (entryCache.isEmpty()) {updateEntryCache();}
@@ -53,7 +54,7 @@ public abstract class CacheFeed<T> implements TupleStream {
 			updateEntryCache();
 		}
 
-		return entryCache.remove();
+		return new SourcedTuple.Wrapper(name, entryCache.remove());
 	}
 
 	/**Feeds are assumed to be infinite, so this method always returns

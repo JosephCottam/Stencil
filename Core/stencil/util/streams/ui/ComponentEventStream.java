@@ -3,12 +3,11 @@ package stencil.util.streams.ui;
 import java.awt.Rectangle;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.TupleStream;
@@ -17,32 +16,27 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class ComponentEventStream implements TupleStream {
-	public static final List<String> FIELDS = Arrays.asList("SOURCE", "X", "Y", "WIDTH", "HEIGHT");
-	
+	protected static final String X_FIELD = "X";
+	protected static final String Y_FIELD = "Y";
+	protected static final String WIDTH_FIELD = "WIDTH";
+	protected static final String HEIGHT_FIELD = "HEIGHT";
+	public static final String[] FIELDS = new String[]{X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD};
+
 	/**Tuple to represent a state of a frame.*/
 	private static final class ComponentState implements Tuple {
-		private static final String SOURCE_FIELD = "SOURCE";
-		private static final String X_FIELD = "X";
-		private static final String Y_FIELD = "Y";
-		private static final String WIDTH_FIELD = "WIDTH";
-		private static final String HEIGHT_FIELD = "HEIGHT";
-		private static final String[] FIELDS = new String[]{SOURCE_FIELD, X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD};
 		private static final Class[] TYPES = new Class[]{String.class, int.class, int.class, int.class, int.class};
 		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
-		public static final int SOURCE = PROTOTYPE.indexOf(SOURCE_FIELD);
 		public static final int X = PROTOTYPE.indexOf(X_FIELD);
 		public static final int Y = PROTOTYPE.indexOf(Y_FIELD);
 		public static final int WIDTH = PROTOTYPE.indexOf(WIDTH_FIELD);
 		public static final int HEIGHT = PROTOTYPE.indexOf(HEIGHT_FIELD);
 		
-		private final String source;
 		private final int x;
 		private final int y;
 		private final int width;
 		private final int height;
 		
-		public ComponentState(String source, Rectangle r) {
-			this.source =source;
+		public ComponentState(Rectangle r) {
 			this.x =r.x;
 			this.y =r.y;
 			this.width = r.width;
@@ -52,7 +46,6 @@ public final class ComponentEventStream implements TupleStream {
 		public Object get(String name) {return Tuples.namedDereference(name, this);}
 		
 		public Object get(int idx) {
-			if (idx == SOURCE) {return source;}
 			if (idx == X) {return x;}
 			if (idx == Y) {return y;}
 			if (idx == HEIGHT) {return height;}
@@ -74,13 +67,11 @@ public final class ComponentEventStream implements TupleStream {
 	/**Data source that always returns the current state.*/
 	private final class CurrentStateSource implements TupleSource {
 		private final JComponent component;
-		private final String sourceName;
-		public CurrentStateSource(String sourceName, JComponent source) {
-			this.sourceName = sourceName;
+		public CurrentStateSource(JComponent source) {
 			this.component = source;
 		}
 		public boolean ready() {return true;}
-		public Tuple next() {return new ComponentState(sourceName, component.getBounds());}
+		public Tuple next() {return new ComponentState(component.getBounds());}
 	}
 	
 	/**Data source that only returns a tuple if it has changed.
@@ -92,17 +83,15 @@ public final class ComponentEventStream implements TupleStream {
 	 */
 	private final class ChangeStateSource implements TupleSource, ComponentListener {
 		private AtomicReference<Rectangle> lastState = new AtomicReference(null);
-		private final String sourceName;
 		
-		public ChangeStateSource(String sourceName, JComponent source) {
-			this.sourceName = sourceName;
+		public ChangeStateSource(JComponent source) {
 			source.addComponentListener(this);
 		}
 		
 		public Tuple next() {
 			Rectangle r = lastState.get();
 			lastState.compareAndSet(r, null);			
-			return new ComponentState(sourceName, r);
+			return new ComponentState(r);
 		}
 
 		public boolean ready() {return lastState.get() != null;}
@@ -114,17 +103,19 @@ public final class ComponentEventStream implements TupleStream {
 	}
 	
 	private final TupleSource tupleSource;
-
-	public ComponentEventStream(String name, JComponent source, boolean onChange) {
+	private final String name;
+	public ComponentEventStream(String name,JComponent source, boolean onChange) {
 		assert source != null : "Cannot use a null frame";
+		this.name = name;
+		
 		if (onChange) {
-			tupleSource = new ChangeStateSource(name, source);
+			tupleSource = new ChangeStateSource(source);
 		} else {
-			tupleSource = new CurrentStateSource(name, source);
+			tupleSource = new CurrentStateSource(source);
 		}
 	}
 	
-	public Tuple next() {return tupleSource.next();}
+	public SourcedTuple next() {return new SourcedTuple.Wrapper(name, tupleSource.next());}
 	public boolean ready() {return tupleSource.ready();}
 	public boolean hasNext() {return true;}
 

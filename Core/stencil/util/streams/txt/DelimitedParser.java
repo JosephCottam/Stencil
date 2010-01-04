@@ -35,10 +35,8 @@ import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
-import static stencil.util.collections.ArrayUtil.arrayAppend;
-import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
-import stencil.tuple.Tuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.SimplePrototype;
@@ -74,7 +72,7 @@ public final class DelimitedParser implements TupleStream {
 	/**Stored tuple, returned before anything new will be read.
 	 * TODO: THIS IS NOT THREAD SAFE!!!!
 	 * */
-	private Tuple tupleCache;
+	private SourcedTuple tupleCache;
 	
 	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
@@ -87,7 +85,7 @@ public final class DelimitedParser implements TupleStream {
 		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), delimiter);}
 		else {this.channel = new LooseChannel(Arrays.asList(labels), delimiter);}
 
-		prototype = new SimplePrototype(arrayAppend(labels, ParserConstants.SOURCE_FIELD));
+		prototype = new SimplePrototype(labels);
 
 		open();
 	}
@@ -120,8 +118,8 @@ public final class DelimitedParser implements TupleStream {
 		} catch (Exception e) {throw new RuntimeException("Error opening " + filename + ".", e);}
 	}
 
-	public Tuple next() {
-		Tuple t;
+	public SourcedTuple next() {
+		SourcedTuple t;
 		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
 		if (tupleCache != null) {
 			t= tupleCache;
@@ -132,8 +130,7 @@ public final class DelimitedParser implements TupleStream {
 			catch (NoSuchElementException e) {throw new NoSuchElementException("Reached end of file: " + filename);}
 			catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 			
-			values = arrayAppend(values, name);			
-			t = new PrototypedTuple(prototype, values);
+			t = new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
 		}
 
 		return t;

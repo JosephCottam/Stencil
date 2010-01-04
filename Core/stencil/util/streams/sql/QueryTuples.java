@@ -4,13 +4,11 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
-import stencil.tuple.Tuple;
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
-import static stencil.util.collections.ArrayUtil.arrayAppend;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
@@ -30,7 +28,7 @@ public class QueryTuples implements TupleStream {
 
 	public QueryTuples(String name, String driver, String connect, String query, String header, String separator) throws Exception {
 		this.fields = header.split(separator);
-		this.prototype = new SimplePrototype(arrayAppend(fields, ParserConstants.SOURCE_FIELD)); 
+		this.prototype = new SimplePrototype(fields); 
 		this.name = name;
 
 		connection = DriverManager.connect(driver, connect);
@@ -55,7 +53,7 @@ public class QueryTuples implements TupleStream {
 		}
 	}
 
-	public Tuple next() {
+	public SourcedTuple next() {
 		List values = new ArrayList(columnCount);
 
 		try {results.next();}
@@ -65,7 +63,7 @@ public class QueryTuples implements TupleStream {
 			try {values.set(i-1, results.getString(i));}
 			catch (Exception e) {throw new RuntimeException(String.format("Error retrieving value %1$d for tuples.", i),e);}
 		}
-		return new PrototypedTuple(prototype, values);
+		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
 	}
 
 	public void reset() throws Exception {
