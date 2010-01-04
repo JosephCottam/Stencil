@@ -113,7 +113,7 @@ public abstract class ImageTest {
 			double deltaPercent = deltaCount/((double) o.getWidth()*o.getHeight());
 			double tolerance = .03;
 			if (deltaPercent > tolerance) {
-				fail(String.format("Difference exceed percent tolarance (actual: %1$f.3, toleraance: %2$f).", deltaPercent, tolerance));
+				fail(String.format("Image difference exceed percent tolarance (actual: %1$f3, toleraance: %2$f).", deltaPercent, tolerance));
 			}
 		}
 	}
