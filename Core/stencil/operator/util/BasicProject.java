@@ -22,7 +22,7 @@ public abstract class BasicProject implements StencilOperator {
 		
 		int i=0;
 		for (Object[] source: sourceArguments) {
-			Object[] actual = packArguments(formalArguments, source, prototype);
+			Object[] actual = packArguments(formalArguments, source, (String[]) prototype.toArray());
 			Tuple t = query(actual);
 			results[i++] = Tuples.toArray(t);
 		}
@@ -42,7 +42,7 @@ public abstract class BasicProject implements StencilOperator {
 	 * 
 	 * TODO: This should probably live somewhere else...a general Operator utility space?
 	 */
-	public static final Object[] packArguments(List<Value> formals, Object[] valueSource, List<String> prototype) {
+	public static final Object[] packArguments(List<Value> formals, Object[] valueSource, String[] prototype) {
 		int a=0;
 		Object[] args = new Object[formals.size()];
 
@@ -51,7 +51,7 @@ public abstract class BasicProject implements StencilOperator {
 			else if (arg.isTupleRef()){
 				TupleRef ref = (TupleRef)arg;
 				int idx = ref.toNumericRef(prototype);
-				if (idx ==-1) {throw new RuntimeException(String.format("Error locating field %1$s while working with guide creation (valid fields: %2$s).", ref, Arrays.deepToString(prototype.toArray())));}
+				if (idx ==-1) {throw new RuntimeException(String.format("Error locating field %1$s while working with guide creation (valid fields: %2$s).", ref, Arrays.deepToString(prototype)));}
 				args[a++] = valueSource[idx];
 			}	//lookup values in the valueSource
 		}

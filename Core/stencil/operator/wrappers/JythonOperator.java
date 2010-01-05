@@ -57,7 +57,7 @@ public class JythonOperator implements DynamicStencilOperator {
 	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new Invokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
 		OpType opType = OpType.valueOf(f.getAnnotation("Type")); //TODO: Cannonize this name somewhere better
-		List<String> fields = TuplePrototypes.getNames(enc.getReturns());
+		String[] fields = TuplePrototypes.getNames(enc.getReturns());
 		FacetData data = new BasicFacetData(f.getName(), opType,  fields); //TODO: Add type information
 		operatorData.addFacet(data);		
 	}
@@ -67,6 +67,7 @@ public class JythonOperator implements DynamicStencilOperator {
 		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in legend %2$s", name, operatorName));
 	}
 
+	//TODO: Change over to taking arrays instead of lists...
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {
 		if (!invokeables.containsKey(GUIDE_BLOCK_TAG)) {throw new UnsupportedOperationException("Guide block not defined in jython operator.");}
 		Invokeable<JythonEncapsulation, Tuple> inv = getFacet(GUIDE_BLOCK_TAG);
@@ -80,7 +81,7 @@ public class JythonOperator implements DynamicStencilOperator {
 			Object[] results = new Object[sourceArguments.size()];
 			int i=0;
 			for (Object[] source: sourceArguments) {
-				Object[] actual = packArguments(formalArguments, source, prototype);
+				Object[] actual = packArguments(formalArguments, source, (String[]) prototype.toArray());
 				Tuple t = inv.invoke(actual);
 				results[i++] = Tuples.toArray(t);
 			}

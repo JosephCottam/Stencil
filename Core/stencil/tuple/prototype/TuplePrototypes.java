@@ -16,58 +16,58 @@ public final class TuplePrototypes {
 	 * @param prefix
 	 * @return
 	 */
-	public static List<String> defaultNames(int count, String prefix) {
+	public static String[] defaultNames(int count, String prefix) {
 		if (prefix == null) {prefix = Tuple.DEFAULT_KEY;}
 		String[] names= new String[count];
 		names[0]=prefix;
 		for (int i=1; i< count; i++) {
 			names[i] = prefix + i;
 		}
-		return Arrays.asList(names);
+		return names;
 	}
 
 	/**Extract a list of the field names.*/
-	public static List<String> getNames(Tuple tuple) {return getNames(tuple.getPrototype());}
-	public static List<String> getNames(TuplePrototype prototype) {
+	public static String[] getNames(Tuple tuple) {return getNames(tuple.getPrototype());}
+	public static String[] getNames(TuplePrototype prototype) {
 		String[] s = new String[prototype.size()];
 		for (int i=0; i<s.length; i++) {
 			s[i] = prototype.get(i).getFieldName();
 		}
-		return Arrays.asList(s);
+		return s;
 	}
 
-	public static List<String> getNames(List<? extends TupleFieldDef> defs) {
+	public static String[] getNames(List<? extends TupleFieldDef> defs) {
 		String[] c = new String[defs.size()];
 		for (int i =0; i< c.length; i++) {
 			c[i] = defs.get(i).getFieldName(); 
 		}
-		return Arrays.asList(c);
+		return c;
 	}
 
 	
 	/**Extract a list of the field types from the given prototype.*/
-	public static List<Class> getTypes(Tuple tuple) {return getTypes(tuple.getPrototype());}
-	public static List<Class> getTypes(TuplePrototype prototype) {
-		Class[] s = new Class[prototype.size()];
-		for (int i=0; i<s.length; i++) {
-			s[i] = prototype.get(i).getFieldType();
+	public static Class[] getTypes(Tuple tuple) {return getTypes(tuple.getPrototype());}
+	public static Class[] getTypes(TuplePrototype prototype) {
+		Class[] c = new Class[prototype.size()];
+		for (int i=0; i<c.length; i++) {
+			c[i] = prototype.get(i).getFieldType();
 		}
-		return Arrays.asList(s);
+		return c;
 	}
 	
-	public static List<Class> getTypes(List<? extends TupleFieldDef> defs) {
+	public static Class[] getTypes(List<? extends TupleFieldDef> defs) {
 		Class[] c = new Class[defs.size()];
 		for (int i =0; i< c.length; i++) {
 			c[i] = defs.get(i).getFieldType(); 
 		}
-		return Arrays.asList(c);
+		return c;
 	}
 	
 
-	public static List<Class> defaultTypes(int size) {
+	public static Class[] defaultTypes(int size) {
 		Class[] types = new Class[size];
 		Arrays.fill(types, Object.class);
-		return Arrays.asList(types);
+		return types;
 	}
 
 }

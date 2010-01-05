@@ -48,7 +48,7 @@ public class FeedTuples extends CacheFeed<SyndFeedInput> {
         	String key = fieldValues.get(keyField);
         	if (idCache.contains(key)) {continue;}
 
-        	String[] fields = (String[]) TuplePrototypes.getNames(prototype).toArray();
+        	String[] fields = TuplePrototypes.getNames(prototype);
         	String[] values = new String[fields.length];
         	for(int i=0; i< fields.length; i++) {
         		values[i] = fieldValues.get(fields[i]);

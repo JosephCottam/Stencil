@@ -29,7 +29,6 @@
 package stencil.operator.wrappers;
 
 import java.util.Arrays;
-import java.util.List;
 
 import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
@@ -116,7 +115,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
 		if (spec !=null && !spec.isSimple()) {throw new SpecializationException("", getName(), spec);}
 		
-		List<String> names = TuplePrototypes.getNames(source.getResults());
+		String[] names = TuplePrototypes.getNames(source.getResults());
 		return Modules.basicOperatorData(module, getName(), OpType.PROJECT, names);
 	}
 

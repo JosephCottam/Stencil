@@ -49,7 +49,7 @@ public class EnvironmentProxy {
 
 		private static String briefMessage(String frame, TuplePrototype contents, FrameException prior) {
 			StringBuilder b = new StringBuilder();
-			b.append(String.format("\tSearched in frame %1$s (fields: %2$s).\n", frame, Arrays.deepToString(TuplePrototypes.getNames(contents).toArray())));
+			b.append(String.format("\tSearched in frame %1$s (fields: %2$s).\n", frame, Arrays.deepToString(TuplePrototypes.getNames(contents))));
 			if (prior != null) {
 				b.append(briefMessage(prior.frame, prior.contents, prior.prior));
 			}

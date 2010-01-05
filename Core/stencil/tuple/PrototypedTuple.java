@@ -56,7 +56,7 @@ public final class PrototypedTuple implements Tuple {
 	}
 	
 	public static PrototypedTuple singleton(String key, Object value) {
-		return new PrototypedTuple(Arrays.asList(key), new Object[]{value});
+		return new PrototypedTuple(new String[]{key}, new Object[]{value});
 	}
 	
 	public static PrototypedTuple singleton(String key, Class type, Object value) {
@@ -68,42 +68,49 @@ public final class PrototypedTuple implements Tuple {
 	 * @param names Names of the values present in the tuple.
 	 * @param values Values to be stored in the tuple.
 	 */
-	public PrototypedTuple(List<String> names, List values) {this(names, values.toArray());}
-	public PrototypedTuple(String[] names, Object[] values) {this(Arrays.asList(names), values);}
-	public PrototypedTuple(List<String> names, Object[] values) {this(names, TuplePrototypes.defaultTypes(names.size()), values);}
+	public PrototypedTuple(List<String> names, List values) {this(names.toArray(new String[0]), values.toArray());}
+	public PrototypedTuple(String[] names, Object[] values) {this(names, TuplePrototypes.defaultTypes(names.length), values);}
 	public PrototypedTuple(List<String> names, List<Class> types, List<Object> values) {this(names, types, values.toArray());}
 	
-	public PrototypedTuple(String[] names, Class[] types, Object[] values) {this(Arrays.asList(names), Arrays.asList(types), values);}
-	public PrototypedTuple(List<String> names, List<Class> types, Object[] values) {
+	public PrototypedTuple(List<String> names, List<Class> types, Object[] values) {this(names.toArray(new String[0]), types.toArray(new Class[types.size()]), values);}
+		public PrototypedTuple(String[] names, Class[] types, Object[] values) {
 		assert types != null : "Types may not be null";
 		assert names != null : "Names may not be null.";
-		assert names.size() == values.length : "Value and name list not of the same length." + names + " vs. " + values;
+		assert names.length == values.length : "Value and name list not of the same length." + names + " vs. " + values;
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 
 		this.prototype = new SimplePrototype(names, types);
 		this.values = validate(types, values);
 	}
-
-	public PrototypedTuple(TuplePrototype prototype, Object[] values) {
-		this.prototype = prototype;
-		this.values = validate(TuplePrototypes.getTypes(prototype), values);		
-	}
 	
 	public PrototypedTuple(TuplePrototype prototype, List values) {
-		this.prototype = prototype;
-		this.values = validate(TuplePrototypes.getTypes(prototype), values.toArray());
+		this (prototype, values.toArray(), false);
+	}
+
+	public PrototypedTuple(TuplePrototype prototype, Object[] values) {
+		this (prototype, values, false);
 	}
 	
-	private static final Object[] validate(List<Class> types, Object[] values) {
-		if (types.size() != values.length) {throw new TypeValidationException("Type list and value list are of different lengths");}
+	public PrototypedTuple(TuplePrototype prototype, Object[] values, boolean doConversions) {
+		this.prototype = prototype;
+		if (doConversions) {
+			this.values = validate(TuplePrototypes.getTypes(prototype), values);
+		} else {
+			this.values = values;
+		}
+	}
+
+	
+	private static final Object[] validate(Class[] types, Object[] values) {
+		if (types.length != values.length) {throw new TypeValidationException("Type list and value list are of different lengths");}
 		Object[] newValues = new Object[values.length];
 		
-		for (int i=0; i< types.size(); i++) {
-			Class target = types.get(i);
+		for (int i=0; i< types.length; i++) {
+			Class target = types[i];
 			Object value = values[i];
 			if (!target.isInstance(value)) {
 				try {newValues[i] = Converter.convert(value, target);}
-				catch (Exception e) {throw new TypeValidationException(types.get(i), values[i], e);}
+				catch (Exception e) {throw new TypeValidationException(types[i], values[i], e);}
 			} else {
 				newValues[i] = value;
 			}
@@ -112,8 +119,9 @@ public final class PrototypedTuple implements Tuple {
 	}
 
 	/**Verify that the names list contains no duplicates.*/
-	private static final String findDuplicateName(List<String> names) {
-		String[] ns = names.toArray(new String[names.size()]);
+	private static final String findDuplicateName(String[] names) {
+		String[] ns = new String[names.length];
+		System.arraycopy(names, 0, ns, 0, names.length);
 		Arrays.sort(ns);		
 		for (int i =0; i<ns.length-1; i++) {
 			if (ns[i].equals(ns[i+1])) {return ns[i];}

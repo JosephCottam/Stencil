@@ -211,7 +211,7 @@ public class StencilUtil extends BasicModule {
 		public final String getName() {return "Echo";}
 
 		public synchronized List guide(List<Value> formalArguments, List<Object[]> sourceArguments, List<String> prototype) {
-			assert sourceArguments == null && prototype == null : "Non-null sourceArgument or prototpye passed to categorize operator's Guide facet.";
+			assert sourceArguments == null: "Non-null sourceArgument categorize operator's Guide facet.";
 			
 			priorCount = seen.size();
 			

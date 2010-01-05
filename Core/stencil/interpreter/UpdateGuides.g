@@ -41,6 +41,7 @@ options {
 	package stencil.interpreter;
 	
 	import java.util.Arrays;
+	import java.util.ArrayList;
 	
 	import stencil.util.AutoguidePair;
 	import stencil.parser.tree.*;	
@@ -103,9 +104,10 @@ options {
 	
 	private final List<Object[]> invokeGuide(Function f, List<Object[]> vals, TuplePrototype prototype) {
 		//TODO: Remove prototype call when numeralize works...
-		List<String> names = null;
-    if (prototype != null) {names = TuplePrototypes.getNames(prototype);}
-		return f.getOperator().guide(f.getArguments(), vals, names);
+    List<String> names;
+    if (prototype != null) {names = Arrays.asList(TuplePrototypes.getNames(prototype));}
+    else {names = new ArrayList();}
+    return f.getOperator().guide(f.getArguments(), vals, names);
 	}
 	
   	private final List<Object[]> packGuide(Pack p, List<Object[]> vals, TuplePrototype prototype) {

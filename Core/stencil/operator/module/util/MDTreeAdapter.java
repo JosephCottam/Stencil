@@ -43,8 +43,8 @@ class MDTreeAdapter extends CommonTreeAdaptor {
 		public boolean isProject() {return getFacetType().equals("project");}		
 		public boolean isCategorize() {return getFacetType().equals("categorize");}
 		public TuplePrototype getPrototype() {
-			List<String> names = Arrays.asList(search("prototype").getChild(0).getText().split(","));
-			List<Class> types = TuplePrototypes.defaultTypes(names.size());
+			String[] names = search("prototype").getChild(0).getText().split(",");
+			Class[] types = TuplePrototypes.defaultTypes(names.length);
 			return new SimplePrototype(names, types);
 		}
 		

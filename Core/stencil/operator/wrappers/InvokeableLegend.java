@@ -58,7 +58,7 @@ public final class InvokeableLegend extends BasicProject {
 		
 		int i=0;
 		for (Object[] argSet: argumentSets) {
-			Object[] actual = packArguments(formalArguments, argSet, prototype);
+			Object[] actual = packArguments(formalArguments, argSet, (String[]) prototype.toArray());
 			Tuple t = query(actual);
 			results[i++] = Tuples.toArray(t);
 		}

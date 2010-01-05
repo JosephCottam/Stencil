@@ -16,7 +16,7 @@ public final class AutoguidePair<I,R> implements Tuple {
 	private static final String[] FIELDS = new String[]{INPUT_FIELD, RESULT_FIELD};
 	public static final int INPUT = Arrays.asList(FIELDS).indexOf(INPUT_FIELD);
 	public static final int RESULT = Arrays.asList(FIELDS).indexOf(RESULT_FIELD);
-	public static final TuplePrototype GENERIC_PROTOTYPE = new SimplePrototype(FIELDS, TuplePrototypes.defaultTypes(FIELDS.length).toArray(new Class[0]));
+	public static final TuplePrototype GENERIC_PROTOTYPE = new SimplePrototype(FIELDS, TuplePrototypes.defaultTypes(FIELDS.length));
 	
 	
 	

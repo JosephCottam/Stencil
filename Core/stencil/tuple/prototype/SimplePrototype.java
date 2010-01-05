@@ -12,7 +12,7 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 
 	public SimplePrototype(String[] names) {this(Arrays.asList(names));}
 	public SimplePrototype(Collection<String> names) {
-		this(new ArrayList(names), TuplePrototypes.defaultTypes(names.size()));
+		this((String[]) names.toArray(), TuplePrototypes.defaultTypes(names.size()));
 	}
 
 	public SimplePrototype(String[] names, Class[] types) {this(Arrays.asList(names), Arrays.asList(types));}
@@ -36,7 +36,7 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 		for (TupleFieldDef def: this) {
 			String name = def.getFieldName();
 			if (!fields.add(name)) {
-				String names = Arrays.deepToString(TuplePrototypes.getNames((List) this).toArray());
+				String names = Arrays.deepToString(TuplePrototypes.getNames((TuplePrototype) this));
 				String message = String.format("Attempt to add %1$s, a duplicate name (all names: %2$s).", name, names);
 				throw new IllegalArgumentException(message);
 			}

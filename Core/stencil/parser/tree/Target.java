@@ -28,8 +28,6 @@
  */
 package stencil.parser.tree;
 
-import java.util.List;
-
 import org.antlr.runtime.Token;
 
 import stencil.tuple.PrototypedTuple;
@@ -59,11 +57,11 @@ public abstract class Target extends StencilTree {
 	 * (such as a glyph, view or canvas) via merge.
 	 */
 	public final Tuple finalize(Tuple source) {
-		List<String> fields = TuplePrototypes.getNames(getPrototype());
-		List<Object> values = new java.util.ArrayList<Object>();
+		String[] fields = TuplePrototypes.getNames(getPrototype());
+		Object[] values = new Object[fields.length];
 
-		int size = fields.size();
-		for (int i=0; i< size; i++) {values.add(source.get(i));}
+		int size = fields.length;
+		for (int i=0; i< size; i++) {values[i] = source.get(i);}
 
 		Tuple rv = new PrototypedTuple(fields, values);
 		return rv;

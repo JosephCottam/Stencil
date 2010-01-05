@@ -7,18 +7,23 @@ import stencil.tuple.Tuple;
 
 /**Unpack a tuple reference.*/
 public final class TupleRef extends Value {
-
-	public TupleRef(Token source) {super(source);}
+	private Atom value = null;
+	
+	public TupleRef(Token source) {
+		super(source);
+	}
 
 	/**Get the simple value portion of this reference (what will be used to de-reference the tuple)*/
-	public Atom getValue() {return (Atom) getChild(0);}
+	public Atom getValue() {
+		if (value == null) {value = (Atom) getChild(0);}
+		return value;
+	}
 
 	/**Get the value this reference holds with respect to the tuple.*/
 	public Object getValue(Tuple source) {
 		if (source == null) {return null;}
 
-		Atom ref = getValue();
-		Object value = doRef(source, ref);
+		Object value = doRef(source, getValue());
 		
 		if (hasSubRef()) {return getSubRef().getValue((Tuple) value);}
 		else {return value;}
@@ -43,12 +48,14 @@ public final class TupleRef extends Value {
 	 * @param prototype
 	 * @return
 	 */
-	public int toNumericRef(List<String> prototype) {
+	public int toNumericRef(String[] prototype) {
 		if (isNumericRef()) {return ((StencilNumber) getValue()).getNumber().intValue();}
 		else {
 			String name = getValue().getValue().toString();
-			if (!prototype.contains(name)) {throw new IllegalArgumentException(String.format("Could not find %1$s in %2$s.", name, prototype.toString()));}			
-			return prototype.indexOf(name);
+			for (int i=0; i< prototype.length; i++) {
+				if (name.equals(prototype[i])) {return i;}
+			}
+			throw new IllegalArgumentException(String.format("Could not find %1$s in %2$s.", name, prototype.toString()));
 		}
 	}
 

@@ -3,6 +3,7 @@ package stencil.util.streams.numbers;
 import static java.lang.String.format;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class RandomStream implements TupleStream {
 		this.size =size;
 
 		count =0;
-		List<String> fields = TuplePrototypes.defaultNames(size, "VALUE");
+		String[] fields = TuplePrototypes.defaultNames(size, "VALUE");
 		prototype = new SimplePrototype(fields);
 	}
 	
@@ -46,5 +47,5 @@ public class RandomStream implements TupleStream {
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}
-	public List<String> getFields() {return TuplePrototypes.getNames(prototype);}
+	public List<String> getFields() {return Arrays.asList(TuplePrototypes.getNames(prototype));}
 }

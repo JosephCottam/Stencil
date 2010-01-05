@@ -87,7 +87,7 @@ public final class Tuples {
 		if (source == null) {return Tuples.EMPTY_TUPLE;}
 		
 		List<String> attributes =  new ArrayList<String>();
-		attributes.addAll(TuplePrototypes.getNames(source));
+		attributes.addAll(Arrays.asList(TuplePrototypes.getNames(source)));
 
 		Object[] values = new Object[attributes.size()];
 		for (int i=0; i< attributes.size(); i++) {
@@ -135,8 +135,8 @@ public final class Tuples {
 	 * @return
 	 */
 	public static boolean transferNeutral(Tuple source, Tuple target) {
-		List<String> targetFields = TuplePrototypes.getNames(target);
-		List<String> sourceFields = TuplePrototypes.getNames(source);
+		List<String> targetFields = Arrays.asList(TuplePrototypes.getNames(target));
+		String[] sourceFields = TuplePrototypes.getNames(source);
 		for (String field: sourceFields) {
 			if (!targetFields.contains(field)) {return false;}
 			Object sourceValue = source.get(field);
@@ -162,13 +162,15 @@ public final class Tuples {
 	/**Provide a string representation of the tuple, 
 	 * but only include the fields in the passed list.
 	 */
-	public static String toString(Tuple t, List<String> fieldNames) {
+	public static String toString(Tuple t, String[] fieldNames) {
 		StringBuilder rv = new StringBuilder();
 		rv.append("(");
 
-
-		String[] fields = fieldNames.toArray(new String[]{});
+		//Copy must be made because Arrays.sort is in-place
+		String[] fields = new String[fieldNames.length];
+		System.arraycopy(fieldNames, 0, fields, 0, fieldNames.length);
 		Arrays.sort(fields);
+		
 		for (String name: fields){
 			Object value =t.get(name);
 			if (value instanceof Number && ((Number) value).doubleValue() ==-0) {value =0.0d;}//Prevent negative zeros
