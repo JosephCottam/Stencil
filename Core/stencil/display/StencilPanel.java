@@ -61,6 +61,13 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 */
 	public static boolean DEFAULT_INTERACTION= true;
 
+	/**Should an adapter paint continuously, or only when directly requested?
+	 * This should be set to true whenever painting timing is controlled by 
+	 * a host application.
+	 */
+	public static boolean continuousPainting = true;
+
+	
 	protected Program program;
 	protected C canvas;
 	private Interpreter interpreter;

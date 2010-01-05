@@ -53,7 +53,7 @@ public interface Adapter<T extends Glyph> {
 	/**Graphics object that may be used by adapters for planning purposes.*/
 	public static final BufferedImage REFERENCE_CANVAS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 	public static final Graphics2D REFERENCE_GRAPHICS = (Graphics2D) REFERENCE_CANVAS.getGraphics();
-
+	
 	//------------------------------------------------------------------------------------------
 	//Compile-time support operations.  These methods are used by the host application
 	//and compiler to create the visualization before any data is added.

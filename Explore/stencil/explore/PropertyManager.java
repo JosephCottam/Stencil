@@ -36,6 +36,7 @@ import java.util.Properties;
 import java.util.TreeMap;
 
 import static stencil.explore.Application.reporter;
+import stencil.display.StencilPanel;
 import stencil.explore.model.AdapterOpts;
 import stencil.explore.ui.interactive.Interactive;
 import stencil.WorkingDirectory;
@@ -58,6 +59,7 @@ public class PropertyManager {
 	public static final String WORKING_DIR_KEY = "workingDir";
 	public static final String CONCURRENT_BIAS_KEY = "concurrentBias";
 	public static final String DEFAULT_ADAPTER = "defaultAdapter";
+	public static final String CONTINUOS_PAINT = "continuousPainting";
 	
 	/**Load properties from either the default file or an argument specified in args.
 	 * If the settings flag appears in args, it will load that file.  Otherwise, it
@@ -161,6 +163,11 @@ public class PropertyManager {
 			catch(Exception e) {System.err.println("Error setting concurrent bias from settings file.");}
 		}
 
+		if (p.containsKey(CONTINUOS_PAINT)) {
+			try {StencilPanel.continuousPainting = Boolean.parseBoolean(p.getProperty(CONTINUOS_PAINT));}
+			catch(Exception e) {System.err.println("Error setting continuous paint from settings file.");}
+		}
+		
 		if (p.containsKey(WORKING_DIR_KEY)) {
 			try {WorkingDirectory.setWorkingDir(p.getProperty(WORKING_DIR_KEY));}
 			catch(Exception e) {System.err.println("Error setting last file from settings file.");}

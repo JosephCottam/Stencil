@@ -12,6 +12,7 @@ import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
+import stencil.display.StencilPanel;
 
 public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	public static final RenderingHints HIGH_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -45,7 +46,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	public void signalStop() {run = false;}
 	
 	public void run() {
-		while (run) {
+		while (run && StencilPanel.continuousPainting) {
 			Rectangle updateBounds = layerUpdates.clear();
 			AffineTransform inverse = target.getInverseViewTransformRef();
 			
