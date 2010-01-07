@@ -47,8 +47,8 @@ options {
   import stencil.operator.module.*;
   import stencil.util.MultiPartName;
   import stencil.tuple.prototype.TuplePrototype;
-  import static stencil.parser.string.EnvironmentProxy.initialEnv;
-  import static stencil.parser.string.EnvironmentProxy.extend;
+  import static stencil.parser.string.EnvironmentProxy.Proxy.initialEnv;
+  import static stencil.parser.string.EnvironmentProxy.Proxy.extend;
 }
 
 @members {

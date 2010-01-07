@@ -71,7 +71,7 @@ tokens {
   AS  = 'as'; //used in imports
   BASE  = 'base'; //Refer to the base entity
   CANVAS  = 'canvas';
-  DEFAULT = 'default';//Use the default value (or revert to it...)
+  DEFAULT = 'default';
   EXTERNAL= 'external';
   FACET = 'facet';
   FILTER  = 'filter';
@@ -219,13 +219,17 @@ streamDef
     -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+))*;
 
 layerDef
-  : LAYER name=ID implantationDef consumesBlock["glyph"]+
-    -> ^(LAYER[$name.text] implantationDef ^(LIST["Consumes"] consumesBlock+));
+  : LAYER name=ID implantationDef defaultsBlock consumesBlock["glyph"]+
+    -> ^(LAYER[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+));
   
 implantationDef
   : ARG type=ID CLOSE_ARG -> GLYPH[$type.text]
   | -> GLYPH[DEFAULT_GLYPH_TYPE];
     
+defaultsBlock
+  : DEFAULT rule["glyph"]+ -> ^(LIST["Defaults"] rule+)
+  | -> ^(LIST["Defaults"]);
+  
 consumesBlock[String def]
   : FROM stream=ID filter* rule[def]+ 
     -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filter*) ^(LIST["Rules"] rule+));

@@ -31,19 +31,36 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 import stencil.display.DisplayLayer;
+import stencil.parser.string.StencilParser;
 
 public class Layer extends StencilTree {
-	protected DisplayLayer displayLayer;
+	private String implantation;
+	private List<Consumes> groups;
+
+	private DisplayLayer displayLayer;
+
 	
 	public Layer(Token source) {super(source);}
 
 	public String getName() {return token.getText();}
-	public String getImplantation() {return this.getChild(0).getText();}
+	
+	public String getImplantation() {
+		if (implantation == null) {
+			implantation = findChild(StencilParser.GLYPH).getText();
+		}
+		return implantation;
+	}
+
+	public List<Rule> getDefaults() {
+		return (List<Rule>) findChild(StencilParser.LIST, "Defaults");
+	}
+	
+	public List<Consumes> getGroups() {
+		if (groups == null) {groups = (List<Consumes>) findChild(StencilParser.LIST, "Consumes");}
+		return groups;
+	}
+
 	
 	public DisplayLayer getDisplayLayer() {return displayLayer;}
 	public void setDisplayLayer(DisplayLayer displayLayer) {this.displayLayer= displayLayer;}
-
-	public List<Consumes> getGroups() {return (List<Consumes>) getChild(1);}
-
-
 }

@@ -34,19 +34,21 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import static java.lang.String.format;
 
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
+import stencil.interpreter.Interpreter;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.Layer;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.*;
 import stencil.util.collections.ListSet;
 
 public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
@@ -102,6 +104,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	 * @param glyph
 	 * @param RuntimeException The glyph introduced does not update a prior glyph (ID matching is used to determine if something is an update)
 	 */
+	@SuppressWarnings("null")
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
@@ -121,39 +124,39 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public Collection<Guide2D> getGuides() {return guides.values();}
 
 	
-	public static DisplayLayer<?> instance(Layer l) {
-		String name = l.getName();
-		String implantation = l.getImplantation();
-		DisplayLayer layer = null;
+	public static DisplayLayer<?> instance(Layer layerDef) {
+		String name = layerDef.getName();
+		String implantation = layerDef.getImplantation();
+		DisplayLayer layer = new DisplayLayer(name);
+		Glyph2D prototype = null;
 		try {
 			if (implantation.equals("SHAPE")) {
-				layer =  new DisplayLayer(name);
-				layer.setPrototype(new Shape(layer, "PROTOTYPE"));
+				prototype = new Shape(layer, "PROTOTYPE");
 			} else if (implantation.equals("LINE")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Line(layer, "PROTOTYPE"));
+				prototype = new Line(layer, "PROTOTYPE");
 			} else if (implantation.equals("TEXT")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Text(layer, "PROTOTYPE"));
+				prototype = new Text(layer, "PROTOTYPE");
 			} else if (implantation.equals("PIE")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Pie(layer, "PROTOTYPE"));
+				prototype = new Pie(layer, "PROTOTYPE");
 			} else if (implantation.equals("IMAGE")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Image(layer, "PROTOTYPE"));
+				prototype = new Image(layer, "PROTOTYPE");
 			} else if (implantation.equals("POLY_LINE")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Poly.PolyLine(layer, "PROTOTYPE"));
+				prototype = new Poly.PolyLine(layer, "PROTOTYPE");
 			} else if (implantation.equals("POLYGON")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Poly.Polygon(layer, "PROTOTYPE"));
+				prototype = new Poly.Polygon(layer, "PROTOTYPE");
 			} else if (implantation.equals("ARC")) {
-				layer = new DisplayLayer(name);
-				layer.setPrototype(new Arc(layer, "PROTOTYPE"));
+				prototype = new Arc(layer, "PROTOTYPE");
 			} 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
+		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
 		
-		if (layer == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
+		try {
+			Tuple defaults = Interpreter.process(layerDef.getDefaults(), Tuples.EMPTY_TUPLE);
+			prototype = prototype.update(defaults);
+		}
+		catch (Exception e) {throw new RuntimeException(format("Error processing defaults on layer %1$s.", name), e);}
+		
+		layer.setPrototype(prototype);
 
 		return layer;
 	}

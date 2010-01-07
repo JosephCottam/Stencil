@@ -12,7 +12,7 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 
 	public SimplePrototype(String[] names) {this(Arrays.asList(names));}
 	public SimplePrototype(Collection<String> names) {
-		this((String[]) names.toArray(), TuplePrototypes.defaultTypes(names.size()));
+		this(names.toArray(new String[names.size()]), TuplePrototypes.defaultTypes(names.size()));
 	}
 
 	public SimplePrototype(String[] names, Class[] types) {this(Arrays.asList(names), Arrays.asList(types));}

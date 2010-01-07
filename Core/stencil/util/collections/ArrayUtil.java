@@ -18,6 +18,16 @@ public final class ArrayUtil {
 	    return result;
 	}
 
+	/**The index of the element in the list or -1 if it is not contained
+	 * in the list.  This should be used on unsorted lists (Arrays.binarySearch is much
+	 * faster for sorted lists of any size).
+	 */
+	public static <T> int indexOf(T element, T[] values) {
+		for (int i=0; i< values.length;i++) {
+			if (element == values[i] || (element != null && element.equals(values[i]))) {return i;}
+		}
+		return -1;
+	}
 	
 	/**List implementation backed by an array that cannot be re-sized.
 	 * This IS NOT an immutable, elements may still be set.  However, it
