@@ -40,7 +40,7 @@ options {
 @header{
   /**Takes operator references and creates operator instances out of them
    * 
-   * Operators can be based off o either operator templates or operator instances from
+   * Operators can be based off of either operator templates or operator instances from
    * an imported module.  If it is based on an operator template, the template is instantiated
    * and the operator reference is replaced with a new operator object that has
    * a body based on the template plus the specializer.  If the operator is

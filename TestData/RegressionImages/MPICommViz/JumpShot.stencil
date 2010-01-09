@@ -14,8 +14,8 @@ SKIP: 0
 STRICT: false
 
 external stream ranks(rank, label)
-external stream overheads(op, rank, cpu, start, end, skewedStart, skewedEnd, r,g,b)
-external stream trans(op, source, dest, start, end, skewedStart, skewedEnd, size, G, r,g,b) 
+external stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
+external stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
 
 order ranks > (overheads | trans)
 

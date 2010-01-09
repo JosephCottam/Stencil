@@ -56,20 +56,6 @@ public interface EnvironmentProxy {
 			return b.toString();
 		}
 	}
-
-	/**Environment that cannot be used for an environment operations.
-	 * This environment is used when processing defaults blocks.
-	 * Any referencing of the environment is an error in a defaults block,
-	 * since they are environment independent.
-	 */
-	public static final EnvironmentProxy ERROR_ENV = new EnvironmentProxy() {
-		public int currentIndex() {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-		public int frameRefFor(String name) {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-		public TuplePrototype get(int idx) {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-		public int getFrameIndex(String name) {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-		public boolean isFrameRef(String name) {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-		public EnvironmentProxy push(String label, TuplePrototype t) {throw new UnsupportedOperationException("Trying to employ an environment in an illegal context.");}
-	};
 	
 	public EnvironmentProxy push(String label, TuplePrototype t);
 	public boolean isFrameRef(String name);
@@ -181,7 +167,10 @@ public interface EnvironmentProxy {
 			
 			//Check for special cases where the environment doesn't matter...
 			Layer l= (Layer) t.getAncestor(StencilParser.LAYER);
-			if (l != null && c == null) {return ERROR_ENV;}
+			if (l != null && c == null) {
+				TuplePrototype p = new SimplePrototype();
+				return makeInitialEnv("", p,p,p);
+			}
 			
 			throw new RuntimeException("Found rule with unknown initial environment: " + t.toStringTree());
 		}

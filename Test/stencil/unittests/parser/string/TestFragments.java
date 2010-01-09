@@ -123,7 +123,14 @@ public class TestFragments extends TestCase {
 			
 		};
 		traverse(program, test);
-		
+	}
+	
+	public void testLiftConstantRules() throws Exception {
+		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
+		Adapter adapter = Adapter.INSTANCE;
+		Program program = ParseStencil.parse(source, adapter);
+		assertEquals("Incorrectly identified defaults count.", 1, program.getLayer("Nodes").getDefaults().size()); 
+		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Edges").getDefaults().size()); 
 	}
 	
 }

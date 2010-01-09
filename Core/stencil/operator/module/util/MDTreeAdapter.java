@@ -48,6 +48,16 @@ class MDTreeAdapter extends CommonTreeAdaptor {
 			return new SimplePrototype(names, types);
 		}
 		
+		public String getAttribute(String key) {
+			for (Object o: getChildren()) {
+				Tree t = (Tree) o;
+				if (key.equals(t.getText())) {
+					return t.getChild(0).getText();
+				}
+ 			}
+			return null;
+		}
+		
 		/**Complete if nothing depends on the operator specializer 
 		 * (indicated by a SPECIALIZATION_DEPENDENT_VALUE instead of a normal value).*/
 		public boolean isComplete() {

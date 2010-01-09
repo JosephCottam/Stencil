@@ -23,13 +23,13 @@ from Edges
 	(X,Y):* Ordering(ID2) -> Circular.Query(VALUE) -> (X,Y)
 
 layer Edges[LINE]
+default
+	STROKE_COLOR: @color(GRAY80, .8)
 from Edges 
 	ID: Concatenate(ID1,ID2) -> (VALUE)
 	(X.1, Y.1):* Nodes.Find(ID1) -> (X,Y)
 	(X.2, Y.2):* Nodes.Find(ID2) ->  (X,Y)
-	STROKE_COLOR: @color(GRAY80, .8)
 	STROKE_WEIGHT: .25
-
 
 operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)

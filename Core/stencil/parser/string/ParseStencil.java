@@ -148,7 +148,6 @@ public abstract class ParseStencil {
 		targets.setTreeAdaptor(treeAdaptor);
 		p = (Program) targets.downup(p);
 
-		
 		//Ensure the proper order blocks
 		treeTokens = new CommonTreeNodeStream(p);
 		EnsureOrders orders = new EnsureOrders(treeTokens);
@@ -181,7 +180,7 @@ public abstract class ParseStencil {
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
-
+		
 		//Add default specializers where required (yes, again)
 		defaultSpecializers.function(p);
 		
@@ -191,19 +190,16 @@ public abstract class ParseStencil {
 		defaultPack.setTreeAdaptor(treeAdaptor);
 		defaultPack.downup(p);
 		
-		
 		//Insert guide specializers
 		treeTokens = new CommonTreeNodeStream(p);
 		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
 		guideSpecailizers.setTreeAdaptor(treeAdaptor);
 		guideSpecailizers.downup(p);
 		
-		
 		//Ensure that auto-guide requirements are met
 		EnsureGuideOp ensure = new EnsureGuideOp(treeTokens,modules); 
 		ensure.setTreeAdaptor(treeAdaptor);		
 		p = (Program) ensure.transform(p);
-		
 		
 		//Prime tree nodes with operators from the modules cache
 		SetOperators set = new SetOperators(treeTokens, modules);
@@ -214,6 +210,7 @@ public abstract class ParseStencil {
 		ag.setTreeAdaptor(treeAdaptor);
 		p = (Program) ag.transform(p);
 		
+
 		treeTokens = new CommonTreeNodeStream(p);
 		TupleRefChain trc = new TupleRefChain(treeTokens);
 		trc.setTreeAdaptor(treeAdaptor);
@@ -229,7 +226,13 @@ public abstract class ParseStencil {
 		treeTokens = new CommonTreeNodeStream(p);
 		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
 		numeralize.setTreeAdaptor(treeAdaptor);
-		p = (Program) numeralize.downup(p);
+		p = (Program) numeralize.downup(p);		
+
+		//Move all constant rules up to the defaults section so they are only evaluated once.
+		treeTokens = new CommonTreeNodeStream(p);
+		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
+		sharedLifter.setTreeAdaptor(treeAdaptor);
+		p = (Program) sharedLifter.transform(p);
 		
 		validate(p);
 		

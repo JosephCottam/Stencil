@@ -2,7 +2,7 @@ STREAM: File
 NAME: EntityFeed
 HEADER: ID X Y
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
+SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
 STRICT: true
 
@@ -17,9 +17,9 @@ external stream EntityFeed(ID, X,Y)  /*Precomputed layout*/
 
 layer Nodes
 from EntityFeed
+	SIZE: 1
 	ID: Count("")
 	(X,Y) : Count("") -> Sub(_,1) -[v]> Layout(_) 
-	SIZE: 1
 
 operator Layout (i) -> (X,Y) 
 	all => (X,Y): Sqrt(i) -> Floor(_) -[shell]>

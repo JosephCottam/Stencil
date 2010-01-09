@@ -11,32 +11,32 @@ import Trigonometry
 external stream Degrees(Deg)
 
 layer DoubleLines[LINE]
+default
+  CAP1: "ARROW"
+  CAP2: "ARROW"
 from Degrees
   ID  : IDS("")
   X.1 : Cosine(Deg) -> Mult(_,-50)
   Y.1 : Sine(Deg) -> Mult(_,-50)
   X.2 : Cosine(Deg) -> Mult(_,50)
   Y.2 : Sine(Deg) -> Mult(_,50)
-  CAP1: "ARROW"
-  CAP2: "ARROW"
 from Degrees
   ID  : IDS("")
   X.1 : Add(90, Deg) -> Cosine(_) -> Mult(_,-50)
   Y.1 : Add(90, Deg) -> Sine(_) -> Mult(_,-50)
   X.2 : Add(90, Deg) -> Cosine(_) -> Mult(_,50)
   Y.2 : Add(90, Deg) -> Sine(_) -> Mult(_,50)
-  CAP1: "ARROW"
-  CAP2: "ARROW"
   STROKE_COLOR: @color(GRAY70)
 
 
 layer SingleLines1[LINE]
+default
+	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Cosine(Deg) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Sine(Deg) -> Mult(_,50) 
-	CAP2: "ARROW"
 	STROKE_COLOR: @color(RED)
 from Degrees
 	ID  : IDS("")
@@ -50,45 +50,41 @@ from Degrees
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(180, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(180, Deg) -> Sine(_) -> Mult(_,50) 
-	CAP2: "ARROW"
 	STROKE_COLOR: @color(CRIMSON)
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(270, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
-	CAP2: "ARROW"
 	STROKE_COLOR: @color(MAROON)
 
 
 layer SingleLines1[LINE]
+default
+	CAP1: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250, 0)
 	X.1 : Cosine(Deg) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Sine(Deg) -> Mult(_,50) 
-	CAP1: "ARROW"
 	STROKE_COLOR: @color(PURPLE)
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250, 0)
 	X.1 : Add(90, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(90, Deg) -> Sine(_) -> Mult(_,50) 
-	CAP1: "ARROW"
 	STROKE_COLOR: @color(VIOLET)
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250,0)
 	X.1 : Add(180, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(180, Deg) -> Sine(_) -> Mult(_,50) 
-	CAP1: "ARROW"
 	STROKE_COLOR: @color(PLUM)
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250,0)
 	X.1 : Add(270, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
-	CAP1: "ARROW"
 	STROKE_COLOR: @color(MediumPurple)
 
 operator IDS base Count

@@ -30,6 +30,7 @@ package stencil.display;
 
 import java.util.Iterator;
 import stencil.adapters.Glyph;
+import stencil.parser.tree.Layer;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
@@ -80,6 +81,7 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	 * This is derived directly from the implantation type.
 	 */
 	public TuplePrototype getPrototype();
+	public void updatePrototype(Layer layerDef);
 
 	/**Return a guide for the specified attribute.
 	 * @throws IllegalArgumentException The attribute named is either not valid for this layer (may be due to implantation type) 

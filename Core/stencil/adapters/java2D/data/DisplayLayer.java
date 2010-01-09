@@ -161,6 +161,15 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		return layer;
 	}
 	
+	public void updatePrototype(Layer layerDef) {
+		try {
+			Tuple defaults = Interpreter.process(layerDef.getDefaults(), Tuples.EMPTY_TUPLE);
+			prototypeGlyph = (T) prototypeGlyph.update(defaults);
+		}
+		catch (Exception e) {throw new RuntimeException(format("Error processing defaults on layer %1$s.", name), e);}		
+	}
+
+	
 	public void addLayerUpdateListener(LayerUpdateListener l) {updateListeners.add(l);}
 	
 	private void fireLayerUpdate(Rectangle2D pre, Rectangle2D post) {

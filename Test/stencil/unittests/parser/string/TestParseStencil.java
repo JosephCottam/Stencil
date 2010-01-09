@@ -67,6 +67,13 @@ public class TestParseStencil extends TestCase {
 	 * 
 	 * Throws an exception if any root has a child that does not identify the root as its parent.
 	 */
+	public final void ancestryEquals(Tree root) {
+		try {ancestryCheck(root);}
+		catch(AncestryException e) {
+			fail(e.getMessage());
+		}
+	}
+
 	public static final void ancestryCheck(Tree root) {
 		for (int i=0; i< root.getChildCount(); i++) {
 			Tree child = root.getChild(i);
@@ -75,11 +82,11 @@ public class TestParseStencil extends TestCase {
 		}
 	}
 
+
 	private static final class AncestryException extends RuntimeException {
 		public AncestryException(Tree child) {
 			super("Parent/Child mis-match at " + child.toStringTree());
 		}
-		
 	}
 	
 }

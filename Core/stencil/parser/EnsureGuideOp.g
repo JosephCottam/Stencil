@@ -32,7 +32,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
-	 superClass = TreeRewriteSequence;
+	superClass = TreeRewriteSequence;
 }
 
 @header{

@@ -63,4 +63,11 @@ public class Layer extends StencilTree {
 	
 	public DisplayLayer getDisplayLayer() {return displayLayer;}
 	public void setDisplayLayer(DisplayLayer displayLayer) {this.displayLayer= displayLayer;}
+
+	public Layer dupNode() {
+		Layer l = (Layer) super.dupNode();
+		l.displayLayer = this.displayLayer;
+		return l;
+	}
+
 }
