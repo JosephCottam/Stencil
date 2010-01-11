@@ -45,8 +45,9 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 			
 			try {
 				Environment env = Environment.getDefault(Canvas.global, View.global, source);
-				env = env.push(Tuples.EMPTY_TUPLE);	//TODO: Handle prefilter
-				env = env.push(Tuples.EMPTY_TUPLE); //TODO: Handle local
+				env = env.ensureCapacity(env.size() + 2 + rule.getAction().getDepth());
+				env.extend(Tuples.EMPTY_TUPLE);//TODO: Handle prefilter
+				env.extend(Tuples.EMPTY_TUPLE);//TODO: Handle local
 				
 				Tuple result = rule.apply(env);
 				Glyph2D newGlyph = glyph.update(result);

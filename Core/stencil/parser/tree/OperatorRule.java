@@ -65,12 +65,16 @@ public class OperatorRule extends StencilTree {
 	 */
 	public Tuple invoke(Environment env) throws Exception {
 		int ruleCount = 0;
-		String legendName = getParent().getText();
 		Tuple result = null;
 		for (Rule rule: getRules()) {
 			Tuple buffer;
-			try {buffer = rule.apply(env);}
-			catch (Exception e) {throw new RuntimeException(String.format("Error invoking sub rule %1$d on operator %2$s.", ruleCount, legendName),e);}
+			Environment ruleEnv = env.ensureCapacity(env.size() + rule.getAction().getDepth());
+			
+			try {buffer = rule.apply(ruleEnv);}
+			catch (Exception e) {
+				String operatorName = this.getAncestor(StencilParser.OPERATOR).getText();
+				throw new RuntimeException(String.format("Error invoking sub rule %1$d on operator %2$s.", ruleCount, operatorName),e);
+			}
 
 			if (buffer == null) {result = null; break;}
 			result= Tuples.merge(result, buffer);

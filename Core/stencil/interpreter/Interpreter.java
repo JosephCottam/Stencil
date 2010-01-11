@@ -64,8 +64,10 @@ public class Interpreter {
 		try {
 			for (Rule rule: rules) {
 				Tuple result;
+				int callDepth = rule.getAction().getDepth();
+				Environment callEnv = env.ensureCapacity(env.size() + callDepth);
 				
-				try {result = rule.apply(env);}
+				try {result = rule.apply(callEnv);}
 				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
 				
 				//TODO: Have rules throw exception (instead of return null)
@@ -95,11 +97,11 @@ public class Interpreter {
 				boolean matches;
 				Tuple prefilter, local, result;
 				
-				Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues());
+				Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues(),2); //Extend by two more: view and local
 				
 				try {prefilter = process(group.getPrefilterRules(), env);}
 				catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", layer.getName()),e);}
-				env = env.push(prefilter);
+				env.extend(prefilter);
 				
 				try {matches = group.matches(env);}
 				catch (Exception e) {throw new RuntimeException(format("Error processing predicates in layer %1$s", layer.getName()), e);}				
@@ -108,7 +110,7 @@ public class Interpreter {
 					
 					try {local = process(group.getLocalRules(), env);}
 					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}	
-					env = env.push(local);
+					env.extend(local);
 					
 					try {
 						result = process(group.getGlyphRules(), env);

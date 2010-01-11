@@ -68,7 +68,7 @@ public final class TupleRef extends Value {
 	 */
 	private final Object doRef(Tuple source, Atom ref) {
 		if (ref.isNumber()){
-			int val = ((StencilNumber) getValue()).getNumber().intValue();
+			int val = ((StencilNumber) ref).getNumber().intValue();
 			return source.get(val);
 		} else if (ref.isName()) {
 			return source.get(((Id) ref).getName());

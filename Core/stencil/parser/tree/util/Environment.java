@@ -43,46 +43,63 @@ public class Environment implements Tuple {
 	
 	private final Tuple[] frames;
 	private final TuplePrototype prototype;
+	private int size = 0;
 	
-	private Environment(int size) {
-		frames = new Tuple[size];
+	
+	private Environment(int capacity) {
+		frames = new Tuple[capacity];
 		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length, "Frame"));
 	}
 	
-	private Environment(Environment prior, Tuple update) {
-		Tuple[] source = prior.frames;
-		frames = new Tuple[source.length+1];
-		frames[source.length] = update;
-		System.arraycopy(source, 0, frames, 0, source.length);
-		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length, "Frame"));
-	}
-
-	public Environment push(Tuple t) {
-		return new Environment(this, t);
+	public Environment extend(Tuple t) {
+		if (size >= frames.length) {throw new RuntimeException("Attempt to over-extend environment");}
+		
+		frames[size] = t;
+		size ++;
+		return this;
 	}
 
 	public Tuple get(int idx) {
 		try {return frames[idx];}
-		catch (Exception e) {throw new Error("Error de-referencing environment of size " + frames.length, e);}
+		catch (Exception e) {throw new RuntimeException("Error de-referencing environment of size " + frames.length, e);}
 	}
 
 	public TuplePrototype getPrototype() {return prototype;}
-	public Object get(String name) throws InvalidNameException {
-		return Tuples.namedDereference(name, this);
-	}
+	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 	public boolean hasField(String name) {return getPrototype().contains(name);}
 
-	public int size() {return frames.length;}
+	public int size() {return size;}
+	public int capacity() {return frames.length;}
+
+	/**Returns an environment with the same contents but potentially different
+	 * capacity than the original.  If the requested capacity is the
+	 * same or less than the current capacity, the environment will be returned;
+	 * 
+	 * Otherwise, a new environment with at least the requested capacity is returned.
+	 * 
+	 * The environment size does not change, but the capacity does.
+	 */
+	public Environment ensureCapacity(int capacity) {
+		if (capacity <= size) {return this;}
+		
+		Environment env = new Environment(capacity);
+		System.arraycopy(frames, 0, env.frames, 0, size);
+		env.size = this.size;
+		return env;
+	}
 	
 	public boolean isDefault(String name, Object value) {return false;}
 
 	/**Create the default environment from the passed tuples.*/
 	public final static Environment getDefault(Tuple canvas, Tuple view, Tuple stream) {
-		Environment e = new Environment(DEFAULT_FRAME_SIZE);
+		return getDefault(canvas, view, stream, 0);
+	}
+	public final static Environment getDefault(Tuple canvas, Tuple view, Tuple stream, int additionalCapacity) {
+		Environment e = new Environment(DEFAULT_FRAME_SIZE + additionalCapacity);
 		e.frames[CANVAS_FRAME] = canvas;
 		e.frames[VIEW_FRAME] = view;
 		e.frames[STREAM_FRAME] = stream;
-
+		e.size = DEFAULT_FRAME_SIZE;
 		return e;
 	}
 }

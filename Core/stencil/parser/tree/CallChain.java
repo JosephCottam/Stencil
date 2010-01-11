@@ -43,7 +43,9 @@ public class CallChain extends StencilTree {
 	public CallChain(Token source) {super(source);}
 
 	public CallTarget getStart() {return (CallTarget) getChild(0);}
-
+	
+	/**How long is this call chain?*/
+	public int getDepth() {return Integer.parseInt(getChild(1).getText());}
 	
 	
 	/**Execute the call chain, all the way through the pack.
@@ -66,7 +68,7 @@ public class CallChain extends StencilTree {
 			Function func = (Function) target;
 			result = func.apply(env);
 			if (result == null) {return null;}
-			env = env.push(result);
+			env = env.extend(result);
 			target = ((Function) target).getCall();
 		}
 

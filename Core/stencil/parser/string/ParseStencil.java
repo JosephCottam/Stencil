@@ -228,13 +228,20 @@ public abstract class ParseStencil {
 		numeralize.setTreeAdaptor(treeAdaptor);
 		p = (Program) numeralize.downup(p);		
 
+		
+		//Annotate call chains with the environment size (optimizes memory allocation)
+		treeTokens = new CommonTreeNodeStream(p);
+		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
+		envSize.setTreeAdaptor(treeAdaptor);
+		p = (Program) envSize.downup(p);
+		validate(p);
+
 		//Move all constant rules up to the defaults section so they are only evaluated once.
 		treeTokens = new CommonTreeNodeStream(p);
 		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
 		sharedLifter.setTreeAdaptor(treeAdaptor);
 		p = (Program) sharedLifter.transform(p);
 		
-		validate(p);
 		
 		return p;
 	}

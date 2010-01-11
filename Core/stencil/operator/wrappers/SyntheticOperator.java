@@ -80,10 +80,10 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 		}
 
 		Tuple tuple = new PrototypedTuple(source.getArguments(), Arrays.asList(values));
-		Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
+		Environment env = Environment.getDefault(Canvas.global, View.global, tuple,1);	//Extra slot for the pre-filter tuple
 
 		//TODO: Handle local and prefitler!
-		env = env.push(Tuples.EMPTY_TUPLE);	//prefilter
+		env = env.extend(Tuples.EMPTY_TUPLE);	//prefilter
 		
 		OperatorRule action = matchingAction(env);
 
