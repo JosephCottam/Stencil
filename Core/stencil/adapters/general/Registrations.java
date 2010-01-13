@@ -48,13 +48,13 @@ public final class Registrations {
 	private Registrations() {/*Utility class.  Not instantiable.*/}
 
 	public static Point2D registrationToTopLeft(Registration registration, Point2D p, Dimension2D d) {
-		return registrationToTopLeft(registration, p.getX(), p.getY(), d.getHeight(), d.getWidth());
+		return registrationToTopLeft(registration, p.getX(), p.getY(), d.getWidth(), d.getHeight());
 	}
 
-	public static Point2D registrationToTopLeft(Registration registration, Point2D p, double h, double w) {
+	public static Point2D registrationToTopLeft(Registration registration, Point2D p, double w, double h) {
 		return registrationToTopLeft(registration, p.getX(), p.getY(), h, w);
 	}
-	public static Point2D registrationToTopLeft(Registration registration, double x, double y, double h, double w) {
+	public static Point2D registrationToTopLeft(Registration registration, double x, double y, double w, double h) {
 		switch(registration) {
 			case TOP_LEFT: 		return new Point2D.Double(x, 	 y);
 			case TOP:			return new Point2D.Double(x-w/2, y);
@@ -92,7 +92,7 @@ public final class Registrations {
 	/**Assuming the point represents the top-left of a rectangle with width/height specified,
 	 * give the relative point indicated by registration.
 	 */
-	public static Point2D topLeftToRegistration(Registration registration, Point2D source, double h, double w) {
+	public static Point2D topLeftToRegistration(Registration registration, Point2D source, double w, double h) {
 		Rectangle2D r = new Rectangle2D.Double(source.getX(), source.getY(), h,w);
 		return topLeftToRegistration(registration, r);
 	}

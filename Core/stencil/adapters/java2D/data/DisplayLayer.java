@@ -73,7 +73,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		if (index.containsKey(id)) {
 			T old = index.get(id);
 			rv = old;
-			if (values.getPrototype().size()>1) {
+			if (values.size()>1) {
 				rv = (T) rv.update(values);
 				index.put(id,rv);
 				fireLayerUpdate(old.getBoundsReference(), rv.getBoundsReference());

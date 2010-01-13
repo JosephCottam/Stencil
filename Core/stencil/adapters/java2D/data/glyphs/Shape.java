@@ -107,11 +107,8 @@ public class Shape extends Filled {
 		size = switchCopy(source.size, safeGet(option, SIZE));
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
 		
-		Point2D topLeft = mergeRegistrations(source, option, size, size, X, Y);
-		Point2D reg = Registrations.topLeftToRegistration(registration, topLeft.getX(), topLeft.getY(), size, size);
-		
-		regX = reg.getX();
-		regY = reg.getY();
+		regX = switchCopy(source.regX, safeGet(option, X));
+		regY = switchCopy(source.regY, safeGet(option, Y));		
 
 		java.awt.Shape glyph = createShape();
 		glyphRef = new SoftReference(glyph);

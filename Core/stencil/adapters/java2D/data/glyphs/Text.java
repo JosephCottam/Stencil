@@ -48,8 +48,13 @@ public final class Text extends Basic {
 		public LayoutDescription(String[] lines) {
 			this.lines = lines;
 			dims = new DoubleDimension[lines.length];
-		}		
+		}
+		
+		public String toString() {
+			return String.format("%1$s[fw=%2$f, fh=%3$f]", super.toString(), fullWidth, fullHeight);
+		}
 	}
+	
 	protected static final TuplePrototype PROTOTYPE;
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
@@ -159,16 +164,23 @@ public final class Text extends Basic {
 				ld.fullHeight = switchCopy(source.horizontalBounds.getHeight(), safeGet(option, HEIGHT));
 			}
 			
-			Point2D topLeft = mergeRegistrations(source, option, ld.fullWidth, ld.fullHeight, X, Y);
+			double x = switchCopy((Double) source.get(X.name), safeGet(option, X));
+			double y = switchCopy((Double) source.get(Y.name), safeGet(option, Y));		
+			Point2D reg = new Point2D.Double(x,y);
+			
+			Point2D topLeft = Registrations.registrationToTopLeft(registration, x,y, ld.fullWidth, ld.fullHeight);
 			horizontalBounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
-			Point2D reg = Registrations.topLeftToRegistration(registration, horizontalBounds);
-
+			
 			GeneralPath renderedText = renderText();
+			renderedTextRef = new SoftReference(renderedText);
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
 			layout.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
-			super.updateBoundsRef(layout.getBounds2D());
-			renderedTextRef = new SoftReference(renderedText);
+			Rectangle2D layoutBounds = layout.getBounds2D();
+			if (layoutBounds.isEmpty()) {
+				layoutBounds = new Rectangle2D.Double(reg.getX(), reg.getY(), 0d, 0d);
+			}
+			super.updateBoundsRef(layoutBounds);
 		}
 	}
 	
@@ -230,12 +242,13 @@ public final class Text extends Basic {
 		//The following guarantees that the registration point is at the same spot that it would have
 		//been had it been rendered exactly under the view transform
 		Point2D p = Registrations.topLeftToRegistration(registration, horizontalBounds);
+		
 		Point2D p2 = new Point2D.Double();
 		fixScale(g);
 		
 		base.transform(p,p2);	//Figure out where to render
 		try {g.getTransform().inverseTransform(p2, p2);}
-		catch (Exception e) {p2 = p;}		
+		catch (Exception e) {p2 = p;}	
 		g.translate(p2.getX(), p2.getY());
 		
 		GeneralPath renderedText = renderedTextRef.get();

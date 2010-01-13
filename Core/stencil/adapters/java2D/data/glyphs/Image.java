@@ -88,7 +88,7 @@ public final class Image extends Basic {
 		width = WIDTH.defaultValue;
 		height = HEIGHT.defaultValue;
 
-		Point2D topLeft = Registrations.registrationToTopLeft(registration, X.defaultValue, Y.defaultValue, height, width);
+		Point2D topLeft = Registrations.registrationToTopLeft(registration, X.defaultValue, Y.defaultValue, width, height);
 		
 		super.updateBoundsRef(getBounds(topLeft));
 	}
@@ -116,7 +116,10 @@ public final class Image extends Basic {
 		width = switchCopy(source.width, safeGet(option, WIDTH));
 		height = switchCopy(source.height, safeGet(option, HEIGHT));
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
-		Point2D topLeft = mergeRegistrations(source, option, width, height, X, Y);
+		
+		Double x = switchCopy(source.bounds.getX(), safeGet(option, X));
+		Double y = switchCopy(source.bounds.getY(), safeGet(option, Y));
+		Point2D topLeft = new Point2D.Double(x,y);
 
 		super.updateBoundsRef(getBounds(topLeft));
 	}

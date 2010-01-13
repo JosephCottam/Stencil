@@ -135,7 +135,7 @@ public final class Line extends Stroked {
 		y2 = switchCopy(source.y2, safeGet(option, Y2));
 		
 		cap1 = switchCopy(source.cap1, safeGet(option, CAP1));
-		cap2 = switchCopy(source.cap1, safeGet(option, CAP2));
+		cap2 = switchCopy(source.cap2, safeGet(option, CAP2));
 		
 		scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
 		

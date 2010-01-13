@@ -135,7 +135,9 @@ public final class Pie extends Stroked {
 			slice = switchCopy(source.slice, safeGet(option, SLICE));
 		}
 		
-		Point2D topLeft = mergeRegistrations(source, option, size, size, X, Y);
+		Double x = switchCopy(source.bounds.getX(), safeGet(option, X));
+		Double y = switchCopy(source.bounds.getY(), safeGet(option, Y));
+		Point2D topLeft = new Point2D.Double(x,y);
 		
 		arc = Pies.makeSlice(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
 		outline = Pies.makePieOutline(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);

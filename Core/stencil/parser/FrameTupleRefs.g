@@ -93,7 +93,8 @@ topdown: action | predicate;
 predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
 
 action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
-
+	catch [EnvironmentProxy.FrameException fe] {throw new RuntimeException("Error framing rule: " + c.toStringTree(), fe);}
+	
 callTarget[EnvironmentProxy env] 
   : ^(f=FUNCTION s=. ^(LIST value[env]*) c=. callTarget[extend(env, $c, $f, modules)])
   | ^(PACK value[env]+);

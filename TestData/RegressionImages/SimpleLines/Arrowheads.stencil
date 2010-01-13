@@ -29,15 +29,14 @@ from Degrees
   STROKE_COLOR: @color(GRAY70)
 
 
-layer SingleLines1[LINE]
-default
-	CAP2: "ARROW"
+layer SingleLines2[LINE]
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Cosine(Deg) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Sine(Deg) -> Mult(_,50) 
 	STROKE_COLOR: @color(RED)
+	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
@@ -45,18 +44,21 @@ from Degrees
 	Y.2 : Add(90, Deg) -> Sine(_) -> Mult(_,50) 
 	CAP2: "ARROW"
 	STROKE_COLOR: @color(FireBrick)
+	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(180, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(180, Deg) -> Sine(_) -> Mult(_,50) 
 	STROKE_COLOR: @color(CRIMSON)
+	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(270, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
 	STROKE_COLOR: @color(MAROON)
+	CAP2: "ARROW"
 
 
 layer SingleLines1[LINE]

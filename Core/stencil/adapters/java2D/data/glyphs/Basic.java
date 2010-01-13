@@ -33,7 +33,6 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -281,30 +280,5 @@ public abstract class Basic implements Glyph2D {
 
 		return fullName.substring(baseName(fullName).length());
 	}
-	
-	/**Given two registration and point descriptions (potentially), what should the top-left
-	 * of a new glyph be if it were the merge of source and option?
-	 *  
-	 * @param targetWidth The width of the newly formed thing
-	 * @param targetHeight The height of the newly formed thing
-	 */
-	public static Point2D mergeRegistrations(Basic source, Tuple option, double targetWidth, double targetHeight, Attribute<Double> X, Attribute<Double> Y) {
-		double x = switchCopy(Converter.toDouble(source.get(X.name)), safeGet(option, X));
-		double y = switchCopy(Converter.toDouble(source.get(Y.name)), safeGet(option, Y));			
-		Registrations.Registration reg = switchCopy(source.registration, safeGet(option, REGISTRATION));
-		
-		//If registrations are split between before and after AND the coordinates are also split, take the old partial value to the new registration system
-		if (source.registration != reg) {
-			if (option.getPrototype().contains(X.name) && !option.getPrototype().contains(Y.name)) {	
-				y = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getY();	
-			} else if (!option.getPrototype().contains(X.name) && option.getPrototype().contains(Y.name)) {
-				x = Registrations.topLeftToRegistration(reg, source.getBoundsReference()).getX();
-			}
-			//Any other case and both X and Y came from the same source, so it will be registration consistent.
-		}		
 
-		//Knowing the registration coordiantes, what is the new top left?
-		Point2D topLeft = Registrations.registrationToTopLeft(reg, x,y, targetHeight, targetWidth);
-		return topLeft;
-	}
 }

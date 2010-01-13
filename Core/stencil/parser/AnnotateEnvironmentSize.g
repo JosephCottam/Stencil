@@ -44,7 +44,7 @@ options {
 }
 
 
-topdown: ^(c=CALL_CHAIN ct=callTarget[0])
+topdown: ^(c=CALL_CHAIN ct=callTarget[0] .?) //Will accept a call chain with or without existing size annotation
 			-> ^(CALL_CHAIN callTarget ^(NUMBER[Integer.toString($ct.depth)]));
 
 callTarget[int d] returns [int depth]

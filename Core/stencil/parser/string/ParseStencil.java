@@ -177,6 +177,14 @@ public abstract class ParseStencil {
 		opTemplates.setTreeAdaptor(treeAdaptor);
 		opTemplates.downup(p);
 
+		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
+		treeTokens = new CommonTreeNodeStream(p);
+		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
+		envSize.setTreeAdaptor(treeAdaptor);
+		p = (Program) envSize.downup(p);
+		validate(p);
+
+		
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.downup(p);
@@ -229,9 +237,7 @@ public abstract class ParseStencil {
 		p = (Program) numeralize.downup(p);		
 
 		
-		//Annotate call chains with the environment size (optimizes memory allocation)
-		treeTokens = new CommonTreeNodeStream(p);
-		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
+		//Since some transformations change chain lengths, this must be re-run.
 		envSize.setTreeAdaptor(treeAdaptor);
 		p = (Program) envSize.downup(p);
 		validate(p);

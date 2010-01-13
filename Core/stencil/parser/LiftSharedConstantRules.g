@@ -47,11 +47,15 @@ options {
 
 @header {
 	package stencil.parser.string;
-	import stencil.parser.tree.*;
+
 	import java.util.Set;
 	import java.util.HashSet;
 	import java.util.ArrayList;
+
 	import stencil.util.MultiPartName;
+	import stencil.tuple.prototype.TuplePrototypes;		
+	import stencil.parser.tree.*;
+	import stencil.parser.ParserConstants;	
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
 	import static stencil.operator.module.FacetData.FUNCTION_ATTRIBUTE;
@@ -93,6 +97,7 @@ options {
 		
 		for (Rule candidate: ruleSet.get(0)) {
 			boolean alwaysPresent = true;
+			if (selectorRule(candidate)) {continue;}
 			for (List<Rule> rules: ruleSet) {
 				boolean present = false;
 				for (Rule other: rules) {
@@ -125,6 +130,14 @@ options {
 		}
 		return constants;
 	}
+
+	/**Is this the selector rule?  The selector rule cannot be lifted.*/	
+	private boolean selectorRule(Rule candidate) {
+   		for (String name: TuplePrototypes.getNames(candidate.getTarget().getPrototype())) {
+   			if (name.equals(ParserConstants.GLYPH_ID_FIELD)) {return true;}
+   		}
+   		return false;
+   	}
 	
     private boolean isConstant(Tree rule) {
        	int children = rule.getChildCount();
