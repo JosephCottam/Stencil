@@ -6,21 +6,21 @@
 			<Opt specializer="[1 .. n]" />
 		</Opts>
 		<Facets>
-			<Facet name="Map" type="PROJECT" function="false" prototype="VALUE"/> 
-			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/> 
+			<Facet name="map" type="PROJECT" function="false" prototype="VALUE"/> 
+			<Facet name="query" type="PROJECT" function="false" prototype="VALUE"/> 
 		</Facets>
 	</Defaults>
 	
 	<Operator name="Mapping">
-		<Facet name="Put" type="PROJECT" function="false" prototype="%"/> 
-		<Facet name="Map" type="PROJECT" function="false" prototype="%"/> 
-		<Facet name="Query" type="PROJECT" function="false" prototype="%"/> 
+		<Facet name="put" type="PROJECT" function="false" prototype="%"/> 
+		<Facet name="map" type="PROJECT" function="false" prototype="%"/> 
+		<Facet name="query" type="PROJECT" function="false" prototype="%"/> 
 	</Operator>
 
 	<Operator name="Rank">
-		<Facet name="Map" type="BOTH" function="false" prototype="VALUE"/> 
-		<Facet name="Query" type="BOTH" function="false" prototype="VALUE"/>
-		<Facet name="Guide" type="BOTH" function="false" prototype="VALUE"/>
+		<Facet name="map" type="BOTH" function="false" prototype="VALUE"/> 
+		<Facet name="query" type="BOTH" function="false" prototype="VALUE"/>
+		<Facet name="guide" type="BOTH" function="false" prototype="VALUE"/>
 	</Operator>
 
 </ModuleData>

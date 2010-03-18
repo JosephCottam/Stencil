@@ -1,0 +1,14 @@
+name: StencilUtil 
+targetClass: stencil.operator.module.provided.StencilUtil
+description: Utilities to manipulate the tuple data representation.
+
+defaults:
+  defaultSpecializer: !spec "[1 .. n]"
+  facets:
+    - {name: map, function: false, type: CATEGORIZE}
+    - {name: query, function: false, type: CATEGORIZE}
+    - {name: stateID, function: false, type: CATEGORIZE}
+
+operators:
+  - name: EchoCategorize
+  - name: EchoContinuous

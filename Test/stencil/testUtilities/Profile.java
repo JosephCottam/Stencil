@@ -39,7 +39,7 @@ public class Profile {
 		String profileProperties = Profile.class.getResource("Profile.properties").getFile();
 
 		
-		ImageTest test = new SquareShells(new String[]{profileProperties});
+		ImageTest test = new Sourceforge(new String[]{profileProperties});
 		
 		TestRecord r = test.getTestRecord();
 		

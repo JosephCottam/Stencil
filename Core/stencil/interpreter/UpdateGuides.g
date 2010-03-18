@@ -33,7 +33,7 @@
 tree grammar UpdateGuides;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = StencilTree;	
+	ASTLabelType = CommonTree;	
 	filter = true;
 }
 
@@ -42,102 +42,47 @@ options {
 	
 	import java.util.Arrays;
 	import java.util.ArrayList;
+	import java.lang.Iterable;
 	
-	import stencil.util.AutoguidePair;
 	import stencil.parser.tree.*;	
 	import stencil.util.MultiPartName;
 	import stencil.display.*;
 	import stencil.operator.module.*;
 	import stencil.tuple.prototype.*;
-	import stencil.tuple.prototype.TuplePrototype;
+	import stencil.tuple.Tuple;
+	import stencil.tuple.Tuples;
+	import stencil.interpreter.guide.SampleSeed;
 	
 }
 
 @members{
 	private StencilPanel panel; //Panel to take elements from
 	
-	private ModuleCache cache;
-		
 	public void updateGuides(StencilPanel panel) {
 		this.panel = panel;
 				
 		downup(panel.getProgram().getCanvasDef().getGuides());
 	}
 	
-	//TODO: Remove when all tuple references are positional
-	public void setModuleCache(ModuleCache c) {this.cache = c;}
-
-	/**Update an actual guide on the current layer using the passed panel.*/
-    private void update(String layerName, String attribute, List<Object[]> categories, List<Object[]> results) {
-    	try {
-       		List<AutoguidePair> pairs = zip(categories, results);
-       		DisplayLayer l = panel.getLayer(layerName);
-       		DisplayGuide g = l.getGuide(attribute);
-       		g.setElements(pairs);
-    	} catch (Exception e) {
-    		throw new RuntimeException(String.format("Error creating guide for attribute \%1\$s", attribute), e);
-    	}
-   	}
-	
-	/**Turn a pair of lists into a list of AutoguidePairs.*/
-    private List<AutoguidePair> zip(List<? extends Object[]> categories, List<? extends Object[]> results) {
-		assert categories.size() == results.size() : "Category and result lists must be of the same length";
-		AutoguidePair[] pairs = new AutoguidePair[categories.size()]; 
+	private void apply(Guide g) {
+		Specializer details = g.getSpecializer();
+		SampleSeed seed = g.getSeedOperator().getSeed();
+		List<Tuple> sample, projection, pairs, results;
 		
-		for (int i=0; i < categories.size(); i++) {
-   			pairs[i] = new AutoguidePair<Object, Object>(categories.get(i), results.get(i));
-		}
-		return Arrays.asList(pairs);	
-	}	
-
-	private final TuplePrototype getPrototype(Function f) {
-		MultiPartName name = new MultiPartName(f.getName());
-		Specializer spec = f.getSpecializer();
 		try {
-   			Module m = cache.findModuleForOperator(name.prefixedName()).module;
-   			OperatorData ld = m.getOperatorData(name.getName(), spec);
-   			FacetData fd = ld.getFacetData("Query");//TODO: This is not always query...we need to add guide facet data
-   			assert fd.getPrototype() != null : "Unexpected null prototype tuple.";
-   			return fd.getPrototype();
-   		} catch (Exception e) {throw new RuntimeException("Error Specailizing", e);}
-	}
-	
-	private final List<Object[]> invokeGuide(Function f, List<Object[]> vals, TuplePrototype prototype) {
-		//TODO: Remove prototype call when numeralize works...
-    List<String> names;
-    if (prototype != null) {names = Arrays.asList(TuplePrototypes.getNames(prototype));}
-    else {names = new ArrayList();}
-    return f.getOperator().guide(f.getArguments(), vals, names);
-	}
-	
-  	private final List<Object[]> packGuide(Pack p, List<Object[]> vals, TuplePrototype prototype) {
-		Object[][] results = new Object[vals.size()][];
+			sample = g.getSampleOperator().sample(seed, details);
+			projection = Interpreter.processAll(sample, g.getGenerator());
+		} catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
 		
-		int i=0;
-		for (Object[] val: vals) {
-			results[i] = new Object[p.getArguments().size()];
-			int j=0;
-			Value arg = p.getArguments().get(j); //TODO: Really need to handle the case where chain is setting more than one value
-			
-   	  if (arg instanceof TupleRef) {
-   	    int idx = ((TupleRef) arg).toNumericRef(TuplePrototypes.getNames(prototype)); //TODO: Remove prototype call when numeralize works
-        results[i][j] = val[idx]; 
-   	  }	else {results[i][j] = arg.getValue();}
-   			i++;
-		}
-		return Arrays.asList(results);
+		try {results = Interpreter.processAll(projection, g.getRules());}
+		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
+		
+		DisplayLayer layer = panel.getLayer(g.getLayer());	   
+		DisplayGuide guide = layer.getGuide(g.getAttribute());
+		//Check for null only required as long as guides are run in separate thread.  Can be removed when scheduling is improved.
+		if (guide != null) {guide.setElements(results);}
 	}
+
 }
 
-topdown: ^(att=GUIDE layer=ID type=. spec=. rules=. callChain[$layer.text, $att.text]); 
-	
-callChain[String layerName, String att]: ^(CALL_CHAIN invoke[layerName, att]);
-invoke[String layerName, String att]
-	@init{List<Object[]> inputs = null;}
-	: ^(f=FUNCTION {inputs = invokeGuide((Function) f, null, null);} . . . target[layerName, att, inputs, inputs, getPrototype((Function) f)]);
-	
-//TODO: Remove prototype call when numeralize works
-target[String layerName, String att, List<Object[\]> inputs, List<Object[\]> vals, TuplePrototype prototype]  //TODO: Remove prototype when all tuple-references are positional
-	: ^(f=FUNCTION . . . target[layerName, att, inputs, invokeGuide((Function) f, vals, prototype), getPrototype((Function) f)])
-	| ^(p=PACK .) {update(layerName, att, inputs, packGuide((Pack) p, vals, prototype));};
-
+topdown: ^(g=GUIDE .*) {apply((Guide) g);};

@@ -6,9 +6,9 @@
 			<Opt specializer="[1 .. n]" />
 		</Opts>
 		<Facets>
-			<Facet name="Map"   type="PROJECT" function="false" prototype="VALUE"/>
-			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/>
-			<Facet name="Guide" type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="map"   type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="query" type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="guide" type="PROJECT" function="false" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 

@@ -66,6 +66,8 @@ public final class Pie extends Stroked {
 	
 	
 	static {
+		ATTRIBUTES.add(X);
+		ATTRIBUTES.add(Y);
 		ATTRIBUTES.add(PERCENT);
 		ATTRIBUTES.add(SLICE);
 		ATTRIBUTES.add(FIELD);

@@ -33,6 +33,7 @@ public abstract class ImageTest {
 	}
 
 	public void testPNG() throws Exception {
+		setUp();
 		if (testPNG.exists()) {testPNG.delete();}
 		if (deltaPNG.exists()) {deltaPNG.delete();}
 
@@ -42,6 +43,7 @@ public abstract class ImageTest {
 	}
 	
 	public void testTXT() throws Exception {
+		setUp();
 		if (testTXT.exists()) {testTXT.delete();}
 
 		stencil.explore.ui.Batch.batchInvoke(record.getTextCommand());

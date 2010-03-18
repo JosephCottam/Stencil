@@ -34,11 +34,13 @@ import stencil.operator.module.Module;
 import stencil.operator.module.ModuleData;
 import stencil.operator.module.provided.Average;
 import stencil.operator.module.util.ModuleDataParser;
+import stencil.operator.util.Invokeable;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
+import stencil.tuple.Tuple;
 
 public class TestMean extends TestCase {
-	final  Module average;
+	final Module average;
 
 	public TestMean() throws Exception {
 		ModuleData MD = ModuleDataParser.parse("./Core/stencil/operator/module/provided/Average.xml");
@@ -48,6 +50,8 @@ public class TestMean extends TestCase {
 	public void testFullRange() throws Exception {
 		Specializer spec = ParseStencil.parseSpecializer("[1..n]");
 		StencilOperator meaner = average.instance("Mean", spec);
+		Invokeable<Tuple> map = meaner.getFacet(StencilOperator.MAP_FACET);
+		Invokeable<Tuple> query = meaner.getFacet(StencilOperator.QUERY_FACET);
 		
 		int count =0;
 		double sum =0;
@@ -55,15 +59,17 @@ public class TestMean extends TestCase {
 		for (int i=0; i < 1000; i++) {
 			sum = sum+i;
 			count++;
-			meaner.map(i);
-			assertEquals(sum/count, meaner.query().get(0));			
+			map.invoke(new Object[]{i});
+			assertEquals(sum/count, query.invoke(new Object[0]).get(0));			
 		}
 	}
 	
 	public void testSplitFullRange() throws Exception {
 		Specializer spec = ParseStencil.parseSpecializer("[v|1..n]");
 		StencilOperator meaner = average.instance("Mean", spec);
-		
+		Invokeable<Tuple> map = meaner.getFacet(StencilOperator.MAP_FACET);
+		Invokeable<Tuple> query = meaner.getFacet(StencilOperator.QUERY_FACET);
+
 		String[] splits = new String[]{"One", "Two", "Three"};
 		
 		for (String split: splits) {
@@ -72,8 +78,9 @@ public class TestMean extends TestCase {
 			for (int i=0; i<100; i++) {
 				sum = sum+i;
 				count++;
-				meaner.map(split, i);
-				assertEquals(sum/count, meaner.query(split).get(0));							
+				map.invoke(new Object[]{split, i});
+				assertEquals(sum/count, query.invoke(new Object[]{split}).get(0));			
+
 			}
 		}
 	}

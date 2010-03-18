@@ -1,14 +1,11 @@
 package stencil.parser.tree;
 
-import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
-import static stencil.parser.ParserConstants.ITERATE_BLOCK_TAG;
-import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
-import static stencil.parser.ParserConstants.QUERY_BLOCK_TAG;
+import static stencil.parser.ParserConstants.INIT_FACET;
+import static stencil.parser.ParserConstants.MAIN_FACET;
+import static stencil.parser.ParserConstants.QUERY_FACET;
 
+import java.util.Map;
 import org.antlr.runtime.Token;
-
-import stencil.util.ANTLRTree;
-import stencil.util.ANTLRTree.NameNotFoundException;
 
 /**In a Python group, there may be more than one block of executable
  * code.  Each of these is a Facet...captured here!
@@ -22,12 +19,7 @@ public final class PythonFacet extends StencilTree {
 	protected Yields getYields() {return (Yields) getChild(0);}
 
 	/**What annotations were included?*/
-	public List<Annotation> getAnnotations() {return (List<Annotation>) getChild(1);}
-	
-	/**Get a particular annotations value.*/
-	public String getAnnotation(String name) throws NameNotFoundException {
-		return ANTLRTree.search(getAnnotations(), name).getChild(0).getText();
-	}
+	public Map<String, Atom> getAnnotations() {return new MapEntry.MapList((List) getChild(1));}
 	
 	/**What is the facet body?  This is the actual executable code.*/
 	public String getBody() {return getChild(2).getText();}
@@ -42,9 +34,8 @@ public final class PythonFacet extends StencilTree {
 	public TuplePrototype getResults() {return getYields().getOutput();}
 
 	//Blocks to test for special cases...
-	public boolean isInit() {return token.getText().endsWith(INIT_BLOCK_TAG);}
-	public boolean isMain() {return token.getText().endsWith(MAIN_BLOCK_TAG);}
-	public boolean isQuery() {return token.getText().endsWith(QUERY_BLOCK_TAG);}
-	public boolean isIterate() {return token.getText().endsWith(ITERATE_BLOCK_TAG);}
+	public boolean isInit() {return token.getText().endsWith(INIT_FACET);}
+	public boolean isMain() {return token.getText().endsWith(MAIN_FACET);}
+	public boolean isQuery() {return token.getText().endsWith(QUERY_FACET);}
 	
 }

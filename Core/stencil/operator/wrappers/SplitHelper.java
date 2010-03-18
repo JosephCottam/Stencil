@@ -2,6 +2,10 @@ package stencil.operator.wrappers;
 
 import stencil.tuple.Tuple;
 import stencil.operator.StencilOperator;
+import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.util.Invokeable;
+import stencil.operator.util.MethodInvokeFailedException;
 import stencil.parser.tree.Split;
 import stencil.parser.tree.Value;
 
@@ -12,6 +16,7 @@ import java.util.HashMap;
 public abstract class SplitHelper implements StencilOperator {
 	protected StencilOperator operator;
 	protected Split split;
+	protected OperatorData operatorData;
 
 	/**Handle unordered split cases (default case).*/
 	public static class UnorderedHelper extends SplitHelper {
@@ -19,20 +24,14 @@ public abstract class SplitHelper implements StencilOperator {
 		
 		public UnorderedHelper(Split split, StencilOperator operator) {super(split, operator);}
 		
-		public Tuple map(Object... args) {
+		public Tuple doSplit(String facet, Object[] args) {
 			Object key = getKey(args);
 			Object[] newArgs = getArgs(args);
 			StencilOperator op = getOp(key);
-			return op.map(newArgs);
+			Invokeable<Tuple> inv = op.getFacet(facet);
+			return inv.invoke(newArgs);
 		}
-		
-		public Tuple query(Object...args) {
-			Object key = getKey(args);
-			Object[] newArgs = getArgs(args);
-			StencilOperator op = getOp(key);
-			return op.query(newArgs);
-		}
-		
+				
 		/**Check if the key has been seen before.
 		 * Return the operator used on that occasion if it 
 		 * has been, otherwise create a new base-operator duplicate.
@@ -56,18 +55,8 @@ public abstract class SplitHelper implements StencilOperator {
 		public OrderedHelper(Split split, StencilOperator operator) {
 			super(split, operator);
 		}
-		
-		public Tuple map(Object...args) {
-			Object[] newArgs = doSplit(args);
-			return operator.map(newArgs);
-		}
-		
-		public Tuple query(Object...args) {
-			Object[] newArgs = doSplit(args);			
-			return operator.query(newArgs);
-		}
-		
-		private Object[] doSplit(Object... args) {
+				
+		public Tuple doSplit(String facet, Object[] args) {
 			Object key = getKey(args);
 			Object[] newArgs = getArgs(args);
 			if (!key.equals(oldKey)) {
@@ -75,15 +64,45 @@ public abstract class SplitHelper implements StencilOperator {
 				catch (Exception e) {throw new Error("Error creating new split operator instance.", e);}
 				oldKey = key;
 			}
-			return newArgs;
+			Invokeable<Tuple> inv = operator.getFacet(facet);
+			return inv.invoke(newArgs);
 		}
 		
+	}
+	
+	private static class SplitTarget implements Invokeable<Tuple> {
+		final SplitHelper helper;
+		final String facet;
+		
+		public SplitTarget(SplitHelper helper, String facet) {
+			this.helper = helper;
+			this.facet = facet;
+		}
+		
+		public Tuple invoke(Object[] arguments)
+				throws MethodInvokeFailedException {
+			return helper.doSplit(facet, arguments);
+		}
+		public Object getTarget() {return this;}
 	}
 	
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
 		this.operator = operator;
+		MutableOperatorData opData = new MutableOperatorData(operator.getOperatorData()); 
+		this.operatorData = opData;
+		opData.addAttribute(OperatorData.FUNCTION_KEY, OperatorData.FALSE);
 	}
+	
+	public Invokeable getFacet(String facet) {
+		try {operator.getFacet(facet);}	
+		catch (Exception e) {throw new RuntimeException("Facet error intializing split for " + operator.getName() + "." + facet);}
+		
+		SplitTarget target = new SplitTarget(this, facet); 
+		return target;
+	}
+	
+	public OperatorData getOperatorData() {return operatorData;}
 	
 	public String getName() {
 		StringBuilder b = new StringBuilder(operator.getName());
@@ -104,7 +123,9 @@ public abstract class SplitHelper implements StencilOperator {
 		System.arraycopy(args, 1, newArgs, 0, newArgs.length);
 		return newArgs;
 	}
-
+	
+	protected abstract Tuple doSplit(String key, Object[] args);
+	
 	/**Returns the first item from the list.  This is assumed to be the split key.*/
 	//final because it is a utility method
 	protected static final Object getKey(Object... args) {return args[0];}

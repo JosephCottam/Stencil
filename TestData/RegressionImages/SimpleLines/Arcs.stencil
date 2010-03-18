@@ -16,7 +16,7 @@ from LineSource
 	Y.1: -5
 	Y.2: 10
 	ARC_HEIGHT: 20
-	STROKE_COLOR: @color(GRAY80)
+	STROKE_COLOR: @Color{GRAY80}
 	STROKE_WEIGHT: 3
 
 layer Horizontal[ARC]
@@ -27,7 +27,7 @@ from LineSource
 	X.1: -5
 	X.2: 10
 	ARC_HEIGHT: 50
-	STROKE_COLOR: @color(GRAY80)
+	STROKE_COLOR: @Color{GRAY80}
 	STROKE_WEIGHT: 3
 
 
@@ -38,7 +38,7 @@ from LineSource
 	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> Mult(V, 2) -> VALUE
 	Y.1: 40
 	Y.2: 50
-	STROKE_COLOR: @color(GRAY80)
+	STROKE_COLOR: @Color{GRAY80}
 	STROKE_WEIGHT: 3
 
 operator Spacing (ID) -> (V) 

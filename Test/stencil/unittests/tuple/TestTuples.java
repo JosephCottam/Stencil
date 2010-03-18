@@ -47,9 +47,9 @@ public class TestTuples extends TestCase {
 		
 		
 		//Sigils
-		testOneConversion("@color(12,34,56,7)", java.awt.Color.class, new java.awt.Color(12,34,56,7));
-		testOneConversion("@color(12,34,56)", java.awt.Color.class, new java.awt.Color(12,34,56));
-		testOneConversion("@color(RED)", java.awt.Color.class, java.awt.Color.red);
+		testOneConversion("@Color{12,34,56,7}", java.awt.Color.class, new java.awt.Color(12,34,56,7));
+		testOneConversion("@Color{12,34,56}", java.awt.Color.class, new java.awt.Color(12,34,56));
+		testOneConversion("@Color{RED}", java.awt.Color.class, java.awt.Color.red);
 	}
 	
 	private void testOneConversion(Object source, Class target, Object reference) {

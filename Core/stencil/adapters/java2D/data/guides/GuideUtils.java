@@ -80,9 +80,9 @@ public abstract class GuideUtils {
 			try {
 				Field f = clss.getField(name);
 				f.set(target, Converter.convert(map.get(name), f.getType()));
+			} catch (NoSuchFieldException e) {//ignored so other properties for the sampler can be included...
 			} catch (SecurityException e) {System.err.println("Attempt to set value that cannot be securely accessed on " + target.toString());
 			} catch (IllegalAccessException e) {System.err.println("Attempt to set value that cannot be accesssed on " + target.toString());
-			} catch (NoSuchFieldException e) {throw new RuntimeException("Property not known: " + name);
 			} catch (IllegalArgumentException e) {
 				throw new RuntimeException("Error setting property: " + name, e);
 			}			
@@ -101,6 +101,9 @@ public abstract class GuideUtils {
 				bounds.add(g.getBoundsReference());
 			}
 		}
+		
+		if (bounds == null) {bounds = new Rectangle2D.Double();}		
 		return bounds;
 	}
+
  }

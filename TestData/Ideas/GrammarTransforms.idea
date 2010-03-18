@@ -1,8 +1,6 @@
 * Lift out constant settings to a defaults mechanism and set them in the layer prototype.  
 Then that rule doesn't need to be done at runtime.
 
-* Verify that only names that appear in the tuples are used in the arguments.
-
 * Named value (e.g. runtime constants)
 	-> Some way to set values that can be referenced from rules
 	-> Set at stencil compile time

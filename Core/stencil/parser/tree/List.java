@@ -10,14 +10,14 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 /**Supports the List node type, and read interface elements of java.util.List.*/
-public class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
+public final class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
 	
 	/**Object to wrap an arbitrary tree in a java.util.List interface.
 	 * Note, all indexes returned from this class are relative to the list, which
 	 * may be offset from the list of children.  To convert from the list index to the
 	 * root-child index, use toTree(int).
 	 * */ 
-	public static class WrapperList<T extends StencilTree> implements java.util.List<T> {
+	public final static class WrapperList<T extends StencilTree> implements java.util.List<T> {
 		protected Tree root; 
 		protected int offset;
 		
@@ -68,15 +68,23 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 
 		public boolean isEmpty() {return (root.getChildCount()-offset)==0;}
 
+		private static class StencilListIterator implements Iterator {
+			int idx;
+			final int max;
+			final Tree root;
+			
+			public StencilListIterator(int offset, Tree root) {
+				idx = offset;
+				max = root.getChildCount();
+				this.root = root;
+			}
+			
+			public boolean hasNext() {return idx < max;}
+			public Object next() {return root.getChild(idx++);}
+			public void remove() {throw new UnsupportedOperationException("Cannot remove from a Stencil Tree List.");}			
+		}
 		public Iterator<T> iterator() {
-			return new Iterator() {
-				int idx=offset;
-				final int max = root.getChildCount();
-				public boolean hasNext() {return idx < max;}
-				public Object next() {return root.getChild(idx++);}
-				public void remove() {throw new UnsupportedOperationException("Cannot remove from a Stencil Tree List.");}
-			};
-
+			return new StencilListIterator(offset, root);
 		}
 
 		public int lastIndexOf(Object o) {

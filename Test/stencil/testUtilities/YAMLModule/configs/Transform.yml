@@ -1,0 +1,45 @@
+name: Transform
+targetClass: stencil.operator.module.provided.Transform
+description: Screen/Canvas conversion transformations.
+
+defaults:
+  defaultSpecializer: !spec "[n .. n]"
+  facets:
+     - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
+     - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
+
+operators:
+   - name: TranslateRegistration
+     facets: 
+      - {name: map, type: PROJECT, function: false, prototype: !proto "X,Y"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "X,Y"}
+
+   - name: ScreenToCanvasPoint
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "X,Y"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "X,Y"}
+
+   - name: ScreenToCanvasDimension
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Width,Height"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Width,Height"}
+
+   - name: CanvasToScreenPoint
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "X,Y"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "X,Y"}
+
+   - name: CanvasToScreenDimension
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Width,Height"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Width,Height"}
+
+   - name: Zoom
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Zoom,X,Y,Width"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Zoom,X,Y,Width"}
+
+   - name: ZoomPadded
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Zoom,X,Y,Width"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Zoom,X,Y,Width"}

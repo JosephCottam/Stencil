@@ -32,13 +32,14 @@ import java.util.HashMap;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.ModuleData;
+import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.operator.wrappers.SplitHelper;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -53,6 +54,8 @@ public class Average extends BasicModule {
 	 * Can be used with zero-length range (n..n) to indicate 'mean of current arguments'
 	 * */
 	protected static class RangeMean extends BasicProject {
+		protected RangeMean(OperatorData opData) {super(opData);}
+
 		private static final String NAME = "Mean";
 		
 		public Tuple map(Object... args) {
@@ -65,13 +68,13 @@ public class Average extends BasicModule {
 				for (double d: values) {sum += d;}
 				mean = sum/values.length;
 			}
-			return PrototypedTuple.singleton(mean);
+			return new ArrayTuple(mean);
 		}
 		public String getName() {return NAME;}
 		public Tuple query(Object... args) {return map(args);}
 		public Tuple invoke(Object... args) {return map(args);}
 		
-		public RangeMean duplicate() {return new RangeMean();}
+		public RangeMean duplicate() {return new RangeMean(operatorData);}
 	}
 
 	/**Keeps a mean over a range from a fixed start point until the current point
@@ -87,19 +90,24 @@ public class Average extends BasicModule {
 		double total =0;
 		long count=0;
 
-		public FullMean(Specializer specializer) {
+		public FullMean(OperatorData opData, Specializer specializer) {
+			super(opData);
+			
 			assert !specializer.getRange().relativeStart() : "Can only use FullMean with an absolute start value.";
 			assert specializer.getRange().endsWithStream() : "Can only use FullMean with a range that ends with the stream.";
-
+			
 			start = specializer.getRange().getStart();
 		}
 		
-		private FullMean(int start) {this.start = start;}
+		private FullMean(OperatorData opData, int start) {
+			super(opData);
+			this.start = start;
+		}
 
 
 		public Tuple map(Object... values) {
 			if (start >0) {start--;}
-			if (start >0) {return PrototypedTuple.singleton(0);}
+			if (start >0) {return new ArrayTuple(0);}
 
 			Double sum=0d;
 			for (Object value: values) {
@@ -109,7 +117,7 @@ public class Average extends BasicModule {
 
 			count += values.length;
 			total += sum;
-			return PrototypedTuple.singleton(total/count);
+			return new ArrayTuple(total/count);
 		}
 		
 		public String getName() {return NAME;}
@@ -118,10 +126,10 @@ public class Average extends BasicModule {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			double value =0;
 			if (count > 0) {value = total/count;}
-			return PrototypedTuple.singleton(value);
+			return new ArrayTuple(value);
 		}
 		
-		public FullMean duplicate() {return new FullMean(start);}
+		public FullMean duplicate() {return new FullMean(operatorData, start);}
 	}
 
 
@@ -132,6 +140,8 @@ public class Average extends BasicModule {
 	 */
 	protected static class Median extends BasicProject {
 		private static final String NAME = "Median";
+
+		protected Median(OperatorData opData) {super(opData);}
 		
 
 		public Tuple map(Object... args) {
@@ -142,16 +152,15 @@ public class Average extends BasicModule {
 			int idx = (int) Math.floor(values.length/2);
 
 			if (idx != values.length/2) {
-				return PrototypedTuple.singleton((values[idx] + values[idx+1])/2);
+				return new ArrayTuple((values[idx] + values[idx+1])/2);
 			}
-			return PrototypedTuple.singleton(values[idx]);
+			return new ArrayTuple(values[idx]);
 		}
 		public String getName() {return NAME;}
 
 		public Tuple query(Object... args) {return map(args);}
-		public Tuple invoke(Object... args) {return map(args);}
 		
-		public Median duplicate() {return new Median();}
+		public Median duplicate() {return new Median(operatorData);}
 	}
 
 	/**Returns the mode value of  range.  The Mode is the most commonly
@@ -161,6 +170,8 @@ public class Average extends BasicModule {
 	protected static class Mode extends BasicProject {
 		private static final String NAME = "Mode";
 
+		public Mode(OperatorData opData) {super(opData);}
+		
 		public Tuple map(Object... args) {
 			HashMap<Double, Integer> counts = new HashMap<Double, Integer>();
 			Double[] values = RangeHelper.flatten(args, Double.NaN);
@@ -184,13 +195,12 @@ public class Average extends BasicModule {
 			if (max == -1) {throw new RuntimeException("Cannot compute mode on empty set.");}
 
 			//return max value as a tuple
-			return PrototypedTuple.singleton(value);
+			return new ArrayTuple(value);
 		}
 		public String getName() {return NAME;}
 
 		public Tuple query(Object... args) {return map(args);}
-		public Tuple invoke(Object... args) {return map(args);}
-		public Mode duplicate() {return new Mode();}
+		public Mode duplicate() {return new Mode(operatorData);}
 	}
 
 	
@@ -213,16 +223,17 @@ public class Average extends BasicModule {
 		validate(name, specializer);
 		
 		try {
+			OperatorData opData = this.getOperatorData(name, specializer);
 			if (name.equals("Average") || name.equals("Mean")) {
 				if (specializer.getRange().isFullRange()) {
-					target =  new FullMean(specializer);
+					target =  new FullMean(opData, specializer);
 				} else {
-					target = RangeHelper.makeLegend(specializer.getRange(), new RangeMean());
+					target = RangeHelper.makeLegend(specializer.getRange(), new RangeMean(opData));
 				}
 			} else if (name.equals(Median.NAME)) {
-				target = RangeHelper.makeLegend(specializer.getRange(), new Median());
+				target = RangeHelper.makeLegend(specializer.getRange(), new Median(opData));
 			} else if (name.equals(Mode.NAME)) {
-				target = RangeHelper.makeLegend(specializer.getRange(), new Mode());
+				target = RangeHelper.makeLegend(specializer.getRange(), new Mode(opData));
 			}else {
 				throw new IllegalArgumentException("Method name not found in package: " + name);
 			}

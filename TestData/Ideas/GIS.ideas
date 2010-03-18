@@ -3,3 +3,9 @@ Java-centered GIS tutorial: http://today.java.net/pub/a/today/2004/02/16/gis.htm
 Java GIS Tool--Geotools: 
 http://geotools.codehaus.org/
 http://docs.codehaus.org/display/GEOT/Home
+
+
+Use code from SwingLabs:
+	Get map: http://today.java.net/pub/a/today/2007/10/30/building-maps-into-swing-app-with-jxmapviewer.html#adding-the-jxmapkit
+	Geocode: https://aerith.dev.java.net/
+	General info: http://swinglabs.org/

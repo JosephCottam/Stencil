@@ -1,6 +1,5 @@
 package stencil.operator.module.util;
 
-import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.parser.tree.Specializer;
@@ -10,48 +9,48 @@ import java.util.HashMap;
 
 /**Simple MutableModule.  Does not allow specialization of the Legends.*/
 public class MutableModule implements Module {
-	protected Map<String, StencilOperator> legends;
+	protected Map<String, StencilOperator> operators;
 	protected MutableModuleData moduleData;
 
 	public MutableModule(String name) {
-		legends = new HashMap<String, StencilOperator>();
+		operators = new HashMap<String, StencilOperator>();
 		moduleData = new MutableModuleData(this, name);
 	}
 
 	public ModuleData getModuleData() {return moduleData;}
 
-	//TODO: allow use of non-default specializer
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
-		Specializer defaultSpecailizer = getModuleData().getDefaultSpecializer(name);
-		if (!specializer.equals(defaultSpecailizer)) {throw new SpecializationException(getName(),name, specializer);}
+		Specializer defaultSpecializer = getModuleData().getDefaultSpecializer(name);
+		if (!specializer.equals(defaultSpecializer)) {throw new SpecializationException(getName(),name, specializer);}
 		return moduleData.getOperatorData(name);		
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		StencilOperator op = legends.get(name);
-		if (op instanceof DynamicStencilOperator 
-				&& !specializer.isSimple()) {
+		StencilOperator op = operators.get(name);
+		Specializer defSpec = op.getOperatorData().getDefaultSpecializer();
+		if (op instanceof StencilOperator
+				&& !defSpec.equals(specializer)) {
 			throw new SpecializationException(getName(),name, specializer);
 		}
 		
-		return legends.get(name);
+		return operators.get(name);
 	}
 
-	public void addOperator(DynamicStencilOperator target) {
+	public void addOperator(StencilOperator target) {
 		try {
-			addOperator(target, target.getOperatorData(null));
+			addOperator(target, target.getOperatorData());
 		} catch (Exception e) {
 			throw new RuntimeException(String.format("Error adding jython legend %1$s to module %2$s", target.getName(), getModuleData().getName()), e);
 		}
 	}
 	
 	public void addOperator(StencilOperator target, OperatorData opData) {
-		legends.put(target.getName(), target);
+		operators.put(target.getName(), target);
 		moduleData.addOperator(opData);
 	}
 	
 	public void addOperator(String name, StencilOperator op, OperatorData opData) {
-		legends.put(name, op);
+		operators.put(name, op);
 		moduleData.addOperator(opData);
 	}
 	

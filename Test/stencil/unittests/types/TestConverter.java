@@ -9,10 +9,9 @@ import junit.framework.TestCase;
 public class TestConverter extends TestCase {
 
 	public void testColor() {
-		stencil.types.color.Color c = new stencil.types.color.Color();
+		stencil.types.color.ColorCache c = new stencil.types.color.ColorCache();
 		
-		assertEquals(c.toTuple(Color.RED), Converter.convert("@color(1.0,0,0)", Color.class));
-		assertEquals(c.toTuple(Color.RED), Converter.convert("@color(255,0,0)", Color.class));
+		assertEquals(c.toTuple(Color.RED), Converter.convert("@Color{255,0,0}", Color.class));
 	}
 	
 	public void testInteger() {
@@ -33,7 +32,7 @@ public class TestConverter extends TestCase {
 		assertEquals("1", Converter.toString(1));
 		assertEquals("203", Converter.toString(203));
 		assertEquals("1.0", Converter.toString(1.0));
-		assertEquals("@color(255,0,0)", Converter.toString(Color.RED));
+		assertEquals("@Color{255,0,0}", Converter.toString(Color.RED));
 	}
 	
 }

@@ -33,29 +33,42 @@
 tree grammar NeedsGuides;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = StencilTree;	
+	ASTLabelType = CommonTree;	
 	filter = true;
 }
 
 @header{
 	package stencil.interpreter;
 	
-	import stencil.parser.tree.*;	
+	import stencil.parser.tree.*;
+	import stencil.tuple.NumericSingleton;	
 }
 
 @members {
+	private static final Object[] EMPTY_ARGS = new Object[0];
+	private static final Map<Object, Integer> stateIDs = new HashMap(); //TODO: Would this be any faster as an array? (The length and offsets can be known at Stencil compile time.)
 	private boolean needsGuide;
-	
+	 	
 	public boolean check(Program program) {
 		needsGuide = false;
 		downup(program);
 		return needsGuide;
 	}
+	
+	public boolean needsGuide(Tree t) {
+    AstInvokeable i = (AstInvokeable) t;
+    int nowID = ((NumericSingleton) i.getInvokeable().invoke(EMPTY_ARGS)).intValue(); //TODO: Look at not returning a tuple from StateID
+         
+    if (!stateIDs.containsKey(i)) {
+       stateIDs.put(i, nowID+1); //Make it different...
+    }
+    int cachedID = stateIDs.get(i);
+    stateIDs.put(i, nowID);
+    return (cachedID != nowID);
+	}
 }
 
-topdown: ^(GUIDE layer=. type=. spec=. rules=. callChain);
-callChain: ^(CALL_CHAIN target);
+topdown: ^(GUIDE_QUERY target*);
 target
-	: ^(f=FUNCTION {needsGuide = (needsGuide || ((Function) f).getOperator().refreshGuide());} . . . target)
-	//TODO: Short-circuit this operation if needsGuide is ever true...maybe throw an exception???
-	| ^(PACK .);
+	: i=AST_INVOKEABLE 
+	  {needsGuide =  needsGuide || needsGuide(i);};

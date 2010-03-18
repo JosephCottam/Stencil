@@ -40,20 +40,4 @@ public class TestModules extends TestCase {
 		
 	}
 	
-	
-	public void testIsFacet() throws Exception {
-		@SuppressWarnings("unused")
-		class Test {
-			public Tuple t1() {return null;}
-			public Object t2() {return null;}
-		}
-		
-		Method m1= Test.class.getMethod("t1");
-		Method m2= Test.class.getMethod("t2");
-		
-		assertTrue(Modules.isFacet(m1));
-		assertFalse(Modules.isFacet(m2));
-	}
-	
-	
 }

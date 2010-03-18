@@ -35,8 +35,6 @@ import stencil.adapters.general.Fills;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
-import stencil.types.SigilType;
-import stencil.types.TypesCache;
 
 /**Utility methods for working with tuples.*/
 //final because it is a collection of utility methods and is not to be instantiated or overridden
@@ -163,8 +161,7 @@ public final class Tuples {
 	 * but only include the fields in the passed list.
 	 */
 	public static String toString(Tuple t, String[] fieldNames) {
-		StringBuilder rv = new StringBuilder();
-		rv.append("(");
+		StringBuilder rv = new StringBuilder("(");
 
 		//Copy must be made because Arrays.sort is in-place
 		String[] fields = new String[fieldNames.length];
@@ -174,19 +171,18 @@ public final class Tuples {
 		for (String name: fields){
 			Object value =t.get(name);
 			if (value instanceof Number && ((Number) value).doubleValue() ==-0) {value =0.0d;}//Prevent negative zeros
-			 
+			
 			//Skip values currently set to the default
 			if (t.isDefault(name, value)) {continue;}
 			
 			if (value == null) {
 				value = "[null]";
-			} else if (TypesCache.hasTypeFor(value)) {
-				SigilType type = TypesCache.getType(value);
-				value = type.toString(value);
 			} else if (value instanceof java.awt.TexturePaint) {
 				value = Fills.fillString((java.awt.TexturePaint) value);
 			}else if (value.getClass().isArray()) {
 				value = Arrays.deepToString((Object[]) value);
+			} else if (value == t) {
+				value = "<self>";
 			}
 			rv.append(String.format("%1$s:%2$s; ", name, value));
 		}
@@ -205,6 +201,8 @@ public final class Tuples {
 	 * Since a copy is not made when merging to a null tuple, this 
 	 * is not always safe to use with mutable tuples.  If safety must 
 	 * be guaranteed, then copy should be used on the arguments.
+	 *
+	 * TODO: Replace all calls to merge with calls to append
 	 *
 	 * @param sourceName Where should the resulting tuple indicate it is from?
 	 * @param source1
@@ -236,12 +234,48 @@ public final class Tuples {
 	}
 
 
+	/**Create a tuple as if the first tuple were followed by
+	 * the second tuple.  If either is null or empty, then
+	 * the other is returned (no copy is made).
+	 * 
+	 * If both are null or empty, an empty or null tuple is returned.
+	 * Names found in the two tuples must be disjoint.  For copying values
+	 * from one tuple to replace those of another use Transfer.
+	 *
+	 * TODO: Replace all calls to merge with calls to append
+	 *
+	 * @param sourceName Where should the resulting tuple indicate it is from?
+	 * @param source1
+	 * @param source2
+	 * @return
+	 */
+	public static Tuple append(Tuple source1, Tuple source2) {
+		if (source1 == null) {source1 = EMPTY_TUPLE;}
+		if (source2 == null) {source2 = EMPTY_TUPLE;}		
+		if (source1 == EMPTY_TUPLE) {return source2;}
+		if (source2 == EMPTY_TUPLE) {return source1;}
+		
+		List<String> names = new ArrayList();
+		List<Object> values = new ArrayList();
+		
+		for (String name: TuplePrototypes.getNames(source1)) {
+			Object value = source1.get(name);
+			names.add(name);
+			values.add(value);
+		}
+		for (String name: TuplePrototypes.getNames(source2)) {
+			Object value = source2.get(name);
+			names.add(name);
+			values.add(value);
+		}
+		return new PrototypedTuple(names, values);
+	}
+	
 	
 	/**Produces an array version of a tuple.  Value are in the same order as the original tuple fields.**/
 	public static Object[] toArray(Tuple t) {
-		Object[] values = new Object[t.getPrototype().size()];
-		int i=0;
-		for (String field:TuplePrototypes.getNames(t)) {values[i++] = t.get(field);}
+		Object[] values = new Object[t.size()];
+		for (int i=0; i< values.length; i++) {values[i] = t.get(i);}
 		return values;
 	}
 	
@@ -267,4 +301,17 @@ public final class Tuples {
         if (s.endsWith("\"")) {s = s.substring(0,s.length()-1);}
         return s;
     }
+
+
+	/**Given a tuple and a prototype, re-arranges the values so the indexes of
+	 * the source match the indexes of the names.
+	 */
+	public static Tuple align(Tuple source, TuplePrototype prototype) {
+		Object[] values = new Object[prototype.size()];
+		for (int i=0; i< values.length; i++) {
+			String name = prototype.get(i).getFieldName();
+			values[i] = source.get(name);
+		}
+		return new ArrayTuple(values);
+	}
 }

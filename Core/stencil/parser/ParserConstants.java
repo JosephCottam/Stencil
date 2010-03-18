@@ -41,7 +41,6 @@ public abstract class ParserConstants {
 	public static final String DEFAULT_FIELD_TYPE_LABEL="NOMINAL";
 	public static final String DEFAULT_LEGEND_BASE="Null";
 
-	public static final String MATCH_ALL = ".*";
 	public static final String NULL_PATTERN= "[null]";
 	
 	public static final String SEPARATOR = ",";
@@ -65,12 +64,12 @@ public abstract class ParserConstants {
 	public static final String OPAQUE_INT	= "255";
 
 	//Block tags (for Python and corresponding to Legend items)
-	public static final String MAIN_BLOCK_TAG = "Map";
-	public static final String INIT_BLOCK_TAG = "Init";
-	public static final String QUERY_BLOCK_TAG = "Query";
-	public static final String ITERATE_BLOCK_TAG = "Iterate";
-	public static final String GUIDE_BLOCK_TAG = "Guide";
-	public static final String DO_GUIDE_BLOCK_TAG = "DoGuide";
+	public static final String MAIN_FACET = "map";
+	public static final String INIT_FACET = "init";
+	public static final String QUERY_FACET = "query";
+	public static final String GUIDE_FACET = "guide";
+	public static final String DO_GUIDE_FACET = "doGuide";
+	public static final String CUSTOM_PARSER_FACET = "argumentParser";
 	
 	public static final int RANGE_START_INT = 1;
 	public static final int RANGE_END_INT = 0;
@@ -92,6 +91,9 @@ public abstract class ParserConstants {
 	public static final String SOURCE_FIELD = "Source";
 	
 	public static final String BIND_OPERATOR = ":";
+	
+	public static final String TRUE_STRING = "TRUE";
+	public static final String FALSE_STRING = "FALSE";
 	
 	/**Specializer to indicate that only the current value 
 	 * is significant and no other special instructions are given.

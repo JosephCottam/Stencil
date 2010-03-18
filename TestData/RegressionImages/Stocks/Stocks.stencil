@@ -14,24 +14,28 @@ from Stocks
 	X.new: TimeStep(Date) -> (VALUE) /*Indicates that a new segment of a poly-line is to be crated.*/
 	Y.new: Price(Open) -> (Price)		/*All news in a block indicate the same extension until a new input is started.*/
 	STROKE_WEIGHT: 1
-	STROKE_COLOR: @color(BLUE)
+	STROKE_COLOR: @Color{BLUE}
 
 layer Averages[POLY_LINE]
 from Stocks
 	ID: "Google_30"
 	X.new: TimeStep(Date) -> (VALUE)
 	Y.new: Price(Open) -> Mean[-30..n](Price) -> (VALUE)	/*Average the most recent 30 values.*/
-	(STROKE_WEIGHT, STROKE_COLOR): (1, @color(LIME,150))
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @Color{LIME,150}
 from Stocks
 	ID: "Google_ALL"
 	X.new: TimeStep(Date) -> (VALUE)
 	Y.new: Price(Open) -> Mean[1..n](Price) -> (VALUE)		/*Average all values.*/
-	(STROKE_WEIGHT, STROKE_COLOR): (1, @color(CRIMSON,150))
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @Color{CRIMSON,150}
 from Stocks
 	ID: "Google_20"
 	X.new: TimeStep(Date) -> (VALUE)
 	Y.new: Price(Open) -> Mean[-30 .. -10](Price) -> (VALUE) /*Average that lags by 10 and includes 20 values.*/
-	(STROKE_WEIGHT, STROKE_COLOR): (1, @color(ORANGE,150))
+	STROKE_WEIGHT: 1
+	STROKE_COLOR: @Color{ORANGE,150}
+	
 
 operator Price (Open) -> (Price)
 	all => (Price) : Mult(-1, Open) -> (VALUE)

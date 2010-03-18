@@ -7,9 +7,9 @@
 			<Opt specializer="[n .. n]" />
 		</Opts>
 		<Facets>
-			<Facet name="Map" type="PROJECT" function="true" prototype="VALUE"/>
-			<Facet name="Query" type="PROJECT" function="true" prototype="VALUE"/>
-			<Facet name="Guide" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="map" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="query" type="PROJECT" function="true" prototype="VALUE"/>
+			<Facet name="guide" type="PROJECT" function="true" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 	
@@ -34,4 +34,8 @@
 	<Operator name="SetIntAlpha" />
 	
 	<Operator name="Opaque" />
+	
+	<Operator name="Color">
+		<Facet name="argumentParser" type="PROJECT" function="true" prototype="self,Red,Green,Blue,Alpha"/>
+	</Operator>
 </ModuleData>

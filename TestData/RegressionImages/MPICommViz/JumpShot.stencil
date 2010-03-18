@@ -25,32 +25,32 @@ from ranks
 	TEXT: label
 	X: -10
 	Y: Layout(rank)
-	FONT_COLOR: @color(GRAY70)
+	FONT_COLOR: @Color{GRAY70}
 	REGISTRATION: "RIGHT"
 from overheads
 	filter (start > margin)
-	prefilter(start, margin): Spacer.Query() -> Add(5000,_) -> (start, VALUE)
+	prefilter(start, margin): Spacer.query() -> Add(5000,_) -> (start, VALUE)
 	
 	ID: start
 	TEXT: start
 	X: Timescale(skewedStart)
 	Y: -10    
-	FONT_COLOR: @color(GRAY70)
+	FONT_COLOR: @Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
-	() : Spacer.Map(start)
+	() : Spacer.map(start)
 from overheads
 	filter (end > margin)
-	prefilter(end, margin): Spacer.Query() -> Add(5000,_) -> (end, VALUE)
+	prefilter(end, margin): Spacer.query() -> Add(5000,_) -> (end, VALUE)
 	
 	ID: end
 	TEXT: end
 	X: Timescale(skewedEnd)
 	Y: -10    
-	FONT_COLOR: @color(GRAY70)
+	FONT_COLOR: @Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
-	() : Spacer.Map(end)
+	() : Spacer.map(end)
 
 operator Spacer base Max[1..n]
 
@@ -58,12 +58,12 @@ layer baseline[LINE]
 from overheads
 	ID: rank
 	X.2: Timescale(skewedStart) -> Max[1..n](_)
-	STROKE_COLOR: @color(Gray90)
+	STROKE_COLOR: @Color{Gray90}
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
 	ID: source
 	X.2: Timescale(skewedStart) -> Max[1..n](_) ->(_,_)
-	STROKE_COLOR: @color(Gray90)
+	STROKE_COLOR: @Color{Gray90}
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
 
@@ -73,7 +73,7 @@ from overheads
 	ID: Count[1]()
 	Y: Layout(rank) 
 	X: Timescale(skewedStart)
-	FILL_COLOR : @color(Purple)
+	FILL_COLOR : @Color{Purple}
 	SIZE: 15
 	REGISTRATION: "CENTER"
 	
@@ -99,10 +99,10 @@ from trans
 	CAP2: "ARROW"
 
 operator ColorByOp(op) -> (C)
-	(op =~ "osend") => C: @color(SlateBlue)
-	(op =~ "orecv") => C: @color(MediumSlateBlue)
-	(op =~ "transmission") => C: @color(FireBrick)
-	all => C: @color(BLACK, .5)
+	(op =~ "osend") => C: @Color{SlateBlue}
+	(op =~ "orecv") => C: @Color{MediumSlateBlue}
+	(op =~ "transmission") => C: @Color{FireBrick}
+	all => C: @Color{BLACK, .5}
 
 operator WeightByOp(op) -> (W)
 	(op =~ "osend") => W : 1

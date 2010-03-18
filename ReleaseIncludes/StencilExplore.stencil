@@ -20,7 +20,7 @@ layer Nodes
 from BFS 
 	ID: ID
 	REGISTRATION : "CENTER"
-	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(BLUE), 10)
+	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @Color(BLUE), 10)
 	(X,Y) : Ordering(ID) -> Squarify(VALUE) -> (X,Y)
 	 
 
@@ -28,7 +28,7 @@ layer Labels[TEXT]				/*Changes the glyph type. All layers have only one glyph t
 from BFS
 	ID : ID
 	(X,Y): Nodes.Find(ID) -> (X,Y)
-	(TEXT, FONT_SIZE, FONT_COLOR): (ID, 10, @color(GRAY60))
+	(TEXT, FONT_SIZE, FONT_COLOR): (ID, 10, @Color(GRAY60))
 
 
 layer Edges[LINE]
@@ -36,7 +36,7 @@ from VertexList
 	ID: Concatenate(ID1,ID2) -> (VALUE)
 	(X.1, Y.1): Nodes.Find(ID1) -> (X,Y)
 	(X.2, Y.2): Nodes.Find(ID2) ->  (X,Y)
-	STROKE_COLOR: @color(0.3,0.3,0.3,0.8)
+	STROKE_COLOR: @Color(0.3,0.3,0.3,0.8)
 
 
 operator Ordering (ID)->(VALUE)  

@@ -42,7 +42,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
-import stencil.types.color.Color;
+import stencil.types.color.ColorCache;
 
 public abstract class Stroked extends Basic {
 	protected static final AttributeList ATTRIBUTES;
@@ -82,7 +82,7 @@ public abstract class Stroked extends Basic {
 	}
 
 	protected void render(Graphics2D g, Shape s) {
-		if (outlinePaint != null && outlineStyle != null && !Color.isTransparent(outlinePaint)) {
+		if (outlinePaint != null && outlineStyle != null && !ColorCache.isTransparent(outlinePaint)) {
 			g.setStroke(outlineStyle);
 			g.setPaint(outlinePaint);
 			g.draw(s);

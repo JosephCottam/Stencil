@@ -1,50 +1,39 @@
 package stencil.types;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import stencil.parser.tree.Atom;
 import stencil.parser.tree.Id;
-import stencil.parser.tree.StencilNumber;
 import stencil.parser.tree.StencilString;
 import stencil.parser.tree.TupleRef;
+import stencil.tuple.ArrayTuple;
+import stencil.tuple.Tuple;
 import stencil.util.ConversionException;
 import stencil.util.enums.ValueEnum;
 
 public final class Converter {
-	
-	public static Double toDouble(Object value) {
-		if (value instanceof Double) {return (Double) value;}
-		if (value instanceof ValueEnum) {return toDouble(((ValueEnum) value).getValue());}
-		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
-		
-		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getNumber().doubleValue());}
-		
-		Class sourceClass = value.getClass();
-		if (TypesCache.hasTypeFor(sourceClass)) {return (Double) TypesCache.getType(sourceClass).convert(value, Double.class);}
+	private static final Map<Class, TypeWrapper> WRAPPER_FOR = new HashMap();
 
-		
-		return Double.parseDouble(value.toString());
+	static {
+		//TODO: Move to something like the modules mechanism, loaded from a configuration file
+		registerWrapper(new NumericWrapper());
+		registerWrapper(new stencil.types.color.ColorWrapper());
 	}
 	
-	public static  Float toFloat(Object value) {
-		if (value instanceof Float) {return (Float) value;}
-		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getNumber().floatValue());}
-		
-		Class sourceClass = value.getClass();
-		if (TypesCache.hasTypeFor(sourceClass)) {return (Float) TypesCache.getType(sourceClass).convert(value, Float.class);}
+	public static final void registerWrapper(TypeWrapper wrapper) {
+		for (Class c: wrapper.appliesTo()) {WRAPPER_FOR.put(c, wrapper);}
+	}
 
-		
-		return Float.parseFloat(value.toString());	
+	public static Tuple toTuple(Object value) {
+		if (value instanceof Tuple) {return (Tuple) value;}
+		if (WRAPPER_FOR.containsKey(value.getClass())) {
+			TypeWrapper w = WRAPPER_FOR.get(value.getClass());
+			return w.toTuple(value);
+		}
+		return new ArrayTuple(value);
 	}
 	
-	public static Integer toInteger(Object value) {
-		if (value instanceof Integer) {return (Integer) value;}
-		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getNumber().intValue());}
-
-		Class sourceClass = value.getClass();
-		if (TypesCache.hasTypeFor(sourceClass)) {return (Integer) TypesCache.getType(sourceClass).convert(value, Integer.class);}
-
-		return toFloat(value).intValue();
-	}
 	
 	public static String toString(Object value) {
 		if (value instanceof String) {return (String) value;}
@@ -52,23 +41,14 @@ public final class Converter {
 		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
 		if (value.getClass().isEnum()) {return ((Enum) value).name();}
 		if (value instanceof TupleRef && ((TupleRef) value).isNamedRef()) {return ((Id) ((TupleRef) value).getValue()).getName();}
-		
-		Class sourceClass = value.getClass();
-		if (TypesCache.hasTypeFor(sourceClass)) {return (String) TypesCache.getType(sourceClass).convert(value, String.class);}
-		
+		if (WRAPPER_FOR.containsKey(value.getClass())) {return (String) WRAPPER_FOR.get(value.getClass()).convert(value, String.class);}
 		return value.toString();
 	}
 	
-	public static Number toNumber(Object value) {
-		if (value instanceof Number) {return (Number)value;}
-		if (value instanceof ValueEnum) {return toNumber(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber();}
-		
-		Class sourceClass = value.getClass();
-		if (TypesCache.hasTypeFor(sourceClass)) {return (Number) TypesCache.getType(sourceClass).convert(value, Number.class);}
-
-		return toDouble(value); //TODO: have it try to figure if it is a whole number or a float..
-	}
+	public static Double toDouble(Object value) {return NumericWrapper.toDouble(value);}
+	public static  Float toFloat(Object value) {return NumericWrapper.toFloat(value);}
+	public static Integer toInteger(Object value) {return NumericWrapper.toInteger(value);}
+	public static Number toNumber(Object value) {return NumericWrapper.toNumber(value);}
 	
 	/**Tries to convert values from the current class to
 	 * the target class.  
@@ -93,35 +73,25 @@ public final class Converter {
 	public static final Object convert(Object value, Class target) throws ConversionException {
 		try {
 			if (value == null || target.isInstance(value)) {return value;}
+			if (value instanceof Atom) {return convert(((Atom) value).getValue(), target);}
+						
+			TypeWrapper wrapper = WRAPPER_FOR.get(target);
+			if (wrapper != null) {return wrapper.convert(value, target);}
 			
 			if (value instanceof ValueEnum) {
 				value = ((ValueEnum) value).getValue();
 				if (target.isInstance(value)) {return value;}
 			}
-			
-			if (TypesCache.hasTypeFor(target)) {return TypesCache.getType(target).convert(value, target);}
-			if (TypesCache.hasTypeFor(value)) {return TypesCache.getType(value).convert(value, target);}
-	
-			if (target.equals(Number.class)) {return toNumber(value);}
-			
-			if (target.equals(Integer.class) || target.equals(int.class)) {return toInteger(value);}
-			if (target.equals(Long.class) || target.equals(long.class)) {
-				if (value instanceof StencilNumber) {return new Long(((StencilNumber) value).getNumber().longValue());}
-				return new Long(Long.parseLong(value.toString()));
-			}
-	
-			if (target.equals(Double.class) || target.equals(double.class)) {return toDouble(value);}
-			
-			if (target.equals(Float.class) || target.equals(float.class)) {return toFloat(value);}
-			
 			if (target.equals(String.class)) {return toString(value);}
-			
+
 			if (target.equals(boolean.class) || target.equals(Boolean.class)) {
 				String v = value.toString().toUpperCase();
 				return new Boolean(v.equals("TRUE") || v.equals("#T"));
 			}
 			
 			if (target.isEnum()) {return Enum.valueOf(target, value.toString());}
+
+			
 		} catch (Exception e) {
 			throw new ConversionException(value, target, e);
 		}

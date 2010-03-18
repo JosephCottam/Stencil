@@ -28,11 +28,11 @@
  */
 package stencil.operator.wrappers;
 
-import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
+import static stencil.parser.ParserConstants.INIT_FACET;
 
 import org.python.util.PythonInterpreter;
 
-import stencil.operator.DynamicStencilOperator;
+import stencil.operator.StencilOperator;
 import stencil.operator.module.util.MutableModule;
 import stencil.parser.tree.PythonFacet;
 import stencil.parser.tree.Python;
@@ -40,7 +40,7 @@ import stencil.parser.tree.Python;
 import java.util.Map;
 import java.util.HashMap;
 
-/**Class to register Jython legends defined in a stencil definition.
+/**Class to register Jython operators defined in a stencil definition.
  *
  * @author jcottam
  */
@@ -53,21 +53,21 @@ public class EncapsulationGenerator {
 	 * @param register Module
 	 * @return Set of encapsulations.
 	 */
-	public DynamicStencilOperator generate(Python pythonSpec, MutableModule module) {
+	public StencilOperator generate(Python pythonSpec, MutableModule module) {
 		assert module != null : "Null moduled passed.";
 		
 		registerEnv(pythonSpec.getEnvironment());
-		JythonOperator legend = new JythonOperator(module.getModuleData().getName(), pythonSpec.getName());
+		JythonOperator operator = new JythonOperator(module.getModuleData().getName(), pythonSpec.getName());
 		for (PythonFacet b: pythonSpec.getFacets()) {
-			if (b.getName().equals(INIT_BLOCK_TAG)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
+			if (b.getName().equals(INIT_FACET)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
 			
-			try {legend.add(new JythonEncapsulation(pythonSpec,b,this), b);}
+			try {operator.add(new JythonEncapsulation(pythonSpec,b,this), b);}
 			catch (Exception e) {throw new RuntimeException(String.format("Error creating encapsulation for facet %1$s (%2$s).", b.getName(), b.getBody()),e);}
 		}
 
-		module.addOperator(legend);
+		module.addOperator(operator);
 		
-		return legend;
+		return operator;
 	}
 	
 	/**Invoke the init block of a spec in the named environment.*/ 

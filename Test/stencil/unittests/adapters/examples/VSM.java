@@ -5,8 +5,8 @@ public class VSM extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/VSM/",
 				  "VSM.stencil",
 				  "BFS VertexList",
-				  "er_100_0.005.bfs er_100_0.005.adj",
-				  "VSM1.txt",
-				  "VSM1.png", configs));
+				  "ws_400_12_0.1.bfs ws_400_12_0.1.adj",
+				  "VSM.txt",
+				  "VSM.png", configs));
 	}
 }

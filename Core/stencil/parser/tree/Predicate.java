@@ -29,54 +29,30 @@
 package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
 
-import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.Tuple;
 
 
 public class Predicate extends StencilTree {
 	public Predicate(Token source) {super(source);}
 
-	public Atom getLHSValue(Environment env) {return getValue(getChild(0), env);}
-
-	public Atom getRHSValue(Environment env) {return getValue(getChild(2), env);}
+	public Atom getLHSValue(Environment env) {return getValue((Value) getChild(0), env);}
+	public Atom getRHSValue(Environment env) {return getValue((Value) getChild(2), env);}
+	private Atom getValue(Value source, Environment env) {
+		return Atom.Literal.instance(TupleRef.resolve(source, env));
+	}
 
 	public BooleanOp getOperator() {return (BooleanOp) getChild(1);}
 
+	/**Does the passed environment match this predicate?*/
 	public boolean matches(Environment env) {
-		if (getChild(0).getType() == StencilParser.ALL) {return true;}
-
-		return getOperator().evaluate(getLHSValue(env), getRHSValue(env));
+		return (getChild(0) instanceof All) 
+				|| getOperator().evaluate(getLHSValue(env), getRHSValue(env));
 	}
 
-	/**Gets the value of the source AST.  The source AST may represent a number, quote string or name.
-	 * If it is a number, it is returned as a Double.  If it is a quoted string, the string text is
-	 * returned.  If it is a name, the value from the tuple with the corresponding name is returned.
-	 * If the tuple is null, but a name is passed, null is returned.
-	 *
-	 * @param source
-	 * @param tuple
-	 * @return
-	 */
-	private Atom getValue(Tree source, Environment env) {
-		if (source instanceof Value) {
-			return Atom.Literal.instance(TupleRef.resolve((Value) source, env));
-		} else if (source instanceof CallChain){
-			Tuple result;
-			try {result = ((CallChain) source).apply(env);}
-			catch (Exception e) {throw new RuntimeException("Error applying function in predicate.");}
-
-			if (result == null){return null;}
-			return Atom.Literal.instance(result.get(0));
-		} else {
-			throw new RuntimeException("Unrecognized tree trying to extract values for filter.");
-		}
-	}
 
 	
-	/**Does the passed tuple match the given predicates?*/
+	/**Does the passed environment match the given predicates?*/
 	public static boolean matches(java.util.List<Predicate> predicates, Environment env) {
 		for (Predicate pred: predicates) {
 			if (!pred.matches(env)) {return false;}

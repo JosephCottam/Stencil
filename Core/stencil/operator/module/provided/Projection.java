@@ -38,15 +38,16 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
 	public static final class HeatScale extends BasicProject {
-		public static final String NAME = "Heat";
+		public static final String NAME = "HeatScale";
 		public static final boolean DEFAULT_THROW_EXCEPTIONS = true;
 
 		private float min = Float.NaN;
@@ -56,12 +57,14 @@ public class Projection extends BasicModule {
 		private Color cold;
 		private Color hot;
 		
-		public HeatScale(Specializer spec) {
-			cold = (Color) spec.getMap().get("cold").getValue();
-			hot = (Color) spec.getMap().get("hot").getValue();
+		public HeatScale(OperatorData opData, Specializer spec) {
+			super(opData);
+			cold = ColorCache.get(spec.getMap().get("cold").getValue().toString());
+			hot = ColorCache.get(spec.getMap().get("hot").getValue().toString());
 		}
 		
-		private HeatScale(Color cold, Color hot) {
+		private HeatScale(OperatorData opData, Color cold, Color hot) {
+			super(opData);
 			this.cold = cold;
 			this.hot = hot;
 		}
@@ -82,7 +85,7 @@ public class Projection extends BasicModule {
 				d = Float.parseFloat(keys[0].toString());
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + keys[0].toString(), e);}
-				else {return PrototypedTuple.singleton(new Color(0,0,0));}			
+				else {return new ArrayTuple(new Color(0,0,0));}			
 			} 
 
 				
@@ -91,11 +94,11 @@ public class Projection extends BasicModule {
 				if (d<min || Double.isNaN(min)) {min = d;}
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
-				t = PrototypedTuple.singleton(averageColors(p));
+				t = new ArrayTuple(averageColors(p));
 //				t = BasicTuple.singleton(new Color(1.0f,p,p));
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Error creating colors with range point:" + p, e);}
-				else {t= PrototypedTuple.singleton(new Color(0,0,0));}
+				else {t= new ArrayTuple(new Color(0,0,0));}
 			}
 			
 			return t;
@@ -133,14 +136,14 @@ public class Projection extends BasicModule {
 			float d = Float.parseFloat(keys[0].toString());
 			
 			if (d >= min && d<= max) {return map(keys);}
-			else {return PrototypedTuple.singleton(null);}
+			else {return new ArrayTuple(new Object[0]);}
 		}
 
 		public String getName() {return NAME;}
 		public boolean getThrowExceptions() {return throwExceptions;}
 		public void setThrowExceptions(boolean v) {throwExceptions = v;}
 		
-		public HeatScale duplicate() {return new HeatScale(cold, hot);} 
+		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot);} 
 	}
 	
 	/**Projects a set of values onto their presentation order.
@@ -157,10 +160,12 @@ public class Projection extends BasicModule {
 		public static final String NAME = "Index";
 		List<String> labels = new ArrayList<String>();
 
+		public Index(OperatorData opData) {super(opData);}
+		
 		public Tuple query(Object... keys) {
 			Object key = keys[0];
-			if (labels.contains(key)) {return PrototypedTuple.singleton(labels.indexOf(key));}
-			return PrototypedTuple.singleton(null);
+			if (labels.contains(key)) {return new ArrayTuple(labels.indexOf(key));}
+			return new ArrayTuple(new Object[0]);
 		}
 
 		public Tuple map(Object... keys) {
@@ -169,13 +174,13 @@ public class Projection extends BasicModule {
 			//TODO: Handle more than just the first value...concatenate the values or something, like compound keys in Rank operator
 			key = keys[0];
 			if (!labels.contains(key)) {labels.add(key.toString());}
-			rv = PrototypedTuple.singleton(labels.indexOf(key));
+			rv = new ArrayTuple(labels.indexOf(key));
 			return rv;
 		}
 
 		public String getName() {return NAME;}
 		
-		public Index duplicate() {return new Index();}
+		public Index duplicate() {return new Index(operatorData);}
 	}
 
 	
@@ -185,6 +190,8 @@ public class Projection extends BasicModule {
 	 */
 	public static final class Count extends BasicProject {
 		Map<Object, Long> counts = new HashMap<Object, Long>();
+		
+		public Count(OperatorData opData) {super(opData);}
 		
 		public String getName() {return "Count";}
 
@@ -200,7 +207,7 @@ public class Projection extends BasicModule {
 				value = 1;
 				counts.put(key, value);
 			}
-			return PrototypedTuple.singleton(value);
+			return new ArrayTuple(value);
 		}
 
 		public Tuple query(Object... args) {
@@ -209,22 +216,24 @@ public class Projection extends BasicModule {
 			if (counts.containsKey(key)) {
 				value = counts.get(key);
 			}
-			return PrototypedTuple.singleton(value);
+			return new ArrayTuple(value);
 		}
 
-		public Count duplicate() {return new Count();}
+		public Count duplicate() {return new Count(operatorData);}
 	}
 
 	public static final class SimpleCount extends BasicProject {
 		private final AtomicInteger count = new AtomicInteger(0);
 		
-		public StencilOperator duplicate() throws UnsupportedOperationException {return new SimpleCount();}
+		public SimpleCount(OperatorData opData) {super(opData);}
+		
+		public StencilOperator duplicate() {return new SimpleCount(operatorData);}
 
 		public String getName() {return "Count";}
 
-		public Tuple map(Object... args) {return PrototypedTuple.singleton(count.getAndAdd(1));}
+		public Tuple map(Object... args) {return new ArrayTuple(count.getAndAdd(1));}
 
-		public Tuple query(Object... args) {return PrototypedTuple.singleton(count.get());}		
+		public Tuple query(Object... args) {return new ArrayTuple(count.get());}		
 	}
 	
 	public Projection(ModuleData md) {super(md);}
@@ -239,21 +248,20 @@ public class Projection extends BasicModule {
 	
 	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
-		
+		OperatorData operatorData = getModuleData().getOperatorData(name);
 		if (specializer.equals(moduleData.getDefaultSpecializer(name))) {
-		
 			if (name.equals("Index")) {
-				return new Index();
+				return new Index(operatorData);
 			} else if (name.equals("HeatScale")) {
-				 return new HeatScale(specializer);
+				 return new HeatScale(operatorData, specializer);
 			} else if (name.equals("Count")) {
-				return new Count();
+				return new Count(operatorData);
 			} else if (name.equals("Justify")) {
 				throw new RuntimeException("Justify doesn't work yet...sorry.");
 			}
 			throw new IllegalArgumentException("Name not known : " + name);
 		} else if (name.equals("Count") && specializer.getArgs().contains(1)) {
-			return new SimpleCount();
+			return new SimpleCount(operatorData);
 		} else {
 			throw new SpecializationException(MODULE_NAME, name, specializer);}
 		}

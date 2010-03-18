@@ -21,10 +21,10 @@ canvas Main
 layer Markers[POLY_LINE]
 from Stocks
 	ID : "Google"
-	X.new : TimeStep(Date) -> Date.Put(VALUE, VALUE, Date) #-> VALUE
+	X.new : TimeStep(Date) -> Date.put(VALUE, VALUE, Date) #-> VALUE
 	Y.new : Add(Open, 0) #-> Price(VALUE) -> Price
 	STROKE_WEIGHT: 1
-	STROKE_COLOR: @color(BLUE)
+	STROKE_COLOR: @Color{BLUE}
 
 from Stocks
 	view(ZOOM, X,Y, WIDTH) 
@@ -42,8 +42,8 @@ from Stocks
 layer Selected[TEXT]
 from Mouse
   ID : "Selected"
-  (X, Y) : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.Find(_) -> (X, Y)
-  TEXT : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.Find(_) -> Mult(-1, Y)
+  (X, Y) : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.find(_) -> (X, Y)
+  TEXT : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.find(_) -> Mult(-1, Y)
   SCALE_BY: "NONE"
 
 
@@ -54,7 +54,7 @@ from Mouse
   Y.1 : 0
   Y.2 : Add(canvas[Y], 3)
   STROKE_WEIGHT : 3
-  STROKE_COLOR : @color(BLUE, 100)
+  STROKE_COLOR : @Color{BLUE, 100}
 
 operator Date base Mapping [1..n, "VALUE", "Date"]
 

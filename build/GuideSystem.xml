@@ -1,0 +1,47 @@
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
+ <project name="GuideSystem" default="Guides">
+ 	<target name="Guides">
+ 		<property name="dest" location="${interpreter}"/>
+ 		<property name="lib" location="${parser}"/>
+
+ 		<!--Interpreter components-->
+ 		<antlr
+ 			target="${interpreter}/UpdateGuides.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
+ 		<antlr
+ 			target="${interpreter}/NeedsGuides.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
+ 		
+ 		<!--Transformation components-->
+        <antlr
+            target="${grammars}/GuideDefaultRules.g"
+            outputdirectory="${parser}"
+        />
+ 		<antlr
+ 			target="${grammars}/GuideLiftGenerator.g"
+			outputdirectory="${parser}"
+ 		/>
+		<antlr
+ 			target="${grammars}/GuideSampleOp.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/GuideInsertSeedOp.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/GuideTransfer.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/GuideSpecializers.g"
+			outputdirectory="${parser}"
+ 		/>
+  	</target>
+ </project>

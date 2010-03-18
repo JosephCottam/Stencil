@@ -36,8 +36,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import stencil.operator.StencilOperator;
+import stencil.operator.module.OperatorData;
 import stencil.operator.module.OperatorData.OpType;
-import stencil.operator.wrappers.InvokeableLegend;
+import stencil.operator.util.Invokeable;
+import stencil.operator.util.ReflectiveInvokeable;
+import stencil.operator.wrappers.InvokeablesLegend;
+import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
@@ -79,22 +83,24 @@ public final class Modules {
 		return parts.length ==0 ? name : parts[parts.length-1];
 	}
 
-	/**Wraps a public static method as a legend or returns a public static class instance;
-	 * performs no specialization.
-	 * 	
-	 * This method will only return instances to public, static methods 
-	 * of a class that return a Tuple OR inner classes.  
-	 * It does so without regard to the method signature, so the
-	 * first method of a given name encountered is the one returned (sorry, overloading
-	 * is no supported in Stencil).
+	/**Finds a member of a class as indicated by the "Target" attribute
+	 * of the OperatorData object.
 	 * 
-	 * WARNING: The comparisons are not case-sensitive.
-	 * 
-	 * @param source The class which provides the method being wrapped
-	 * @param module The module that contains that supposed contains the operator
-	 * @param name The name of the target (method or class)
-	 * */
-	public static StencilOperator instance(Class source, String target, String module, String name) {
+	 * Class members are searched by name (not case sensitive).  It first
+	 * looks at public static classes, then public static methods of the 
+	 * source class. If a public static class is found, then that class
+	 * is instantiated with the passed OperatorData object as the parameter.
+	 * THEREFORE, any public static class to be instantiated through this
+	 * mechanism must have a constructor that takes an OperatorData element
+	 * as its only argument.  If a public static method is found, an Invokeable
+	 * is created and a wrapping operator is returned.  The wrapping operator
+	 * will use the given target for all methods of the operator.
+	 **/
+	public static StencilOperator instance(Class source, OperatorData operatorData) {
+		String module = operatorData.getModule();
+		String name = operatorData.getName();
+		String target = operatorData.getAttribute("Target");
+
 		if (target == null) {throw new IllegalArgumentException("Cannot use null target.");}
 		target = target.toUpperCase();
 		
@@ -103,7 +109,12 @@ public final class Modules {
 			if (!StencilOperator.class.isAssignableFrom(c)) {continue;}
 			if (!Modifier.isPublic(c.getModifiers())) {continue;} //Might be a superfluous test
 
-			try {if (target.equals(c.getSimpleName().toUpperCase())) {return (StencilOperator) c.getConstructor().newInstance();}}
+			try {
+				if (target.equals(c.getSimpleName().toUpperCase())) {
+					Object[] args = new Object[]{operatorData};
+					return (StencilOperator) c.getConstructor(OperatorData.class).newInstance(args);
+				}
+			}
 			catch (Exception e) {/*Ignore, must not be the right thing if it can't be instantiated!*/}
 		}
 		
@@ -112,17 +123,15 @@ public final class Modules {
 			if (!Modifier.isStatic(m.getModifiers())) {continue;}
 			if (!Tuple.class.isAssignableFrom(m.getReturnType())) {continue;}
 
-			if (target.equals(m.getName().toUpperCase())) {return new InvokeableLegend(name, m);}
+			if (target.equals(m.getName().toUpperCase())) {
+				Invokeable inv = new ReflectiveInvokeable(m);
+				return new InvokeablesLegend(name, operatorData, inv);
+			}
 		}
 	
 
 		throw new IllegalArgumentException(String.format("Operator %1$s not found in module %2$s.", name, module));
 		
-	}
-
-	/**Verify that the passed method could be used as stencil legend.*/
-	public static boolean isFacet(Method m) {
-		return stencil.tuple.Tuple.class.isAssignableFrom(m.getReturnType());
 	}
 	
 	/**Return a mutableLegendData object with the default facets and specializer.
@@ -151,9 +160,9 @@ public final class Modules {
 	
 	public static MutableOperatorData basicOperatorData(String module, String name, OpType type, List<String> fields) {
 		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
-		legendData.addFacet(new BasicFacetData("Map", type, fields));
-		legendData.addFacet(new BasicFacetData("Query", type, fields));
-		legendData.addFacet(new BasicFacetData("Guide", type, fields));
+		legendData.addFacet(new BasicFacetData(ParserConstants.MAIN_FACET, type, fields));
+		legendData.addFacet(new BasicFacetData(ParserConstants.QUERY_FACET, type, fields));
+		legendData.addFacet(new BasicFacetData(ParserConstants.GUIDE_FACET, type, fields));
 		return legendData;
 	}
 }

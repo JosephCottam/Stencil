@@ -30,15 +30,13 @@ package stencil.types.color;
 
 
 import java.awt.Color;
-import java.util.List;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
 
-import stencil.parser.tree.Value;
 import stencil.types.Converter;
 import static stencil.types.color.IntColor.*;
-import static stencil.types.color.Color.CLEAR_INT;
+import static stencil.types.color.ColorCache.CLEAR_INT;
 
 public final class NamedColor {
 	public static final String SEPARATOR = ",";
@@ -196,8 +194,8 @@ public final class NamedColor {
 
 	private NamedColor() {/*Utility class. Not instantiable.*/}
 	
-	static int create(List<Value> args) {
-		String name = Converter.toString(args.get(0)).toUpperCase();
+	static int create(String[] args) {
+		String name = Converter.toString(args[0]).toUpperCase();
 		
 		int c;
 		//Named color
@@ -210,18 +208,17 @@ public final class NamedColor {
 			catch (Exception e) {throw new IllegalArgumentException("Improperly formed gray value (" + name + ").  Format is " + GRAY_PREFIX + "XX where XX is a numer between 0 and 100 (inclusive).");}
 			
 			if (value > 100 | value <0) {throw new IllegalArgumentException("Gray values must between 0 and 100 (found " + value + " in " + name + ").");}
-			float percent = value/100.0f;
+			float percent = value/100.0f;			
+			int component = ColorUtils.rangeValue((int) (percent * ColorCache.OPAQUE_INT));
 			
-			int component = ColorUtils.rangeValue(percent);
-			
-			c= IntColor.colorInt(component, component, component, stencil.types.color.Color.OPAQUE_INT);
+			c= IntColor.colorInt(component, component, component, stencil.types.color.ColorCache.OPAQUE_INT);
 		} else {
-			throw new IllegalArgumentException("Cannot form a color from " + Arrays.deepToString(args.toArray()));
+			throw new IllegalArgumentException("Cannot form a color from " + Arrays.deepToString(args));
 		}
 		
 		//Change alpha, if supplied
-		if (args.size() !=1) {
-			int n = ColorUtils.rangeValue(args.get(1));
+		if (args.length !=1) {
+			int n = ColorUtils.rangeValue(Converter.toInteger(args[1]));
 			c = modifyAlpha(c, n);
 		} 
 		return c;

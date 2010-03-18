@@ -22,34 +22,36 @@ layer Nodes
 from BFS 
 	ID: ID
 	REGISTRATION : "CENTER"
-	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(BLUE), 10)
+	FILL_COLOR:  @Color{BLUE}
+	(SHAPE, SIZE) : ("ELLIPSE", 10)
 	(X,Y) : Ordering(ID) -> Triangular(VALUE) -> (X,Y)
 	 
 
 layer Labels[TEXT]				/*Changes the glyph type. All layers have only one glyph type.*/
 from BFS
 	ID : ID
-	(X,Y): Nodes.Find(ID) -> (X,Y)
-	(TEXT, FONT_SIZE, FONT_COLOR): (ID, 10, @color(GRAY60))
+	(X,Y): Nodes.find(ID) -> (X,Y)
+	(TEXT, FONT_SIZE): (ID, 10)
+	FONT_COLOR: @Color{GRAY60}
 
 layer Edges[LINE]
 from VertexList 
 	ID: Concatenate(ID1,ID2) -> (VALUE)
-	(X.1, Y.1): Nodes.Find(ID1) -> (X,Y)
-	(X.2, Y.2): Nodes.Find(ID2) ->  (X,Y)
-	STROKE_COLOR: @color(0.3,0.3,0.3,0.8)
+	(X.1, Y.1): Nodes.find(ID1) -> (X,Y)
+	(X.2, Y.2): Nodes.find(ID2) ->  (X,Y)
+	STROKE_COLOR: @Color{GRAY30,80}
 
 
 operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
 python Triangular
-facet Init {
+facet init {
 	from math import sqrt
 	from math import ceil
 }
 
-facet Map (Seq) -> (X,Y) {
+facet map (Seq) -> (X,Y) {
 	seq = int(Seq)+1
 	base = int(ceil(sqrt(seq)))
 	X = (seq/base) * 10 *base

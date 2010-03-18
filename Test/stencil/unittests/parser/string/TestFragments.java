@@ -16,8 +16,8 @@ import stencil.parser.string.Imports;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.string.StencilLexer;
 import stencil.parser.string.StencilParser;
+import stencil.parser.string.PreparsePython;
 import stencil.parser.tree.*;
-import stencil.parser.validators.PythonValidator;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
 
@@ -67,7 +67,7 @@ public class TestFragments extends TestCase {
 
 		//Create ad-hoc operators
 		treeTokens = new CommonTreeNodeStream(p);
-		PythonValidator pyValidator = new PythonValidator(treeTokens);
+		PreparsePython pyValidator = new PreparsePython(treeTokens);
 		pyValidator.downup(p);
 		
 		treeTokens = new CommonTreeNodeStream(p);
@@ -129,7 +129,7 @@ public class TestFragments extends TestCase {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
 		Adapter adapter = Adapter.INSTANCE;
 		Program program = ParseStencil.parse(source, adapter);
-		assertEquals("Incorrectly identified defaults count.", 1, program.getLayer("Nodes").getDefaults().size()); 
+		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Nodes").getDefaults().size()); 
 		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Edges").getDefaults().size()); 
 	}
 	

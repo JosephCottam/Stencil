@@ -44,8 +44,13 @@ final class StrictChannel implements NextChannel {
 		if (line == null) {throw new NoSuchElementException("Reached end of file.");}
 		
 		//TODO: Convert things by some type schema here.
-		String[] values = splitter.split(line);
-		if (values.length != labels.size()) {throw new InvalidInputLineException("Could not treat line as full tuple: "+ line);}
+		String[] values;
+		if (labels.size() == 1) {values = new String[]{line};}
+		else {values = splitter.split(line);}
+		
+		if (values.length != labels.size()) {
+			throw new InvalidInputLineException("Could not treat line as full tuple: "+ line);
+		}
 		return values;
 	}
 	

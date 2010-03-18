@@ -10,8 +10,8 @@ from Mouse
 	(X,Y) : (X,Y)
 	FILL_COLOR: Colorize(META) -> C
 	SIZE: 10
-	STROKE_COLOR : @color(CLEAR)
-	canvas(BACKGROUND_COLOR): @color(BLACK)
+	STROKE_COLOR : @Color{CLEAR}
+	canvas(BACKGROUND_COLOR): @Color{BLACK}
 
 layer Nav
 from Mouse
@@ -31,5 +31,5 @@ from Mouse
 	view(WIDTH, HEIGHT, X,Y) : (canvas[WIDTH], canvas[HEIGHT], canvas[X], canvas[Y])
 
 operator Colorize(Meta) -> C
-	(Meta !~ "true") => C: @color(WHITE)
-	(Meta =~ "true") => C: @color(GREEN)
+	(Meta !~ "true") => C: @Color{WHITE}
+	(Meta =~ "true") => C: @Color{GREEN}

@@ -28,7 +28,6 @@
  */
 package stencil.unittests.adapters;
 
-import junit.framework.AssertionFailedError;
 import junit.framework.TestCase;
 import stencil.unittests.adapters.examples.*;
 
@@ -40,88 +39,96 @@ public abstract class Examples extends TestCase {
 	
 	protected void setConfigs(String... configs) {this.configs = configs;}
 	
-	//Run a test.  Preferentially throws the txt error, if there is one.
-	
-	private void testOne(ImageTest imageTest) throws Throwable {
-		Throwable pngFail = null;
-		Throwable txtFail = null;
-		
-		imageTest.setUp();
-		
-		try {imageTest.testPNG();}
-		catch (AssertionFailedError e1) {pngFail = e1;}
-		catch (Throwable e) {
-			pngFail = e;
-			System.err.println("Error creating test PNG:");
-			e.printStackTrace();
-		}
-		
-		try {imageTest.testTXT();} 
-		catch (AssertionFailedError e1) {txtFail = e1;}
-		catch (Throwable e) {
-			txtFail = e;
-			System.err.println("Error creating test TXT:");
-			e.printStackTrace();
-		}
-		
-		if (pngFail == null && txtFail == null) {return;} //passed!
-		if (pngFail == null && txtFail != null) {throw txtFail;}
-		if (pngFail != null && txtFail == null) {throw pngFail;}
-		
-		if (txtFail != null) {throw new Exception("Error creating txt and png (txt error enclosed)", txtFail);}
-		throw new Exception("Error creating png", pngFail);		
-	}
-
-
-	public void testAutoGuide_Axis() throws Throwable {
-		testOne(new AutoGuide_Axis(configs));
-	}
-
-	public void testAutoGuide_Sidebar() throws Throwable {
-		testOne(new AutoGuide_Sidebar(configs));
-	}
-
-	public void testNodeLink() throws Throwable {
-		testOne(new NodeLink(configs));
-	}
-
-	public void testPoverty() throws Throwable {
-		testOne(new Poverty(configs));
-	}
-
-	public void testRegistration() throws Throwable {
-		testOne(new Registration(configs));
+	public void testAutoGuide_AxisImage() throws Throwable {
+		new AutoGuide_Axis(configs).testPNG();
 	}
 	
-	public void testRotation() throws Throwable {
-		testOne(new Rotation(configs));
-	}
-	
-	public void testSeeTest() throws Throwable {
-		testOne(new SeeTest(configs));
-	}
-	
-	public void testSimpleLines() throws Throwable {
-		testOne(new SimpleLines(configs));
-	}
-	
-	public void testSourceForge() throws Throwable {
-		testOne(new Sourceforge(configs));
+	public void testAutoGuide_AxisText() throws Throwable {
+		new AutoGuide_Axis(configs).testTXT();
 	}
 
-	public void testStocks() throws Throwable {
-		testOne(new Stocks(configs));
+	public void testAutoGuide_SidebarText() throws Throwable {
+		new AutoGuide_Sidebar(configs).testTXT();
 	}
 	
-	public void testTweetCount() throws Throwable {
-		testOne(new TweetCount(configs));
-	}
-	
-	public void testVSM() throws Throwable {
-		testOne(new VSM(configs));
+	public void testAutoGuide_SidebarImage() throws Throwable {
+		new AutoGuide_Sidebar(configs).testPNG();
 	}
 
-	public void testVSM2() throws Throwable {
-		testOne(new VSM2(configs));
+	public void testNodeLinkText() throws Throwable {
+		new NodeLink(configs).testTXT();
+	}
+	public void testNodeLinkImage() throws Throwable {
+		new NodeLink(configs).testPNG();
+	}
+
+	public void testPovertyText() throws Throwable {
+		new Poverty(configs).testTXT();
+	}
+	public void testPovertyImage() throws Throwable {
+		new Poverty(configs).testPNG();
+	}
+
+	public void testRegistrationText() throws Throwable {
+		new Registration(configs).testTXT();
+	}
+	public void testRegistrationImage() throws Throwable {
+		new Registration(configs).testPNG();
+	}
+	
+	public void testRotationText() throws Throwable {
+		new Rotation(configs).testTXT();
+	}
+	public void testRotationImage() throws Throwable {
+		new Rotation(configs).testPNG();
+	}
+	
+	public void testSeeTestText() throws Throwable {
+		new SeeTest(configs).testTXT();
+	}
+	public void testSeeTestImage() throws Throwable {
+		new SeeTest(configs).testPNG();
+	}
+	
+	public void testSimpleLinesText() throws Throwable {
+		new SimpleLines(configs).testTXT();
+	}
+	public void testSimpleLinesImage() throws Throwable {
+		new SimpleLines(configs).testPNG();
+	}
+	
+	public void testSourceForgeText() throws Throwable {
+		new Sourceforge(configs).testTXT();
+	}
+	public void testSourceForgeImage() throws Throwable {
+		new Sourceforge(configs).testPNG();
+	}
+
+	public void testStocksText() throws Throwable {
+		new Stocks(configs).testTXT();
+	}
+	public void testStocksImage() throws Throwable {
+		new Stocks(configs).testPNG();
+	}
+	
+	public void testTweetCountText() throws Throwable {
+		new TweetCount(configs).testTXT();
+	}
+	public void testTweetCountImage() throws Throwable {
+		new TweetCount(configs).testPNG();
+	}
+	
+	public void testVSMText() throws Throwable {
+		new VSM_FillGrid(configs).testTXT();
+	}
+	public void testVSMImage() throws Throwable {
+		new VSM_FillGrid(configs).testPNG();
+	}
+
+	public void testVSM2Text() throws Throwable {
+		new VSM(configs).testTXT();
+	}
+	public void testVSM2Image() throws Throwable {
+		new VSM(configs).testPNG();
 	}
 }

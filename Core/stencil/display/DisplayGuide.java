@@ -2,7 +2,7 @@ package stencil.display;
 
 import java.util.List;
 
-import stencil.util.AutoguidePair;
+import stencil.tuple.Tuple;
 
 /**Conforming to this interface is required for guides used as automatic generation targets.
  * 
@@ -12,5 +12,5 @@ import stencil.util.AutoguidePair;
 public interface DisplayGuide {
 	/**Given a set of autoguide pairs, set the appropriate fields in the guide itself.*/
 	
-	public void setElements(List<AutoguidePair> elements);
+	public void setElements(List<Tuple> elements);
 }

@@ -29,6 +29,8 @@
 package stencil.operator.module;
 
 import java.util.Collection;
+import java.util.List;
+
 import stencil.parser.tree.Specializer;
 
 /**Interface for an object providing meta-data about a legend.
@@ -41,6 +43,8 @@ import stencil.parser.tree.Specializer;
  * */
 public interface OperatorData {
 	public static enum OpType {PROJECT, CATEGORIZE, BOTH, OTHER, NA};
+	public static String FUNCTION_KEY = "Function";
+	public static String FALSE = "false";
 	
 	/**What is the legend's name?*/
 	public String getName();
@@ -49,7 +53,7 @@ public interface OperatorData {
 	public String getModule();
 
 	/**What facets exist can be invoked?*/
-	public Collection<String> getFacets();
+	public List<String> getFacets();
 
 	/**Get the facet data object for the named facet.
 	 * */

@@ -34,7 +34,6 @@ import stencil.display.DisplayLayer;
 import stencil.parser.string.StencilParser;
 
 public class Layer extends StencilTree {
-	private String implantation;
 	private List<Consumes> groups;
 
 	private DisplayLayer displayLayer;
@@ -45,10 +44,7 @@ public class Layer extends StencilTree {
 	public String getName() {return token.getText();}
 	
 	public String getImplantation() {
-		if (implantation == null) {
-			implantation = findChild(StencilParser.GLYPH).getText();
-		}
-		return implantation;
+		return  findChild(StencilParser.GLYPH, null).getText();
 	}
 
 	public List<Rule> getDefaults() {

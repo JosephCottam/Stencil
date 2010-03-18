@@ -104,7 +104,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	 * @param glyph
 	 * @param RuntimeException The glyph introduced does not update a prior glyph (ID matching is used to determine if something is an update)
 	 */
-	@SuppressWarnings("null")
 	public void update(T glyph) throws RuntimeException {
 		String ID = glyph.getID();
 		T prior = index.replace(ID, glyph);
@@ -150,12 +149,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
 		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
 		
-		try {
-			Tuple defaults = Interpreter.process(layerDef.getDefaults(), Tuples.EMPTY_TUPLE);
-			prototype = prototype.update(defaults);
-		}
-		catch (Exception e) {throw new RuntimeException(format("Error processing defaults on layer %1$s.", name), e);}
-		
 		layer.setPrototype(prototype);
 
 		return layer;
@@ -163,7 +156,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	public void updatePrototype(Layer layerDef) {
 		try {
-			Tuple defaults = Interpreter.process(layerDef.getDefaults(), Tuples.EMPTY_TUPLE);
+			Tuple defaults = Interpreter.process(Tuples.EMPTY_TUPLE, layerDef.getDefaults());
 			prototypeGlyph = (T) prototypeGlyph.update(defaults);
 		}
 		catch (Exception e) {throw new RuntimeException(format("Error processing defaults on layer %1$s.", name), e);}		

@@ -11,8 +11,7 @@ public final class ArrayUtil {
 	
 	/**Append the given elements to the passed array.*/
 	public static <T> T[] arrayAppend(T[] a, T...ts ) {
-		T[] result = (T[]) java.lang.reflect.Array.
-        newInstance(a.getClass().getComponentType(), a.length + ts.length);
+		T[] result = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), a.length + ts.length);
 		System.arraycopy(a, 0, result, 0, a.length);
 	    System.arraycopy(ts, 0, result, a.length, ts.length);
 	    return result;
@@ -27,6 +26,33 @@ public final class ArrayUtil {
 			if (element == values[i] || (element != null && element.equals(values[i]))) {return i;}
 		}
 		return -1;
+	}
+	
+	/**Taken from Java 1.6 java.util.Arrays*/
+	public static <T> T[] copyOf(T[] source, int size) {
+		T[] n = (T[]) java.lang.reflect.Array.newInstance(source.getClass().getComponentType(), size);
+		System.arraycopy(source, 0, n, 0, Math.min(source.length, n.length));
+		return n;
+	}
+
+	/**Taken from Java 1.6 java.util.Arrays*/
+	public static <T> T[] copyOfRange(T[] source, int start, int end) {
+		int length = end-start;
+		T[] n = (T[]) java.lang.reflect.Array.newInstance(source.getClass().getComponentType(), length);
+		System.arraycopy(source, start, n, 0, length);
+		return n;
+	}
+	
+	/**Move elements from the iterator to the passed array. 
+	 * Will stop when the array is full or the iterator is exhausted.
+	 * Return value is the passed array.
+	 */
+	public static <T> T[] fromIterator(Iterable<T> source, T[] target) {
+		Iterator<T> it = source.iterator();
+		for (int i=0; i< target.length && it.hasNext(); i++) {
+			target[i] = it.next();
+		}
+		return target;
 	}
 	
 	/**List implementation backed by an array that cannot be re-sized.

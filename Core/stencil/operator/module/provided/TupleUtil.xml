@@ -7,9 +7,9 @@
 			<Opt specializer="[1 .. n]"/>
 		</Opts>
 		<Facets>
-			<Facet name="Map"  function="true" type="PROJECT" prototype="VALUE"/>
-			<Facet name="Query" function="true" type="PROJECT" prototype="VALUE"/>
-			<Facet name="Guide" function="true" type="PROJECT" prototype="VALUE"/>
+			<Facet name="map"  function="true" type="PROJECT" prototype="VALUE"/>
+			<Facet name="query" function="true" type="PROJECT" prototype="VALUE"/>
+			<Facet name="guide" function="true" type="PROJECT" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 
@@ -17,7 +17,7 @@
 	<Operator name="Len" target="Length"/>
 
 	<Operator name="Rename">
-		<Facet name="Map" function="true" type="PROJECT" prototype="%"/>
-		<Facet name="Query" function="true" type="PROJECT" prototype="%"/>
+		<Facet name="map" function="true" type="PROJECT" prototype="%"/>
+		<Facet name="query" function="true" type="PROJECT" prototype="%"/>
 	</Operator>
 </ModuleData>

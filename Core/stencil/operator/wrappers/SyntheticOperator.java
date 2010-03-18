@@ -30,16 +30,13 @@ package stencil.operator.wrappers;
 
 import java.util.Arrays;
 
-import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData;
-import stencil.operator.module.SpecializationException;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
+import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.OperatorRule;
-import stencil.parser.tree.Specializer;
 import stencil.parser.tree.View;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.PrototypedTuple;
@@ -47,14 +44,66 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototypes;
 
-/**Legend defined through a stencil definition.
- * TODO: Add compiler step to fold these legends directly into the call chains if only has one rule predicate on ALL and has no specialization
+/**Operator defined through a stencil definition.
+ * 
+ * TODO: Add compiler step to fold these operators directly into the call chains if only has one rule predicate on ALL and has no specialization
  * TODO: These aren't always projects...but they are for now!
+ * TODO: Add support for multi-faceted synthetic operators
  * */
-public class SyntheticOperator extends stencil.operator.util.BasicProject implements DynamicStencilOperator {
-	/**Exception to indicate that no rule matches the parameters passed to the given synthetic legend.*/
+public class SyntheticOperator extends stencil.operator.util.BasicProject implements StencilOperator {
+	/**Exception to indicate that no rule matches the parameters passed to the given synthetic operator.*/
 	public static class NoMatchException extends RuntimeException {
 		public NoMatchException(String message) {super(message);}
+	}
+	
+	/**Container for holding a stencil-defined operator.
+	 * @author jcottam
+	 *
+	 */
+	public static class SyntheticInvokeTarget {
+		stencil.parser.tree.Operator opDef;
+		public SyntheticInvokeTarget (stencil.parser.tree.Operator source) {
+			this.opDef = source;
+		}
+		
+		public Tuple query(Object... values) {return map(values);}
+
+		/**Returns the mapping set in this operator.*/
+		public Tuple map(Object... values) {
+			if (opDef.getArguments().size() != values.length) {
+				int expected = opDef.getArguments().size();
+				throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
+			}
+
+			Tuple tuple = new PrototypedTuple(opDef.getArguments(), Arrays.asList(values));
+			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);	//Extra slot for the pre-filter tuple
+			
+			OperatorRule action = matchingAction(env);
+
+			if (action != null) {
+				try {
+					 Tuple result = action.invoke(env);
+					 result = Tuples.align(result, opDef.getResults());
+					 return result;
+				} catch (Exception e) {
+					throw new RuntimeException ("Error executing method.",e);
+				}
+			}
+			
+			throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
+		}
+		
+
+		/**Find the action that matches the given tuple.  If none does, return null.*/
+		private OperatorRule matchingAction(Environment tuple) {
+			for (OperatorRule action: opDef.getRules()) {
+				if (action.matches(tuple)) {
+					return action;
+				}
+			}
+			return null;
+		}
+
 	}
 	
 	/**Indicates that rule exists to handle a value, may be returned from a query when a rule exists to handle a value.
@@ -63,72 +112,25 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 
 	protected final String module;
 
-	protected final stencil.parser.tree.Operator source;
+	protected final SyntheticInvokeTarget source;
 	
-	/**Create a Stencil Legend from a specification.*/
-	public SyntheticOperator(String module, stencil.parser.tree.Operator source) {
-		this.source = source;
+	/**Create a Stencil operator from a specification.*/
+	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
+		super(Modules.basicOperatorData(module, opDef.getName(), OpType.PROJECT, TuplePrototypes.getNames(opDef.getResults())));
+		this.source = new SyntheticInvokeTarget(opDef);
 		this.module = module;
-	}
-
-
-	/**Returns the mapping set in this legend.*/
-	public Tuple map(Object... values) {
-		if (source.getArguments().size() != values.length) {
-			int expected = source.getArguments().size();
-			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
-		}
-
-		Tuple tuple = new PrototypedTuple(source.getArguments(), Arrays.asList(values));
-		Environment env = Environment.getDefault(Canvas.global, View.global, tuple,1);	//Extra slot for the pre-filter tuple
-
-		//TODO: Handle local and prefitler!
-		env = env.extend(Tuples.EMPTY_TUPLE);	//prefilter
-		
-		OperatorRule action = matchingAction(env);
-
-		if (action != null) {
-			try {
-				 return action.invoke(env);
-			} catch (Exception e) {
-				throw new RuntimeException ("Error executing method.",e);
-			}
-		}
-		
-		throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
-	}
-
-	public String getName() {return source.getName();}
-
-	public Tuple query(Object... values) {return map(values);}
-
-	/**Find the action that matches the given tuple.  If none does, return null.*/
-	private OperatorRule matchingAction(Environment tuple) {
-		for (OperatorRule action: source.getRules()) {
-			if (action.matches(tuple)) {
-				return action;
-			}
-		}
-		return null;
-	}
-
-	public OperatorData getOperatorData(Specializer spec) throws SpecializationException {
-		if (spec !=null && !spec.isSimple()) {throw new SpecializationException("", getName(), spec);}
-		
-		String[] names = TuplePrototypes.getNames(source.getResults());
-		return Modules.basicOperatorData(module, getName(), OpType.PROJECT, names);
 	}
 
 	public Invokeable getFacet(String name) throws IllegalArgumentException {
 		try {
-			if (name.equals(StencilOperator.INVOKE_METHOD) 
-				|| name.equals(StencilOperator.QUERY_METHOD)) {
-				return new Invokeable(Modules.javaCase(name), this);
+			if (name.equals(StencilOperator.MAP_FACET) 
+				|| name.equals(StencilOperator.QUERY_FACET)) {
+				return new ReflectiveInvokeable(name, source);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
 		throw new IllegalArgumentException("Facet not defined: "+ name);
 	}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
-	public DisplayOperator duplicate() {throw new UnsupportedOperationException();}
+	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 }

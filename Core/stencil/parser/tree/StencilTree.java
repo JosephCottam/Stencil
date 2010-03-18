@@ -29,8 +29,6 @@
 package stencil.parser.tree;
 
 import java.lang.reflect.*;
-import java.util.Arrays;
-import java.util.List;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
@@ -52,10 +50,6 @@ public class StencilTree extends CommonTree {
 		return StencilParser.tokenNames[type];
 	}
 	
-	protected CommonTree findChild(int type) {
-		return findChild(type, null);
-	}
-	
 	protected CommonTree findChild(int type, String content) {
 		for (int i=0; children != null && i < children.size(); i++) {
 			CommonTree t = (CommonTree) children.get(i);
@@ -68,40 +62,6 @@ public class StencilTree extends CommonTree {
 	}
 	
 	public static boolean verifyType(Tree tree, int type) {return tree.getType() == type;}
-
-	/**Creates an array of accessors from the trees.  The objects in the array will be of the type passes*/
-	public static List<? extends StencilTree> pack(List<Tree> trees, Class<? extends Object> type) {
-		Constructor<? extends Object> c;
-
-		try {
-			c = type.getConstructor(new Class[]{Tree.class});
-		} catch (Exception e) {throw new IllegalArgumentException("Could not find appropriate constructor in class type passed.");}
-
-		StencilTree[] result = new StencilTree[trees.size()];
-		for (int i=0; i<trees.size(); i++) {
-			try{
-				result[i] = (StencilTree) c.newInstance(new Object[]{trees.get(i)});
-			} catch (Exception e) {throw new IllegalArgumentException("Error constructing wrapper accessor.", e);}
-		}
-		return Arrays.asList(result);
-	}
-
-	/**Creates an array of accessors from the trees.  The objects in the array be created by the method passed.
-	 * The method passed must take a single argument of type Tree.*/
-	public static List<? extends StencilTree> pack(List<Tree> trees, Class clss, String factoryMethod) {
-		StencilTree[] result = new StencilTree[trees.size()];
-		Method factory;
-		try {factory = clss.getMethod(factoryMethod, Tree.class);}
-		catch (Exception e) {throw new Error("Could not find " + factoryMethod + " method in class CallTarget");}
-
-		for (int i=0; i<trees.size(); i++) {
-			try{
-				result[i] = (StencilTree) factory.invoke(null, trees.get(i));
-			} catch (Exception e) {throw new IllegalArgumentException("Error constructing wrapper accessor.", e);}
-		}
-		return Arrays.asList(result);
-	}
-
 	
 	public Tree dupNode() {
 		try {

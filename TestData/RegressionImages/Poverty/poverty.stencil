@@ -1,5 +1,5 @@
 STREAM: File
-NAME: Region
+NAME: Regions
 HEADER: State  Region  Division
 SEPARATOR: \s\s+
 SOURCE: ./regions.txt
@@ -21,7 +21,7 @@ SKIP: 0
 STRICT: true
 STREAM: File
 NAME: Pop
-HEADER: State,Children,Adults,Elderly, Total
+HEADER: State,Children,Adults,Elderly,Total
 SEPARATOR: ,
 SOURCE: ./povertyCounts.csv
 SKIP: 1
@@ -40,13 +40,12 @@ external stream Regions(State, Region, Division)
 external stream Pop(State,Total,Children,Adults,Elderly)
 external stream Poverty(State,Children, Adults, Elderly, Total)
 
-order (Items | Postal | Region | Pop) > Poverty
+order (Items | Postal | Regions | Pop) > Poverty
 
 canvas Main
-	guide sidebar[displayOn="FILL_COLOR", X=350, Y=100] from Children FONT_COLOR
+	guide sidebar[sample="CATEGORICAL", displayOn="FILL_COLOR", X=350, Y=100, example.SIZE=12] from Children FONT_COLOR
 		example.SHAPE: "RECTANGLE"
-		label.FONT_SIZE: 10
-		example.SIZE: 12
+        label.FONT_SIZE: 10
 
 layer Labels[TEXT]
 from Items
@@ -56,19 +55,19 @@ from Items
 	X: XLayout(Name) -> (X)
 	FONT_SIZE: 15
 	WIDTH: 60
-	FONT_COLOR: @color(GRAY40)
+	FONT_COLOR: @Color{GRAY40}
 
 layer Prime
 from Postal
-	() : Abr.Put(State, ID) -> ()
+	() : Abr.put(State, ID) -> ()
 from Regions
-	() : Reg.Put(State, State, Region, Division) -> ()
+	() : Reg.put(State, Region, Division) -> ()
 from Pop
-	() : Pop.Put(State, State, Total,Children,Adults,Elderly) -> ()
+	() : Pop.put(State, Total, Children, Adults, Elderly) -> ()
 
 
-operator Pop base Mapping [1 .. n, "State", "Total", "Children", "Adults", "Elderly", CaseInsensitive=1]
-operator Reg base Mapping [1 .. n, "State", "Region", "Division", CaseInsensitive=1]
+operator Pop base Mapping [1 .. n, "Total", "Children", "Adults", "Elderly", CaseInsensitive=1]
+operator Reg base Mapping [1 .. n, "Region", "Division", CaseInsensitive=1]
 operator Abr base Mapping [1 .. n, "id", CaseInsensitive=1]
 
 layer Children[TEXT]
@@ -77,7 +76,7 @@ from Poverty
 	TEXT: Abr(State)
 	X: XLayout("Children")
 	Y:* Rank(Children, State) -> Mult(15, VALUE) 
-	FONT_COLOR:  Reg(State) #-> Color(Division)
+	FONT_COLOR:  Reg(State) #-> Coloring(Division)
 
 layer Children2[TEXT]
 from Poverty
@@ -85,8 +84,8 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Children") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Children.Find(State) -[L1]>
-				  Children2.Find(State) -[L2]>
+	FONT_COLOR :* Children.find(State) -[L1]>
+				  Children2.find(State) -[L2]>
 				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
@@ -97,7 +96,7 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> (X)
 	Y :* Rank(Total, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR: Reg(State) -> Color(Division) -> C
+	FONT_COLOR: Reg(State) -> Coloring(Division) -> C
 
 layer Total2[TEXT]
 from Poverty
@@ -105,8 +104,8 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Total.Find(State) -[L1]>
-				  Total2.Find(State) -[L2]>
+	FONT_COLOR :* Total.find(State) -[L1]>
+				  Total2.find(State) -[L2]>
 				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
@@ -117,7 +116,7 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> (X)
 	Y :* Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR: Reg(State) -> Color(Division) -> C
+	FONT_COLOR: Reg(State) -> Coloring(Division) -> C
 
 layer Elderly2[TEXT]
 from Poverty
@@ -125,8 +124,8 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Elderly.Find(State) -[L1]>
-				  Elderly2.Find(State) -[L2]>
+	FONT_COLOR :* Elderly.find(State) -[L1]>
+				  Elderly2.find(State) -[L2]>
 				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
@@ -137,7 +136,7 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> (X)
 	Y :* Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR: Reg(State) -> Color(Division) -> C
+	FONT_COLOR: Reg(State) -> Coloring(Division) -> C
 
 layer Adults2[TEXT]
 from Poverty
@@ -145,29 +144,29 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Adults.Find(State) -[L1]>
-				  Adults2.Find(State) -[L2]>
+	FONT_COLOR :* Adults.find(State) -[L1]>
+				  Adults2.find(State) -[L2]>
 				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 operator Color2 (State, Alpha) -> (C)
-(all) => (C): Color(State) -[Root]> 
-					Mult(Alpha,.5) -> Add(.25, VALUE) ->
+(all) => (C): Coloring(State) -[Root]> 
+					Mult(Alpha,.5) -> Add(64, VALUE) ->
 				  	SetAlpha(VALUE, Root[C]) -> VALUE
 
-operator Color(Division) -> (C)
-(Division =~ "USA") => (C) : @color(GRAY40)
-(Division =~ "New England") => (C) : @color(GREEN, .5)
-(Division =~ "Mid Atlantic") => (C) : @color(DARKGREEN, .5)
-(Division =~ "East North Central") => (C) : @color(TURQUOISE, .75)
-(Division =~ "West North Central") => (C) : @color(SKYBLUE, .75)
-(Division =~ "Atlantic") => (C) : @color(SANDYBROWN, .5)
-(Division =~ "East South Central") => (C) : @color(RED, .5)
-(Division =~ "West South Central") => (C) : @color(DARKORANGE, .5)
-(Division =~ "Mountain") => (C) : @color(PURPLE, .5)
-(Division =~ "Pacific") => (C) : @color(VIOLET, .5)
-(all) => (C) : @color(RED)
+operator Coloring(Division) -> (C)
+(Division =~ "USA") => (C) : @Color{GRAY40}
+(Division =~ "New England") => (C) : @Color{GREEN, 128}
+(Division =~ "Mid Atlantic") => (C) : @Color{DARKGREEN, 128}
+(Division =~ "East North Central") => (C) : @Color{TURQUOISE, 192}
+(Division =~ "West North Central") => (C) : @Color{SKYBLUE, 192}
+(Division =~ "Atlantic") => (C) : @Color{SANDYBROWN, 128}
+(Division =~ "East South Central") => (C) : @Color{RED, 128}
+(Division =~ "West South Central") => (C) : @Color{DARKORANGE, 128}
+(Division =~ "Mountain") => (C) : @Color{PURPLE, 128}
+(Division =~ "Pacific") => (C) : @Color{VIOLET, 128}
+(all) => (C) : @Color{RED}
 
 operator XLayout (Name) -> (X)
 (Name =~ "Total") => (X) : 0

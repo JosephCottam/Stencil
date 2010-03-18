@@ -4,14 +4,11 @@ package stencil.adapters.java2D.util;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import stencil.parser.tree.Canvas;
-import stencil.parser.tree.View;
+import stencil.interpreter.Interpreter;
 import stencil.parser.tree.Rule;
-import stencil.parser.tree.util.Environment;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.tuple.Tuple;
-import stencil.tuple.Tuples;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
 final class DynamicUpdateTask implements Runnable, Stopable {
@@ -44,16 +41,9 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
 			
 			try {
-				Environment env = Environment.getDefault(Canvas.global, View.global, source);
-				env = env.ensureCapacity(env.size() + 2 + rule.getAction().getDepth());
-				env.extend(Tuples.EMPTY_TUPLE);//TODO: Handle prefilter
-				env.extend(Tuples.EMPTY_TUPLE);//TODO: Handle local
-				
-				Tuple result = rule.apply(env);
+				Tuple result = Interpreter.process(source, rule);
 				Glyph2D newGlyph = glyph.update(result);
-				if (newGlyph != glyph) {
-					table.update(newGlyph);
-				}
+				if (result != newGlyph) {table.update(newGlyph);}
 			}
 			catch (Exception ex) {
 				System.err.println("Error in dynamic update.");

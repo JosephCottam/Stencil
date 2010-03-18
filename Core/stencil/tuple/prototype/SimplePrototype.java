@@ -10,7 +10,8 @@ import java.util.Set;
 public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TuplePrototype<SimpleFieldDef> {
 	public SimplePrototype() {super();}
 
-	public SimplePrototype(String[] names) {this(Arrays.asList(names));}
+
+	public SimplePrototype(String... names) {this(Arrays.asList(names));}
 	public SimplePrototype(Collection<String> names) {
 		this(names.toArray(new String[names.size()]), TuplePrototypes.defaultTypes(names.size()));
 	}

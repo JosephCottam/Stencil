@@ -1,0 +1,37 @@
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
+ <project name="TestStencil" default="RunTests">
+	<!--GUnit tests--> 	
+ 	<target name="RunTests"> 
+	 	<property name="testsLocation" location="bin/stencil/unittests/parser/string/grammars/" />
+
+		<jar jarfile="${runtimeLibrary}/Stencil.jar" includes="*.class" basedir=".">
+			<fileset dir="bin"/>
+		</jar>
+		<antcall target="EclipseRefresh"/>
+
+		<java classname="org.antlr.gunit.Interp" fork="yes" dir="${target}">
+			<classpath>
+				<pathelement path="${testsLocation}"/>
+				<pathelement path="${java.class.path}"/>
+				<pathelement path="."/>
+			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+			</classpath>
+			<arg value="${testsLocation}/Stencil.gunit"/>
+		</java>
+		<java classname="org.antlr.gunit.Interp" fork="yes" dir="${target}">
+			<classpath>
+				<pathelement path="${testsLocation}"/>
+				<pathelement path="${java.class.path}"/>
+				<pathelement path="."/>
+			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+			</classpath>
+			<arg value="${testsLocation}/SigilArgs.gunit"/>
+		</java>
+ 		
+
+ 		
+ 		<delete file="${runtimeLibrary}/Stencil.jar"/>
+	</target>
+ </project>

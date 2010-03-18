@@ -1,6 +1,6 @@
 package stencil.unittests.operator;
 
-import stencil.operator.DynamicStencilOperator;
+import stencil.operator.StencilOperator;
 import stencil.operator.module.ModuleCache;
 import stencil.operator.wrappers.EncapsulationGenerator;
 import stencil.operator.wrappers.JythonEncapsulation;
@@ -10,8 +10,8 @@ import stencil.parser.string.ParseStencil;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.operator.module.TestModuleCache;
 import stencil.adapters.java2D.Adapter;
-import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
-import static stencil.parser.ParserConstants.MAIN_BLOCK_TAG;
+import static stencil.parser.ParserConstants.INIT_FACET;
+import static stencil.parser.ParserConstants.MAIN_FACET;
 import junit.framework.*;
 
 import java.util.ArrayList;
@@ -72,29 +72,29 @@ public class TestEncapsulationGenerator extends TestCase {
 			
 			ModuleCache modules = new ModuleCache();
 			
-			Set<DynamicStencilOperator> legends = new HashSet<DynamicStencilOperator>();
+			Set<StencilOperator> legends = new HashSet<StencilOperator>();
 			for (Python p: program.getPythons()) {
-				DynamicStencilOperator l = g.generate(p, modules.getAdHoc());
+				StencilOperator l = g.generate(p, modules.getAdHoc());
 				legends.add(l);
 			}				
 			assertEquals("Incorrect number of encapsulations generated.", program.getPythons().size(),legends.size());
 			
 			for (Python p: program.getPythons()) {
 				assertNotNull("Defined environment not found: " + p.getEnvironment(), g.getEnvironment(p.getEnvironment()));
-				assertNotNull("Defined python group not found: " + p.getName(), findLegend(p.getName(), legends));
+				assertNotNull("Defined python group not found: " + p.getName(), findOperator(p.getName(), legends));
 			}
 			
 			for (Python p: program.getPythons()) {
-				JythonOperator legend = findLegend(p.getName(), legends);
+				JythonOperator legend = findOperator(p.getName(), legends);
 				
 				for (PythonFacet b: p.getFacets()) {
-					if (b.getName().equals(INIT_BLOCK_TAG)) {continue;}//Init blocks are not transfered, just executed.
+					if (b.getName().equals(INIT_FACET)) {continue;}//Init blocks are not transfered, just executed.
 					assertNotNull("Could not find declared python block", legend.getFacet(b.getName()));
 				}
 			}
 		}
-
-		assertEquals("Errors found generating for file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
+		String err = String.format("Errors found generating for %1$s file(s).", errors.size());
+		assertEquals(err, "[]", java.util.Arrays.deepToString(errors.toArray()));
 		assertTrue("No stencils found to parase.", foundStencils);
 	}
 	
@@ -105,14 +105,14 @@ public class TestEncapsulationGenerator extends TestCase {
 		List<String> arguments = Arrays.asList(new String[]{"value"});
 		List<String> results = Arrays.asList(new String[]{"rv"});
 		
-		Python p1 = getPython("test1", INIT_BLOCK_TAG, null, null, "sv=500");
+		Python p1 = getPython("test1", INIT_FACET, null, null, "sv=500");
 		g.generate(p1, modules.getAdHoc());
 
 		assertNotNull("Expected value not found after init block creation.", g.getEnvironment(p1.getEnvironment()).get("sv"));
 		assertEquals("Invalid value after init declared", 500, g.getEnvironment(p1.getEnvironment()).get("sv").__tojava__(Object.class));
 
 
-		Python p2 = getPython("test1", MAIN_BLOCK_TAG,  arguments, results,"rv=value");
+		Python p2 = getPython("test1", MAIN_FACET,  arguments, results,"rv=value");
 		JythonEncapsulation e2 = new JythonEncapsulation(p2,p2.getFacets().get(0), g);
 
 		PythonInterpreter env1 = g.getEnvironment(p1.getEnvironment());
@@ -132,9 +132,9 @@ public class TestEncapsulationGenerator extends TestCase {
 		assertEquals("Invalid value after Map facet was declared (but not executed).", 500, env2.get("sv").__tojava__(Object.class));
 	}
 	
-	private JythonOperator findLegend(String name, Set<DynamicStencilOperator> legends) {
-		for (DynamicStencilOperator l: legends) {
-			if (l.getName().equals(name)) {return (JythonOperator) l;}
+	private JythonOperator findOperator(String name, Set<StencilOperator> operators) {
+		for (StencilOperator op: operators) {
+			if (op.getName().equals(name)) {return (JythonOperator) op;}
 		}
 		return null;
 	}

@@ -2,14 +2,14 @@ STREAM: File
 NAME: VertexList
 HEADER: ID1,ID2
 SEPARATOR: ,
-SOURCE: ./er_100_0.005.adj
+SOURCE: ./ws_400_12_0.1.adj.adj
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: BFS
 HEADER: ID
 SEPARATOR: ,
-SOURCE: ./er_100_0.005.bfs
+SOURCE: ./ws_400_12_0.1.adj.bfs
 SKIP: 1
 STRICT: true
 
@@ -19,17 +19,18 @@ external stream BFS(ID)
 order BFS > VertexList
 
 layer VSM
+default
+    FILL_COLOR: @Color{RED}
+    (SIZE, SHAPE) : (1, "RECTANGLE")
 from VertexList
-	ID : Concatenate(ID2, ID1) -> VALUE
-	X : Ordering(ID1) -> (VALUE)
-	Y : Ordering(ID2) -> Mult(VALUE, -1) -> (VALUE)
-	(FILL_COLOR, SIZE, SHAPE) : (@color(RED), 1, "RECTANGLE")
+   ID : Concatenate(ID1, ID2) 
+   X : Ordering(ID1)
+   Y : Ordering(ID2) -> Mult(_, -1)
 from VertexList
-	ID : Concatenate(ID1, ID2) -> VALUE
-	X : Ordering(ID2) -> (VALUE)
-	Y : Ordering(ID1) -> Mult(VALUE, -1) -> (VALUE)
-	(FILL_COLOR, SIZE, SHAPE) : (@color(RED), 1, "RECTANGLE")
-
+   ID : Concatenate(ID2, ID1) 
+   X : Ordering(ID2) 
+   Y : Ordering(ID1) -> Mult(_, -1)
+ 
 layer Prime
 from BFS
 	() : Ordering(ID) -> ()

@@ -48,7 +48,6 @@ import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
 import stencil.parser.tree.CanvasDef;
 import stencil.parser.tree.Layer;
-import stencil.types.Converter;
 
 
 /**Some of this is derived from Prefuse's display and related objects.*/
@@ -70,7 +69,9 @@ public final class Canvas extends JComponent implements LayerUpdateListener {
 
 	
 	public Canvas(CanvasDef def, List<Layer> layers) {
-		this.setBackground((Color) Converter.convert(def.getSpecializer().getMap().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name()), Color.class));
+		String colorKey = def.getSpecializer().getMap().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name()).toString();
+		Color c = stencil.types.color.ColorCache.get(colorKey);
+		this.setBackground(c);
 		
 		this.layers = new DisplayLayer[layers.size()];
 		for (int i=0;i< layers.size();i++) {

@@ -94,20 +94,22 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		
 		for (Guide guideDef : program.getCanvasDef().getGuides()) {
 			DisplayLayer l = panel.getLayer(guideDef.getLayer());
-			String attribute = guideDef.getAttribute();
 			String guideType = guideDef.getGuideType();
 			
 			if (guideType.equals("axis")) {
-				Guide2D guide = new Axis(attribute, guideDef);
-				l.addGuide(attribute, guide);
+				Guide2D guide = new Axis(guideDef);
+				l.addGuide(guideDef.getAttribute(), guide);
 				
 				if (l.hasGuide("X") && l.hasGuide("Y")) {
 					((Axis) l.getGuide("X")).setConnect(true);
 					((Axis) l.getGuide("Y")).setConnect(true);
 				}
 			} else if (guideType.equals("sidebar")) {
-				Guide2D guide = new Sidebar(attribute, guideDef, sidebarCount++);
-				l.addGuide(attribute, guide);	
+				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
+				l.addGuide(guideDef.getAttribute(), guide);
+			} else if (guideType.equals("pointLabels")) {
+				Guide2D guide = new PointLabel(guideDef);
+				l.addGuide(guideDef.getAttribute(), guide);
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
 			}

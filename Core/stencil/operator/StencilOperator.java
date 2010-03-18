@@ -29,54 +29,57 @@
 package stencil.operator;
 
 
-import stencil.parser.tree.Value;
-import stencil.tuple.Tuple;
-
-import java.util.List;
+import stencil.operator.module.OperatorData;
+import stencil.operator.util.Invokeable;
 
 
-/**A Legend is a group of mapping function that may be specialized
- * to serve separate instance independently.  BasicLegend dictates the minimum
- * methods that must exist for a class to be used as a Legend.  Module-provided
- * meta-data reports the remaining information to the Stencil system.
+/**An operator is an object that can 
+ * hand out method objects to be appropriately invoked.
+ * Method objects are requested by role (role matching is case
+ * insensitive).  
  * 
- * Individual methods on a Legend are its mapping functions.
- *
- * The simplest legend is the identity function (tree = results).  Legends will typically move input values
- * to a color space (like a heat-map), coordinate space (alphabetical ordering on the axis)
- * or a shape space.
+ * Required roles: map and query
+ * Canonical, optional roles:
+ * 		guide -- Used in guide generation, may modify future results of map
+ *  			as guide requests may represent advice of potential inputs;
+ *  			when guide is not available query is used instead.
+ * 		updateRequired -- Used to determine if a dynamic binding or guide needs to be updated.
+ * 				Should return true if a call to map/query/guide may return 
+ * 				a different value than it did previously.  If not available,
+ * 				this will be assumed false on functions and true on non-functions.
  * 
- * A more complex map is the keystore.  It has two methods: map and query that behave differently,
- * but rely on information shared between them.  Futhermore, the 'remove' method modifies
- * the map and query behavior more, but is not a standard legend function.  
- *
+ * 
+ * The method objects returned by a role request must return a Tuple, 
+ * but may take any of a number of arguments over any types
+ * (and thus don't conform to a standard java Interface).  
+ * The Stencil runtime will take care of properly constructing
+ * an argument array to invoke the given method.
+ * 
+ * Operators instances may be specialized, and the specialization will
+ * be reflected in all roles.  Operators instances of the same base type
+ * are completely independent. 
+ * 
  * @author jcottam
  *
  */
 public interface StencilOperator {
-	/**Name of the method that should be invoked by clients wanting to use this legend*/
-	public static final String INVOKE_METHOD ="Map";
-	public static final String QUERY_METHOD ="Query";
-
-	/**Given the objects passed, what is the resulting object?
-	 * This method may feel free to produce side-effects.
-	 * The source for the returned tuple should be the same as the name
-	 * returned by getName.
+	//TODO:Move to ParserConstants...
+	public static final String MAP_FACET ="map";
+	public static final String QUERY_FACET ="query";
+	
+	/**Facet used to get the ID of the current state.
+	 * This is used to determine if update operations are required.
 	 */
-	public Tuple map(Object... args);
-
-	/**Alternative interface for map, but side effects are strongly discouraged.
-	 * This is used to check if something has been seen before, or
-	 * a hypothetical query before a set of values is accepted.
-	 * Generally, query(X) = map(X) when X is a valid set of objects.
-	 * However, query should return a tuple to indicate failure where
-	 * map is allowed to throw exceptions.   Generally, the tuple
-	 * should contain a single 'null' value, however if 'null'
-	 * "makes sense" for the legend, the implementing legend
-	 * should provide a consistent indicator.
-	 */
-	public Tuple query(Object... args);
-
+	public static final String STATE_FACET = "stateID";
+	
+	/**Retrieve an invokeable object.  This is a combined method and target.
+	 * IllegalArgumentException is thrown when the facet is not know.
+	 * */
+	public Invokeable getFacet(String facet) throws IllegalArgumentException;
+	
+	/**Retrieve the operator data for the current operator.*/ 
+	public OperatorData getOperatorData();
+	
 	/**How is this legend identified?  Legends are registered in their modules under their name.*/
 	public String getName();
 	
@@ -86,9 +89,11 @@ public interface StencilOperator {
 	 * This is an optional operation, required by Split support.  If an operator does not support
 	 * split, it should throw an UnsupportedOperationException.
 	 * 
-	 * This is similar, but not identical to clone.
+	 * This is similar, but not identical to clone as clone copies ALL runtime state where
+	 * duplicate produces a new instance.
+	 * 
 	 * A possible implementation would be to clone the implementing object immediately upon
-	 * construction and keep that pristine clone in private storage.  When duplicate is
+	 * 	construction and keep that pristine clone in private storage.  When duplicate is
 	 * called, the clone is then cloned again and the new replicate is returned.  
 	 * This is not necessarily an efficient way to implement duplicate, but it is
 	 * would satisfy the semantics of duplicate. True mathematical functions with no 
@@ -98,29 +103,4 @@ public interface StencilOperator {
 	 * @throws UnsupportedOperationException
 	 */
 	public StencilOperator duplicate() throws UnsupportedOperationException;
-	
-
-	/**Generate the relevant guide objects.
-	 * 
-	 * For categorical operations, all inputs may be ignored and a list of categories is returned.  
-	 * 
-	 * For project operations, the input is a list of potential requests to map.
-	 * The output is a list of results that the operator would produce
-	 * if presented with those inputs.
-	 * 
-	 * @param formalArguments What are the formal arguments for this operator invocation instance?
-	 * @param sourceArguments What was produced by the prior operator in the chain?
-	 * @param prototype What is the tuple prototype for the prior operator in the chain? //TODO: Remove when the formals use strictly positional references
-	 * 
-	 * @throws IllegalArgumentException Null list passed to project operation
-	 * @throws IllegalArgumentException Non-null list passed to categorize operation
-	 * @throws UnsupportedOperationException Thrown when this method is not defined
-	 */
-	public List<Object[]> guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype);
-	
-	/**Does this operator require a refresh for the guide?
-	 * Returns true when the guide operator would likely return
-	 * different results given the same input than before.
-	 **/
-	public boolean refreshGuide();
 }

@@ -46,7 +46,7 @@ options {
 	import stencil.parser.tree.Function;
 	import stencil.parser.tree.StencilTreeAdapter;
 	import stencil.parser.tree.Rule;
-	import static stencil.parser.ParserConstants.QUERY_BLOCK_TAG;
+	import static stencil.parser.ParserConstants.QUERY_FACET;
 
 	import java.util.Map;
 	import java.util.HashMap;
@@ -79,10 +79,10 @@ options {
 	}
     
     
-    private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_BLOCK_TAG).toString();}       
+    private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
 }
 
 topdown 
-	@after{((Function) retval.tree).setOperator(((Function) f).getOperator());}
+  @after{((Function) retval.tree).setInvokeable(((Function) f).getOperator(), QUERY_FACET);}
 	:^(f=FUNCTION spec=. args=. yield=. target=.) -> ^(FUNCTION[queryName($f.getText())] $spec $args $yield $target);
 

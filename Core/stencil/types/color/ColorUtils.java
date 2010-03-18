@@ -32,48 +32,31 @@ import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.operator.module.ModuleData;
+import stencil.operator.module.OperatorData;
 import stencil.operator.module.util.BasicModule;
-import stencil.parser.tree.Value;
+import stencil.operator.util.BasicProject;
 
 public final class ColorUtils extends BasicModule {
-	//TODO: Try to make more static methods in sigils so this instance doesn't need to exist
-	private static final stencil.types.color.Color colorType = new stencil.types.color.Color();
-	
 	private enum DIR {up, down, full, none};
 
-	static Integer rangeValue(Value value) {
-		Integer v;
-		if (value.isNumber()) {
-			Number n = (Number) value.getValue();
-			if (n instanceof Integer) {
-				v = (Integer) n;
-			} else {
-				v = rangeValue(((Double) n).floatValue());
-			}
-		} else {
-			throw new RuntimeException("Recived non-number to 'rangeValue'");
-		}
-		return v;
-	}
-		
-	/**Convert a float to be in the proper integer range.*/
-	static final Integer rangeValue(float f) {
-		if (f > 1) {f=1;}
-		if (f < 0) {f=0;}
-		return Math.round(f*255);
+	
+	/**Ensure integer is in the proper range**/
+	static final int rangeValue(int i) {
+		if (i<0) {i=0;}
+		if (i>255) {i=255;}
+		return i;
 	}
 	
 	private static ColorTuple validate(Object o) {
 		if (o instanceof ColorTuple) {return (ColorTuple) o;}
-		return (ColorTuple) colorType.convert(o, ColorTuple.class);
+		if (o instanceof java.awt.Color) {return ColorCache.toTuple(((java.awt.Color) o).getRGB());}
+		else throw new RuntimeException("Not a known color format: " + o.toString());
 	}
 
 	private static Tuple mod(Object source, int comp, Object v, String name) {
 		ColorTuple color = validate(source);
 		
-		Number value = Converter.toNumber(v);
-		if (value instanceof Float) {value = rangeValue((Float) value);}
-		else if (value instanceof Double) {value = rangeValue(((Double) value).floatValue());}
+		Integer value = rangeValue(Converter.toInteger(v));
 		
 		return PrototypedTuple.singleton(color.modify(comp, value)); //TODO: Change so just the color tuple is returned
 	}
@@ -115,6 +98,13 @@ public final class ColorUtils extends BasicModule {
 	public static Tuple setAlpha(Object v, Object o) {return mod(o, ColorTuple.ALPHA, v, "setAlpha");}
 	public static Tuple opaque(Object o) {return mod(o, ColorTuple.ALPHA, DIR.full, "Opque");}
 
+	public static class Color extends BasicProject {
+		public Color(OperatorData opData) {super(opData);}
+		public Tuple argumentParser(String arg) {
+			return ColorCache.get(arg);
+		}
+
+	}
 	
 	public ColorUtils(ModuleData md) {super(md);}
 }

@@ -12,35 +12,35 @@ external stream Edges (ID1, ID2)
 
 layer Nodes
 from Edges
-	ID: ID1
-	REGISTRATION : "CENTER"
-	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y):* Ordering(ID1) -> Circular.Query(VALUE) -> (X,Y)
+	ID: ID1 
+	FILL_COLOR: @Color{MAROON}
+	(X,Y):* Ordering(ID1) -> Circular.query(VALUE) -> (X,Y)
+	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
 from Edges
 	ID: ID2
-	REGISTRATION : "CENTER"
-	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @color(MAROON), 2)
-	(X,Y):* Ordering(ID2) -> Circular.Query(VALUE) -> (X,Y)
+	FILL_COLOR: @Color{MAROON}
+	(X,Y):* Ordering(ID2) -> Circular.query(VALUE) -> (X,Y)
+	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
 
 layer Edges[LINE]
 default
-	STROKE_COLOR: @color(GRAY80, .8)
+	STROKE_COLOR: @Color{GRAY80, .8}
 from Edges 
 	ID: Concatenate(ID1,ID2) -> (VALUE)
-	(X.1, Y.1):* Nodes.Find(ID1) -> (X,Y)
-	(X.2, Y.2):* Nodes.Find(ID2) ->  (X,Y)
+	(X.1, Y.1):* Nodes.find(ID1) -> (X,Y)
+	(X.2, Y.2):* Nodes.find(ID2) ->  (X,Y)
 	STROKE_WEIGHT: .25
 
 operator Ordering (ID)->(VALUE)  
 	(all) => VALUE : Index(ID) -> (VALUE)
 
 python Circular
-facet Init {
+facet init {
 	from math import *
 	max =0
 }
 
-facet Query(Seq) -> (X,Y) {
+facet query(Seq) -> (X,Y) {
 	Seq = float(Seq) +1
 	if (Seq > max): max=Seq
 

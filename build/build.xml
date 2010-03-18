@@ -1,0 +1,217 @@
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
+ <project name="Stencil" default="Stencil" basedir="..">
+ 	<property name="src" location="Core" />
+ 	<property name="target" location="bin" />
+ 	<property name="runtimeLibrary" location="./Library/"/>
+ 	<property name="grammars" location ="${src}/stencil/parser/grammars/"/>
+ 	<property name="parser" location ="${src}/stencil/parser/string/"/>
+ 	<property name="ast" location ="${src}/stencil/parser/tree/"/>
+ 	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
+ 	
+ 	<target name="CurrentWorkingGrammar">
+ 		<antlr 
+			target="${grammars}/Stencil.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr 
+			target="${grammars}/PrepareCustomArgs.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antcall target="EclipseRefresh"/>
+ 	</target>
+ 	
+ 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
+		<javac srcdir="${src}" destdir="${target}">
+			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
+			<!-- compilerarg value="-Xlint"/ -->
+		</javac>
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+
+
+ 	
+ 	<target name="Interpreter" depends="StencilGrammar">
+ 		<property name="dest" location="${interpreter}"/>
+ 		<property name="lib" location="${parser}"/>
+ 		
+ 		<antlr
+ 			target="${interpreter}/DynamicRule.g"
+			outputdirectory="${dest}"
+ 			libdirectory="${lib}"
+ 		/>
+  	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+  	
+	<!-- Just the core stencil grammar, not the additional processing.-->
+ 	<target name="StencilGrammar">
+ 		<antlr 
+			target="${grammars}/Stencil.g"
+			outputdirectory="${parser}"
+		/>
+
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+
+ 	
+ 	<!--All of the tree manipulations prior to the interpreter-->
+ 	<target name="StencilTransformer" depends="StencilGrammar">
+        <antlr
+           target="${grammars}/PreparsePython.g"
+           outputdirectory="${parser}"
+           libdirectory="${parser}"
+       />
+
+ 		<antlr
+			target="${grammars}/Imports.g"
+			outputdirectory="${parser}"
+		/>
+ 		<antlr
+ 			target="${grammars}/DefaultSpecializers.g"
+ 			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/EnsureOrders.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/AdHocOperators.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/SetOperators.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/DefaultPack.g"
+ 			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${grammars}/DereferenceOperators.g"
+			outputdirectory="${parser}"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/TupleRefChain.g"
+			outputdirectory="${parser}"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/SeparateTargets.g"
+			outputdirectory="${parser}"
+		/> 	
+ 		<antlr
+ 			target="${grammars}/NumeralizeTupleRefs.g"
+			outputdirectory="${parser}"
+ 		/> 
+ 		<antlr
+ 			target="${grammars}/FrameTupleRefs.g"
+			outputdirectory="${parser}"
+ 		/> 
+ 		<antlr 
+			target="${grammars}/LiftSharedConstantRules.g"
+			outputdirectory="${parser}"
+ 		/> 		
+ 		<antlr 
+			target="${grammars}/AnnotateEnvironmentSize.g"
+			outputdirectory="${parser}"
+ 		/> 		
+ 		<antlr 
+			target="${grammars}/PrepareCustomArgs.g"
+			outputdirectory="${parser}"
+ 		/>
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+
+ 	<target name="Validators" depends="StencilGrammar">
+        <antlr
+            target="${grammars}/validators/AllInvokeables.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+
+ 		<antlr
+ 			target="${grammars}/validators/RangeValidator.g"
+ 			outputdirectory="${parser}/validators/"
+ 			libdirectory="${parser}"
+ 		/>
+ 		<antlr
+			target="${grammars}/validators/StreamDeclarationValidator.g"
+ 			outputdirectory="${parser}/validators/"
+ 			libdirectory="${parser}"
+		/>
+        <antlr
+           target="${grammars}/validators/TargetMatchesPack.g"
+           outputdirectory="${parser}/validators/"
+           libdirectory="${parser}"
+       />
+ 	</target>
+ 		
+ 	
+ 	<target name="ModuleData">
+ 		<property name="modulesUtil" location="${src}/stencil/operator/module/util/"/>
+ 		<antlr
+ 			target="${modulesUtil}/ModuleData.g"
+			outputdirectory="${modulesUtil}"
+ 		/>
+ 	 	<antcall target="EclipseRefresh"/>
+
+ 	</target>
+ 	
+
+
+ 	<target name="TreeAdapterGrammar" depends="StencilGrammar">
+ 		<antlr
+ 			target="${grammars}/StencilTreeAdapter.g"
+ 			outputdirectory="${ast}"
+ 		/>
+ 	 	<antcall target="EclipseRefresh"/>
+	</target>
+
+ 	<target name="TreeAdapter" depends="TreeAdapterGrammar, StencilBuild">
+		<java classname="stencil.util.build.GenerateTreeAdapter" fork="true">
+			<classpath>
+				<pathelement path="${target}"/>
+				<pathelement path="${java.class.path}"/>
+			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+			</classpath>
+			<arg value="${parser}/Stencil.tokens" />
+			<arg value="${grammars}/StencilTreeAdapter.stg" />
+			<arg value="${ast}/StencilTreeAdapter.java" />
+		</java>
+ 	 	<antcall target="EclipseRefresh"/> 		
+ 	</target>
+
+ 	<target name="StencilBuild">
+ 		<property name="dir" value="/stencil/util/build"/>
+ 		<mkdir dir="${target}${dir}" />
+ 		<javac sourcepath="" srcdir="${src}${dir}" destdir="${target}">
+			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
+ 		</javac>
+ 	</target>
+
+ 	
+ 	<target name="Release_With_Build" depends="Stencil,Release" />
+ 	
+ 	<target name="Release">
+ 		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>
+	</target> 
+
+ 	<target name="GuideSystem" depends="StencilGrammar">
+ 		<ant antfile="./build/GuideSystem.xml" inheritRefs="true"/>
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+ 	
+ 	
+	<!--GUnit tests--> 	
+ 	<target name="RunTests" depends="StencilGrammar"> 
+ 		<ant antfile="./build/Test.xml" inheritRefs="true"/>
+	</target>
+
+
+ 	<target name="EclipseRefresh" if="eclipse.running">
+ 		<eclipse.refreshLocal resource="Stencil/Core/" depth="infinite" />
+ 	</target>
+ 			
+
+ 
+ </project>

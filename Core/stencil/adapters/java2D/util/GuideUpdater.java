@@ -6,7 +6,6 @@ import org.antlr.runtime.tree.TreeNodeStream;
 import stencil.display.StencilPanel;
 import stencil.interpreter.NeedsGuides;
 import stencil.interpreter.UpdateGuides;
-import stencil.operator.module.ModuleCache;
 import stencil.parser.tree.Program;
 
 public class GuideUpdater implements Runnable, Stopable {
@@ -25,13 +24,11 @@ public class GuideUpdater implements Runnable, Stopable {
 		NeedsGuides ng = null;
 		UpdateGuides ug = null;
 		
-		ModuleCache c = program.getModuleCache();
 		TreeNodeStream treeTokens = new CommonTreeNodeStream(program);
 
 		if (program.getCanvasDef().getGuides().size() >0) {
 			ng = new NeedsGuides(treeTokens);
 			ug = new UpdateGuides(treeTokens);
-			ug.setModuleCache(c);//TODO: Remove when all tuple references are positional
 		}
 		
 		needsGuides = ng;
@@ -54,8 +51,7 @@ public class GuideUpdater implements Runnable, Stopable {
 			updateGuides.updateGuides(panel);
 		}	
 	}
-	
-	
+		
 	public void signalStop() {run = false;}
 	
 	/**Is this updater required for the program it was passed?

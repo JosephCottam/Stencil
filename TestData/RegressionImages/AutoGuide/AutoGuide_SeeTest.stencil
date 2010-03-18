@@ -17,8 +17,8 @@ external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name
 external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
 
 canvas main
-	guide axis from Trivial Y
-	guide axis from Trivial X
+	guide axis[sample="CATEGORICAL"] from Trivial Y
+	guide axis[sample="CATEGORICAL"] from Trivial X
 
 
 layer Trivial
@@ -37,15 +37,15 @@ operator BasicFails(fails) -> (C)
 	(fails > 0) => C: Pallet("FAIL") -> SetAlpha(.4,C) -> (VALUE)
 
 operator Pallet(Name) -> (C)
-	(Name =~"FAIL")    => C: @color(200,30,30)
-	(Name =~"PASS")    => C: @color(0,180,0)
-	(Name =~"MISSING") => C: @color(WHITE)
-	(Name =~"N/A")     => C: @color(GRAY90)
-	(Name =~"GRID")    => C: @color(GRAY80)
+	(Name =~"FAIL")    => C: @Color{200,30,30}
+	(Name =~"PASS")    => C: @Color{0,180,0}
+	(Name =~"MISSING") => C: @Color{WHITE}
+	(Name =~"N/A")     => C: @Color{GRAY90}
+	(Name =~"GRID")    => C: @Color{GRAY80}
 
 
 python Layout
-facet Init {
+facet init {
 XIndex= []
 YIndex = []
 majorOffset = 50
@@ -87,18 +87,24 @@ def suiteLayout(baseX, baseY, suite):
 	return (X,Y) 
 }
 
-@project facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
+@type("PROJECT")
+facet suite(X1,X2,Y1,Y2, suite) -> (X,Y)
 {
 	(X,Y) = baseLayout(X1,X2,Y1,Y2)
 	(X,Y) = suiteLayout(X,Y, suite)
 }
 
-@project facet Map (X1,X2,Y1,Y2) -> (X,Y) {
+@type("PROJECT")
+facet map (X1,X2,Y1,Y2) -> (X,Y) {
 	(X,Y) = baseLayout(X1,X2,Y1,Y2)
 }
 
-@project facet Query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
-@project facet DoGuide () -> (T) {T = "FALSE"}
+@type("PROJECT")
+facet query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
 
-@project facet Guide (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
+@type("PROJECT")
+facet doGuide () -> (T) {T = "FALSE"}
+
+@type("PROJECT")
+facet guiding (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
 

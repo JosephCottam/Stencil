@@ -29,11 +29,17 @@
 package stencil.util;
 
 import java.awt.geom.Dimension2D;
+import java.awt.geom.Rectangle2D;
 
 public final class DoubleDimension extends Dimension2D {
 	public double width;
 	public double height;
 
+	public DoubleDimension(Rectangle2D r) {
+		width = r.getWidth();
+		height = r.getHeight();
+	}
+	
 	public DoubleDimension(int width, int height) {
 		this.width = width;
 		this.height = height;

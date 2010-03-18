@@ -1,0 +1,17 @@
+name: TupleUtil
+targetClass: stencil.operator.module.provided.TupleUtil
+description: Utilities to manipulate the tuple data representation.
+
+defaults:
+  defaultSpecializer: !spec "[1 .. n]"
+  facets:
+    - {name: map,  function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: query,  function: true, type: PROJECT, prototype: !proto "VALUE"}
+
+operators:
+  - name: Length
+  - {name: Len, target: Length}
+  - name: Rename
+    facets:
+      - {name: map, function: true, type: PROJECT}
+      - {name: query, function: true, type: PROJECT}

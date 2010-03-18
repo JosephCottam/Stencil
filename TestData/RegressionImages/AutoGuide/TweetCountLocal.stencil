@@ -7,11 +7,13 @@ SKIP: 1
 STRICT: TRUE
 
 
-external stream Tweets(MESSAGE, LINK, TIME)
+external stream Tweets(MESSAGE)
 
 canvas Main
-	guide axis[label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6] 
-		from Counts X
+	guide axis[sample="CATEGORICAL", tickSize=5, textOffset=6] from Counts X
+        label.FONT_SIZE: 10
+        line.STROKE_WEIGHT: 1 
+        label.REGISTRATION: "LEFT"
 	
 
 layer Counts
@@ -21,6 +23,8 @@ from Tweets
 	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE)
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
+	
+layer Tracking
 from Tweets
 	view(ZOOM) : Zoom(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT]) -> _
 	view(X,Y): (canvas[X], canvas[Y])

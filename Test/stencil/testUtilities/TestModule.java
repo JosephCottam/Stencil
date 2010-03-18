@@ -4,7 +4,9 @@ import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
-import stencil.operator.wrappers.InvokeableLegend;
+import stencil.operator.util.Invokeable;
+import stencil.operator.util.ReflectiveInvokeable;
+import stencil.operator.wrappers.InvokeablesLegend;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
@@ -20,13 +22,11 @@ public class TestModule implements Module {
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
 		MutableOperatorData ld = (MutableOperatorData) MODULE_DATA.getOperatorData("FilterFail");
-		ld.addFacet(new BasicFacetData("Map", OpType.PROJECT, "VALUE"));
+		ld.addFacet(new BasicFacetData("map", OpType.PROJECT, "VALUE"));
 	}
 	
 	public static TestModule instance() {return instance;}
-	
 
-	
 	public static class Filter {
 		static int count = 0;
 		public static Tuple doFilter(String ID) {
@@ -44,7 +44,9 @@ public class TestModule implements Module {
 		try {
 			if (name.equals("FilterFail")) {
 				Method m = Filter.class.getMethod("doFilter", String.class);
-				return new InvokeableLegend(name, m);
+				Invokeable inv = new ReflectiveInvokeable(m, null);
+				OperatorData od = getOperatorData(name, specializer);
+				return new InvokeablesLegend(name,  od, inv);
 			}
 		} catch (Exception e) {throw new RuntimeException(e);}
 		throw new RuntimeException("No such legend " + name);

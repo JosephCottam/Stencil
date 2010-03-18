@@ -36,17 +36,17 @@ import stencil.parser.tree.PythonFacet;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
-import static stencil.parser.ParserConstants.INIT_BLOCK_TAG;
+import static stencil.parser.ParserConstants.INIT_FACET;
 
 import java.util.Arrays;
 import java.lang.reflect.Method;
 
 /**Container of Jython code that has been defined in a stencil definition.
- * This container is suitable for use with the method paint and performs the
- * translation into and out of the jython environment for values passed to and
+ * This container is suitable for use with the stencil operator method invocation routines 
+ * and performs the translation into and out of the jython environment for values passed to and
  * returned from the jython environment.
  *
- * Jython body's that are named after the ParserConstants.INIT_BLOCK_TAG are
+ * Jython bodies that are named after the ParserConstants.INIT_BLOCK_TAG are
  * automatically executed on construction of the encapsulation.
  *
  * @author jcottam
@@ -61,7 +61,7 @@ public final class JythonEncapsulation {
 	protected final PyCode codeCache;
 
 	public JythonEncapsulation(Python python, PythonFacet facet, EncapsulationGenerator envSource) {
-		assert !facet.getName().equals(INIT_BLOCK_TAG) : "Should never create an encapusluation for init block.";
+		assert !facet.getName().equals(INIT_FACET) : "Should never create an encapusluation for init block.";
 
 		this.facet = facet;
 		environment = envSource.registerEnv(python.getEnvironment());
@@ -123,7 +123,7 @@ public final class JythonEncapsulation {
 	public String getName() {return facet.getName();}
 	public TuplePrototype getArguments() {return facet.getArguments();}
 	public TuplePrototype getReturns() {return facet.getResults();}
-	public String getAnnotation(String name) {return facet.getAnnotation(name);}
+	public String getAnnotation(String name) {return facet.getAnnotations().get(name).getText();}
 	
 	
 	public Method getInvokeMethod() {

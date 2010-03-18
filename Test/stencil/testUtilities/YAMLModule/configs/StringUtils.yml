@@ -1,0 +1,17 @@
+name: StringUtils
+targetClass: stencil.operator.module.provided.StringUtils
+description: String manipulation.
+
+defaults:
+  defaultSpecializer: !spec "[n .. n]"
+  facets:
+    - {name: map, type: PROJECT, function: true, prototype: !proto "VALUE"}
+    - {name: query, type: PROJECT, function: true, prototype: !proto "VALUE"}
+
+operators:
+  - name: Concatenate
+  - name: Format
+  - name: Print
+  - name: ToString
+  - name: Substring
+  - name: Trim

@@ -32,19 +32,19 @@ layer Others[PIE]
 from MTTSource
 	filter(suite_name !~"trivial")
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
-	(X,Y): Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
+	(X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
 	SIZE: 13
 	STROKE_WEIGHT: 3
 	STROKE_COLOR: RelativeFails(fail, pass)
 	SLICE: fail
 	FIELD: pass
 	SLICE_COLOR: Palet("FAIL")
-	FIELD_COLOR: @color(WHITE)
+	FIELD_COLOR: @Color{WHITE}
 
 layer NotApplicable
 from MTTNotApplicable
 	ID: Concatenate(axis1A, axis1B, axis2A, axis2B) 
-	(X,Y) : Layout.Query(axis1A, axis1B, axis2A, axis2B) -> (X,Y)
+	(X,Y) : Layout.query(axis1A, axis1B, axis2A, axis2B) -> (X,Y)
 	FILL_COLOR: Palet("N/A") -> (C)
 	SIZE: 50
 	SHAPE: "RECTANGLE"
@@ -55,16 +55,15 @@ from MTTNotApplicable
 layer SubLabels[TEXT]
 from MTTSource
 	filter(suite_name !~"trivial")
-	ID: Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> (VALUE)
-	X: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(X, -10) -> (VALUE)
-	Y: Layout.Suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> Add(Y,11) -> (VALUE)
+	local(ID): Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
+	ID: local[ID]
+	(X,Y): Others.find(local[ID]) -> (X,Y)
 	TEXT: suite_name
 	FONT_SIZE: 5
-	WIDTH: 30
 	ROTATION: -45
-	JUSTIFY: "CENTER"
+	REGISTRATION: "CENTER"
 	FONT_STYLE: "BOLD"
-	FONT_COLOR: @color(0,0,0,.65)
+	FONT_COLOR: @Color{0,0,0,166}
 
 layer Labels[TEXT]
 from MTTSource
@@ -77,8 +76,8 @@ from MTTSource
 	ID: Concatenate(axis2A, axis2B) -> VALUE
 	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12) -> VALUE
 	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(VALUE) -> Label
-	(X, WIDTH) : (-155, 150)
-	(JUSTIFY): ("RIGHT")
+	X : -5
+	(JUSTIFY, REGISTRATION): ("RIGHT", "TOP_RIGHT")
 from MTTSource
 	ID: graphLabel
 	Y: NamesIndex(graphLabel) -> VALUE
@@ -118,23 +117,23 @@ operator NamesIndex(ID) -> (VALUE)
 	all => VALUE: Index(ID) -> (VALUE)
 
 operator BasicFails(fails) -> (C)
-	(fails = 0) => C: Palet("PASS") -> SetAlpha(.2, C)
-	(fails > 0) => C: Palet("FAIL") -> SetAlpha(.4,C)
+	(fails = 0) => C: Palet("PASS") -> SetAlpha(51, C)
+	(fails > 0) => C: Palet("FAIL") -> SetAlpha(102,C)
 
 operator RelativeFails(fails, passes) -> (C)
-	(passes= 0) => C: @color(BLACK)
+	(passes= 0) => C: @Color{BLACK}
 	(fails = 0) => C: Palet("PASS")
 	(fails > 0) => C: Palet("FAIL")
 
 operator Palet(Name) -> (C)
-	(Name =~"FAIL")    => C: @color(200,30,30)
-	(Name =~"PASS")    => C: @color(0,180,0)
-	(Name =~"MISSING") => C: @color(WHITE)
-	(Name =~"N/A")     => C: @color(GRAY90)
-	(Name =~"GRID")    => C: @color(GRAY80)
+	(Name =~"FAIL")    => C: @Color{200,30,30}
+	(Name =~"PASS")    => C: @Color{0,180,0}
+	(Name =~"MISSING") => C: @Color{WHITE}
+	(Name =~"N/A")     => C: @Color{GRAY90}
+	(Name =~"GRID")    => C: @Color{GRAY80}
 
 python Break
-facet Map (Orig) -> (Label)
+facet map (Orig) -> (Label)
 {
 	Label=Orig.replace("Absoft: Absoft ", "")
 	Label=Label.replace("Absoft: ", "")
@@ -144,7 +143,7 @@ facet Map (Orig) -> (Label)
 
 
 python Layout
-facet Init {
+facet init {
 	XIndex= []
 	YIndex = []
 	majorOffset = 50
@@ -185,11 +184,11 @@ facet Init {
 		return (X,Y)	
 }
 
-facet Suite(X1,X2,Y1,Y2, suite) -> (X,Y)
+facet suite(X1,X2,Y1,Y2, suite) -> (X,Y)
 {
 	(X,Y) = baseLayout(X1,X2,Y1,Y2)
 	(X,Y) = suiteLayout(X,Y, suite)
 }
-facet Map   (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = baseLayout(X1,X2,Y1,Y2)}
-facet Query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
+facet map   (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = baseLayout(X1,X2,Y1,Y2)}
+facet query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
 

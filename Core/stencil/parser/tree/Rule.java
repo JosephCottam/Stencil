@@ -53,7 +53,7 @@ public class Rule extends StencilTree {
 	public CallChain getAction() {return (CallChain) getChild(1);}
 
 	/**Is the binding dynamic?*/
-	public boolean isDyanmic() {return getChild(2).getType() == StencilParser.DYNAMIC;}
+	public boolean isDynamic() {return getChild(2).getType() == StencilParser.DYNAMIC;}
 	
 	/**Is the binding static?*/
 	public boolean isStatic() {return getChild(2).getType() == StencilParser.DEFINE;}

@@ -1,0 +1,17 @@
+name: Projection
+targetClass: stencil.operator.module.provided.Projection
+description: Set to set transformations, filed under a really bad name.
+
+defaults:
+  defaultSpecializer: !spec "[1 .. n]"
+  facets:
+    - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
+    - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
+    - {name: guide, type: PROJECT, function: false, prototype: !proto "VALUE"}
+
+operators:
+    - name: Count
+    - name: Index
+    - name: Justify
+    - name: HeatScale
+      defaultSpecializer: !spec "[1 .. n, hot=\"WHITE\", cold=\"RED\"]"

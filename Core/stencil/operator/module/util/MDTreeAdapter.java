@@ -107,7 +107,7 @@ class MDTreeAdapter extends CommonTreeAdaptor {
 		}
 		
 		
-		public Collection<String> getFacets() {
+		public List<String> getFacets() {
 			String[] s = new String[getChild(1).getChildCount()];
 			for (CommonTree fd: (List<CommonTree>) ((CommonTree) getChild(1)).getChildren()) {
 				s[fd.childIndex] = fd.getText();

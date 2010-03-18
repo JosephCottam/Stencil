@@ -26,7 +26,7 @@ from Values
   ID : Count("") -> VALUE
   X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
   Y : Count(Category) #-> Mult(VALUE, -11) -> VALUE
-  FILL_COLOR: @color(BLUE)
+  FILL_COLOR: @Color{BLUE}
   SIZE: 10
   REGISTRATION: "CENTER"
 

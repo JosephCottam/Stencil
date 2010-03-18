@@ -1,0 +1,86 @@
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
+ <project name="Release" default="Release">
+ 	<target name="Release">
+ 		<property name="release" location="./release"/>
+ 		<property name="JarFile" value="Stencil.jar"/>
+ 		<tstamp><format property="today" pattern="ddMMMyyy"/></tstamp>
+ 		<property name="result" value="Stencil_${today}.zip"/>
+
+ 		<!--Clear up prior attempts-->
+ 		<delete dir="${release}"/>
+ 		<delete file="${result}"/>
+ 		<mkdir dir="${release}"/>
+
+ 		
+ 		<!--Create jar file-->
+ 		<delete file="${JarFile}"/>
+ 		 		
+ 		<pathconvert property="jarClasspath" pathsep=" " dirsep="/">
+ 			<map from="${runtimeLibrary}" to="./lib"/>
+ 	 		<path id="library.Classpath">
+ 	 			<fileset dir="${runtimeLibrary}">
+ 	 				<include name="*.jar"/>
+ 	 				<exclude name="antlr-3.2.jar"/>
+ 	 				<exclude name="antlr3-ant.jar"/>
+ 	 				<exclude name="stringtemplate-3.2.jar"/>
+ 	 				<exclude name="stencil.jar"/>
+ 	 			</fileset>
+ 	 		</path>
+ 		</pathconvert>
+ 		
+		<jar jarfile="${release}/${JarFile}" includes="*.class" basedir=".">
+			<fileset dir="${target}"/>
+			<manifest>
+				<attribute name="Created-By" value="Joseph A. Cottam"/>
+				<attribute name="Main-Class" value="stencil.explore.Application"/>
+				<attribute name="Class-Path" value="${jarClasspath}"/>
+			</manifest>
+		</jar>
+
+ 		
+ 		<!--create Zip file with jar -->
+ 		 		
+ 		<property name="lib.app.dir" location="${release}/lib"/>
+ 		<mkdir dir="${lib.app.dir}"/>
+ 		<copy todir="${lib.app.dir}">
+ 			<fileset dir="${runtimeLibrary}">
+ 				<include name="*.jar"/>
+ 				<exclude name="antlr3-ant.jar"/>
+				<exclude name="antlr-3.2.jar"/>
+ 				<exclude name="stringtemplate-3.2.jar"/>
+ 				<exclude name="stencil.jar"/>
+ 			</fileset>
+ 		</copy>
+
+ 		<copy file="./TestData/Stencil.properties" tofile="${release}/Stencil.properties" overwrite="true"/>
+ 		<copy file="./TestData/Explore.properties" tofile="${release}/Explore.properties" overwrite="true"/>
+ 		<copy todir="${release}/Examples/" overwrite="true">
+ 			<fileset dir="./TestData/RegressionImages/">
+ 				<include name="**"/>
+ 				<exclude name="**/*.png"/>
+ 			</fileset>
+ 		</copy>
+ 		
+ 		<copy todir="${release}" overwrite="true">
+ 			<fileset dir="./ReleaseIncludes/" includes="**"/>
+ 		</copy>
+ 		
+ 		<!--Create the zip files-->
+ 		<zip destfile="${result}" basedir="${release}"/>
+ 		
+ 		<zip destfile="src_${today}.zip" basedir=".">
+ 			<exclude name="**/jrat.output/**" />
+ 			<exclude name="**/TestData/**" />
+ 			<exclude name="**/bin/**" />
+ 			<exclude name="**/${release}/**" />
+ 			<exclude name="jrat.xml"/>
+ 			<exclude name="*.zip"/>
+ 		</zip>
+ 		
+ 		<!--Clean up temporaries-->
+ 		<delete dir="${release}"/>
+ 		<delete file="${JarFile}"/>
+	</target> 
+ </project>

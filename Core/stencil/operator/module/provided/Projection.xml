@@ -7,9 +7,9 @@
 			<Opt specializer="[1 .. n]"/>
 		</Opts>
 		<Facets>
-			<Facet name="Map" type="PROJECT" function="false" prototype="VALUE" />
-			<Facet name="Query" type="PROJECT" function="false" prototype="VALUE"/>
-			<Facet name="Guide" function="false" type="PROJECT" prototype="VALUE"/>
+			<Facet name="map" type="PROJECT" function="false" prototype="VALUE" />
+			<Facet name="query" type="PROJECT" function="false" prototype="VALUE"/>
+			<Facet name="guide" function="false" type="PROJECT" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 
@@ -17,6 +17,7 @@
 	<Operator name="Index"/>
 	<Operator name="Justify"/>	
 	<Operator name="HeatScale">
-		<Opt specializer="[1 .. n, hot=@color(WHITE), cold=@color(RED)]"/>
+		<Opt specializer="[1 .. n]"/>
+        <!-- Opt specializer='[1 .. n, hot="WHITE", cold="RED"]'/-->
 	</Operator>
 </ModuleData>

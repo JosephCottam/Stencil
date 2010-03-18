@@ -8,7 +8,7 @@ STRICT: true
 
 
 /*Layout for turning a linear sequence into a square.
-  Each number is assigned a 'shell' based on the square root of the value.
+  Each number is assigned a "shell" based on the square root of the value.
   Shells are filled top-down, the right-to-left.
 */
 

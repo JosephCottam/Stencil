@@ -7,22 +7,22 @@
 			<Opt specializer="[1 .. n]"/>
 		</Opts>
 		<Facets>
-			<Facet name="Map"  function="true" type="PROJECT" prototype="VALUE"/>
-			<Facet name="Query" function="true" type="PROJECT" prototype="VALUE"/>
-			<Facet name="Guide" function="true" type="OTHER" prototype="VALUE"/>
+			<Facet name="map"  function="false" type="PROJECT" prototype="VALUE"/>
+			<Facet name="query" function="false" type="PROJECT" prototype="VALUE"/>
+			<Facet name="stateID" function="false" type="CATEGORIZE" prototype="VALUE"/>
 		</Facets>
 	</Defaults>
 
 	<Operator name="EchoCategorize">
-		<Facet name="Map" function="true" type="CATEGORIZE" prototype="%"/>
-		<Facet name="Query" function="true" type="CATEGORIZE" prototype="%"/>
-		<Facet name="Guide" function="true" type="OTHER" prototype="%"/>
+		<Facet name="map" function="false" type="CATEGORIZE" prototype="%"/>
+		<Facet name="query" function="false" type="CATEGORIZE" prototype="%"/>
+        <Facet name="stateID" function="false" type="CATEGORIZE" prototype="VALUE"/>
 	</Operator>
 	
 	<Operator name="EchoContinuous">
-		<Facet name="Map" function="true" type="CATEGORIZE" prototype="%"/>
-		<Facet name="Query" function="true" type="CATEGORIZE" prototype="%"/>
-		<Facet name="Guide" function="true" type="OTHER" prototype="%"/>
+		<Facet name="map" function="false" type="CATEGORIZE" prototype="%"/>
+		<Facet name="query" function="false" type="CATEGORIZE" prototype="%"/>
+        <Facet name="stateID" function="false" type="CATEGORIZE" prototype="VALUE"/>
 	</Operator>
 
 </ModuleData>

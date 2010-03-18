@@ -1,62 +1,84 @@
 glyph BarChart
-  stream values(Cat, Value)
-  stream title(Title)
+    hide Lines(ID, X1,X2,Y1,Y2)
+    properties(Cat, Value)
+    
+    item Title[Text]
 
-  item Title[Text]
-  from title(Title)
-       TEXT: Title
-
-  layer Lines[Line]
-  from values(Cat, Value)
+    layer Lines[Line]
+    from properties(Cat, Value)
       ID: Cat
       (X1, X2) : Index(ID) -> (_,_)
       (Y1, Y2) : (0, value)
+
 
 stream values(Type, Cat, Value)
 
 layer Mutliples[BarChart]
   from values
       ID: Type
-      Title: Type          //If I got uber fancy,
+      Title[TEXT]: Type
       Cat: Cat
       Value: Value
       (X,Y): layout(Type)
 
 A glyph will define a compound object.  It automatically gets what 
-all glyphs do: X,Y,ID.  Any additional properties are defined in 
-the 'stream' statements.  These statements basically define the 
-smallest unit updates that can be made on a glyph.  You may satisfy 
-more than one stream statement in an update, but you have to satisfy 
-all of the fields in the stream to have an update occur.  Partial 
-satisfaction of any stream is ignored UNLESS no stream is satisfied, 
-then an error occurs.  A glyph may have either 'layer' elements or 'item' 
-elements.  Item elements are singletons.  Their ID on the layer is their name.  
-They retain all other properties.  Layers are groups per before.  Both 'layer' 
-and 'item' elements consume streams and have update rules, per regular layers.  
-Notice also that the stream names inside the glyph are completely independent 
-of those outside the glyph.
+all glyphs do: X,Y,ID.  By default, properties of elements (glyph & item)
+are accessible by prefixing the property with the entity name (like 'Title').
+Any additional properties are defined in a 'properties' statement (properties
+can define ID,X,Y in which case when they are set on the root glyph, the internals
+can be re-arranged). Properties defines a stream that can be consumed by 
+rules in any element.
+
+Positional information on elements of a glyph are relative to the top-left of the glyph.
+This, in-essence, makes a glyph a private canvas.  A 'canvas' operator 
+will convert from the local space to the global canvas space.
+
 
 
 Here is a labeled shape glyph:
-glyph LabeledShape
-  stream input(Text?, Color?, Size?)
- 
-   item Label[Text]
-   from input
-       TEXT: Text
-       FONT_COLOR: Color
-       FONT_SIZE: Size
- 
-   item Shape[Shape]
-   from input
-       SIZE: Size
-       (X,Y): Left(LabeledShape[Label])    //Left is an imaginary function right now. 
-                //It gives the left-registration position of the named object
+glyph LabeledTic
+  hide Label X,Y
+  hide Tick X,Y
 
-This time, the stream definition is slightly extended with 'optional' tags, 
-just like in regular expressions its a '?'.  If any value is not 
-supplied but marked with a '?', it will have a special value put in its 
-place.  Rules that depend on those fields will not be run. (This last thing 
-may be tricky to implement, especially with the new scoping ruels.  It 
-will require some real work in the AST at a minimum...but that isn't 
-you're problem).
+  properties (position)
+
+   element Label[Text]
+   from properties
+        (X,Y, REGISTRATION) : reposition(position)
+   
+   element Tick[SHAPE]
+   defaults
+      REGISTRATION: "Center"
+      SHAPE: "TICK"
+
+   operator reposition (v) -> (X,Y,R)
+      (v =~"top")        => X,Y : top(Tick) -> (X,Y, "BOTTOM")
+      (v =~"bottom") => X,Y : bottom(Tick) -> (X,Y, "TOP")
+      (v =~"left")        => X,Y : left(Tick) -> (X,Y, "RIGHT")
+      (v =~"right")     => X,Y : right(Tick) -> (X,Y, "LEFT")
+      
+The 'position' attribute is used to determine where
+the label is relative to the shape.  'top', 'bottom', 'left' and 'right'
+are operators that get respective X,Y locations of the named element.
+
+Below is a scene-graph style declaration of axes
+(using the labeled shape defined above):
+
+glyph[AXIS, OFFSET] axisGuide
+   hide extent(X1,Y1,X2,Y2)
+   hide tics(X,Y, REGISTRATION)
+
+   element extent[LINE]
+       (X1,Y1,X2,Y2): 
+            bounds(tics) -> layout(X,Y,WIDTH,HEIGHT)
+
+    layer tics[LabeledTic]
+
+    //AXIS and OFFSET are  the specializer arguments from the glyph definition
+    operator layout (X,Y,WIDTH, HEIGHT) -> (X1,Y1,X2,Y2)
+         (AXIS =~ "X") => (X1,Y1,X2,Y2): sum(X, WIDTH) -[X2]> 
+                                       X, OFFSET, X2[_], OFFSET
+         (AXIS =~ "Y") => (X1,Y1,X2,Y2): sum(X, WIDTH) -[Y2]> 
+                                       OFFSET, Y, OFFSET, Y2[_]
+
+

@@ -36,7 +36,7 @@ import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 
 /**
@@ -47,6 +47,8 @@ public class Temp extends BasicModule {
 	 * the position in the list on lookup.
 	 */
 	public static class Rank extends BasicProject {
+		public Rank(OperatorData opData) {super(opData);}
+
 		public static final String NAME = "Rank";
 		
 		/**Compare groups of object, often pair-wise.
@@ -121,21 +123,25 @@ public class Temp extends BasicModule {
 				rank =-1;
 			}
 			
-			return PrototypedTuple.singleton(rank);
+			return new ArrayTuple(rank);
 		}
 		
-		public Rank duplicate() {return new Rank();}
+		public Rank duplicate() {return new Rank(operatorData);}
 	}
 
 	/**Maps one element to a set of other elements*/
 	public static class Mapping extends BasicProject {
 		public static final String NAME = "Mapping";
+		public static final String PUT_FACET = "put";
 		
-		protected Map<Object, Object[]> map = new HashMap();
-		String[] names;
+		final protected Map<Object, Object[]> map = new HashMap();
+		final String[] names;
 		boolean caseSensitive=true;
 		
-		public Mapping(String...names) {this.names = names;}
+		public Mapping(OperatorData opData, String...names) {
+			super(opData);
+			this.names = names;
+		}
 
 		public String getName() {return NAME;}
 
@@ -147,26 +153,27 @@ public class Temp extends BasicModule {
 			
 			if (objects.length ==0) {
 				objects = map.get(key);
-			} else if (objects.length== names.length){
+			} else if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
 				map.put(key, objects);
 			} else {
 				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
 			}
-			return new PrototypedTuple(names, objects);
+			return new ArrayTuple(objects);
 		}
 
 		public Tuple map(Object... args) {return query(args);}
 		public Tuple query(Object... args) {
-			if (args.length > 1) {throw new IllegalArgumentException("Can only query with single-argument to map.");}
 			Object key = args[0];
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 			
 			Object[] results = map.get(key);
-			if (results == null) {return null;}			
-			return new PrototypedTuple(names, results);
+			if (results == null) {
+				return null;
+			}			
+			return new ArrayTuple(results);
 		}
 		
-		public static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
+		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
 			String module = basic.getModule();
 			String name = basic.getName();
 			String[] fields;
@@ -174,22 +181,23 @@ public class Temp extends BasicModule {
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 			
 			MutableOperatorData od = new MutableOperatorData(basic);
-			od.addFacet(new BasicFacetData("Put", OpType.PROJECT, fields));
-			od.addFacet(new BasicFacetData("Map", OpType.PROJECT, fields));
-			od.addFacet(new BasicFacetData("Query", OpType.PROJECT, fields));
-			od.addFacet(new BasicFacetData("Guide", OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData(PUT_FACET, OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData(MAP_FACET, OpType.PROJECT, fields));
+			od.addFacet(new BasicFacetData(QUERY_FACET, OpType.PROJECT, fields));
 			return od;
 		}
 
-		public static StencilOperator instance(String moduleName, String name, Specializer specializer) throws SpecializationException, NoSuchMethodException {
+		public static StencilOperator instance(OperatorData opData, Specializer specializer) throws SpecializationException, NoSuchMethodException {
 			if (!specializer.getRange().isFullRange() || specializer.getSplit().hasSplitField()) {
-				throw new SpecializationException(moduleName, name, specializer);
+				throw new SpecializationException(opData.getModule(), opData.getName(), specializer);
 			}
 
 			String[] names;
 			try {names = getNames(specializer);}
-			catch (Exception e) {throw new SpecializationException(moduleName, name, specializer, e);}			
-			Mapping m = new Mapping(names);
+			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), specializer, e);}
+			//Blend names into the operator data
+			
+			Mapping m = new Mapping(getOperatorData(opData, specializer), names);
 			
 			if (specializer.getMap().containsKey("CaseInsensitive")) {m.caseSensitive = false;}
 			
@@ -212,7 +220,7 @@ public class Temp extends BasicModule {
 			return fields;
 		}
 		
-		public Mapping duplicate() {return new Mapping(names);}
+		public Mapping duplicate() {return new Mapping(operatorData, names);}
 	}
 
 	
@@ -232,7 +240,7 @@ public class Temp extends BasicModule {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		try {
 			if (name.equals("Mapping")) {
-				return Mapping.instance(getModuleData().getName(), name, specializer);
+				return Mapping.instance(getOperatorData(name, specializer), specializer);
 			}
 			return super.instance(name, specializer);
 		} catch (Exception e) {throw new Error("Error retriving " + name + " method.",e);}

@@ -17,7 +17,9 @@ public final class TuplePrototypes {
 	 * @return
 	 */
 	public static String[] defaultNames(int count, String prefix) {
+		if (count ==0) {return new String[0];}
 		if (prefix == null) {prefix = Tuple.DEFAULT_KEY;}
+
 		String[] names= new String[count];
 		names[0]=prefix;
 		for (int i=1; i< count; i++) {

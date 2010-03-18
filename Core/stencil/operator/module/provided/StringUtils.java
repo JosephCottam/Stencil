@@ -30,38 +30,36 @@ package stencil.operator.module.provided;
 
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 public class StringUtils extends BasicModule {
 	/**Print the passed tuple. Replaces names with new names.*/
 	public static Tuple print(Object... os) {
-		String[] labels = new String[os.length];
 		for (int i=0;i<os.length;i++) {
-			labels[i] = "VALUE" + (i==0?"":i);
 			if(os[i] ==null) {System.out.print("null");}
 			else{System.out.print(os[i].toString());}
 			if (i!=os.length-1) {System.out.print(",");}
 		}
 		System.out.println();
-		return new PrototypedTuple(labels, os);
+		return new ArrayTuple(os);
 	}
 	
 	/**Converts a value to a string value.*/
-	public static Tuple toString(Object s) {return PrototypedTuple.singleton(s.toString());}
+	public static Tuple toString(Object s) {return new ArrayTuple(s.toString());}
 	
 	
 	//TODO: Add range support to concatenate
 	public static Tuple concatenate(Object... os) {
 		StringBuilder b = new StringBuilder();
 		for (Object o:os) {b.append(o.toString());}
-		return PrototypedTuple.singleton(b.toString());
+		return new ArrayTuple(b.toString());
 	}
 
 	public static Tuple format(Object v, Object f) {
 		String rv = String.format(f.toString(), v);
-		return PrototypedTuple.singleton(rv);
+		return new ArrayTuple(rv);
 	}
 	
 	public static Tuple substring(Object str, Object s, Object e) {
@@ -69,13 +67,13 @@ public class StringUtils extends BasicModule {
 		int start = Converter.toInteger(s);
 		int end = Converter.toInteger(e);
 		
-		if (end >= 0) {return PrototypedTuple.singleton(string.substring(start, end));}
-		else {return PrototypedTuple.singleton(string.substring(start));}
+		if (end >= 0) {return new ArrayTuple(string.substring(start, end));}
+		else {return new ArrayTuple(string.substring(start));}
 	}
 	
 	public static Tuple trim(Object str) {
 		String string = Converter.toString(str);
-		return PrototypedTuple.singleton(string.trim());
+		return new ArrayTuple(string.trim());
 	}
 
 	public StringUtils(ModuleData md) {super(md);}

@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
  * @author jcottam
  *
  */
-public class DirectYield extends Pass {
+public class DirectYield extends StencilTree {
 	public DirectYield(Token token) {super(token);}
 	public String getName() {return token.getText();}
 }

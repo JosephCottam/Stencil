@@ -32,7 +32,10 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import static java.lang.String.format;
 
+import stencil.interpreter.guide.SampleSeed;
+import stencil.interpreter.guide.SeedOperator;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.FacetData;
 import stencil.operator.module.ModuleData;
@@ -41,21 +44,33 @@ import stencil.operator.module.SpecializationException;
 import stencil.operator.module.util.BasicFacetData;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.util.Invokeable;
+import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.parser.tree.StencilString;
-import stencil.parser.tree.Value;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
 public class StencilUtil extends BasicModule {
-	private static abstract class EchoBase implements StencilOperator{
-		final String[] names;
+	public static abstract class EchoBase implements StencilOperator, SeedOperator {
+		final OperatorData operatorData;
+		final TuplePrototype samplePrototype;
 		
-		protected EchoBase(String... names) {this.names = names;}
-		protected EchoBase(Specializer s) throws SpecializationException {
-			names = new String[s.getArgs().size()];
+		protected final Object STATE_LOCK = new Object();
+		protected int stateID=0; 
+		
+		protected EchoBase(OperatorData opData, TuplePrototype p) {
+			operatorData = opData;
+			samplePrototype =p;
+		}
+		
+		protected EchoBase(OperatorData opData, Specializer s) throws SpecializationException {
+			this.operatorData = opData;
+			String[] names = new String[s.getArgs().size()];
 			Atom atom = s.getArgs().get(0);
 			for (int i=0; i< names.length; atom = s.getArgs().get(++i)) {
 				if (atom instanceof StencilString) {
@@ -64,33 +79,39 @@ public class StencilUtil extends BasicModule {
 					throw new SpecializationException("StencilUtil", getName(), s);
 				}
 			}
+			
+			samplePrototype = new SimplePrototype(names);
 		}
 		
-		/**Does this legend accept the given specializer?*/
-		protected static boolean accepts(Specializer specializer) {
-			return specializer.getRange().isFullRange() && 
-					specializer.getArgs().size() > 0 &&
-					(specializer.getArgs().get(0) instanceof StencilString);
+		public TuplePrototype getSamplePrototype() {return samplePrototype;}
+
+		public Invokeable getFacet(String facet) {
+			try {return new ReflectiveInvokeable(facet, this);}
+			catch (Exception e) {
+				throw new IllegalArgumentException(format("Facet %1$s not known.", facet),e);
+			}
 		}
-		
+
+		public OperatorData getOperatorData() {return operatorData;}
+				
 		/**Complete the legend data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
 			MutableOperatorData ld = new MutableOperatorData(base);
-			FacetData fd = ld.getFacetData("Map");
-			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), spec.getArgs());
+			FacetData fd = ld.getFacetData(StencilOperator.MAP_FACET);
+			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), new String[0]);
 			ld.addFacet(fd);
 			
-			fd = ld.getFacetData("Query");
-			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), spec.getArgs());
+			fd = ld.getFacetData(StencilOperator.QUERY_FACET);
+			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), new String[0]);
 			ld.addFacet(fd);
 			
-			fd = ld.getFacetData("Guide");
-			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), spec.getArgs());
+			fd = ld.getFacetData(StencilOperator.STATE_FACET);
 			ld.addFacet(fd);
 			
 			return ld;
-			
 		}
+		
+		public Tuple stateID() {return Converter.toTuple(stateID);}
 	}
 
 	
@@ -102,33 +123,20 @@ public class StencilUtil extends BasicModule {
 	public static final class EchoContinuous extends EchoBase {
 		public static final String NAME = EchoContinuous.class.getSimpleName();
 
-		private boolean useIntegers = false;
-		private int tickCount = 10;
-		
 		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
 		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
-		private boolean expanded = false;		//TODO: This strategy can result in a missed update. 
 		
-		protected EchoContinuous(String... names) {super(names);}
-		
-		public EchoContinuous(Specializer spec) throws SpecializationException {
-			super(spec);
+		public EchoContinuous(OperatorData opData, TuplePrototype p) {super(opData, p);}
+		public EchoContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
+			super(opData, spec);
 		}
 		
-		public StencilOperator duplicate() throws UnsupportedOperationException {
-			return new EchoContinuous(names);
-		}
+		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype);}
 
 		public String getName() {return NAME;}
 
-		public List<Object[]> guide(List<Value> formalArguments, List<Object[]> sourceArguments, List<String> prototype) {
-			assert sourceArguments == null && prototype == null : "Non-null sourceArgument or prototpye passed to echo operator's Guide facet.";
-			
-			expanded = false;
-			
-			List ranges = buildRange(max, min, tickCount, useIntegers);
-			
-			return ranges;
+		public SampleSeed getSeed() {
+			return new SampleSeed(true, min, max);
 		}
 
 		public Tuple map(Object... args) {
@@ -143,56 +151,12 @@ public class StencilUtil extends BasicModule {
 				min = Math.min(value, min);
 			}
 			
-			expanded = expanded || (max != oldMax) || (min != oldMin);
+			if ((max != oldMax) || (min != oldMin)) {synchronized (STATE_LOCK) {stateID++;}}
 			
-			return new PrototypedTuple(names, args);
+			return new ArrayTuple(args);
 		}
 
-		public Tuple query(Object... args) {return new PrototypedTuple(names, args);}
-
-		public boolean refreshGuide() {return expanded;}
-		
-		
-		private static List<Number[]> buildRange(double max, double min, int tickCount, boolean useIntegers) {
-			double range = niceNum(max-min, false);							//'Nice' range
-			double spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
-			if (spacing < 1) {spacing =1;}									//Ensure some spacing occurs
-			double graphMin = Math.floor(min/spacing) * spacing;			//Smallest value on the graph
-			double graphMax = Math.ceil(max/spacing) * spacing;				//Largest value on the graph
-			List<Number[]> nums = new ArrayList();
-			
-			for (double v=graphMin; v<(graphMax+.5*spacing); v+=spacing) {
-				nums.add(new Number[]{v});
-			}
-			
-			return nums;
-		}
-		
-
-		
-		/**Finds a multiple of 1,2 or 5 or a power of 10 near the passed number.
-		 * 
-		 * From: Graphic Gems, "Nice Numbers for Graph Labels," by Paul Heckbert*/
-		private static double niceNum(double num, boolean round) {
-			int exp;
-			double f;
-			double nf;
-			
-			exp = (int) Math.floor(Math.log10(num));
-			f = num/Math.pow(10, exp);
-			if (round) {
-				if (f< 1.5) {nf=1;}
-				else if (f<3) {nf=2;}
-				else if (f<7) {nf=5;}
-				else {nf=10;}
-			} else {
-				if (f<=1) {nf=1;}
-				else if (f<=2) {nf=2;}
-				else if (f<=5) {nf=5;}
-				else {nf=10;}
-			}		
-			return (float) (nf*Math.pow(10, exp));
-		}
+		public Tuple query(Object... args) {return new ArrayTuple(args);}
 	}
 	
 	/**Returns exactly what it was passed, but
@@ -202,25 +166,20 @@ public class StencilUtil extends BasicModule {
 		public static final String NAME = EchoCategorize.class.getSimpleName();
 		
 		private final List<Object[]> seen = Collections.synchronizedList(new ArrayList());
-		private int priorCount;								//TODO: This strategy can result in a missed update.
 				
-		public EchoCategorize(String...names) {super(names);}
-		public EchoCategorize(Specializer s) throws SpecializationException {super(s);}
-		public StencilOperator duplicate() throws UnsupportedOperationException {return new EchoCategorize(names);}
+		public EchoCategorize(OperatorData opData, TuplePrototype p) {super(opData, p);}
+		public EchoCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData, s);}
+		public StencilOperator duplicate() throws UnsupportedOperationException {return new EchoCategorize(operatorData, samplePrototype);}
 
 		public final String getName() {return "Echo";}
 
-		public synchronized List guide(List<Value> formalArguments, List<Object[]> sourceArguments, List<String> prototype) {
-			assert sourceArguments == null: "Non-null sourceArgument categorize operator's Guide facet.";
-			
-			priorCount = seen.size();
-			
-			return new ArrayList(seen); 
+		public synchronized SampleSeed getSeed() {
+			return new SampleSeed(false, new ArrayList(seen));
 		}
 
 		public Tuple map(Object... args) {
-			if (!deepContains(seen, args)) {seen.add(args);}
-			return new PrototypedTuple(names, args);
+			if (!deepContains(seen, args)) {seen.add(args); stateID = seen.size();}
+			return new ArrayTuple(args);
 		}
 		
 		private static final boolean deepContains(List<Object[]> list, Object[] candidate) {
@@ -229,22 +188,14 @@ public class StencilUtil extends BasicModule {
 		}
 
 		public Tuple query(Object... args) {
-			return new PrototypedTuple(names, args);
-		}
-
-		public synchronized boolean refreshGuide() {
-			return seen.size() != priorCount;
+			return new ArrayTuple(args);
 		}
 	}
-
+	
 	public StencilUtil(ModuleData md) {super(md);}
-
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-
-		
-		if (!EchoBase.accepts(specializer)) {throw new SpecializationException(moduleData.getName(), name, specializer);}
 	}
 	
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
@@ -259,9 +210,9 @@ public class StencilUtil extends BasicModule {
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		validate(name, specializer);
-		
-		if (name.equals("EchoCategorize")) {return new EchoCategorize(specializer);}
-		else if (name.equals("EchoContinuous")) {return new EchoContinuous(specializer);}
+		OperatorData opData = getOperatorData(name, specializer);
+		if (name.equals("EchoCategorize")) {return new EchoCategorize(opData, specializer);}
+		else if (name.equals("EchoContinuous")) {return new EchoContinuous(opData, specializer);}
 
 		throw new RuntimeException(String.format("Legend name not known: %1$s.", name));
 	}

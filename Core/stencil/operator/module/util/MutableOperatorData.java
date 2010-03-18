@@ -1,7 +1,9 @@
 package stencil.operator.module.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -66,7 +68,7 @@ public class MutableOperatorData implements OperatorData {
 		
 		return facetData.get(name);
 	}
-	public Collection<String> getFacets() {return facetData.keySet();}
+	public List<String> getFacets() {return new ArrayList(facetData.keySet());}
 
 	public String getModule() {return module;}
  	public String getName() {return operatorName;}

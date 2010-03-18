@@ -1,0 +1,150 @@
+gunit Stencil;
+@header{package stencil.parser.string;}
+
+ID:
+""				FAIL
+"."				FAIL
+".a"			FAIL
+"1"				FAIL
+"124"			FAIL
+".1"			FAIL
+"A"				OK
+"AB"			OK
+"A1"			OK
+"A.B"			OK
+"A.1"			OK
+"A.B1"			OK
+"SomeLonger"	OK
+"Some.Longer"	OK
+"Some.Longer.1"	OK
+
+TAGGED_ID:
+""        FAIL
+"."       FAIL
+".a"      FAIL
+"1"       FAIL
+"124"     FAIL
+".1"      FAIL
+"A"       FAIL
+"@A"      OK
+"AB"      FAIL
+"@AB"      OK
+"A1"      FAIL
+"@A1"      OK
+"@A.B"     OK
+"@A.B1"      OK
+"@SomeLonger"  OK
+"@Some.Longer" OK
+"@Some.Longer.1" OK
+
+
+
+tupleRef:
+"" 				FAIL
+"[local]"		FAIL
+" "				FAIL
+"[_]"			FAIL
+"_" 			OK
+"A" 			OK
+"local"			OK 
+"Abba" 			OK
+"Abba1" 		OK
+"Abba[1]"		OK
+"local[1]" 		OK
+"local[X]" 		OK
+"local[1][2]" 	OK
+"local[1][_]" 	OK
+"loc[1][_][3]" 	OK
+"_[1]" 			OK
+"[1][_]" 		OK
+"[1]" 			OK
+"[1][2]" 		OK
+"[1][2][X]" 	OK
+"[1][2][X][3]" 	OK
+"[1][2][3][X][4]" OK
+
+number:
+""				FAIL
+"a"				FAIL
+"124a"			FAIL
+"032452"		OK
+"1"				OK
+"123"			OK
+"896154234"		OK
+"-480"			OK
+"-1"			OK
+"0"				OK
+".1"			OK
+".087132444"	OK
+"0.1"			OK
+"0.9645553"		OK
+"1.1"			OK
+"483.0847"		OK
+"-.1"			OK
+"-4.1"			OK
+"-0.586234"		OK
+
+valueList:
+""				FAIL
+"A"				FAIL
+"1"				FAIL
+"ref[1]"		FAIL
+"\"String s\""	FAIL
+"(_)"			OK
+"(1)"			OK
+"(A)"			OK
+"(\"A String\")"OK
+"(ref[1])"		OK
+"(ref[A])"		OK
+"(1,2,3)" 		OK
+"(A,B,C)"		OK
+"(1,A,2)"		OK
+"(A,1,B)"		OK
+"()"			FAIL	//Fails, it would be nice if this was allowed
+
+
+ISLAND_BLOCK:
+"{}"        OK
+"{VALUE}"   OK
+"{12}"      OK
+"{12VVS}"   OK
+"{%#$S}"    OK
+"{....}"    OK
+"{:}"       OK
+"{->}"      OK
+"{layer}"   OK
+"{\"string\"}"  OK
+"{\"nonString}" OK
+"{nonString\"}" OK
+"{{[1]}}"   OK      
+"{{hello}}" OK      
+"{{h1}}"    OK      
+"{{1he}}"   OK    
+"{{}}"      OK     
+
+
+functionCall:
+
+//Island/Custom grammar argument functions
+"@name{}"        OK
+"@name{VALUE}"   OK
+"@name{12}"      OK
+"@name{12VVS}"   OK
+"@name{%#$S}"    OK
+"@name{....}"    OK
+"@name{:}"       OK
+"@name{->}"      OK
+"@name{layer}"   OK
+"@name{\"string\"}"  OK
+"@name{\"nonString}" OK
+"@name{nonString\"}" OK
+"@name{{[1]}}"   OK      //numeric references allowed
+"@name{{hello}}" OK      //named references allowed
+"@name{{h1}}"    OK      
+"@name{{1he}}"   OK    //non-name not allowed in embedded ref
+"@name{{}}"      OK    //Empty reference not allowed
+
+
+
+
+

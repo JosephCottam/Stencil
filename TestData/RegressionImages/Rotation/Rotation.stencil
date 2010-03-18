@@ -24,7 +24,7 @@ from Elements
 	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
 	Y : 40
 	SIZE: 30
- 	FILL_COLOR: @color(RED)
+ 	FILL_COLOR: @Color{RED}
 
 from Elements
 	ID: Concatenate(Name, "Center")
@@ -34,7 +34,7 @@ from Elements
 	X : Count(Name) -> Mult(40, _) -> Add(15,_)
 	Y : 100
 	SIZE: 30
- 	FILL_COLOR: @color(BLUE)
+ 	FILL_COLOR: @Color{BLUE}
 
 
 

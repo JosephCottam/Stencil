@@ -24,21 +24,21 @@ from NodePositions
 	(X,Y) : (X,Y)
 	SIZE: 3
 	SHAPE: "RECTANGLE"
-	FILL_COLOR: @color(GRAY)
+	FILL_COLOR: @Color{GRAY}
 
 layer Overlay
 from Attributes
 	filter (ATT =~ "C|Java|Python")				/*Only continue with specific attributes*/
 	filter (NodesID !~ "[null]") 				/*...and with things in the other layer.*/
-	prefilter(NodesID) :  Nodes.Find(ID) -> ID
+	prefilter(NodesID) :  Nodes.find(ID) -> ID
 
 	ID : ID
-	(X,Y) : Nodes.Find(ID) -> (X,Y)
+	(X,Y) : Nodes.find(ID) -> (X,Y)
 	SHAPE: "CROSS"
 	SIZE: 3.1
 	FILL_COLOR: Coloring(ATT) -> (C)
 
 operator Coloring(ATT) -> (C)
-	(ATT =~ "Python") => C : @color(30,100,50)		/*Sigil colors*/
-	(ATT =~ "Java")   => C : @color(65,70,135)
-	(ATT =~ "C")      => C : @color(120,40,80)
+	(ATT =~ "Python") => C : @Color{30,100,50}
+	(ATT =~ "Java")   => C : @Color{65,70,135}
+	(ATT =~ "C")      => C : @Color{120,40,80}

@@ -31,30 +31,26 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 
-import stencil.operator.DynamicStencilOperator;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.util.Modules;
 import stencil.operator.util.Invokeable;
 import stencil.tuple.Tuple;
-import stencil.util.MultiPartName;
 
 
 public class Function extends CallTarget {
 	private static final class FunctionApplicationException extends RuntimeException {
-		public FunctionApplicationException(Function f, Exception e) {
-			super("Error applying function " + f.getName(), e);
+		public FunctionApplicationException(Function f, Tuple t, Exception e) {
+			super(String.format("Error applying function %1$s with tuple %2$s.", f.getName(), t.toString()), e);
 		}
 	}
 
-	protected StencilOperator operator;
 	protected Invokeable invokeable;
+	protected StencilOperator operator;
 		
 	public Function(Token source) {super(source);}
 	
 	public String getName() {return token.getText();}
 	public Specializer getSpecializer() {return (Specializer) getChild(0);}
 	public List<Value> getArguments() {return (List<Value>) getChild(1);}
-	public Pass getPass() {return (Pass) getChild(2);}
 	public boolean isTerminal() {return false;}
 
 	public CallTarget getCall() {return (CallTarget) getChild(3);}
@@ -69,39 +65,56 @@ public class Function extends CallTarget {
 	public Tuple apply(Tuple valueSource) throws Exception {
 		try {
 			Object[] formals = TupleRef.resolveAll(getArguments(), valueSource);
-			Tuple results = getInvokeable().invoke(formals);
+			Tuple results = (Tuple) getInvokeable().invoke(formals);
 			return results;
- 		} catch (Exception e) {throw new FunctionApplicationException(this, e);} 		
+ 		} catch (Exception e) {throw new FunctionApplicationException(this, valueSource, e);} 		
 	}
 
 	
-	public void setOperator(StencilOperator operator)  {this.operator = operator;}
-	
+	public Invokeable getInvokeable() {return invokeable;}
 	public StencilOperator getOperator() {return operator;}
 
-	/**What actually needs to be invoked when a call is to be made?*/
-	private Invokeable<StencilOperator, Tuple> getInvokeable() throws NoSuchMethodException {
-		if (invokeable != null) {return invokeable;}
-		
-		MultiPartName name = new MultiPartName(getName());
-		
-		if (operator instanceof DynamicStencilOperator) {
-			invokeable = ((DynamicStencilOperator) operator).getFacet(name.getFacet());
-		} else {
-			invokeable = new Invokeable(Modules.javaCase(name.getFacet()), operator);
-		}
-		return invokeable;
+	/**Sets the invokeable for this function.  This will also
+	 * set the associate operator since the invokeable comes from
+	 * the operator.
+	 * 
+	 * @param operator
+	 * @param facet
+	 */
+	public void setInvokeable(StencilOperator operator, String facet) {
+		this.operator = operator;
+		this.invokeable = operator.getFacet(facet);
 	}
 	
+	
+	/**Copy operator/invokeable from one function to another.
+	 * This method DOES NOT check that the operator is the target for the 
+	 * invokeable;  the preferred method to set invokeables is through setInvokeable(StencilOperator, String)
+	 * however this method is convenient when manipulating trees.
+	 * @param operator
+	 * @param invokeable
+	 */
+	public void setInvokeable(StencilOperator operator, Invokeable invokeable) {
+		this.operator = operator;
+		this.invokeable = invokeable;
+	}
+	
+
 	public Function dupNode() {
 		Function f = (Function) super.dupNode();
-		f.setOperator(operator);
+		f.invokeable = invokeable;
+		f.operator = operator;
 		return f;
 	}
 	
+	/**
+	 * Star after the name indicates no invokeable set.
+	 * Plus after the name indicates no operator set.
+	 */
 	public String toString() {
 		String s = super.toString();
-		if (operator == null) {return s + "*";}
+		if (invokeable == null) {return s + "*";}
+		if (operator == null) {return s + "+";}
 		return s;
 	}
 }

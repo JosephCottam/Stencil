@@ -31,7 +31,7 @@ package stencil.types;
 import java.util.Arrays;
 import java.util.List;
 
-public final class TypeCreationException extends Exception {
+public final class TypeCreationException extends RuntimeException {
 	public TypeCreationException(List source) {this(source, null);}
 	public TypeCreationException(List source, Exception cause) {this(source.toArray(), cause);}
 	 

@@ -31,7 +31,7 @@ from Reg
    ID : Name
    X: Count(Name) -> (VALUE)
    Y: 10
-   FILL_COLOR: @color(RED)
+   FILL_COLOR: @Color{RED}
    REGISTRATION:  Name
    SIZE: 4
 
@@ -39,9 +39,9 @@ layer Marks
 from Reg2
    ID : Name
    SIZE: 3
-   (X,Y): Points.Find(Name) -> (X,Y)
+   (X,Y): Points.find(Name) -> (X,Y)
    SHAPE: "CROSS"
-   FILL_COLOR: @color(RED)
+   FILL_COLOR: @Color{RED}
    REGISTRATION: "CENTER"
 
 layer Text[TEXT]

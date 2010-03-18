@@ -28,6 +28,8 @@
  */
 package stencil.interpreter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static java.lang.String.format;
 
@@ -39,6 +41,7 @@ import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
+//TODO: Look at UpdateGuides v1229 for hints on how to use ANTLR as the application engine instead of embedding it in the AST
 public class Interpreter {
 	private final StencilPanel panel;
 	private final Program program;
@@ -50,34 +53,46 @@ public class Interpreter {
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple process(List<Rule> rules, Tuple streamTuple) throws Exception {
-		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
-		return process(rules, env);
+
+	public static List<Tuple> processAll(Iterable<Tuple> sources ,Rule... rules) throws Exception{return processAll(sources, Arrays.asList(rules));}
+	public static List<Tuple> processAll(Iterable<Tuple> sources ,Iterable<Rule> rules) throws Exception{
+		List<Tuple> results = new ArrayList();
+		for (Tuple source: sources) {
+			results.add(process(source, rules));
+		}
+		return results;
 	}
 	
-	public static Tuple process(List<Rule> rules, Environment env) throws Exception {
-		if (rules == null || rules.size() ==0 || env == null) {return Tuples.EMPTY_TUPLE;}
+	public static Tuple process(Tuple streamTuple, Rule... rules) throws Exception {return process(streamTuple, Arrays.asList(rules));}
+	public static Tuple process(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
+		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
+		return process(env, rules);
+	}
+	
+	public static Tuple process(Environment env, Rule... rules) throws Exception {return process(env, Arrays.asList(rules));}	
+	public static Tuple process(Environment env, Iterable<Rule> rules) throws Exception {
+		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
 		
-		Tuple fullResult = null;
+		Tuple fullResult = Tuples.EMPTY_TUPLE;
 		
 		//Apply all rules
 		try {
 			for (Rule rule: rules) {
 				Tuple result;
 				int callDepth = rule.getAction().getDepth();
-				Environment callEnv = env.ensureCapacity(env.size() + callDepth);
+				Environment callEnv = env.extendCapacity(env.size() + callDepth);
 				
 				try {result = rule.apply(callEnv);}
 				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
 				
 				//TODO: Have rules throw exception (instead of return null)
 				//TODO: Fix the creation issue.  Right now errors in dynamic rules are ignored (they will be retried later in the dynamic system)
-				if (result == null && !rule.isDyanmic()) {
+				if (result == null && !rule.isDynamic()) {
 					if (abortOnError) {throw new RuleAbortException(rule);}
 					else {return null;}
 				}
 				
-				fullResult = Tuples.merge(result, fullResult);
+				fullResult = Tuples.append(fullResult, result);
 			}
 			
 		} catch (RuleAbortException ra) {
@@ -92,33 +107,33 @@ public class Interpreter {
 	public void processTuple(SourcedTuple source) throws Exception {
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
-				if (!group.getStream().equals(source.getSource())) {break;}
+				if (!group.getStream().equals(source.getSource())) {continue;}
 
 				boolean matches;
 				Tuple prefilter, local, result;
 				
-				Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues(),2); //Extend by two more: view and local
+				Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues());
 				
-				try {prefilter = process(group.getPrefilterRules(), env);}
+				try {prefilter = process(env, group.getPrefilterRules());}
 				catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", layer.getName()),e);}
-				env.extend(prefilter);
+				env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 				
 				try {matches = group.matches(env);}
 				catch (Exception e) {throw new RuntimeException(format("Error processing predicates in layer %1$s", layer.getName()), e);}				
 				
 				if (matches) {
 					
-					try {local = process(group.getLocalRules(), env);}
+					try {local = process(env, group.getLocalRules());}
 					catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", layer.getName()), e);}	
-					env.extend(local);
+					env.setFrame(Environment.LOCAL_FRAME, local);
 					
 					try {
-						result = process(group.getGlyphRules(), env);
+						result = process(env, group.getGlyphRules());
 						if (result != null && result.getPrototype().contains(ParserConstants.GLYPH_ID_FIELD)) {
 							try {
 								//TODO: What about locals in a dynamic binding?
 								stencil.adapters.Glyph glyph = layer.getDisplayLayer().makeOrFind(result);
-								for (Rule rule: group.getGlyphRules()) {if (rule.isDyanmic()) {panel.addDynamic(glyph, rule, source.getValues());}}
+								for (Rule rule: group.getGlyphRules()) {if (rule.isDynamic()) {panel.addDynamic(glyph, rule, source.getValues());}}
 							} catch (Exception e) {
 								throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);
 							}
@@ -127,13 +142,13 @@ public class Interpreter {
 					catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in layer %1$s", layer.getName()), e);}
 					
 					try {
-						Tuple viewUpdate = process(group.getViewRules(), env);
+						Tuple viewUpdate = process(env, group.getViewRules());
 						if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global);}
 					}
 					catch (Exception e) {throw new RuntimeException(format("Error processing view rules in layer %1$s.", layer.getName()), e);}
 					
 					try{
-						Tuple canvasUpdate = process(group.getCanvasRules(), env);
+						Tuple canvasUpdate = process(env, group.getCanvasRules());
 						if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global);}
 					} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in layer %1$s.", layer.getName()), e);}
 

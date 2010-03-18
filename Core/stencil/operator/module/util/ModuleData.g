@@ -181,7 +181,8 @@ name returns [String name]: NAME DEF^ v=VAL {$name=stripQuotes($v.text);};
 
 valuePair : id=ID DEF v=VAL -> ^(DEF[stripQuotes($id.text)] VAL[stripQuotes($v.text)]);
 	
-VAL   : '"' (options {greedy=false;} :.)* '"';
+VAL   : '"' (options {greedy=false;} :.)* '"'
+	  | '\'' (options {greedy=false;} :.)* '\'';
 
 ID    : ('a'..'z' | 'A'..'Z' | '_') ('.'? ('a'..'z' | 'A'..'Z' | '_' | '0'..'9'))*;
 

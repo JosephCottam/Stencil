@@ -5,7 +5,6 @@ import stencil.operator.module.Module;
 import stencil.operator.module.ModuleData;
 import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
-import stencil.operator.wrappers.InvokeableLegend;
 import stencil.parser.tree.Specializer;
 
 /**Basic implementation for modules where meta-data is determined largely
@@ -63,14 +62,8 @@ public abstract class BasicModule implements Module {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
-		OperatorData ld = getModuleData().getOperatorData(name);
-		String targetName = ld.getAttribute("Target");
-		
-		StencilOperator operator = Modules.instance(this.getClass(), targetName, getModuleData().getName(), name);
-		
-		if (operator instanceof InvokeableLegend && ld.getAttribute("DisallowAutoGuide") != null) {
-			((InvokeableLegend) operator).allowAutoGuide(false);
-		}
+		OperatorData operatorData = getModuleData().getOperatorData(name);		
+		StencilOperator operator = Modules.instance(this.getClass(), operatorData);
 		
 		return operator;
 		

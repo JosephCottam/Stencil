@@ -68,7 +68,7 @@ public class OperatorRule extends StencilTree {
 		Tuple result = null;
 		for (Rule rule: getRules()) {
 			Tuple buffer;
-			Environment ruleEnv = env.ensureCapacity(env.size() + rule.getAction().getDepth());
+			Environment ruleEnv = env.extendCapacity(env.size() + rule.getAction().getDepth());
 			
 			try {buffer = rule.apply(ruleEnv);}
 			catch (Exception e) {
@@ -77,7 +77,7 @@ public class OperatorRule extends StencilTree {
 			}
 
 			if (buffer == null) {result = null; break;}
-			result= Tuples.merge(result, buffer);
+			result= Tuples.append(buffer,result);
 			ruleCount++;
 		}
 

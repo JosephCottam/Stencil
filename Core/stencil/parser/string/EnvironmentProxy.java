@@ -5,8 +5,8 @@ import stencil.tuple.prototype.TuplePrototypes;
 import stencil.operator.module.Module;
 import stencil.operator.module.ModuleCache;
 import stencil.operator.module.OperatorData;
-import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.util.MultiPartName;
 
@@ -25,9 +25,7 @@ import org.antlr.runtime.tree.CommonTree;
  * @author jcottam
  *
  */
-public interface EnvironmentProxy {
-	public static enum TARGETS {NONE, PREFILTER, LOCAL, BOTH}
-	
+public abstract class EnvironmentProxy {
 	public static final class FrameException extends RuntimeException {
 		private String frame;
 		private TuplePrototype contents;
@@ -57,20 +55,21 @@ public interface EnvironmentProxy {
 		}
 	}
 	
-	public EnvironmentProxy push(String label, TuplePrototype t);
-	public boolean isFrameRef(String name);
-	public int frameRefFor(String name);
-	public int currentIndex();
-	public int getFrameIndex(String name);
-	public TuplePrototype get(int idx);
-	
-	public static class Proxy implements EnvironmentProxy {
+	public abstract EnvironmentProxy push(String label, TuplePrototype t);
+	public abstract boolean isFrameRef(String name);
+	public abstract int frameRefFor(String name);
+	public abstract int currentIndex();
+	public abstract int getFrameIndex(String name);
+	public abstract TuplePrototype get(int idx);
+
+	/**Complete proxy environment implementation.*/
+	public static class Proxy extends EnvironmentProxy {
 		final Proxy parent;
 		final TuplePrototype prototype;
 		final String label;
 	
 		public Proxy(String label, TuplePrototype prototype) {this(label, prototype, null);}
-		private Proxy(String label, TuplePrototype prototype, Proxy parent) {
+		Proxy(String label, TuplePrototype prototype, Proxy parent) {
 			this.label = label;
 			this.prototype = prototype;
 			this.parent = parent;
@@ -119,107 +118,130 @@ public interface EnvironmentProxy {
 			}
 			return index;
 		}
-	
-	
-		/**Given a list of rules, what is the eventual prototype?*/
-		public static TuplePrototype calcPrototype(List<Rule> rules) {
-			List<TupleFieldDef> defs = new ArrayList();
-			for (Rule r: rules) {
-				for (TupleFieldDef def: r.getTarget().getPrototype()) {
-					defs.add(def);
-				}
-			}
-			return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
-		}
-	
-	
-		public static EnvironmentProxy extend(EnvironmentProxy env, CommonTree pass, CommonTree callTree, ModuleCache modules) {
-			String label = ((Pass) pass).getName();
-			Function call = (Function) callTree;
-			TuplePrototype prototype = getPrototype(call, modules);
-			return env.push(label, prototype);
-		} 
-	
-		private static TuplePrototype getPrototype(Function call, ModuleCache modules) {
-			MultiPartName name= new MultiPartName(call.getName());
-			Module m;
-			try{
-				m = modules.findModuleForOperator(name.prefixedName()).module;
-			} catch (Exception e) {
-				throw new RuntimeException("Error getting module information for operator " + name, e);
-			}
-	
-			try {
-				OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-				return od.getFacetData(name.getFacet()).getPrototype();
-			} catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);}       
-		}
-	
-	
-		@SuppressWarnings("null")
-		public static EnvironmentProxy initialEnv(CommonTree t, ModuleCache modules) {
-			Consumes c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
-			Operator o = (Operator) t.getAncestor(StencilParser.OPERATOR);
-			Guide g = (Guide) t.getAncestor(StencilParser.GUIDE);
-			if (c != null) {return initialEnv(c, additionalTargets(t));}
-			if (o != null) {return initialEnv(o, additionalTargets(t));}
-			if (g != null) {return initialEnv(g, modules);}
-			
-			//Check for special cases where the environment doesn't matter...
-			Layer l= (Layer) t.getAncestor(StencilParser.LAYER);
-			if (l != null && c == null) {
-				TuplePrototype p = new SimplePrototype();
-				return makeInitialEnv("", p,p,p);
-			}
-			
-			throw new RuntimeException("Found rule with unknown initial environment: " + t.toStringTree());
-		}
-		
-		private static EnvironmentProxy initialEnv(Consumes c, TARGETS targets) {
-			TuplePrototype prefilter = null;
-			TuplePrototype local =null;
-			if (targets.ordinal() >= TARGETS.PREFILTER.ordinal()) {prefilter = calcPrototype(c.getPrefilterRules());}
-			if (targets.ordinal() >= TARGETS.LOCAL.ordinal()) {local = calcPrototype(c.getLocalRules());}
-	
-			Program p = (Program) c.getAncestor(StencilParser.PROGRAM);
-			External ex = External.find(c.getStream(), p.getExternals());
-			return makeInitialEnv(ex.getName(), ex.getPrototype(), prefilter, local);
-		}
-	
-		private static EnvironmentProxy initialEnv(Operator o, TARGETS targets) {
-			TuplePrototype prefilter = null;
-			if (targets.ordinal() >= TARGETS.PREFILTER.ordinal()) {prefilter = calcPrototype(o.getPrefilterRules());}
-	
-			return makeInitialEnv(o.getName(), o.getYields().getInput(), prefilter, null);
-		}
-	
-		private static EnvironmentProxy initialEnv(Guide g, ModuleCache modules) {
-			Function call = (Function) g.getGenerator().getStart();
-			TuplePrototype prototype = getPrototype(call, modules);
-	
-			return makeInitialEnv(g.getLayer(), prototype, null, null);
-		}
-	
-		private static EnvironmentProxy makeInitialEnv(String name, TuplePrototype prototype, TuplePrototype prefilter, TuplePrototype local) {
-			EnvironmentProxy proxy = new Proxy(ParserConstants.CANVAS_FRAME, stencil.display.CanvasTuple.PROTOTYPE)
-			.push(ParserConstants.VIEW_FRAME, stencil.display.ViewTuple.PROTOTYPE)
-			.push(name, prototype);
-	
-			if (prefilter != null) {proxy = proxy.push(ParserConstants.PREFILTER_FRAME, prefilter);}
-			if (local != null) {proxy = proxy.push(ParserConstants.LOCAL_FRAME, local);}
-			return proxy;
-		}
-	
-		protected static TARGETS additionalTargets(CommonTree t) {
-			if (t instanceof Predicate) {return TARGETS.PREFILTER;}
-	
-			Target target = ((Rule) t.getAncestor(StencilParser.RULE)).getTarget();
-	
-			if (target instanceof Prefilter) {return TARGETS.NONE;}
-			if (target instanceof Local) {return TARGETS.PREFILTER;}
-			return TARGETS.BOTH;
-		}
 	}
 
+	/**Utility object for calculating, passing and referring 
+	 * to potential ancestors of a tree.
+	 */
+	private static class AncestryPackage {
+		final Consumes c;
+		final Operator o;
+		final Guide g;
+		final Layer l;
+		final Program program;
+		final CommonTree focus;
+		final boolean inRuleList;	//Is this operator in a rule list, or just a single rule?
+		
+		public AncestryPackage(CommonTree t) {
+			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
+			o = (Operator) t.getAncestor(StencilParser.OPERATOR);
+			g = (Guide) t.getAncestor(StencilParser.GUIDE);
+			l= (Layer) t.getAncestor(StencilParser.LAYER);
+			
+			Rule r= (Rule) t.getAncestor(StencilParser.RULE);
+			
+			//r can be null if we are in a predicate
+			inRuleList = (r !=null && r.getParent().getType() == StencilParser.LIST);
+			
+			program = (Program) t.getAncestor(StencilParser.PROGRAM);
+			focus = t;
+		}
+	}
+	
+	/**Create a new Proxy environment from a default environment.
+	 * The proxy environment will have the default labels on the initial
+	 * frames and empty labels on subsequent frames.
+	 * @param streamName  Name applied to the stream frame.
+	 * @return
+	 */
+	public static EnvironmentProxy fromDefault(Environment env, String streamName) {
+		Proxy p = null; //root frame has null parent, so this is safe...for now
+		for (int i=0; i<Environment.DEFAULT_SIZE; i++) {
+			String name;
+			if (i==Environment.STREAM_FRAME) {name= streamName;}
+			else {name = Environment.DEFAULT_FRAME_NAMES[i];}
+			p = new Proxy(name, env.get(i).getPrototype(), p);
+		}
+		
+		for (int i=Environment.DEFAULT_SIZE; i<env.size();i++) {
+			p = new Proxy("", env.get(i).getPrototype(),p);
+		}
+		return p;
+	}
+
+	/**Given a list of rules, what is the eventual prototype?*/
+	public static TuplePrototype calcPrototype(List<Rule> rules) {
+		List<TupleFieldDef> defs = new ArrayList();
+		for (Rule r: rules) {
+			for (TupleFieldDef def: r.getTarget().getPrototype()) {
+				defs.add(def);
+			}
+		}
+		return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
+	}
+
+	public static EnvironmentProxy extend(EnvironmentProxy env, DirectYield pass, CommonTree callTree, ModuleCache modules) {
+		String label = pass.getName();
+		Function call = (Function) callTree;
+		TuplePrototype prototype = getPrototype(call, modules);
+		return env.push(label, prototype);
+	} 
+
+	private static TuplePrototype getPrototype(Function call, ModuleCache modules) {
+		MultiPartName name= new MultiPartName(call.getName());
+		Module m;
+		try{
+			m = modules.findModuleForOperator(name.prefixedName()).module;
+		} catch (Exception e) {
+			throw new RuntimeException("Error getting module information for operator " + name, e);
+		}
+
+		try {
+			OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
+			return od.getFacetData(name.getFacet()).getPrototype();
+		} catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);}       
+	}
+
+	public static EnvironmentProxy initialEnv(CommonTree t, ModuleCache modules) {
+		AncestryPackage ancestry = new AncestryPackage(t);
+		TuplePrototype[] prototypes = new TuplePrototype[Environment.DEFAULT_SIZE];
+		prototypes[Environment.CANVAS_FRAME] = stencil.display.CanvasTuple.PROTOTYPE;
+		prototypes[Environment.VIEW_FRAME] = stencil.display.ViewTuple.PROTOTYPE;
+		prototypes[Environment.STREAM_FRAME] = calcStreamProxy(ancestry, modules);
+		prototypes[Environment.PREFILTER_FRAME] = calcPrefilterProxy(ancestry);
+		prototypes[Environment.LOCAL_FRAME] = calcLocalProxy(ancestry);
+
+		//Construct the actual proxy environment
+		EnvironmentProxy proxy = new Proxy(Environment.DEFAULT_FRAME_NAMES[0], prototypes[0]);
+		for (int i=1; i< prototypes.length; i++) {
+			proxy = proxy.push(Environment.DEFAULT_FRAME_NAMES[i], prototypes[i]);
+		}
+		return proxy;
+	}
+	
+	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
+		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
+		if (anc.c != null) {return External.find(anc.c.getStream(), anc.program.getExternals()).getPrototype();}
+		if (anc.o != null) {return anc.o.getYields().getInput();}
+		if (anc.g != null) {
+			if (anc.inRuleList) {
+				return anc.g.getGenerator().getTarget().getPrototype();
+			} else {return anc.g.getSeedOperator().getSamplePrototype();}
+		}
+		
+		throw new RuntimeException("Could not calculate stream proxy for tree: " + anc.focus.toStringTree());
+	}
+	
+	private static TuplePrototype calcPrefilterProxy(AncestryPackage anc) {
+		if (anc.c != null) {return calcPrototype(anc.c.getPrefilterRules());}
+		if (anc.o != null) {return calcPrototype(anc.o.getPrefilterRules());}
+		
+		return new SimplePrototype();
+	}
+	
+	private static TuplePrototype calcLocalProxy(AncestryPackage anc) {
+		if (anc.c != null) {return calcPrototype(anc.c.getLocalRules());}
+		return new SimplePrototype();
+	}
 
 }

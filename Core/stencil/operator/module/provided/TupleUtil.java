@@ -8,7 +8,7 @@ import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 
 
@@ -29,18 +29,23 @@ public class TupleUtil extends BasicModule {
 		
 		String[] keys;
 		
-		public Rename(Specializer specializer) {
+		public Rename(OperatorData opData, Specializer specializer) {
+			super(opData);
 			keys = new String[specializer.getArgs().size()];
 			for (int i=0; i< keys.length; i++) {
 				keys[i] = specializer.getArgs().get(i).toString();
 			}
 		}		
-		public Rename(String...keys) {this.keys = keys;}
+		public Rename(OperatorData opData, String...keys) {
+			super(opData);
+			this.keys = keys;
+		}
+		
 		public Tuple query(Object... args) {return map(args);}
 		public Tuple map(Object... values) {
 			assert keys.length == values.length : "Keys and values lengths do not match.";
 			
-			return new PrototypedTuple(keys, values);
+			return new ArrayTuple(values);
 		}
 		public String getName() {return NAME;}
 
@@ -50,7 +55,7 @@ public class TupleUtil extends BasicModule {
 				!specializer.getSplit().hasSplitField();
 		}
 		
-		public Rename duplicate() {return new Rename(keys);}
+		public Rename duplicate() {return new Rename(operatorData, keys);}
 	}
 
 	/**How many elements does the given tuple have?
@@ -61,6 +66,7 @@ public class TupleUtil extends BasicModule {
 	 * TODO: This may really be a categorize...I'm not sure!
 	 * */
 	public static final class Length extends BasicProject {
+		protected Length(OperatorData opData) {super(opData);}
 		public String getName() {return this.getClass().getSimpleName();}
 		public Tuple query(Object... args) {return map(args);}		
 
@@ -71,7 +77,7 @@ public class TupleUtil extends BasicModule {
 					sum += ((Tuple) args[0]).getPrototype().size();
 				} else {sum++;}
 			}
-			return PrototypedTuple.singleton(sum);
+			return new ArrayTuple(sum);
 		}
 		
 		public static boolean accepts(Specializer specializer) {return specializer.isSimple();}
@@ -100,10 +106,10 @@ public class TupleUtil extends BasicModule {
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		validate(name, specializer);
-		
+		OperatorData opData = getOperatorData(name, specializer);
 		//TODO: Extends modules to auto-detect a static 'instance' method or constructor to take a specializer use it instead of the zero-argument constructor 
-		if (name.equals("Rename")) {return new Rename(specializer);}
-		else if (name.equals("Length")) {return new Length();}
+		if (name.equals("Rename")) {return new Rename(opData, specializer);}
+		else if (name.equals("Length")) {return new Length(opData);}
 
 		throw new RuntimeException(String.format("Legend name not known: %1$s.", name));
 	}

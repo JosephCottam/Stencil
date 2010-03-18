@@ -20,7 +20,7 @@ from Stocks
 	X.new: TimeStep(Date) 
 	Y.new: Mult(Open, -1)
 	STROKE_WEIGHT: 1
-	STROKE_COLOR: @color(BLUE)
+	STROKE_COLOR: @Color{BLUE}
 from Stocks
 	view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
 from Stocks

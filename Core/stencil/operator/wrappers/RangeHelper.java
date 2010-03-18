@@ -29,6 +29,9 @@
 package stencil.operator.wrappers;
 
 import stencil.operator.StencilOperator;
+import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Range;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
@@ -49,9 +52,28 @@ import java.util.List;
  */
 
 public abstract class RangeHelper implements StencilOperator {
+	
+	/**Invokeable object returned by ranging operators.*/
+	private static final class RangeTarget implements Invokeable<Tuple> {
+		final RangeHelper helper;
+		final Invokeable<Tuple> base;
+		
+		public RangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+			this.helper = helper;
+			this.base = base;
+		}
+		
+		public Tuple invoke(Object[] args) {
+			Object[] formals = helper.updateCache(args);
+			return (Tuple) base.invoke(formals);
+		}
+		
+		public Object getTarget() {return this;}
+	}
+	
 	private static final class RelativeHelper extends RangeHelper {
-		public RelativeHelper(Range range, StencilOperator oprator) {
-			super(range, oprator);
+		public RelativeHelper(Range range, StencilOperator operator) {
+			super(range, operator);
 			
 			if (range.getStart() < range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toStringTree());}
 			
@@ -70,7 +92,6 @@ public abstract class RangeHelper implements StencilOperator {
 			Object[] formals = values.subList(0, endRange).toArray();
 			return formals;
 		}
-		
 	}
 	
 	private static final class AbsoluteHelper extends RangeHelper {
@@ -123,16 +144,30 @@ public abstract class RangeHelper implements StencilOperator {
 	protected Range range;
 	protected List values;	 		//One list, used by both Query and Map.  Invoking a single instance in both may end up arguments appended multiple times. 
 	private StencilOperator operator; //Backing StencilLegend instance
+	protected final OperatorData operatorData;
+	
 	
 	protected RangeHelper(Range range, StencilOperator operator) {
 		this.operator = operator;
 		this.range = range;
+		MutableOperatorData opData = new MutableOperatorData(operator.getOperatorData()); 
+		this.operatorData = opData;
+		opData.addAttribute(OperatorData.FUNCTION_KEY, OperatorData.FALSE);
 	}
 
-	public Tuple map(Object...args) {
-		Object[] formals = updateCache(args);
-		//TODO: Should we do something special if formals.length ==0?
-		return operator.map(formals);
+	public OperatorData getOperatorData() {return operatorData;}
+
+	public Invokeable getFacet(String facet) {
+		if (facet.equals(StencilOperator.QUERY_FACET)) {
+			throw new UnsupportedOperationException("Range operation is inherently mutative, query facet not supporetd.");
+		}
+		
+		try {
+			Invokeable f = operator.getFacet(facet);
+			return new RangeTarget(this, f);
+		} catch (Exception e) {
+			throw new RuntimeException("Error getting range-wrapped facet " + facet, e);
+		}
 	}
 
 	/**Given an array of objects, will attempt to convert them all to the
@@ -159,11 +194,6 @@ public abstract class RangeHelper implements StencilOperator {
 	}
 
 	public String getName() {return operator.getName() + "(Ranged)";}
-
-	public Tuple query(Object... args) {
-		Object[] formals = updateCache(args);
-		return operator.query(formals);
-	}
 	
 	/**Updates the list storage according to the specified range.
 	 * @return List of arguments to actually invoke the underlying legend with.
