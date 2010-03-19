@@ -36,6 +36,8 @@ import java.awt.Color;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.ArrayTuple;
@@ -248,7 +250,7 @@ public class Projection extends BasicModule {
 	
 	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperatorData(name);
+		OperatorData operatorData = getModuleData().getOperator(name);
 		if (specializer.equals(moduleData.getDefaultSpecializer(name))) {
 			if (name.equals("Index")) {
 				return new Index(operatorData);

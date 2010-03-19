@@ -10,11 +10,11 @@ import java.util.HashMap;
 /**Simple MutableModule.  Does not allow specialization of the Legends.*/
 public class MutableModule implements Module {
 	protected Map<String, StencilOperator> operators;
-	protected MutableModuleData moduleData;
+	protected ModuleData moduleData;
 
 	public MutableModule(String name) {
 		operators = new HashMap<String, StencilOperator>();
-		moduleData = new MutableModuleData(this, name);
+		moduleData = new ModuleData(this, name);
 	}
 
 	public ModuleData getModuleData() {return moduleData;}
@@ -22,7 +22,7 @@ public class MutableModule implements Module {
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
 		Specializer defaultSpecializer = getModuleData().getDefaultSpecializer(name);
 		if (!specializer.equals(defaultSpecializer)) {throw new SpecializationException(getName(),name, specializer);}
-		return moduleData.getOperatorData(name);		
+		return moduleData.getOperator(name);		
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {

@@ -31,9 +31,9 @@ package stencil.types.color;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import stencil.operator.module.ModuleData;
-import stencil.operator.module.OperatorData;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 
 public final class ColorUtils extends BasicModule {

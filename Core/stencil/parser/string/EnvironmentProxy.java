@@ -4,7 +4,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.operator.module.Module;
 import stencil.operator.module.ModuleCache;
-import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.prototype.SimplePrototype;
@@ -198,7 +198,7 @@ public abstract class EnvironmentProxy {
 
 		try {
 			OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
-			return od.getFacetData(name.getFacet()).getPrototype();
+			return od.getFacet(name.getFacet()).getPrototype();
 		} catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);}       
 	}
 

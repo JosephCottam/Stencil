@@ -71,9 +71,12 @@ public abstract class ParseStencil {
 			StencilParser.tuple_return parserRV = parser.tuple(allowEmpty);
 			if (parser.getNumberOfSyntaxErrors() >0) {throw new SyntaxException(parser.getNumberOfSyntaxErrors(), source);}
 			
-			validate((StencilTree) parserRV.getTree());
+			TuplePrototype p =(TuplePrototype) parserRV.getTree();
+			//Makes sure that there are as many parts to the prototype as parts to the definition
+			assert p.size() == source.split(",").length : "Prototpye type length not as expected";
+			validate(p);
 			
-			return (TuplePrototype) parserRV.getTree();
+			return p;
 		} catch (Exception e) {
 			throw new ProgramParseException(String.format("Error parsing specializer: '%1$s'.", source), e);
 		}	

@@ -22,7 +22,7 @@
  		<antcall target="EclipseRefresh"/>
  	</target>
  	
- 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Interpreter, Validators, ModuleData">
+ 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Interpreter, Validators">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
@@ -145,19 +145,6 @@
            libdirectory="${parser}"
        />
  	</target>
- 		
- 	
- 	<target name="ModuleData">
- 		<property name="modulesUtil" location="${src}/stencil/operator/module/util/"/>
- 		<antlr
- 			target="${modulesUtil}/ModuleData.g"
-			outputdirectory="${modulesUtil}"
- 		/>
- 	 	<antcall target="EclipseRefresh"/>
-
- 	</target>
- 	
-
 
  	<target name="TreeAdapterGrammar" depends="StencilGrammar">
  		<antlr

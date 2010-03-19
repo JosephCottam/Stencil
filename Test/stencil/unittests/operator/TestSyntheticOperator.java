@@ -2,7 +2,7 @@ package stencil.unittests.operator;
 
 import stencil.adapters.Adapter;
 import stencil.operator.*;
-import stencil.operator.module.FacetData;
+import stencil.operator.module.util.FacetData;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.MethodInvokeFailedException;
 import stencil.operator.wrappers.SyntheticOperator;
@@ -35,7 +35,7 @@ public class TestSyntheticOperator extends TestCase {
 	public void testMap() throws Exception {
 		Program program = ParseStencil.parse(fullOperatorSource, ADAPTER);
 		SyntheticOperator operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
-		FacetData facetData = operator.getOperatorData().getFacetData(StencilOperator.MAP_FACET);
+		FacetData facetData = operator.getOperatorData().getFacet(StencilOperator.MAP_FACET);
 		TuplePrototype prototype = facetData.getPrototype();
 		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
 		Tuple rv;

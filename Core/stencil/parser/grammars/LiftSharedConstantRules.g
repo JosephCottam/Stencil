@@ -59,7 +59,6 @@ options {
 	import stencil.parser.ParserConstants;	
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
-	import static stencil.operator.module.FacetData.FUNCTION_ATTRIBUTE;
 }
 
 @members {
@@ -170,9 +169,8 @@ options {
        	try{
     		Module m = modules.findModuleForOperator(name.prefixedName()).module;
     		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
-    		FacetData fd=od.getFacetData(name.getSuffix());
-    		String function =fd.getAttribute(FUNCTION_ATTRIBUTE);
-       		return  function != null && !function.toUpperCase().equals("FALSE"); 
+    		FacetData fd=od.getFacet(name.getSuffix());
+    		return fd.isFunction();
    		} catch (Exception e) {
    			throw new RuntimeException("Error getting module information for operator " + name, e);
 		}

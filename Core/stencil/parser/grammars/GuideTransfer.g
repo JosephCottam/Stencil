@@ -60,10 +60,10 @@ options {
 	import stencil.util.MultiPartName;
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
-	import stencil.operator.module.OperatorData.OpType;
   import stencil.operator.util.Invokeable;
   import stencil.operator.StencilOperator;
 
+  import static stencil.operator.module.util.OperatorData.TYPE_CATEGORIZE;
 	import static stencil.parser.ParserConstants.GUIDE_FACET;
 	import static stencil.parser.ParserConstants.MAIN_FACET;
 	import static stencil.parser.ParserConstants.QUERY_FACET;
@@ -147,8 +147,8 @@ options {
    		MultiPartName name = new MultiPartName(f.getName());
    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
    		try {
-   			OpType opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacetData(name.getFacet()).getFacetType();;
-   			return (opType == OpType.CATEGORIZE);
+   			String opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacet(name.getFacet()).getType();;
+   			return TYPE_CATEGORIZE.equals(opType);
    		} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.",e);}
 	}
 	

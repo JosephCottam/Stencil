@@ -53,7 +53,6 @@ options {
 	import stencil.parser.tree.*;
 	
 	import static stencil.parser.ParserConstants.BIND_OPERATOR;
-	import static stencil.operator.module.OperatorData.OpType;
 	import static stencil.tuple.Tuples.stripQuotes;	
 	import static stencil.parser.ParserConstants.MAIN_FACET;
 	import static stencil.interpreter.guide.Samplers.CATEGORICAL;

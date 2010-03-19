@@ -2,7 +2,6 @@ package stencil.testUtilities;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
@@ -11,18 +10,20 @@ import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import static stencil.operator.module.util.OperatorData.*;
+
 import java.lang.reflect.*;
 
 public class TestModule implements Module {
-	private static final MutableModuleData MODULE_DATA = new MutableModuleData(instance(), "TestModule");
+	private static final ModuleData MODULE_DATA = new ModuleData(instance(), "TestModule");
 	private static final TestModule instance = new TestModule();
 	
 	static {
-		try {MODULE_DATA.addOperator("FilterFail", ParseStencil.parseSpecializer("[1 .. n]"));}
+		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[1 .. n]")));}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
-		MutableOperatorData ld = (MutableOperatorData) MODULE_DATA.getOperatorData("FilterFail");
-		ld.addFacet(new BasicFacetData("map", OpType.PROJECT, "VALUE"));
+		OperatorData od = MODULE_DATA.getOperator("FilterFail");
+		od.addFacet(new FacetData("map", TYPE_PROJECT, true, "VALUE"));
 	}
 	
 	public static TestModule instance() {return instance;}
@@ -56,7 +57,7 @@ public class TestModule implements Module {
 
 	public OperatorData getOperatorData(String name, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
-		if (name.equals("FilterFail")) {return MODULE_DATA.getOperatorData("FilterFail");}
+		if (name.equals("FilterFail")) {return MODULE_DATA.getOperator("FilterFail");}
 		throw new IllegalArgumentException("No legend of name " + name);
 	}
 

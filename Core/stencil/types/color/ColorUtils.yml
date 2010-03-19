@@ -1,0 +1,37 @@
+name: Color
+targetClass: stencil.types.color.ColorUtils
+description: Create and modify colors.
+
+defaults:
+  defaultSpecializer: !spec "[n .. n]"
+  facets:
+    - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: guide, function: true, type: PROJECT, prototype: !proto "VALUE"}
+
+operators:
+  - name: Brighter  
+  - name: Brighter
+  - name: Darker
+
+  - name: GetRed
+  - name: SetRed
+  - name: SetIntRed
+  
+  - name: GetBlue
+  - name: SetBlue
+  - name: SetIntBlue
+
+  - name: GetGreen
+  - name: SetGreen
+  - name: SetIntGreen
+
+  - name: GetAlpha
+  - name: SetAlpha
+  - name: SetIntAlpha
+  
+  - name: Opaque
+  
+  - name: Color
+    facets:
+      - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}

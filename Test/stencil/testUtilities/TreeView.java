@@ -8,7 +8,6 @@ import java.util.Properties;
 import org.antlr.runtime.tree.*;
 
 import stencil.adapters.java2D.Adapter;
-import stencil.operator.module.util.*;
 import stencil.parser.string.*;
 import stencil.testUtilities.treeView.ANTLRNode;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
@@ -50,15 +49,11 @@ public class TreeView {
 		
 		if (file == null) {throw  new IllegalArgumentException("Must provide file name.");}
 		
-		if (file.endsWith(".xml")) {
-			tree = (Tree) ModuleDataParser.parse(file);
-			f = new stencil.testUtilities.treeView.TreeFrame(tree, new ModuleDataParser(null));
-		} else {
-			stencil.Configure.loadProperties(props);
-			tree = stencil.parser.string.ParseStencil.parse(text, Adapter.INSTANCE);
+
+		stencil.Configure.loadProperties(props);
+		tree = stencil.parser.string.ParseStencil.parse(text, Adapter.INSTANCE);
 //			tree = pieceWise(text, Adapter.INSTANCE);
-			f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
-		}
+		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
 		f.setVisible(true);
 		
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

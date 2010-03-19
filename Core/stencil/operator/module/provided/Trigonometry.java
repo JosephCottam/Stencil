@@ -1,7 +1,7 @@
 package stencil.operator.module.provided;
 
-import stencil.operator.module.ModuleData;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 

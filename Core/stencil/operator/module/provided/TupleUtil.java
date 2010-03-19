@@ -87,7 +87,7 @@ public class TupleUtil extends BasicModule {
 	public TupleUtil(ModuleData md) {super(md);}
 	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
+		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 
 		if (name.equals("Rename") && !Rename.accepts(specializer)) {
 			throw new SpecializationException(moduleData.getName(), name, specializer);
@@ -98,7 +98,7 @@ public class TupleUtil extends BasicModule {
 	
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
-		OperatorData ld = moduleData.getOperatorData(name);
+		OperatorData ld = moduleData.getOperator(name);
 
 		if (ld.isComplete()) {return ld;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, ld);

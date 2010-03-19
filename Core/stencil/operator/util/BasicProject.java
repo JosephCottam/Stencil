@@ -5,7 +5,7 @@ import static java.lang.String.format;
 
 import stencil.tuple.Tuple;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.OperatorData;
 
 public abstract class BasicProject implements StencilOperator {
 	protected final OperatorData operatorData;

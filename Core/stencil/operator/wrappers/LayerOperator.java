@@ -4,11 +4,10 @@ import static java.lang.String.format;
 
 import stencil.display.DisplayLayer;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.Modules;
-import stencil.operator.module.util.BasicFacetData;
-import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.module.util.FacetData;
+import stencil.operator.module.util.OperatorData;
+import static stencil.operator.module.util.OperatorData.TYPE_NA;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.tuple.prototype.TuplePrototype;
@@ -29,17 +28,17 @@ public final class LayerOperator implements StencilOperator {
 	private static final String REMOVE_METHOD = "remove";
 	
 	protected final DisplayLayer layer;
-	protected final MutableOperatorData operatorData;
+	protected final OperatorData operatorData;
 	
 	public LayerOperator(String module, DisplayLayer layer) {
 		this.layer = layer;
 
 		TuplePrototype prototype = layer.getPrototype();
 		operatorData = Modules.basicLegendData(module, getName());
-		operatorData.addFacet(new BasicFacetData(FIND_FACET, OpType.NA, prototype));
-		operatorData.addFacet(new BasicFacetData(MAP_FACET, OpType.NA, prototype));
-		operatorData.addFacet(new BasicFacetData(QUERY_FACET, OpType.NA, prototype));
-		operatorData.addFacet(new BasicFacetData(REMOVE_FACET, OpType.NA, prototype));
+		operatorData.addFacet(new FacetData(FIND_FACET, TYPE_NA, false, prototype));
+		operatorData.addFacet(new FacetData(MAP_FACET, TYPE_NA, false, prototype));
+		operatorData.addFacet(new FacetData(QUERY_FACET, TYPE_NA, false, prototype));
+		operatorData.addFacet(new FacetData(REMOVE_FACET, TYPE_NA, false, prototype));
 	}
 	
 	public String getName() {return layer.getName();}

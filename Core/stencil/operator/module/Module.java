@@ -29,6 +29,8 @@
 package stencil.operator.module;
 
 import stencil.operator.StencilOperator;
+import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
 /**A module is a collection of related legends.

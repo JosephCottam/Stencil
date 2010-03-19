@@ -56,6 +56,7 @@
  */
 package stencil.operator.module;
 
+import stencil.operator.module.util.ModuleData;
 import stencil.parser.tree.Specializer;
 
 /**Indicates that trying to specialize a method from a package failed.

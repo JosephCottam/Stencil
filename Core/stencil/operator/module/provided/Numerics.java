@@ -31,7 +31,9 @@ package stencil.operator.module.provided;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
 import stencil.operator.module.util.Modules;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
@@ -188,7 +190,7 @@ public class Numerics extends BasicModule {
  	public ModuleData getModuleData() {return moduleData;}
  	
  	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
+		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 
 		if (specializer.getArgs().size() >0) {throw new SpecializationException(moduleData.getName(), name, specializer);}
  	}
@@ -198,7 +200,7 @@ public class Numerics extends BasicModule {
 
 		validate(name, specializer);
 		StencilOperator target = null;
-		OperatorData operatorData = getModuleData().getOperatorData(name);
+		OperatorData operatorData = getModuleData().getOperator(name);
 		
 		try {
 			

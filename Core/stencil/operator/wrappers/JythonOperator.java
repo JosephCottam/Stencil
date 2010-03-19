@@ -10,7 +10,6 @@ import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.PythonFacet;
@@ -21,13 +20,13 @@ public class JythonOperator implements StencilOperator {
 	protected String operatorName;
 	protected String module;
 	protected Map<String, ReflectiveInvokeable<JythonEncapsulation, Tuple>> invokeables;
-	protected MutableOperatorData operatorData;
+	protected OperatorData operatorData;
 	
 	public JythonOperator(String module, String name) {
 		this.module = module;
 		this.operatorName = name;
 		invokeables = new HashMap<String, ReflectiveInvokeable<JythonEncapsulation, Tuple>>();
-		operatorData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
+		operatorData = new OperatorData(module, name, SIMPLE_SPECIALIZER);
 	}
 		
 	public String getName() {return operatorName;}
@@ -48,9 +47,9 @@ public class JythonOperator implements StencilOperator {
 	
 	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new ReflectiveInvokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
-		OpType opType = OpType.valueOf(f.getAnnotations().get("TYPE").getText());
+		String opType = f.getAnnotations().get("TYPE").getText();
 		String[] fields = TuplePrototypes.getNames(enc.getReturns());
-		FacetData data = new BasicFacetData(f.getName(), opType,  fields); //TODO: Add type information
+		FacetData data = new FacetData(f.getName(), opType, false, fields);
 		operatorData.addFacet(data);		
 	}
 

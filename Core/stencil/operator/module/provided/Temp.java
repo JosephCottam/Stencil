@@ -32,8 +32,8 @@ import java.util.*;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.*;
+import static stencil.operator.module.util.OperatorData.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
 import stencil.tuple.ArrayTuple;
@@ -180,10 +180,10 @@ public class Temp extends BasicModule {
 			try {fields = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 			
-			MutableOperatorData od = new MutableOperatorData(basic);
-			od.addFacet(new BasicFacetData(PUT_FACET, OpType.PROJECT, fields));
-			od.addFacet(new BasicFacetData(MAP_FACET, OpType.PROJECT, fields));
-			od.addFacet(new BasicFacetData(QUERY_FACET, OpType.PROJECT, fields));
+			OperatorData od = new OperatorData(basic);
+			od.addFacet(new FacetData(PUT_FACET, TYPE_PROJECT, false,  fields));
+			od.addFacet(new FacetData(MAP_FACET, TYPE_PROJECT, false, fields));
+			od.addFacet(new FacetData(QUERY_FACET, TYPE_PROJECT, false, fields));
 			return od;
 		}
 
@@ -231,7 +231,7 @@ public class Temp extends BasicModule {
 		throws SpecializationException {
 
 		if(name.equals("Mapping")) {
-			return Mapping.getOperatorData(getModuleData().getOperatorData(name), specializer);
+			return Mapping.getOperatorData(getModuleData().getOperator(name), specializer);
 		}
 
 		return super.getOperatorData(name, specializer);

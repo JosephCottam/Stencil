@@ -37,13 +37,11 @@ import static java.lang.String.format;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.SeedOperator;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.FacetData;
-import stencil.operator.module.ModuleData;
-import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
-import stencil.operator.module.util.BasicFacetData;
 import stencil.operator.module.util.BasicModule;
-import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.module.util.FacetData;
+import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Atom;
@@ -96,16 +94,16 @@ public class StencilUtil extends BasicModule {
 				
 		/**Complete the legend data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
-			MutableOperatorData ld = new MutableOperatorData(base);
-			FacetData fd = ld.getFacetData(StencilOperator.MAP_FACET);
-			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), new String[0]);
+			OperatorData ld = new OperatorData(base);
+			FacetData fd = ld.getFacet(StencilOperator.MAP_FACET);
+			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
 			ld.addFacet(fd);
 			
-			fd = ld.getFacetData(StencilOperator.QUERY_FACET);
-			fd = new BasicFacetData(fd.getName(), fd.getFacetType(), new String[0]);
+			fd = ld.getFacet(StencilOperator.QUERY_FACET);
+			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
 			ld.addFacet(fd);
 			
-			fd = ld.getFacetData(StencilOperator.STATE_FACET);
+			fd = ld.getFacet(StencilOperator.STATE_FACET);
 			ld.addFacet(fd);
 			
 			return ld;
@@ -195,12 +193,12 @@ public class StencilUtil extends BasicModule {
 	public StencilUtil(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
+		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 	}
 	
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
-		OperatorData ld = moduleData.getOperatorData(name);
+		OperatorData ld = moduleData.getOperator(name);
 
 		ld = EchoBase.complete(ld, specializer);
 

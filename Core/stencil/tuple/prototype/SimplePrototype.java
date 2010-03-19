@@ -2,7 +2,6 @@ package stencil.tuple.prototype;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,7 +11,7 @@ public class SimplePrototype extends ArrayList<SimpleFieldDef> implements TupleP
 
 
 	public SimplePrototype(String... names) {this(Arrays.asList(names));}
-	public SimplePrototype(Collection<String> names) {
+	public SimplePrototype(List<String> names) {
 		this(names.toArray(new String[names.size()]), TuplePrototypes.defaultTypes(names.size()));
 	}
 

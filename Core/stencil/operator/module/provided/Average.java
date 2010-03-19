@@ -31,10 +31,10 @@ package stencil.operator.module.provided;
 import java.util.HashMap;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.ModuleData;
-import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.operator.wrappers.SplitHelper;
@@ -207,7 +207,7 @@ public class Average extends BasicModule {
 	public Average(ModuleData md) {super(md);}
 	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
+		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 
 		//Accept greater-than-zero ranges and no additional arguments (split is allowed).
 		if (specializer.getRange().isSimple() ||

@@ -2,13 +2,13 @@ package stencil.operator.module.util;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.Module;
-import stencil.operator.module.ModuleData;
-import stencil.operator.module.OperatorData;
 import stencil.operator.module.SpecializationException;
 import stencil.parser.tree.Specializer;
 
 /**Basic implementation for modules where meta-data is determined largely
  * by the static module data in the configuration file.  
+ * 
+ * TODO: Should this merge with mutable module?  All of the meta-data are now mutable anyway....
  * 
  */
 public abstract class BasicModule implements Module {
@@ -48,7 +48,7 @@ public abstract class BasicModule implements Module {
 	 */
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException, MetaDataHoleException {
 		validate(name, specializer);
-		OperatorData ld = moduleData.getOperatorData(name);
+		OperatorData ld = moduleData.getOperator(name);
 		if (ld.isComplete()) {return ld;}
 		
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, ld);
@@ -62,7 +62,7 @@ public abstract class BasicModule implements Module {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
-		OperatorData operatorData = getModuleData().getOperatorData(name);		
+		OperatorData operatorData = getModuleData().getOperator(name);		
 		StencilOperator operator = Modules.instance(this.getClass(), operatorData);
 		
 		return operator;
@@ -79,7 +79,7 @@ public abstract class BasicModule implements Module {
 	 * @param specializer
 	 */
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperators().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
+		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 		if (!specializer.equals(moduleData.getDefaultSpecializer(name))) {throw new SpecializationException(moduleData.getName(), name, specializer);}
 	}
 }

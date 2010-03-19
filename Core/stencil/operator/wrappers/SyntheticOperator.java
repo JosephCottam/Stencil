@@ -31,8 +31,8 @@ package stencil.operator.wrappers;
 import java.util.Arrays;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.module.util.Modules;
+import static stencil.operator.module.util.OperatorData.TYPE_PROJECT;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Canvas;
@@ -116,7 +116,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	
 	/**Create a Stencil operator from a specification.*/
 	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
-		super(Modules.basicOperatorData(module, opDef.getName(), OpType.PROJECT, TuplePrototypes.getNames(opDef.getResults())));
+		super(Modules.basicOperatorData(module, opDef.getName(), TYPE_PROJECT, TuplePrototypes.getNames(opDef.getResults())));
 		this.source = new SyntheticInvokeTarget(opDef);
 		this.module = module;
 	}

@@ -28,14 +28,13 @@
  */
 package stencil.operator.module;
 
- import java.util.*;
+import java.io.InputStream;
+import java.util.*;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.*;
 import stencil.parser.tree.Specializer;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 
 /**Utilities for handling module->method conversions.
  *
@@ -133,7 +132,7 @@ s	 */
 	 */
 	public PrefixedModule findModuleForOperator(String name) throws IllegalArgumentException {
 		for (PrefixedModule pm: importedModules) {
-			for (String operatorName: pm.module.getModuleData().getOperators()) {
+			for (String operatorName: pm.module.getModuleData().getOperatorNames()) {
 				if (name.equals(Modules.prefixName(pm.prefix, operatorName))) {
 					return pm;
 				}
@@ -190,9 +189,9 @@ s	 */
 				Module m;
 				ModuleData md;
 				
-				BufferedReader stream = new BufferedReader(new InputStreamReader(ModuleCache.class.getResourceAsStream(filename)));
-				
-				try {md = ModuleDataParser.parse(stream);} 
+				InputStream stream = ModuleCache.class.getResourceAsStream(filename);
+
+				try {md = ModuleDataParser.load(stream);} 
 				catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}
 				
 				try {m = md.getModule();}

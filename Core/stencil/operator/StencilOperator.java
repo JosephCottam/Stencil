@@ -29,7 +29,7 @@
 package stencil.operator;
 
 
-import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 
 

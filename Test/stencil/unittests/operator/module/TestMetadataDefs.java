@@ -13,12 +13,12 @@ public class TestMetadataDefs  extends TestCase {
 	public void testParseAll() throws Exception {
 		ArrayList errors = new ArrayList();
 		
-		Collection<String> files= StringUtils.allFiles(METADATA_PATH, ".xml");
+		Collection<String> files= StringUtils.allFiles(METADATA_PATH, ".yml");
 		assertTrue("No metadata files found.", files.size() >0);
 
 		for (String fileName: files) {
 			try {
-				ModuleDataParser.parse(fileName);
+				ModuleDataParser.load(fileName);
 			}
 			catch (Throwable e) {
 				e.printStackTrace();

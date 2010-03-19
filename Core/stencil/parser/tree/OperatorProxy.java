@@ -32,8 +32,7 @@ import org.antlr.runtime.Token;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.ModuleCache;
-import stencil.operator.module.OperatorData;
-import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.module.util.OperatorData;
 
 public class OperatorProxy extends StencilTree {
 	private StencilOperator operator;
@@ -47,8 +46,9 @@ public class OperatorProxy extends StencilTree {
 		this.operator = operator;
 		
 		if (!operatorData.getName().equals(getName())) {
-			this.operatorData = new MutableOperatorData(ModuleCache.AD_HOC_NAME, operatorData);
-			((MutableOperatorData)this.operatorData).setName(getName());
+			this.operatorData = new OperatorData(operatorData);
+			this.operatorData.setModule(ModuleCache.AD_HOC_NAME);
+			((OperatorData)this.operatorData).setName(getName());
 		} else {
 			this.operatorData =operatorData; 
 		}

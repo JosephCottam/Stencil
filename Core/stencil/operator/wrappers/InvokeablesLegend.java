@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import static java.lang.String.format;
 
-import stencil.operator.module.OperatorData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
@@ -26,7 +26,7 @@ public final class InvokeablesLegend extends BasicProject {
 	
 	/**All facets are directed towards the same target (a common case for functional operators).*/
 	public InvokeablesLegend(String name, OperatorData opData, Invokeable target) {
-		this(name, opData, new KeysetConstantMap(opData.getFacets(), target));
+		this(name, opData, new KeysetConstantMap(opData.getFacetNames(), target));
 	}
 
 	
@@ -42,7 +42,7 @@ public final class InvokeablesLegend extends BasicProject {
 		this.name = name;
 		this.facets = new HashMap();
 
-		List<String> facetNames = opData.getFacets();
+		List<String> facetNames = opData.getFacetNames();
 		assert facetNames.size() == targets.size() : "Facet list and targets list must be of the same length";
 		
 		for (int i=0; i< facetNames.size(); i++) {
@@ -62,7 +62,7 @@ public final class InvokeablesLegend extends BasicProject {
 	 * anytime the facets collection or operator data object changes.
 	 */
 	private void verify() {
-		for (String facet: operatorData.getFacets()) {
+		for (String facet: operatorData.getFacetNames()) {
 			if (!facets.containsKey(facet)) {
 				throw new RuntimeException(format("No invokeable was set for operator %1$s.", facet));
 			}

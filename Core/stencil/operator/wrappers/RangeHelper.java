@@ -29,8 +29,8 @@
 package stencil.operator.wrappers;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData;
-import stencil.operator.module.util.MutableOperatorData;
+import stencil.operator.module.util.FacetData;
+import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Range;
 import stencil.parser.tree.Value;
@@ -150,9 +150,11 @@ public abstract class RangeHelper implements StencilOperator {
 	protected RangeHelper(Range range, StencilOperator operator) {
 		this.operator = operator;
 		this.range = range;
-		MutableOperatorData opData = new MutableOperatorData(operator.getOperatorData()); 
+		OperatorData opData = new OperatorData(operator.getOperatorData()); 
 		this.operatorData = opData;
-		opData.addAttribute(OperatorData.FUNCTION_KEY, OperatorData.FALSE);
+		for (FacetData facet: opData.getFacets()) {
+			facet.setFunction(false);
+		}
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}

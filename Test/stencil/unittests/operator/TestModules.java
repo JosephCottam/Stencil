@@ -3,14 +3,9 @@ package stencil.unittests.operator;
 import junit.framework.TestCase;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
-import stencil.operator.module.util.*;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.Tuple;
 import stencil.unittests.operator.module.TestModuleCache;
 import stencil.util.MultiPartName;
-
-import java.lang.reflect.*;
-
 
 public class TestModules extends TestCase {
 	protected Module module;
@@ -32,7 +27,7 @@ public class TestModules extends TestCase {
 		Module m = mc.getModule(n.getPrefix());
 		assertNotNull("Module not found " + n.getPrefix(), m);
 		
-		Specializer s = m.getModuleData().getOperatorData(n.getName()).getDefaultSpecializer();
+		Specializer s = m.getModuleData().getOperator(n.getName()).getDefaultSpecializer();
 		assertNotNull(s);
 		
 		StencilOperator l = m.instance(n.getName(), s);		

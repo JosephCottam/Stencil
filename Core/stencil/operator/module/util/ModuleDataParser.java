@@ -1,4 +1,4 @@
-package stencil.testUtilities.YAMLModule;
+package stencil.operator.module.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,7 +20,7 @@ import stencil.tuple.prototype.TuplePrototype;
 
 
 
-public class YAMLLoader {
+public class ModuleDataParser {
 	/**Constructor class to handle loading the stencil-specific constructs.*/
 	private static class StencilYAMLConstructor extends Constructor {
 	    public StencilYAMLConstructor(Class root) {
@@ -32,6 +32,7 @@ public class YAMLLoader {
 	    private class ConstructPrototype extends AbstractConstruct {
 	        public TuplePrototype construct(Node node) {
 	            String source = (String) constructScalar((ScalarNode) node);
+	            source = String.format("(%1$s)", source);
 	            try {
 	            	return ParseStencil.parsePrototype(source,false);
 	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined prototype: " + source);}
@@ -51,17 +52,21 @@ public class YAMLLoader {
 	/**Given an input stream, will parse the contents 
 	 * and return a ModuleData object.
 	 */
-	public static MutableModuleData load(InputStream source) {
-		Constructor constructor = new StencilYAMLConstructor(MutableModuleData.class);
-		TypeDescription mdDesc = new TypeDescription(MutableModuleData.class);
-		mdDesc .putListPropertyType("operators", MutableOperatorData.class);
+	public static ModuleData load(InputStream source) {
+		Constructor constructor = new StencilYAMLConstructor(ModuleData.class);
+		TypeDescription mdDesc = new TypeDescription(ModuleData.class);
+		mdDesc .putListPropertyType("operators", OperatorData.class);
 		constructor.addTypeDescription(mdDesc);
 
 		Loader loader = new Loader(constructor);
 		Yaml yaml = new Yaml(loader);
 
-		MutableModuleData md = (MutableModuleData) yaml.load(source);
+		ModuleData md = (ModuleData) yaml.load(source);
 		return md;
+	}
+	
+	public static ModuleData load(String fileName) throws Exception {
+		return load(new FileInputStream(fileName));
 	}
 	
 	public static void main(String[] args) throws Exception {

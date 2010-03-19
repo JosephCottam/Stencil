@@ -37,6 +37,7 @@ import stencil.display.CanvasTuple;
 
 import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
+import stencil.operator.module.util.ModuleData;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.View;
 import stencil.tuple.ArrayTuple;

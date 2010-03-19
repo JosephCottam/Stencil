@@ -36,13 +36,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.OperatorData;
-import stencil.operator.module.OperatorData.OpType;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.operator.wrappers.InvokeablesLegend;
 import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
+
+import static stencil.operator.module.util.OperatorData.TYPE_PROJECT;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
@@ -99,7 +99,7 @@ public final class Modules {
 	public static StencilOperator instance(Class source, OperatorData operatorData) {
 		String module = operatorData.getModule();
 		String name = operatorData.getName();
-		String target = operatorData.getAttribute("Target");
+		String target = operatorData.getTarget();
 
 		if (target == null) {throw new IllegalArgumentException("Cannot use null target.");}
 		target = target.toUpperCase();
@@ -141,8 +141,8 @@ public final class Modules {
 	 * Default facet set is Map and Query.
 	 * 
 	 **/
-	public static MutableOperatorData basicLegendData(String module, String name) {
-		return basicOperatorData(module, name, OpType.PROJECT, "VALUE");
+	public static OperatorData basicLegendData(String module, String name) {
+		return basicOperatorData(module, name, TYPE_PROJECT, "VALUE");
 	}
 	
 	/**Produce a mutable operator meta-data object with the names, op-type and operator fields
@@ -154,15 +154,15 @@ public final class Modules {
 	 * @param fields
 	 * @return
 	 */
-	public static MutableOperatorData basicOperatorData(String module, String name, OpType type, String...fields) {
+	public static OperatorData basicOperatorData(String module, String name, String type, String...fields) {
 		return basicOperatorData(module, name, type, Arrays.asList(fields));
 	}
 	
-	public static MutableOperatorData basicOperatorData(String module, String name, OpType type, List<String> fields) {
-		MutableOperatorData legendData = new MutableOperatorData(module, name, SIMPLE_SPECIALIZER);
-		legendData.addFacet(new BasicFacetData(ParserConstants.MAIN_FACET, type, fields));
-		legendData.addFacet(new BasicFacetData(ParserConstants.QUERY_FACET, type, fields));
-		legendData.addFacet(new BasicFacetData(ParserConstants.GUIDE_FACET, type, fields));
+	public static OperatorData basicOperatorData(String module, String name, String type, List<String> fields) {
+		OperatorData legendData = new OperatorData(module, name, SIMPLE_SPECIALIZER);
+		legendData.addFacet(new FacetData(ParserConstants.MAIN_FACET, type, false, fields));
+		legendData.addFacet(new FacetData(ParserConstants.QUERY_FACET, type, false, fields));
+		legendData.addFacet(new FacetData(ParserConstants.GUIDE_FACET, type, false, fields));
 		return legendData;
 	}
 }
