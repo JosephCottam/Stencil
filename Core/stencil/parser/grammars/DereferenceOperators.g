@@ -53,6 +53,7 @@ options {
   import stencil.parser.tree.*;  
   import stencil.operator.module.*;
   import stencil.operator.*;
+  import stencil.operator.module.util.OperatorData;
 }
 
 @members{

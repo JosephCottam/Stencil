@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="Explore"/>
 	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="src" path="Core"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.5.0 (MacOS X Default)"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Stencil"/>
 	<classpathentry kind="lib" path="Library/antlr-3.2.jar" sourcepath="/Users/jcottam/Library/Java/antlr-3.1.3"/>
@@ -14,10 +13,7 @@
 	<classpathentry kind="lib" path="Library/rome-1.0.jar"/>
 	<classpathentry kind="lib" path="Library/stringtemplate-3.2.jar"/>
 	<classpathentry kind="lib" path="Library/twitter4j-2.0.8.jar"/>
-	<classpathentry kind="lib" path="Library/snakeyaml-1.5.jar" sourcepath="/Users/jcottam/Library/Java/snakeyaml/snakeyaml-1.5-sources.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="jar:file:/Users/jcottam/Library/Java/snakeyaml/snakeyaml-1.5-javadoc.jar!/"/>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.5"/>
+	<classpathentry kind="lib" path="Library/snakeyaml-1.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
