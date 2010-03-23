@@ -1,8 +1,8 @@
 import sys
 
 def prefix(parts):
-    print "\\\\ %s pallet of %s elements" % (parts[2].strip(), parts[1])
-    print "public static final Color[] %s = new Color[]{" % parts[0]
+    print "// %s pallet of %s elements" % (parts[2].strip(), parts[1])
+    print "public static final Color[] %s%s = new Color[]{" % (parts[0].upper(), parts[1])
 
 def terminate():
      print "};\n\n"
@@ -16,6 +16,7 @@ def color(parts):
 
 
 input = open(sys.argv[1],"r")
+input.readLine() 		//skip header...
 
 for line in input:
    parts = line.split("\t")
@@ -27,3 +28,5 @@ for line in input:
       terminate()
       prefix(parts)
       color(parts)
+      
+terminate()

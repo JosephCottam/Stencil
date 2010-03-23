@@ -98,7 +98,7 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	public Invokeable getFacet(String facet) {
 		try {operator.getFacet(facet);}	
-		catch (Exception e) {throw new RuntimeException("Facet error intializing split for " + operator.getName() + "." + facet);}
+		catch (Exception e) {throw new RuntimeException("Facet error intializing split for " + operator.getName() + "." + facet, e);}
 		
 		SplitTarget target = new SplitTarget(this, facet); 
 		return target;

@@ -80,6 +80,6 @@ public abstract class BasicModule implements Module {
 	 */
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-		if (!specializer.equals(moduleData.getDefaultSpecializer(name))) {throw new SpecializationException(moduleData.getName(), name, specializer);}
+		//if (!specializer.equals(moduleData.getDefaultSpecializer(name))) {throw new SpecializationException(moduleData.getName(), name, specializer);}
 	}
 }

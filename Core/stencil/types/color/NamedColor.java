@@ -45,7 +45,7 @@ public final class NamedColor {
 	public static final String GRAY_PREFIX = "GRAY";
 	public static final Color CLEAR = new Color(CLEAR_INT,CLEAR_INT,CLEAR_INT,CLEAR_INT);
 
-	private static final Map<String, Integer> COLOR_CONSTANTS = new TreeMap<String, Integer>();
+	public static final Map<String, Integer> COLOR_CONSTANTS = new TreeMap<String, Integer>();
 	
 	static {
 		COLOR_CONSTANTS.put("ALICEBLUE",IntColor.colorInt(240,248,255));

@@ -96,7 +96,7 @@ public final class Modules {
 	 * is created and a wrapping operator is returned.  The wrapping operator
 	 * will use the given target for all methods of the operator.
 	 **/
-	public static StencilOperator instance(Class source, OperatorData operatorData) {
+	public static StencilOperator instance(Class source, OperatorData operatorData, Object...args) {
 		String module = operatorData.getModule();
 		String name = operatorData.getName();
 		String target = operatorData.getTarget();
@@ -111,8 +111,12 @@ public final class Modules {
 
 			try {
 				if (target.equals(c.getSimpleName().toUpperCase())) {
-					Object[] args = new Object[]{operatorData};
-					return (StencilOperator) c.getConstructor(OperatorData.class).newInstance(args);
+					Object[] fullArgs = new Object[args.length+1];
+					fullArgs[0] = operatorData;
+					System.arraycopy(args, 0, fullArgs, 1, args.length);
+					Class[] argTypes = new Class[fullArgs.length];
+					for (int i=0; i< fullArgs.length; i++) {argTypes[i] = fullArgs[i].getClass();}
+					return (StencilOperator) c.getConstructor(argTypes).newInstance(fullArgs);
 				}
 			}
 			catch (Exception e) {/*Ignore, must not be the right thing if it can't be instantiated!*/}

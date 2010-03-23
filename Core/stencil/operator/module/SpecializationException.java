@@ -64,20 +64,22 @@ import stencil.parser.tree.Specializer;
  * and may include further details in nested exceptions.
  */
 public class SpecializationException extends Exception {
-	public SpecializationException(ModuleData module, String legend, Specializer specializer) {this(module.getName(), legend, specializer, null);}
+	public SpecializationException(ModuleData module, String legend, Specializer specializer) {this(module.getName(), legend, specializer, "", null);}
 
 	/**
 	 * @param legendName Name of method trying to specialize
 	 * @param specializer Specializer employed
 	 */
-	public SpecializationException(String module, String legend, Specializer specializer) {this(module, legend, specializer, null);}
+	public SpecializationException(String module, String legend, Specializer specializer) {this(module, legend, specializer, "", null);}
+	public SpecializationException(String module, String legend, Specializer specializer, String message) {this(module, legend, specializer, message, null);}
 
 	/**
 	 * @param name Name of method trying to specialize
 	 * @param specializer Specializer employed
 	 * @param e Originating exception
 	 */
-	public SpecializationException(String module, String name, Specializer specializer, Exception e) {
-		super(String.format("Cannot create legend %1$s from %2$s with specializer %3$s", name, module, specializer.toStringTree()), e);
+	public SpecializationException(String module, String name, Specializer specializer, Exception e) {this(module, name, specializer, "", e);}
+	public SpecializationException(String module, String name, Specializer specializer, String message, Exception e) {
+		super(String.format("Cannot create operator %1$s from %2$s with specializer %3$s: %4$s", name, module, specializer.toStringTree(), message), e);
 	}
 }

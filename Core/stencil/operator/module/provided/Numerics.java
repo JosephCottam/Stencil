@@ -187,8 +187,6 @@ public class Numerics extends BasicModule {
  	
  	public Numerics(ModuleData md) {super(md);}
  	
- 	public ModuleData getModuleData() {return moduleData;}
- 	
  	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 

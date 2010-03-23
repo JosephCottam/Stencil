@@ -52,23 +52,39 @@ import java.util.List;
  */
 
 public abstract class RangeHelper implements StencilOperator {
-	
-	/**Invokeable object returned by ranging operators.*/
-	private static final class RangeTarget implements Invokeable<Tuple> {
+	private static abstract class AbstractRangeTarget implements Invokeable<Tuple> {
 		final RangeHelper helper;
 		final Invokeable<Tuple> base;
 		
-		public RangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+		public AbstractRangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
 			this.helper = helper;
 			this.base = base;
+		}
+		
+		public Object getTarget() {return this;}
+	}
+	
+	private static final class QueryRangeTarget extends AbstractRangeTarget {
+		public QueryRangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+			super(helper, base);
+		}
+		
+		public Tuple invoke(Object[] args) {
+			Object[] formals = helper.getCache();
+			return (Tuple) base.invoke(formals);
+		}
+	}
+	
+	/**Invokeable object returned by ranging operators.*/
+	private static final class RangeTarget extends AbstractRangeTarget {
+		public RangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+			super(helper, base);
 		}
 		
 		public Tuple invoke(Object[] args) {
 			Object[] formals = helper.updateCache(args);
 			return (Tuple) base.invoke(formals);
 		}
-		
-		public Object getTarget() {return this;}
 	}
 	
 	private static final class RelativeHelper extends RangeHelper {
@@ -84,13 +100,16 @@ public abstract class RangeHelper implements StencilOperator {
 			//Rotate in the new values
 			if (values.size() > range.getStart()) {values.remove(0);} //Range.start indicates the oldest value that needs to be remembered.  In an offset, this is the larger number
 			values.add(args);
-
+			return getCache();
+		}
+		
+		protected Object[] getCache() {
 			//We can always start at 0, since that is the 'oldest' value, but we may
 			//have an end that is not the end of the range we must remember
 			//(e.g. the range arg was -10 to -5, just five items are returned but you need to remember 10)
 			int endRange = values.size()-1 > range.getEnd() ? values.size()-1 - range.getEnd() : 0;
 			Object[] formals = values.subList(0, endRange).toArray();
-			return formals;
+			return formals;			
 		}
 	}
 	
@@ -118,8 +137,10 @@ public abstract class RangeHelper implements StencilOperator {
 				values = values.subList(0, range.getEnd()); //The endpoint is exclusive, but range is 1-based, so it all works out!
 				trimmed = true;
 			}
-			return values.toArray();
+			return getCache();
 		}
+		
+		protected Object[] getCache() {return values.toArray();}
 	}
 	
 	private static final class HybridHelper extends RangeHelper {
@@ -136,6 +157,10 @@ public abstract class RangeHelper implements StencilOperator {
 		protected Object[] updateCache(Object... args) {
 			if (offsetCountdown >0) {offsetCountdown--; return new Object[0];}
 			values.add(args);			
+			return getCache();
+		}
+		
+		protected Object[] getCache() {
 			return values.subList(0, range.getEnd()).toArray();
 		}
 	}
@@ -160,13 +185,14 @@ public abstract class RangeHelper implements StencilOperator {
 	public OperatorData getOperatorData() {return operatorData;}
 
 	public Invokeable getFacet(String facet) {
-		if (facet.equals(StencilOperator.QUERY_FACET)) {
-			throw new UnsupportedOperationException("Range operation is inherently mutative, query facet not supporetd.");
-		}
-		
 		try {
 			Invokeable f = operator.getFacet(facet);
-			return new RangeTarget(this, f);
+
+			if (facet.equals(StencilOperator.QUERY_FACET)) {
+				return new QueryRangeTarget(this, f);
+			} else {
+				return new RangeTarget(this, f);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error getting range-wrapped facet " + facet, e);
 		}
@@ -202,6 +228,12 @@ public abstract class RangeHelper implements StencilOperator {
 	 */
 	protected abstract Object[] updateCache(Object... args);
 	
+	/**Gets a list of stored items according to the specified range.
+	 * This is the analog of 'updateCache' but without mutating state.
+	 * @return
+	 */
+	protected abstract Object[] getCache();
+	
 	public StencilOperator duplicate() {
 		StencilOperator op = operator.duplicate();
 		return makeLegend(range, op);
@@ -218,7 +250,5 @@ public abstract class RangeHelper implements StencilOperator {
 		if (!range.relativeStart() && range.relativeEnd()) {return new HybridHelper(range, operator);}
 		
 		throw new RuntimeException("Unsupported paramter combinitation in range: " + range.toStringTree());
-		
-		
 	}
 }
