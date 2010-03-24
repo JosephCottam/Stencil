@@ -58,7 +58,7 @@ public final class Text extends Basic {
 	protected static final TuplePrototype PROTOTYPE;
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
-	private static final String IMPLANTATION = "TEXT";
+	public static final String IMPLANTATION = "TEXT";
 	
 	private static final Pattern SPLITTER = Pattern.compile("\n");
 	

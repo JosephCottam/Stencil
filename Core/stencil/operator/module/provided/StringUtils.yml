@@ -12,6 +12,7 @@ operators:
   - name: Concatenate
   - name: Format
   - name: Print
+  - name: IndexOf
   - name: ToString
   - name: Substring
   - name: Trim

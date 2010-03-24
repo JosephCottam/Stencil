@@ -28,10 +28,10 @@
  */
 package stencil.operator.module.provided;
 
-import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
 import stencil.tuple.ArrayTuple;
+import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -75,6 +75,13 @@ public class StringUtils extends BasicModule {
 	public static Tuple trim(Object str) {
 		String string = Converter.toString(str);
 		return new ArrayTuple(string.trim());
+	}
+	
+	public static Tuple indexOf(Object str, Object t) {
+		String string = Converter.toString(str);
+		String target = Converter.toString(t);
+		int idx = string.indexOf(target);
+		return new NumericSingleton(idx);
 	}
 
 	public StringUtils(ModuleData md) {super(md);}

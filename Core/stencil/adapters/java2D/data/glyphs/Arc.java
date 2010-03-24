@@ -46,7 +46,7 @@ public class Arc extends Stroked {
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
 	
-	private static final String IMPLANTATION = "ARC";
+	public static final String IMPLANTATION = "ARC";
 	
 	private static final Attribute<Double> X1 = new Attribute("X.1", 0d);
 	private static final Attribute<Double> X2 = new Attribute("X.2", 0d);

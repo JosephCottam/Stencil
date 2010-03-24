@@ -51,7 +51,7 @@ import stencil.types.Converter;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
-		private static final String IMPLANTATION = "POLY_LINE";
+		public static final String IMPLANTATION = "POLY_LINE";
 		
 		public PolyLine(DisplayLayer layer, String id) {super(layer, id, false);}
 		protected PolyLine(String id, PolyLine source) {super(id, source);}

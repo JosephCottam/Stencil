@@ -46,13 +46,13 @@ import stencil.tuple.Tuples;
 import stencil.types.Converter;
 
 public final class Pie extends Stroked {
-	private static final String IMPLANTATION = "PIE";
+	public static final String IMPLANTATION = "PIE";
 	
 	private static final Color DEFAULT_SLICE_COLOR  = Color.RED;
 	private static final Color DEFAULT_FIELD_COLOR  = Color.WHITE;
 
-	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
-	private static final AttributeList UNSETTABLES = new AttributeList();;
+	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
+	private static final AttributeList UNSETTABLES = new AttributeList();
 
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);

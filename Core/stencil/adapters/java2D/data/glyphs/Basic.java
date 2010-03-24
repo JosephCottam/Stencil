@@ -61,7 +61,7 @@ public abstract class Basic implements Glyph2D {
 	
 	protected static final Attribute ID = new Attribute(StandardAttribute.ID);
 	protected static final Attribute LAYERNAME = new Attribute(StandardAttribute.LAYERNAME);
-	protected static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
+	public static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
 
 	protected static final Attribute<Registrations.Registration> REGISTRATION = new Attribute(StandardAttribute.REGISTRATION);
 

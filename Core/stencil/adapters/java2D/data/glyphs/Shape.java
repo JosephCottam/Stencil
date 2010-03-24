@@ -46,7 +46,7 @@ import stencil.tuple.Tuples;
 public class Shape extends Filled {
 	private static final AttributeList ATTRIBUTES = new AttributeList(Filled.ATTRIBUTES);
 	private static final AttributeList UNSETTABLES = new AttributeList();
-	private static final String IMPLANTATION = "SHAPE";
+	public static final String IMPLANTATION = "SHAPE";
 	
 	private static final Attribute<StandardShape> SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
 	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);

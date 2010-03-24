@@ -49,9 +49,9 @@ import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
 public final class Line extends Stroked {
-	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
+	private static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
 	private static final AttributeList UNSETTABLES = new AttributeList();
-	private static final String IMPLANTATION = "LINE";
+	public static final String IMPLANTATION = "LINE";
 	
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);

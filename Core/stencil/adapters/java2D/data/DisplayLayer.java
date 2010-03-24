@@ -129,21 +129,23 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		DisplayLayer layer = new DisplayLayer(name);
 		Glyph2D prototype = null;
 		try {
-			if (implantation.equals("SHAPE")) {
+			if (implantation.equals(Shape.IMPLANTATION)) {
 				prototype = new Shape(layer, "PROTOTYPE");
-			} else if (implantation.equals("LINE")) {
+			} else if (implantation.equals(Line.IMPLANTATION)) {
 				prototype = new Line(layer, "PROTOTYPE");
-			} else if (implantation.equals("TEXT")) {
+			} else if (implantation.equals(Text.IMPLANTATION)) {
 				prototype = new Text(layer, "PROTOTYPE");
-			} else if (implantation.equals("PIE")) {
+			} else if (implantation.equals(Pie.IMPLANTATION)) {
 				prototype = new Pie(layer, "PROTOTYPE");
-			} else if (implantation.equals("IMAGE")) {
+			} else if (implantation.equals(Image.IMPLANTATION)) {
 				prototype = new Image(layer, "PROTOTYPE");
-			} else if (implantation.equals("POLY_LINE")) {
+			} else if (implantation.equals(Poly.PolyLine.IMPLANTATION)) {
 				prototype = new Poly.PolyLine(layer, "PROTOTYPE");
-			} else if (implantation.equals("POLYGON")) {
+			} else if (implantation.equals(Poly.Polygon.IMPLANTATION)) {
 				prototype = new Poly.Polygon(layer, "PROTOTYPE");
-			} else if (implantation.equals("ARC")) {
+			} else if (implantation.equals(Arc.IMPLANTATION)) {
+				prototype = new Arc(layer, "PROTOTYPE");
+			} else if (implantation.equals(Slice.IMPLANTATION)) {
 				prototype = new Arc(layer, "PROTOTYPE");
 			} 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
