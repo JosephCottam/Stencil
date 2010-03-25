@@ -52,6 +52,7 @@ public final class Image extends Basic {
 
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES= new AttributeList();
+	public static final String IMPLANTATION = "IMAGE";
 	
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);
@@ -141,7 +142,7 @@ public final class Image extends Basic {
 		return super.get(name);
 	}
 	
-	public String getImplantation() {return "IMAGE";}
+	public String getImplantation() {return IMPLANTATION;}
 
 	private double getHeight() {
 		if (height != AUTO_SCALE) {return height;}

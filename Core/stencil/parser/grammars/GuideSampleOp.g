@@ -50,7 +50,10 @@ options {
    public void setSampleOp(Guide g) {
       Specializer spec = g.getSpecializer();
       
-      String sampleType = (String) spec.getMap().get("sample").getValue();
+      String sampleType = Samplers.CATEGORICAL;
+      if (spec.getMap().containsKey("sample")) {
+            sampleType = (String) spec.getMap().get("sample").getValue();
+      }
       String dataType;
       if (sampleType.equals(Samplers.CATEGORICAL)) {dataType = "java.lang.String";}
       else {dataType = "java.lang.Integer";}

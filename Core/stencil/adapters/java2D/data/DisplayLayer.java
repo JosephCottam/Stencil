@@ -30,8 +30,12 @@ package stencil.adapters.java2D.data;
  
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import static java.lang.String.format;
@@ -57,12 +61,22 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	private T prototypeGlyph;
 	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();
 	private final Set<LayerUpdateListener> updateListeners = new ListSet();	
+	
+	private static final Comparator<Glyph2D> Z_SORTER = new Comparator<Glyph2D>() {
+		public int compare(Glyph2D o1, Glyph2D o2) {
+			return (int) o1.getZ() - (int) o2.getZ();
+		}
+	};
 
 	protected DisplayLayer(String name) {this.name = name;}
 	
 	public String getName() {return name;}
 
-	public Iterator<T> iterator() {return index.values().iterator();}
+	public Iterator<T> iterator() {
+		List<T> renderOrder = new ArrayList(index.values()); //TODO: Cache and clear on changes (resort if update is to change values only)
+		Collections.sort(renderOrder, Z_SORTER);
+		return renderOrder.iterator();
+	}
 	
 	public T find(String ID) {return index.get(ID);}
 
@@ -146,7 +160,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 			} else if (implantation.equals(Arc.IMPLANTATION)) {
 				prototype = new Arc(layer, "PROTOTYPE");
 			} else if (implantation.equals(Slice.IMPLANTATION)) {
-				prototype = new Arc(layer, "PROTOTYPE");
+				prototype = new Slice(layer, "PROTOTYPE");
 			} 
 		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
 		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}

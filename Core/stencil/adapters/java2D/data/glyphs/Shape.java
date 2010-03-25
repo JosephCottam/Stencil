@@ -50,7 +50,7 @@ public class Shape extends Filled {
 	
 	private static final Attribute<StandardShape> SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
 	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);
-	private static final Attribute<Double> SIZE = new Attribute("SIZE", 1.0d);
+	private static final Attribute<Double> SIZE = new Attribute("SIZE", 5.0d);
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);
 	

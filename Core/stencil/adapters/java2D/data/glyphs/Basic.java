@@ -62,6 +62,7 @@ public abstract class Basic implements Glyph2D {
 	protected static final Attribute ID = new Attribute(StandardAttribute.ID);
 	protected static final Attribute LAYERNAME = new Attribute(StandardAttribute.LAYERNAME);
 	public static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
+	public static final Attribute<Double> Z = new Attribute(StandardAttribute.Z);
 
 	protected static final Attribute<Registrations.Registration> REGISTRATION = new Attribute(StandardAttribute.REGISTRATION);
 
@@ -75,6 +76,7 @@ public abstract class Basic implements Glyph2D {
 		ATTRIBUTES.add(IMPLANTATION);
 		ATTRIBUTES.add(VISIBLE);
 		ATTRIBUTES.add(REGISTRATION);
+		ATTRIBUTES.add(Z);
 	}
 	
 	protected final String id;
@@ -89,12 +91,15 @@ public abstract class Basic implements Glyph2D {
 	
 	protected final Rectangle2D bounds = new Rectangle2D.Double();
 	
+	protected final double z;
+	
 	protected Basic(DisplayLayer layer, String id) {
 		this.layer = layer;
 
 		this.id = id;
 		visible = VISIBLE.defaultValue;
 		registration = REGISTRATION.defaultValue;
+		z = Z.defaultValue;
 	}
 
 	protected Basic(String id, Basic source) {
@@ -102,6 +107,7 @@ public abstract class Basic implements Glyph2D {
 		this.layer = source.layer;
 		this.registration = source.registration;
 		this.visible = source.visible;
+		this.z = source.z;
 		updateBoundsRef(source.bounds);
 	}
 	
@@ -111,7 +117,8 @@ public abstract class Basic implements Glyph2D {
 		updateBoundsRef(source.getBoundsReference());
 		id = switchCopy(source.id, (String) safeGet(option, ID));
 		visible = switchCopy(source.visible, safeGet(option, VISIBLE));
-		registration = switchCopy(source.registration, safeGet(option, REGISTRATION));		
+		registration = switchCopy(source.registration, safeGet(option, REGISTRATION));
+		z = switchCopy(source.z, safeGet(option, Z));
 	}
 	
 	/**What is the name of this implantation?*/
@@ -162,6 +169,7 @@ public abstract class Basic implements Glyph2D {
 		if (IMPLANTATION.is(name)) {return getImplantation();}
 		if (REGISTRATION.is(name)) {return registration;}
 		if (VISIBLE.is(name)) {return visible;}
+		if (Z.is(name)) {return z;}
 		throw new InvalidNameException(name, getPrototype());
 	}
 
@@ -191,7 +199,7 @@ public abstract class Basic implements Glyph2D {
 	public DisplayLayer getLayer() {return layer;}
 	
 	public String getID() {return id;}
-	
+	public double getZ() {return z;}
 	public boolean isVisible() {return visible;}
 	
 	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/

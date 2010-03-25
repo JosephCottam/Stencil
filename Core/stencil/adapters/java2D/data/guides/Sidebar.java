@@ -35,7 +35,7 @@ public class Sidebar implements Guide2D {
 	public static final String LABEL_PROPERTY_TAG = "label";
 	public static final String EXAMPLE_PROPERTY_TAG = "example";
 	
-	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=1, label.FONT_COLOR=\"BLACK\", example.SIZE=.8, spacing=.25, displayOn=\"" + SIMPLE_DEFAULT + "\"]";
+	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=4, label.FONT_COLOR=\"BLACK\", example.SIZE=4, spacing=.25, displayOn=\"" + SIMPLE_DEFAULT + "\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
@@ -140,7 +140,7 @@ public class Sidebar implements Guide2D {
 		catch (Exception e) {throw new RuntimeException("Error updating guide with descriptor pair: " + contents.toString(), e);}
 		
 		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
-		Object[] labelValues = new Object[]{exampleWidth + hSpacing, indexOffset, contents.get(label_idx), "LEFT"};
+		Object[] labelValues = new Object[]{hSpacing, indexOffset, contents.get(label_idx), "LEFT"};
 		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
 		label = label.update(Tuples.sift("label.", result));
 		

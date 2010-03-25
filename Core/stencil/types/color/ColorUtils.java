@@ -103,6 +103,9 @@ public final class ColorUtils extends BasicModule {
 		public Tuple argumentParser(String arg) {
 			return ColorCache.get(arg);
 		}
+		public Tuple query(String arg) {
+			return ColorCache.get(arg);
+		}
 
 	}
 	

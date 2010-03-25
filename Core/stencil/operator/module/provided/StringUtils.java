@@ -58,8 +58,8 @@ public class StringUtils extends BasicModule {
 		return new ArrayTuple(b.toString());
 	}
 
-	public static Tuple format(Object v, Object f) {
-		String rv = String.format(f.toString(), v);
+	public static Tuple format(Object f, Object vs) {
+		String rv = String.format(f.toString(), vs);
 		return new ArrayTuple(rv);
 	}
 	

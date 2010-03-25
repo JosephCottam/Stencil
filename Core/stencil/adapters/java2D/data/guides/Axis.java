@@ -39,7 +39,7 @@ public class Axis implements Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=1, label.FONT_COLOR=\"BLACK\", line.STROKE_WEIGHT=.1, line.STROKE_COLOR=\"GRAY\", textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
+	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=4, label.FONT_COLOR=\"BLACK\", line.STROKE_WEIGHT=.1, line.STROKE_COLOR=\"GRAY\", textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}

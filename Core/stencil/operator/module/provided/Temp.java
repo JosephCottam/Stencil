@@ -37,12 +37,103 @@ import static stencil.operator.module.util.OperatorData.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
 import stencil.tuple.ArrayTuple;
+import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
+import stencil.types.Converter;
 
 /**
  * A module of misc utilities that I haven't figured out where they really belong yet.
  */
 public class Temp extends BasicModule {
+
+	/**Projects one range of values into another.
+	 * The target range is statically specified by the specializer.
+	 * The source range is constructed based upon input.
+	 * 
+	 * This operator only works with numbers, but using Rank to convert
+	 * arbitrary values to numbers can be used to scale arbitrary items. 
+	 * @author jcottam
+	 *
+	 */
+	public static final class Scale extends BasicProject {
+		private static final String MAX_KEY = "max";
+		private static final String MIN_KEY = "min";
+		final double outMin, outMax, span;
+		double inMin = Double.MAX_VALUE;
+		double inMax = Double.MIN_VALUE;
+
+		public Scale(OperatorData od, Specializer spec) {
+			super(od);
+			outMin = Converter.toDouble(spec.getArgs().get(0));
+			outMax = Converter.toDouble(spec.getArgs().get(1));
+			if (spec.getMap().containsKey(MAX_KEY)) {inMax = Converter.toDouble(spec.getMap().get(MAX_KEY).getValue());}
+			if (spec.getMap().containsKey(MIN_KEY)) {inMin = Converter.toDouble(spec.getMap().get(MIN_KEY).getValue());}
+			span = outMax-outMin;
+		}
+
+		public Tuple map(Object v) {
+			double dv = Converter.toDouble(v);       
+
+			inMin = Math.min(dv, inMin);
+			inMax = Math.max(dv, inMax);
+			return query(dv);   
+		}
+
+		public Tuple query(Object v) {
+			double dv = Converter.toDouble(v);       
+			return query(dv);
+		}
+
+		public Tuple query(double v) {
+			double percent = (v-inMin)/inMax;
+			double value = span*percent + outMin;
+			return new NumericSingleton(value);}
+	}
+
+
+	/**Takes a range of values and creates a set of partitions of that range.
+	 * Will report what partition any value falls in.  This is done with modulus
+	 * if a value is outside the original range and with abs if outside in a negative manner.
+	 * 
+	 * @author jcottam
+	 *
+	 */
+	public static final class Partition extends BasicProject {
+		final double min;
+		final double max;
+		final double buckets;
+		final double bucketSpan;
+		
+		public Partition(OperatorData od, Specializer spec) {
+			super(od);
+			if (spec.getArgs().size() ==2) {
+				min =0;
+				max = Converter.toDouble(spec.getArgs().get(0));
+				buckets = Converter.toDouble(spec.getArgs().get(1));
+			} else {
+				min =Converter.toDouble(spec.getArgs().get(1));
+				max = Converter.toDouble(spec.getArgs().get(2));
+				buckets = Converter.toDouble(spec.getArgs().get(3));
+			}
+			bucketSpan = (max-min)/buckets;
+		}
+
+		public Tuple map(Object v) {return query(v);}
+		public Tuple query(Object v) {
+			double dv = Converter.toDouble(v);
+			dv = dv-min;
+
+			double bucket = (buckets)/((max-min)/dv);
+			bucket = Math.abs(Math.floor(bucket));
+			bucket = bucket%buckets;
+
+			double start = bucket*bucketSpan;
+			double end = (bucket +1)*bucketSpan;
+			
+			return new ArrayTuple(start,end,bucket);
+		}
+	}
+
 	/**Keeps sorted lists of elements, reporting back
 	 * the position in the list on lookup.
 	 */
@@ -50,7 +141,7 @@ public class Temp extends BasicModule {
 		public Rank(OperatorData opData) {super(opData);}
 
 		public static final String NAME = "Rank";
-		
+
 		/**Compare groups of object, often pair-wise.
 		 * The first non-zero comparison wins.
 		 * If all elements match, the longest array is 'after' the shorter one (so an array is always less than a non-array).
@@ -59,18 +150,18 @@ public class Temp extends BasicModule {
 		 */
 		private static class CompoundCompare implements Comparator {
 			protected CompoundCompare() {super();}
-			
+
 			private int compareOne(Comparable first, Comparable second) {
 				return first.compareTo(second);
 			}
-			 
+
 			private int compareArrays(Object[] firstArray, Object[] secondArray) {
 				for (int i =0; i< firstArray.length && i < secondArray.length; i++) {
 					Object first = firstArray[i];
 					Object second = secondArray[i];
-					
+
 					if (first == second) {continue;}
-					
+
 					if (first instanceof Comparable && first.getClass().isInstance(second)) {
 						int d = compareOne((Comparable) first, (Comparable)second);
 						if (d != 0) {return d;}
@@ -79,7 +170,7 @@ public class Temp extends BasicModule {
 
 				return firstArray.length-secondArray.length;
 			}
-			
+
 			public int compare(Object f, Object s) {
 				if (f instanceof Object[] && s instanceof Object[]) {return compareArrays((Object[]) f, (Object[]) s);}
 				else if (f instanceof Object[]) {return -1;}
@@ -100,11 +191,11 @@ public class Temp extends BasicModule {
 
 		//TODO: Move to a concurrent set
 		private SortedSet set = Collections.synchronizedSortedSet(new TreeSet(new CompoundCompare()));
-//		private TreeSet set = new TreeSet(new CompoundCompare());
+		//		private TreeSet set = new TreeSet(new CompoundCompare());
 
 		public Tuple map(Object... values) {return rank(true, values);} 
 		public Tuple query(Object... values) {return rank(false, values);}
-	
+
 		public String getName() {return NAME;}
 
 		/**What is the rank of the values passed.
@@ -122,10 +213,10 @@ public class Temp extends BasicModule {
 			}else {
 				rank =-1;
 			}
-			
+
 			return new ArrayTuple(rank);
 		}
-		
+
 		public Rank duplicate() {return new Rank(operatorData);}
 	}
 
@@ -133,11 +224,11 @@ public class Temp extends BasicModule {
 	public static class Mapping extends BasicProject {
 		public static final String NAME = "Mapping";
 		public static final String PUT_FACET = "put";
-		
+
 		final protected Map<Object, Object[]> map = new HashMap();
 		final String[] names;
 		boolean caseSensitive=true;
-		
+
 		public Mapping(OperatorData opData, String...names) {
 			super(opData);
 			this.names = names;
@@ -150,7 +241,7 @@ public class Temp extends BasicModule {
 			Object[] objects = new Object[values.length-1];
 			System.arraycopy(values, 1, objects, 0, values.length-1);
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
-			
+
 			if (objects.length ==0) {
 				objects = map.get(key);
 			} else if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
@@ -165,21 +256,21 @@ public class Temp extends BasicModule {
 		public Tuple query(Object... args) {
 			Object key = args[0];
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
-			
+
 			Object[] results = map.get(key);
 			if (results == null) {
 				return null;
 			}			
 			return new ArrayTuple(results);
 		}
-		
+
 		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
 			String module = basic.getModule();
 			String name = basic.getName();
 			String[] fields;
 			try {fields = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
-			
+
 			OperatorData od = new OperatorData(basic);
 			od.addFacet(new FacetData(PUT_FACET, TYPE_PROJECT, false,  fields));
 			od.addFacet(new FacetData(MAP_FACET, TYPE_PROJECT, false, fields));
@@ -196,11 +287,11 @@ public class Temp extends BasicModule {
 			try {names = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), specializer, e);}
 			//Blend names into the operator data
-			
+
 			Mapping m = new Mapping(getOperatorData(opData, specializer), names);
-			
+
 			if (specializer.getMap().containsKey("CaseInsensitive")) {m.caseSensitive = false;}
-			
+
 			return m;
 		}
 
@@ -219,16 +310,16 @@ public class Temp extends BasicModule {
 			}
 			return fields;
 		}
-		
+
 		public Mapping duplicate() {return new Mapping(operatorData, names);}
 	}
 
-	
-	
+
+
 	public Temp(ModuleData md) {super(md);}
 
 	public OperatorData getOperatorData(String name, Specializer specializer)
-		throws SpecializationException {
+	throws SpecializationException {
 
 		if(name.equals("Mapping")) {
 			return Mapping.getOperatorData(getModuleData().getOperator(name), specializer);
@@ -241,7 +332,12 @@ public class Temp extends BasicModule {
 		try {
 			if (name.equals("Mapping")) {
 				return Mapping.instance(getOperatorData(name, specializer), specializer);
+			} else if (name.equals("Scale")) {
+				return new Scale(getOperatorData(name, specializer), specializer);
+			} else if (name.equals("Partition")) {
+				return new Partition(getOperatorData(name, specializer), specializer);
 			}
+			
 			return super.instance(name, specializer);
 		} catch (Exception e) {throw new Error("Error retriving " + name + " method.",e);}
 	}

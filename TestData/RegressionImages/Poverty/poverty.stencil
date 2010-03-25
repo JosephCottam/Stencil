@@ -43,7 +43,7 @@ external stream Poverty(State,Children, Adults, Elderly, Total)
 order (Items | Postal | Regions | Pop) > Poverty
 
 canvas Main
-	guide sidebar[sample="CATEGORICAL", displayOn="FILL_COLOR", X=350, Y=100, example.SIZE=12] from Children FONT_COLOR
+	guide sidebar[sample="CAT", displayOn="FILL_COLOR", X=350, Y=100, example.SIZE=12] from Children FONT_COLOR
 		example.SHAPE: "RECTANGLE"
         label.FONT_SIZE: 10
 

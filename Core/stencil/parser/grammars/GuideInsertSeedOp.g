@@ -61,8 +61,10 @@ options {
 }
 
 @members {
+  private static final String SEED_PREFIX = "seed.";
+
   private static final boolean isCategorical(Specializer spec) {
-    return spec.getMap().containsKey(SAMPLE_KEY) &&
+    return !spec.getMap().containsKey(SAMPLE_KEY) ||
            CATEGORICAL.equals(spec.getMap().get(SAMPLE_KEY).getValue());
   }
 
@@ -111,6 +113,8 @@ options {
    	    return r;
     }
     
+    
+    private String key(CallTarget target) {return key((Rule) target.getAncestor(RULE));}
 
     /**Given a tree, how should it be looked up in the guides map?*/
     private String key(Rule rule) {
@@ -162,8 +166,8 @@ options {
      *
      * @param t Call target that will follow the new echo operator.
      */
-    private List<Value> echoArgs(CommonTree t) {
-    	CallTarget target = (CallTarget) t;
+    private List<Value> echoArgs(Tree target) {return echoArgs((CallTarget) target);}
+    private List<Value> echoArgs(CallTarget target) {
     	List<Value> args = (List<Value>) adaptor.create(LIST, "Arguments");
     	
  		  for (Value v: target.getArguments()) {
@@ -174,7 +178,8 @@ options {
     }
     
     private Specializer spec(CommonTree t) {
-      List<Value> args = echoArgs(t);
+      CallTarget target = (CallTarget) t;
+      List<Value> args = echoArgs(target);
       StringBuilder b = new StringBuilder("[1 .. n,");
       for (Value v: args) {
         if (v instanceof TupleRef) {
@@ -184,6 +189,21 @@ options {
 	        b.append(",");
 	      }
       }
+      
+      //Get additional map arguments from the guide declaration
+      Specializer spec = requestedGuides.get(key(target));
+      for (String k: spec.getMap().keySet()) {
+          if (k.startsWith(SEED_PREFIX)) {
+             String value = spec.getMap().get(k).toString();
+             String key = k.substring(SEED_PREFIX.length());
+             
+             b.append(key);
+             b.append("=");
+             b.append(value);
+             b.append(",");
+          }
+      }
+      
       b.replace(b.length()-1, b.length(), "]");
       try {return ParseStencil.parseSpecializer(b.toString());}
       catch (Exception e) {throw new Error("Error parsing synthesized specializer: " + b.toString());}

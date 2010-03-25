@@ -204,7 +204,7 @@ public final class NamedColor {
 			int value=0;
 			String part = name.substring(GRAY_PREFIX.length());
 
-			try {value = Integer.parseInt(part);}
+			try {value = (int) Double.parseDouble(part);}
 			catch (Exception e) {throw new IllegalArgumentException("Improperly formed gray value (" + name + ").  Format is " + GRAY_PREFIX + "XX where XX is a numer between 0 and 100 (inclusive).");}
 			
 			if (value > 100 | value <0) {throw new IllegalArgumentException("Gray values must between 0 and 100 (found " + value + " in " + name + ").");}

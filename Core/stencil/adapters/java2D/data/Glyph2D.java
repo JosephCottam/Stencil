@@ -22,4 +22,6 @@ public interface Glyph2D extends stencil.adapters.Glyph, Renderable {
 
 	/**Is the glyph current toggeled for rendering?*/
 	public boolean isVisible();
+	
+	public double getZ();
 }

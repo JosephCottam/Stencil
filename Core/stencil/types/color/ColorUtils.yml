@@ -35,3 +35,5 @@ operators:
   - name: Color
     facets:
       - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      

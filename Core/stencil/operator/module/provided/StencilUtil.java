@@ -32,6 +32,8 @@ import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 import static java.lang.String.format;
 
 import stencil.interpreter.guide.SampleSeed;
@@ -52,6 +54,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
+import static stencil.parser.ParserConstants.FALSE_STRING;
 
 public class StencilUtil extends BasicModule {
 	public static abstract class EchoBase implements StencilOperator, SeedOperator {
@@ -117,19 +120,30 @@ public class StencilUtil extends BasicModule {
 	 * seen.  Used for continuous legends and should probably never
 	 * be used directly.
 	 * 
+	 * TODO: Lift rangeLock out so locked ranges are a separate class...its a much simpler class!
+	 * 
 	 */
 	public static final class EchoContinuous extends EchoBase {
 		public static final String NAME = EchoContinuous.class.getSimpleName();
+		public static final String MAX_KEY = "max";
+		public static final String MIN_KEY = "min";
+		public static final String LOCK_KEY = "lock";
 
 		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
 		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
+		private final boolean rangeLock;
 		
-		public EchoContinuous(OperatorData opData, TuplePrototype p) {super(opData, p);}
+		public EchoContinuous(OperatorData opData, TuplePrototype p, boolean lock) {super(opData, p); this.rangeLock=lock;}
 		public EchoContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
 			super(opData, spec);
+			
+			Map<String, Atom> map = spec.getMap();
+			if (map.containsKey(MAX_KEY)) {max = Converter.toDouble(map.get(MAX_KEY));}
+			if (map.containsKey(MIN_KEY)) {min = Converter.toDouble(map.get(MIN_KEY));}
+			rangeLock = map.containsKey(LOCK_KEY) && map.get(LOCK_KEY).getValue().equals(FALSE_STRING);
 		}
 		
-		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype);}
+		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype, rangeLock);}
 
 		public String getName() {return NAME;}
 
@@ -140,16 +154,19 @@ public class StencilUtil extends BasicModule {
 		public Tuple map(Object... args) {
 			assert args.length == 1;
 			double value = Converter.toNumber(args[0]).doubleValue();  //TODO: Remove when typed calls work
+
+			if (!rangeLock) {
 			
-			double oldMax = max;
-			double oldMin = min;
-			
-			synchronized(this) {
-				max = Math.max(value, max);
-				min = Math.min(value, min);
+				double oldMax = max;
+				double oldMin = min;
+				
+				synchronized(this) {
+					max = Math.max(value, max);
+					min = Math.min(value, min);
+				}
+				if ((max != oldMax) || (min != oldMin)) {synchronized (STATE_LOCK) {stateID++;}}
 			}
 			
-			if ((max != oldMax) || (min != oldMin)) {synchronized (STATE_LOCK) {stateID++;}}
 			
 			return new ArrayTuple(args);
 		}

@@ -23,9 +23,9 @@ public class Slice extends Filled {
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);
 	private static final Attribute<Double> START = new Attribute("START", 0d);
 	private static final Attribute<Double> END = new Attribute("END", 360d);
-	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 1);
-	private static final Attribute<Double> OUTERX = new Attribute("OUTERX", 1);
-	private static final Attribute<Double> OUTERY = new Attribute("OUTERY", 1);
+	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 1d);
+	private static final Attribute<Double> OUTERX = new Attribute("OUTERX", 1d);
+	private static final Attribute<Double> OUTERY = new Attribute("OUTERY", 1d);
 	
 	static {
 		ATTRIBUTES.add(X);
@@ -53,8 +53,8 @@ public class Slice extends Filled {
 		start = START.defaultValue;
 		end = END.defaultValue;
 		height = HEIGHT.defaultValue;
-		super.updateBoundsRef(bounds());
 		glyph = makeArc();
+		super.updateBoundsRef(glyph.getBounds2D());
 	}
 	
 	private Slice(String id, Slice source) {
@@ -65,8 +65,8 @@ public class Slice extends Filled {
 		this.start = source.start;
 		this.end = source.end;
 		this.height= source.height;
-		super.updateBoundsRef(source.getBoundsReference());
 		glyph = makeArc();
+		super.updateBoundsRef(glyph.getBounds2D());
 	}
 	
 	private Slice(Slice source, Tuple option) {
@@ -77,8 +77,8 @@ public class Slice extends Filled {
 		this.start = switchCopy(source.start, safeGet(option, START));
 		this.end = switchCopy(source.end, safeGet(option, END));
 		this.height = switchCopy(source.height, safeGet(option, HEIGHT));		
-		super.updateBoundsRef(bounds());
 		glyph = makeArc();
+		super.updateBoundsRef(glyph.getBounds2D());
 	}
 	
 	public String getImplantation() {return IMPLANTATION;} 
@@ -108,12 +108,12 @@ public class Slice extends Filled {
 	}
 	
 	private Rectangle2D bounds() {
-		double bx = x -(height/2);
-		double by = y +(height/2);
-		return new Rectangle2D.Double(bx,by,height, height);
+		double bx = x -(height/2d);
+		double by = y -(height/2d);
+		return new Rectangle2D.Double(bx,by, height, height);
 	}
 	
-	private Arc2D makeArc(){return new Arc2D.Double(bounds, start, end-start, Arc2D.PIE);}
+	private Arc2D makeArc(){return new Arc2D.Double(bounds(), start, end-start, Arc2D.PIE);}
 	
 	public void render(Graphics2D g, AffineTransform base) {
 		super.render(g, glyph);

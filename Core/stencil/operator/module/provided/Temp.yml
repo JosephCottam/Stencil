@@ -13,3 +13,9 @@ operators:
      facets:
       - {name: map, type: BOTH, function: false, prototype: !proto "VALUE"}
       - {name: query, type: BOTH, function: false, prototype: !proto "VALUE"} 
+   - name: Scale
+   - name: Partition
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Start, End, Bucket"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Start, End, Bucket"}
+   
