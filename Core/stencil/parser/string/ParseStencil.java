@@ -28,9 +28,12 @@
  */
 package stencil.parser.string;
 
+import java.io.PrintStream;
+
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
+import org.antlr.runtime.tree.Tree;
 
 import stencil.operator.module.ModuleCache;
 import stencil.adapters.Adapter;
@@ -56,6 +59,27 @@ public abstract class ParseStencil {
 		public String getInput() {return input;}
 	}
 
+	@SuppressWarnings("unused")
+	private static class DumpTree {
+	    public static final String HEADER = "Parent, Child, ChildIdx";
+
+
+	    private static String represent(Tree t) {return t.getText();}
+	    public static void printTree(Tree t, PrintStream out) {
+	    	out.println(HEADER);
+	    	dump(t, out);
+	    }
+
+	    public static void dump(Tree root, PrintStream out) {
+			for (int i=0; i<root.getChildCount(); i++) {
+				Tree child = root.getChild(i);
+				out.printf("%1$s, %2$s, %3$d\n", represent(root), represent(child), i);
+				dump(child,out);
+			}
+		}
+	}
+
+	
 	
 	public static final StencilTreeAdapter TREE_ADAPTOR = new StencilTreeAdapter(); 
 	
