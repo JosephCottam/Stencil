@@ -51,15 +51,14 @@ options {
 
 @members {
    public static final List<String> DIRECT_TYPES = Arrays.asList("sidebar", "axis");
-   static {Collections.sort(DIRECT_TYPES);}
    
    public void setSampleOp(Guide g) {
 	   String type = g.getGuideType();
-	   if (DIRECT_TYPES.contains(g.getGuideType())) {
+//	   if (DIRECT_TYPES.contains(g.getGuideType())) {
 		   setDirectSample(g);
-	   } else {
-		   setSummarySample(g);
-	   }
+//	   } else {
+//		   setSummarySample(g);
+//	   }
    }
    
    public void setSummarySample(Guide g) {
@@ -71,7 +70,11 @@ options {
    public void setDirectSample(Guide g) {
       Specializer spec = g.getSpecializer();
       
-      String sampleType = (String) spec.getMap().get("sample").getValue();
+      String sampleType = Samplers.CATEGORICAL;
+      if (spec.getMap().containsKey("sample")) {
+         sampleType = (String) spec.getMap().get("sample").getValue();
+      }
+      
       String dataType;
       if (sampleType.equals(Samplers.CATEGORICAL)) {dataType = "java.lang.String";}
       else {dataType = "java.lang.Integer";}

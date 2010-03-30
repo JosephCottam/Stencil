@@ -92,19 +92,27 @@ options {
 
      if (g.getGuideType().equals("pointLabels")) {
         if (!names.contains(X_FIELD)) {
-           Rule r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
+           Rule r = parseRule(X_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + X_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(Y_FIELD)) {
-           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
+           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + Y_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(TEXT_FIELD)) {
-           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
+           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + OUTPUT_FIELD);
            adaptor.addChild(rules, r);
         }
-     } else {
-          
+     } else if (g.getGuideType().equals("trend")) {
+        if (!names.contains(X_FIELD)) {
+           Rule r = parseRule(X_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + X_FIELD); 
+           adaptor.addChild(rules, r);
+        }
+        if (!names.contains(Y_FIELD)) {
+           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + Y_FIELD); 
+           adaptor.addChild(rules, r);
+        }        
+     } else {          
 	     if (!names.contains(OUTPUT_FIELD)) {
 	        adaptor.addChild(rules, adaptor.dupTree(OUTPUT_RULE));   
 	     }

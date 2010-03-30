@@ -110,6 +110,9 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			} else if (guideType.equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);
 				l.addGuide(guideDef.getAttribute(), guide);
+			} else if (guideType.equals("trend")) {
+				Guide2D guide = new TrendLine(guideDef);
+				l.addGuide(guideDef.getAttribute(), guide);
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
 			}
