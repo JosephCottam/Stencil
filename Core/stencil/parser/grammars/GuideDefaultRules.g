@@ -62,6 +62,7 @@ options {
    private static final String INPUT_FIELD = "Input";
    private static final String X_FIELD = "X";
    private static final String Y_FIELD = "Y";
+   private static final String ID_FIELD = "ID";
    private static final String TEXT_FIELD = "TEXT";
    
    static {
@@ -91,15 +92,15 @@ options {
 
      if (g.getGuideType().equals("pointLabels")) {
         if (!names.contains(X_FIELD)) {
-           Rule r = parseRule(X_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + X_FIELD); 
+           Rule r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(Y_FIELD)) {
-           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + g.getLayer() + ".find(Output) -> " + Y_FIELD); 
+           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(TEXT_FIELD)) {
-           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + OUTPUT_FIELD);
+           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
            adaptor.addChild(rules, r);
         }
      } else {

@@ -44,16 +44,34 @@ options {
 	
 	import stencil.parser.tree.*;
 	import stencil.interpreter.guide.Samplers;
+	import java.util.Arrays;
+	import java.util.Collections;
+	import stencil.interpreter.guide.samplers.IdentitySampler;
 }
 
 @members {
+   public static final List<String> DIRECT_TYPES = Arrays.asList("sidebar", "axis");
+   static {Collections.sort(DIRECT_TYPES);}
+   
    public void setSampleOp(Guide g) {
+	   String type = g.getGuideType();
+	   if (DIRECT_TYPES.contains(g.getGuideType())) {
+		   setDirectSample(g);
+	   } else {
+		   setSummarySample(g);
+	   }
+   }
+   
+   public void setSummarySample(Guide g) {
+	   Program p = (Program) g.getAncestor(PROGRAM);
+	   Layer l = p.getLayer(g.getLayer());
+	   g.setSampleOperator(new IdentitySampler(l));
+   }
+   
+   public void setDirectSample(Guide g) {
       Specializer spec = g.getSpecializer();
       
-      String sampleType = Samplers.CATEGORICAL;
-      if (spec.getMap().containsKey("sample")) {
-            sampleType = (String) spec.getMap().get("sample").getValue();
-      }
+      String sampleType = (String) spec.getMap().get("sample").getValue();
       String dataType;
       if (sampleType.equals(Samplers.CATEGORICAL)) {dataType = "java.lang.String";}
       else {dataType = "java.lang.Integer";}
