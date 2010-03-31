@@ -96,6 +96,12 @@ public class Axis implements Guide2D {
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
 		GuideUtils.setValues(guideDef.getSpecializer(), this);
+
+		//Apply default registration based on axis orientation
+		String registration = axis==AXIS.X ? "LEFT" : "RIGHT";
+		Tuple update = new PrototypedTuple(new String[]{"REGISTRATION"}, new Object[]{registration});
+		prototypeText = prototypeText.update(update);
+		
 		
 		prototypeText = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LABEL_PROPERTY_TAG, prototypeText);
 		prototypeText = GuideUtils.applyDefaults(guideDef.getSpecializer(), LABEL_PROPERTY_TAG, prototypeText);
@@ -116,8 +122,8 @@ public class Axis implements Guide2D {
 		if (guideDef.getSpecializer().getMap().containsKey(AXIS_LABEL_PROPERTY)) {
 			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
 			int rotation = axis==AXIS.X ? 0 : 270;
-			String registration = axis==AXIS.X ? "TOP" : "BOTTOM";
-			Tuple update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT_SIZE", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
+			registration = axis==AXIS.X ? "TOP" : "BOTTOM";
+			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT_SIZE", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
 			
 			axisLabel = axisLabel.update(update);
 		}		
@@ -137,17 +143,17 @@ public class Axis implements Guide2D {
 		}
 		bounds = GuideUtils.fullBounds(marks);
 		
+		Tuple update;
 		if (axis == AXIS.X) {
 			double x = bounds.getCenterX();
-			double y = bounds.getMaxY();
-			Tuple t = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
-			axisLabel = axisLabel.update(t);
+			double y = bounds.getMaxY() + 2;
+			update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
 		} else {
-			double x = bounds.getMinX();
+			double x = bounds.getMinX() - 2;
 			double y = bounds.getCenterY();
-			Tuple t = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
-			axisLabel = axisLabel.update(t);
+			update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
 		}
+		axisLabel = axisLabel.update(update);
 		marks.add(axisLabel);
 		bounds = GuideUtils.fullBounds(marks);		
 	}
