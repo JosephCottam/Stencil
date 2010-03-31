@@ -29,6 +29,8 @@ public class Axis implements Guide2D {
 	private final String[] LABEL_FIELDS =  new String[]{"TEXT", "X","Y", "ROTATION"};
 	private final String[] LINE_FIELDS = new String[]{"X.1", "Y.1","X.2","Y.2"};
 
+	public static final String AXIS_LABEL_PROPERTY="axisLabel";
+	
 	/**In the axial specializer, map values that start with
 	 * this tag will be applied to the labels.
 	 */
@@ -39,7 +41,7 @@ public class Axis implements Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=4, label.FONT_COLOR=\"BLACK\", line.STROKE_WEIGHT=.1, line.STROKE_COLOR=\"GRAY\", textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
+	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=4, label.FONT_COLOR=\"BLACK\", line.STROKE_WEIGHT=.4, line.STROKE_COLOR=\"GRAY60\", textOffset=1, tickSize=.75, tickCount=10, axisOffset=0, connect=\"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
@@ -73,7 +75,7 @@ public class Axis implements Guide2D {
 	 * */
 	public float tickCount;
 	
-	protected AXIS axis;
+	protected final AXIS axis;
 	
 	protected Glyph2D prototypeText = new Text(null, "prototype");
 	protected Glyph2D prototypeLine = new Line(null, "prototype");
@@ -85,6 +87,8 @@ public class Axis implements Guide2D {
 	protected final int label_idx;
 	protected final int offset_idx;
 	protected final TupleSorter sorter;
+	
+	protected Text axisLabel;
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {		
@@ -107,6 +111,16 @@ public class Axis implements Guide2D {
 		assert offset_idx >=0 : "Output field not found for labeling in results prototype";
 		
 		sorter = new TupleSorter(offset_idx);
+
+		axisLabel = new Text(null, "label");
+		if (guideDef.getSpecializer().getMap().containsKey(AXIS_LABEL_PROPERTY)) {
+			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
+			int rotation = axis==AXIS.X ? 0 : 270;
+			String registration = axis==AXIS.X ? "TOP" : "BOTTOM";
+			Tuple update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT_SIZE", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
+			
+			axisLabel = axisLabel.update(update);
+		}		
 	}
 	
 	public void setConnect(boolean connect) {this.connect = connect;}
@@ -120,7 +134,21 @@ public class Axis implements Guide2D {
 			createLabeledTics(elements);
 			Glyph2D line = createLine(elements);
 			if (line !=null) {marks.add(line);}	
-		} 
+		}
+		bounds = GuideUtils.fullBounds(marks);
+		
+		if (axis == AXIS.X) {
+			double x = bounds.getCenterX();
+			double y = bounds.getMaxY();
+			Tuple t = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
+			axisLabel = axisLabel.update(t);
+		} else {
+			double x = bounds.getMinX();
+			double y = bounds.getCenterY();
+			Tuple t = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
+			axisLabel = axisLabel.update(t);
+		}
+		marks.add(axisLabel);
 		bounds = GuideUtils.fullBounds(marks);		
 	}
 
