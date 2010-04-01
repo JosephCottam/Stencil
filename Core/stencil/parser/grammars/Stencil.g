@@ -45,6 +45,8 @@ tokens {
   GLYPH;        //Indicates the target is a layer's glyph (can only be derived, not specified)
   GUIDE_QUERY;
   GUIDE_GENERATOR;
+  GUIDE_DIRECT;
+  GUIDE_SUMMARIZATION;
   LIST;
   CANVAS_DEF;
   NUMBER;
