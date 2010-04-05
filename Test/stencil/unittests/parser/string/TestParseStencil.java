@@ -7,8 +7,8 @@ import java.util.Map;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.Adapter;
-import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
+import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.operator.module.TestModuleCache;
 

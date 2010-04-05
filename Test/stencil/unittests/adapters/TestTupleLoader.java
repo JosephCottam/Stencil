@@ -2,8 +2,8 @@ package stencil.unittests.adapters;
 
 import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
-import stencil.parser.tree.*;
 import stencil.parser.string.ParseStencil;
+import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import stencil.util.streams.txt.DelimitedParser;
 

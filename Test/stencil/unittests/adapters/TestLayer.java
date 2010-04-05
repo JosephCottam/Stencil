@@ -5,8 +5,8 @@ import stencil.adapters.Adapter;
 import stencil.adapters.Glyph;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
-import stencil.parser.tree.Program;
 import stencil.parser.string.ParseStencil;
+import stencil.parser.tree.Program;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 

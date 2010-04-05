@@ -5,7 +5,8 @@
  	<target name="Guides">
  		<property name="dest" location="${interpreter}"/>
  		<property name="lib" location="${parser}"/>
-
+        <property name="guideGrammars" location="${grammars}/guide"/>
+ 		
  		<!--Interpreter components-->
  		<antlr
  			target="${interpreter}/UpdateGuides.g"
@@ -20,28 +21,36 @@
  		
  		<!--Transformation components-->
         <antlr
-            target="${grammars}/GuideDefaultRules.g"
+            target="${guideGrammars}/GuideDefaultRules.g"
             outputdirectory="${parser}"
         />
  		<antlr
- 			target="${grammars}/GuideLiftGenerator.g"
+ 			target="${guideGrammars}/GuideLiftGenerator.g"
 			outputdirectory="${parser}"
  		/>
 		<antlr
- 			target="${grammars}/GuideSampleOp.g"
+ 			target="${guideGrammars}/GuideSampleOp.g"
 			outputdirectory="${parser}"
  		/>
  		<antlr
- 			target="${grammars}/GuideInsertSeedOp.g"
+ 			target="${guideGrammars}/GuideInsertSeedOp.g"
 			outputdirectory="${parser}"
  		/>
  		<antlr
- 			target="${grammars}/GuideTransfer.g"
+ 			target="${guideGrammars}/GuideTransfer.g"
 			outputdirectory="${parser}"
  		/>
  		<antlr
- 			target="${grammars}/GuideSpecializers.g"
+ 			target="${guideGrammars}/GuideSpecializers.g"
 			outputdirectory="${parser}"
  		/>
-  	</target>
+ 		<antlr
+ 			target="${guideGrammars}/GuideDistinguish.g"
+			outputdirectory="${parser}"
+ 		/>
+ 		<antlr
+ 			target="${guideGrammars}/GuideClean.g"
+			outputdirectory="${parser}"
+ 		/>
+ 	</target>
  </project>
