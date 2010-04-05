@@ -47,7 +47,7 @@ public class Specializer extends StencilTree {
 	/**What additional arguments were passed to the specializer?*/
 	public java.util.List<Atom> getArgs() {return (List<Atom>) getChild(2);}
 
-	public java.util.Map<String, Atom> getMap() {
+	public MapEntry.MapList getMap() {
 		return new MapEntry.MapList((List<MapEntry>) getChild(3));
 	}
 	

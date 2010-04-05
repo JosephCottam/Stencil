@@ -37,9 +37,9 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.operator.module.ModuleCache;
 import stencil.adapters.Adapter;
+import stencil.parser.ProgramParseException;
 import stencil.parser.string.validators.*;
 import stencil.parser.tree.*;
-import stencil.parser.ProgramParseException;
 
 public abstract class ParseStencil {	
 	/**Exception indicating that errors were founding parsing the program.  Individual
@@ -227,18 +227,25 @@ public abstract class ParseStencil {
 		DefaultPack defaultPack = new DefaultPack(treeTokens);
 		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
 		defaultPack.downup(p);
+
 		
+		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
+		//Insert Distinguish between guide types
+		treeTokens = new CommonTreeNodeStream(p);
+		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
+		guideDistinguish.downup(p);
+
 		//Insert guide specializers
 		treeTokens = new CommonTreeNodeStream(p);
 		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
 		guideSpecailizers.setTreeAdaptor(TREE_ADAPTOR);
 		guideSpecailizers.downup(p);
-		
+
 		//Ensure that auto-guide requirements are met
 		GuideInsertSeedOp ensure = new GuideInsertSeedOp(treeTokens,modules); 
 		ensure.setTreeAdaptor(TREE_ADAPTOR);		
 		p = (Program) ensure.transform(p);
-		
+
 		//Add default specializers to all function nodes (cover things recently added)
 		defaultSpecializers.function(p);
 		
@@ -267,6 +274,12 @@ public abstract class ParseStencil {
 
 		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
 		gSampleOp.downup(p);
+		
+		treeTokens = new CommonTreeNodeStream(p);
+		GuideClean guideClean = new GuideClean(treeTokens);
+		guideClean.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) guideClean.downup(p);
+		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 		
 		treeTokens = new CommonTreeNodeStream(p);
 		TupleRefChain trc = new TupleRefChain(treeTokens);

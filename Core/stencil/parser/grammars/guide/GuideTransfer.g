@@ -49,24 +49,24 @@ options {
 }
 
 @header{
-	package stencil.parser.string;
+  package stencil.parser.string;
 	
-	import java.util.Map;
-	import java.util.HashMap;
+  import java.util.Map;
+  import java.util.HashMap;
 
-	import org.antlr.runtime.tree.*;
+  import org.antlr.runtime.tree.*;
 
-	import stencil.parser.tree.*;
-	import stencil.util.MultiPartName;
-	import stencil.operator.module.*;
-	import stencil.operator.module.util.*;
+  import stencil.parser.tree.*;
+  import stencil.util.MultiPartName;
+  import stencil.operator.module.*;
+  import stencil.operator.module.util.*;
   import stencil.operator.util.Invokeable;
   import stencil.operator.StencilOperator;
 
   import static stencil.operator.module.util.OperatorData.TYPE_CATEGORIZE;
-	import static stencil.parser.ParserConstants.GUIDE_FACET;
-	import static stencil.parser.ParserConstants.MAIN_FACET;
-	import static stencil.parser.ParserConstants.QUERY_FACET;
+  import static stencil.parser.ParserConstants.GUIDE_FACET;
+  import static stencil.parser.ParserConstants.MAIN_FACET;
+  import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
 @members{
@@ -117,6 +117,10 @@ options {
       return downup(t, this, "renameMappingsDown");
     }    
     
+    private String key(Tree selector) {
+      Selector sel=(Selector) selector;
+      return key(sel.get(0), sel.get(1));
+    }
     private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
     private String key(String layer, String attribute) {
@@ -169,37 +173,41 @@ options {
 	}
 }
 
-//Move mappings from the declarations in the consumes block up to the 
-//guides section
+//Move mappings from the declarations in the consumes block up to the guides section
 buildMappings: ^(c=CONSUMES . . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
 mapping[String layerName] 
   : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
 		{attDefs.put(key(layerName, field), group);};
 
+//Move in the appropriate mappings -----------------------------------------------
 transferMappings
-	 : ^(field=GUIDE layerName=ID type=ID spec=. rules=.)
+	 : ^(GUIDE_DIRECT ^(GUIDE type=ID spec=. selector=. actions=.))
 	 	{
-	 	 if (!attDefs.containsKey(key(layerName,field))) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(layerName, field));}
+	 	 if (!attDefs.containsKey(key(selector))) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(selector));}
 	 	}
-	 	-> ^($field $layerName $type $spec $rules 
-	 	   ^(RULE ^(RETURN ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["Output"] DEFAULT))) {adaptor.dupTree(attDefs.get(key(layerName,field)))}));
+	 	-> ^(GUIDE_DIRECT 
+	 	     ^(GUIDE $type $spec $selector $actions 
+	 	        ^(RULE ^(RETURN ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["Output"] DEFAULT))) {adaptor.dupTree(attDefs.get(key(selector)))})))
+	 | ^(GUIDE_SUMMARIZATION ^(GUIDE type=ID spec=. selector=. actions=.))
+	   -> ^(GUIDE_SUMMARIZATION 
+	         ^(GUIDE $type $spec $selector $actions 
+	            ^(RULE ^(RETURN TUPLE_PROTOTYPE) ^(CALL_CHAIN PACK))));
+
 
 //Update query creation -----------------------------------------------
+//TODO: Extend to include actions and sampler
+copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=. .*))) ->
+        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(GUIDE_QUERY {adaptor.dupTree($chain)}));
 
-copyQuery: ^(GUIDE layer=. type=. spec=. map=. ^(gen=RULE t=. ^(CALL_CHAIN c=. .*))) ->
-        ^(GUIDE $layer $type $spec $map {adaptor.dupTree($gen)} ^(GUIDE_QUERY {adaptor.dupTree($c)}));
 
 foldQuery: ^(GUIDE_QUERY qc=foldQueryChain) -> {toCompactList($qc.tree)};
 foldQueryChain
   @after{
      if ($f != null) {
        StencilOperator op =((Function) f).getOperator();
-       try {
+       if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
           Invokeable inv = op.getFacet(StencilOperator.STATE_FACET);
           ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setInvokeable(inv);
-       } catch (Exception e) {
-          //This is okay, some operators don't have a state query because they
-          // are (for example) functions.  
        }
     }
   }
@@ -209,13 +217,11 @@ foldQueryChain
 
 //trimMappings  -----------------------------------------------
 trimGuide
-  : ^(GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=. .*)) query=.)
-   -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall((CallTarget) c)})) $query);
+  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=. .*)) query=.)
+    {g.getAncestor(GUIDE_DIRECT) != null}?
+    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall((CallTarget) c)})) $query);
 
 //^(CALL_CHAIN call=. size=.) {call.getAncestor(GUIDE) != null}? -> ^(CALL_CHAIN {trimCall((CallTarget) call)});
-
-
-
 
 //Rename mappings -----------------------------------------------
 //Pick the 'guide'-related function instead of whatever else

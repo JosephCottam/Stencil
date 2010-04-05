@@ -25,51 +25,24 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-package stencil.parser.tree;
+ */ 
+ 
 
-import java.lang.reflect.*;
-
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.runtime.tree.CommonTree;
-
-import stencil.parser.string.StencilParser;
-
-
-public class StencilTree extends CommonTree {
-	public StencilTree(Token token) {super(token);}
-
-	/**Gets the string name of the type given.
-	 * Note: This uses a relatively slow method for lookup.
-	 * @param type Type to be investigated
-	 * @return The name associated with the type integer
-	 */
-	protected static String typeName(int type) {
-		return StencilParser.tokenNames[type];
-	}
-	
-	protected CommonTree findChild(int type, String content) {
-		for (int i=0; children != null && i < children.size(); i++) {
-			CommonTree t = (CommonTree) children.get(i);
-			if (t.getType() == type 
-				&& (content == null || content.equals(t.getText()))) {
-				return t;
-			}
-		}
-		return null;
-	}
-	
-	public static boolean verifyType(Tree tree, int type) {return tree.getType() == type;}
-	
-	public Tree dupNode() {
-		try {
-			Constructor c = this.getClass().getConstructor(Token.class);
-			return (Tree) c.newInstance(this.getToken());
-		} catch (Exception e) {
-			throw new Error(String.format("Error reflectively duplicating node to node of same type (%1$s).", this.getClass().getName()), e);
-		}
-	}
-
-	public StencilTree getParent() {return (StencilTree) super.getParent();}
+tree grammar GuideClean;
+options {
+  tokenVocab = Stencil;
+  ASTLabelType = CommonTree;	
+  filter = true;
+  superClass = TreeRewriteSequence;
+  output = AST;	
 }
+
+@header {
+  /**Remove compiler annotations that are of no significance for runtime.*/
+  
+  package stencil.parser.string; 
+}
+
+bottomup
+  :  ^(GUIDE_DIRECT g=.) -> $g
+  |  ^(GUIDE_SUMMARIZATION g=.) -> $g;

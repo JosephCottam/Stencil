@@ -25,51 +25,51 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-package stencil.parser.tree;
+ */ 
+ 
 
-import java.lang.reflect.*;
-
-import org.antlr.runtime.Token;
-import org.antlr.runtime.tree.Tree;
-import org.antlr.runtime.tree.CommonTree;
-
-import stencil.parser.string.StencilParser;
-
-
-public class StencilTree extends CommonTree {
-	public StencilTree(Token token) {super(token);}
-
-	/**Gets the string name of the type given.
-	 * Note: This uses a relatively slow method for lookup.
-	 * @param type Type to be investigated
-	 * @return The name associated with the type integer
-	 */
-	protected static String typeName(int type) {
-		return StencilParser.tokenNames[type];
-	}
-	
-	protected CommonTree findChild(int type, String content) {
-		for (int i=0; children != null && i < children.size(); i++) {
-			CommonTree t = (CommonTree) children.get(i);
-			if (t.getType() == type 
-				&& (content == null || content.equals(t.getText()))) {
-				return t;
-			}
-		}
-		return null;
-	}
-	
-	public static boolean verifyType(Tree tree, int type) {return tree.getType() == type;}
-	
-	public Tree dupNode() {
-		try {
-			Constructor c = this.getClass().getConstructor(Token.class);
-			return (Tree) c.newInstance(this.getToken());
-		} catch (Exception e) {
-			throw new Error(String.format("Error reflectively duplicating node to node of same type (%1$s).", this.getClass().getName()), e);
-		}
-	}
-
-	public StencilTree getParent() {return (StencilTree) super.getParent();}
+tree grammar GuideDistinguish;
+options {
+	tokenVocab = Stencil;
+	ASTLabelType = CommonTree;	
+	filter = true;
+  superClass = TreeRewriteSequence;
+  output = AST;	
 }
+
+@header {
+  /**Distinguish between summariziation and direct guides structurally
+   * so future passes can use tree pattern matching.
+   */
+
+  package stencil.parser.string;
+
+  import java.util.Arrays;
+}
+
+@members {
+  //TODO: Get the list of direct types from the adaptor
+  private static List<String> DIRECT_TYPES = Arrays.asList("AXIS", "SIDEBAR");
+
+
+  public GuideDistinguish(TreeNodeStream input, TreeAdaptor adaptor) {
+    super(input, new RecognizerSharedState());
+    this.adaptor = adaptor;
+  }
+
+
+  private boolean isDirect(Tree t) {
+    String type = t.getText().toUpperCase();
+    return DIRECT_TYPES.contains(type);
+  }
+  
+  private Tree taggedType(Tree t) {
+     if (isDirect(t)) {
+       return (Tree) adaptor.create(GUIDE_DIRECT, "");
+     } else {
+       return (Tree) adaptor.create(GUIDE_SUMMARIZATION, "");
+     }
+  }
+}
+
+bottomup: ^(GUIDE t=. s=. p=. r=.) -> ^({taggedType(t)} ^(GUIDE $t $s $p $r));

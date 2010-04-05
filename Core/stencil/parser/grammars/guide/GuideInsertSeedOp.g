@@ -47,8 +47,8 @@ options {
 	import java.util.Set;
 	import java.util.HashSet;
 	import stencil.util.MultiPartName;
-  import stencil.operator.module.*;
-  import stencil.util.collections.ArrayUtil;
+    import stencil.operator.module.*;
+    import stencil.util.collections.ArrayUtil;
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	
@@ -114,6 +114,8 @@ options {
     }
     
     
+    private String key(Selector s) {return s.get(0) +  BIND_OPERATOR + s.get(1);}
+    
     private String key(CallTarget target) {return key((Rule) target.getAncestor(RULE));}
 
     /**Given a tree, how should it be looked up in the guides map?*/
@@ -164,6 +166,8 @@ options {
  
     /**Construct the arguments section of an echo call block.
      *
+     * TODO: Remove by having guide happen AFTER numeralize occurs
+     * 
      * @param t Call target that will follow the new echo operator.
      */
     private List<Value> echoArgs(Tree target) {return echoArgs((CallTarget) target);}
@@ -198,7 +202,7 @@ options {
              String key = k.substring(SEED_PREFIX.length());
              
              b.append(key);
-             b.append("=");
+             b.append("=");	//TODO: Change to BIND_OPERATOR (when done elsewhere)
              b.append(value);
              b.append(",");
           }
@@ -209,7 +213,6 @@ options {
       catch (Exception e) {throw new Error("Error parsing synthesized specializer: " + b.toString());}
     }
     
-     /**Determine which echo operator to use.*/
      public CallTarget getStart(Tree c) {
        return ((CallChain) c).getStart();
      }
@@ -226,8 +229,8 @@ options {
 }
 
 //Identify requested guides from canvas def
-listRequirements: ^(g=GUIDE layer=. type=. spec=. actions=.) 
-	{requestedGuides.put(key(layer, g), (Specializer) spec);};
+listRequirements: ^(GUIDE_DIRECT ^(GUIDE type=. spec=. sel=. actions=.)) 
+   {requestedGuides.put(key((Selector) sel), (Specializer) spec);};
 
 //Replace the #-> with an echo operator...
 replaceCompactForm:

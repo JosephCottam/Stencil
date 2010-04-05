@@ -58,7 +58,7 @@ options {
     
 	public GuideSpecializers(TreeNodeStream input, Adapter adapter) {
 		super(input, new RecognizerSharedState());
-		assert adapter != null : "ModuleCache must not be null.";
+		assert adapter != null : "Adaptor must not be null.";
 		this.adapter = adapter;
 	}
 
@@ -95,13 +95,15 @@ options {
       adaptor.addChild(entry, adaptor.dupTree(entries.get(key)));
       adaptor.addChild(mapList, entry);
     }
-    int mapIdx = ((CommonTree) result.getMap()).getChildIndex();    
+
+    int mapIdx = result.getMap().getSource().getChildIndex();    
     adaptor.replaceChildren(result, mapIdx, mapIdx, mapList);
     return result;
   }
 }
 
 topdown
-  : ^(GUIDE type=ID s=. target=ID) -> ^(GUIDE $type {makeSpec($type.text, (Specializer) s)} $target);
+  : ^(GUIDE type=. spec=. sel=.  rules=.) 
+    -> ^(GUIDE $type {makeSpec(type.getText(), (Specializer) spec)} $sel $rules);
 
 //Instructions at http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching%2C+rewriting+a+reality

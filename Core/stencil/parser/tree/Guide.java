@@ -7,6 +7,7 @@ import org.antlr.runtime.Token;
 
 import stencil.interpreter.guide.*;
 import stencil.operator.util.Invokeable;
+import stencil.parser.string.StencilParser;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
@@ -18,19 +19,16 @@ public class Guide extends StencilTree {
 	
 	public Guide(Token token) {super(token);}
 
-	public String getAttribute() {return token.getText();}
-	
-	/**What layer is the guide data coming from?*/
-	public String getLayer() {return getChild(0).getText();}
+	public Selector getSelector() {return (Selector) getFirstChildWithType(StencilParser.SELECTOR);}
 	
 	/**What type of guide needs to be created?*/
-	public String getGuideType() {return getChild(1).getText();}
+	public String getGuideType() {return getFirstChildWithType(StencilParser.ID).getText();}
 	
 	/**What are the specializer arguments?*/
-	public Specializer getSpecializer() {return (Specializer) getChild(2);}
+	public Specializer getSpecializer() {return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);}
 		
 	/**Rules are applied to the generated tuples.*/
-	public List<Rule> getRules() {return (List<Rule>) getChild(3);}
+	public List<Rule> getRules() {return (List)	this.getFirstChildWithType(StencilParser.LIST);}
 
 	public SeedOperator getSeedOperator() {return seedOperator;}
 	public void setSeedOperator(Invokeable inv) {
@@ -49,7 +47,7 @@ public class Guide extends StencilTree {
 	 * each resulting tuple.
 	 */
 	public Rule getGenerator() {
-		if (this.getChildCount() < 5) {throw new RuntimeException(String.format("Generator not set yet for guide %1$s on layer %2$s.", getAttribute(), getLayer()));}
+		if (this.getChildCount() < 5) {throw new RuntimeException(String.format("Generator not set yet for guide %1$s on layer %2$s.", getSelector().toString()));}
 		return (Rule) getChild(4).getChild(0);
 	}
 	

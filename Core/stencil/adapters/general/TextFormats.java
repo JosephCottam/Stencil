@@ -125,7 +125,7 @@ public final class TextFormats {
 
 	public static final Format make(Tuple... sources) {
 		String name = (String) TextProperty.FONT.defaultValue;
-		FontStyle style = (FontStyle) TextProperty.FONT_STYLE.defaultValue;;
+		FontStyle style = (FontStyle) TextProperty.FONT_STYLE.defaultValue;
 		Float size = (Float) TextProperty.FONT_SIZE.defaultValue;
 		Color color = (Color) TextProperty.FONT_COLOR.defaultValue;
 		Justification just = (Justification) TextProperty.JUSTIFY.defaultValue;

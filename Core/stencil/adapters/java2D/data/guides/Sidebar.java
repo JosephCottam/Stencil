@@ -92,7 +92,7 @@ public class Sidebar implements Guide2D {
 		
 		
 		if (specializer.getMap().containsKey(StandardAttribute.X.name()) || specializer.getMap().containsKey(StandardAttribute.Y.name())) {autoPlace = false;}
-		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.getAttribute();}
+		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.getSelector().getAttribute();}
 		
 		TuplePrototype p = guideDef.getPrototype();		//Get input prototype
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));

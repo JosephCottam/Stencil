@@ -48,12 +48,22 @@ options {
 }
 
 topdown 
-  @after{((Guide) retval.tree).setSeedOperator(((Function) seed).getInvokeable());}
-  : ^(g=GUIDE layer=. type=. spec=. map=. 
-              ^(RULE target=.
-                 ^(CALL_CHAIN ^(seed=FUNCTION s=. a=. y=. c=.))) query=.)
-          -> ^(GUIDE[$g.text] $layer $type $spec $map ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query);
+  @after{
+    Guide g = (Guide) retval.tree.getChild(0);
+    if (seed != null) {
+       g.setSeedOperator(((Function) seed).getInvokeable());
+    } else {
+       MUST DO SOMETHING HERE!!!!!
+    }
+  }
 
+  : ^(GUIDE_DIRECT ^(GUIDE type=. spec=. selector=. actions=.
+        ^(RULE target=.
+           ^(CALL_CHAIN ^(seed=FUNCTION s=. a=. y=. c=.))) query=.))        
+     -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query))
+  | ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. seeder=. query=.))
+     -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $seeder) $query));
+     
 bottomup
   : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
 

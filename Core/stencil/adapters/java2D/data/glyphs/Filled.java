@@ -44,7 +44,7 @@ import stencil.tuple.Tuple;
 import stencil.types.color.ColorCache;
 
 public abstract class Filled extends Stroked {
-	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);;
+	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
 	
 	protected static final Attribute<Paint> STROKE_COLOR = new Attribute<Paint>("STROKE_COLOR", new java.awt.Color(0,0,0, ColorCache.CLEAR_INT));
 	static {

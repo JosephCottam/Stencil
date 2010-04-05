@@ -142,7 +142,7 @@ public final class Fills {
 	}
 	
 	/**Items that can be used as 'PATTERN' attribute*/
-	public static enum Pattern {HATCH, SOLID};
+	public static enum Pattern {HATCH, SOLID}
 
 	public static enum FillProperty implements Attribute {
 		PATTERN(Pattern.SOLID, Pattern.class),

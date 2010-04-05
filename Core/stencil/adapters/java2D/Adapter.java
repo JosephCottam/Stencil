@@ -41,6 +41,7 @@ import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.data.guides.*;
 import stencil.adapters.java2D.util.Painter;
 import stencil.adapters.java2D.util.ZoomPanHandler;
+import twitter4j.Trend;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter INSTANCE = new Adapter();
@@ -62,6 +63,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public Class getGuideClass(String name) {
 		if (name.equals("axis")) {return Axis.class;}
 		else if (name.equals("sidebar")) {return Sidebar.class;}
+		else if (name.equals("trend")) {return Trend.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
@@ -93,12 +95,15 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		int sidebarCount = 0;//How many side-bars have been created?
 		
 		for (Guide guideDef : program.getCanvasDef().getGuides()) {
-			DisplayLayer l = panel.getLayer(guideDef.getLayer());
+			String layer = guideDef.getSelector().getLayer();
+			String attribute = guideDef.getSelector().getAttribute();
+			
+			DisplayLayer l = panel.getLayer(layer);
 			String guideType = guideDef.getGuideType();
 			
 			if (guideType.equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
-				l.addGuide(guideDef.getAttribute(), guide);
+				l.addGuide(attribute, guide);
 				
 				if (l.hasGuide("X") && l.hasGuide("Y")) {
 					((Axis) l.getGuide("X")).setConnect(true);
@@ -106,13 +111,13 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 				}
 			} else if (guideType.equals("sidebar")) {
 				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
-				l.addGuide(guideDef.getAttribute(), guide);
+				l.addGuide(attribute, guide);
 			} else if (guideType.equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);
-				l.addGuide(guideDef.getAttribute(), guide);
+				l.addGuide(attribute, guide);
 			} else if (guideType.equals("trend")) {
 				Guide2D guide = new TrendLine(guideDef);
-				l.addGuide(guideDef.getAttribute(), guide);
+				l.addGuide(attribute, guide);
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
 			}

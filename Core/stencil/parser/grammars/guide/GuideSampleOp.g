@@ -28,36 +28,57 @@
  */ 
  
 
-tree grammar GuideDistinguish;
+tree grammar GuideSampleOp;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
 	filter = true;
-  superClass = TreeRewriteSequence;
-  output = AST;	
 }
 
 @header {
-  /**Distinguish between summariziation and direct guides structurally
-   * so future passes can use tree pattern matching.
+  /**Determines the sample operator based on the specializer.
+   * Retrieves it and annotates the guide with it.
    */
 
 	package stencil.parser.string;
-
-  import java.util.Arrays;
 	
-	import static stencil.parser.ParserConstants.BIND_OPERATOR;
 	import stencil.parser.tree.*;
-	import stencil.tuple.prototype.*;
-	import stencil.tuple.prototype.TuplePrototype;
-	
-	
+	import stencil.interpreter.guide.Samplers;
+	import java.util.Arrays;
+	import java.util.Collections;
+	import stencil.interpreter.guide.samplers.IdentitySampler;
 }
 
 @members {
-  
+   public void setSummarySample(Guide g) {
+	   Program p = (Program) g.getAncestor(PROGRAM);
+	   Layer l = p.getLayer(g.getSelector().getLayer());
+	   g.setSampleOperator(new IdentitySampler(l));
+   }
+   
+   public void setDirectSample(Guide g) {
+      Specializer spec = g.getSpecializer();
+      
+      boolean categorical=true;
+      
+      String sampleType = Samplers.CATEGORICAL;
+      if (spec.getMap().containsKey("sample")) {
+         sampleType = (String) spec.getMap().get("sample").getValue();
+      }
+      
+      String dataType;
+      if (sampleType.equals(Samplers.CATEGORICAL)) {dataType = "java.lang.String";}
+      else {dataType = "java.lang.Integer";}
+      if (spec.getMap().containsKey("Type")) {dataType = spec.getMap().get("Type").toString();}
+
+      Class t;
+      try {t = Class.forName(dataType);}
+      catch (Exception e) {throw new RuntimeException("Invalid type specified for guide sampling: " + dataType);}
+      
+      g.setSampleOperator(Samplers.get(t));
+   }
 }
 
-topdown: ^(g=GUIDE . . .*) 
-
-   }-> ^(GUIDE {type(g)} .*)
+topdown 
+  : ^(GUIDE_DIRECT ^(g=GUIDE .*)) {setDirectSample((Guide) g);}
+  | ^(GUIDE_SUMMARIZATION ^(g=GUIDE .*)) {setSummarySample((Guide) g);};

@@ -10,7 +10,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 /**Supports the List node type, and read interface elements of java.util.List.*/
-public final class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
+public class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
 	
 	/**Object to wrap an arbitrary tree in a java.util.List interface.
 	 * Note, all indexes returned from this class are relative to the list, which

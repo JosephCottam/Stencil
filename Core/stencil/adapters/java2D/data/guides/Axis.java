@@ -92,7 +92,7 @@ public class Axis implements Guide2D {
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {		
-		axis = AXIS.valueOf(guideDef.getAttribute());
+		axis = AXIS.valueOf(guideDef.getSelector().getAttribute());
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
 		GuideUtils.setValues(guideDef.getSpecializer(), this);

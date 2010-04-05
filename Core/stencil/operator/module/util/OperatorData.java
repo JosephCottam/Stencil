@@ -45,6 +45,7 @@ public final class OperatorData {
 		throw new IllegalArgumentException(String.format("Could not find find facet %1$s in operator %2$s.", name, this.name));
 	}
 	
+	public boolean hasFacet(String name) {return getFacetNames().contains(name);}
 	public List<String> getFacetNames() {return new ArrayList(facets.keySet());}
 	public List<FacetData> getFacets() {return new ArrayList(facets.values());}
 	public void setFacets(List<FacetData> newFacets) {

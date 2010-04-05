@@ -30,13 +30,10 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
 /**A map is a key/value pair.*/
 public class MapEntry extends StencilTree implements Map.Entry<String, Atom> {
@@ -164,16 +161,18 @@ public class MapEntry extends StencilTree implements Map.Entry<String, Atom> {
 			
 		}
 		
-		
-		protected final List<MapEntry> source;
-		protected EntrySet entries = new EntrySet();
-		protected KeySet keySet = new KeySet();
-		protected Values values = new Values();
+		private final List<MapEntry> source;
+		private final EntrySet entries = new EntrySet();
+		private final KeySet keySet = new KeySet();
+		private final Values values = new Values();
 		
 		public MapList(List<MapEntry> source) {
-			if (source != null) {this.source = source;}
-			else {this.source = (List) Collections.unmodifiableList(Arrays.asList());}
+			assert source != null : "Cannot base a mapList on null";
+			this.source = source;
 		}
+		
+		public List getSource() {return source;}
+		
 		public void clear() {throw new UnsupportedOperationException();}
 	
 		public boolean containsKey(Object key) {return search(key)!= null;}

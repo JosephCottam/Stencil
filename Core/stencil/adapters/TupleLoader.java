@@ -37,7 +37,7 @@ import stencil.util.streams.txt.InvalidInputLineException;
  * via the application engine.
  */
 public class TupleLoader implements Runnable {
-	private enum STATE {UNSTARTED, RUNNING, STOPPED, EXCEPTION};
+	private enum STATE {UNSTARTED, RUNNING, STOPPED, EXCEPTION}
 	private static final long DEFAULT_UPDATE_FREQUENCY = 10;
 
 	protected TupleStream input;

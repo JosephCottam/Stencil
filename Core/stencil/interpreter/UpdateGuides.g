@@ -51,8 +51,8 @@ options {
 	import stencil.tuple.prototype.*;
 	import stencil.tuple.Tuple;
 	import stencil.tuple.Tuples;
-	import stencil.interpreter.guide.SampleSeed;
-	
+	import stencil.interpreter.guide.SampleSeed; 
+	import stencil.interpreter.guide.SeedOperator;
 }
 
 @members{
@@ -66,19 +66,29 @@ options {
 	
 	private void apply(Guide g) {
 		Specializer details = g.getSpecializer();
-		SampleSeed seed = g.getSeedOperator().getSeed();
+		SeedOperator seedOp = g.getSeedOperator();
+		String layerName = g.getSelector().getLayer();
+		String attribute = g.getSelector().getAttribute();
 		List<Tuple> sample, projection, pairs, results;
 		
-		try {
-			sample = g.getSampleOperator().sample(seed, details);
-			projection = Interpreter.processAll(sample, g.getGenerator());
-		} catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
+		if (seedOp != null) {
+			SampleSeed seed = seedOp.getSeed();
 		
+			try {
+				sample = g.getSampleOperator().sample(seed, details);
+				projection = Interpreter.processAll(sample, g.getGenerator());
+			} catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
+		} else {
+			sample = g.getSampleOperator().sample(null, details);
+			projection = sample;	
+		}
+				
 		try {results = Interpreter.processAll(projection, g.getRules());}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 		
-		DisplayLayer layer = panel.getLayer(g.getLayer());	   
-		DisplayGuide guide = layer.getGuide(g.getAttribute());
+		
+		DisplayLayer layer = panel.getLayer(layerName);	   
+		DisplayGuide guide = layer.getGuide(attribute);
 		//Check for null only required as long as guides are run in separate thread.  Can be removed when scheduling is improved.
 		if (guide != null) {guide.setElements(results);}
 	}

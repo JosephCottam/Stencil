@@ -66,6 +66,7 @@ tokens {
   RULE;
   SIGIL_ARGS;
   SPECIALIZER;
+  SELECTOR;		//Indicate some part of a stencil
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
   TUPLE_REF;
@@ -217,8 +218,10 @@ canvasLayer
     -> ^(CANVAS_DEF[$name.text] canvasProperties ^(LIST["Guides"] guideDef+))
   | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT) ^(LIST["Guides"]));
 
-guideDef: GUIDE type=ID spec=specializer[RuleOpts.Simple] FROM layer=ID attribute=ID rule["glyph"]* 
-			-> ^(GUIDE[$attribute.text] $layer $type $spec ^(LIST["Rules"] rule*));
+guideDef: GUIDE type=ID spec=specializer[RuleOpts.Simple] FROM selector rule["glyph"]* 
+			-> ^(GUIDE $type $spec selector ^(LIST["Rules"] rule*));
+
+selector: ID* -> ^(SELECTOR ID*);
 
 canvasProperties: specializer[RuleOpts.Simple]; 
 
