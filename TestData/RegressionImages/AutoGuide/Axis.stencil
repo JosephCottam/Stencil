@@ -16,7 +16,7 @@ canvas Main
 		line.STROKE_WEIGHT: 1
 		label.REGISTRATION: "RIGHT"
 
-	guide axis[sample="CAT", tickSize=5, textOffset=6] from Chart X
+	guide axis[sample="CATEGORICAL", tickSize=5, textOffset=6] from Chart X
 		label.REGISTRATION: "LEFT"
 		label.FONT_SIZE: 10
 		line.STROKE_WEIGHT: 1 

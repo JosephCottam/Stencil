@@ -85,9 +85,4 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	 */
 	public TuplePrototype getPrototype();
 	public void updatePrototype(Layer layerDef);
-
-	/**Return a guide for the specified attribute.
-	 * @throws IllegalArgumentException The attribute named is either not valid for this layer (may be due to implantation type) 
-	 * 									or no guide was set for the requested attribute. */
-	public DisplayGuide getGuide(String attribute) throws IllegalArgumentException;
 }

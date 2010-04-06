@@ -36,9 +36,10 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+import java.util.Collection;
 import java.util.List;
-
-import javax.swing.JComponent;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
@@ -46,13 +47,16 @@ import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.util.LayerUpdateListener;
 import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
+import stencil.display.DisplayCanvas;
+import stencil.display.DisplayGuide;
 import stencil.parser.tree.CanvasDef;
 import stencil.parser.tree.Layer;
+import stencil.util.Selector;
 
 
 /**Some of this is derived from Prefuse's display and related objects.*/
 
-public final class Canvas extends JComponent implements LayerUpdateListener {	
+public final class Canvas extends DisplayCanvas implements LayerUpdateListener {	
 	final Painter painter;
 	final Thread painterThread;
 	BufferedImage buffer;
@@ -60,7 +64,8 @@ public final class Canvas extends JComponent implements LayerUpdateListener {
 	private AffineTransform viewTransform = new AffineTransform();
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
 	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
-
+	private final Map<Selector, Guide2D> guides  = new ConcurrentHashMap();
+	
 	private Rectangle2D contentBounds;
 	final DisplayLayer<? extends Glyph2D>[] layers;
 
@@ -100,6 +105,12 @@ public final class Canvas extends JComponent implements LayerUpdateListener {
 	
 	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
 	
+	public DisplayGuide getGuide(Selector sel) {return guides.get(sel);}
+	public void addGuide(Selector sel, Guide2D guide) {guides.put(sel, guide);}
+	public boolean hasGuide(Selector sel) {return guides.containsKey(sel);}
+	public Collection<Guide2D> getGuides() {return guides.values();}
+
+	
 	/**What are the bounds of everything currently on this canvas 
 	 * (not just visible or in window).
 	 * 
@@ -120,15 +131,16 @@ public final class Canvas extends JComponent implements LayerUpdateListener {
 						bounds.add(g.getBoundsReference());
 					}
 				}
-				for (Guide2D g: t.getGuides()) {
-					if (bounds == null) {
-						bounds =(Rectangle2D) g.getBoundsReference().clone();
-					}else {
-						bounds.add(g.getBoundsReference());
-					}
+			}
+			
+			for (Guide2D g: guides.values()) {
+				if (bounds == null) {
+					bounds =(Rectangle2D) g.getBoundsReference().clone();
+				}else {
+					bounds.add(g.getBoundsReference());
 				}
-			}			
-		} 
+			}
+		}			
 		
 		if (bounds == null) {return new Rectangle(0,0,0,0);}
 		else {return bounds.getBounds();}

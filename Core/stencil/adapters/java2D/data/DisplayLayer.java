@@ -31,18 +31,15 @@ package stencil.adapters.java2D.data;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import static java.lang.String.format;
 
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.adapters.java2D.util.LayerUpdateListener;
-import stencil.display.DisplayGuide;
 import stencil.display.DuplicateIDException;
 import stencil.interpreter.Interpreter;
 import stencil.parser.ParserConstants;
@@ -59,7 +56,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	private ConcurrentHashMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private final String name; 
 	private T prototypeGlyph;
-	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();
 	private final Set<LayerUpdateListener> updateListeners = new ListSet();
 	private int stateID = Integer.MIN_VALUE; 
 	
@@ -132,11 +128,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	/**Get the tuple prototype of this table.*/
 	public TuplePrototype getPrototype() {return prototypeGlyph.getPrototype();}
 	
-	public DisplayGuide getGuide(String attribute) {return guides.get(attribute);}
-	public void addGuide(String attribute, Guide2D guide) {guides.put(attribute, guide);}
-	public boolean hasGuide(String attribute) {return guides.containsKey(attribute);}
-	public Collection<Guide2D> getGuides() {return guides.values();}
-
 	private void updateStateID() {stateID++;} //Occasional missed updates are OK
 	public int getStateID() {return stateID;}
 

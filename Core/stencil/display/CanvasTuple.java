@@ -28,7 +28,6 @@
  */
 package stencil.display;
 
-import java.awt.Component;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,7 +96,7 @@ public abstract class CanvasTuple implements MutableTuple {
 
 
 	/**Return the actual backing component*/
-	public abstract Component getComponent();
+	public abstract DisplayCanvas getComponent();
 	protected abstract Rectangle getBounds();
 
 	//TODO: Convert so the indexed de-reference is the principle one

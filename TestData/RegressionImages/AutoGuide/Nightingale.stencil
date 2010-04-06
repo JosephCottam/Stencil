@@ -1,0 +1,80 @@
+STREAM: File
+NAME: Deaths
+HEADER: date, type, count
+SEPARATOR: \s*,\s*
+SOURCE: ./NightingaleCrimeaSplit.csv
+SKIP: 1
+STRICT: true
+
+external stream Deaths(date, type, count)
+
+canvas Main
+  guide sidebar[X=-75, Y=-50] from Rose FILL_COLOR
+
+  guide pointLabels from Rose ID
+    TEXT: MakeLabel(Output)
+    (X,Y): Rose.find(Output) 
+            -> MinRadius.query(50, X, Y, OUTERX, OUTERY)
+    REGISTRATION: "CENTER"
+    FONT_SIZE: 4
+
+layer Rose[SLICE]
+from Deaths
+   local(month, year) : ParseDate(date)
+   ID: Concatenate(type, ":", month)
+   FILL_COLOR: ColorBy(type)
+   STROKE_COLOR: @Color{Gray70}
+   HEIGHT:* Scale[0, 250](count)
+   Z: Mult(-1, count)
+   (X,Y): (0,0)
+   (START, END): Sub1(month) -> Partition(_)  
+    
+operator ColorBy (t) -> (C)
+   (t=~"wounds") => C:@Color{LightPink}
+   (t=~"other") => C:@Color{DarkGray}
+   (t=~"disease") => C:@Color{LightBlue}
+
+python MinRadius 
+facet init {from math import *}
+facet query(Min, X1,Y1,X,Y) -> (X,Y) {
+   rise = Y-Y1
+   run = X-X1
+   radius = sqrt(rise**2 + run**2)
+   if (radius >0): ratio = Min/radius
+   else: ratio=1
+
+   #Only needs to change if its not far enough already
+   if (ratio > 1):
+      Y = Y1 + (ratio * rise)
+      X = X1 + (ratio * run)
+}
+
+operator ParseDate (d) -> (m,y)
+   (all) => (m,y): IndexOf(d, "/") -[s]> 
+                     Substring(d, 0, s[0]) -[m]>
+                     Add1(s[0]) -> Substring(d, _, -1) -> (m[0], _) 
+
+operator MakeLabel(id) -> (text)
+   (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) -> MonthAbr(_)
+   (all) => text: ""
+
+operator Partition(n) -> (start, end)
+   (all) => (start, end): Sub(12, n) -> Sub(_,4) -[n]> 
+                          Mult(30, n[0]) -[end]>
+                          Add1(n[0]) -> Mult(30,_) -> (_,end[_])
+
+
+operator MonthAbr (n) -> (month) 
+   (n=1) => month: "Jan"
+   (n=2) => month: "Feb"
+   (n=3) => month: "Mar"
+   (n=4) => month: "Apr"
+   (n=5) => month: "May"
+   (n=6) => month: "Jun"
+   (n=7) => month: "Jul"
+   (n=8) => month: "Aug"
+   (n=9) => month: "Sep"
+   (n=10) => month: "Oct"
+   (n=11) => month: "Nov"
+   (n=12) => month: "Dec"
+   (all) => month: "ERROR"

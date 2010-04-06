@@ -1,14 +1,23 @@
 package stencil.parser.tree;
 
+import java.util.ArrayList;
+
 import org.antlr.runtime.Token;
 
-public class Selector extends List {
+public class Selector extends List implements stencil.util.Selector {
 	public Selector(Token token) {super(token);}
 	
-	public String getLayer() {return get(0).getText();}
+	public String getName(int i) {return get(i).getText();}
+	public String getLayer() {return getName(0);}
 	public String getAttribute() {
-		if (size() >0) {return get(1).getText();}
+		if (size() >0) {return getName(1);}
 		else {return null;}
+	}
+	
+	public java.util.List<String> getNames() {
+		ArrayList result = new ArrayList();
+		for (Object a: this) {result.add(((Atom) a).getText());}
+		return result;
 	}
 	
 	public String toString() {
@@ -21,7 +30,6 @@ public class Selector extends List {
 		b.deleteCharAt(b.length()-1);
 		return b.toString();
 	}
-
 
 	public int hashCode() {return toString().hashCode();}
 	

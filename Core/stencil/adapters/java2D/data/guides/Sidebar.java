@@ -104,7 +104,7 @@ public class Sidebar implements Guide2D {
 		sorter = new TupleSorter(label_idx);
 	}
 
-	public void setElements(List<Tuple> elements) {
+	public synchronized void setElements(List<Tuple> elements) {
 		marks.clear();
 		
 		Collections.sort(elements, sorter);
@@ -153,7 +153,7 @@ public class Sidebar implements Guide2D {
 	}	
 
 
-	public void render(Graphics2D g, AffineTransform viewTransform) {
+	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
 		g.translate(X, Y);
 		AffineTransform localTransform = g.getTransform();
 		for (Glyph2D mark: marks) {

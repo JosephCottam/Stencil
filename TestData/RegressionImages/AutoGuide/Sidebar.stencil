@@ -9,12 +9,12 @@ STRICT: true
 external stream Values(Category)
 
 canvas Main
-	guide axis[sample="CAT", tickSize=5, textOffset=6] from Chart X
+	guide axis[sample="CATEGORICAL", tickSize=5, textOffset=6] from Chart X
   		label.FONT_SIZE: 10
 		line.STROKE_WEIGHT: 1
 		label.REGISTRATION: "LEFT"
 
-	guide sidebar[sample="LINEAR", round="TRUE", spacing=4] from Chart FILL_COLOR
+	guide sidebar[sample="LINEAR", round="TRUE", spacing=1] from Chart FILL_COLOR
 		label.FONT_SIZE : 10
 		example.SIZE: 9
 

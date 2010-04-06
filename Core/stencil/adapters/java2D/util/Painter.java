@@ -78,7 +78,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 				}
 			}
 			
-			for (Guide2D guide: table.getGuides()) {guide.render(g, base);} //TODO: Guides should probably be associated with the entire panel and rendered after all layers...
+			for (Guide2D guide: target.getGuides()) {guide.render(g, base);}
 		}
 	}
 	

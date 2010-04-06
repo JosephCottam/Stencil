@@ -28,7 +28,7 @@
  */
 package stencil.adapters.java2D;
 
- import java.awt.Color;
+import java.awt.Color;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.StencilPanel;
@@ -94,31 +94,35 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	//TODO: Lift out into a grammar pass...
 	private void constructGuides(Panel panel, Program program) {
 		int sidebarCount = 0;//How many side-bars have been created?
+		Canvas canvas = panel.getCanvas().getComponent();
 		
 		for (Guide guideDef : program.getCanvasDef().getGuides()) {
-			String layer = guideDef.getSelector().getLayer();
-			String attribute = guideDef.getSelector().getAttribute();
-			
-			DisplayLayer l = panel.getLayer(layer);
+			stencil.parser.tree.Selector sel = guideDef.getSelector();
 			String guideType = guideDef.getGuideType();
 			
 			if (guideType.equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
-				l.addGuide(attribute, guide);
+				canvas.addGuide(sel, guide);
 				
-				if (l.hasGuide("X") && l.hasGuide("Y")) {
-					((Axis) l.getGuide("X")).setConnect(true);
-					((Axis) l.getGuide("Y")).setConnect(true);
+				
+				//If an X and Y for the same selector path exist on this canvas, make the axes meet
+				stencil.util.Selector.ListSelector XAxis = new stencil.util.Selector.ListSelector(sel.getNames());
+				stencil.util.Selector.ListSelector YAxis = new stencil.util.Selector.ListSelector(sel.getNames());
+				XAxis.setName(XAxis.size()-1, "X");
+				YAxis.setName(YAxis.size()-1, "Y");				
+				if (canvas.hasGuide(XAxis) && canvas.hasGuide(YAxis)) {
+					((Axis) canvas.getGuide(YAxis)).setConnect(true);
+					((Axis) canvas.getGuide(XAxis)).setConnect(true);
 				}
 			} else if (guideType.equals("sidebar")) {
 				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
-				l.addGuide(attribute, guide);
+				canvas.addGuide(sel, guide);
 			} else if (guideType.equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);
-				l.addGuide(attribute, guide);
+				canvas.addGuide(sel, guide);
 			} else if (guideType.equals("trend")) {
 				Guide2D guide = new TrendLine(guideDef);
-				l.addGuide(attribute, guide);
+				canvas.addGuide(sel, guide);
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
 			}

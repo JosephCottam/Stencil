@@ -1,0 +1,30 @@
+STREAM: File
+NAME: Barley
+HEADER: year, site, yield, variety
+SEPARATOR: \s*,\s+
+SOURCE: ./BeckersBarley.csv
+SKIP: 1
+STRICT: true
+
+external stream Barley(year, site, yield, variety)
+
+canvas Main
+  guide axis[axisLabel="Variety"] from BarleySite Y
+  guide 
+    axis[axisLabel="Yield", 
+         sample="LINEAR", seed.min=10, seed.max=100] 
+    from BarleySite X
+  guide 
+    sidebar[X=75, Y=-60] 
+    from BarleySite STROKE_COLOR
+      example.FILL_COLOR: @Color{GRAY90}
+
+layer BarleySite
+  from Barley
+    filter(site =~ "University Farm") 
+    ID: Concatenate(variety,year)
+    STROKE_COLOR: BrewerColors["PuRd","BLACK"](year)
+    FILL_COLOR: @Color{CLEAR}
+    X:* Scale[10,100, min=10, max=100](yield)
+    Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)
+    REGISTRATION: "CENTER"

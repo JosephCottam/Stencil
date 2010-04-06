@@ -87,10 +87,9 @@ options {
 		try {results = Interpreter.processAll(projection, g.getRules());}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 		
-		
-		DisplayLayer layer = panel.getLayer(layerName);	   
-		DisplayGuide guide = layer.getGuide(attribute);
-		//Check for null only required as long as guides are run in separate thread.  Can be removed when scheduling is improved.
+
+    //TODO: Remove null check when scheduling is improved.
+		DisplayGuide guide = panel.getCanvas().getComponent().getGuide(g.getSelector());
 		if (guide != null) {guide.setElements(results);}
 	}
 
