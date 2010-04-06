@@ -44,6 +44,7 @@ import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 
 public abstract class GuideUtils {
+	public static final String SAMPLE_KEY="sample";
 	
 	/**Applies the values found in a specializer map to the target.
 	 * Only values that start with the given prefix (plus a name separator) will be applied.
