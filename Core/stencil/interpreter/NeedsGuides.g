@@ -57,7 +57,7 @@ options {
 	
 	public boolean needsGuide(Tree t) {
     AstInvokeable i = (AstInvokeable) t;
-    int nowID = ((NumericSingleton) i.getInvokeable().invoke(EMPTY_ARGS)).intValue(); //TODO: Look at not returning a tuple from StateID
+    int nowID = (Integer) i.getInvokeable().invoke(EMPTY_ARGS);
          
     if (!stateIDs.containsKey(i)) {
        stateIDs.put(i, nowID+1); //Make it different...

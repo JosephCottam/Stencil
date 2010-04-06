@@ -52,8 +52,8 @@ options {
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.tuple.prototype.SimplePrototype;
   import stencil.tuple.prototype.TuplePrototypes;
-  import static stencil.parser.string.EnvironmentProxy.Proxy.initialEnv;
-  import static stencil.parser.string.EnvironmentProxy.Proxy.extend;
+  import static stencil.parser.string.EnvironmentProxy.initialEnv;
+  import static stencil.parser.string.EnvironmentProxy.extend;
 }
 
 @members {

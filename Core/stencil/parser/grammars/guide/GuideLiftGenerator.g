@@ -45,6 +45,9 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
+	import stencil.interpreter.guide.SeedOperator;
+  import stencil.operator.util.ReflectiveInvokeable;
+  import stencil.interpreter.guide.samplers.LayerSampler;
 }
 
 topdown 
@@ -53,7 +56,10 @@ topdown
     if (seed != null) {
        g.setSeedOperator(((Function) seed).getInvokeable());
     } else {
-       MUST DO SOMETHING HERE!!!!!
+       String layerName = g.getSelector().getLayer();
+       Layer layer = ((Program) g.getAncestor(PROGRAM)).getLayer(layerName);
+       SeedOperator op = new LayerSampler.SeedOperator(layer);
+       g.setSeedOperator(new ReflectiveInvokeable("getSeed", op));
     }
   }
 

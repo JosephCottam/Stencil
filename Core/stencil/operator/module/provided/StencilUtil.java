@@ -62,7 +62,7 @@ public class StencilUtil extends BasicModule {
 		final TuplePrototype samplePrototype;
 		
 		protected final Object STATE_LOCK = new Object();
-		protected int stateID=0; 
+		protected int stateID=Integer.MIN_VALUE; 
 		
 		protected EchoBase(OperatorData opData, TuplePrototype p) {
 			operatorData = opData;
@@ -112,7 +112,7 @@ public class StencilUtil extends BasicModule {
 			return ld;
 		}
 		
-		public Tuple stateID() {return Converter.toTuple(stateID);}
+		public int stateID() {return stateID;}
 	}
 
 	

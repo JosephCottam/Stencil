@@ -28,7 +28,7 @@
  */ 
  
 
-tree grammar GuideClean;
+tree grammar GuideExtendQuery;
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;	
@@ -37,11 +37,26 @@ options {
 }
 
 @header {
-  /**Remove compiler annotations that are of no significance for runtime.*/
+  /**Ensure the query guide includes the seed, sample and any stateful action operations.*/
   
   package stencil.parser.string; 
+  
+  import stencil.operator.util.Invokeable;
+  import stencil.operator.util.ReflectiveInvokeable;
+  import static stencil.operator.StencilOperator.STATE_FACET;
+  import stencil.parser.tree.*;
 }
 
-bottomup
-  :  ^(GUIDE_DIRECT g=.) -> $g
-  |  ^(GUIDE_SUMMARIZATION g=.) -> $g;
+topdown:
+  ^(g=GUIDE type=. spec=. selector=. actions=. gen=. query[(Guide) g])
+     -> ^(GUIDE $type $spec $selector $actions $gen query);
+     
+     
+query[Guide g]
+   @after{
+      Invokeable seedInv = new ReflectiveInvokeable(STATE_FACET, g.getSeedOperator());
+      AstInvokeable seedAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "seed");
+      seedAInv.setInvokeable(seedInv);      
+      adaptor.addChild(gq, seedAInv);
+   }
+   : ^(gq=GUIDE_QUERY .*); 

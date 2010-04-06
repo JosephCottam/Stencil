@@ -1,9 +1,7 @@
 package stencil.operator.util;
 
 import java.lang.reflect.*;
-import static java.lang.String.format;
 
-import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 
@@ -31,10 +29,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 		if (target != null && !method.getDeclaringClass().isAssignableFrom(target.getClass())) {
 			throw new IllegalArgumentException("Method and target object are not type compatible.");
-		}
-
-		if (!Tuple.class.isAssignableFrom(method.getReturnType())) {
-			throw new IllegalArgumentException(format("Can only wrap methods with return type Tuple (%1$s has return type %2$s).", method.getName(), method.getReturnType().getName()));
 		}
 		
 		this.method = method;

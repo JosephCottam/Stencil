@@ -230,17 +230,17 @@ public abstract class ParseStencil {
 
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-		//Insert Distinguish between guide types
-		treeTokens = new CommonTreeNodeStream(p);
-		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
-		guideDistinguish.downup(p);
-
 		//Insert guide specializers
 		treeTokens = new CommonTreeNodeStream(p);
 		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
 		guideSpecailizers.setTreeAdaptor(TREE_ADAPTOR);
 		guideSpecailizers.downup(p);
 
+		//Distinguish between guide types
+		treeTokens = new CommonTreeNodeStream(p);
+		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
+		guideDistinguish.downup(p);
+		
 		//Ensure that auto-guide requirements are met
 		GuideInsertSeedOp ensure = new GuideInsertSeedOp(treeTokens,modules); 
 		ensure.setTreeAdaptor(TREE_ADAPTOR);		
@@ -273,12 +273,17 @@ public abstract class ParseStencil {
 		set2.downup(p);
 
 		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
+		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
 		gSampleOp.downup(p);
-		
-		treeTokens = new CommonTreeNodeStream(p);
+
+		GuideExtendQuery guideExtend = new GuideExtendQuery(treeTokens);
+		guideExtend.setTreeAdaptor(TREE_ADAPTOR);
+		guideExtend.downup(p);
+
 		GuideClean guideClean = new GuideClean(treeTokens);
 		guideClean.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) guideClean.downup(p);
+		guideClean.downup(p);
+
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 		
 		treeTokens = new CommonTreeNodeStream(p);

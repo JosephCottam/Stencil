@@ -77,6 +77,9 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**How many elements are in this layer?*/
 	public int size();
 	
+	/**Identifier for the current state**/
+	public int getStateID();
+	
 	/**What is the tuple prototype for this layer?
 	 * This is derived directly from the implantation type.
 	 */

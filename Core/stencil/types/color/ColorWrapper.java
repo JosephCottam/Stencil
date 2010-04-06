@@ -12,7 +12,7 @@ import stencil.types.TypeWrapper;
 import stencil.util.collections.ArrayUtil;
 
 public final class ColorWrapper implements TypeWrapper<ColorTuple> {
-	private static final Class[] ACCEPTS = {Color.class, Paint.class};
+	private static final Class[] ACCEPTS = {Color.class, Paint.class, ColorTuple.class};
 	
 	public Class[] appliesTo() {return ACCEPTS;}
 
@@ -22,7 +22,7 @@ public final class ColorWrapper implements TypeWrapper<ColorTuple> {
 			v=v.substring(v.indexOf("{")+1, v.lastIndexOf("}"));
 		}
 		
-		if (c.equals(Color.class) || c.equals(Paint.class)) {return ColorCache.get(v);}
+		if (c.equals(Color.class) || c.equals(Paint.class) || c.equals(ColorTuple.class)) {return ColorCache.get(v);}
 		if (c.equals(String.class) && value instanceof ColorTuple) {return value.toString();}
 		if (c.equals(String.class) && value instanceof Color) {return ColorCache.get((Color) value).toString();}
 		

@@ -82,6 +82,5 @@ public class NumericSampler implements SampleOperator {
 		}		
 		return (float) (nf*Math.pow(10, exp));
 	}
-	
 }
 

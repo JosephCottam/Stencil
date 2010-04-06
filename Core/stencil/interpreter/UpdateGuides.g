@@ -53,6 +53,7 @@ options {
 	import stencil.tuple.Tuples;
 	import stencil.interpreter.guide.SampleSeed; 
 	import stencil.interpreter.guide.SeedOperator;
+	import stencil.interpreter.guide.samplers.LayerSampler;
 }
 
 @members{
@@ -71,16 +72,16 @@ options {
 		String attribute = g.getSelector().getAttribute();
 		List<Tuple> sample, projection, pairs, results;
 		
-		if (seedOp != null) {
+		if (seedOp instanceof LayerSampler.SeedOperator) {
+      sample = g.getSampleOperator().sample(null, details);
+      projection = sample;
+		} else {
 			SampleSeed seed = seedOp.getSeed();
 		
 			try {
 				sample = g.getSampleOperator().sample(seed, details);
 				projection = Interpreter.processAll(sample, g.getGenerator());
 			} catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
-		} else {
-			sample = g.getSampleOperator().sample(null, details);
-			projection = sample;	
 		}
 				
 		try {results = Interpreter.processAll(projection, g.getRules());}

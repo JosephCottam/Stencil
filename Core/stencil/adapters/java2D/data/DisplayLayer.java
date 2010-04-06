@@ -60,14 +60,15 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	private final String name; 
 	private T prototypeGlyph;
 	private final Map<String, Guide2D> guides  = new ConcurrentHashMap<String, Guide2D>();
-	private final Set<LayerUpdateListener> updateListeners = new ListSet();	
+	private final Set<LayerUpdateListener> updateListeners = new ListSet();
+	private int stateID = Integer.MIN_VALUE; 
 	
 	private static final Comparator<Glyph2D> Z_SORTER = new Comparator<Glyph2D>() {
 		public int compare(Glyph2D o1, Glyph2D o2) {
 			return (int) o1.getZ() - (int) o2.getZ();
 		}
 	};
-
+	
 	protected DisplayLayer(String name) {this.name = name;}
 	
 	public String getName() {return name;}
@@ -136,6 +137,9 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	public boolean hasGuide(String attribute) {return guides.containsKey(attribute);}
 	public Collection<Guide2D> getGuides() {return guides.values();}
 
+	private void updateStateID() {stateID++;} //Occasional missed updates are OK
+	public int getStateID() {return stateID;}
+
 	
 	public static DisplayLayer<?> instance(Layer layerDef) {
 		String name = layerDef.getName();
@@ -177,7 +181,6 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 		}
 		catch (Exception e) {throw new RuntimeException(format("Error processing defaults on layer %1$s.", name), e);}		
 	}
-
 	
 	public void addLayerUpdateListener(LayerUpdateListener l) {updateListeners.add(l);}
 	
@@ -188,6 +191,7 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	}
 	
 	private void fireLayerUpdate(Rectangle2D bounds) {
+		updateStateID();
 		Rectangle update = bounds.getBounds();
 		for (LayerUpdateListener l:updateListeners) {l.layerUpdated(update);}
 	}

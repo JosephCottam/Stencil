@@ -43,7 +43,7 @@ public class TrendLine  implements Guide2D {
 		sorter=new TupleSorter(x_idx);
 	}
 	
-	public void setElements(List<Tuple> elements) {
+	public synchronized void setElements(List<Tuple> elements) {
 		marks.clear();
 		if (elements.size() == 0) {return;}
 		
@@ -71,7 +71,7 @@ public class TrendLine  implements Guide2D {
 
 	public Rectangle2D getBoundsReference() {return bounds;}
 
-	public void render(Graphics2D g, AffineTransform viewTransform) {
+	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
 		for (Glyph2D mark: marks) {
 			mark.render(g, viewTransform);
 		}

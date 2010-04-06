@@ -94,11 +94,11 @@ options {
 
      if (g.getGuideType().equals("pointLabels")) {
         if (!names.contains(X_FIELD)) {
-           Rule r = parseRule(X_FIELD + BIND_OPERATOR + layer + ".find(Output) -> " + X_FIELD); 
+           Rule r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(Y_FIELD)) {
-           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + layer + ".find(Output) -> " + Y_FIELD); 
+           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(TEXT_FIELD)) {

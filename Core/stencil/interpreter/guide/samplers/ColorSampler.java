@@ -26,6 +26,4 @@ public class ColorSampler implements SampleOperator {
 			throw new Error("Cannot produce a continous sample on color data.");
 		}
 	}
-
-
 }

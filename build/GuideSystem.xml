@@ -52,5 +52,8 @@
  			target="${guideGrammars}/GuideClean.g"
 			outputdirectory="${parser}"
  		/>
- 	</target>
+        <antlr
+            target="${guideGrammars}/GuideExtendQuery.g"
+            outputdirectory="${parser}"
+        /> 	</target>
  </project>

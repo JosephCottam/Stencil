@@ -24,5 +24,4 @@ public class StringSampler implements SampleOperator {
 		}
 		return sample;
 	}
-
 }

@@ -49,4 +49,7 @@ public interface SeedOperator {
 	 * TODO: This should be pushed into the AST, not held here!
 	 */
 	public TuplePrototype getSamplePrototype();
+	
+	/**State identifier for the seed operator.**/
+	public int stateID();
 }
