@@ -102,7 +102,7 @@ options {
            adaptor.addChild(rules, r);
         }
         if (!names.contains(TEXT_FIELD)) {
-           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + OUTPUT_FIELD);
+           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
            adaptor.addChild(rules, r);
         }
      } else if (g.getGuideType().equals("trend")) {

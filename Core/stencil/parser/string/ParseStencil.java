@@ -167,7 +167,7 @@ public abstract class ParseStencil {
 
 		Program p = checkParse(source);
 
-		//Group the operators
+		//Group the operator chains
 		treeTokens = new CommonTreeNodeStream(p);
 		SeparateTargets targets = new SeparateTargets(treeTokens);
 		targets.setTreeAdaptor(TREE_ADAPTOR);

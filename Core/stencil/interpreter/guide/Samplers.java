@@ -11,7 +11,7 @@ import java.util.Map;
 import java.awt.Color;
 
 public final class Samplers {
-	public static final String CATEGORICAL ="CAT";
+	public static final String CATEGORICAL ="CATEGORICAL";
 	public static final String SAMPLE_KEY = "sample";
 
 	

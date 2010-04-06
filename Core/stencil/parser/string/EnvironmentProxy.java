@@ -2,6 +2,7 @@ package stencil.parser.string;
 
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.operator.module.Module;
 import stencil.operator.module.ModuleCache;
 import stencil.operator.module.util.OperatorData;
@@ -110,7 +111,9 @@ public final class EnvironmentProxy {
 		if (anc.c != null) {return External.find(anc.c.getStream(), anc.program.getExternals()).getPrototype();}
 		if (anc.o != null) {return anc.o.getYields().getInput();}
 		if (anc.g != null) {
-			if (anc.inRuleList) {
+			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
+				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();
+			} else if (anc.inRuleList) {
 				return anc.g.getGenerator().getTarget().getPrototype();
 			} else {return anc.g.getSeedOperator().getSamplePrototype();}
 		}
@@ -237,4 +240,17 @@ public final class EnvironmentProxy {
 		return new EnvironmentProxy (label, t, this);
 	}
 
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		if(parent != null) {
+			b.append(parent.toString());
+		}
+		
+		b.append(label);
+		b.append(": ");
+		b.append(Arrays.deepToString(TuplePrototypes.getNames(prototype)));
+		b.append("\n");
+		return b.toString();
+	}
+	
 }

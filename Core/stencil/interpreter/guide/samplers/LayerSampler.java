@@ -14,23 +14,18 @@ import stencil.tuple.prototype.TuplePrototype;
 public final class LayerSampler implements SampleOperator {
 	/**Special seed operator to accompany this sampler type.*/
 	public static final class SeedOperator implements stencil.interpreter.guide.SeedOperator {
-		private final Layer layerDef;
-		public SeedOperator(Layer l) {layerDef = l;}
-		private final DisplayLayer<Tuple> getDisplayLayer() {return layerDef.getDisplayLayer();}
-
-		public TuplePrototype getSamplePrototype() {
-			return getDisplayLayer().getPrototype();
-		}
-
+		private final DisplayLayer layer;
+		
+		public SeedOperator(Layer l) {layer = l.getDisplayLayer();}
+		public TuplePrototype getSamplePrototype() {return layer.getPrototype();}
 		public SampleSeed getSeed() {return new SampleSeed(false);}
-
-		public int stateID() {return getDisplayLayer().getStateID();}		
+		public int stateID() {return layer.getStateID();}
 	}
 	
-	private final Layer layerDef;
+	private final DisplayLayer layer;
 	
 	public LayerSampler(Layer layer) {
-		this.layerDef = layer;
+		this.layer = layer.getDisplayLayer();
 	}
 
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
@@ -38,6 +33,5 @@ public final class LayerSampler implements SampleOperator {
 		for (Tuple t: getDisplayLayer()) {l.add(t);}
 		return l;
 	}
-	
-	private final DisplayLayer<Tuple> getDisplayLayer() {return layerDef.getDisplayLayer();}
+	public final DisplayLayer<Tuple> getDisplayLayer() {return layer;}
 }

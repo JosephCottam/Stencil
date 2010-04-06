@@ -64,6 +64,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		if (name.equals("axis")) {return Axis.class;}
 		else if (name.equals("sidebar")) {return Sidebar.class;}
 		else if (name.equals("trend")) {return Trend.class;}
+		else if (name.equals("pointLabels")) {return PointLabel.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}

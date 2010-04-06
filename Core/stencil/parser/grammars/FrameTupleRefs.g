@@ -86,7 +86,6 @@ options {
   }
 }
 
-
 topdown: action | predicate;
 
 predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
