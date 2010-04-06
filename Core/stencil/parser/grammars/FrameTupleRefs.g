@@ -94,7 +94,7 @@ action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 	catch [EnvironmentProxy.FrameException fe] {throw new RuntimeException("Error framing rule: " + c.toStringTree(), fe);}
 	
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION s=. ^(LIST value[env]*) y=. callTarget[extend(env, (DirectYield) $y, $f, modules)])
+  : ^(f=FUNCTION s=. ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(PACK value[env]+);
           
 value[EnvironmentProxy env] 

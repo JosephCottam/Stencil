@@ -12,10 +12,12 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.util.MultiPartName;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 
 /**The environment proxy is used during compilation to mimic the shape of, 
  * but not the content of, runtime environment.
@@ -108,7 +110,7 @@ public final class EnvironmentProxy {
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
-		if (anc.c != null) {return External.find(anc.c.getStream(), anc.program.getExternals()).getPrototype();}
+		if (anc.c != null) {return findExternal(anc.c.getStream(), anc.program.getExternals()).getPrototype();}
 		if (anc.o != null) {return anc.o.getYields().getInput();}
 		if (anc.g != null) {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
@@ -120,9 +122,15 @@ public final class EnvironmentProxy {
 
 		throw new RuntimeException("Could not calculate stream proxy for tree: " + anc.focus.toStringTree());
 	}
+	
+	
+	private static External findExternal(String name, Collection<External> externals) {
+		for (External s: externals) {if (s.getName().equals(name)) {return s;}}
+		throw new RuntimeException("Could not find external of name " + name + ".");
+	}
 
-	public static EnvironmentProxy extend(EnvironmentProxy env, DirectYield pass, CommonTree callTree, ModuleCache modules) {
-		String label = pass.getName();
+	public static EnvironmentProxy extend(EnvironmentProxy env, Tree pass, CommonTree callTree, ModuleCache modules) {
+		String label = pass.getText();
 		Function call = (Function) callTree;
 		TuplePrototype prototype = getPrototype(call, modules);
 		return env.push(label, prototype);

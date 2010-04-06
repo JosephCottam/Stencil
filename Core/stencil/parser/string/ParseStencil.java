@@ -163,53 +163,45 @@ public abstract class ParseStencil {
 	 * @throws SyntaxException Syntax errors were encountered.
 	 */
 	public static Program parse(String source, Adapter adapter) throws ProgramParseException, Exception {
-		CommonTreeNodeStream treeTokens;
-
 		Program p = checkParse(source);
-
+		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
+		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
+		
 		//Group the operator chains
-		treeTokens = new CommonTreeNodeStream(p);
 		SeparateTargets targets = new SeparateTargets(treeTokens);
 		targets.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) targets.downup(p);
 
 		//Ensure the proper order blocks
-		treeTokens = new CommonTreeNodeStream(p);
 		EnsureOrders orders = new EnsureOrders(treeTokens);
 		orders.setTreeAdaptor(TREE_ADAPTOR);
 		p = orders.ensureOrder(p);
 
 		//Do module imports
-		treeTokens = new CommonTreeNodeStream(p);
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
 		p.setModuleCache(modules);
 		
 		//Verify that Python operators are syntactically correct and appropriately indented
-		treeTokens = new CommonTreeNodeStream(p);
 		PreparsePython pyParse = new PreparsePython(treeTokens);
 		pyParse.downup(p);
 
 		//Parse custom argument blocks
-		treeTokens = new CommonTreeNodeStream(p);
 		PrepareCustomArgs customArgs = new PrepareCustomArgs(treeTokens);
 		customArgs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) customArgs.downup(p);
 
 		//Add default specializers where required
-		treeTokens = new CommonTreeNodeStream(p);
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
 		defaultSpecializers.misc(p);
 		
 		//Remove all operator references
-		treeTokens = new CommonTreeNodeStream(p);
 		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
 		opTemplates.setTreeAdaptor(TREE_ADAPTOR);
 		opTemplates.downup(p);
 
 		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
-		treeTokens = new CommonTreeNodeStream(p);
 		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
 		envSize.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) envSize.downup(p);
@@ -223,7 +215,6 @@ public abstract class ParseStencil {
 		defaultSpecializers.function(p);
 		
 		//Add default packs where required
-		treeTokens = new CommonTreeNodeStream(p);
 		DefaultPack defaultPack = new DefaultPack(treeTokens);
 		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
 		defaultPack.downup(p);
@@ -231,13 +222,11 @@ public abstract class ParseStencil {
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		//Insert guide specializers
-		treeTokens = new CommonTreeNodeStream(p);
 		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
 		guideSpecailizers.setTreeAdaptor(TREE_ADAPTOR);
 		guideSpecailizers.downup(p);
 
 		//Distinguish between guide types
-		treeTokens = new CommonTreeNodeStream(p);
 		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
 		guideDistinguish.downup(p);
 		
@@ -253,17 +242,14 @@ public abstract class ParseStencil {
 		SetOperators set = new SetOperators(treeTokens, modules);
 		set.downup(p);
 		
-		treeTokens = new CommonTreeNodeStream(p);
 		GuideTransfer ag = new GuideTransfer(treeTokens, modules);
 		ag.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) ag.transform(p);
 		
-		treeTokens = new CommonTreeNodeStream(p);
 		GuideLiftGenerator gLiftSeed = new GuideLiftGenerator(treeTokens);
 		gLiftSeed.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) gLiftSeed.downup(p);
 
-		treeTokens = new CommonTreeNodeStream(p);
 		GuideDefaultRules gDefaultRules = new GuideDefaultRules(treeTokens);
 		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) gDefaultRules.downup(p);
@@ -286,19 +272,16 @@ public abstract class ParseStencil {
 
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 		
-		treeTokens = new CommonTreeNodeStream(p);
 		TupleRefChain trc = new TupleRefChain(treeTokens);
 		trc.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) trc.downup(p);
 
 		//Ensure that all tuple references have a frame reference
-		treeTokens = new CommonTreeNodeStream(p);
 		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
 		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) frameRefs.downup(p);
 		
 		//Numeralize all tuple references
-		treeTokens = new CommonTreeNodeStream(p);
 		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
 		numeralize.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) numeralize.downup(p);		
@@ -309,7 +292,6 @@ public abstract class ParseStencil {
 		p = (Program) envSize.downup(p);
 		
 		//Move all constant rules up to the defaults section so they are only evaluated once.
-		treeTokens = new CommonTreeNodeStream(p);
 		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
 		sharedLifter.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) sharedLifter.transform(p);

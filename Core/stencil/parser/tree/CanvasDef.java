@@ -30,12 +30,14 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.parser.string.StencilParser;
+
 public class CanvasDef extends StencilTree {
 	public static final String DEFAULT_SPECIALIZER = "[BACKGROUND_COLOR=\"white\"]";
 	
 	public CanvasDef(Token t) {super(t);}
 	
 	public String getName() {return token.getText();}
-	public Specializer getSpecializer() {return (Specializer) getChild(0);}
-	public List<Guide> getGuides() {return (List<Guide>) getChild(1);}
+	public Specializer getSpecializer() {return (Specializer) getFirstChildWithType(StencilParser.SPECIALIZER);}
+	public List<Guide> getGuides() {return (List<Guide>) getFirstChildWithType(StencilParser.LIST);}
 }
