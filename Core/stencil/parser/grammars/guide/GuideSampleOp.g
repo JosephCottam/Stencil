@@ -46,14 +46,14 @@ options {
 	import stencil.interpreter.guide.Samplers;
 	import java.util.Arrays;
 	import java.util.Collections;
-	import stencil.interpreter.guide.samplers.IdentitySampler;
+	import stencil.interpreter.guide.samplers.LayerSampler;
 }
 
 @members {
    public void setSummarySample(Guide g) {
 	   Program p = (Program) g.getAncestor(PROGRAM);
 	   Layer l = p.getLayer(g.getSelector().getLayer());
-	   g.setSampleOperator(new IdentitySampler(l));
+	   g.setSampleOperator(new LayerSampler(l));
    }
    
    public void setDirectSample(Guide g) {

@@ -38,4 +38,4 @@ public class MapTuple implements MutableTuple {
 	public void set(String field, Object value) {
 		map.put(field, value);		
 	}
-};
+}

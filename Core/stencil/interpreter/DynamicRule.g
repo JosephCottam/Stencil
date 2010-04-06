@@ -36,8 +36,6 @@ options {
 
 @header{
 	/** Converts a rule into a rule suitable for dynamic bindings.
-	 *
-	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
 	 **/
 
 	package stencil.interpreter;
@@ -59,10 +57,9 @@ options {
 	/**Cache of rules that the dynamic representation has already been constructed for.**/
 	private static Map<Rule, Rule> mapCache  = new HashMap<Rule, Rule>();
 	
-	/**Convert a rule to its dynamic for; this is the preferred method
-	  *for creating a dynamic rule.
-	  *
-	  *This method is memoized.
+	/** Convert a rule to its dynamic form. 
+	  * This method should be used instead of directly invoking topdown.
+	  * This method is memoized.
 	 **/
 	public static Rule toDynamic(Rule original) {
 		if (mapCache.containsKey(original)) {return mapCache.get(original);}
