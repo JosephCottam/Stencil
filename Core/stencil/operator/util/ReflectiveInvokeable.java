@@ -1,7 +1,6 @@
 package stencil.operator.util;
 
 import java.lang.reflect.*;
-
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -77,16 +76,18 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				args = new Object[method.getParameterTypes().length];
 
 				//Copy over fixed arguments
-				validateTypes(arguments, method.getParameterTypes(), 0, args.length-1);
+				validateTypes(arguments, method.getParameterTypes(), 0, args.length-1, args);
 
 				//Prepare variable argument for last position of arguments array
 				Class type = method.getParameterTypes()[method.getParameterTypes().length-1].getComponentType();
 				Object varArgs = Array.newInstance(type, (arguments.length-expectedNumArgs)+1);
-				System.arraycopy(arguments, args.length-1, varArgs, 0, Array.getLength(varArgs));
+				for (int i=0; i< Array.getLength(varArgs); i++) {
+					Array.set(varArgs, i, arguments[args.length +i-1]);
+				}				
 				args[args.length-1] = varArgs;
-				result = (R) method.invoke(target, args);
 			} else {
-				args = validateTypes(arguments, method.getParameterTypes(), 0, arguments.length);
+				args = new Object[arguments.length];
+				validateTypes(arguments, method.getParameterTypes(), 0, arguments.length, args);
 			}
 		} catch (Exception e) {
 			throw new MethodInvokeFailedException(String.format("Exception thrown peparing arguments to invoke '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(arguments)),e);
@@ -111,12 +112,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	 */
 	private void validateTypes(Object[] arguments, Class<?>[] types, int start, int end, Object result) {
 		for (int i=start; i< end; i++) {
-			if (arguments.getClass().isAssignableFrom(types[i])) {
-				Array.set(result, i, arguments[i]);
-			} else {
-				Array.set(result, i, Converter.convert(arguments[i], types[i]));
-			}
+			Array.set(result, i, Converter.convert(arguments[i], types[i]));
 		}
 	}
-	
 }

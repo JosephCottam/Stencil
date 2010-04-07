@@ -13,7 +13,7 @@ import stencil.tuple.Tuple;
 import static stencil.operator.module.util.OperatorData.*;
 
 import java.lang.reflect.*;
-
+ 
 public class TestModule implements Module {
 	private static final ModuleData MODULE_DATA = new ModuleData(instance(), "TestModule");
 	private static final TestModule instance = new TestModule();
