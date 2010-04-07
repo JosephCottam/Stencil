@@ -33,6 +33,6 @@ public final class ArrayTuple implements Tuple {
 	 * the internal state of the tuple, so modifications to the array are
 	 * reflected in the tuple.
 	 */
-	public Object[] getValues() {return values;}	
+	public Object[] getValues() {return values;}
 	public String toString() {return Tuples.toString(this, TuplePrototypes.defaultNames(size(), PREFIX));}
 }

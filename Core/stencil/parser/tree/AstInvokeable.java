@@ -25,8 +25,6 @@ public final class AstInvokeable extends StencilTree {
 	public Invokeable getInvokeable() {return inv;}
 
 	public Tuple invoke(Object[] args) {return inv.tupleInvoke(args);}
-	
-	public Tuple invoke(Object[] args, Tuple store) {return inv.tupleInvoke(args);}		
 
 	public AstInvokeable dupNode() {
 		AstInvokeable n = (AstInvokeable) super.dupNode();

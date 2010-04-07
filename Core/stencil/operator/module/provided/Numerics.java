@@ -40,6 +40,7 @@ import stencil.parser.tree.Specializer;
 import stencil.parser.tree.Range;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.types.Converter;
 
 public class Numerics extends BasicModule {
 
@@ -52,16 +53,15 @@ public class Numerics extends BasicModule {
  		
  		public FullSum(OperatorData opData) {super(opData);}
 		
- 		protected static double sum(Object... values) {
+ 		protected static double sum(double... values) {
  			double sum = 0;
- 			for (Object o: values) {
-				Double v = validate(o);
+ 			for (double v: values) {
 				sum = sum + v;
 			}
  			return sum;
  		}
  		
-		public Tuple map(Object... args) {
+		public Tuple map(double... args) {
 			sum += sum(args);
 			return new ArrayTuple(sum);
 		}
@@ -86,15 +86,14 @@ public class Numerics extends BasicModule {
  		public FullMin(OperatorData opData) {super(opData);}
 
  		
- 		protected static double min(Object... values) {
+ 		protected static double min(double... values) {
 			double min = Double.MAX_VALUE;
- 			for (Object o: values) {
-				Double v = validate(o);
+ 			for (double v: values) {
 				min = Math.min(min, v);
 			}
 			return min;
  		}
- 		public Tuple map(Object... values) {
+ 		public Tuple map(double... values) {
  			min = Math.min(min, min(values));
 			return new ArrayTuple(min);
 		}
@@ -117,16 +116,15 @@ public class Numerics extends BasicModule {
 
  		public FullMax(OperatorData opData) {super(opData);}
  		
- 		protected static double max(Object... values) {
+ 		protected static double max(double... values) {
  			double max = -Double.MAX_VALUE;
- 			for (Object o: values) {
-				Double v = validate(o);
+ 			for (double v: values) {
 				max = Math.max(max, v);
 			}
 			return max;
  		}
  		
-		public Tuple map(Object... values) {
+		public Tuple map(double... values) {
  			max = Math.max(max, max(values));
  			return new ArrayTuple(max);
 		}
@@ -142,48 +140,39 @@ public class Numerics extends BasicModule {
 	}
 
 
-	protected static double validate(Object d) {
-		if (d == null) {throw new IllegalArgumentException("Cannot use nulls in numerics functions.");}
-		if (String.class.isInstance(d)) {d = Double.parseDouble((String) d);}
-		if (!Number.class.isInstance(d)) {throw new IllegalArgumentException("Can only handle incomming number-derived classes (recieved " + d.getClass() + ").");}
-		return ((Number) d).doubleValue();
-	}
-
-	public static double add1(Object d) {return validate(d)+1;}
-	public static double sub1(Object d) {return validate(d)-1;}
+	public static double add1(double d) {return d+1;}
+	public static double sub1(double d) {return d-1;}
 
 
-	public static double abs(Object d) {return Math.abs(validate(d));}
-	public static double sum(Object...ds) {return FullSum.sum(ds);}
-	public static double add(Object d, Object d2) {return validate(d)+validate(d2);}
-	public static double sub(Object d, Object d2) {return validate(d)-validate(d2);}
-	public static double divide(Object d1, Object d2) {return validate(d1)/validate(d2);}
-	public static double mult(Object d1, Object d2) {return validate(d1)*validate(d2);}
-	public static double negate(Object d) {return -1 * validate(d);}
-	public static double mod(Object d1, Object d2) {return Math.round(validate(d1))%Math.round(validate(d2));}
-	public static double div(Object d1, Object d2) {return Math.round(validate(d1))/Math.round(validate(d2));}
+	public static double abs(double d) {return Math.abs(d);}
+	public static double sum(double...ds) {return FullSum.sum(ds);}
+	public static double add(double d, double d2) {return d+d2;}
+	public static double sub(double d, double d2) {return d-d2;}
+	public static double divide(double d1, double d2) {return d1/d2;}
+	public static double mult(double d1, double d2) {return d1*d2;}
+	public static double negate(double d) {return -1 * d;}
+	public static double mod(double d1, double d2) {return Math.round(d1)%Math.round(d2);}
+	public static double div(double d1, double d2) {return Math.round(d1)/Math.round(d2);}
 
-	public static double log(Object d1) {return  Math.log(validate(d1));}
-	public static double log10(Object d1) {return  Math.log10(validate(d1));}
+	public static double log(double d1) {return  Math.log(d1);}
+	public static double log10(double d1) {return  Math.log10(d1);}
 	
-	public static double max(Object... ds) {return FullMax.max(ds);}
-	public static double min(Object... ds) {return FullMin.min(ds);}
+	public static double max(double... ds) {return FullMax.max(ds);}
+	public static double min(double... ds) {return FullMin.min(ds);}
 
-	public static double floor(Object d1) {return Math.floor(validate(d1));}
-	public static double ceil(Object d1) {return Math.ceil(validate(d1));}
- 	public static double round(Object d1) {return Math.round(validate(d1));}
- 	public static double nearest(Object d1, Object d2) {
- 		long m = (long) validate(d1);
- 		long n = (long) validate(d2);
+	public static double floor(double d1) {return Math.floor(d1);}
+	public static double ceil(double d1) {return Math.ceil(d1);}
+ 	public static double round(double d1) {return Math.round(d1);}
+ 	public static double nearest(long m, long n) {
  		//Round m to the nearest multiple of n (per http://mindprod.com/jgloss/round.html)
  		long near = ( m + n/2 ) / n * n;
  		return near;
  	}
  	
- 	public static double asNumber(Object d) {return validate(d);}
+ 	public static Number asNumber(Object v) {return Converter.toNumber(v);}
 
- 	public static double sqrt(Object d) {return Math.sqrt(validate(d));}
- 	public static double pow(Object d1, Object d2) {return Math.pow(validate(d1), validate(d2));}
+ 	public static double sqrt(double d) {return Math.sqrt(d);}
+ 	public static double pow(double d1, double d2) {return Math.pow(d1, d2);}
  	
  	public Numerics(ModuleData md) {super(md);}
  	

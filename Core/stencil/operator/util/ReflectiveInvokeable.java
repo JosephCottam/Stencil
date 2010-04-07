@@ -77,36 +77,46 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				args = new Object[method.getParameterTypes().length];
 
 				//Copy over fixed arguments
-				for (int i=0; i< args.length-1; i++) {args[i] = arguments[i];}
+				validateTypes(arguments, method.getParameterTypes(), 0, args.length-1);
 
 				//Prepare variable argument for last position of arguments array
 				Class type = method.getParameterTypes()[method.getParameterTypes().length-1].getComponentType();
-				Object[] varArgs = (Object[]) java.lang.reflect.Array.newInstance(type, (arguments.length-expectedNumArgs)+1);
-				System.arraycopy(arguments, args.length-1, varArgs, 0, varArgs.length);
+				Object varArgs = Array.newInstance(type, (arguments.length-expectedNumArgs)+1);
+				System.arraycopy(arguments, args.length-1, varArgs, 0, Array.getLength(varArgs));
 				args[args.length-1] = varArgs;
 				result = (R) method.invoke(target, args);
 			} else {
-//				args = validateTypes(arguments, method.getParameterTypes());
-				args = arguments;
-				result = (R) method.invoke(target, args);
+				args = validateTypes(arguments, method.getParameterTypes(), 0, arguments.length);
 			}
+		} catch (Exception e) {
+			throw new MethodInvokeFailedException(String.format("Exception thrown peparing arguments to invoke '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(arguments)),e);
+		}
+			
+		try {
+			result = (R) method.invoke(target, args);
 		} catch (Exception e) {
 		 	throw new MethodInvokeFailedException(String.format("Exception thrown invoking '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(args)), e);
 		}
 		return result;
 	}
 	
-	private Object[] validateTypes(Object[] arguments, Class<?>[] types) {
-		Object[] results = new Object[arguments.length];
-		
-		for (int i=0; i< arguments.length; i++) {
+	/**Copies values from the arguments array to the result array, converting them per the type along the way.
+	 * It is assumed that arguments[i] will be converted to type[i] and put in results[i]
+	 * 
+	 * @param arguments  List of values to put into the results
+	 * @param types Types to convert to along the way. 
+	 * @param start Index to start converting at
+	 * @param end Index to end converting at
+	 * @param result Place to store results.
+	 */
+	private void validateTypes(Object[] arguments, Class<?>[] types, int start, int end, Object result) {
+		for (int i=start; i< end; i++) {
 			if (arguments.getClass().isAssignableFrom(types[i])) {
-				results[i] = arguments[i];
+				Array.set(result, i, arguments[i]);
 			} else {
-				results[i] = Converter.convert(arguments[i], types[i]);
+				Array.set(result, i, Converter.convert(arguments[i], types[i]));
 			}
 		}
-		return results;
 	}
 	
 }

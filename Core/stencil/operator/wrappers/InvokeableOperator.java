@@ -20,24 +20,24 @@ import stencil.util.collections.KeysetConstantMap;
  * TODO: Add support for duplicate.  Have the underlying
  * object of a facet support duplicate...
  */
-public final class InvokeablesLegend extends BasicProject {
+public final class InvokeableOperator extends BasicProject {
 	private final String name;
 	private final Map<String, ReflectiveInvokeable> facets;
 	
 	/**All facets are directed towards the same target (a common case for functional operators).*/
-	public InvokeablesLegend(String name, OperatorData opData, Invokeable target) {
+	public InvokeableOperator(String name, OperatorData opData, Invokeable target) {
 		this(name, opData, new KeysetConstantMap(opData.getFacetNames(), target));
 	}
 
 	
-	public InvokeablesLegend(String name, OperatorData opData, Map<String, ReflectiveInvokeable> facets) {
+	public InvokeableOperator(String name, OperatorData opData, Map<String, ReflectiveInvokeable> facets) {
 		super(opData);
 		this.name= name;
 		this.facets = facets;
 		verify();
 	}
 	
-	public InvokeablesLegend(String name, OperatorData opData, List<ReflectiveInvokeable> targets) {
+	public InvokeableOperator(String name, OperatorData opData, List<ReflectiveInvokeable> targets) {
 		super(opData);
 		this.name = name;
 		this.facets = new HashMap();
@@ -73,7 +73,7 @@ public final class InvokeablesLegend extends BasicProject {
 	
 	//TODO: Would it be better to see if all facets were functions as a quick-check?
 	//TODO: implement a more general duplicate
-	public InvokeablesLegend duplicate() {
+	public InvokeableOperator duplicate() {
 		boolean allStatic = true;
 		for (ReflectiveInvokeable i: facets.values()) {
 			if (!i.isStatic()) {allStatic = false; break;}
