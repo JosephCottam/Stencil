@@ -106,7 +106,9 @@ options {
 
 function
   : ^(f=FUNCTION ^(SPECIALIZER DEFAULT) args=. op=. target=.) 
-      -> ^(FUNCTION {getDefault($f.getText())} $args $op $target);
+      -> ^(FUNCTION {getDefault($f.getText())} $args $op $target)
+  | ^(f=FUNCTION inv=. ^(SPECIALIZER DEFAULT) args=. op=. target=.) 
+      -> ^(FUNCTION $inv {getDefault($f.getText())} $args $op $target);
 
 misc
   :   ^(OPERATOR_REFERENCE base=. ^(SPECIALIZER DEFAULT)) 

@@ -69,6 +69,8 @@ public abstract class RangeHelper implements StencilOperator {
 			super(helper, base);
 		}
 		
+		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
+
 		public Tuple invoke(Object[] args) {
 			Object[] formals = helper.getCache();
 			return (Tuple) base.invoke(formals);
@@ -80,7 +82,9 @@ public abstract class RangeHelper implements StencilOperator {
 		public RangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
 			super(helper, base);
 		}
-		
+
+		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
+
 		public Tuple invoke(Object[] args) {
 			Object[] formals = helper.updateCache(args);
 			return (Tuple) base.invoke(formals);

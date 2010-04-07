@@ -73,8 +73,8 @@ options {
 		List<Tuple> sample, projection, pairs, results;
 		
 		if (seedOp instanceof LayerSampler.SeedOperator) {
-      sample = g.getSampleOperator().sample(null, details);
-      projection = sample;
+            sample = g.getSampleOperator().sample(null, details);
+            projection = sample;
 		} else {
 			SampleSeed seed = seedOp.getSeed();
 		

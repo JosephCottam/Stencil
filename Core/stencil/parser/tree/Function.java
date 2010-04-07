@@ -31,10 +31,8 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 
-import stencil.operator.StencilOperator;
-import stencil.operator.util.Invokeable;
 import stencil.tuple.Tuple;
-
+import stencil.parser.string.StencilParser;
 
 public class Function extends CallTarget {
 	private static final class FunctionApplicationException extends RuntimeException {
@@ -43,17 +41,22 @@ public class Function extends CallTarget {
 		}
 	}
 
-	protected Invokeable invokeable;
-	protected StencilOperator operator;
-		
 	public Function(Token source) {super(source);}
 	
 	public String getName() {return token.getText();}
-	public Specializer getSpecializer() {return (Specializer) getChild(0);}
-	public List<Value> getArguments() {return (List<Value>) getChild(1);}
+	public Specializer getSpecializer() {return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);}
+	public List<Value> getArguments() {return (List<Value>) getFirstChildWithType(StencilParser.LIST);}
+	public AstInvokeable getTarget() {return (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
+	public CallTarget getCall() {
+		CallTarget target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+		if (target == null) {
+			target = (Pack) getFirstChildWithType(StencilParser.PACK);
+		}
+		return target;
+	}
+
 	public boolean isTerminal() {return false;}
 
-	public CallTarget getCall() {return (CallTarget) getChild(3);}
 
 	/**
 	 * Invokes the current function, and return the result.
@@ -65,56 +68,8 @@ public class Function extends CallTarget {
 	public Tuple apply(Tuple valueSource) throws Exception {
 		try {
 			Object[] formals = TupleRef.resolveAll(getArguments(), valueSource);
-			Tuple results = (Tuple) getInvokeable().invoke(formals);
+			Tuple results = getTarget().invoke(formals);
 			return results;
  		} catch (Exception e) {throw new FunctionApplicationException(this, valueSource, e);} 		
-	}
-
-	
-	public Invokeable getInvokeable() {return invokeable;}
-	public StencilOperator getOperator() {return operator;}
-
-	/**Sets the invokeable for this function.  This will also
-	 * set the associate operator since the invokeable comes from
-	 * the operator.
-	 * 
-	 * @param operator
-	 * @param facet
-	 */
-	public void setInvokeable(StencilOperator operator, String facet) {
-		this.operator = operator;
-		this.invokeable = operator.getFacet(facet);
-	}
-	
-	
-	/**Copy operator/invokeable from one function to another.
-	 * This method DOES NOT check that the operator is the target for the 
-	 * invokeable;  the preferred method to set invokeables is through setInvokeable(StencilOperator, String)
-	 * however this method is convenient when manipulating trees.
-	 * @param operator
-	 * @param invokeable
-	 */
-	public void setInvokeable(StencilOperator operator, Invokeable invokeable) {
-		this.operator = operator;
-		this.invokeable = invokeable;
-	}
-	
-
-	public Function dupNode() {
-		Function f = (Function) super.dupNode();
-		f.invokeable = invokeable;
-		f.operator = operator;
-		return f;
-	}
-	
-	/**
-	 * Star after the name indicates no invokeable set.
-	 * Plus after the name indicates no operator set.
-	 */
-	public String toString() {
-		String s = super.toString();
-		if (invokeable == null) {return s + "*";}
-		if (operator == null) {return s + "+";}
-		return s;
 	}
 }

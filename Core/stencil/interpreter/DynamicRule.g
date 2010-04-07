@@ -42,7 +42,8 @@ options {
 		
 	import stencil.util.MultiPartName;
 	import stencil.parser.tree.Function;
-	import stencil.parser.tree.StencilTreeAdapter;
+    import stencil.parser.tree.StencilTreeAdapter;
+    import stencil.parser.tree.AstInvokeable;
 	import stencil.parser.tree.Rule;
 	import static stencil.parser.ParserConstants.QUERY_FACET;
 
@@ -80,6 +81,9 @@ options {
 }
 
 topdown 
-  @after{((Function) retval.tree).setInvokeable(((Function) f).getOperator(), QUERY_FACET);}
-	:^(f=FUNCTION spec=. args=. yield=. target=.) -> ^(FUNCTION[queryName($f.getText())] $spec $args $yield $target);
+  @after{
+    AstInvokeable inv=((Function) $topdown.tree).getTarget();
+    inv.changeFacet(QUERY_FACET);
+  }
+  : ^(f=FUNCTION i=AST_INVOKEABLE spec=. args=. yield=. target=.) -> ^(FUNCTION[queryName($f.getText())] $i $spec $args $yield $target);
 

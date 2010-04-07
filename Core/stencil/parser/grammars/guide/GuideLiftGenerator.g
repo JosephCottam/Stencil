@@ -54,7 +54,7 @@ topdown
   @after{
     Guide g = (Guide) retval.tree.getChild(0);
     if (seed != null) {
-       g.setSeedOperator(((Function) seed).getInvokeable());
+       g.setSeedOperator(((Function) seed).getTarget().getInvokeable());
     } else {
        String layerName = g.getSelector().getLayer();
        Layer layer = ((Program) g.getAncestor(PROGRAM)).getLayer(layerName);
@@ -65,7 +65,7 @@ topdown
 
   : ^(GUIDE_DIRECT ^(GUIDE type=. spec=. selector=. actions=.
         ^(RULE target=.
-           ^(CALL_CHAIN ^(seed=FUNCTION s=. a=. y=. c=.))) query=.))        
+           ^(CALL_CHAIN ^(seed=FUNCTION i=. s=. a=. y=. c=. ))) query=.))        
      -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query))
   | ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. seeder=. query=.))
      -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $seeder) $query));
@@ -78,7 +78,7 @@ retarget
       -> ^(RETURN ^(TUPLE_PROTOTYPE $p ^(TUPLE_FIELD_DEF STRING["Input"] STRING["DEFAULT"])));
       
 repack
-  : ^(FUNCTION . . . repack)
+  : ^(FUNCTION (options {greedy=false;} :.)* repack)
   | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID["**stream**"] ^(TUPLE_REF NUMBER["0"])));
   //TODO: Is there a better way to reference to root source?  **stream** is a little obscure...
   //HACK: Only works if there is only one input

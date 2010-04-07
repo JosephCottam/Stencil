@@ -36,12 +36,11 @@ options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
 	filter = true;
+	output = AST;
 }
 
 @header {
 	/** Annotate function call tree nodes with Invokeable objects. 
-	 *
-	 *
 	 **/
 	 
 
@@ -54,6 +53,7 @@ options {
     import stencil.parser.tree.Function;
     import stencil.parser.tree.Specializer;
     import stencil.parser.tree.StencilTree;
+    import stencil.parser.tree.AstInvokeable;
     import stencil.util.*;
 
 }
@@ -66,22 +66,28 @@ options {
 		this.modules = modules;
 	}
 	
-  	public void setOperator(Function func) {
-  	  if (func.getOperator() != null) {return;}
-  	  
-    	try {
-    		MultiPartName name = new MultiPartName(func.getName());
+    public AstInvokeable makeInvokeable(Tree t) {
+    	Function func = (Function) t;
+  		StencilOperator op;
+   		MultiPartName name = new MultiPartName(func.getName());
+  		
+  		try {
     		Specializer s = func.getSpecializer();
-
-        StencilOperator op = modules.instance(name.prefixedName(), s);
-        func.setInvokeable(op, name.getSuffix());
+            op = modules.instance(name.prefixedName(), s);
     	} catch (Exception e) {
-    		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getName()); //TODO: Add line number report...tree.getLine() doesn't work!
+    		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getName()); //TODO: Add path to the point of error...
     		throw new RuntimeException(message, e);
     	}
+    	
+       AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
+       inv.setOperator(op);
+       inv.setInvokeable(op.getFacet(name.getSuffix()));
+       return inv;
     }
 }
 
-topdown: ^(f=FUNCTION .*) {setOperator((Function) $f);};
+topdown 
+  : (FUNCTION AST_INVOKEABLE ) => ^(f=FUNCTION AST_INVOKEABLE .*) 
+  | ^(f=FUNCTION spec=. args=. yield=. pack=.) -> ^(FUNCTION {makeInvokeable($f)} $spec $args $yield $pack);
 
 

@@ -49,6 +49,6 @@ topdown: ^(c=CALL_CHAIN ct=callTarget[0] .?) //Will accept a call chain with or 
 
 callTarget[int d] returns [int depth]
 	@init {$depth = d;}
-	: ^(FUNCTION   (options {greedy=false;} :.)* ct=callTarget[d+1] {$depth = $ct.depth;})
+	: ^(FUNCTION (options {greedy=false;} :.)* ct=callTarget[d+1] {$depth = $ct.depth;})
 	| ^(PACK .*);
-          
+ 

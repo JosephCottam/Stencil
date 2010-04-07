@@ -8,6 +8,7 @@ import stencil.parser.tree.Id;
 import stencil.parser.tree.StencilString;
 import stencil.parser.tree.TupleRef;
 import stencil.tuple.ArrayTuple;
+import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
 import stencil.util.ConversionException;
 import stencil.util.enums.ValueEnum;
@@ -27,10 +28,18 @@ public final class Converter {
 
 	public static Tuple toTuple(Object value) {
 		if (value instanceof Tuple) {return (Tuple) value;}
-		if (WRAPPER_FOR.containsKey(value.getClass())) {
-			TypeWrapper w = WRAPPER_FOR.get(value.getClass());
+		
+		Class clazz = value.getClass();
+		
+		if (clazz.isArray()) {return new ArrayTuple(value);}
+
+		if (WRAPPER_FOR.containsKey(clazz)) {
+			TypeWrapper w = WRAPPER_FOR.get(clazz);
 			return w.toTuple(value);
 		}
+		
+		if (Number.class.isAssignableFrom(clazz)) {return new NumericSingleton((Number) value);}
+		
 		return new ArrayTuple(value);
 	}
 	

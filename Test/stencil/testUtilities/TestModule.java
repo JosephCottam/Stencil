@@ -5,7 +5,7 @@ import stencil.operator.module.*;
 import stencil.operator.module.util.*;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
-import stencil.operator.wrappers.InvokeablesLegend;
+import stencil.operator.wrappers.InvokeableOperator;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
@@ -47,7 +47,7 @@ public class TestModule implements Module {
 				Method m = Filter.class.getMethod("doFilter", String.class);
 				Invokeable inv = new ReflectiveInvokeable(m, null);
 				OperatorData od = getOperatorData(name, specializer);
-				return new InvokeablesLegend(name,  od, inv);
+				return new InvokeableOperator(name,  od, inv);
 			}
 		} catch (Exception e) {throw new RuntimeException(e);}
 		throw new RuntimeException("No such legend " + name);

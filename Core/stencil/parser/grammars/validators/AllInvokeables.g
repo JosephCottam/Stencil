@@ -56,18 +56,11 @@ options {
   	}
   }  
 
-
-  private void validate(Function f) {
-      if (f.getInvokeable() == null) {throw new OperatorMissingException(f.getName());}
-  }
-  
   private void validate(AstInvokeable i) {
       if (i.getInvokeable() == null) {throw new OperatorMissingException("AST Invokeable.");}
   }
 }
 
-topdown 
-  : f = FUNCTION {validate((Function) f);}
-  | i = AST_INVOKEABLE {validate((AstInvokeable) i);};
+topdown: i = AST_INVOKEABLE {validate((AstInvokeable) i);};
   
   

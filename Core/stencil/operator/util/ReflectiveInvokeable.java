@@ -2,6 +2,7 @@ package stencil.operator.util;
 
 import java.lang.reflect.*;
 
+import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 
@@ -49,6 +50,13 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public T getTarget() {return target;}
 	public Method getMethod() {return method;}
 	
+	
+	public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {
+		R result = invoke(arguments);
+		Tuple t=null;
+		if (result != null) {t=Converter.toTuple(result);}
+		return t;
+	}
 	
 	/* (non-Javadoc)
 	 * @see stencil.operator.util.Invokeable#invoke(java.lang.Object[])

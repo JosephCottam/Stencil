@@ -88,7 +88,7 @@ public class TestFragments extends TestCase {
 
 			public boolean check(Tree t) {
 				if (t instanceof Function) {
-					return ((Function) t).getOperator() != null;
+					return ((Function) t).getTarget().getOperator() != null;
 				}
 				return true;
 			}

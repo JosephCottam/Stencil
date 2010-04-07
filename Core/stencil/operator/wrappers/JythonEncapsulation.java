@@ -85,19 +85,12 @@ public final class JythonEncapsulation {
 	
 			TuplePrototype returns = getReturns();
 			int returnCount = returns.size();
-			if (returnCount == 1) {
-				String name = returns.get(0).getFieldName();
-				return new PrototypedTuple(getReturns(), Arrays.asList(new Object[]{pyToJava(environment.get(name))}));
-			} else if (returnCount >1) {
-				Object[] vals = new Object[returnCount];
-				for (int i=0; i< returnCount; i++) {
-					String name = returns.get(i).getFieldName();
-					vals[i] = pyToJava(environment.get(name));
-				}
-				return new PrototypedTuple(getReturns(), Arrays.asList(vals));
-			} else {
-				throw new RuntimeException("Zero return value python encapuslation not supported.");
+			Object[] vals = new Object[returnCount];
+			for (int i=0; i< returnCount; i++) {
+				String name = returns.get(i).getFieldName();
+				vals[i] = pyToJava(environment.get(name));
 			}
+			return new PrototypedTuple(returns, Arrays.asList(vals));
 		}
 	}
 

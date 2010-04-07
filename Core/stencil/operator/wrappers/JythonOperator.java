@@ -11,6 +11,7 @@ import stencil.tuple.prototype.TuplePrototypes;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
 import stencil.operator.module.util.*;
+import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.PythonFacet;
 
@@ -19,13 +20,13 @@ import stencil.parser.tree.PythonFacet;
 public class JythonOperator implements StencilOperator {
 	protected String operatorName;
 	protected String module;
-	protected Map<String, ReflectiveInvokeable<JythonEncapsulation, Tuple>> invokeables;
+	protected Map<String, Invokeable<Tuple>> invokeables;
 	protected OperatorData operatorData;
 	
 	public JythonOperator(String module, String name) {
 		this.module = module;
 		this.operatorName = name;
-		invokeables = new HashMap<String, ReflectiveInvokeable<JythonEncapsulation, Tuple>>();
+		invokeables = new HashMap<String, Invokeable<Tuple>>();
 		operatorData = new OperatorData(module, name, SIMPLE_SPECIALIZER);
 	}
 		
@@ -53,7 +54,7 @@ public class JythonOperator implements StencilOperator {
 		operatorData.addFacet(data);		
 	}
 
-	public ReflectiveInvokeable<JythonEncapsulation, Tuple> getFacet(String name) throws IllegalArgumentException {
+	public Invokeable<Tuple> getFacet(String name) throws IllegalArgumentException {
 		if (invokeables.containsKey(name)) {return invokeables.get(name);}
 		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in legend %2$s", name, operatorName));
 	}

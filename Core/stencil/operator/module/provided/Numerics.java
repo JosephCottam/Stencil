@@ -149,41 +149,41 @@ public class Numerics extends BasicModule {
 		return ((Number) d).doubleValue();
 	}
 
-	public static Tuple add1(Object d) {return new ArrayTuple(validate(d)+1);}
-	public static Tuple sub1(Object d) {return new ArrayTuple(validate(d)-1);}
+	public static double add1(Object d) {return validate(d)+1;}
+	public static double sub1(Object d) {return validate(d)-1;}
 
 
-	public static Tuple abs(Object d) {return new ArrayTuple(Math.abs(validate(d)));}
-	public static Tuple sum(Object...ds) {return new ArrayTuple(FullSum.sum(ds));}
-	public static Tuple add(Object d, Object d2) {return new ArrayTuple(validate(d)+validate(d2));}
-	public static Tuple sub(Object d, Object d2) {return new ArrayTuple(validate(d)-validate(d2));}
-	public static Tuple divide(Object d1, Object d2) {return new ArrayTuple(validate(d1)/validate(d2));}
-	public static Tuple mult(Object d1, Object d2) {return new ArrayTuple(validate(d1)*validate(d2));}
-	public static Tuple negate(Object d) {return new ArrayTuple(-1 * validate(d));}
-	public static Tuple mod(Object d1, Object d2) {return new ArrayTuple(Math.round(validate(d1))%Math.round(validate(d2)));}
-	public static Tuple div(Object d1, Object d2) {return new ArrayTuple(Math.round(validate(d1))/Math.round(validate(d2)));}
+	public static double abs(Object d) {return Math.abs(validate(d));}
+	public static double sum(Object...ds) {return FullSum.sum(ds);}
+	public static double add(Object d, Object d2) {return validate(d)+validate(d2);}
+	public static double sub(Object d, Object d2) {return validate(d)-validate(d2);}
+	public static double divide(Object d1, Object d2) {return validate(d1)/validate(d2);}
+	public static double mult(Object d1, Object d2) {return validate(d1)*validate(d2);}
+	public static double negate(Object d) {return -1 * validate(d);}
+	public static double mod(Object d1, Object d2) {return Math.round(validate(d1))%Math.round(validate(d2));}
+	public static double div(Object d1, Object d2) {return Math.round(validate(d1))/Math.round(validate(d2));}
 
-	public static Tuple log(Object d1) {return  new ArrayTuple(Math.log(validate(d1)));}
-	public static Tuple log10(Object d1) {return  new ArrayTuple(Math.log10(validate(d1)));}
+	public static double log(Object d1) {return  Math.log(validate(d1));}
+	public static double log10(Object d1) {return  Math.log10(validate(d1));}
 	
-	public static Tuple max(Object... ds) {return new ArrayTuple(FullMax.max(ds));}
-	public static Tuple min(Object... ds) {return new ArrayTuple(FullMin.min(ds));}
+	public static double max(Object... ds) {return FullMax.max(ds);}
+	public static double min(Object... ds) {return FullMin.min(ds);}
 
-	public static Tuple floor(Object d1) {return new ArrayTuple(Math.floor(validate(d1)));}
-	public static Tuple ceil(Object d1) {return new ArrayTuple(Math.ceil(validate(d1)));}
- 	public static Tuple round(Object d1) {return new ArrayTuple(Math.round(validate(d1)));}
- 	public static Tuple nearest(Object d1, Object d2) {
+	public static double floor(Object d1) {return Math.floor(validate(d1));}
+	public static double ceil(Object d1) {return Math.ceil(validate(d1));}
+ 	public static double round(Object d1) {return Math.round(validate(d1));}
+ 	public static double nearest(Object d1, Object d2) {
  		long m = (long) validate(d1);
  		long n = (long) validate(d2);
  		//Round m to the nearest multiple of n (per http://mindprod.com/jgloss/round.html)
  		long near = ( m + n/2 ) / n * n;
- 		return new ArrayTuple(near);
+ 		return near;
  	}
  	
- 	public static Tuple asNumber(Object d) {return new ArrayTuple(validate(d));}
+ 	public static double asNumber(Object d) {return validate(d);}
 
- 	public static Tuple sqrt(Object d) {return new ArrayTuple(Math.sqrt(validate(d)));}
- 	public static Tuple pow(Object d1, Object d2) {return new ArrayTuple(Math.pow(validate(d1), validate(d2)));}
+ 	public static double sqrt(Object d) {return Math.sqrt(validate(d));}
+ 	public static double pow(Object d1, Object d2) {return Math.pow(validate(d1), validate(d2));}
  	
  	public Numerics(ModuleData md) {super(md);}
  	

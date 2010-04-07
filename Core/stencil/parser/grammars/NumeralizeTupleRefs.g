@@ -118,7 +118,7 @@ predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p
 action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION s=. ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  : ^(f=FUNCTION (options {greedy=false;} :.)* ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(PACK value[env]+);    
       
 value[EnvironmentProxy env]

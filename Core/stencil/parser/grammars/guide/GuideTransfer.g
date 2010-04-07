@@ -204,14 +204,14 @@ foldQuery: ^(GUIDE_QUERY qc=foldQueryChain) -> {toCompactList($qc.tree)};
 foldQueryChain
   @after{
      if ($f != null) {
-       StencilOperator op =((Function) f).getOperator();
+       StencilOperator op =((Function) f).getTarget().getOperator();
        if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
           Invokeable inv = op.getFacet(StencilOperator.STATE_FACET);
           ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setInvokeable(inv);
        }
     }
   }
-  : ^(f=FUNCTION . . . foldQueryChain) -> ^(AST_INVOKEABLE[$f.text] foldQueryChain)
+  : ^(f=FUNCTION (options {greedy=false;} :.)* foldQueryChain) -> ^(AST_INVOKEABLE[$f.text] foldQueryChain)
   | ^(PACK .*) -> ^(PACK);
 	
 
@@ -227,5 +227,8 @@ trimGuide
 //Pick the 'guide'-related function instead of whatever else
 //was selected for each function
 renameMappingsDown
-   @after{((Function) $renameMappingsDown.tree).setInvokeable(((Function) f).getOperator(), QUERY_FACET);}
-   : ^(f=FUNCTION spec=. args=. style=. c=.) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[guideName($f.text)] $spec $args $style $c);
+   @after{
+     Function func = ((Function) $renameMappingsDown.tree);
+     func.getTarget().changeFacet(QUERY_FACET);
+   }
+   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[guideName($f.text)] $i $spec $args $style $c);

@@ -79,6 +79,7 @@ public abstract class SplitHelper implements StencilOperator {
 			this.facet = facet;
 		}
 		
+		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
 		public Tuple invoke(Object[] arguments)
 				throws MethodInvokeFailedException {
 			return helper.doSplit(facet, arguments);

@@ -38,7 +38,7 @@ import java.util.List;
 import stencil.operator.StencilOperator;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
-import stencil.operator.wrappers.InvokeablesLegend;
+import stencil.operator.wrappers.InvokeableOperator;
 import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
 
@@ -125,11 +125,10 @@ public final class Modules {
 		for (Method m: source.getMethods()) {
 			if (!Modifier.isPublic(m.getModifiers())) {continue;}
 			if (!Modifier.isStatic(m.getModifiers())) {continue;}
-			if (!Tuple.class.isAssignableFrom(m.getReturnType())) {continue;}
 
 			if (target.equals(m.getName().toUpperCase())) {
 				Invokeable inv = new ReflectiveInvokeable(m);
-				return new InvokeablesLegend(name, operatorData, inv);
+				return new InvokeableOperator(name, operatorData, inv);
 			}
 		}
 	

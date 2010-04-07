@@ -30,6 +30,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 
@@ -42,10 +43,16 @@ import stencil.tuple.Tuple;
 public class CallChain extends StencilTree {
 	public CallChain(Token source) {super(source);}
 
-	public CallTarget getStart() {return (CallTarget) getChild(0);}
+	public CallTarget getStart() {
+		CallTarget target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+		if (target == null) {
+			target = (Pack) getFirstChildWithType(StencilParser.PACK);
+		}
+		return target;
+	}
 	
 	/**How long is this call chain?*/
-	public int getDepth() {return Integer.parseInt(getChild(1).getText());}
+	public int getDepth() {return ((StencilNumber) getFirstChildWithType(StencilParser.NUMBER)).getNumber().intValue();}
 	
 	
 	/**Execute the call chain, all the way through the pack.

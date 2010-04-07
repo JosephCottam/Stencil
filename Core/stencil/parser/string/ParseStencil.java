@@ -240,22 +240,25 @@ public abstract class ParseStencil {
 		
 		//Prime tree nodes with operators from the modules cache
 		SetOperators set = new SetOperators(treeTokens, modules);
+		set.setTreeAdaptor(TREE_ADAPTOR);
 		set.downup(p);
 		
 		GuideTransfer ag = new GuideTransfer(treeTokens, modules);
 		ag.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) ag.transform(p);
 		
-		GuideLiftGenerator gLiftSeed = new GuideLiftGenerator(treeTokens);
-		gLiftSeed.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) gLiftSeed.downup(p);
+		GuideLiftGenerator gLiftGenerator = new GuideLiftGenerator(treeTokens);
+		gLiftGenerator.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) gLiftGenerator.downup(p);
 
 		GuideDefaultRules gDefaultRules = new GuideDefaultRules(treeTokens);
 		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) gDefaultRules.downup(p);
 
 		defaultSpecializers.function(p);
+
 		SetOperators set2 = new SetOperators(treeTokens, modules);
+		set2.setTreeAdaptor(TREE_ADAPTOR);
 		set2.downup(p);
 
 		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
