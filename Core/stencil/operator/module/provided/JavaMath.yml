@@ -1,0 +1,46 @@
+name: JavaMath
+targetClass: java.lang.Math
+description: Math functions taken from java.lang.Math directly.
+
+defaults:
+  defaultSpecializer: !spec "[n .. n]"
+  facets:
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}
+
+operators:
+   - name: Abs
+   - name: ACos
+   - name: ASin
+   - name: ATan
+   - name: ATan2
+   - name: Cbrt
+   - name: Ceil
+   - name: Cos
+   - name: Cosh 
+   - name: Exp
+   - name: Expm1
+   - name: Floor
+   - name: Hypot
+   - name: IEEERemainder
+   - name: Log
+   - name: Log10
+   - name: Log1p
+   - name: Negate
+   - name: Max
+   - name: Min
+   - name: Pow
+   - name: Round
+   - name: Random
+     facets:
+       - {name: map, type: OPAQUE, function: FALSE, prototype: !proto "VALUE"}
+       - {name: query, type: OPAQUE, function: FALSE, prototype: !proto "VALUE"}
+   - name: Signum
+   - name: Sin
+   - name: Sinh
+   - name: Sqrt
+   - name: Tan
+   - name: Tanh
+   - name: ToRadians
+   - name: ToDegrees
+   - name: Ulp

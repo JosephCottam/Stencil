@@ -40,7 +40,6 @@ import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.operator.wrappers.InvokeableOperator;
 import stencil.parser.ParserConstants;
-import stencil.tuple.Tuple;
 
 import static stencil.operator.module.util.OperatorData.TYPE_PROJECT;
 

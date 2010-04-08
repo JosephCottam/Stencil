@@ -33,10 +33,17 @@ public final class ModuleData {
 
 	public void setModule(Module module) {this.module = module;}
 	public Module getModule() throws Exception {
-		if (module == null) {
-			module = (Module) Class.forName(clazz).getConstructor(ModuleData.class).newInstance(this);
-		}
+		if (module == null) {createModule();}
 		return module;
+	}
+	
+	private void createModule() throws Exception {
+		Class c = Class.forName(clazz);
+		if (Module.class.isAssignableFrom(c)) {
+			module = (Module) Class.forName(clazz).getConstructor(ModuleData.class).newInstance(this);			
+		} else {
+			module = new SyntheticModule(this);
+		}
 	}
 	
 	public void setTargetClass(String clazz) {this.clazz = clazz;}
