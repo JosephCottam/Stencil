@@ -1,6 +1,7 @@
 package stencil.operator.util;
 
 import java.lang.reflect.*;
+
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -12,17 +13,19 @@ import stencil.types.Converter;
 //final because it is immutable
 public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	/**Method to be invoked.*/
-	private Method method;
+	private final Method method;
+	
 	/**Object to invoke method on, null for static methods.*/
-	private T target;
+	private final T target;
+
+	//Cache objects common allocated/referenced while invoking but never materially changing
+	private final Class[] paramTypes;
+	private final Object[] args;
 	
 	public ReflectiveInvokeable(Method method) {this(method, null);}
-	public ReflectiveInvokeable(Method method, T target) {initialize(method, target);}
-	public ReflectiveInvokeable(String method, Class target) {initialize(findMethod(method, target), null);}
-	public ReflectiveInvokeable(String method, T target) {initialize(findMethod(method, target.getClass()), target);}
-
-	
-	private void initialize(Method method, T target) {
+	public ReflectiveInvokeable(String method, Class target) {this(findMethod(method, target), null);}
+	public ReflectiveInvokeable(String method, T target) {this(findMethod(method, target.getClass()), target);}
+	public ReflectiveInvokeable(Method method, T target) {
 		if (Modifier.isStatic(method.getModifiers()) && target != null) {
 			throw new IllegalArgumentException("Cannot supply a target for static methods.");
 		}
@@ -33,10 +36,12 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		
 		this.method = method;
 		this.target =target;
+		paramTypes = method.getParameterTypes();
+		args = new Object[paramTypes.length];
 	}
 
 	//Find the method amidst the class
-	private Method findMethod(String methodName, Class clss) {
+	private static Method findMethod(String methodName, Class clss) {
 		for (Method m: clss.getMethods()) {
 			if (m.getName().equals(methodName)) {return m;}
 		}
@@ -61,33 +66,32 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	 * @see stencil.operator.util.Invokeable#invoke(java.lang.Object[])
 	 */
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
-		int expectedNumArgs = method.getParameterTypes().length;
+		int expectedNumArgs = paramTypes.length;
+		boolean isVarArgs =method.isVarArgs();
 		R result;
 
-		if ((arguments.length != expectedNumArgs && !method.isVarArgs()) ||
-			(arguments.length < expectedNumArgs &&
-					(arguments.length == expectedNumArgs -1 && !method.isVarArgs()))) {
-			throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking %1$s (expected %2$s; received: %3$s).", method.getName(), expectedNumArgs, arguments.length));
-		}
-
-		Object[] args = null;
 		try {
-			if (method.isVarArgs()) {
-				args = new Object[method.getParameterTypes().length];
+			if (isVarArgs) {
+				if (!(arguments.length > expectedNumArgs-1)) {
+					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking varArgs method %1$s (expected at least %2$s; received: %3$s).", method.getName(), expectedNumArgs-1, arguments.length));
+				}
 
 				//Copy over fixed arguments
-				validateTypes(arguments, method.getParameterTypes(), 0, args.length-1, args);
+				validateTypes(arguments, paramTypes, 0, args.length-1, args);
 
 				//Prepare variable argument for last position of arguments array
-				Class type = method.getParameterTypes()[method.getParameterTypes().length-1].getComponentType();
+				Class type = paramTypes[paramTypes.length-1].getComponentType();
 				Object varArgs = Array.newInstance(type, (arguments.length-expectedNumArgs)+1);
 				for (int i=0; i< Array.getLength(varArgs); i++) {
-					Array.set(varArgs, i, arguments[args.length +i-1]);
+					Array.set(varArgs, i, Converter.convert(arguments[args.length +i-1], type));
 				}				
 				args[args.length-1] = varArgs;
 			} else {
-				args = new Object[arguments.length];
-				validateTypes(arguments, method.getParameterTypes(), 0, arguments.length, args);
+				if (arguments.length != expectedNumArgs) {
+					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking %1$s (expected %2$s; received: %3$s).", method.getName(), expectedNumArgs, arguments.length));
+				}
+
+				validateTypes(arguments, paramTypes, 0, arguments.length, args);
 			}
 		} catch (Exception e) {
 			throw new MethodInvokeFailedException(String.format("Exception thrown peparing arguments to invoke '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(arguments)),e);

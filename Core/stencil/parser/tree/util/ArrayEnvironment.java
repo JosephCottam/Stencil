@@ -37,26 +37,18 @@ import stencil.tuple.prototype.TuplePrototypes;
 
 final class ArrayEnvironment extends Environment {
 	private static final String FRAME_PREFIX = "Frame";
-	private final TuplePrototype prototype;
 	private final Tuple[] frames;
 	private int size = 0;
 	
 	
 	private ArrayEnvironment(int capacity) {
 		frames = new Tuple[capacity];
-		prototype = new SimplePrototype(TuplePrototypes.defaultNames(frames.length,FRAME_PREFIX));
 	}
 	
-	/* (non-Javadoc)
-	 * @see stencil.parser.tree.util.Environment#setFrame(int, stencil.tuple.Tuple)
-	 */
 	public void setFrame(int frame, Tuple t) {
 		frames[frame]=t;
 	}
 	
-	/* (non-Javadoc)
-	 * @see stencil.parser.tree.util.Environment#extend(stencil.tuple.Tuple)
-	 */
 	public ArrayEnvironment extend(Tuple t) {
 		if (size >= frames.length) {throw new RuntimeException("Attempt to over-extend environment (max env size of " + frames.length + ")." );}
 		
@@ -70,7 +62,7 @@ final class ArrayEnvironment extends Environment {
 		catch (Exception e) {throw new RuntimeException("Error de-referencing environment of size " + frames.length, e);}
 	}
 
-	public TuplePrototype getPrototype() {return prototype;}
+	public TuplePrototype getPrototype() {return new SimplePrototype(TuplePrototypes.defaultNames(frames.length,FRAME_PREFIX));}
 	public Object get(String name) throws InvalidNameException {
 		String part = name.substring(FRAME_PREFIX.length());
 		int i;
