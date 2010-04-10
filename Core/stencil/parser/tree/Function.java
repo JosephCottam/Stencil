@@ -35,6 +35,11 @@ import stencil.tuple.Tuple;
 import stencil.parser.string.StencilParser;
 
 public class Function extends CallTarget {
+	private Specializer spec;
+	private List<Value> args;
+	private AstInvokeable target;
+	private CallTarget call;
+	
 	private static final class FunctionApplicationException extends RuntimeException {
 		public FunctionApplicationException(Function f, Tuple t, Exception e) {
 			super(String.format("Error applying function %1$s with tuple %2$s.", f.getName(), t.toString()), e);
@@ -44,15 +49,29 @@ public class Function extends CallTarget {
 	public Function(Token source) {super(source);}
 	
 	public String getName() {return token.getText();}
-	public Specializer getSpecializer() {return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);}
-	public List<Value> getArguments() {return (List<Value>) getFirstChildWithType(StencilParser.LIST);}
-	public AstInvokeable getTarget() {return (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
-	public CallTarget getCall() {
-		CallTarget target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
-		if (target == null) {
-			target = (Pack) getFirstChildWithType(StencilParser.PACK);
-		}
+	
+	public Specializer getSpecializer() {
+		if (spec == null) {spec= (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);}
+		return spec;
+	}
+	
+	public List<Value> getArguments() {
+		if (args == null) {args = (List<Value>) getFirstChildWithType(StencilParser.LIST);}
+		return args;
+	}
+	
+	public AstInvokeable getTarget() {
+		if (target == null) {target = (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
 		return target;
+	}
+	public CallTarget getCall() {
+		if (call == null) {
+			call = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+			if (call == null) {
+				call = (Pack) getFirstChildWithType(StencilParser.PACK);
+			}
+		}
+		return call;
 	}
 
 	public boolean isTerminal() {return false;}

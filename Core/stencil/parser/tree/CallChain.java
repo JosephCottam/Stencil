@@ -41,19 +41,28 @@ import stencil.tuple.Tuple;
  *
  */
 public class CallChain extends StencilTree {
+	private CallTarget target;
+	private int depth = Integer.MIN_VALUE;
+	
 	public CallChain(Token source) {super(source);}
 
 	public CallTarget getStart() {
-		CallTarget target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
 		if (target == null) {
-			target = (Pack) getFirstChildWithType(StencilParser.PACK);
+			target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+			if (target == null) {
+				target = (Pack) getFirstChildWithType(StencilParser.PACK);
+			}
 		}
 		return target;
 	}
 	
 	/**How long is this call chain?*/
-	public int getDepth() {return ((StencilNumber) getFirstChildWithType(StencilParser.NUMBER)).getNumber().intValue();}
-	
+	public int getDepth() {
+		if (depth <0) {
+			depth = ((StencilNumber) getFirstChildWithType(StencilParser.NUMBER)).getNumber().intValue();
+		}
+		return depth;
+	}	
 	
 	/**Execute the call chain, all the way through the pack.
 	 * 	 *
