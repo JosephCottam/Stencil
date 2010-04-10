@@ -35,63 +35,42 @@ import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Registrations.Registration;
 import stencil.display.CanvasTuple;
 
-import stencil.operator.module.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.View;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.Tuple;
-import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 
 public class Transform extends BasicModule {
 	
 	//Given an original registration and position, what would the X/Y be in the target registration
-	public static Tuple translateRegistration(Object original, Object x, Object y, Object width, Object height, Object target) {
-		x = Converter.toDouble(x);
-		y = Converter.toDouble(y);
-		width = Converter.toDouble(width);
-		height = Converter.toDouble(height);
-		original = Converter.convert(original, Registration.class);
-		target = Converter.convert(target, Registration.class);
+	public static double[] translateRegistration(Registration original, double x, double y, double width, double height, Registration target) {
+		Point2D topLeft = Registrations.registrationToTopLeft(original, x, y, width, height);
+		Point2D targetValue = Registrations.topLeftToRegistration(target, topLeft.getX(), topLeft.getY(), width, height);
 		
-		
-		Point2D topLeft = Registrations.registrationToTopLeft((Registration) original, (Double) x, (Double) y, (Double) width, (Double) height);
-		Point2D targetValue = Registrations.topLeftToRegistration((Registration) target, topLeft.getX(), topLeft.getY(), (Double) width, (Double) height);
-		
-		Object[] values = new Double[]{targetValue.getX(), targetValue.getY()};
-		return new ArrayTuple(values);
+		return new double[]{targetValue.getX(), targetValue.getY()};
 	}
 	
 	
-	public static Tuple screenToCanvasPoint(Object x, Object y) {
-		x = Converter.toDouble(x);
-		y = Converter.toDouble(y);
-		Point2D p = View.global.viewToCanvas(new Point2D.Double((Double)x,(Double)y));
-		return new ArrayTuple(new Object[]{p.getX(), p.getY()});
+	public static double[] screenToCanvasPoint(double x, double y) {
+		Point2D p = View.global.viewToCanvas(new Point2D.Double(x, y));
+		return new double[]{p.getX(), p.getY()};
 	}
 
-	public static Tuple screenToCanvasDimension(Object width, Object height) {
-		width = Converter.toDouble(width);
-		height = Converter.toDouble(height);
-		Dimension2D p = View.global.viewToCanvas(new DoubleDimension((Double)width,(Double)height));
-		return new ArrayTuple(new Object[]{p.getWidth(), p.getHeight()});
+	public static double[] screenToCanvasDimension(double width, double height) {
+		Dimension2D p = View.global.viewToCanvas(new DoubleDimension( width, height));
+		return new double[]{p.getWidth(), p.getHeight()};
 	}
 
 
-	public static Tuple canvasToScreenPoint(Object x, Object y) {
-		x = Converter.toDouble(x);
-		y = Converter.toDouble(y);
-		Point2D p = View.global.canvasToView(new Point2D.Double((Double)x,(Double)y));
-		return new ArrayTuple(new Object[]{p.getX(), p.getY()});
+	public static double[] canvasToScreenPoint(double x, double y) {
+		Point2D p = View.global.canvasToView(new Point2D.Double(x, y));
+		return new double[]{p.getX(), p.getY()};
 	}
 
-	public static Tuple canvasToScreenDimension(Object width, Object height) {
-		width = Converter.toDouble(width);
-		height = Converter.toDouble(height);
-		Dimension2D p = View.global.canvasToView(new DoubleDimension((Double)width,(Double)height));
-		return new ArrayTuple(new Object[]{p.getWidth(), p.getHeight()});
+	public static double[] canvasToScreenDimension(double width, double height) {
+		Dimension2D p = View.global.canvasToView(new DoubleDimension(width, height));
+		return new double[]{p.getWidth(), p.getHeight()};
 	}
 
 	/**Calculates the scale factor to keep values undistorted but all objects visible.
@@ -103,7 +82,7 @@ public class Transform extends BasicModule {
 	 * @param canvasHeight
 	 * @return
 	 */
-	public static Tuple zoom(Object portalWidth, Object portalHeight, Object canvasWidth, Object canvasHeight) {
+	public static double[] zoom(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
 		return zoomPadded(portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
 	}
 	
@@ -111,35 +90,28 @@ public class Transform extends BasicModule {
 	 * Padding is specified in canvas pixels. 
 	 * 
 	 */
-	public static Tuple zoomPadded(Object portalWidth, Object portalHeight, Object canvasWidth, Object canvasHeight, Object pad) {
+	public static double[] zoomPadded(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
 		CanvasTuple global = Canvas.global;
-
-		double p = Converter.toDouble(pad);
-		double pw = Converter.toDouble(portalWidth);
-		double ph = Converter.toDouble(portalHeight);
-		double cw = Converter.toDouble(canvasWidth) + 2 * p;
-		double ch = Converter.toDouble(canvasHeight) + 2 * p;
-		double x = global.getX() - p;
-		double y = global.getY() - p;
 		
-		double zy = ch !=0?ph/ch:1;
-		double zx = cw !=0?pw/cw:1;
+		double x = global.getX() - pad;
+		double y = global.getY() - pad;
+		double zy = canvasHeight !=0?portalHeight/canvasHeight:1;
+		double zx = canvasWidth !=0?portalWidth/canvasWidth:1;
 		double min = Math.min(zx, zy);
 		if (min ==0 || Double.isInfinite(min) || Double.isNaN(min)) {min =1;}
 
 		if (min == zx) {
-			double newCanvasHeight = Converter.toDouble(canvasHeight)/min;
-			double newPortalHeight = Converter.toDouble(portalHeight)/min;
+			double newCanvasHeight = canvasHeight/min;
+			double newPortalHeight = portalHeight/min;
 			y = global.getY() + (newPortalHeight - newCanvasHeight)/2;
 		} else {
-			double newCanvasWidth = Converter.toDouble(canvasWidth)/min;
-			double newPortalWidth = Converter.toDouble(portalWidth)/min;
+			double newCanvasWidth = canvasWidth/min;
+			double newPortalWidth = portalWidth/min;
 			x = global.getX() - (newPortalWidth - newCanvasWidth)/2;
 		}
 			
 		
-		Tuple t = new ArrayTuple(new Object[]{min, x, y, cw});
-		return t;
+		return new double[]{min, x, y, canvasWidth};
 	}
 	
 	public Transform(ModuleData md) {super(md);}

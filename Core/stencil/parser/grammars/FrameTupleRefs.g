@@ -94,8 +94,9 @@ action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 	catch [EnvironmentProxy.FrameException fe] {throw new RuntimeException("Error framing rule: " + c.toStringTree(), fe);}
 	
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION (options {greedy=false;} :.)* ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
-  | ^(PACK value[env]+);
+//  : ^(f=FUNCTION (options {greedy=false;} :.)* ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)]) --> This didn't work if the arg list was empty...
+  : ^(f=FUNCTION . . ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  | ^(PACK value[env]*);
           
 value[EnvironmentProxy env] 
   : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {frame($t, env)}

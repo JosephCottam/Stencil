@@ -37,7 +37,6 @@ import stencil.operator.module.util.ModuleDataParser;
 import stencil.operator.util.Invokeable;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.Tuple;
 
 public class TestMean extends TestCase {
 	final Module average;
@@ -50,8 +49,8 @@ public class TestMean extends TestCase {
 	public void testFullRange() throws Exception {
 		Specializer spec = ParseStencil.parseSpecializer("[1..n]");
 		StencilOperator meaner = average.instance("Mean", spec);
-		Invokeable<Tuple> map = meaner.getFacet(StencilOperator.MAP_FACET);
-		Invokeable<Tuple> query = meaner.getFacet(StencilOperator.QUERY_FACET);
+		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
+		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
 		
 		int count =0;
 		double sum =0;
@@ -60,15 +59,15 @@ public class TestMean extends TestCase {
 			sum = sum+i;
 			count++;
 			map.invoke(new Object[]{i});
-			assertEquals(sum/count, query.invoke(new Object[0]).get(0));			
+			assertEquals(sum/count, query.invoke(new Object[0]));			
 		}
 	}
 	
 	public void testSplitFullRange() throws Exception {
 		Specializer spec = ParseStencil.parseSpecializer("[v|1..n]");
 		StencilOperator meaner = average.instance("Mean", spec);
-		Invokeable<Tuple> map = meaner.getFacet(StencilOperator.MAP_FACET);
-		Invokeable<Tuple> query = meaner.getFacet(StencilOperator.QUERY_FACET);
+		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
+		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
 
 		String[] splits = new String[]{"One", "Two", "Three"};
 		
@@ -79,7 +78,7 @@ public class TestMean extends TestCase {
 				sum = sum+i;
 				count++;
 				map.invoke(new Object[]{split, i});
-				assertEquals(sum/count, query.invoke(new Object[]{split}).get(0));			
+				assertEquals(sum/count, query.invoke(new Object[]{split}));			
 
 			}
 		}

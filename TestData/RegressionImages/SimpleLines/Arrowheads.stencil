@@ -6,8 +6,6 @@ SOURCE: ./degrees.txt
 SKIP: 1
 STRICT: true
 
-import Trigonometry
-
 external stream Degrees(Deg)
 
 layer DoubleLines[LINE]

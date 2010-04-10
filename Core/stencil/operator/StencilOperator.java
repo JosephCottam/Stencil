@@ -63,16 +63,22 @@ import stencil.operator.util.Invokeable;
  *
  */
 public interface StencilOperator {
-	//TODO:Move to ParserConstants...
+	//TODO:Move these names to ParserConstants...
+	/**Name of the facet used by default in contexts where mutation is permitted.*/
 	public static final String MAP_FACET ="map";
+
+	/**Name of the facet used by default in contexts where mutation is NOT permitted.*/
 	public static final String QUERY_FACET ="query";
+	
+	/**Suggested facet name for use in ranged operations using Stencils range helpers.*/
+	public static final String RANGE_FACET ="range";
 	
 	/**Facet used to get the ID of the current state.
 	 * This is used to determine if update operations are required.
 	 */
 	public static final String STATE_FACET = "stateID";
 	
-	/**Retrieve an invokeable object.  This is a combined method and target.
+	/**Retrieve an invokable object.  This is a combined method and target.
 	 * IllegalArgumentException is thrown when the facet is not know.
 	 * */
 	public Invokeable getFacet(String facet) throws IllegalArgumentException;

@@ -3,7 +3,6 @@ package stencil.operator.util;
 import java.lang.reflect.Method;
 import static java.lang.String.format;
 
-import stencil.tuple.Tuple;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.OperatorData;
 
@@ -23,9 +22,7 @@ public abstract class BasicProject implements StencilOperator {
 	public Invokeable getFacet(String name) {
 		String searchName = name.toUpperCase();
 		for (Method method: this.getClass().getMethods()) {
-			if (method.getName().toUpperCase().equals(searchName)
-				&& Tuple.class.isAssignableFrom(method.getReturnType())) {
-				
+			if (method.getName().toUpperCase().equals(searchName)) {
 				return new ReflectiveInvokeable(method, this);
 			}
 		}

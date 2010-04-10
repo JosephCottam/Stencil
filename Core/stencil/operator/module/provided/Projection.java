@@ -30,7 +30,6 @@
 package stencil.operator.module.provided;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.awt.Color;
 
 import stencil.operator.StencilOperator;
@@ -48,6 +47,7 @@ public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
+	//TODO: Lift the throws-exception out to a wrapping class.  If throws Exception is requested, use the wrapper; otherwise use this class directly.  Change argument types to float.
 	public static final class HeatScale extends BasicProject {
 		public static final String NAME = "HeatScale";
 		public static final boolean DEFAULT_THROW_EXCEPTIONS = true;
@@ -78,15 +78,15 @@ public class Projection extends BasicModule {
 		 * If the key passed cannot be parsed as number and 'throwExceptions' is set to false, black is returned.
 		 * If the key passed cannot be parsed and 'throwExceptions' is set to true, an exception is thrown.
 		 */
-		public Tuple map(Object... keys) {
+		public Tuple map(Object key) {
 			float d;
 			float p =-1;
 			Tuple t;
 			
 			try {
-				d = Float.parseFloat(keys[0].toString());
+				d = Float.parseFloat(key.toString());
 			} catch (Exception e) {
-				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + keys[0].toString(), e);}
+				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + key.toString(), e);}
 				else {return new ArrayTuple(new Color(0,0,0));}			
 			} 
 
@@ -134,10 +134,10 @@ public class Projection extends BasicModule {
 		/**Returns a color value if the first key object is between the current max and min.
 		 * Otherwise it returns a null-valued tuple.
 		 */
-		public Tuple query(Object...keys) {
-			float d = Float.parseFloat(keys[0].toString());
+		public Tuple query(Object key) {
+			float d = Float.parseFloat(key.toString());
 			
-			if (d >= min && d<= max) {return map(keys);}
+			if (d >= min && d<= max) {return map(key);}
 			else {return new ArrayTuple(new Object[0]);}
 		}
 
@@ -164,20 +164,14 @@ public class Projection extends BasicModule {
 
 		public Index(OperatorData opData) {super(opData);}
 		
-		public Tuple query(Object... keys) {
-			Object key = keys[0];
-			if (labels.contains(key)) {return new ArrayTuple(labels.indexOf(key));}
-			return new ArrayTuple(new Object[0]);
+		public int query(Object key) {
+			if (labels.contains(key)) {return labels.indexOf(key);}
+			return 0;
 		}
 
-		public Tuple map(Object... keys) {
-			Tuple rv;
-			Object key;
-			//TODO: Handle more than just the first value...concatenate the values or something, like compound keys in Rank operator
-			key = keys[0];
+		public int map(Object key) {
 			if (!labels.contains(key)) {labels.add(key.toString());}
-			rv = new ArrayTuple(labels.indexOf(key));
-			return rv;
+			return labels.indexOf(key);
 		}
 
 		public String getName() {return NAME;}
@@ -197,8 +191,7 @@ public class Projection extends BasicModule {
 		
 		public String getName() {return "Count";}
 
-		public Tuple map(Object... args) {
-			Object key = args[0];
+		public long map(Object key) {
 			long value;
 			if (counts.containsKey(key)) {
 				Long l = counts.get(key);
@@ -209,33 +202,28 @@ public class Projection extends BasicModule {
 				value = 1;
 				counts.put(key, value);
 			}
-			return new ArrayTuple(value);
+			return value;
 		}
 
-		public Tuple query(Object... args) {
-			Object key = args[0];
+		public long query(Object key) {
 			long value =0;
 			if (counts.containsKey(key)) {
 				value = counts.get(key);
 			}
-			return new ArrayTuple(value);
+			return value;
 		}
 
 		public Count duplicate() {return new Count(operatorData);}
 	}
 
+	/**Counting when there are no keys to worry about.**/
 	public static final class SimpleCount extends BasicProject {
-		private final AtomicInteger count = new AtomicInteger(0);
-		
+		private long count =1;
 		public SimpleCount(OperatorData opData) {super(opData);}
-		
 		public StencilOperator duplicate() {return new SimpleCount(operatorData);}
-
 		public String getName() {return "Count";}
-
-		public Tuple map(Object... args) {return new ArrayTuple(count.getAndAdd(1));}
-
-		public Tuple query(Object... args) {return new ArrayTuple(count.get());}		
+		public long map() {return count++;}
+		public long query() {return count;}		
 	}
 	
 	public Projection(ModuleData md) {super(md);}

@@ -56,10 +56,10 @@ public class TestProjectionOperators extends TestCase {
 		Projection.Index l = new Projection.Index(null);
 		String[] items = new String[] {"Hello", "Why", "What", "@Color{12,39,2}"};
 		for (int i=0; i< items.length;i++) {
-			assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(0)));
+			assertEquals(new Integer(i), Converter.toInteger(l.map(items[i])));
 		}
-		for (int i=0; i< items.length;i++) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(0)));}
-		for (int i=items.length-1; i>=0;i--) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i]).get(0)));}
+		for (int i=0; i< items.length;i++) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i])));}
+		for (int i=items.length-1; i>=0;i--) {assertEquals(new Integer(i), Converter.toInteger(l.map(items[i])));}
 
 		assertEquals(Projection.Index.NAME,l.getName());
 	}

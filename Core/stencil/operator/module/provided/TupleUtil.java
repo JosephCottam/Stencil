@@ -68,16 +68,16 @@ public class TupleUtil extends BasicModule {
 	public static final class Length extends BasicProject {
 		protected Length(OperatorData opData) {super(opData);}
 		public String getName() {return this.getClass().getSimpleName();}
-		public Tuple query(Object... args) {return map(args);}		
+		public int query(Object... args) {return map(args);}		
 
-		public Tuple map(Object... args) {
+		public int map(Object... args) {
 			int sum =0;
 			for (Object o: args) {
 				if (o instanceof Tuple) {
 					sum += ((Tuple) args[0]).getPrototype().size();
 				} else {sum++;}
 			}
-			return new ArrayTuple(sum);
+			return sum;
 		}
 		
 		public static boolean accepts(Specializer specializer) {return specializer.isSimple();}

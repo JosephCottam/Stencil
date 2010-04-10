@@ -1,6 +1,8 @@
 package stencil.operator.util;
 
 import java.lang.reflect.*;
+import static java.util.Arrays.deepToString;
+import static java.lang.String.format;
 
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -62,9 +64,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return t;
 	}
 	
-	/* (non-Javadoc)
-	 * @see stencil.operator.util.Invokeable#invoke(java.lang.Object[])
-	 */
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
 		int expectedNumArgs = paramTypes.length;
 		boolean isVarArgs =method.isVarArgs();
@@ -72,7 +71,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 		try {
 			if (isVarArgs) {
-				if (!(arguments.length > expectedNumArgs-1)) {
+				if (!(arguments.length >= expectedNumArgs-1)) {
 					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking varArgs method %1$s (expected at least %2$s; received: %3$s).", method.getName(), expectedNumArgs-1, arguments.length));
 				}
 
@@ -88,19 +87,19 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				args[args.length-1] = varArgs;
 			} else {
 				if (arguments.length != expectedNumArgs) {
-					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking %1$s (expected %2$s; received: %3$s).", method.getName(), expectedNumArgs, arguments.length));
+					throw new MethodInvokeFailedException(format("Incorrect number of arguments for method specified (expected %1$s; received: %2$s).", expectedNumArgs, arguments.length), method, target);
 				}
 
 				validateTypes(arguments, paramTypes, 0, arguments.length, args);
 			}
 		} catch (Exception e) {
-			throw new MethodInvokeFailedException(String.format("Exception thrown peparing arguments to invoke '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(arguments)),e);
+			throw new MethodInvokeFailedException(format("Exception thrown peparing arguments: %1$s.", deepToString(arguments)),method, target, e);
 		}
 			
 		try {
 			result = (R) method.invoke(target, args);
 		} catch (Exception e) {
-		 	throw new MethodInvokeFailedException(String.format("Exception thrown invoking '%1$s' with arguments %2$s.", method.getName(), java.util.Arrays.deepToString(args)), e);
+		 	throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, e);
 		}
 		return result;
 	}

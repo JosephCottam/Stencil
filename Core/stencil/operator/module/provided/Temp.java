@@ -36,9 +36,6 @@ import stencil.operator.module.util.*;
 import static stencil.operator.module.util.OperatorData.*;
 import stencil.operator.util.BasicProject;
 import stencil.parser.tree.*;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.NumericSingleton;
-import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 /**
@@ -71,23 +68,16 @@ public class Temp extends BasicModule {
 			span = outMax-outMin;
 		}
 
-		public Tuple map(Object v) {
-			double dv = Converter.toDouble(v);       
-
+		public double map(double dv) {
 			inMin = Math.min(dv, inMin);
 			inMax = Math.max(dv, inMax);
 			return query(dv);   
 		}
 
-		public Tuple query(Object v) {
-			double dv = Converter.toDouble(v);       
-			return query(dv);
-		}
-
-		public Tuple query(double v) {
+		public double query(double v) {
 			double percent = (v-inMin)/inMax;
 			double value = span*percent + outMin;
-			return new NumericSingleton(value);}
+			return value;}
 	}
 
 
@@ -118,9 +108,8 @@ public class Temp extends BasicModule {
 			bucketSpan = (max-min)/buckets;
 		}
 
-		public Tuple map(Object v) {return query(v);}
-		public Tuple query(Object v) {
-			double dv = Converter.toDouble(v);
+		public double[] map(double dv) {return query(dv);}
+		public double[] query(double dv) {
 			dv = dv-min;
 
 			double bucket = (buckets)/((max-min)/dv);
@@ -130,7 +119,7 @@ public class Temp extends BasicModule {
 			double start = bucket*bucketSpan;
 			double end = (bucket +1)*bucketSpan;
 			
-			return new ArrayTuple(start,end,bucket);
+			return new double[]{start,end,bucket};
 		}
 	}
 
@@ -193,8 +182,8 @@ public class Temp extends BasicModule {
 		private SortedSet set = Collections.synchronizedSortedSet(new TreeSet(new CompoundCompare()));
 		//		private TreeSet set = new TreeSet(new CompoundCompare());
 
-		public Tuple map(Object... values) {return rank(true, values);} 
-		public Tuple query(Object... values) {return rank(false, values);}
+		public int map(Object... values) {return rank(true, values);} 
+		public int query(Object... values) {return rank(false, values);}
 
 		public String getName() {return NAME;}
 
@@ -203,7 +192,7 @@ public class Temp extends BasicModule {
 		 * @param add Should this set of values be added to the set if it is not already there?
 		 * @param values What set of values needs ranking?
 		 */
-		private Tuple rank(boolean add, Object... values) {
+		private int rank(boolean add, Object... values) {
 			int rank;
 			if (add && !set.contains(values)) {
 				set.add(values);
@@ -214,7 +203,7 @@ public class Temp extends BasicModule {
 				rank =-1;
 			}
 
-			return new ArrayTuple(rank);
+			return rank;
 		}
 
 		public Rank duplicate() {return new Rank(operatorData);}
@@ -236,32 +225,28 @@ public class Temp extends BasicModule {
 
 		public String getName() {return NAME;}
 
-		public Tuple put(Object... values) {
-			Object key = values[0];
-			Object[] objects = new Object[values.length-1];
-			System.arraycopy(values, 1, objects, 0, values.length-1);
+		public Object[] put(Object key, Object... values) {
+			Object[] objects = new Object[values.length];
+			System.arraycopy(values, 0, objects, 0, values.length);	//Copy is required for storage.
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
-			if (objects.length ==0) {
-				objects = map.get(key);
-			} else if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
+			if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
 				map.put(key, objects);
 			} else {
 				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
 			}
-			return new ArrayTuple(objects);
+			return objects;
 		}
 
-		public Tuple map(Object... args) {return query(args);}
-		public Tuple query(Object... args) {
-			Object key = args[0];
+		public Object[] map(Object key, Object... args) {return query(key, args);}
+		public Object[] query(Object key, Object... args) {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
 			Object[] results = map.get(key);
 			if (results == null) {
 				return null;
 			}			
-			return new ArrayTuple(results);
+			return results;
 		}
 
 		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{

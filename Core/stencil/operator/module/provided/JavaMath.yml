@@ -27,8 +27,6 @@ operators:
    - name: Log10
    - name: Log1p
    - name: Negate
-   - name: Max
-   - name: Min
    - name: Pow
    - name: Round
    - name: Random

@@ -1,6 +1,6 @@
 name: Numerics
 targetClass: stencil.operator.module.provided.Numerics
-description: Math functions.
+description: Math functions to supplement the standard ones from JavaMath.
 
 defaults:
   defaultSpecializer: !spec "[n .. n]"
@@ -21,6 +21,9 @@ operators:
   - name: Mult
   - name: Negate
   - name: Nearest
+  - name: Sine
+  - name: Cosine
+  - name: Tangent
   - name: Sub
   - name: Sub1
   - name: Sum

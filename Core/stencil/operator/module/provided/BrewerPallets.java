@@ -50,8 +50,6 @@ public class BrewerPallets  extends BasicModule {
 			return stencil.types.color.ColorCache.get(colors[idx]);  
 		}
 
-		public Tuple guide(Object value) {return query(value);}
-
 		public Tuple query(Object value) {
 			int idx = Collections.binarySearch(seen, value);
 

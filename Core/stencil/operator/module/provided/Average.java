@@ -38,10 +38,8 @@ import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.operator.wrappers.SplitHelper;
+import static stencil.operator.StencilOperator.RANGE_FACET;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.Tuple;
-import stencil.types.Converter;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -58,21 +56,23 @@ public class Average extends BasicModule {
 
 		private static final String NAME = "Mean";
 		
-		public Tuple map(Object... args) {
-			Double[] values = RangeHelper.flatten(args, Double.NaN);
-
+		public double range(Object... args) {
+			return map((double[]) RangeHelper.flatten(args, double.class));
+		}
+		
+		public double map(double... args) {
 			double mean=0;
 
-			if (values.length !=0) {
+			if (args.length !=0) {
 				int sum =0;
-				for (double d: values) {sum += d;}
-				mean = sum/values.length;
+				for (double d: args) {sum += d;}
+				mean = sum/args.length;
 			}
-			return new ArrayTuple(mean);
+			return mean;
 		}
 		public String getName() {return NAME;}
-		public Tuple query(Object... args) {return map(args);}
-		public Tuple invoke(Object... args) {return map(args);}
+		public double query(double... args) {return map(args);}
+		public double invoke(double... args) {return map(args);}
 		
 		public RangeMean duplicate() {return new RangeMean(operatorData);}
 	}
@@ -105,28 +105,25 @@ public class Average extends BasicModule {
 		}
 
 
-		public Tuple map(Object... values) {
+		public double map(double... values) {
 			if (start >0) {start--;}
-			if (start >0) {return new ArrayTuple(0);}
+			if (start >0) {return 0;}
 
 			Double sum=0d;
-			for (Object value: values) {
-				Double num = Converter.toDouble(value);
-				sum += num;
-			}
+			for (int i=0;i < values.length; i++) {sum += values[i];}
 
 			count += values.length;
 			total += sum;
-			return new ArrayTuple(total/count);
+			return total/count;
 		}
 		
 		public String getName() {return NAME;}
 
-		public Tuple query(Object... args) {
+		public double query(Object... args) {
 			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
 			double value =0;
 			if (count > 0) {value = total/count;}
-			return new ArrayTuple(value);
+			return value;
 		}
 		
 		public FullMean duplicate() {return new FullMean(operatorData, start);}
@@ -143,22 +140,23 @@ public class Average extends BasicModule {
 
 		protected Median(OperatorData opData) {super(opData);}
 		
+		public double range(Object... args) {
+			return map((double[]) RangeHelper.flatten(args, double.class));
+		}
+		public double map(double... args) {
+			if (args.length == 0) {throw new RuntimeException("Cannot compute median on empty list");}
 
-		public Tuple map(Object... args) {
-			Double[] values = RangeHelper.flatten(args, Double.NaN);
-			if (values.length == 0) {throw new RuntimeException("Cannot compute median on empty list");}
+			java.util.Arrays.sort(args);
+			int idx = (int) Math.floor(args.length/2);
 
-			java.util.Arrays.sort(values);
-			int idx = (int) Math.floor(values.length/2);
-
-			if (idx != values.length/2) {
-				return new ArrayTuple((values[idx] + values[idx+1])/2);
+			if (idx != args.length/2) {
+				return (args[idx] + args[idx+1])/2;
 			}
-			return new ArrayTuple(values[idx]);
+			return args[idx];
 		}
 		public String getName() {return NAME;}
 
-		public Tuple query(Object... args) {return map(args);}
+		public double query(double... args) {return map(args);}
 		
 		public Median duplicate() {return new Median(operatorData);}
 	}
@@ -172,12 +170,14 @@ public class Average extends BasicModule {
 
 		public Mode(OperatorData opData) {super(opData);}
 		
-		public Tuple map(Object... args) {
+		public double range(Object... args) {
+			return map((Double[]) RangeHelper.flatten(args, Double.class));
+		}
+		public double map(Double... args) {
 			HashMap<Double, Integer> counts = new HashMap<Double, Integer>();
-			Double[] values = RangeHelper.flatten(args, Double.NaN);
 
 			//count values into a hash
-			for (double d: values) {
+			for (double d: args) {
 				if (counts.containsKey(d)) {counts.put(d, counts.get(d) +1);}
 				else {counts.put(d, 1);}
 			}
@@ -195,11 +195,11 @@ public class Average extends BasicModule {
 			if (max == -1) {throw new RuntimeException("Cannot compute mode on empty set.");}
 
 			//return max value as a tuple
-			return new ArrayTuple(value);
+			return value;
 		}
 		public String getName() {return NAME;}
 
-		public Tuple query(Object... args) {return map(args);}
+		public double query(Double... args) {return map(args);}
 		public Mode duplicate() {return new Mode(operatorData);}
 	}
 
@@ -228,12 +228,12 @@ public class Average extends BasicModule {
 				if (specializer.getRange().isFullRange()) {
 					target =  new FullMean(opData, specializer);
 				} else {
-					target = RangeHelper.makeLegend(specializer.getRange(), new RangeMean(opData));
+					target = RangeHelper.makeOperator(specializer.getRange(), new RangeMean(opData), RANGE_FACET);
 				}
 			} else if (name.equals(Median.NAME)) {
-				target = RangeHelper.makeLegend(specializer.getRange(), new Median(opData));
+				target = RangeHelper.makeOperator(specializer.getRange(), new Median(opData), RANGE_FACET);
 			} else if (name.equals(Mode.NAME)) {
-				target = RangeHelper.makeLegend(specializer.getRange(), new Mode(opData));
+				target = RangeHelper.makeOperator(specializer.getRange(), new Mode(opData), RANGE_FACET);
 			}else {
 				throw new IllegalArgumentException("Method name not found in package: " + name);
 			}

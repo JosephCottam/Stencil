@@ -30,58 +30,45 @@ package stencil.operator.module.provided;
 
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.NumericSingleton;
-import stencil.tuple.Tuple;
-import stencil.types.Converter;
 
 public class StringUtils extends BasicModule {
 	/**Print the passed tuple. Replaces names with new names.*/
-	public static Tuple print(Object... os) {
+	public static Object[] print(Object... os) {
 		for (int i=0;i<os.length;i++) {
 			if(os[i] ==null) {System.out.print("null");}
 			else{System.out.print(os[i].toString());}
 			if (i!=os.length-1) {System.out.print(",");}
 		}
 		System.out.println();
-		return new ArrayTuple(os);
+		return os;
 	}
 	
 	/**Converts a value to a string value.*/
-	public static Tuple toString(Object s) {return new ArrayTuple(s.toString());}
+	public static String toString(Object s) {return s.toString();}
 	
 	
 	//TODO: Add range support to concatenate
-	public static Tuple concatenate(Object... os) {
+	public static String concatenate(Object... os) {
 		StringBuilder b = new StringBuilder();
 		for (Object o:os) {b.append(o.toString());}
-		return new ArrayTuple(b.toString());
+		return b.toString();
 	}
 
-	public static Tuple format(Object f, Object vs) {
-		String rv = String.format(f.toString(), vs);
-		return new ArrayTuple(rv);
+	public static String format(String f, Object... vs) {
+		return String.format(f, vs);
 	}
 	
-	public static Tuple substring(Object str, Object s, Object e) {
-		String string = Converter.toString(str);
-		int start = Converter.toInteger(s);
-		int end = Converter.toInteger(e);
-		
-		if (end >= 0) {return new ArrayTuple(string.substring(start, end));}
-		else {return new ArrayTuple(string.substring(start));}
+	public static String substring(String string, int start, int end) {		
+		if (end >= 0) {return string.substring(start, end);}
+		else {return string.substring(start);}
 	}
 	
-	public static Tuple trim(Object str) {
-		String string = Converter.toString(str);
-		return new ArrayTuple(string.trim());
+	public static String trim(String string) {
+		return string.trim();
 	}
 	
-	public static Tuple indexOf(Object str, Object t) {
-		String string = Converter.toString(str);
-		String target = Converter.toString(t);
-		int idx = string.indexOf(target);
-		return new NumericSingleton(idx);
+	public static int indexOf(String string, String target) {
+		return string.indexOf(target);
 	}
 
 	public StringUtils(ModuleData md) {super(md);}

@@ -1,6 +1,5 @@
 package stencil.operator.wrappers;
 
-import stencil.tuple.Tuple;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.FacetData;
 import stencil.operator.module.util.OperatorData;
@@ -8,6 +7,8 @@ import stencil.operator.util.Invokeable;
 import stencil.operator.util.MethodInvokeFailedException;
 import stencil.parser.tree.Split;
 import stencil.parser.tree.Value;
+import stencil.tuple.Tuple;
+import stencil.types.Converter;
 
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,11 @@ public abstract class SplitHelper implements StencilOperator {
 		
 		public UnorderedHelper(Split split, StencilOperator operator) {super(split, operator);}
 		
-		public Tuple doSplit(String facet, Object[] args) {
+		public Object doSplit(String facet, Object[] args) {
 			Object key = getKey(args);
 			Object[] newArgs = getArgs(args);
 			StencilOperator op = getOp(key);
-			Invokeable<Tuple> inv = op.getFacet(facet);
+			Invokeable inv = op.getFacet(facet);
 			return inv.invoke(newArgs);
 		}
 				
@@ -56,7 +57,7 @@ public abstract class SplitHelper implements StencilOperator {
 			super(split, operator);
 		}
 				
-		public Tuple doSplit(String facet, Object[] args) {
+		public Object doSplit(String facet, Object[] args) {
 			Object key = getKey(args);
 			Object[] newArgs = getArgs(args);
 			if (!key.equals(oldKey)) {
@@ -64,13 +65,13 @@ public abstract class SplitHelper implements StencilOperator {
 				catch (Exception e) {throw new Error("Error creating new split operator instance.", e);}
 				oldKey = key;
 			}
-			Invokeable<Tuple> inv = operator.getFacet(facet);
+			Invokeable inv = operator.getFacet(facet);
 			return inv.invoke(newArgs);
 		}
 		
 	}
 	
-	private static class SplitTarget implements Invokeable<Tuple> {
+	private static class SplitTarget implements Invokeable {
 		final SplitHelper helper;
 		final String facet;
 		
@@ -79,8 +80,8 @@ public abstract class SplitHelper implements StencilOperator {
 			this.facet = facet;
 		}
 		
-		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
-		public Tuple invoke(Object[] arguments)
+		public Tuple tupleInvoke(Object[] arguments) {return Converter.toTuple(invoke(arguments));}
+		public Object invoke(Object[] arguments)
 				throws MethodInvokeFailedException {
 			return helper.doSplit(facet, arguments);
 		}
@@ -127,7 +128,7 @@ public abstract class SplitHelper implements StencilOperator {
 		return newArgs;
 	}
 	
-	protected abstract Tuple doSplit(String key, Object[] args);
+	protected abstract Object doSplit(String key, Object[] args);
 	
 	/**Returns the first item from the list.  This is assumed to be the split key.*/
 	//final because it is a utility method

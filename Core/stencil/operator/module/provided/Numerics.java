@@ -41,6 +41,8 @@ import stencil.parser.tree.Range;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
+import static stencil.operator.StencilOperator.QUERY_FACET;
+
 
 public class Numerics extends BasicModule {
 
@@ -154,7 +156,12 @@ public class Numerics extends BasicModule {
 	public static double sub1(double d) {return d-1;}
 	public static double sum(double...ds) {return FullSum.sum(ds);}
 
- 	public static double nearest(long m, long n) {
+	public static double Cosine(double deg) {return Math.cos(Math.toRadians(deg));}
+	public static double Sine(double deg) {return Math.sin(Math.toRadians(deg));}
+	public static double Tangent(double deg) {return Math.tan(Math.toRadians(deg));}
+
+	
+	public static double nearest(long m, long n) {
  		//Round m to the nearest multiple of n (per http://mindprod.com/jgloss/round.html)
  		long near = ( m + n/2 ) / n * n;
  		return near;
@@ -183,15 +190,15 @@ public class Numerics extends BasicModule {
 			if (specializer.isSimple()) {
 				return target;
 			} else if (name.equals("Sum") && !range.isFullRange()) {
-				target = RangeHelper.makeLegend(specializer.getRange(), target);
+				target = RangeHelper.makeOperator(specializer.getRange(), target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
 				target = new FullSum(operatorData);
 			} else if (name.equals("Max") && !range.isFullRange()) {
-				target = RangeHelper.makeLegend(specializer.getRange(), target);
+				target = RangeHelper.makeOperator(specializer.getRange(), target, QUERY_FACET);
 			} else if (name.equals("Max")) {
 				target = new FullMax(operatorData);
 			} else if (name.equals("Min") && !range.isFullRange()) {
-				target = RangeHelper.makeLegend(specializer.getRange(),target);}
+				target = RangeHelper.makeOperator(specializer.getRange(),target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
 				target = new FullMin(operatorData);
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toString()));}

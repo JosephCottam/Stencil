@@ -31,7 +31,7 @@ public final class Converter {
 		
 		Class clazz = value.getClass();
 		
-		if (clazz.isArray()) {return new ArrayTuple(value);}
+		if (clazz.isArray()) {return new ArrayTuple(value, true);}
 
 		if (WRAPPER_FOR.containsKey(clazz)) {
 			TypeWrapper w = WRAPPER_FOR.get(clazz);
@@ -81,7 +81,7 @@ public final class Converter {
 	 */
 	public static final Object convert(Object value, Class target) throws ConversionException {
 		try {
-			if (value == null || target.isInstance(value)) {return value;}
+			if (value == null || target.equals(Object.class) || target.isInstance(value)) {return value;}
 			if (value instanceof Atom) {return convert(((Atom) value).getValue(), target);}
 						
 			TypeWrapper wrapper = WRAPPER_FOR.get(target);

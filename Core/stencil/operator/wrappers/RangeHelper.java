@@ -29,7 +29,6 @@
 package stencil.operator.wrappers;
 
 import stencil.operator.StencilOperator;
-import stencil.operator.module.util.FacetData;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.parser.tree.Range;
@@ -37,6 +36,7 @@ import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,11 +52,11 @@ import java.util.List;
  */
 
 public abstract class RangeHelper implements StencilOperator {
-	private static abstract class AbstractRangeTarget implements Invokeable<Tuple> {
+	private static abstract class AbstractRangeTarget implements Invokeable {
 		final RangeHelper helper;
-		final Invokeable<Tuple> base;
+		final Invokeable base;
 		
-		public AbstractRangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+		public AbstractRangeTarget(RangeHelper helper, Invokeable base) {
 			this.helper = helper;
 			this.base = base;
 		}
@@ -65,35 +65,35 @@ public abstract class RangeHelper implements StencilOperator {
 	}
 	
 	private static final class QueryRangeTarget extends AbstractRangeTarget {
-		public QueryRangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+		public QueryRangeTarget(RangeHelper helper, Invokeable base) {
 			super(helper, base);
 		}
 		
-		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
+		public Tuple tupleInvoke(Object[] arguments) {return Converter.toTuple(invoke(arguments));}
 
-		public Tuple invoke(Object[] args) {
+		public Object invoke(Object[] args) {
 			Object[] formals = helper.getCache();
-			return (Tuple) base.invoke(formals);
+			return base.invoke(formals);
 		}
 	}
 	
 	/**Invokeable object returned by ranging operators.*/
 	private static final class RangeTarget extends AbstractRangeTarget {
-		public RangeTarget(RangeHelper helper, Invokeable<Tuple> base) {
+		public RangeTarget(RangeHelper helper, Invokeable base) {
 			super(helper, base);
 		}
 
-		public Tuple tupleInvoke(Object[] arguments) {return invoke(arguments);}
+		public Tuple tupleInvoke(Object[] arguments) {return Converter.toTuple(invoke(arguments));}
 
-		public Tuple invoke(Object[] args) {
+		public Object invoke(Object[] args) {
 			Object[] formals = helper.updateCache(args);
-			return (Tuple) base.invoke(formals);
+			return base.invoke(formals);
 		}
 	}
 	
 	private static final class RelativeHelper extends RangeHelper {
-		public RelativeHelper(Range range, StencilOperator operator) {
-			super(range, operator);
+		public RelativeHelper(Range range, StencilOperator operator, String facetName) {
+			super(range, operator, facetName);
 			
 			if (range.getStart() < range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toStringTree());}
 			
@@ -121,8 +121,8 @@ public abstract class RangeHelper implements StencilOperator {
 		private boolean trimmed = false;
 		private int offsetCountdown;
 		
-		public AbsoluteHelper(Range range, StencilOperator operator) {
-			super(range, operator);
+		public AbsoluteHelper(Range range, StencilOperator operator, String facetName) {
+			super(range, operator, facetName);
 
 			if (range.getStart() > range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toStringTree());}
 
@@ -150,8 +150,8 @@ public abstract class RangeHelper implements StencilOperator {
 	private static final class HybridHelper extends RangeHelper {
 		int offsetCountdown;
 			
-		public HybridHelper(Range range, StencilOperator operator) {
-			super(range, operator);
+		public HybridHelper(Range range, StencilOperator operator, String facetName) {
+			super(range, operator, facetName);
 			
 			if (range.relativeStart()) {throw new RuntimeException("Hybrid ranges must have absolute start points.  Recieved range " + range.toStringTree());}
 			values = new ArrayList();
@@ -170,62 +170,91 @@ public abstract class RangeHelper implements StencilOperator {
 	}
 	
 
-	protected Range range;
-	protected List values;	 		//One list, used by both Query and Map.  Invoking a single instance in both may end up arguments appended multiple times. 
-	private StencilOperator operator; //Backing StencilLegend instance
+	protected List values;	 			//One list, used by both Query and Map.  Invoking a single instance in both may end up arguments appended multiple times. 
+	protected final Range range;
 	protected final OperatorData operatorData;
+	private final StencilOperator baseOperator; //Backing StencilLegend instance
+	protected final Invokeable baseFacet;		//Actual facet invokable for doing computations
+	private final String facetName;				//Facet on the operator to be used in ranged operations.  MUST be a function.
 	
-	
-	protected RangeHelper(Range range, StencilOperator operator) {
-		this.operator = operator;
+	protected RangeHelper(Range range, StencilOperator operator, String facetName) {
+		this.baseOperator = operator;
 		this.range = range;
-		OperatorData opData = new OperatorData(operator.getOperatorData()); 
-		this.operatorData = opData;
-		for (FacetData facet: opData.getFacets()) {
-			facet.setFunction(false);
-		}
+		this.operatorData =  null;
+		this.facetName = facetName;
+		this.baseFacet = operator.getFacet(facetName);
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
 
-	public Invokeable getFacet(String facet) {
+	/**Get a facet on this range helper object.
+	 * The returned facet will use the operator/facet specified at construction.
+	 * If the operator/facet is not a function, then query is not a premited facetName to use here.
+	 */
+	public Invokeable getFacet(String facetName) {
 		try {
-			Invokeable f = operator.getFacet(facet);
-
-			if (facet.equals(StencilOperator.QUERY_FACET)) {
-				return new QueryRangeTarget(this, f);
+			if (QUERY_FACET.equals(facetName)) {
+				if (!baseOperator.getOperatorData().getFacet(facetName).isFunction()) {
+					throw new IllegalArgumentException("Cannot construct a ranged query facet if base facet is not a function.");
+				} else{
+					return new QueryRangeTarget(this, baseFacet);
+				}
+			} else if (MAP_FACET.equals(facetName)) {
+				return new RangeTarget(this, baseFacet);
 			} else {
-				return new RangeTarget(this, f);
+				throw new IllegalArgumentException(String.format("Facet %1$s not known in ranged %2$s.", facetName, baseOperator.getName()));
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Error getting range-wrapped facet " + facet, e);
+			throw new RuntimeException(String.format("Error getting range-wrapped facet '%1$s'", baseFacet), e);
 		}
 	}
 
-	/**Given an array of objects, will attempt to convert them all to the
-	 * specified target class.  Will convert arrays of arrays to a
-	 * single-level array as well.
-	 *
-	 * @param values
-	 * @param target
-	 * @return
-	 */
-	 public static <T> T[] flatten(Object[] values, T prototype) {
-		ArrayList<T> v = new ArrayList<T>();
-
-		for(Object o:values) {
-			if (o.getClass().isArray()) {
-				for (Object o2: (Object[]) o) {
-					v.add((T)Converter.convert(o2, prototype.getClass()));
+	//TODO: Get away from Object[] by doing two sweeps: pre-calculating size, then fill
+	public static Object flatten(final Object values, Class convertTo) {
+		final Object result = Array.newInstance(convertTo, size(values));
+		int offset = 0;
+		
+		for (int i=0; i< Array.getLength(values); i++) {
+			final Object v = Array.get(values, i);
+			if (v.getClass().isArray()) {
+				final Object rslt = flatten(v, convertTo);
+				for (int j=0; j<Array.getLength(rslt); j++) {
+					Object value = Converter.convert(Array.get(rslt, j), convertTo);
+					Array.set(result, offset, value);
+					offset++;
 				}
 			} else {
-				v.add((T)Converter.convert(o, prototype.getClass()));
+				Object value = Converter.convert(Array.get(values, i), convertTo);
+				Array.set(result, offset, value);
+				offset++;
 			}
-		}
-		return v.toArray((T[]) java.lang.reflect.Array.newInstance(prototype.getClass(), 0));
+		}		
+		return result;
 	}
+	
+	/**Recursive size of the passed object.
+	 * 
+	 * A singleton is size 1.
+	 * An array is size of its length.
+	 * An array of arrays is the total number of elements in all sub arrays.
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public static int size(final Object values) {
+		final int length = Array.getLength(values);
+		int size = 0;
+		
+		for (int i=0; i<length; i++) {
+			Object v = Array.get(values, i);
+			if (v.getClass().isArray()) {size += size(v);}
+			else {size++;}
+		}
+		return size;
+	}
+	 
 
-	public String getName() {return operator.getName() + "(Ranged)";}
+	public String getName() {return baseOperator.getName() + "(Ranged)";}
 	
 	/**Updates the list storage according to the specified range.
 	 * @return List of arguments to actually invoke the underlying legend with.
@@ -239,19 +268,26 @@ public abstract class RangeHelper implements StencilOperator {
 	protected abstract Object[] getCache();
 	
 	public StencilOperator duplicate() {
-		StencilOperator op = operator.duplicate();
-		return makeLegend(range, op);
+		StencilOperator op = baseOperator.duplicate();
+		return makeOperator(range, op, facetName);
 	}
 	
-	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", operator.getName()));}
-	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", operator.getName()));}
+	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
+	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
 	
 	
-	public static StencilOperator makeLegend(Range range, StencilOperator operator) {
+	/**Produce an operator that works over the requested range specificiation.
+	 * 
+	 * @param range  Range to operator over
+	 * @param operator The base operator instance (also the default return value, if the range is simple) 
+	 * @param baseFacet The name of the facet to be used in non-simple ranged operations
+	 * @return
+	 */
+	public static StencilOperator makeOperator(Range range, StencilOperator operator, String facetName) {
 		if (range.isSimple()) {return operator;}
-		if (range.relativeStart() && range.relativeEnd()) {return new RelativeHelper(range, operator);}
-		if (!range.relativeStart() && !range.relativeEnd()) {return new AbsoluteHelper(range, operator);}
-		if (!range.relativeStart() && range.relativeEnd()) {return new HybridHelper(range, operator);}
+		if (range.relativeStart() && range.relativeEnd()) {return new RelativeHelper(range, operator, facetName);}
+		if (!range.relativeStart() && !range.relativeEnd()) {return new AbsoluteHelper(range, operator, facetName);}
+		if (!range.relativeStart() && range.relativeEnd()) {return new HybridHelper(range, operator, facetName);}
 		
 		throw new RuntimeException("Unsupported paramter combinitation in range: " + range.toStringTree());
 	}
