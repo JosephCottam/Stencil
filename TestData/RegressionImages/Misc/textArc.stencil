@@ -6,7 +6,7 @@ SOURCE:
 SKIP: 0
 STRICT: true
 
-external stream Words(word, line)
+stream Words(word, line)
 
 order Words
 
@@ -31,18 +31,18 @@ from Words
 operator Prior(line) -> (text) 
   prefilter(t) : Border.find(line)
   (t =~ "[null]") => text: ""
-  (all) => text: t[text]
+  (ALL) => text: t[text]
 
 operator FreqColor(word) -> (C)
-  (all) => C: Freq(word) 
-             -> Linear[start="Gray10", end="Gray90"](div)
+  (ALL) => C: Freq(word) 
+             -> Linear[start: "Gray10", end: "Gray90"](div)
 
 operator FreqSize(word) -> (size)
-  (all) => size: Freq(word) 
-             -> Linear[start="0", end="20"](div)
+  (ALL) => size: Freq(word) 
+             -> Linear[start: "0", end: "20"](div)
 
 operator Freq (word) -> (freq)
-  (all) => freq: Count(word) -> Max[1..n](_) 
+  (ALL) => freq: Count(word) -> Max[1..n](_) 
            -> Div(count, max)
 
 

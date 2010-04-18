@@ -6,7 +6,7 @@ SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: TRUE
 
-external stream Stocks(Date, Open)
+stream Stocks(Date, Open)
 
 layer Ticker[POLY_LINE]					/*Poly-line is a set of line segments treated as a group.*/
 from Stocks
@@ -20,25 +20,25 @@ layer Averages[POLY_LINE]
 from Stocks
 	ID: "Google_30"
 	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[-30..n](Price) -> (VALUE)	/*Average the most recent 30 values.*/
+	Y.new: Price(Open) -> Mean[range: "-30..n"](Price) -> (VALUE)	/*Average the most recent 30 values.*/
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @Color{LIME,150}
 from Stocks
 	ID: "Google_ALL"
 	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[1..n](Price) -> (VALUE)		/*Average all values.*/
+	Y.new: Price(Open) -> Mean[range: ALL](Price) -> (VALUE)		/*Average all values.*/
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @Color{CRIMSON,150}
 from Stocks
 	ID: "Google_20"
 	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[-30 .. -10](Price) -> (VALUE) /*Average that lags by 10 and includes 20 values.*/
+	Y.new: Price(Open) -> Mean[range: "-30 .. -10"](Price) -> (VALUE) /*Average that lags by 10 and includes 20 values.*/
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @Color{ORANGE,150}
 	
 
 operator Price (Open) -> (Price)
-	all => (Price) : Mult(-1, Open) -> (VALUE)
+	ALL => (Price) : Mult(-1, Open) -> (VALUE)
 
 operator TimeStep (T) -> (VALUE)
-	all => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE
+	ALL => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE

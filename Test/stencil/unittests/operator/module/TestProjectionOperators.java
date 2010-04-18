@@ -17,7 +17,7 @@ public class TestProjectionOperators extends TestCase {
 
 		java.awt.Color c;
 
-		Specializer s = ParseStencil.parseSpecializer("[1 .. n, cold=\"RED\", hot=\"WHITE\"]");
+		Specializer s = ParseStencil.parseSpecializer("[cold: \"RED\", hot: \"WHITE\"]");
 		
 		
 		Projection.HeatScale l = new Projection.HeatScale(null, s);	//OperatorData is not required...

@@ -3,7 +3,7 @@ targetClass: stencil.operator.module.provided.StencilUtil
 description: Utilities to manipulate the tuple data representation.
 
 defaults:
-  defaultSpecializer: !spec "[1 .. n]"
+  defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets:
     - {name: map, function: false, type: CATEGORIZE}
     - {name: query, function: false, type: CATEGORIZE}

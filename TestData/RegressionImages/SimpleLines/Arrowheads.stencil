@@ -6,7 +6,7 @@ SOURCE: ./degrees.txt
 SKIP: 1
 STRICT: true
 
-external stream Degrees(Deg)
+stream Degrees(Deg)
 
 layer DoubleLines[LINE]
 default

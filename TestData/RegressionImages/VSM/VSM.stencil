@@ -13,8 +13,8 @@ SOURCE: ./ws_400_12_0.1.adj.bfs
 SKIP: 1
 STRICT: true
 
-external stream VertexList(ID1, ID2)
-external stream BFS(ID)
+stream VertexList(ID1, ID2)
+stream BFS(ID)
 
 order BFS > VertexList
 
@@ -36,5 +36,5 @@ from BFS
 	() : Ordering(ID) -> ()
 
 operator Ordering (ID) -> (VALUE)
-	(all) => VALUE : Index(ID) -> VALUE
+	(ALL) => VALUE : Index(ID) -> VALUE
 

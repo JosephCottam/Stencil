@@ -3,7 +3,7 @@ targetClass: stencil.types.color.ColorUtils
 description: Create and modify colors.
 
 defaults:
-  defaultSpecializer: !spec "[n .. n]"
+  defaultSpecializer: !spec "[range: ALL, split:0]"
   facets:
     - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
     - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}

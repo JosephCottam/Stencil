@@ -7,7 +7,7 @@ STRICT: TRUE
 SKIP: 1
 
 
-external stream Elements(Name)
+stream Elements(Name)
 
 layer Text[TEXT]
 from Elements
@@ -39,4 +39,4 @@ from Elements
 
 
 operator Count(Name) -> (VALUE) 
-	(all) => VALUE : Index(Name) -> VALUE
+	(ALL) => VALUE : Index(Name) -> VALUE

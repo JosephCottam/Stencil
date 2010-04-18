@@ -5,6 +5,12 @@ import stencil.operator.module.Module;
 import stencil.operator.module.SpecializationException;
 import stencil.parser.tree.Specializer;
 
+/**Module created when meta-data indicates that a
+ * module root is not an instance of Module.
+ * 
+ * @author jcottam
+ *
+ */
 public class SyntheticModule implements Module {
 	private final ModuleData md;
 	private final Class clazz;

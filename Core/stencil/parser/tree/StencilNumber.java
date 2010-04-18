@@ -23,4 +23,14 @@ public class StencilNumber extends Atom {
 
 		throw new NumberFormatException("String " + value + " does not encode valid integer or double.");
 	}
+	
+	public boolean equals(Object other) {
+		if (this == other) {return true;}
+		if (!(other instanceof StencilNumber)) {return false;}
+		StencilNumber alter = (StencilNumber) other;
+		
+		return this.getNumber().equals(alter.getNumber());
+	}
+	
+	public int hashCode() {return getNumber().hashCode();}
 }

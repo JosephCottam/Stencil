@@ -5,7 +5,7 @@ import stencil.operator.module.util.FacetData;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.MethodInvokeFailedException;
-import stencil.parser.tree.Split;
+import stencil.operator.util.Split;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -136,7 +136,7 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	//final because it is a utility method
 	public static final StencilOperator makeOperator(Split split, StencilOperator operator) {
-		if (!split.hasSplitField()) {return operator;}
+		if (split.getFields() ==0) {return operator;}
 		if (split.isOrdered()) {return new OrderedHelper(split, operator);}
 		return new UnorderedHelper(split, operator);
 	}

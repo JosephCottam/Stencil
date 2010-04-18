@@ -64,7 +64,7 @@ options {
 
   public Specializer makeSpec(String guideType, Specializer spec) {
      if (spec.getChild(0).getType() == DEFAULT) {return getDefault(guideType);}
-     else {return blendMaps(getDefault(guideType), spec);}
+     else {return Specializer.blendMaps(getDefault(guideType), spec, adaptor);}
   }
 
 	private Specializer getDefault(String guideType) {
@@ -81,25 +81,6 @@ options {
 			
     return  (Specializer) adaptor.dupTree(defaultSpec);
 	}
-
-  private Specializer blendMaps(Specializer defaults, Specializer update) {
-    Specializer result = (Specializer) adaptor.dupTree(update);
-    CommonTree mapList = (CommonTree) adaptor.create(LIST, "<map args>");
-    
-    Map<String, Atom> entries = new HashMap();
-    entries.putAll(defaults.getMap());
-    entries.putAll(update.getMap());
-    
-    for (String key: entries.keySet()) {
-      MapEntry entry = (MapEntry) adaptor.create(MAP_ENTRY, key);
-      adaptor.addChild(entry, adaptor.dupTree(entries.get(key)));
-      adaptor.addChild(mapList, entry);
-    }
-
-    int mapIdx = result.getMap().getSource().getChildIndex();    
-    adaptor.replaceChildren(result, mapIdx, mapIdx, mapList);
-    return result;
-  }
 }
 
 topdown

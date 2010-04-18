@@ -37,13 +37,14 @@ import stencil.parser.string.StencilParser;
 
 public class Program extends StencilTree {
 	private static final int IMPORTS = 0;
-	private static final int ORDER = 1;
+	private static final int GLOBALS = 1;
 	private static final int STREAMS = 2;
-	private static final int CANVAS_DEF = 3;
-	private static final int LAYERS = 4;
-	private static final int OPERATORS =5;
-	private static final int PYTHONS = 6;
-	private static final int TEMPLATES = 7;
+	private static final int ORDER = 3;
+	private static final int CANVAS_DEF = 4;
+	private static final int LAYERS = 5;
+	private static final int OPERATORS =6;
+	private static final int PYTHONS = 7;
+	private static final int TEMPLATES = 8;
 		
 	private ModuleCache mc;	//TODO: Remove when all tuple references are positional
 	
@@ -55,6 +56,13 @@ public class Program extends StencilTree {
 		return (List) getChild(LAYERS);
 	}
 
+	/**What are the layers of this stencil?*/
+	public List<Layer> getGlobals() {
+		assert verifyType(getChild(GLOBALS), StencilParser.LIST);
+		return (List) getChild(GLOBALS);
+	}
+
+	
 	/**Get the layer specified.
 	 * @throws NoSuchElementException Name given that does not correspond to a layer name.
 	 */
@@ -82,9 +90,9 @@ public class Program extends StencilTree {
 	/**Get a list of all stream names used in this stencil.
 	 * TODO: Provide a method to get all streams (not just externals)
 	 * */
-	public List<External> getExternals() {
+	public List<ExternalStream> getExternalStreams() {
 		assert verifyType(getChild(STREAMS), StencilParser.LIST) : "Unexpeced type for streams list" + typeName(getChild(STREAMS).getType());
-		return (List<External>) getChild(STREAMS);
+		return (List<ExternalStream>) getChild(STREAMS);
 	}
 
 	/**List of all operators defined by this stencil.*/

@@ -47,7 +47,7 @@ public class TestMean extends TestCase {
 	}
 	
 	public void testFullRange() throws Exception {
-		Specializer spec = ParseStencil.parseSpecializer("[1..n]");
+		Specializer spec = ParseStencil.parseSpecializer("[range: ALL, split: 0]");
 		StencilOperator meaner = average.instance("Mean", spec);
 		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
 		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
@@ -64,7 +64,7 @@ public class TestMean extends TestCase {
 	}
 	
 	public void testSplitFullRange() throws Exception {
-		Specializer spec = ParseStencil.parseSpecializer("[v|1..n]");
+		Specializer spec = ParseStencil.parseSpecializer("[split: \"1,pre\", range: ALL]");
 		StencilOperator meaner = average.instance("Mean", spec);
 		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
 		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);

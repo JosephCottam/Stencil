@@ -14,8 +14,8 @@ STRICT: TRUE
 SKIP: 0
 
 
-external stream Reg(Name)
-external stream Reg2(Name)
+stream Reg(Name)
+stream Reg2(Name)
 
 order Reg > Reg2
 
@@ -64,4 +64,4 @@ from Reg
 
 
 operator Count(C) -> (VALUE)
-   all => VALUE: Index(C) -> Mult(10, VALUE) -> (VALUE)
+   ALL => VALUE: Index(C) -> Mult(10, VALUE) -> (VALUE)

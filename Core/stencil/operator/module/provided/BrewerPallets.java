@@ -28,14 +28,17 @@ public class BrewerPallets  extends BasicModule {
 	}
 	
 	public static final class BrewerColors extends BasicProject {
+		private static String PALLET = "pallet";
+		private static String RESERVE = "reserve";
+		
 		final List seen = new ArrayList();
 		final String rootPallet;
 		final Tuple reserve;
 
 		public BrewerColors(OperatorData od, Specializer spec) {
 			super(od);
-			rootPallet = spec.getArgs().get(0).getText().toUpperCase();
-			reserve = stencil.types.color.ColorCache.get(spec.getArgs().get(1).getText());
+			rootPallet = spec.get(PALLET).getText().toUpperCase();
+			reserve = stencil.types.color.ColorCache.get(spec.get(RESERVE).getText());
 		}
 
 		public Tuple map(Object value) {

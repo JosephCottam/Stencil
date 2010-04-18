@@ -8,22 +8,22 @@ import stencil.parser.string.ParseStencil;
 public class TestSpecializerParse extends TestCase {
 	public void testRangePass() throws Exception {
 		String[] specializers = new String[] {
-				"[1 .. n]",
-				"[n .. n]",
-				"[-1 .. n]",
-				"[1 .. 2]",
-				"[1 .. -10]",
-				"[-10 .. -1]"
+				"[range: \"1..n\"]",
+				"[range: \"n .. n\"]",
+				"[range: \"-1..n\"]",
+				"[range: \"1 .. 2\"]",
+				"[range: \"1 .. -10\"]",
+				"[range: \"-10 .. -1\"]"
 		};
 		testPasses(specializers);
 	}
 	
 	public void testRangeFail() throws Exception {
 		String[] specializers = new String[] {
-				"[n .. 1]",			//n in first position, not in last
-				"[10 .. 9]",		//Start index after end
-				"[-10 .. -20]",		//Start index after end
-				"[-1 .. 5]",		//Start index after end
+				"[range: \"n .. 1\"]",			//n in first position, not in last
+				"[range: \"10 .. 9\"]",		//Start index after end
+				"[range: \"-10 .. -20\"]",		//Start index after end
+				"[range: \"-1 .. 5\"]",		//Start index after end
 		};
 		testFails(specializers);
 	}
@@ -37,28 +37,14 @@ public class TestSpecializerParse extends TestCase {
 	}
 
 	
-	public void testArgsList() throws Exception {
-		String[] specializers = new String[] {
-				"[]",
-				"[\"one\"]",
-				"[\"one\", \"two\"]",
-				"[\"one\", \"two\", \"three\"]",
-				"[\"one\", \"two\", \"three\", \"four\"]",
-				"[\"one\", \"two\", \"three\", \"four\", \"five\", \"six\", \"seven\", \"eight\",\"nine\"]",
-				"[1]",
-				"[1, 2,3]",
-				"[1, \"two\", 3, \"four\"]"};
-		testPasses(specializers);
-	}
-	
 	public void testRangeArgs() throws Exception {
 		String[] specializers = new String[] {
-				"[1 .. n, 1]",
-				"[1 .. n, \"one\"]",
-				"[1 .. n, \"one\", \"two\", \"three\"]",
-				"[1 .. n, 1, 2,3]",
-				"[1 .. n, 1, \"two\", 3, \"four\"]",
-				"[1 .. n, \"one one\", \"two, two\", \" three, three \"]"
+				"[range: \"1..n\", more: 1]",
+				"[range: \"1..n\", more: \"one\"]",
+				"[range: \"1..n\", more: \"one\", more2: \"two\", more3: \"three\"]",
+				"[range: \"1..n\", more: 1, more2: 2, more3: 3]",
+				"[range: ALL]",
+				"[range: LAST]"
 				};
 		testPasses(specializers);
 	}
@@ -67,12 +53,10 @@ public class TestSpecializerParse extends TestCase {
 	public void testNamedArgs() throws Exception {
 		String[] specializers = new String[] {
 				"[]",
-				"[one=1.0]",			
-				"[one=1]",			
-				"[one=\"one\", two=\"two\"]",
-				"[one=\"one\", two=2, three=\"three\"]",
-				"[\"one\", two=\"two\"]",		//un-named, followed by named
-				"[\"one\", \"two\", three=\"three\", four=\"four\", five=5]"};
+				"[one: 1.0]",			
+				"[one: 1]",			
+				"[one: \"one\", two: \"two\"]",
+				"[one: \"one\", two: 2, three: \"three\"]"};
 
 		
 		testPasses(specializers);

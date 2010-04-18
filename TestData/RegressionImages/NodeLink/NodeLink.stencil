@@ -13,8 +13,8 @@ SOURCE: ./er_100_0.005.bfs
 SKIP: 1
 STRICT: true
 
-external stream BFS (ID) 
-external stream VertexList (ID1, ID2)
+stream BFS (ID) 
+stream VertexList (ID1, ID2)
 
 order BFS > VertexList			/*Load the node list before the vertex list.*/
 
@@ -43,7 +43,7 @@ from VertexList
 
 
 operator Ordering (ID)->(VALUE)  
-	(all) => VALUE : Index(ID) -> (VALUE)
+	(ALL) => VALUE : Index(ID) -> (VALUE)
 
 python Triangular
 facet init {

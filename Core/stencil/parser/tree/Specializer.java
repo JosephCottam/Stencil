@@ -28,35 +28,48 @@
  */
 package stencil.parser.tree;
 
+import java.util.HashMap;
+import java.util.Map;
 
 import org.antlr.runtime.Token; 
+import org.antlr.runtime.tree.TreeAdaptor;
+
+import stencil.parser.string.StencilParser;
 
 public class Specializer extends StencilTree {
-
+	private MapEntry.MapList map;
+	
+	/**Customary key used to store range descriptor.*/
+	public static final String RANGE = "range";
+	
+	/**Customary key used to store split descriptor.*/
+	public static final String SPLIT = "split";
+	
 	public Specializer(Token source) {super(source);}
 
-	/**Is the split before or after the range?*/
-	public boolean isPreSplit() {return false;} //TODO: implement pre/post split...
+	/**Direct access to the map arguments.*/
+	public Atom get(String key) {return getMap().get(key);}
 
-	/**What is the range argument?*/
-	public Range getRange() {return (Range) getChild(0);}
-
-	/**What is the split argument?*/
-	public Split getSplit() {return (Split) getChild(1);}
+	/**Direct access to the map key query.*/
+	public boolean containsKey(String key) {return getMap().containsKey(key);}
 	
-	/**What additional arguments were passed to the specializer?*/
-	public java.util.List<Atom> getArgs() {return (List<Atom>) getChild(2);}
-
+	/**What map arguments were passed to the specializer?*/
 	public MapEntry.MapList getMap() {
-		return new MapEntry.MapList((List<MapEntry>) getChild(3));
+		if (map == null) {map =new MapEntry.MapList((List<MapEntry>) getChild(0));}
+		return map;
 	}
 	
-	public boolean isSimple() {
-		return getRange().isSimple()
-				&& !getSplit().hasSplitField()
-				&& getArgs().size() ==0
-				&& getMap().size() ==0;
+	/**A simple specializer has no arguments.*/
+	public boolean isSimple() {return getMap().size()==0;}
+
+	/**A specializer with at most a Range and Split argument.*/
+	public boolean isBasic() {
+		return isSimple()
+		    || (getMap().size() == 1 && containsKey(RANGE)) 
+			|| (getMap().size() ==1 && containsKey(SPLIT))
+			|| (getMap().size() == 2 && (containsKey(RANGE) && containsKey(SPLIT)));
 	}
+
 	
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
@@ -68,21 +81,16 @@ public class Specializer extends StencilTree {
 		if (this.getChild(0).getText().equals("DEFAULT") || alter.getChild(0).getText().equals("DEFAULT")) {return false;}//only one is default
 		
 		
-		return this.isPreSplit() == alter.isPreSplit() &&
-				((this.getArgs() == null && alter.getArgs() == null) ||	(this.getArgs().size() == alter.getArgs().size())) &&
-				((this.getRange() == null && alter.getRange() == null)  || (this.getRange().equals(alter.getRange()))) &&
-				((this.getSplit() == null && alter.getSplit() == null) || (this.getSplit().equals(alter.getSplit()))) &&
-				allArgsEqual(this, alter);
+		return allArgsEqual(this, alter);
 	}
 	
 	@Override
 	public int hashCode() {
-		return getSplit().hashCode() * getRange().hashCode() * hashArgs();
+		return hashArgs();
 	}
 
 	private final int hashArgs() {
 		int acc=1;
-		for (Atom arg: getArgs()) {acc = acc*arg.hashCode();}
 		for (Atom arg: getMap().values()) {acc = acc*arg.hashCode();}
 		for (String arg: getMap().keySet()) {acc = acc*arg.hashCode();}
  		return acc;
@@ -90,15 +98,36 @@ public class Specializer extends StencilTree {
 	
 	/**Compare the argument lists.*/
 	private static final boolean allArgsEqual(Specializer one, Specializer two) {
-		java.util.List<Atom> argsOne = one.getArgs();
-		java.util.List<Atom> argsTwo = two.getArgs();
-		if (argsOne == null && argsTwo == null) {return true;}
+		java.util.Map mapOne = one.getMap();
+		java.util.Map mapTwo = two.getMap();
 		
-		if (argsOne == null || argsOne.size() != argsTwo.size()) {return false;}
+
+		if (mapOne.size() != mapTwo.size()) {return false;}
 		
-		for (int i =0; i< argsOne.size(); i++) {
-			if (!argsOne.get(i).equals(argsTwo.get(i))) {return false;}
+		for (Object key: mapOne.keySet()) {
+			Object v1 = mapOne.get(key);
+			Object v2 = mapTwo.get(key);
+			if (v1 != v2 && v1 != null && !v1.equals(v2)) {return false;}
 		}
 		return true;
+	}
+	
+	public static Specializer blendMaps(Specializer defaults, Specializer update, TreeAdaptor adaptor) {
+		Specializer result = (Specializer) adaptor.dupTree(update);
+		StencilTree mapList = (StencilTree) adaptor.create(StencilParser.LIST, "<map args>");
+
+		Map<String, Atom> entries = new HashMap();
+		entries.putAll(defaults.getMap());
+		entries.putAll(update.getMap());
+
+		for (String key: entries.keySet()) {
+			MapEntry entry = (MapEntry) adaptor.create(StencilParser.MAP_ENTRY, key);
+			adaptor.addChild(entry, adaptor.dupTree(entries.get(key)));
+			adaptor.addChild(mapList, entry);
+		}
+
+		int mapIdx = result.getMap().getSource().getChildIndex();    
+		adaptor.replaceChildren(result, mapIdx, mapIdx, mapList);
+		return result;
 	}
 }

@@ -30,14 +30,11 @@ package stencil.operator.module.provided;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.*;
-import stencil.operator.module.util.BasicModule;
-import stencil.operator.module.util.ModuleData;
-import stencil.operator.module.util.Modules;
-import stencil.operator.module.util.OperatorData;
+import stencil.operator.module.util.*;
 import stencil.operator.util.BasicProject;
+import stencil.operator.util.Range;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.parser.tree.Specializer;
-import stencil.parser.tree.Range;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -171,34 +168,29 @@ public class Numerics extends BasicModule {
  	
  	public Numerics(ModuleData md) {super(md);}
  	
- 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-
-		if (specializer.getArgs().size() >0) {throw new SpecializationException(moduleData.getName(), name, specializer);}
- 	}
  	
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		Range range = specializer.getRange();
+		OperatorData operatorData = getModuleData().getOperator(name);
+		Range range = new Range(specializer.get(Specializer.RANGE));
 
 		validate(name, specializer);
 		StencilOperator target = null;
-		OperatorData operatorData = getModuleData().getOperator(name);
 		
 		try {
 			
 			target = Modules.instance(this.getClass(), operatorData);
-			if (specializer.isSimple()) {
+			if (specializer.isBasic()) {
 				return target;
 			} else if (name.equals("Sum") && !range.isFullRange()) {
-				target = RangeHelper.makeOperator(specializer.getRange(), target, QUERY_FACET);
+				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
 				target = new FullSum(operatorData);
 			} else if (name.equals("Max") && !range.isFullRange()) {
-				target = RangeHelper.makeOperator(specializer.getRange(), target, QUERY_FACET);
+				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Max")) {
 				target = new FullMax(operatorData);
 			} else if (name.equals("Min") && !range.isFullRange()) {
-				target = RangeHelper.makeOperator(specializer.getRange(),target, QUERY_FACET);}
+				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
 				target = new FullMin(operatorData);
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toString()));}

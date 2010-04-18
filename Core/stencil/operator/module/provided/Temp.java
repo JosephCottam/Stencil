@@ -53,18 +53,27 @@ public class Temp extends BasicModule {
 	 *
 	 */
 	public static final class Scale extends BasicProject {
-		private static final String MAX_KEY = "max";
-		private static final String MIN_KEY = "min";
+		private static final String IN_MAX = "inMax";
+		private static final String IN_MIN = "inMin";
+		private static final String OUT_MAX = "max";
+		private static final String OUT_MIN = "min";
 		final double outMin, outMax, span;
 		double inMin = Double.MAX_VALUE;
 		double inMax = Double.MIN_VALUE;
 
 		public Scale(OperatorData od, Specializer spec) {
 			super(od);
-			outMin = Converter.toDouble(spec.getArgs().get(0));
-			outMax = Converter.toDouble(spec.getArgs().get(1));
-			if (spec.getMap().containsKey(MAX_KEY)) {inMax = Converter.toDouble(spec.getMap().get(MAX_KEY).getValue());}
-			if (spec.getMap().containsKey(MIN_KEY)) {inMin = Converter.toDouble(spec.getMap().get(MIN_KEY).getValue());}
+			outMin = Converter.toDouble(spec.get(OUT_MIN));
+			outMax = Converter.toDouble(spec.get(OUT_MAX));
+			
+			if (spec.containsKey(IN_MAX)) {
+				inMax = Converter.toDouble(spec.get(IN_MAX));
+			} 
+			
+			if (spec.containsKey(IN_MIN)) {
+				inMin = Converter.toDouble(spec.get(IN_MIN));
+			}
+			
 			span = outMax-outMin;
 		}
 
@@ -89,27 +98,39 @@ public class Temp extends BasicModule {
 	 *
 	 */
 	public static final class Partition extends BasicProject {
-		final double min;
-		final double max;
-		final double buckets;
-		final double bucketSpan;
+		private static final String MIN = "min";
+		private static final String MAX = "max";
+		private static final String BUCKETS = "n";
+		
+		private final double buckets;
+		private final boolean autoMin;
+		private final boolean autoMax;
+
+		private double min;
+		private double max;
+		private double bucketSpan;
 		
 		public Partition(OperatorData od, Specializer spec) {
 			super(od);
-			if (spec.getArgs().size() ==2) {
-				min =0;
-				max = Converter.toDouble(spec.getArgs().get(0));
-				buckets = Converter.toDouble(spec.getArgs().get(1));
-			} else {
-				min =Converter.toDouble(spec.getArgs().get(1));
-				max = Converter.toDouble(spec.getArgs().get(2));
-				buckets = Converter.toDouble(spec.getArgs().get(3));
-			}
-			bucketSpan = (max-min)/buckets;
+
+			buckets = Converter.toDouble(spec.get(BUCKETS));
+
+			autoMin = !spec.containsKey(MAX);
+			autoMax = !spec.containsKey(MIN);
+			max = autoMax ? Converter.toDouble(spec.get(MAX)) : Double.MAX_VALUE;
+			min = autoMin ? Converter.toDouble(spec.get(MIN)) : Double.MAX_VALUE; 
 		}
 
+		private void calcSpan(double value) {
+			if (autoMax && value > max) {max = value;}
+			if (autoMin && value < min) {min = value;}
+			bucketSpan = (max-min)/buckets;
+		}
+		
 		public double[] map(double dv) {return query(dv);}
 		public double[] query(double dv) {
+			calcSpan(dv);
+			
 			dv = dv-min;
 
 			double bucket = (buckets)/((max-min)/dv);
@@ -211,6 +232,7 @@ public class Temp extends BasicModule {
 
 	/**Maps one element to a set of other elements*/
 	public static class Mapping extends BasicProject {
+		public static final String NAMES = "fields";
 		public static final String NAME = "Mapping";
 		public static final String PUT_FACET = "put";
 
@@ -253,6 +275,7 @@ public class Temp extends BasicModule {
 			String module = basic.getModule();
 			String name = basic.getName();
 			String[] fields;
+			
 			try {fields = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
@@ -264,14 +287,10 @@ public class Temp extends BasicModule {
 		}
 
 		public static StencilOperator instance(OperatorData opData, Specializer specializer) throws SpecializationException, NoSuchMethodException {
-			if (!specializer.getRange().isFullRange() || specializer.getSplit().hasSplitField()) {
-				throw new SpecializationException(opData.getModule(), opData.getName(), specializer);
-			}
-
 			String[] names;
+			
 			try {names = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), specializer, e);}
-			//Blend names into the operator data
 
 			Mapping m = new Mapping(getOperatorData(opData, specializer), names);
 
@@ -279,21 +298,9 @@ public class Temp extends BasicModule {
 
 			return m;
 		}
-
-		/**Convert a specializer into a list of strings.  
-		 * All specializer arguments must have atom.isName == true.
-		 * 
-		 * @throws IllegalArgumentException A non-name appears in the specializer list.
-		 **/
-		private static String[] getNames(Specializer specializer) throws SpecializationException {
-			String[] fields = new String[specializer.getArgs().size()];
-
-			for (int i = 0; i< specializer.getArgs().size(); i++) {
-				Atom atom = specializer.getArgs().get(i);
-				if (!atom.isString()) {throw new IllegalArgumentException(String.format("Non-string in position %1$d.  Found '%2$s' instead.", i, atom.toStringTree()));}
-				fields[i] = atom.getText();
-			}
-			return fields;
+		
+		private static String[] getNames(Specializer spec) {
+			return spec.get(NAMES).getText().split("\\s*,\\s*");
 		}
 
 		public Mapping duplicate() {return new Mapping(operatorData, names);}

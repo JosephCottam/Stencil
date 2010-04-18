@@ -28,7 +28,7 @@
  */ 
  
 /* Verifies that each range is properly formed.*/
-tree grammar RangeValidator;
+tree grammar SpecializerValidator;
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
@@ -36,38 +36,14 @@ options {
 }
 
 @header {
-  /** Validates that ranges make sense.**/
-   
-
+  /**Verify that specializers are correct:
+    *  (1) No default  tags remain
+    *  (2) TODO: Map argument labels all match a an argument key pattern from the meta-data.
+  **/
+  
   package stencil.parser.string.validators;
   
-  import static stencil.parser.ParserConstants.RANGE_END_INT;
-  import stencil.parser.tree.Specializer;
-  import stencil.parser.tree.Range;
-  import stencil.parser.tree.StencilTree;
   import stencil.parser.string.ValidationException;
 }
 
-@members {
-  private static final class RangeValidationException extends ValidationException {
-    public RangeValidationException(Range range) {
-         super("Invalid range:" + range.rangeString());
-    }    
-  }
-
-   private void validate(Range range) {
-      int start = range.getStart();
-      boolean relativeStart = range.relativeStart();
-      int end = range.getEnd();
-      boolean relativeEnd = range.relativeEnd();
-   
-      if ((end == RANGE_END_INT)  //If the end is range-end, any start value can be used
-          || (relativeStart == relativeEnd && relativeStart && start > end)
-          || (relativeStart == relativeEnd && !relativeStart && start < end)
-          || (relativeEnd && !relativeStart)) {return;}
-          
-      throw new RangeValidationException(range);
-   }
-}
-
-topdown: ^(r=RANGE .*) {validate((Range) r);};
+topdown: ^(s=SPECIALIZER DEFAULT) {throw new ValidationException("Default specializer found after all supposedly removed.");};

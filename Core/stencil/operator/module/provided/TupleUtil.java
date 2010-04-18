@@ -20,27 +20,26 @@ public class TupleUtil extends BasicModule {
 	 * TODO: Merge echo and categorize and Rename
 	 */
 	public static final class Rename extends BasicProject {
+		private static String NAMES = "names";
 		public static final String NAME = "Rename";
 		public static final Specializer DEFAULT_SPECAILIZER;
 		static {
 			try {DEFAULT_SPECAILIZER = ParseStencil.parseSpecializer("[VALUE]");}
 			catch (Exception e) {throw new Error("Error creating default specializer for Rename.");}
 		}
-		
+
 		String[] keys;
-		
+
 		public Rename(OperatorData opData, Specializer specializer) {
 			super(opData);
-			keys = new String[specializer.getArgs().size()];
-			for (int i=0; i< keys.length; i++) {
-				keys[i] = specializer.getArgs().get(i).toString();
-			}
-		}		
+			keys = specializer.get(NAMES).getText().split("\\s+,\\s+");
+		}
+
 		public Rename(OperatorData opData, String...keys) {
 			super(opData);
 			this.keys = keys;
 		}
-		
+
 		public Tuple query(Object... args) {return map(args);}
 		public Tuple map(Object... values) {
 			assert keys.length == values.length : "Keys and values lengths do not match.";
@@ -50,9 +49,7 @@ public class TupleUtil extends BasicModule {
 		public String getName() {return NAME;}
 
 		public static boolean accepts(Specializer specializer) {
-			return specializer.getArgs().size() > 0 &&
-				specializer.getRange().isSimple() &&
-				!specializer.getSplit().hasSplitField();
+			return specializer.getMap().size() ==0;
 		}
 		
 		public Rename duplicate() {return new Rename(operatorData, keys);}

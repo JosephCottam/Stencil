@@ -3,7 +3,7 @@ targetClass: stencil.operator.module.provided.Numerics
 description: Math functions to supplement the standard ones from JavaMath.
 
 defaults:
-  defaultSpecializer: !spec "[n .. n]"
+  defaultSpecializer: !spec "[range: LAST, split: 0]"
   facets:
     - {name: map, type: PROJECT, function: FALSE, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: FALSE, prototype: !proto "VALUE"}
@@ -27,7 +27,8 @@ operators:
   - name: Sub
   - name: Sub1
   - name: Sum
-    defaultSpecializer: !spec "[1 .. n]"
+    defaultSpecializer: !spec "[range: ALL, split:0]"
+    keys: range, split
     target: Add
     facets:
       - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}

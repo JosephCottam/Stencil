@@ -27,7 +27,7 @@ public class JythonOperator implements StencilOperator {
 		this.module = module;
 		this.operatorName = name;
 		invokeables = new HashMap<String, Invokeable<Tuple>>();
-		operatorData = new OperatorData(module, name, SIMPLE_SPECIALIZER);
+		operatorData = new OperatorData(module, name, BASIC_SPECIALIZER);
 	}
 		
 	public String getName() {return operatorName;}

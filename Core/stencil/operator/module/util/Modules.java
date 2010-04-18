@@ -161,10 +161,10 @@ public final class Modules {
 	}
 	
 	public static OperatorData basicOperatorData(String module, String name, String type, List<String> fields) {
-		OperatorData legendData = new OperatorData(module, name, SIMPLE_SPECIALIZER);
-		legendData.addFacet(new FacetData(ParserConstants.MAIN_FACET, type, false, fields));
-		legendData.addFacet(new FacetData(ParserConstants.QUERY_FACET, type, false, fields));
-		legendData.addFacet(new FacetData(ParserConstants.GUIDE_FACET, type, false, fields));
-		return legendData;
+		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER);
+		od.addFacet(new FacetData(ParserConstants.MAIN_FACET, type, false, fields));
+		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, type, false, fields));
+		od.addFacet(new FacetData(ParserConstants.GUIDE_FACET, type, false, fields));
+		return od;
 	}
 }

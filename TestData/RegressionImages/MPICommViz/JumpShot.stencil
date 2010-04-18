@@ -13,9 +13,9 @@ SOURCE: ./diss_16.viz
 SKIP: 0
 STRICT: false
 
-external stream ranks(rank, label)
-external stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
-external stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
+stream ranks(rank, label)
+stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
+stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
 
 order ranks > (overheads | trans)
 
@@ -52,7 +52,7 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
 
-operator Spacer base Max[1..n]
+operator Spacer base Max[ALL]
 
 layer baseline[LINE]
 from overheads
@@ -70,7 +70,7 @@ from trans
 layer compressions[SHAPE]
 from overheads
 	filter(op =~ "clocalop")
-	ID: Count[1]()
+	ID: Count()
 	Y: Layout(rank) 
 	X: Timescale(skewedStart)
 	FILL_COLOR : @Color{Purple}
@@ -80,7 +80,7 @@ from overheads
 layer overhead[LINE]
 from overheads
 	filter(op !~ "clocalop") 
-	ID: Count[1]()
+	ID: Count()
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 	X.1: Timescale(skewedStart)
 	X.2: Timescale(skewedEnd)
@@ -102,18 +102,18 @@ operator ColorByOp(op) -> (C)
 	(op =~ "osend") => C: @Color{SlateBlue}
 	(op =~ "orecv") => C: @Color{MediumSlateBlue}
 	(op =~ "transmission") => C: @Color{FireBrick}
-	all => C: @Color{BLACK, .5}
+	ALL => C: @Color{BLACK, .5}
 
 operator WeightByOp(op) -> (W)
 	(op =~ "osend") => W : 1
  	(op =~ "orecv") => W : 1
 	(op =~ "transmission") => W: .5
-	all => W: 2
+	ALL => W: 2
    
 	
 operator Layout (rank)->(Y)
-  all => (Y) : Mult(20, rank)
+  ALL => (Y) : Mult(20, rank)
  
 
 operator Timescale(time) -> (time)
-  all => time : Div(time, 50)
+  ALL => time : Div(time, 50)

@@ -35,7 +35,7 @@ public class Sidebar implements Guide2D {
 	public static final String LABEL_PROPERTY_TAG = "label";
 	public static final String EXAMPLE_PROPERTY_TAG = "example";
 	
-	private static final String defaultArguments = "[sample=\"CATEGORICAL\", label.FONT_SIZE=4, label.FONT_COLOR=\"BLACK\", example.SIZE=4, spacing=.25, displayOn=\"" + SIMPLE_DEFAULT + "\"]";
+	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT_SIZE: 4, label.FONT_COLOR: \"BLACK\", example.SIZE: 4, spacing: .25, displayOn: \"" + SIMPLE_DEFAULT + "\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}

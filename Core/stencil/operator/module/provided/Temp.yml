@@ -2,7 +2,7 @@ name: Temp
 targetClass: stencil.operator.module.provided.Temp
 
 defaults: 
-  defaultSpecializer: !spec "[1 .. n]"
+  defaultSpecializer: !spec "[range: ALL, split:0]"
   facets: 
     - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"} 
@@ -10,6 +10,7 @@ defaults:
 operators: 
    - name: Mapping
    - name: Rank
+     keys: "min, max, n"
      facets:
       - {name: map, type: BOTH, function: false, prototype: !proto "VALUE"}
       - {name: query, type: BOTH, function: false, prototype: !proto "VALUE"} 

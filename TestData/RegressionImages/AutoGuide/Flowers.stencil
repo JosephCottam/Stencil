@@ -6,21 +6,21 @@ SOURCE: ./AndersonsFlowers.csv
 SKIP: 1
 STRICT: true
 
-external stream flowers(sepalL, petalW, sepalW, 
+stream flowers(sepalL, petalW, sepalW, 
                         petalL, species, obs)
 
 canvas Main
-  guide trend[sample="SIMPLE"] from FlowerPlot ID 
-  guide sidebar[X=20, Y=-110] from FlowerPlot FILL_COLOR
-  guide axis[sample="Linear", axisLabel="Petal Length"] 
+  guide trend[sample: "SIMPLE"] from FlowerPlot ID 
+  guide sidebar[X: 20, Y: -110] from FlowerPlot FILL_COLOR
+  guide axis[sample: "Linear", axisLabel: "Petal Length"] 
     from FlowerPlot Y
-  guide axis[sample="Linear", axisLabel="Petal Width"] 
+  guide axis[sample: "Linear", axisLabel: "Petal Width"] 
      from FlowerPlot X
 
 layer FlowerPlot
 from flowers
    ID: obs
-   X:* Scale[0,100](petalL)
-   Y:* Scale[0,100](petalW) -> Mult(_,-1)
+   X:* Scale[min: 0, max:100](petalL)
+   Y:* Scale[min: 0, max:100](petalW) -> Mult(_,-1)
    FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
    REGISTRATION: "CENTER"

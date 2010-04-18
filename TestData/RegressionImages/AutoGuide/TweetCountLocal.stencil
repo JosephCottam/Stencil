@@ -7,10 +7,10 @@ SKIP: 1
 STRICT: TRUE
 
 
-external stream Tweets(MESSAGE)
+stream Tweets(MESSAGE)
 
 canvas Main
-	guide axis[sample="CATEGORICAL", tickSize=5, textOffset=6] from Counts X
+	guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Counts X
         label.FONT_SIZE: 10
         line.STROKE_WEIGHT: 1 
         label.REGISTRATION: "LEFT"
@@ -19,7 +19,7 @@ canvas Main
 layer Counts
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
-	X:* firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE)
+	X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11,VALUE)
 	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE)
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
@@ -31,4 +31,4 @@ from Tweets
 	
 
 operator firstLetter(Phrase) -> (Letter)
-	(all) => Letter: Trim(Phrase) -> Substring(VALUE, 0,1)-> VALUE
+	(ALL) => Letter: Trim(Phrase) -> Substring(VALUE, 0,1)-> VALUE

@@ -11,7 +11,7 @@ import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 
 public abstract class TestLayer extends junit.framework.TestCase {
-	String ruleSources ="external stream Stream1(Source, A,B,C) layer Layer1 from Stream1 X: A";
+	String ruleSources ="stream Stream1(Source, A,B,C) layer Layer1 from Stream1 X: A";
 
 	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}
 	

@@ -19,7 +19,7 @@ public class TestModule implements Module {
 	private static final TestModule instance = new TestModule();
 	
 	static {
-		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[1 .. n]")));}
+		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[range: ALL]")));}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
 		OperatorData od = MODULE_DATA.getOperator("FilterFail");

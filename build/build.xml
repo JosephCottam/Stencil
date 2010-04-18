@@ -128,12 +128,12 @@
             outputdirectory="${parser}/validators/"
             libdirectory="${parser}"
         />
+        <antlr
+            target="${grammars}/validators/SpecializerValidator.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
 
- 		<antlr
- 			target="${grammars}/validators/RangeValidator.g"
- 			outputdirectory="${parser}/validators/"
- 			libdirectory="${parser}"
- 		/>
  		<antlr
 			target="${grammars}/validators/StreamDeclarationValidator.g"
  			outputdirectory="${parser}/validators/"

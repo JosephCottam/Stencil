@@ -217,10 +217,10 @@ public class Projection extends BasicModule {
 	}
 
 	/**Counting when there are no keys to worry about.**/
-	public static final class SimpleCount extends BasicProject {
+	public static final class Counter extends BasicProject {
 		private long count =1;
-		public SimpleCount(OperatorData opData) {super(opData);}
-		public StencilOperator duplicate() {return new SimpleCount(operatorData);}
+		public Counter(OperatorData opData) {super(opData);}
+		public StencilOperator duplicate() {return new Counter(operatorData);}
 		public String getName() {return "Count";}
 		public long map() {return count++;}
 		public long query() {return count;}		
@@ -229,7 +229,7 @@ public class Projection extends BasicModule {
 	public Projection(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (name.equals("Count") && specializer.getArgs().size() == 1) {
+		if (name.equals("Count")) {
 			return;
 		} else {
 			super.validate(name, specializer);
@@ -250,8 +250,6 @@ public class Projection extends BasicModule {
 				throw new RuntimeException("Justify doesn't work yet...sorry.");
 			}
 			throw new IllegalArgumentException("Name not known : " + name);
-		} else if (name.equals("Count") && specializer.getArgs().contains(1)) {
-			return new SimpleCount(operatorData);
 		} else {
 			throw new SpecializationException(MODULE_NAME, name, specializer);}
 		}

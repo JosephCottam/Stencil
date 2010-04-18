@@ -17,8 +17,8 @@ STRICT: true
    Stresses the parsing and glyph creation system.
  **/
  
-external stream NodePositions(ID, X,Y)
-external stream Attributes(ID, ATT)
+stream NodePositions(ID, X,Y)
+stream Attributes(ID, ATT)
 
 order NodePositions > Attributes
 
@@ -30,4 +30,4 @@ from Attributes
 	ID : Counter()
 	(X,Y) : Counter() -> (_,_)
 
-operator Counter base Count[1]
+operator Counter base Count

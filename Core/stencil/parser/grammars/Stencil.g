@@ -40,15 +40,18 @@ tokens {
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
+  CANVAS_DEF;
   DIRECT_YIELD;
+  EXTERNAL_STREAM;
   FUNCTION;
   GLYPH;        //Indicates the target is a layer's glyph (can only be derived, not specified)
   GUIDE_QUERY;
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
   GUIDE_SUMMARIZATION;
+  GUIDE_YIELD;
   LIST;
-  CANVAS_DEF;
+  MAP_ENTRY;
   NUMBER;
   OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
   OPERATOR_PROXY;    //Operator, specfied by base reference to an instance of an imported operator 
@@ -64,28 +67,29 @@ tokens {
   PYTHON_FACET;
   RETURN;       //Inidicates the target is an operator return value (can only be derived, not specified)
   RULE;
+  ROLE;         //Proxy object before facet resolution is done
   SIGIL_ARGS;
   SPECIALIZER;
   SELECTOR;		//Indicate some part of a stencil
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
   TUPLE_REF;
-  MAP_ENTRY;
-
+  
   //General Keywords
-  ALL = 'all'; //Default pattern
-  AS  = 'as'; //used in imports
-  BASE  = 'base'; //Refer to the base entity
+  ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n
+  AS  = 'as';         //used in imports
+  BASE  = 'base';     //Refer to the base entity
   CANVAS  = 'canvas';
+  CONST = 'const';
   DEFAULT = 'default';
-  EXTERNAL= 'external';
   FACET = 'facet';
   FILTER  = 'filter';
   FROM  = 'from';
   GUIDE = 'guide';
   IMPORT  = 'import';
-  LOCAL = 'local';  //Target to indicate temporary storage after filtering
   LAYER = 'layer';
+  LAST ='LAST';     //Proxy value for n..n range
+  LOCAL = 'local';  //Target to indicate temporary storage after filtering
   OPERATOR= 'operator';
   ORDER = 'order';
   PREFILTER = 'prefilter'; //Target to indicate actions that occure before filters
@@ -100,7 +104,6 @@ tokens {
   ARG     = '[';
   CLOSE_ARG = ']';
   SEPARATOR = ',';
-  RANGE   = '..';
 
 
   //Name manipulation
@@ -111,18 +114,13 @@ tokens {
   DEFINE    = ':';
   DYNAMIC = ':*';//Rules that should be periodically re-evaluated
   ANIMATED = '<:';
-  ANIMATED_DYNAMIC = '<*';
+  ANIMATED_DYNAMIC = '<:*';
 
 
   //Operators
   YIELDS  = '->';
-  FEED  = '>>';
-  GUIDE_FEED  = '#>>';
-  GUIDE_YIELD = '#->';
 
   GATE  = '=>';
-  SPLIT = '|';
-  JOIN  = '-->';
   TAG = '@';
 }
 
@@ -162,26 +160,19 @@ tokens {
   	else {super.emitErrorMessage(msg);}
   }
   
-  public List getErrors() {return errors;}
-
-
-  public static enum RuleOpts {
-    All,  //Anything is allowed 
-    Simple, //Only argument lists (no split or range)
-    Empty
-  }; //Must be empty
-  
+  public List getErrors() {return errors;}  
   
   public String customArgsCall(String call) {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;
   }
 }
 
-program : imports* externals order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+program : imports* globalValue* externalStream* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
+          ^(LIST["Global Values"] globalValue*)
+          ^(LIST["External Stream"] externalStream*)
           order 
-          externals 
           canvasLayer
           ^(LIST["Layers"] layerDef*) 
           ^(LIST["Operators"] operatorDef*) 
@@ -192,11 +183,14 @@ program : imports* externals order canvasLayer (streamDef | layerDef | operatorD
 
 //////////////////////////////////////////// PREAMBLE ///////////////////////////
 imports
-  : IMPORT name=ID (ARG args=argList CLOSE_ARG)? (AS as=ID)? 
-      -> {as==null && args==null}? ^(IMPORT[$name.text] ID[""] LIST["Arguments"])
-      -> {as==null && args!=null}? ^(IMPORT[$name.text] ID[""] $args)
-      -> {as!=null && args==null}? ^(IMPORT[$name.text] $as LIST["Arguments"])
-      -> ^(IMPORT[$name.text] $as $args); 
+  : (IMPORT ID specializer AS) => IMPORT name=ID args=specializer AS as=ID
+      -> ^(IMPORT[$name.text] $as $args)
+  | (IMPORT ID AS) => IMPORT name=ID AS as=ID
+      -> ^(IMPORT[$name.text] $as LIST["Arguments"])
+  | (IMPORT ID specializer) => IMPORT name=ID args=specializer
+      -> ^(IMPORT[$name.text] ID[""] $args)
+  | IMPORT ID
+      -> ^(IMPORT[$name.text] ID[""] LIST["Arguments"]);
 
 order
   : ORDER orderRef ('>' orderRef)*
@@ -205,25 +199,28 @@ order
 
 orderRef
   : ID -> ^(LIST["Streams"] ID)
-  | GROUP ID (SPLIT ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
+  | GROUP ID ('|' ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
 
-externals: externalStream* -> ^(LIST["Externals"] externalStream*);
-externalStream: EXTERNAL STREAM name=ID tuple[false] -> ^(EXTERNAL[$name.text] tuple);
+globalValue
+  : (CONST ID atom) => CONST name=ID DEFINE atom
+  | CONST name=ID;
 
+externalStream: STREAM name=ID tuple[false] -> ^(EXTERNAL_STREAM[$name.text] tuple);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 
 canvasLayer
-  : CANVAS name=ID canvasProperties guideDef+ 
-    -> ^(CANVAS_DEF[$name.text] canvasProperties ^(LIST["Guides"] guideDef+))
-  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT) ^(LIST["Guides"]));
+  : CANVAS name=ID specializer guideDef+ 
+    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST["Guides"] guideDef+))
+  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER LIST) ^(LIST["Guides"]));
 
-guideDef: GUIDE type=ID spec=specializer[RuleOpts.Simple] FROM selector rule["glyph"]* 
-			-> ^(GUIDE $type $spec selector ^(LIST["Rules"] rule*));
+guideDef: GUIDE ID specializer FROM selector rule["glyph"]* 
+			-> ^(GUIDE ID specializer selector ^(LIST["Rules"] rule*));
 
-selector: ID* -> ^(SELECTOR ID*);
-
-canvasProperties: specializer[RuleOpts.Simple]; 
+selector
+  options{backtrack=true;}
+  : att=ID DEFINE path=ID* -> ^(SELECTOR $att ^(LIST["path"] $path))
+  |               path=ID* -> ^(SELECTOR DEFAULT ^(LIST["path"] $path));
 
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 
@@ -256,7 +253,7 @@ operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text])
 operatorDef
   : OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
-  | OPERATOR name=ID BASE base=ID specializer[RuleOpts.All]
+  | OPERATOR name=ID BASE base=ID specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
 operatorRule
@@ -283,10 +280,10 @@ functionCallTarget
    
 
 functionCall
-  :(callName[MAIN_FACET] specializer[RuleOpts.All] valueList) =>
-   name=callName[MAIN_FACET] specializer[RuleOpts.All] valueList
+  :(callName[MAIN_FACET] specializer valueList) =>
+   name=callName[MAIN_FACET] specializer valueList
     -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList))
-  | name=callName[MAIN_FACET] specializer[RuleOpts.All] emptySet
+  | name=callName[MAIN_FACET] specializer emptySet
     -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"]))
   | t=TAGGED_ID ISLAND_BLOCK
     -> ^(FUNCTION[customArgsCall($t.text)] ^(SPECIALIZER DEFAULT) ISLAND_BLOCK);  
@@ -338,39 +335,19 @@ predicate
   | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
     -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
 
-specializer[RuleOpts opts]
-  : ARG range sepArgList CLOSE_ARG
-    {opts == RuleOpts.All}? -> ^(SPECIALIZER range ^(SPLIT BASIC PRE ID[(String) null]) sepArgList)
-  | ARG split[false] sepArgList CLOSE_ARG
-    {opts == RuleOpts.All}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) split sepArgList)
-  | ARG range SPLIT split[false] sepArgList CLOSE_ARG
-    {opts == RuleOpts.All}? ->  ^(SPECIALIZER range split sepArgList)
-  | ARG split[true] SPLIT range sepArgList CLOSE_ARG
-    {opts == RuleOpts.All}? -> ^(SPECIALIZER range split sepArgList)
-  | ARG argList CLOSE_ARG
-    {opts != RuleOpts.Empty}? -> ^(SPECIALIZER ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]) ^(SPLIT BASIC PRE ID[(String) null]) argList)
+specializer
+  : ARG mapList CLOSE_ARG -> ^(SPECIALIZER mapList)
+  | ARG CLOSE_ARG -> ^(SPECIALIZER LIST["Map Arguments"])
   | -> ^(SPECIALIZER DEFAULT);
 
-sepArgList
-  : SEPARATOR! argList
-  | -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"]);
-   
-argList
-  : -> ^(LIST["Values Arguments"]) ^(LIST["Map Arguments"])
-  | (values SEPARATOR mapList)=> values SEPARATOR! mapList
-  | values -> values ^(LIST["Map Arguments"])
-  | mapList -> ^(LIST["Value Arguments"]) mapList;
-
-values
-  : atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
 
 mapList
   : mapEntry (SEPARATOR mapEntry)* -> ^(LIST["Map Arguments"] mapEntry*);
   
 mapEntry 
-  : k=ID '=' v=atom -> ^(MAP_ENTRY[$k.text] $v);
+  : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v);
 
-tuple[boolean allowEmpty] //TODO: Add optionally permitted types [boolean allowEmpty]
+tuple[boolean allowEmpty] //TODO: Add optionally permitted types
   : emptySet {allowEmpty}?
     -> ^(TUPLE_PROTOTYPE)
   | ID
@@ -380,28 +357,11 @@ tuple[boolean allowEmpty] //TODO: Add optionally permitted types [boolean allowE
 
 emptySet: GROUP! CLOSE_GROUP!;
 
-valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;  //TODO: combine with 'values' above...
+atomList: atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
+valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!; 
 		
-range
-  : number RANGE number
-    -> ^(RANGE number number)
-  | number RANGE i=ID
-    {$i.text.equals(FINAL_VALUE)}?
-    -> ^(RANGE number NUMBER[RANGE_END])
-  | s=ID RANGE e=ID
-    {$s.text.equals(FINAL_VALUE) && $e.text.equals(FINAL_VALUE)}?
-    -> ^(RANGE NUMBER[RANGE_END] NUMBER[RANGE_END]);
-
-
-split[boolean pre]
-  : ID  -> {pre}? ^(SPLIT BASIC PRE ID)
-        ->        ^(SPLIT BASIC POST ID)
-    | ORDER ID
-        -> {pre}? ^(SPLIT ORDER PRE ID)
-        ->        ^(SPLIT ORDER  POST ID);
-
-value : tupleRef |  atom;
-atom  : number | STRING | DEFAULT | ALL;  //TODO: Does this need to be here, now that there is separate filterRule branch?
+value : tupleRef | atom;
+atom  : number | STRING | DEFAULT | ALL | LAST;
 
 tupleRef
   : simpleRef
@@ -433,13 +393,15 @@ booleanOp
 
 passOp  
   : directYield
-  | GUIDE_YIELD; 
-    //TODO: Add feed
+  | guideYield;
 
 directYield
   : '-[' id=ID ']>' -> ^(DIRECT_YIELD[$id.text])
   | YIELDS -> ^(DIRECT_YIELD[(String) null]);
 
+guideYield
+  : '-[' id=ID ']#>' -> ^(GUIDE_YIELD[$id.text])
+  | '-#>' -> ^(GUIDE_YIELD[(String) null]);
 
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.
 number  :  doubleNum | intNum;

@@ -42,11 +42,11 @@ public class TestModuleCache extends TestCase {
 		ModuleCache m = new ModuleCache();
 		StencilOperator l= null;
 
-		try {l=m.instance("NoMethod", ParserConstants.SIMPLE_SPECIALIZER);}
+		try {l=m.instance("NoMethod", ParserConstants.BASIC_SPECIALIZER);}
 		catch (MethodInstanceException e) {/*Exception expected, tested below.*/}
 		assertNull("Method found when not expected.",l);
 
-		try {m.instance("Concatenate", ParserConstants.SIMPLE_SPECIALIZER);}
+		try {m.instance("Concatenate", ParserConstants.BASIC_SPECIALIZER);}
 		catch (MethodInstanceException e) {fail("Method not found when expected.");}
 		catch (Exception e) {fail("Unexpected error looking for method.");}
 	}

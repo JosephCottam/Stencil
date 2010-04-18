@@ -31,7 +31,7 @@ package stencil.operator.wrappers;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
-import stencil.parser.tree.Range;
+import stencil.operator.util.Range;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -95,7 +95,7 @@ public abstract class RangeHelper implements StencilOperator {
 		public RelativeHelper(Range range, StencilOperator operator, String facetName) {
 			super(range, operator, facetName);
 			
-			if (range.getStart() < range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toStringTree());}
+			if (range.getStart() < range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toString());}
 			
 			values = new ArrayList(range.getStart());
 		}
@@ -124,7 +124,7 @@ public abstract class RangeHelper implements StencilOperator {
 		public AbsoluteHelper(Range range, StencilOperator operator, String facetName) {
 			super(range, operator, facetName);
 
-			if (range.getStart() > range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toStringTree());}
+			if (range.getStart() > range.getEnd()) {throw new IllegalArgumentException("Range ends before it starts: " + range.toString());}
 
 			values = new ArrayList(range.getEnd());
 			offsetCountdown = range.getStart();
@@ -153,7 +153,7 @@ public abstract class RangeHelper implements StencilOperator {
 		public HybridHelper(Range range, StencilOperator operator, String facetName) {
 			super(range, operator, facetName);
 			
-			if (range.relativeStart()) {throw new RuntimeException("Hybrid ranges must have absolute start points.  Recieved range " + range.toStringTree());}
+			if (range.relativeStart()) {throw new RuntimeException("Hybrid ranges must have absolute start points.  Recieved range " + range.toString());}
 			values = new ArrayList();
 			offsetCountdown = range.getStart();
 		}
@@ -289,6 +289,6 @@ public abstract class RangeHelper implements StencilOperator {
 		if (!range.relativeStart() && !range.relativeEnd()) {return new AbsoluteHelper(range, operator, facetName);}
 		if (!range.relativeStart() && range.relativeEnd()) {return new HybridHelper(range, operator, facetName);}
 		
-		throw new RuntimeException("Unsupported paramter combinitation in range: " + range.toStringTree());
+		throw new RuntimeException("Unsupported paramter combinitation in range: " + range.toString());
 	}
 }

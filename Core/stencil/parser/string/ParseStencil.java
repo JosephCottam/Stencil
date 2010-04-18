@@ -116,7 +116,7 @@ public abstract class ParseStencil {
 	
 			StencilParser parser = new StencilParser(tokens);
 			parser.setTreeAdaptor(TREE_ADAPTOR);
-			StencilParser.specializer_return parserRV = parser.specializer(StencilParser.RuleOpts.All);
+			StencilParser.specializer_return parserRV = parser.specializer();
 			if (parser.getNumberOfSyntaxErrors() >0) {throw new SyntaxException(parser.getNumberOfSyntaxErrors(), source);}
 			
 			validate((StencilTree) parserRV.getTree());
@@ -194,7 +194,7 @@ public abstract class ParseStencil {
 		//Add default specializers where required
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
-		defaultSpecializers.misc(p);
+		defaultSpecializers.downup(p);
 		
 		//Remove all operator references
 		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
@@ -212,7 +212,7 @@ public abstract class ParseStencil {
 		adHoc.downup(p);
 		
 		//Add default specializers to all function nodes
-		defaultSpecializers.function(p);
+		defaultSpecializers.downup(p);
 		
 		//Add default packs where required
 		DefaultPack defaultPack = new DefaultPack(treeTokens);
@@ -236,7 +236,7 @@ public abstract class ParseStencil {
 		p = (Program) ensure.transform(p);
 
 		//Add default specializers to all function nodes (cover things recently added)
-		defaultSpecializers.function(p);
+		defaultSpecializers.downup(p);
 		
 		//Prime tree nodes with operators from the modules cache
 		SetOperators set = new SetOperators(treeTokens, modules);
@@ -255,7 +255,7 @@ public abstract class ParseStencil {
 		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) gDefaultRules.downup(p);
 
-		defaultSpecializers.function(p);
+		defaultSpecializers.downup(p);
 
 		SetOperators set2 = new SetOperators(treeTokens, modules);
 		set2.setTreeAdaptor(TREE_ADAPTOR);
@@ -301,7 +301,6 @@ public abstract class ParseStencil {
 
 		validate(p);
 		
-		
 		return p;
 	}
 	
@@ -310,12 +309,12 @@ public abstract class ParseStencil {
 	private static void validate(StencilTree t) {
 		//Since validators don't permute the tree in any way, one token stream might be enough...
 		CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
+
+		SpecializerValidator specializer = new SpecializerValidator(treeTokens);
+		specializer.downup(t);
 		
-		RangeValidator rangeValidator = new RangeValidator(treeTokens);
-		rangeValidator.downup(t);
-		
-		StreamDeclarationValidator streamValidator = new StreamDeclarationValidator(treeTokens);
-		streamValidator.downup(t);
+		StreamDeclarationValidator stream = new StreamDeclarationValidator(treeTokens);
+		stream.downup(t);
 		
 		AllInvokeables invokeables = new AllInvokeables(treeTokens);
 		invokeables.downup(t);

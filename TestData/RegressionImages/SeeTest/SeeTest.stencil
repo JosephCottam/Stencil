@@ -13,8 +13,8 @@ SOURCE: ./NoData-Comp.txt
 SKIP: 1
 STRICT: true
 
-external stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
-external stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
 
 order MTTSource > MTTNotApplicable
 
@@ -107,14 +107,14 @@ from MTTSource
 	STROKE_COLOR: Palet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-	all => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[1 .. n](VALUE)
+	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[range: ALL](VALUE)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-	all => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[1 .. n](VALUE)
+	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[range: ALL](VALUE)
 
 
 operator NamesIndex(ID) -> (VALUE)
-	all => VALUE: Index(ID) -> (VALUE)
+	ALL => VALUE: Index(ID) -> (VALUE)
 
 operator BasicFails(fails) -> (C)
 	(fails = 0) => C: Palet("PASS") -> SetAlpha(51, C)

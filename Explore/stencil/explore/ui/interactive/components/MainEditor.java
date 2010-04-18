@@ -43,7 +43,7 @@ import stencil.explore.model.sources.SourceCache;
 import stencil.explore.model.sources.StreamSource;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.External;
+import stencil.parser.tree.ExternalStream;
 
 
 public class MainEditor extends JPanel implements StencilListener.StencilChanged, TextPositionChangedListener {
@@ -99,7 +99,7 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 		//Synch Sources
 		Set<StreamSource> sources = new TreeSet<StreamSource>();
 		try {
-			for (External stream: program.getExternals()) {
+			for (ExternalStream stream: program.getExternalStreams()) {
 				StreamSource source;
 				if (SourceCache.weakContains(stream.getName())) {
 					source = SourceCache.weakGet(stream.getName());

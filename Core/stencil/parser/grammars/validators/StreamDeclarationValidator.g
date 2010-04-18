@@ -45,7 +45,7 @@ options {
 
   package stencil.parser.string.validators;
   
-  import stencil.parser.tree.External;
+  import stencil.parser.tree.ExternalStream;
   import stencil.parser.string.StencilParser;
   import stencil.parser.tree.TuplePrototype;
   import stencil.parser.tree.TupleFieldDef;
@@ -59,7 +59,7 @@ options {
 }
 
 @members {
-  public void uniqueFieldNames(External e, TuplePrototype prototype) {
+  public void uniqueFieldNames(ExternalStream e, TuplePrototype prototype) {
     String field = null;
     Set<String> fields = new HashSet<String>();
     
@@ -81,7 +81,7 @@ options {
   
 }
 
-topdown: ^(e=EXTERNAL ^(p=TUPLE_PROTOTYPE .*)) 
+topdown: ^(e=EXTERNAL_STREAM ^(p=TUPLE_PROTOTYPE .*)) 
          {
-            uniqueFieldNames((External) e, (TuplePrototype) p);
+            uniqueFieldNames((ExternalStream) e, (TuplePrototype) p);
          };

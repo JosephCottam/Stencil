@@ -36,10 +36,15 @@ import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
+import stencil.operator.util.Range;
+import stencil.operator.util.Split;
 import stencil.operator.wrappers.RangeHelper;
 import stencil.operator.wrappers.SplitHelper;
-import static stencil.operator.StencilOperator.RANGE_FACET;
 import stencil.parser.tree.Specializer;
+
+import static stencil.parser.tree.Specializer.RANGE;
+import static stencil.parser.tree.Specializer.SPLIT;
+import static stencil.operator.StencilOperator.RANGE_FACET;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -93,10 +98,11 @@ public class Average extends BasicModule {
 		public FullMean(OperatorData opData, Specializer specializer) {
 			super(opData);
 			
-			assert !specializer.getRange().relativeStart() : "Can only use FullMean with an absolute start value.";
-			assert specializer.getRange().endsWithStream() : "Can only use FullMean with a range that ends with the stream.";
+			Range range = new Range(specializer.get(RANGE));
+			assert !range.relativeStart() : "Can only use FullMean with an absolute start value.";
+			assert range.endsWithStream() : "Can only use FullMean with a range that ends with the stream.";
 			
-			start = specializer.getRange().getStart();
+			start = range.getStart();
 		}
 		
 		private FullMean(OperatorData opData, int start) {
@@ -208,10 +214,8 @@ public class Average extends BasicModule {
 	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-
 		//Accept greater-than-zero ranges and no additional arguments (split is allowed).
-		if (specializer.getRange().isSimple() ||
-			specializer.getArgs().size() >0) {
+		if (new Range(specializer.get(Specializer.RANGE)).isSimple()) {
 			throw new SpecializationException(moduleData.getName(), name, specializer);
 		}
 	}
@@ -222,25 +226,28 @@ public class Average extends BasicModule {
 		StencilOperator target;
 		validate(name, specializer);
 		
+		Range range = new Range(specializer.get(RANGE));
+		Split split = new Split(specializer.get(SPLIT));
+		
 		try {
 			OperatorData opData = this.getOperatorData(name, specializer);
 			if (name.equals("Average") || name.equals("Mean")) {
-				if (specializer.getRange().isFullRange()) {
+				if (range.isFullRange()) {
 					target =  new FullMean(opData, specializer);
 				} else {
-					target = RangeHelper.makeOperator(specializer.getRange(), new RangeMean(opData), RANGE_FACET);
+					target = RangeHelper.makeOperator(range, new RangeMean(opData), RANGE_FACET);
 				}
 			} else if (name.equals(Median.NAME)) {
-				target = RangeHelper.makeOperator(specializer.getRange(), new Median(opData), RANGE_FACET);
+				target = RangeHelper.makeOperator(range, new Median(opData), RANGE_FACET);
 			} else if (name.equals(Mode.NAME)) {
-				target = RangeHelper.makeOperator(specializer.getRange(), new Mode(opData), RANGE_FACET);
+				target = RangeHelper.makeOperator(range, new Mode(opData), RANGE_FACET);
 			}else {
 				throw new IllegalArgumentException("Method name not found in package: " + name);
 			}
 
 		} catch(Exception e) {throw new Error("Error locating method to invoke in Average package.", e);}
 
-		target = SplitHelper.makeOperator(specializer.getSplit(), target);
+		target = SplitHelper.makeOperator(split, target);
 		
 		return target;
 	}

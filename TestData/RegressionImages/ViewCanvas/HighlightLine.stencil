@@ -9,20 +9,20 @@ STREAM: Mouse
 NAME: Mouse
 FREQUENCY: 30
 
-external stream Stocks(Date, Open)
-external stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+stream Stocks(Date, Open)
+stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
 canvas Main
-	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="LEFT", axisOffset=10] from Markers X
+	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT_SIZE: 10, line.STROKE_WEIGHT: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] from Markers X
 		label.TEXT: Date(_) -> Print(Date)
-	guide axis[sample="LINEAR", tickCount=10, label.SCALE_BY="NONE", label.FONT_SIZE=10, line.STROKE_WEIGHT=1, tickSize=5, textOffset=6, label.REGISTRATION="RIGHT", axisOffset=-10] from Markers Y
+	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT_SIZE: 10, line.STROKE_WEIGHT: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] from Markers Y
 
 
 layer Markers[POLY_LINE]
 from Stocks
 	ID : "Google"
-	X.new : TimeStep(Date) -> Date.put(VALUE, VALUE, Date) #-> VALUE
-	Y.new : Add(Open, 0) #-> Price(VALUE) -> Price
+	X.new : TimeStep(Date) -> Date.put(VALUE, VALUE, Date) -#> VALUE
+	Y.new : Add(Open, 0) -#> Price(VALUE) -> Price
 	STROKE_WEIGHT: 1
 	STROKE_COLOR: @Color{BLUE}
 
@@ -59,8 +59,8 @@ from Mouse
 operator Date base Mapping [1..n, "VALUE", "Date"]
 
 operator Price (Open) -> (Price)
-	all => (Price) : Mult(-1, Open)
+	ALL => (Price) : Mult(-1, Open)
 
 operator TimeStep (T) -> (VALUE, Date)
-	all => VALUE : Index(T) -> Mult(VALUE, 3) -> VALUE
+	ALL => VALUE : Index(T) -> Mult(VALUE, 3) -> VALUE
 			Date : T

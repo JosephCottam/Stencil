@@ -34,16 +34,16 @@ SOURCE: ./items.txt
 SKIP: 0
 STRICT: true
 
-external stream Items(Name)
-external stream Postal(State, ID)
-external stream Regions(State, Region, Division)
-external stream Pop(State,Total,Children,Adults,Elderly)
-external stream Poverty(State,Children, Adults, Elderly, Total)
+stream Items(Name)
+stream Postal(State, ID)
+stream Regions(State, Region, Division)
+stream Pop(State,Total,Children,Adults,Elderly)
+stream Poverty(State,Children, Adults, Elderly, Total)
 
 order (Items | Postal | Regions | Pop) > Poverty
 
 canvas Main
-	guide sidebar[sample="CATEGORICAL", displayOn="FILL_COLOR", X=350, Y=100, example.SIZE=12] from Children FONT_COLOR
+	guide sidebar[sample: "CATEGORICAL", displayOn: "FILL_COLOR", X: 350, Y: 100, example.SIZE: 12] from Children FONT_COLOR
 		example.SHAPE: "RECTANGLE"
         label.FONT_SIZE: 10
 
@@ -66,9 +66,9 @@ from Pop
 	() : Pop.put(State, Total, Children, Adults, Elderly) -> ()
 
 
-operator Pop base Mapping [1 .. n, "Total", "Children", "Adults", "Elderly", CaseInsensitive=1]
-operator Reg base Mapping [1 .. n, "Region", "Division", CaseInsensitive=1]
-operator Abr base Mapping [1 .. n, "id", CaseInsensitive=1]
+operator Pop base Mapping [fields: "Total, Children, Adults, Elderly", CaseInsensitive: 1]
+operator Reg base Mapping [fields: "Region, Division", CaseInsensitive: 1]
+operator Abr base Mapping [fields: "id", CaseInsensitive: 1]
 
 layer Children[TEXT]
 from Poverty
@@ -76,7 +76,7 @@ from Poverty
 	TEXT: Abr(State)
 	X: XLayout("Children")
 	Y:* Rank(Children, State) -> Mult(15, VALUE) 
-	FONT_COLOR:  Reg(State) #-> Coloring(Division)
+	FONT_COLOR:  Reg(State) -#> Coloring(Division)
 
 layer Children2[TEXT]
 from Poverty
@@ -151,7 +151,7 @@ from Poverty
 
 
 operator Color2 (State, Alpha) -> (C)
-(all) => (C): Coloring(State) -[Root]> 
+(ALL) => (C): Coloring(State) -[Root]> 
 					Mult(Alpha,.5) -> Add(64, VALUE) ->
 				  	SetAlpha(VALUE, Root[C]) -> VALUE
 
@@ -166,7 +166,7 @@ operator Coloring(Division) -> (C)
 (Division =~ "West South Central") => (C) : @Color{DARKORANGE, 128}
 (Division =~ "Mountain") => (C) : @Color{PURPLE, 128}
 (Division =~ "Pacific") => (C) : @Color{VIOLET, 128}
-(all) => (C) : @Color{RED}
+(ALL) => (C) : @Color{RED}
 
 operator XLayout (Name) -> (X)
 (Name =~ "Total") => (X) : 0
@@ -175,4 +175,4 @@ operator XLayout (Name) -> (X)
 (Name =~ "Elderly") => (X) : 240
 
 operator Ordering (ID) -> (VALUE) 
-	all => VAlUE : Index(ID) -> VALUE
+	ALL => VAlUE : Index(ID) -> VALUE

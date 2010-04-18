@@ -77,6 +77,8 @@ public abstract class ParserConstants {
 	public static final String RANGE_END = Integer.toString(RANGE_END_INT);
 	public static final String NEW_VALUE = "new";
 	public static final String FINAL_VALUE = "n";
+	public static final String ALL = "ALL";
+	public static final String LAST = "LAST";
 
 	public static final String NAME_SPACE = "::";
 	public static final String NAME_SEPARATOR  = ".";
@@ -95,16 +97,17 @@ public abstract class ParserConstants {
 	public static final String TRUE_STRING = "TRUE";
 	public static final String FALSE_STRING = "FALSE";
 	
-	/**Specializer to indicate that only the current value 
-	 * is significant and no other special instructions are given.
-	 * This is a common default specializer.
+	/**Common safe specializer:
+	 *    * Memory is preserved (range: ALL)
+	 *    * No split is to be performed (split: 0)
 	 */
-	public static final Specializer SIMPLE_SPECIALIZER;
+	public static final Specializer BASIC_SPECIALIZER;
+	public static final Specializer EMPTY_SPECIALIZER;
 		
 	static {
 		try {
-			SIMPLE_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[%1$s .. %1$s]",FINAL_VALUE));
-			if (!SIMPLE_SPECIALIZER.isSimple()) {throw new Error("Error creating simple specializer: does not return isSimple()==true");}			
+			EMPTY_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[]"));
+			BASIC_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[range: ALL, split: 0]"));
 		} catch (Throwable e) {throw new Error("Error creating reference specializer.", e);}
 	}
 

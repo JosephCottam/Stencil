@@ -1,6 +1,7 @@
 package stencil.operator.module.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,15 @@ public final class OperatorData {
 	public static final String TYPE_CATEGORIZE = "CATEGORIZE";
 	public static final String TYPE_NA = "NA";
 	
-	private Specializer spec;
-	private String name;
-	private String target;
-	private String module;
+	
+	private Specializer spec;		 /**Default Specializer*/
+	private String name;			 /**Operator Name*/
+	private String target;			 /**Method or class to use for the given operator (containing class is determined by the module).*/
+	private String module;		     /**Module this operator belongs to.*/
+	String[] argKeys = new String[0];/**Valid map key patterns (regexps).*/
 	private Map<String, FacetData> facets = new HashMap();
-
+	
+	
 	public OperatorData() {}
 	
 	public OperatorData(String module, String name, Specializer specializer) {
@@ -61,7 +65,12 @@ public final class OperatorData {
 	public String getName() {return name;}
 
 	public String getTarget() {return target;}
-	public void setTarget(String target) {this.target = target;}	
+	public void setTarget(String target) {this.target = target;}
+	
+	public String[] getKeyPatterns() {return argKeys;}
+	public String getKeys() {return Arrays.deepToString(argKeys);}
+	public void setKeys(String k) {argKeys = k.trim().split(",\\s+");}
+
 	
 	public boolean isComplete() {
 		return target != null

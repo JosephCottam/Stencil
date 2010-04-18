@@ -110,7 +110,7 @@ public final class EnvironmentProxy {
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
-		if (anc.c != null) {return findExternal(anc.c.getStream(), anc.program.getExternals()).getPrototype();}
+		if (anc.c != null) {return findStream(anc.c.getStream(), anc.program.getExternalStreams()).getPrototype();}
 		if (anc.o != null) {return anc.o.getYields().getInput();}
 		if (anc.g != null) {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
@@ -124,8 +124,8 @@ public final class EnvironmentProxy {
 	}
 	
 	
-	private static External findExternal(String name, Collection<External> externals) {
-		for (External s: externals) {if (s.getName().equals(name)) {return s;}}
+	private static ExternalStream findStream(String name, Collection<ExternalStream> externals) {
+		for (ExternalStream s: externals) {if (s.getName().equals(name)) {return s;}}
 		throw new RuntimeException("Could not find external of name " + name + ".");
 	}
 

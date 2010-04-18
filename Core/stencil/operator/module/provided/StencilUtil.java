@@ -48,7 +48,6 @@ import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
-import stencil.parser.tree.StencilString;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.SimplePrototype;
@@ -59,29 +58,17 @@ import static stencil.parser.ParserConstants.FALSE_STRING;
 public class StencilUtil extends BasicModule {
 	public static abstract class EchoBase implements StencilOperator, SeedOperator {
 		final OperatorData operatorData;
-		final TuplePrototype samplePrototype;
+		final TuplePrototype samplePrototype =new SimplePrototype();
 		
 		protected final Object STATE_LOCK = new Object();
 		protected int stateID=Integer.MIN_VALUE; 
 		
 		protected EchoBase(OperatorData opData, TuplePrototype p) {
 			operatorData = opData;
-			samplePrototype =p;
 		}
 		
 		protected EchoBase(OperatorData opData, Specializer s) throws SpecializationException {
 			this.operatorData = opData;
-			String[] names = new String[s.getArgs().size()];
-			Atom atom = s.getArgs().get(0);
-			for (int i=0; i< names.length; atom = s.getArgs().get(++i)) {
-				if (atom instanceof StencilString) {
-					names[i] = atom.getText();
-				} else {
-					throw new SpecializationException("StencilUtil", getName(), s);
-				}
-			}
-			
-			samplePrototype = new SimplePrototype(names);
 		}
 		
 		public TuplePrototype getSamplePrototype() {return samplePrototype;}

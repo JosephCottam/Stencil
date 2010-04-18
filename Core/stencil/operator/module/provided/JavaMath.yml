@@ -3,7 +3,7 @@ targetClass: java.lang.Math
 description: Math functions taken from java.lang.Math directly.
 
 defaults:
-  defaultSpecializer: !spec "[n .. n]"
+  defaultSpecializer: !spec "[]"
   facets:
     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}

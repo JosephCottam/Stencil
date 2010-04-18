@@ -6,10 +6,10 @@ SOURCE: ./NightingaleCrimeaSplit.csv
 SKIP: 1
 STRICT: true
 
-external stream Deaths(date, type, count)
+stream Deaths(date, type, count)
 
 canvas Main
-  guide sidebar[X=-75, Y=-50] from Rose FILL_COLOR
+  guide sidebar[X: -75, Y: -50] from Rose FILL_COLOR
 
   guide pointLabels from Rose ID
     TEXT: MakeLabel(ID)
@@ -23,7 +23,7 @@ from Deaths
    ID: Concatenate(type, ":", month)
    FILL_COLOR: ColorBy(type)
    STROKE_COLOR: @Color{Gray70}
-   HEIGHT:* Scale[0, 250](count)
+   HEIGHT:* Scale[min:0, max:250](count)
    Z: Mult(-1, count)
    (X,Y): (0,0)
    (START, END): Sub1(month) -> Partition(_)  
@@ -49,16 +49,16 @@ facet query(Min, X1,Y1,X,Y) -> (X,Y) {
 }
 
 operator ParseDate (d) -> (m,y)
-   (all) => (m,y): IndexOf(d, "/") -[s]> 
+   (ALL) => (m,y): IndexOf(d, "/") -[s]> 
                      Substring(d, 0, s[0]) -[m]>
                      Add1(s[0]) -> Substring(d, _, -1) -> (m[0], _) 
 
 operator MakeLabel(id) -> (text)
    (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) -> MonthAbr(_)
-   (all) => text: ""
+   (ALL) => text: ""
 
 operator Partition(n) -> (start, end)
-   (all) => (start, end): Sub(12, n) -> Sub(_,4) -[n]> 
+   (ALL) => (start, end): Sub(12, n) -> Sub(_,4) -[n]> 
                           Mult(30, n[0]) -[end]>
                           Add1(n[0]) -> Mult(30,_) -> (_,end[_])
 
@@ -76,4 +76,4 @@ operator MonthAbr (n) -> (month)
    (n=10) => month: "Oct"
    (n=11) => month: "Nov"
    (n=12) => month: "Dec"
-   (all) => month: "ERROR"
+   (ALL) => month: "ERROR"

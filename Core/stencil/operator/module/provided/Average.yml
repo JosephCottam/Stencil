@@ -2,7 +2,7 @@ name: Average
 targetClass: stencil.operator.module.provided.Average
 description: Module for handling the average, in various manners
 defaults: 
-  defaultSpecializer: !spec "[1 .. n]"
+  defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets: 
     - {name: map, type: PROJECT, function: TRUE, prototype: !proto VALUE}
     - {name: query, type: PROJECT, function: TRUE, prototype: !proto VALUE}

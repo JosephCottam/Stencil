@@ -4,10 +4,10 @@ FEED_URL: http://twitter.com/statuses/public_timeline.rss
 USERNAME: 
 PASSWORD: 
 
-external stream Tweets(MESSAGE, LINK, TIME)
+stream Tweets(MESSAGE, LINK, TIME)
 
 canvas Main
-    guide axis[sample="CATEORICAL", tickSize=5, textOffset=6] from Counts X
+    guide axis[sample: "CATEORICAL", tickSize: 5, textOffset: 6] from Counts X
         label.FONT_SIZE: 10
         line.STROKE_WEIGHT: 1 
         label.REGISTRATION: "LEFT"
@@ -16,7 +16,7 @@ canvas Main
 layer Counts
 from Tweets
     ID: firstLetter(MESSAGE) -> Letter
-    X:* firstLetter(MESSAGE) #-> Rank(Letter) -> Mult(11,VALUE) 
+    X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11,VALUE) 
     Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE)
     REGISTRATION: "BOTTOM"
     SIZE: 10
@@ -26,4 +26,4 @@ from Tweets
     
 
 operator firstLetter(Phrase) -> (Letter)
-    (all) => Letter: Trim(Phrase) -> Substring(_, 0,1)-> VALUE
+    (ALL) => Letter: Trim(Phrase) -> Substring(_, 0,1)-> VALUE

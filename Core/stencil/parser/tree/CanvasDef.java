@@ -33,7 +33,7 @@ import org.antlr.runtime.Token;
 import stencil.parser.string.StencilParser;
 
 public class CanvasDef extends StencilTree {
-	public static final String DEFAULT_SPECIALIZER = "[BACKGROUND_COLOR=\"white\"]";
+	public static final String DEFAULT_SPECIALIZER = "[BACKGROUND_COLOR: \"white\"]";
 	
 	public CanvasDef(Token t) {super(t);}
 	

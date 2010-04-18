@@ -15,7 +15,7 @@ import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class TestInterpreter extends junit.framework.TestCase{
 	public static String registerFailRule = "import TestModule " +
-											"external stream NodeAttributes(ID, ATT, Source)"+
+											"stream NodeAttributes(ID, ATT, Source)"+
 											"layer Overlay from NodeAttributes" +
 											"   filter(ATT =~ \"C\")" +
 											"   ID: FilterFail(ID) -> (VALUE)";

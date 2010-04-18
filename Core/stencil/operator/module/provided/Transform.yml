@@ -3,7 +3,7 @@ targetClass: stencil.operator.module.provided.Transform
 description: Screen/Canvas conversion transformations.
 
 defaults:
-  defaultSpecializer: !spec "[n .. n]"
+  defaultSpecializer: !spec "[]"
   facets:
      - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
      - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
