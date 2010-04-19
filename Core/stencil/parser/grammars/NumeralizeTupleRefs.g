@@ -75,6 +75,8 @@ options {
     } else {
       idx = ((StencilNumber) ref.getValue()).getNumber().intValue();
     }
+    
+    if (idx < 0) {throw new RuntimeException("Error numeralizing.");}
 
     StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
     newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
@@ -98,6 +100,8 @@ options {
       idx = ((StencilNumber) ref.getValue()).getNumber().intValue();      
     }
     
+    if (idx < 0) {throw new RuntimeException("Error numeralizing.");}
+    
     StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
     newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
     adaptor.addChild(newRef, num);
@@ -114,7 +118,7 @@ options {
 topdown: action | predicate;
 
 predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
-
+  
 action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
@@ -122,6 +126,8 @@ callTarget[EnvironmentProxy env]
   | ^(PACK value[env]+);    
       
 value[EnvironmentProxy env]
-  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {resolve($t, env)}
+  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {resolve($t, env)}  
   | .;
+      catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
+  
           
