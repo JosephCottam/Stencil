@@ -57,18 +57,22 @@ import static stencil.parser.ParserConstants.FALSE_STRING;
 
 public class StencilUtil extends BasicModule {
 	public static abstract class EchoBase implements StencilOperator, SeedOperator {
+		private final String FIELDS = "fields";
+		
 		final OperatorData operatorData;
-		final TuplePrototype samplePrototype =new SimplePrototype();
+		final TuplePrototype samplePrototype;
 		
 		protected final Object STATE_LOCK = new Object();
 		protected int stateID=Integer.MIN_VALUE; 
 		
 		protected EchoBase(OperatorData opData, TuplePrototype p) {
 			operatorData = opData;
+			samplePrototype = p;
 		}
 		
 		protected EchoBase(OperatorData opData, Specializer s) throws SpecializationException {
 			this.operatorData = opData;
+			samplePrototype  = new SimplePrototype(s.get(FIELDS).getText().split("\\s*,\\s*"));
 		}
 		
 		public TuplePrototype getSamplePrototype() {return samplePrototype;}

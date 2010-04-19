@@ -219,8 +219,8 @@ guideDef: GUIDE ID specializer FROM selector rule["glyph"]*
 
 selector
   options{backtrack=true;}
-  : att=ID DEFINE path=ID* -> ^(SELECTOR $att ^(LIST["path"] $path))
-  |               path=ID* -> ^(SELECTOR DEFAULT ^(LIST["path"] $path));
+  : att=ID DEFINE path+=ID+ -> ^(SELECTOR[$att.text] $att ^(LIST["path"] $path+))
+  |               path+=ID+ -> ^(SELECTOR["DEFAULT"] DEFAULT ^(LIST["path"] $path+));
 
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 

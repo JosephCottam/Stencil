@@ -34,9 +34,14 @@ public class Split {
 	public boolean isOrdered() {return ordered;}
 	public boolean isPre() {return pre;}
 	public boolean isPost() {return !pre;}
-
+	
+	/**No split action required.*/
+	public boolean isVoid() {return fields ==0;}
+	
 	public int getFields() {return fields;}
 
+	
+	
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
 		if (!(other instanceof Split)) {return false;}

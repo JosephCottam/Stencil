@@ -27,64 +27,28 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Make sure sensible specializers are present on every
- * mapping operator. 
- */
-tree grammar GuideSpecializers;
+
+tree grammar GuideDefaultSelector;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
-	output = AST;
 	filter = true;
+  output = AST;	
 }
 
-@header{
-	/**  Make sure that every guide a specializer.
-	 *
-	 *
-	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
-	 **/
+@header {
+  /**Determines the default selector attribute.*/
+
 	package stencil.parser.string;
-	
+
 	import stencil.parser.tree.*;
-	import stencil.adapters.Adapter;
-	import java.lang.reflect.Field;
-	import java.util.Arrays;
 }
 
-@members{
-	public static final String DEFAULT_FIELD_NAME = "DEFAULT_ARGUMENTS";
-	protected Adapter adapter;
-    
-	public GuideSpecializers(TreeNodeStream input, Adapter adapter) {
-		super(input, new RecognizerSharedState());
-		assert adapter != null : "Adaptor must not be null.";
-		this.adapter = adapter;
-	}
+@members {
 
-  public Specializer makeSpec(String guideType, Specializer spec) {
-     if (spec.getChild(0).getType() == DEFAULT) {return getDefault(guideType);}
-     else {return Specializer.blendMaps(getDefault(guideType), spec, adaptor);}
-  }
-
-	private Specializer getDefault(String guideType) {
-		Class clss = adapter.getGuideClass(guideType);
-		Specializer defaultSpec;
-		
-		try {
-			Field f = clss.getField(DEFAULT_FIELD_NAME);
-    	defaultSpec = (Specializer) f.get(null);
-		} catch (Exception e) {
-  		try {defaultSpec = ParseStencil.parseSpecializer("[]");}
-  		catch (Exception e2) {throw new Error("Error in parsing of constant specializer...");}
-		}			
-			
-    return  (Specializer) adaptor.dupTree(defaultSpec);
-	}
 }
 
-topdown
-  : ^(GUIDE type=. spec=. sel=.  rules=.) 
-    -> ^(GUIDE $type {makeSpec(type.getText(), (Specializer) spec)} $sel $rules);
+topdown: 
+  ^(SELECTOR DEFAULT p=path) -> ^(SELECTOR[$p.att] ID[$p.att] $p);
 
-//Instructions at http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching%2C+rewriting+a+reality
+path returns [String att]: ^(LIST i=ID+) {$att=$i.text;};

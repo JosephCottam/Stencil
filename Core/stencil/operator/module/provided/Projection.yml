@@ -3,7 +3,7 @@ targetClass: stencil.operator.module.provided.Projection
 description: Set to set transformations, filed under a really bad name.
 
 defaults:
-  defaultSpecializer: !spec "[range: ALL, split:0]"
+  defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets:
     - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
@@ -15,6 +15,6 @@ operators:
     - name: Index
     - name: Justify
     - name: HeatScale
-      defaultSpecializer: !spec "[range: ALL, cold: \"RED\", hot: \"WHITE\"]"
+      defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\"]"
       keys: "cold, hot, split"
       

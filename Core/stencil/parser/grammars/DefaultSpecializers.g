@@ -42,32 +42,43 @@ options {
 	  * all properties defined in their default specializer.	  
 	 **/
 	package stencil.parser.string;
+
+  import java.lang.reflect.Field;
 	
 	import stencil.parser.tree.*;
 	import stencil.util.MultiPartName;
 	import stencil.operator.module.*;
 	import stencil.operator.module.util.*;
+	import stencil.adapters.Adapter;
 	import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 	
 }
 
 @members{
 	protected ModuleCache modules;
+  protected Adapter adapter;
     
-  public DefaultSpecializers(TreeNodeStream input, ModuleCache modules) {
+  public DefaultSpecializers(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
     super(input, new RecognizerSharedState());
     assert modules != null : "ModuleCache must not be null.";
+    assert adapter != null : "Adaptor must not be null.";
     this.modules = modules;
+    this.adapter = adapter;    
   }
 
+
+  //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private Specializer getDefault(Specializer spec) {
     try {
 	     Function f = (Function) spec.getAncestor(FUNCTION);
 	     if (f != null) {return  getDefault(f.getName());}
 	     
-	     CanvasDef c = (CanvasDef) spec.getAncestor(CANVAS_DEF);
-	     if (c != null) {return defaultCanvasSpecailizer();}
+	     Guide g = (Guide) spec.getAncestor(GUIDE);
+       if (g != null) {return getGuideDefault(g.getGuideType());}
 	     
+	     CanvasDef c = (CanvasDef) spec.getAncestor(CANVAS_DEF);
+	     if (c != null) {return ParseStencil.parseSpecializer(CanvasDef.DEFAULT_SPECIALIZER);}
+	     	     
 	     Import i = (Import) spec.getAncestor(IMPORT);
 	     if (i != null) {return EMPTY_SPECIALIZER;} 
 	     
@@ -77,12 +88,26 @@ options {
     } catch (Exception e) {return (Specializer) adaptor.dupTree(spec);}
 	  throw new IllegalArgumentException("Specializer encountered in unexpected context: " + spec.getParent().toStringTree());
   }
-  public Specializer defaultCanvasSpecailizer() {
+  
+  /**Work with the graphics adapter to get the default
+    * specializer for a given guide type.
+    **/
+  private Specializer getGuideDefault(String guideType) {
+    Class clss = adapter.getGuideClass(guideType);
+    Specializer defaultSpec;
+    
     try {
-      return ParseStencil.parseSpecializer(CanvasDef.DEFAULT_SPECIALIZER);
-    } catch (Exception e) {throw new Error("Parse or pre-defined constant failed.", e);}
+      Field f = clss.getField("DEFAULT_ARGUMENTS");
+      defaultSpec = (Specializer) f.get(null);
+    } catch (Exception e) {
+      try {defaultSpec = (Specializer) adaptor.dupTree(EMPTY_SPECIALIZER);}
+      catch (Exception e2) {throw new Error("Error in parsing of constant specializer...");}
+    }     
+      
+    return  (Specializer) adaptor.dupTree(defaultSpec);
   }
 
+  /**Get the default guide for a named operator.*/
   public Specializer getDefault(String fullName) {
     MultiPartName name= new MultiPartName(fullName);
     ModuleData md;
@@ -101,6 +126,7 @@ options {
       } 
   }
   
+  /**Combine a given specializer with the appropriate default.*/
   private Specializer blendWithDefault(Specializer spec) {
      return Specializer.blendMaps(getDefault(spec), spec, adaptor);
   }

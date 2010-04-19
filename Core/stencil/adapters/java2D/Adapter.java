@@ -105,15 +105,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 				canvas.addGuide(sel, guide);
 				
 				
-				//If an X and Y for the same selector path exist on this canvas, make the axes meet
-				stencil.util.Selector.ListSelector XAxis = new stencil.util.Selector.ListSelector(sel.getNames());
-				stencil.util.Selector.ListSelector YAxis = new stencil.util.Selector.ListSelector(sel.getNames());
-				XAxis.setName(XAxis.size()-1, "X");
-				YAxis.setName(YAxis.size()-1, "Y");				
-				if (canvas.hasGuide(XAxis) && canvas.hasGuide(YAxis)) {
-					((Axis) canvas.getGuide(YAxis)).setConnect(true);
-					((Axis) canvas.getGuide(XAxis)).setConnect(true);
-				}
+				//TODO: If an X and Y for the same selector path exist on this canvas, make the axes meet
 			} else if (guideType.equals("sidebar")) {
 				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
 				canvas.addGuide(sel, guide);

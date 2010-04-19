@@ -1,33 +1,38 @@
 package stencil.parser.tree;
 
-import java.util.ArrayList;
-
 import org.antlr.runtime.Token;
 
-public class Selector extends List implements stencil.util.Selector {
+import stencil.parser.string.StencilParser;
+import static stencil.parser.ParserConstants.BIND_OPERATOR;
+import static stencil.parser.ParserConstants.NAME_SEPARATOR;
+
+public class Selector extends StencilTree {
 	public Selector(Token token) {super(token);}
-	
-	public String getName(int i) {return get(i).getText();}
-	public String getLayer() {return getName(0);}
-	public String getAttribute() {
-		if (size() >0) {return getName(1);}
-		else {return null;}
-	}
-	
-	public java.util.List<String> getNames() {
-		ArrayList result = new ArrayList();
-		for (Object a: this) {result.add(((Atom) a).getText());}
-		return result;
+
+	/**What is this selector associated with?*/
+	public String getAttribute() {return getChild(0).getText();}
+
+	/**What is being selected?  This is a path statement.*/
+	public List<Id> getPath() {return (List) this.getFirstChildWithType(StencilParser.LIST);}
+
+
+	/**Get a string representation of the path*/
+	public String pathString() {
+		StringBuilder b = new StringBuilder();
+		for (Object o: getPath()) {
+			b.append(o.toString());
+			b.append(NAME_SEPARATOR);
+		}
+		b.deleteCharAt(b.length()-1);
+		return b.toString();
 	}
 	
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		
-		for (Object o: this) {
-			b.append(o.toString());
-			b.append(".");
-		}
-		b.deleteCharAt(b.length()-1);
+		b.append(getAttribute());
+		b.append(BIND_OPERATOR);
+		b.append(pathString());
 		return b.toString();
 	}
 
@@ -35,13 +40,6 @@ public class Selector extends List implements stencil.util.Selector {
 	
 	public boolean equals(Object o) {
 		if (!(o instanceof Selector)) {return false;}
-	    Selector os = (Selector) o;
-	    
-	    if (os.size() != size()) {return false;}
-	    
-	    for (int i=0; i< size(); i++) {
-	    	if (!(os.get(i).equals(get(i)))) {return false;}
-	    }
-		return true;
+	    return o.toString().equals(this.toString());
 	}
 }

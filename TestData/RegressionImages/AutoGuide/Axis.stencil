@@ -4,26 +4,26 @@ HEADER: Category
 SEPARATOR: ,
 SOURCE: ./Fruits.txt
 SKIP: 0
-STRICT: TRUE
+STRICT: true
 
 stream Values(Category)
 
 /*Left-hand side defines the legend type.  Right-hand side says what to create it for.*/
 /*Specializers (things in square brackets) define the graphic design*/
 canvas Main
-	guide axis[sample: "LINEAR", tickCount: 10, tickSize: 5, textOffset: 6] from Chart Y
-		label.FONT_SIZE: 10
-		line.STROKE_WEIGHT: 1
-		label.REGISTRATION: "RIGHT"
+    guide axis[sample: "LINEAR", tickCount: 10, tickSize: 5, textOffset: 6] from Chart Y
+        label.FONT_SIZE: 10
+        line.STROKE_WEIGHT: 1
+        label.REGISTRATION: "RIGHT"
 
-	guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Chart X
-		label.REGISTRATION: "LEFT"
-		label.FONT_SIZE: 10
-		line.STROKE_WEIGHT: 1 
-		
+    guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Chart X
+        label.REGISTRATION: "LEFT"
+        label.FONT_SIZE: 10
+        line.STROKE_WEIGHT: 1 
+        
 layer Chart
 from Values
-  ID : Count()
+  ID : Counter()
   X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
   Y : Count(Category) -#> Mult(VALUE, -11) -> VALUE
   FILL_COLOR: @Color{BLUE}

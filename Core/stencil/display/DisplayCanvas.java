@@ -5,7 +5,7 @@ import java.util.Collection;
 import javax.swing.JComponent;
 
 import stencil.adapters.java2D.data.Guide2D;
-import stencil.util.Selector;
+import stencil.parser.tree.Selector;
 
 /**What should a canvas component be able to do?*/
 public abstract class DisplayCanvas extends JComponent {

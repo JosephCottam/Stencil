@@ -192,7 +192,7 @@ public abstract class ParseStencil {
 		p = (Program) customArgs.downup(p);
 
 		//Add default specializers where required
-		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules);
+		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
 		defaultSpecializers.downup(p);
 		
@@ -221,11 +221,11 @@ public abstract class ParseStencil {
 
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-		//Insert guide specializers
-		GuideSpecializers guideSpecailizers  = new GuideSpecializers(treeTokens, adapter);
-		guideSpecailizers.setTreeAdaptor(TREE_ADAPTOR);
-		guideSpecailizers.downup(p);
+		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);
+		guideSelector.setTreeAdaptor(TREE_ADAPTOR);
+		guideSelector.downup(p);
 
+		
 		//Distinguish between guide types
 		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
 		guideDistinguish.downup(p);

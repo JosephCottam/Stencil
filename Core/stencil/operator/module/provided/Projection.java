@@ -38,6 +38,8 @@ import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
+import stencil.operator.util.Range;
+import stencil.operator.util.Split;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
@@ -239,18 +241,22 @@ public class Projection extends BasicModule {
 	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
-		if (specializer.equals(moduleData.getDefaultSpecializer(name))) {
-			if (name.equals("Index")) {
-				return new Index(operatorData);
-			} else if (name.equals("HeatScale")) {
-				 return new HeatScale(operatorData, specializer);
-			} else if (name.equals("Count")) {
-				return new Count(operatorData);
-			} else if (name.equals("Justify")) {
-				throw new RuntimeException("Justify doesn't work yet...sorry.");
-			}
-			throw new IllegalArgumentException("Name not known : " + name);
-		} else {
-			throw new SpecializationException(MODULE_NAME, name, specializer);}
+		Range r = new Range(specializer.get(Specializer.RANGE));
+		Split s = new Split(specializer.get(Specializer.SPLIT));
+		
+		if (!r.isFullRange() || !s.isVoid())  {
+			throw new SpecializationException(MODULE_NAME, name, specializer);
 		}
+		
+		if (name.equals("Index")) {
+			return new Index(operatorData);
+		} else if (name.equals("HeatScale")) {
+			 return new HeatScale(operatorData, specializer);
+		} else if (name.equals("Count")) {
+			return new Count(operatorData);
+		} else if (name.equals("Counter")) {
+			return new Counter(operatorData);
+		}
+		throw new IllegalArgumentException("Name not known : " + name);
+	}
 }

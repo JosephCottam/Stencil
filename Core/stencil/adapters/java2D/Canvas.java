@@ -51,7 +51,7 @@ import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
 import stencil.parser.tree.CanvasDef;
 import stencil.parser.tree.Layer;
-import stencil.util.Selector;
+import stencil.parser.tree.Selector;
 
 
 /**Some of this is derived from Prefuse's display and related objects.*/

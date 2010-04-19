@@ -41,7 +41,7 @@
 			outputdirectory="${parser}"
  		/>
  		<antlr
- 			target="${guideGrammars}/GuideSpecializers.g"
+ 			target="${guideGrammars}/GuideDefaultSelector.g"
 			outputdirectory="${parser}"
  		/>
  		<antlr

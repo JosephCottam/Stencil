@@ -68,7 +68,7 @@ options {
 	private void apply(Guide g) {
 		Specializer details = g.getSpecializer();
 		SeedOperator seedOp = g.getSeedOperator();
-		String layerName = g.getSelector().getLayer();
+		String layerName = g.getSelector().getPath().get(0).getName();
 		String attribute = g.getSelector().getAttribute();
 		List<Tuple> sample, projection, pairs, results;
 		

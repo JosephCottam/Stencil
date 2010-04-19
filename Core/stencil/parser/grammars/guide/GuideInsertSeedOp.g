@@ -47,8 +47,8 @@ options {
 	import java.util.Set;
 	import java.util.HashSet;
 	import stencil.util.MultiPartName;
-    import stencil.operator.module.*;
-    import stencil.util.collections.ArrayUtil;
+  import stencil.operator.module.*;
+  import stencil.util.collections.ArrayUtil;
 	import stencil.operator.StencilOperator;
 	import stencil.parser.tree.*;
 	
@@ -114,7 +114,10 @@ options {
     }
     
     
-    private String key(Selector s) {return s.get(0) +  BIND_OPERATOR + s.get(1);}
+    private String key(Selector s) {
+      List<Id> path = s.getPath();
+      return key(path.get(0).getText(), path.get(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
+    }
     
     private String key(CallTarget target) {return key((Rule) target.getAncestor(RULE));}
 
@@ -184,15 +187,15 @@ options {
     private Specializer spec(CommonTree t) {
       CallTarget target = (CallTarget) t;
       List<Value> args = echoArgs(target);
-      StringBuilder b = new StringBuilder("[1 .. n,");
+      StringBuilder b = new StringBuilder("[range" + BIND_OPERATOR + " ALL, fields: \"");
       for (Value v: args) {
         if (v instanceof TupleRef) {
-	        b.append("\"");
 	        b.append(((TupleRef) v).getValue());
-	        b.append("\"");
 	        b.append(",");
 	      }
       }
+      b.replace(b.length()-1, b.length(), "\",");
+      
       
       //Get additional map arguments from the guide declaration
       Specializer spec = requestedGuides.get(key(target));
@@ -202,12 +205,11 @@ options {
              String key = k.substring(SEED_PREFIX.length());
              
              b.append(key);
-             b.append("=");	//TODO: Change to BIND_OPERATOR (when done elsewhere)
+             b.append(BIND_OPERATOR);
              b.append(value);
              b.append(",");
           }
       }
-      
       b.replace(b.length()-1, b.length(), "]");
       try {return ParseStencil.parseSpecializer(b.toString());}
       catch (Exception e) {throw new Error("Error parsing synthesized specializer: " + b.toString());}

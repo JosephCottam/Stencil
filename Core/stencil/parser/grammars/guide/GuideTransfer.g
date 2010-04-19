@@ -119,7 +119,8 @@ options {
     
     private String key(Tree selector) {
       Selector sel=(Selector) selector;
-      return key(sel.get(0), sel.get(1));
+      List<Id> path = sel.getPath();
+      return key(path.get(0).getText(), path.get(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
     }
     private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}

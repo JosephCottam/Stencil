@@ -20,7 +20,7 @@ canvas Main
 
 layer Chart
 from Values
-  ID : Count("") -> VALUE 				/*Give everything a unique ID.*/
+  ID : Counter() 				/*Give everything a unique ID.*/
   X :* Rank(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
   Y : Count(Category) -> Mult(VALUE, -11) -> VALUE
   SIZE: 10

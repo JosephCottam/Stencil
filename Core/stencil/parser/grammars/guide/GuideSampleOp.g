@@ -52,7 +52,7 @@ options {
 @members {
    public void setSummarySample(Guide g) {
 	   Program p = (Program) g.getAncestor(PROGRAM);
-	   Layer l = p.getLayer(g.getSelector().getLayer());
+	   Layer l = p.getLayer(g.getSelector().getPath().get(0).getName());
 	   g.setSampleOperator(new LayerSampler(l));
    }
    
