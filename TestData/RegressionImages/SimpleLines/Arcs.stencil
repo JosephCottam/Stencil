@@ -42,4 +42,4 @@ from LineSource
 	STROKE_WEIGHT: 3
 
 operator Spacing (ID) -> (V) 
-	AL => V : Index(ID) -> Mult(VALUE, 100) -> (VALUE)
+	ALL => V : Index(ID) -> Mult(VALUE, 100) -> (VALUE)

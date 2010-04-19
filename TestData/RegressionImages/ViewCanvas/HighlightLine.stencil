@@ -56,7 +56,7 @@ from Mouse
   STROKE_WEIGHT : 3
   STROKE_COLOR : @Color{BLUE, 100}
 
-operator Date base Mapping [1..n, "VALUE", "Date"]
+operator Date base Mapping [range: ALL, fields:"VALUE, Date"]
 
 operator Price (Open) -> (Price)
 	ALL => (Price) : Mult(-1, Open)

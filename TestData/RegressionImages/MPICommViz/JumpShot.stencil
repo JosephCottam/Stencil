@@ -52,17 +52,17 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
 
-operator Spacer base Max[ALL]
+operator Spacer base Max[range: ALL]
 
 layer baseline[LINE]
 from overheads
 	ID: rank
-	X.2: Timescale(skewedStart) -> Max[1..n](_)
+	X.2: Timescale(skewedStart) -> Max[range: ALL](_)
 	STROKE_COLOR: @Color{Gray90}
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
 	ID: source
-	X.2: Timescale(skewedStart) -> Max[1..n](_) ->(_,_)
+	X.2: Timescale(skewedStart) -> Max[range: ALL](_) ->(_,_)
 	STROKE_COLOR: @Color{Gray90}
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
@@ -90,7 +90,7 @@ from overheads
 
 layer coms[LINE]
 from trans
-	ID: Count[1]()
+    ID: Counter()
 	Y.1: Layout(source)
 	Y.2: Layout(dest)
 	X.1: Timescale(skewedStart)

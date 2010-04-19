@@ -41,8 +41,6 @@ import stencil.operator.util.BasicProject;
 import stencil.operator.util.Range;
 import stencil.operator.util.Split;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.Tuple;
 import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
@@ -80,16 +78,15 @@ public class Projection extends BasicModule {
 		 * If the key passed cannot be parsed as number and 'throwExceptions' is set to false, black is returned.
 		 * If the key passed cannot be parsed and 'throwExceptions' is set to true, an exception is thrown.
 		 */
-		public Tuple map(Object key) {
+		public Color map(Object key) {
 			float d;
 			float p =-1;
-			Tuple t;
 			
 			try {
 				d = Float.parseFloat(key.toString());
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + key.toString(), e);}
-				else {return new ArrayTuple(new Color(0,0,0));}			
+				else {return new Color(0,0,0);}			
 			} 
 
 				
@@ -98,14 +95,12 @@ public class Projection extends BasicModule {
 				if (d<min || Double.isNaN(min)) {min = d;}
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
-				t = new ArrayTuple(averageColors(p));
+				return averageColors(p);
 //				t = BasicTuple.singleton(new Color(1.0f,p,p));
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Error creating colors with range point:" + p, e);}
-				else {t= new ArrayTuple(new Color(0,0,0));}
+				return new Color(0,0,0);
 			}
-			
-			return t;
 		}
 		
 		private Color averageColors(float distance) {
@@ -134,13 +129,13 @@ public class Projection extends BasicModule {
 		}
 
 		/**Returns a color value if the first key object is between the current max and min.
-		 * Otherwise it returns a null-valued tuple.
+		 * Otherwise it returns null.
 		 */
-		public Tuple query(Object key) {
+		public Color query(Object key) {
 			float d = Float.parseFloat(key.toString());
 			
 			if (d >= min && d<= max) {return map(key);}
-			else {return new ArrayTuple(new Object[0]);}
+			else {return null;}
 		}
 
 		public String getName() {return NAME;}

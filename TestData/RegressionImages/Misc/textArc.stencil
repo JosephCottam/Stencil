@@ -42,7 +42,7 @@ operator FreqSize(word) -> (size)
              -> Linear[start: "0", end: "20"](div)
 
 operator Freq (word) -> (freq)
-  (ALL) => freq: Count(word) -> Max[1..n](_) 
+  (ALL) => freq: Count(word) -> Max[range: ALL](_) 
            -> Div(count, max)
 
 

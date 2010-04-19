@@ -18,11 +18,11 @@ stream EntityFeed(ID, X,Y)  /*Precomputed layout*/
 layer Nodes
 from EntityFeed
 	SIZE: 1
-	ID: Count("")
-	(X,Y) : Count("") -> Sub(_,1) -[v]> Layout(_) 
+	ID: Counter()
+	(X,Y) : Counter() -> Sub(_,1) -[v]> Layout(_) 
 
 operator Layout (i) -> (X,Y) 
-	all => (X,Y): Sqrt(i) -> Floor(_) -[shell]>
+	ALL => (X,Y): Sqrt(i) -> Floor(_) -[shell]>
 				Add(1,_) -[n]>
 				Pow(n[_],2) -> Sub(_, n[_]) -[center]> 
 				ByOdds(i,shell[_],center[_]) 
