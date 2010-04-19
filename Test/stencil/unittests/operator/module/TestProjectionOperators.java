@@ -24,31 +24,31 @@ public class TestProjectionOperators extends TestCase {
 
 		//Test floating ceiling (white)
 		for (int i=0; i< 100; i++) {
-			c = (java.awt.Color) l.map(Integer.toString(i)).get(0);
+			c = (java.awt.Color) l.map(Integer.toString(i));
 			assertEquals("Testing " + i, white, ColorTuple.toString(c));
 		}
 
 		//Test floating floor (red)
 		l =  new Projection.HeatScale(null, s);
-		c = (java.awt.Color) l.map("100").get(0);		
+		c = (java.awt.Color) l.map("100");		
 		assertEquals(white,ColorTuple.toString(c));
 		
 		for (int i=99; i>= 0; i--) {
-			c = (java.awt.Color) l.map(Integer.toString(i)).get(0);
+			c = (java.awt.Color) l.map(Integer.toString(i));
 			assertEquals("Testing " + i, red, ColorTuple.toString(c));
 		}
 
 		//Test mid-ranges
-		assertEquals("@Color{255,127,127}", ColorTuple.toString((java.awt.Color) l.map("50").get(0)));
-		assertEquals("@Color{255,63,63}", ColorTuple.toString((java.awt.Color) l.map("25").get(0)));
-		assertEquals("@Color{255,191,191}", ColorTuple.toString((java.awt.Color) l.map("75").get(0)));
+		assertEquals("@Color{255,127,127}", ColorTuple.toString((java.awt.Color) l.map("50")));
+		assertEquals("@Color{255,63,63}", ColorTuple.toString((java.awt.Color) l.map("25")));
+		assertEquals("@Color{255,191,191}", ColorTuple.toString((java.awt.Color) l.map("75")));
 
 
 		//Test misc changes
-		assertEquals(white, ColorTuple.toString((java.awt.Color) l.map("200").get(0)));
-		assertEquals("@Color{255,127,127}", ColorTuple.toString((java.awt.Color) l.map("100").get(0)));
-		assertEquals("@Color{255,63,63}", ColorTuple.toString((java.awt.Color) l.map("50").get(0)));
-		assertEquals("@Color{255,191,191}", ColorTuple.toString((java.awt.Color) l.map("150").get(0)));
+		assertEquals(white, ColorTuple.toString((java.awt.Color) l.map("200")));
+		assertEquals("@Color{255,127,127}", ColorTuple.toString((java.awt.Color) l.map("100")));
+		assertEquals("@Color{255,63,63}", ColorTuple.toString((java.awt.Color) l.map("50")));
+		assertEquals("@Color{255,191,191}", ColorTuple.toString((java.awt.Color) l.map("150")));
 	}
 
 

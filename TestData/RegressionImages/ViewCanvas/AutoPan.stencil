@@ -2,9 +2,9 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/ViewCanvas/google_stocks.csv
 SKIP: 1
-STRICT: TRUE
+STRICT: true
 STREAM: Mouse
 NAME: Mouse
 FREQUENCY: -2147483648
@@ -16,33 +16,35 @@ order (Stocks | Mouse)
 
 layer Ticker[POLY_LINE]
 from Stocks
-	ID : "Google"	
-	X.new: TimeStep(Date) 
-	Y.new: Mult(Open, -1)
-	STROKE_WEIGHT: 1
-	STROKE_COLOR: @Color{BLUE}
+    ID : "Google"   
+    X.new: TimeStep(Date) 
+    Y.new: Mult(Open, -1)
+    STROKE_WEIGHT: 1
+    STROKE_COLOR: @Color{BLUE}
 from Stocks
-	view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
+    view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
 from Stocks
-	filter(Margin < 50)
-	filter(TimeStep < view[RIGHT])
-	prefilter(TimeStep, Margin) : TimeStep(Date) -[Time]> Sub(view[RIGHT], _) -> (Time[VALUE], VALUE) 
-	
-	view(X): Add(3, view[X])
+    filter(Margin < 50)
+    filter(TimeStep < RIGHT)
+    prefilter(TimeStep, Margin, RIGHT) : 
+        TranslateRegistration("TOP_LEFT", view[X], view[Y], view[WIDTH], view[HEIGHT], "RIGHT") -[Right]>
+        TimeStep(Date) -[Time]> Sub(Right[X], _) -> (Time[VALUE], VALUE, Right[X]) 
+    
+    view(X): Add(3, view[X])
 
 layer Nav
 from Mouse
-	filter(BUTTON = 1)
-	filter(SHIFT !~ "true")
-	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
+    filter(BUTTON = 1)
+    filter(SHIFT !~ "true")
+    view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
 from Mouse
-	filter(BUTTON = 1)
-	filter(SHIFT =~ "true")
-	view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height, view[Y])
+    filter(BUTTON = 1)
+    filter(SHIFT =~ "true")
+    view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height, view[Y])
 from Mouse
-	filter(CLICK_COUNT = 3)
-	filter(BUTTON = 1)
-	view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
+    filter(CLICK_COUNT = 3)
+    filter(BUTTON = 1)
+    view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
 
 operator TimeStep (Date) -> (VALUE)
-	ALL => VALUE : Index(Date) -> Mult(3, VALUE)
+    ALL => VALUE : Index(Date) -> Mult(3, VALUE)
