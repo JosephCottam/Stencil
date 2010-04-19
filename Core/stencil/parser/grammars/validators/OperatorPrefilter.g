@@ -1,4 +1,4 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
+	/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -25,29 +25,42 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */ 
+ 
+/* Verifies that python blocks contain valid python code.
+ * Corrects python block indentation for blocks that have are
+ * indented on their first non-blank line. 
  */
-package stencil.parser.tree;
-
-import java.util.List;
-import org.antlr.runtime.Token;
-
-import stencil.parser.string.StencilParser;
-
-public class Operator extends StencilTree {
-	public Operator(Token source) {super(source);}
-
-	public String getName() {return token.getText();}
-
-	public Yields getYields() {return (Yields) this.getFirstChildWithType(StencilParser.YIELDS);}
-	public TuplePrototype getArguments() {return getYields().getInput();}
-	public TuplePrototype getResults() {return getYields().getOutput();}
-
-	public List<OperatorRule> getRules() {
-		return (List<OperatorRule>) findChild(StencilParser.LIST, "Rules");
-	}
-	
-	public List<Rule> getPrefilterRules() {
-		return (List<Rule>) findChild(StencilParser.LIST, "Prefilters");
-	}
-
+tree grammar OperatorPrefilter;
+options {
+  tokenVocab = Stencil;
+  ASTLabelType = CommonTree;  
+  filter = true;
 }
+
+@header {
+  /** Verify that the target in the operator prefilter block is always prefilter.**/
+   
+
+  package stencil.parser.string.validators;
+  
+  import stencil.parser.tree.*;
+  import stencil.parser.string.ValidationException;
+  import stencil.parser.string.StencilParser;
+}
+
+@members {
+  private static final class TargetPackMismatchException extends ValidationException {
+      public TargetPackMismatchException() {
+        super("");
+      }
+  }  
+}
+
+topdown: ^(OPERATOR . ^(LIST prefilter) .*);
+prefilter
+	: (RULE PREFILTER) => ^(RULE PREFILTER .*) 
+	| v=. {throw new RuntimeException("Non-prefilter in prefilter block for operator " + v.getAncestor(StencilParser.OPERATOR).getText());}; 
+
+
+  

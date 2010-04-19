@@ -75,7 +75,7 @@ valueE[EnvironmentProxy env]
   | ^(t=TUPLE_REF r=NUMBER v=valueP[env.get(((StencilNumber) $r).getNumber().intValue())])
   | (TUPLE_REF NUMBER) => ^(t=TUPLE_REF r=NUMBER)
   | .;
-    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
+    catch[Exception e] {throw new RuntimeException(String.format("Error numeralizing %1$s.\n%2$s.", $t.toStringTree(), e.toString())));}
   
       
 //TODO:Unify envProxy and TuplePrototype (will eliminated the valueE and valueNP variants, requires a way to get a prototype from a prototype...)

@@ -328,8 +328,12 @@ public abstract class ParseStencil {
 			AllInvokeables invokeables = new AllInvokeables(treeTokens);
 			invokeables.downup(t);
 	
+			
 			TargetMatchesPack targetPack = new TargetMatchesPack(treeTokens);
 			targetPack.downup(t);
+
+			OperatorPrefilter opPrefilter = new OperatorPrefilter(treeTokens);
+			opPrefilter.downup(t);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {e.printStackTrace();}

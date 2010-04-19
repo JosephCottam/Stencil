@@ -251,8 +251,8 @@ filter: FILTER! predicate;
 operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text]);
   
 operatorDef
-  : OPERATOR name=ID tuple[false] YIELDS tuple[false] operatorRule+
-    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
+  : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
+    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Prefilters"] $pf*) ^(LIST["Rules"] operatorRule+))
   | OPERATOR name=ID BASE base=ID specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
@@ -303,6 +303,7 @@ target[String def]
   | LOCAL^ tuple[false]
   | VIEW^ tuple[false]
   | tuple[true]
+    -> {def.equals("prefilter")}? ^(PREFILTER tuple)
     -> {def.equals("glyph")}? ^(GLYPH tuple)
     -> {def.equals("return")}? ^(RETURN tuple)
     -> ^(DEFAULT tuple);

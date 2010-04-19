@@ -11,39 +11,44 @@ stream Words(word, line)
 order Words
 
 canvas Main
-   guide pointLabels from Words ID
+   guide pointLabels from Center ID
 
 layer Border[TEXT]
 from Words
    ID: line
    TEXT: GetExisting(line)  -> Concatenate(prior, " ", word)
-   (X,Y):* CircularLayout(line) -> Centroid.put(word, x,y)
+   (X,Y):* CircularLayout(line) -> Centroid.put(word, X,Y)
    REGISTRATAION: "Center"
 
 layer Center[TEXT]
 from Words
    ID: word
-   (X,Y) :* Centroid(word)
+   (X,Y) :* Centroid.get(word)
    TEXT: word
    TEXT_COLOR: FreqColor(word)
    TEXT_SIZE: FreqSize(word)
+
+operator GetExisting (l) -> (prior) 
+  prefilter(existing) : Border.find(l)
+  (existing =~ "[null]") => prior: ""
+  ALL => prior: existing
    
 operator Prior(line) -> (text) 
-  prefilter(t) : Border.find(line)
+  prefilter(t) : Border.find(line) -> TEXT
   (t =~ "[null]") => text: ""
-  (ALL) => text: t[text]
+  (ALL) => text: t
 
 operator FreqColor(word) -> (C)
   (ALL) => C: Freq(word) 
-             -> Linear[start: "Gray10", end: "Gray90"](div)
+             -> HeatScale[cold: "Gray10", hot: "Gray90"](freq)
 
 operator FreqSize(word) -> (size)
   (ALL) => size: Freq(word) 
-             -> Linear[start: "0", end: "20"](div)
+             -> Scale[min: 0, max: 20](freq)
 
 operator Freq (word) -> (freq)
-  (ALL) => freq: Count(word) -> Max[range: ALL](_) 
-           -> Div(count, max)
+  (ALL) => freq: Count(word) -[count]> Max[range: ALL](_) 
+           -> Div(count[_], _)
 
 
 python Centroid
@@ -75,10 +80,18 @@ facet init {
 	from math import *
 	max =0
 }
-
-facet query(Seq) -> (X,Y) {
+facet map(Seq) -> (X,Y) {
 	Seq = float(Seq) +1
 	if (Seq > max): max=Seq
+
+	radius = sqrt(max)+ max/100 * 20
+	offset = (Seq/max)*360*0.01745   #to radians
+
+	X = radius * cos(offset)
+	Y = radius * sin(offset)
+}
+facet query(Seq) -> (X,Y) {
+	Seq = float(Seq) +1
 
 	radius = sqrt(max)+ max/100 * 20
 	offset = (Seq/max)*360*0.01745   #to radians
