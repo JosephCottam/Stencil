@@ -27,6 +27,8 @@ public class TreeView {
 	//  If header is not indicated, all lines in the source file will loaded
 	//  Stencil Properties file must always be indicated
 	 public static void main(String args[]) throws Exception {
+		 ParseStencil.abortOnValidationException = false;
+		 
 		String text = TreeView.test;
 		String file = null;
 		//Init modules...

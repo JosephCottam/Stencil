@@ -204,6 +204,7 @@ public final class EnvironmentProxy {
 		this.parent = parent;
 	}
 
+	
 	public int currentIndex() {
 		int index =0;
 		EnvironmentProxy  prior=parent;
@@ -231,6 +232,7 @@ public final class EnvironmentProxy {
 		else if (parent == null) {throw new FrameException(idx);}
 		else {return parent.get(idx);}
 	}
+
 
 	//Convert the name to a numeric ref (can be either a frame or tuple ref)
 	public int getFrameIndex(String name) {

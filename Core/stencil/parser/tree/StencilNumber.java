@@ -13,6 +13,8 @@ public class StencilNumber extends Atom {
 
 	public Number getNumber() {return getValue();}
 	public Number getValue() {return value;}
+	public int intValue() {return value.intValue();}
+	public double doubleValue() {return value.doubleValue();}
 
 	private static final Number parseValue(String value) throws NumberFormatException {
 		try {return new Integer(value);}

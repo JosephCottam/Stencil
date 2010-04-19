@@ -32,7 +32,6 @@ options {
   ASTLabelType = CommonTree;  
   output = AST;
   filter = true;
-  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -43,15 +42,7 @@ options {
    
   package stencil.parser.string;
   
-  import java.util.Arrays;
-  
-  import stencil.parser.ParserConstants;
-  import stencil.parser.tree.*;
   import stencil.operator.module.*;
-  import stencil.util.MultiPartName;
-  import stencil.tuple.prototype.TuplePrototype;
-  import stencil.tuple.prototype.SimplePrototype;
-  import stencil.tuple.prototype.TuplePrototypes;
   import static stencil.parser.string.EnvironmentProxy.initialEnv;
   import static stencil.parser.string.EnvironmentProxy.extend;
 }
@@ -64,40 +55,22 @@ options {
     assert modules != null : "ModuleCache must not be null.";
     this.modules = modules;
   }
-
-  protected TupleRef frame(CommonTree t, EnvironmentProxy env) {
-    TupleRef ref = (TupleRef) t;
-    
-    int frameIdx;
-    if (!ref.isNumericRef()) {
-      String name = ((Id) ref.getValue()).getName();
-      if (env.isFrameRef(name)) {return (TupleRef) adaptor.dupTree(ref);}	//No need to frame, already uses a frame ref
-		
-      frameIdx = env.frameRefFor(name);
-    } else {
-      frameIdx =env.currentIndex();
-    }
-	
-    TupleRef newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "<frame autogen>");
-    StencilNumber frame = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(frameIdx));
-    adaptor.addChild(newRef, frame);
-    adaptor.addChild(newRef, adaptor.dupTree(ref));
-    return newRef;
-  }
 }
 
-topdown: action | predicate;
-
-predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
-
-action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
+topdown
+  : ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)])
+  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 	catch [EnvironmentProxy.FrameException fe] {throw new RuntimeException("Error framing rule: " + c.toStringTree(), fe);}
 	
 callTarget[EnvironmentProxy env] 
-//  : ^(f=FUNCTION (options {greedy=false;} :.)* ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)]) --> This didn't work if the arg list was empty...
   : ^(f=FUNCTION . . ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(PACK value[env]*);
           
-value[EnvironmentProxy env] 
-  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {frame($t, env)}
+value[EnvironmentProxy env]
+  options{backtrack=true;}
+  : ^(TUPLE_REF n=ID v=.) 
+       -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n $v)		//Already is a frame ref, no need to extend 
+       -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n $v))
+  | ^(TUPLE_REF n=ID)   -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n))
+  | ^(TUPLE_REF NUMBER) -> ^(TUPLE_REF NUMBER[Integer.toString(env.currentIndex())] ^(TUPLE_REF NUMBER))
   | .;

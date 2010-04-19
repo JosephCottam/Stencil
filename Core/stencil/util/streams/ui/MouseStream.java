@@ -108,7 +108,7 @@ public class MouseStream implements TupleStream {
 	 * CTRL, ALT, SHIFT, META: Modifier keys concurrently pressed
 	 * TYPE: Click/Press/Move/Drag
 	 */
-	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE};
+	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE}
 	private static final TuplePrototype PROTOTYPE = new SimplePrototype(EnumUtils.allNames(Names.class)); 
 	
 	
@@ -163,7 +163,7 @@ public class MouseStream implements TupleStream {
 			values[Names.SCREEN_X.ordinal()] = mouse.current.getX();
 			values[Names.SCREEN_Y.ordinal()] = mouse.current.getY();
 			values[Names.CLICK_COUNT.ordinal()] = mouse.storedEvent.getClickCount();
-			values[Names.CTRL.ordinal()] = mouse.storedEvent.isControlDown();;
+			values[Names.CTRL.ordinal()] = mouse.storedEvent.isControlDown();
 			values[Names.ALT.ordinal()] = mouse.storedEvent.isAltDown();
 			values[Names.SHIFT.ordinal()] = mouse.storedEvent.isShiftDown();
 			values[Names.META.ordinal()] = mouse.storedEvent.isMetaDown();

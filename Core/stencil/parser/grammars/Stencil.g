@@ -251,7 +251,7 @@ filter: FILTER! predicate;
 operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text]);
   
 operatorDef
-  : OPERATOR  name=ID tuple[false] YIELDS tuple[false] operatorRule+
+  : OPERATOR name=ID tuple[false] YIELDS tuple[false] operatorRule+
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Rules"] operatorRule+))
   | OPERATOR name=ID BASE base=ID specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);

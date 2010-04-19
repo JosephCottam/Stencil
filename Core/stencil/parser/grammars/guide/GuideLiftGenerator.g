@@ -79,7 +79,6 @@ retarget
       
 repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)
-  | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID["**stream**"] ^(TUPLE_REF NUMBER["0"])));
-  //TODO: Is there a better way to reference to root source?  **stream** is a little obscure...
+  | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID["stream"] ^(TUPLE_REF NUMBER["0"])));
   //HACK: Only works if there is only one input
       

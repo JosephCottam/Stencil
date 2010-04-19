@@ -41,7 +41,12 @@ import stencil.parser.ProgramParseException;
 import stencil.parser.string.validators.*;
 import stencil.parser.tree.*;
 
-public abstract class ParseStencil {	
+public abstract class ParseStencil {
+	/**Should an exception be thrown when validation fails?
+	 * If false, a warning message is printed still printed.
+	 */
+	public static boolean abortOnValidationException = true;
+	
 	/**Exception indicating that errors were founding parsing the program.  Individual
 	 * errors may not propagated to allow the parser to attempt automatic recovery
 	 * and improve error reporting past the first instance.
@@ -307,19 +312,27 @@ public abstract class ParseStencil {
 	
 	//Run common validators.
 	private static void validate(StencilTree t) {
-		//Since validators don't permute the tree in any way, one token stream might be enough...
-		CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
-
-		SpecializerValidator specializer = new SpecializerValidator(treeTokens);
-		specializer.downup(t);
-		
-		StreamDeclarationValidator stream = new StreamDeclarationValidator(treeTokens);
-		stream.downup(t);
-		
-		AllInvokeables invokeables = new AllInvokeables(treeTokens);
-		invokeables.downup(t);
-
-		TargetMatchesPack targetPack = new TargetMatchesPack(treeTokens);
-		targetPack.downup(t);
+		try {
+			//Since validators don't permute the tree in any way, one token stream might be enough...
+			CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
+	
+			SpecializerValidator specializer = new SpecializerValidator(treeTokens);
+			specializer.downup(t);
+	
+			FullNumeralize numeralize = new FullNumeralize(treeTokens);
+			numeralize.downup(t);
+			
+			StreamDeclarationValidator stream = new StreamDeclarationValidator(treeTokens);
+			stream.downup(t);
+			
+			AllInvokeables invokeables = new AllInvokeables(treeTokens);
+			invokeables.downup(t);
+	
+			TargetMatchesPack targetPack = new TargetMatchesPack(treeTokens);
+			targetPack.downup(t);
+		} catch (RuntimeException e) {
+			if (abortOnValidationException) {throw e;}
+			else {e.printStackTrace();}
+		}
 	}
 }

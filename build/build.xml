@@ -129,6 +129,11 @@
             libdirectory="${parser}"
         />
         <antlr
+            target="${grammars}/validators/FullNumeralize.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+        <antlr
             target="${grammars}/validators/SpecializerValidator.g"
             outputdirectory="${parser}/validators/"
             libdirectory="${parser}"

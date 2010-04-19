@@ -59,75 +59,34 @@ options {
     assert modules != null : "ModuleCache must not be null.";
     this.modules = modules;
   }
-
-  private TupleRef resolve(TupleRef ref, String prototype) {
-    throw new RuntimeException("Tuple sub-ref numeralization not complete.");
-  }
-  
-  
-  private TupleRef resolve(TupleRef ref, TuplePrototype prototype) {
-    TupleRef newRef;    
-
-    int idx;
-    if (!ref.isNumericRef()) {
-      String name = ((Id) ref.getValue()).getName();
-      idx = prototype.indexOf(name);
-    } else {
-      idx = ((StencilNumber) ref.getValue()).getNumber().intValue();
-    }
-    
-    if (idx < 0) {throw new RuntimeException("Error numeralizing.");}
-
-    StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
-    adaptor.addChild(newRef, num);
-    
-    if (ref.hasSubRef()) {
-      adaptor.addChild(newRef, resolve(ref.getSubRef(), prototype.get(idx).getFieldName()));
-    }
-    return newRef;
-  }
-  
-  private TupleRef resolve(CommonTree r, EnvironmentProxy env) {
-    TupleRef ref = (TupleRef) r;
-    TupleRef newRef;
-    int idx;
-    
-    if (!ref.isNumericRef()) {
-      String name = ((Id) ref.getValue()).getName();
-      idx = env.getFrameIndex(name);
-    } else {
-      idx = ((StencilNumber) ref.getValue()).getNumber().intValue();      
-    }
-    
-    if (idx < 0) {throw new RuntimeException("Error numeralizing.");}
-    
-    StencilNumber num = (StencilNumber) adaptor.create(StencilParser.NUMBER, Integer.toString(idx));
-    newRef = (TupleRef) adaptor.create(StencilParser.TUPLE_REF, "TUPLE_REF");
-    adaptor.addChild(newRef, num);
-    
-    if (ref.hasSubRef()) {
-      adaptor.addChild(newRef, resolve(ref.getSubRef(), env.get(idx)));
-    }
-
-    return newRef;
-  }
-
 }
 
-topdown: action | predicate;
-
-predicate: ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)]);
-  
-action : ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
+topdown
+	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
+    | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
 
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION (options {greedy=false;} :.)* ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
-  | ^(PACK value[env]+);    
+  : ^(f=FUNCTION . . ^(LIST valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  | ^(PACK valueE[env]+);    
       
-value[EnvironmentProxy env]
-  : (TUPLE_REF) => ^(t=TUPLE_REF .+) -> {resolve($t, env)}  
+valueE[EnvironmentProxy env]
+  : ^(t=TUPLE_REF r=ID v=valueP[env.get(env.getFrameIndex($r.text))]) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] $v)
+  | (TUPLE_REF ID) => ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))])
+  | ^(t=TUPLE_REF r=NUMBER v=valueP[env.get(((StencilNumber) $r).getNumber().intValue())])
+  | (TUPLE_REF NUMBER) => ^(t=TUPLE_REF r=NUMBER)
   | .;
-      catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
+    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
   
-          
+      
+//TODO:Unify envProxy and TuplePrototype (will eliminated the valueE and valueNP variants, requires a way to get a prototype from a prototype...)
+valueP[TuplePrototype p]
+  : ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))])
+  | ^(t=TUPLE_REF r=ID valueNP) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))] valueNP)
+  | ^(t=TUPLE_REF r=NUMBER valueNP) 
+  | ^(t=TUPLE_REF r=NUMBER);
+    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
+
+valueNP
+  : ^(TUPLE_REF ID) {throw new RuntimeException("Numeralize can only handle one level names in nesting");}
+  | ^(TUPLE_REF NUMBER valueNP)
+  | ^(TUPLE_REF NUMBER);
