@@ -1,12 +1,12 @@
 STREAM: File
 NAME: Words
-HEADER: 
-SEPARATOR: 
-SOURCE: 
-SKIP: 0
+HEADER: line, word
+SEPARATOR: \s*,\s*
+SOURCE: ./AliceInWonderland.csv
+SKIP: 1
 STRICT: true
 
-stream Words(word, line)
+stream Words(line, word)
 
 order Words
 
@@ -29,15 +29,10 @@ from Words
    TEXT_SIZE: FreqSize(word)
 
 operator GetExisting (l) -> (prior) 
-  prefilter(existing) : Border.find(l)
-  (existing =~ "[null]") => prior: ""
-  ALL => prior: existing
+  prefilter(exists) : Border.contains(l)
+  (exists !~ "true") => prior: Print("No") -> ""
+  ALL => prior: Print("YES") -> Border.find(l) -> TEXT
    
-operator Prior(line) -> (text) 
-  prefilter(t) : Border.find(line) -> TEXT
-  (t =~ "[null]") => text: ""
-  (ALL) => text: t
-
 operator FreqColor(word) -> (C)
   (ALL) => C: Freq(word) 
              -> HeatScale[cold: "Gray10", hot: "Gray90"](freq)

@@ -71,6 +71,9 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**Given an ID, remove the associated tuple from the layer*/
 	public void remove(String ID);
 
+	/**Is the provided ID associated with a tuple on this layer?*/
+	public boolean contains(String ID);
+	
 	/**What is the name of this layer*/
 	public String getName();
 

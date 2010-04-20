@@ -77,6 +77,8 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	public T find(String ID) {return index.get(ID);}
 
+	public boolean contains(String ID) {return index.containsKey(ID);}
+	
 	public T makeOrFind(Tuple values) {
 		String id = Converter.toString(values.get(ParserConstants.GLYPH_ID_FIELD));
 		T rv;

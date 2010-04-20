@@ -30,6 +30,7 @@ package stencil.operator.wrappers;
 
 import java.util.Arrays;
 
+import stencil.interpreter.Interpreter;
 import stencil.operator.StencilOperator;
 import stencil.operator.module.util.Modules;
 import static stencil.operator.module.util.OperatorData.TYPE_PROJECT;
@@ -39,7 +40,7 @@ import stencil.parser.tree.Canvas;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.View;
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototypes;
@@ -74,9 +75,13 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 				int expected = opDef.getArguments().size();
 				throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
 			}
-
-			Tuple tuple = new PrototypedTuple(opDef.getArguments(), Arrays.asList(values));
-			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);	//Extra slot for the pre-filter tuple
+			Tuple prefilter;
+			Tuple tuple = new ArrayTuple(values);
+			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
+			
+			try {prefilter = Interpreter.process(env, opDef.getPrefilterRules());}
+			catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s and tuple %2$s.", opDef.getName(), tuple.toString()));}
+			env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 			
 			OperatorRule action = matchingAction(env);
 

@@ -27,6 +27,9 @@ public final class LayerOperator implements StencilOperator {
 	public static final String REMOVE_FACET = "remove";
 	private static final String REMOVE_METHOD = "remove";
 	
+	private static final String CONTAINS_FACET = "contains";
+	private static final String CONTAINS_METHOD = "contains";
+	
 	protected final DisplayLayer layer;
 	protected final OperatorData operatorData;
 	
@@ -39,6 +42,7 @@ public final class LayerOperator implements StencilOperator {
 		operatorData.addFacet(new FacetData(MAP_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(QUERY_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(REMOVE_FACET, TYPE_NA, false, prototype));
+		operatorData.addFacet(new FacetData(CONTAINS_FACET, TYPE_NA, false, prototype));
 	}
 	
 	public String getName() {return layer.getName();}
@@ -48,6 +52,8 @@ public final class LayerOperator implements StencilOperator {
 			|| StencilOperator.QUERY_FACET.equals(facet)
 			|| FIND_FACET.equals(facet)) {
 			return new ReflectiveInvokeable(FIND_METHOD, layer);
+		} else if (CONTAINS_FACET.equals(facet)) {
+			return new ReflectiveInvokeable(CONTAINS_METHOD, layer);
 		} else if (REMOVE_FACET.equals(facet)) {
 			return new ReflectiveInvokeable(REMOVE_METHOD, layer);
 		}
