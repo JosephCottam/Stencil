@@ -8,7 +8,6 @@ import java.util.List;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -37,7 +36,7 @@ public class NumericSampler implements SampleOperator {
 		}
 
 		List<Tuple> sample = new ArrayList(sourceSize);
-		for (Object sv: source) {sample.add(Converter.toTuple(sv, new ArrayTuple()));}
+		for (Object sv: source) {sample.add(Converter.toTuple(sv));}
 		return sample;
 
 	}

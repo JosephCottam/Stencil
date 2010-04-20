@@ -1,6 +1,5 @@
 package stencil.operator.util;
 
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 
 public interface Invokeable<R> {
@@ -12,7 +11,7 @@ public interface Invokeable<R> {
 	 * the passed 'container' tuple will be used.  The container
 	 * value MUST NOT be null.
      **/
-	public abstract Tuple tupleInvoke(Object[] arguments, ArrayTuple container) 
+	public abstract Tuple tupleInvoke(Object[] arguments) 
 		throws MethodInvokeFailedException;
 
 	/**Invoke some entity with the passed arguments.*/

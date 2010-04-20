@@ -13,7 +13,7 @@ import stencil.tuple.prototype.TuplePrototypes;
  */
 public final class ArrayTuple implements Tuple {
 	private static final String PREFIX = "***";
-	private Object values;
+	private final Object values;
 		
 	public ArrayTuple(Object... values) {this.values = values;}
 	
@@ -51,8 +51,4 @@ public final class ArrayTuple implements Tuple {
 	 */
 	public Object getValues() {return values;}
 	public String toString() {return Tuples.toString(this, TuplePrototypes.defaultNames(size(), PREFIX));}
-	public void setArray(Object value) {
-		if (value.getClass().isArray()) {this.values = value;}
-		else {this.values = new Object[]{value};}
-	}
 }

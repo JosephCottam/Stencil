@@ -33,10 +33,11 @@ public final class Converter {
 	 * @param container
 	 * @return
 	 */
-	public static Tuple toTuple(Object value, ArrayTuple container) {
+	public static Tuple toTuple(Object value) {
 		if (value instanceof Tuple) {return (Tuple) value;}
 		
 		Class clazz = value.getClass();
+		if (clazz.isArray()) {return new ArrayTuple(value, true);}
 		
 		if (WRAPPER_FOR.containsKey(clazz)) {
 			TypeWrapper w = WRAPPER_FOR.get(clazz);
@@ -45,8 +46,7 @@ public final class Converter {
 		
 		if (Number.class.isAssignableFrom(clazz)) {return new NumericSingleton((Number) value);}
 		
-		container.setArray(value);
-		return container;
+		return new ArrayTuple(value);
 	}
 	
 	

@@ -7,7 +7,6 @@ import stencil.operator.util.Invokeable;
 import stencil.operator.util.MethodInvokeFailedException;
 import stencil.operator.util.Split;
 import stencil.parser.tree.Value;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -81,8 +80,8 @@ public abstract class SplitHelper implements StencilOperator {
 			this.facet = facet;
 		}
 		
-		public Tuple tupleInvoke(Object[] arguments, ArrayTuple container) {
-			return Converter.toTuple(invoke(arguments), container);
+		public Tuple tupleInvoke(Object[] arguments) {
+			return Converter.toTuple(invoke(arguments));
 		}
 		public Object invoke(Object[] arguments)
 				throws MethodInvokeFailedException {
