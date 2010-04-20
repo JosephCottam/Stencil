@@ -33,6 +33,7 @@ import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.Range;
 import stencil.parser.tree.Value;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -62,6 +63,10 @@ public abstract class RangeHelper implements StencilOperator {
 		}
 		
 		public Object getTarget() {return this;}
+		
+		public Tuple tupleInvoke(Object[] arguments, ArrayTuple container) {
+			return Converter.toTuple(invoke(arguments), container);
+		}
 	}
 	
 	private static final class QueryRangeTarget extends AbstractRangeTarget {
@@ -69,8 +74,6 @@ public abstract class RangeHelper implements StencilOperator {
 			super(helper, base);
 		}
 		
-		public Tuple tupleInvoke(Object[] arguments) {return Converter.toTuple(invoke(arguments));}
-
 		public Object invoke(Object[] args) {
 			Object[] formals = helper.getCache();
 			return base.invoke(formals);
@@ -82,8 +85,6 @@ public abstract class RangeHelper implements StencilOperator {
 		public RangeTarget(RangeHelper helper, Invokeable base) {
 			super(helper, base);
 		}
-
-		public Tuple tupleInvoke(Object[] arguments) {return Converter.toTuple(invoke(arguments));}
 
 		public Object invoke(Object[] args) {
 			Object[] formals = helper.updateCache(args);

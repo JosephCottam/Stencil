@@ -31,6 +31,7 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.parser.string.StencilParser;
 
@@ -39,6 +40,7 @@ public class Function extends CallTarget {
 	private List<Value> args;
 	private AstInvokeable target;
 	private CallTarget call;
+	private final ArrayTuple container = new ArrayTuple();
 	
 	private static final class FunctionApplicationException extends RuntimeException {
 		public FunctionApplicationException(Function f, Tuple t, Exception e) {
@@ -87,7 +89,7 @@ public class Function extends CallTarget {
 	public Tuple apply(Tuple valueSource) throws Exception {
 		try {
 			Object[] formals = TupleRef.resolveAll(getArguments(), valueSource);
-			Tuple results = getTarget().invoke(formals);
+			Tuple results = getTarget().invoke(formals, container);
 			return results;
  		} catch (Exception e) {throw new FunctionApplicationException(this, valueSource, e);} 		
 	}

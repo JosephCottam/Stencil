@@ -26,13 +26,18 @@ public final class Converter {
 		for (Class c: wrapper.appliesTo()) {WRAPPER_FOR.put(c, wrapper);}
 	}
 
-	public static Tuple toTuple(Object value) {
+	/**Make the given object into a tuple; 
+	 * uses the passed container array tuple if an array tuple would be used anyway.
+	 * 
+	 * @param value
+	 * @param container
+	 * @return
+	 */
+	public static Tuple toTuple(Object value, ArrayTuple container) {
 		if (value instanceof Tuple) {return (Tuple) value;}
 		
 		Class clazz = value.getClass();
 		
-		if (clazz.isArray()) {return new ArrayTuple(value, true);}
-
 		if (WRAPPER_FOR.containsKey(clazz)) {
 			TypeWrapper w = WRAPPER_FOR.get(clazz);
 			return w.toTuple(value);
@@ -40,7 +45,8 @@ public final class Converter {
 		
 		if (Number.class.isAssignableFrom(clazz)) {return new NumericSingleton((Number) value);}
 		
-		return new ArrayTuple(value);
+		container.setArray(value);
+		return container;
 	}
 	
 	

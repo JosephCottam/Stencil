@@ -4,6 +4,7 @@ import org.antlr.runtime.Token;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.util.Invokeable;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 
 /**Holder for invokeables, independent of context.
@@ -24,7 +25,9 @@ public final class AstInvokeable extends StencilTree {
 	public StencilOperator getOperator() {return op;}
 	public Invokeable getInvokeable() {return inv;}
 
-	public Tuple invoke(Object[] args) {return inv.tupleInvoke(args);}
+	public Tuple invoke(Object[] args, ArrayTuple container) {
+		return inv.tupleInvoke(args, container);
+	}
 
 	public AstInvokeable dupNode() {
 		AstInvokeable n = (AstInvokeable) super.dupNode();
