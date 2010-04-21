@@ -9,7 +9,9 @@ lineNum =-1
 for line in input:
   lineNum = lineNum +1
   for word in line.strip().split(" "):
-    output.write('{0!r}, {1}\n'.format(lineNum, word))
+    if (word.strip()!=""):
+      word = word.replace(",","") 
+      output.write('{0!r}, {1}\n'.format(lineNum, word))
 
 output.close()
 input.close()

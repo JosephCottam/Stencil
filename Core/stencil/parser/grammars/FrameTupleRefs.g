@@ -60,7 +60,11 @@ options {
 topdown
   : ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)])
   | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
-	catch [EnvironmentProxy.FrameException fe] {throw new RuntimeException("Error framing rule: " + c.toStringTree(), fe);}
+	catch [EnvironmentProxy.FrameException fe] {
+	 if (c != null) {throw new RuntimeException("Error framing: " + c.toStringTree(), fe);}
+	 else if (p != null) {throw new RuntimeException("Error framing: " + p.toStringTree(), fe);}
+	 else {throw new Error("Error in framing: No root.");}
+  }
 	
 callTarget[EnvironmentProxy env] 
   : ^(f=FUNCTION . . ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
