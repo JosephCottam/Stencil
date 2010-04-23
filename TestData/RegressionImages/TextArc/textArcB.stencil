@@ -1,0 +1,80 @@
+STREAM: File
+NAME: Words
+HEADER: words
+SEPARATOR:
+SOURCE: ./AliceInWonderland.txt
+SKIP: 0
+STRICT: true
+
+stream RawLines(words)
+
+stream Lines (line, words)
+from RawLines
+   line: Counter()
+   words: words
+
+stream Words (line, word)
+from Lines
+   line: line
+   word: split(words, "\s+") -> strip(_)   /*Strip removes all non-letters from word front\rear*/
+
+stream Centroid(word, X,Y)
+from Words
+  word: word
+  X,Y: LineIndex.get(word) -> Concatenate(_, ",", line) -> Index.put(word, _)
+       -> LineIndex.get(word) -> split(_, ",") 
+       >> CircularLayout(_) >> 
+       Select[fields: X](*) -[X]> Average(*)
+       Select[fields: Y](*) -[Y]> Average(*) -> (X[_], Y[_])
+
+layer Border[TEXT]
+from Lines
+   ID: line
+   TEXT: text
+   (X,Y):* CircularLayout(line) 
+
+
+layer Center[TEXT]
+from Centroid
+   (ID,X,Y): (word,X,Y)
+   TEXT: word
+   FONT_COLOR:* FreqColor(word)
+   FONT_SIZE:* FreqSize(word)
+
+operator FreqColor(word) -> (C)
+  (ALL) => C: Freq(word) 
+             -> HeatScale[cold: "Gray10", hot: "Gray90"](freq)
+
+operator FreqSize(word) -> (size)
+  (ALL) => size: Freq(word) 
+             -> Scale[min: 0, max: 20](freq)
+
+operator Freq (word) -> (freq)
+  (ALL) => freq: Count(word) -[count]> Max[range: ALL](_) 
+           -> Div(count[_], _)
+
+
+python CircularLayout
+facet init {
+    from math import *
+    max =0
+}
+facet map(Seq) -> (X,Y) {
+    Seq = float(Seq) +1
+    if (Seq > max): max=Seq
+
+    radius = sqrt(max)+ max/100 * 20
+    offset = (Seq/max)*360*0.01745   #to radians
+
+    X = radius * cos(offset)
+    Y = radius * sin(offset)
+}
+facet query(Seq) -> (X,Y) {
+    Seq = float(Seq) +1
+
+    radius = sqrt(max)+ max/100 * 20
+    offset = (Seq/max)*360*0.01745   #to radians
+
+    X = radius * cos(offset)
+    Y = radius * sin(offset)
+}
