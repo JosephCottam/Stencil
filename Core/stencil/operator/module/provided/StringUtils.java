@@ -46,6 +46,9 @@ public class StringUtils extends BasicModule {
 	/**Converts a value to a string value.*/
 	public static String toString(Object s) {return s.toString();}
 	
+	public static String[] split(String value, String pattern) {
+		return value.split(pattern);
+	}
 	
 	//TODO: Add range support to concatenate
 	public static String concatenate(Object... os) {

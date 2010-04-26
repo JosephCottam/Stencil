@@ -51,7 +51,7 @@ import stencil.explore.model.sources.TextSource;
 import stencil.explore.ui.components.*;
 import stencil.parser.string.ParseStencil;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.ExternalStream;
+import stencil.parser.tree.Stream;
 import stencil.explore.Application;
 import stencil.explore.PropertyManager;
 
@@ -201,7 +201,7 @@ public final class Applet extends JApplet implements StencilListener.StencilChan
 		//Synch Sources
 		Set<TextSource> sources = new HashSet<TextSource>();
 		try {
-			for (ExternalStream stream: program.getExternalStreams()) {
+			for (Stream stream: program.getExternalStreams()) {
 				TextSource source;
 				if (SourceCache.weakContains(stream.getName())) {
 					source = (TextSource) SourceCache.weakGet(stream.getName());

@@ -64,6 +64,12 @@
        />
 
  		<antlr
+           target="${grammars}/LiftStreamPrototypes.g"
+           outputdirectory="${parser}"
+           libdirectory="${parser}"
+       />
+
+ 		<antlr
 			target="${grammars}/Imports.g"
 			outputdirectory="${parser}"
 		/>

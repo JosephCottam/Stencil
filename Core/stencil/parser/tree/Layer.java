@@ -65,5 +65,4 @@ public class Layer extends StencilTree {
 		l.displayLayer = this.displayLayer;
 		return l;
 	}
-
 }

@@ -16,3 +16,4 @@ operators:
   - name: ToString
   - name: Substring
   - name: Trim
+  - name: Split

@@ -1,26 +1,26 @@
 STREAM: File
 NAME: RawLines
-HEADER: 
-SEPARATOR: 
-SOURCE: 
+HEADER: text
+SEPARATOR: [n/a]
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
-stream RawLines(words)
+stream RawLines(text)
 
-stream Lines (line, words)
+stream Lines (line, text)
 from RawLines
    line: Counter()
-   words: words
+   words: text
 
 stream Words (line, word)
 from Lines
    line: line
-   word: split(words, "\\s+") -> strip(_)   /*Strip removes all non-letters from word front\rear*/
+   word: split(text, "\\s+") -> strip(_)   /*Strip removes all non-letters from word front\rear*/
    
 stream PrimeCentroid (X,Y)
 from Words
- (X,Y) : LineIndex.get(word) -> DelimitList(_, ",", line) -> LineIndex.put(word, _)
+ (X,Y) : LineIndex.query(word) -> DelimitList(_, ",", line) -> LineIndex(word, _)
 
 
 layer Border[TEXT]
@@ -55,12 +55,12 @@ operator LineIndex base Index[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   (ALL) =>
-    (X): LineIndex.get(word) -> split(_, ",") 
+    (X): LineIndex(word) -> Split(_, ",") 
             >> CircularLayout(_) >>
-            Select[fields: "X"](*) -> Average(*)
-    (Y):  LineIndex.get(word) -> split(_, ",") 
+            Select[field: 0](*) -> Average(*)
+    (Y):  LineIndex(word) -> Split(_, ",") 
             >> CircularLayout(_) >>
-            Select[fields: "Y"](*) -> Average(*)
+            Select[field: 1](*) -> Average(*)
             
 
 python CircularLayout

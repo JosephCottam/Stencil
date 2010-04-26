@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.antlr.runtime.Token;
 
-import stencil.operator.module.ModuleCache;
 import stencil.parser.string.StencilParser;
 
 public class Program extends StencilTree {
@@ -41,13 +40,12 @@ public class Program extends StencilTree {
 	private static final int STREAMS = 2;
 	private static final int ORDER = 3;
 	private static final int CANVAS_DEF = 4;
-	private static final int LAYERS = 5;
-	private static final int OPERATORS =6;
-	private static final int PYTHONS = 7;
-	private static final int TEMPLATES = 8;
+	private static final int STREAM_DEFS = 5;
+	private static final int LAYERS = 6;
+	private static final int OPERATORS = 7;
+	private static final int PYTHONS = 8;
+	private static final int TEMPLATES = 9;
 		
-	private ModuleCache mc;	//TODO: Remove when all tuple references are positional
-	
 	public Program(Token source) {super(source);}
 
 	/**What are the layers of this stencil?*/
@@ -56,6 +54,13 @@ public class Program extends StencilTree {
 		return (List) getChild(LAYERS);
 	}
 
+	/**What are the layers of this stencil?*/
+	public List<Layer> getStreamDefs() {
+		assert verifyType(getChild(STREAM_DEFS), StencilParser.LIST);
+		return (List) getChild(STREAM_DEFS);
+	}
+
+	
 	/**What are the layers of this stencil?*/
 	public List<Layer> getGlobals() {
 		assert verifyType(getChild(GLOBALS), StencilParser.LIST);
@@ -87,12 +92,10 @@ public class Program extends StencilTree {
 	
 	public CanvasDef getCanvasDef() {return (CanvasDef) getChild(CANVAS_DEF);}
 
-	/**Get a list of all stream names used in this stencil.
-	 * TODO: Provide a method to get all streams (not just externals)
-	 * */
-	public List<ExternalStream> getExternalStreams() {
+	/**Get a list of all stream names used in this stencil.**/
+	public List<Stream> getStreams() {
 		assert verifyType(getChild(STREAMS), StencilParser.LIST) : "Unexpeced type for streams list" + typeName(getChild(STREAMS).getType());
-		return (List<ExternalStream>) getChild(STREAMS);
+		return (List<Stream>) getChild(STREAMS);
 	}
 
 	/**List of all operators defined by this stencil.*/
@@ -111,6 +114,4 @@ public class Program extends StencilTree {
 		return (List<OperatorTemplate>) getChild(TEMPLATES);
 	}	
 	
-	public void setModuleCache(ModuleCache mc) {this.mc = mc;}//TODO: Remove when all tuple references are positional
-	public ModuleCache getModuleCache() {return mc;}//TODO: Remove when all tuple references are positional
 }

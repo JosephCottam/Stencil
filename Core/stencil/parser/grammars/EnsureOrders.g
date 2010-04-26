@@ -71,7 +71,7 @@ import stencil.parser.tree.*;
 }
 
 gatherStreams
-	: ^(e=EXTERNAL_STREAM .*) {addName($e.text);};
+	: ^(e=STREAM .*) {addName($e.text);};
 	
 fixOrder
 	: ORDER -> {newOrder}

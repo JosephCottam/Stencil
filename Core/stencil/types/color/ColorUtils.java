@@ -37,7 +37,7 @@ import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.BasicProject;
 
 public final class ColorUtils extends BasicModule {
-	private enum DIR {up, down, full, none};
+	private enum DIR {up, down, full, none}
 
 	
 	/**Ensure integer is in the proper range**/
@@ -58,7 +58,7 @@ public final class ColorUtils extends BasicModule {
 		
 		Integer value = rangeValue(Converter.toInteger(v));
 		
-		return PrototypedTuple.singleton(color.modify(comp, value)); //TODO: Change so just the color tuple is returned
+		return color.modify(comp, value);
 	}
 
 	private static Tuple mod(Object source, int comp, ColorUtils.DIR dir, String name) {

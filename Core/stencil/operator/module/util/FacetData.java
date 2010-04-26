@@ -45,7 +45,7 @@ public final class FacetData {
 	public String getType() {return type;}
 	
 	public void setTarget(String target) {this.target = target;}
-	public String getTarget() {return target;}
+	public String getTarget() {return target!=null?target:name;}
 	
 	public String getRoles() {return roles;}
 	public void setRoles(String roles) {this.roles = roles;}

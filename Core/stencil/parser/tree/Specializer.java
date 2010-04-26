@@ -37,8 +37,6 @@ import org.antlr.runtime.tree.TreeAdaptor;
 import stencil.parser.string.StencilParser;
 
 public class Specializer extends StencilTree {
-	private MapEntry.MapList map;
-	
 	/**Customary key used to store range descriptor.*/
 	public static final String RANGE = "range";
 	
@@ -55,8 +53,7 @@ public class Specializer extends StencilTree {
 	
 	/**What map arguments were passed to the specializer?*/
 	public MapEntry.MapList getMap() {
-		if (map == null) {map =new MapEntry.MapList((List<MapEntry>) getChild(0));}
-		return map;
+		return new MapEntry.MapList((List<MapEntry>) getChild(0));
 	}
 	
 	/**A simple specializer has no arguments.*/

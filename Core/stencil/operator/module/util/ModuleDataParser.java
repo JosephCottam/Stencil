@@ -35,7 +35,7 @@ public class ModuleDataParser {
 	            source = String.format("(%1$s)", source);
 	            try {
 	            	return ParseStencil.parsePrototype(source,false);
-	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined prototype: " + source);}
+	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined prototype: " + source, e);}
 	        }
 	    }
 
@@ -44,7 +44,7 @@ public class ModuleDataParser {
 	            String source = (String) constructScalar((ScalarNode) node);
 	            try {
 	            	return ParseStencil.parseSpecializer(source);
-	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined specializer: " + source);}
+	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined specializer: " + source, e);}
 	        }
 	    }
 	}

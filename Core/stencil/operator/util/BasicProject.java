@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import static java.lang.String.format;
 
 import stencil.operator.StencilOperator;
+import stencil.operator.module.util.FacetData;
 import stencil.operator.module.util.OperatorData;
 
 public abstract class BasicProject implements StencilOperator {
@@ -20,7 +21,8 @@ public abstract class BasicProject implements StencilOperator {
 	 * facet.
 	 */
 	public Invokeable getFacet(String name) {
-		String searchName = name.toUpperCase();
+		FacetData fd = operatorData.getFacet(name);
+		String searchName = fd.getTarget().toUpperCase();
 		for (Method method: this.getClass().getMethods()) {
 			if (method.getName().toUpperCase().equals(searchName)) {
 				return new ReflectiveInvokeable(method, this);

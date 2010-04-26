@@ -39,11 +39,11 @@ options {
 
 @header{
 	/** Make sure all elements with specializers have
-	  * all properties defined in their default specializer.	  
+	 * all properties defined in their default specializer.	  
 	 **/
 	package stencil.parser.string;
 
-  import java.lang.reflect.Field;
+    import java.lang.reflect.Field;
 	
 	import stencil.parser.tree.*;
 	import stencil.util.MultiPartName;
@@ -55,7 +55,7 @@ options {
 }
 
 @members{
-	protected ModuleCache modules;
+  protected ModuleCache modules;
   protected Adapter adapter;
     
   public DefaultSpecializers(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
@@ -71,7 +71,7 @@ options {
   private Specializer getDefault(Specializer spec) {
     try {
 	     Function f = (Function) spec.getAncestor(FUNCTION);
-	     if (f != null) {return  getDefault(f.getName());}
+	     if (f != null) {return  getOperatorDefault(f.getName());}
 	     
 	     Guide g = (Guide) spec.getAncestor(GUIDE);
        if (g != null) {return getGuideDefault(g.getGuideType());}
@@ -83,7 +83,7 @@ options {
 	     if (i != null) {return EMPTY_SPECIALIZER;} 
 	     
 	     OperatorReference ref = (OperatorReference) spec.getAncestor(OPERATOR_REFERENCE);
-	     if (ref != null) {return getDefault(ref.getBase().getName());}
+	     if (ref != null) {return getOperatorDefault(ref.getBase().getName());}
 	     
     } catch (Exception e) {return (Specializer) adaptor.dupTree(spec);}
 	  throw new IllegalArgumentException("Specializer encountered in unexpected context: " + spec.getParent().toStringTree());
@@ -108,7 +108,7 @@ options {
   }
 
   /**Get the default guide for a named operator.*/
-  public Specializer getDefault(String fullName) {
+  public Specializer getOperatorDefault(String fullName) {
     MultiPartName name= new MultiPartName(fullName);
     ModuleData md;
     

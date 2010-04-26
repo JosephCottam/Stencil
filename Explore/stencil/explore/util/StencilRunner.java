@@ -50,7 +50,6 @@ import stencil.parser.tree.Atom;
  * This contains the heart of the data coordination engine that is part
  * of the Explore extension to Stencil.
  * 
- * TODO: Add error reporting
  * @author jcottam
  *
  */

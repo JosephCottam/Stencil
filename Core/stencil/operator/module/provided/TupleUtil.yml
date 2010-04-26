@@ -5,10 +5,11 @@ description: Utilities to manipulate the tuple data representation.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-    - {name: map,  function: true, type: PROJECT, prototype: !proto "VALUE"}
-    - {name: query,  target: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: map, target: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
 
 operators:
   - name: Enfold
   - name: Rename
   - name: Size
+  - name: Select

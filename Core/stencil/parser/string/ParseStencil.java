@@ -171,6 +171,12 @@ public abstract class ParseStencil {
 		Program p = checkParse(source);
 		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
 		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
+
+		//Group the operator chains
+		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
+		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) liftStreams.downup(p);
+
 		
 		//Group the operator chains
 		SeparateTargets targets = new SeparateTargets(treeTokens);
@@ -185,7 +191,6 @@ public abstract class ParseStencil {
 		//Do module imports
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
-		p.setModuleCache(modules);
 		
 		//Verify that Python operators are syntactically correct and appropriately indented
 		PreparsePython pyParse = new PreparsePython(treeTokens);

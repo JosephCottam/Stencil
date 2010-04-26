@@ -66,6 +66,31 @@ public class TupleUtil extends BasicModule {
 		public EnfoldValues duplicate() {return this;}
 	}
 	
+	/**Take a tuple of tuples.  Retrieve the n-th field from
+	 * each of those tuples to form a new tuple.
+	 * 
+	 * @author jcottam
+	 *
+	 */
+	public static final class Select extends BasicProject {
+		private final int field;
+		
+		public Select(OperatorData opData, Specializer spec) {
+			super(opData);
+			field = Converter.toInteger(spec.get("field"));
+		}
+		
+		public Object[] query(Tuple t) {
+			Object[] values = new Object[t.size()];
+			for (int i=0; i< t.size() ;i++) {
+				if (t.get(i) instanceof Tuple) {
+					values[i] = ((Tuple) t.get(i)).get(field);
+				}
+			}
+			return values;
+		}
+	}
+	
 	
 	public TupleUtil(ModuleData md) {super(md);}
 		
@@ -82,6 +107,7 @@ public class TupleUtil extends BasicModule {
 		OperatorData opData = getOperatorData(name, specializer);
 
 		if (name.equals("Rename")) {return new Rename(opData, specializer);}
+		if (name.equals("Select")) {return new Select(opData, specializer);}
 		else {return super.instance(name, specializer);}
 	}
 }

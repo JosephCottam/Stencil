@@ -25,63 +25,40 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
- 
-/* Verifies that each range is properly formed.*/
-tree grammar StreamDeclarationValidator;
+ */
+
+
+/**Creates a stream prototype for internally defined streams.
+ **/
+tree grammar LiftStreamPrototypes;
 options {
-  tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
-  filter = true;
+	tokenVocab = Stencil;
+	ASTLabelType = CommonTree;	
+	output = AST;
+	filter = true;
 }
 
 @header {
-  /** Validates that all stream declarations include the 
-    * standard source-indicator field in the prototype,
-    * that all field names in the declaration are unique
-    * and that no field name is the same as the stream name.
-   **/
-   
-
-  package stencil.parser.string.validators;
-  
-  import stencil.parser.tree.Stream;
-  import stencil.parser.string.StencilParser;
-  import stencil.parser.tree.TuplePrototype;
-  import stencil.parser.tree.TupleFieldDef;
-
-  import java.util.HashSet;
-  import java.util.Set;
-
-  import stencil.parser.string.ValidationException;
-  import static java.lang.String.format;
-  import static stencil.parser.ParserConstants.SOURCE_FIELD;
+   package stencil.parser.string;
+	
+   import stencil.parser.tree.*;
 }
 
 @members {
-  public void uniqueFieldNames(Stream e, TuplePrototype prototype) {
-    String field = null;
-    Set<String> fields = new HashSet<String>();
-    
-    for (TupleFieldDef def: prototype) {
-      field = def.getFieldName();
-      if (!fields.add(field)) {break;}
-      else {field = null;}
-    }  
+   private Tree makePrototype(StreamDef t) {
+      Stream s = (Stream) adaptor.create(STREAM, t.getName());
+      adaptor.addChild(s, adaptor.dupTree(t.getPrototype()));
+      return s;
+   }   
 
-    String stream = e.getName();  
-    if (field != null) {
-      throw new ValidationException(format("Duplicate field name in stream declaration \%1\$s: \%2\$s.", stream, field));
-    }
-    
-    if (fields.contains(stream)) {
-      throw new ValidationException(format("Field with same name as containing stream: \%1\$s", stream));
-    }
-  }
-  
+   private Tree addPrototypes(List prototypes, List<StreamDef> defs) {
+      Tree listing = (Tree) adaptor.dupTree(prototypes);
+      
+      for (StreamDef sd: defs) {adaptor.addChild(listing, makePrototype(sd));}
+      return listing;
+   }
 }
 
-topdown: ^(e=EXTERNAL_STREAM ^(p=TUPLE_PROTOTYPE .*)) 
-         {
-            uniqueFieldNames((Stream) e, (TuplePrototype) p);
-         };
+topdown 
+  : ^(PROGRAM i=. gv=. sd=. o=. cd=. s=. r+=.*) 
+      -> ^(PROGRAM $i $gv  {addPrototypes((List) $sd, (List) $s)} $o $cd $s $r*);

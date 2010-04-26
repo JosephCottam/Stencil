@@ -42,7 +42,6 @@ tokens {
   CALL_CHAIN;
   CANVAS_DEF;
   DIRECT_YIELD;
-  EXTERNAL_STREAM;
   FUNCTION;
   GLYPH;        //Indicates the target is a layer's glyph (can only be derived, not specified)
   GUIDE_QUERY;
@@ -70,7 +69,8 @@ tokens {
   ROLE;         //Proxy object before facet resolution is done
   SIGIL_ARGS;
   SPECIALIZER;
-  SELECTOR;		//Indicate some part of a stencil
+  SELECTOR;		    //Indicate some part of a stencil
+  STREAM_DEF;		//Root of a stream definition
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
   TUPLE_REF;
@@ -175,9 +175,10 @@ program : imports* globalValue* externalStream* order canvasLayer (streamDef | l
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           ^(LIST["Global Values"] globalValue*)
-          ^(LIST["External Stream"] externalStream*)
+          ^(LIST["Stream Declarations"] externalStream*)
           order 
           canvasLayer
+          ^(LIST["Streams"] streamDef*) 
           ^(LIST["Layers"] layerDef*) 
           ^(LIST["Operators"] operatorDef*) 
           ^(LIST["Pythons"] pythonDef*) 
@@ -209,7 +210,7 @@ globalValue
   : (CONST ID atom) => CONST name=ID DEFINE atom
   | CONST name=ID;
 
-externalStream: STREAM name=ID tuple[false] -> ^(EXTERNAL_STREAM[$name.text] tuple);
+externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 
@@ -230,7 +231,7 @@ selector
 
 streamDef
   : STREAM name=ID tuple[true]  consumesBlock["return"]+
-    -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+));
+    -> ^(STREAM_DEF[$name.text] tuple ^(LIST["Consumes"] consumesBlock+));
 
 layerDef
   : LAYER name=ID implantationDef defaultsBlock consumesBlock["glyph"]+
