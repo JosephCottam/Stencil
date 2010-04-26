@@ -11,6 +11,8 @@ public final class FacetData {
 	private String type;
 	private boolean function;
 	private TuplePrototype prototype;
+	private String target;
+	private String roles;
 
 	public FacetData() {}
 	
@@ -41,6 +43,13 @@ public final class FacetData {
 
 	public void setType(String type) {this.type = type.toUpperCase();}
 	public String getType() {return type;}
+	
+	public void setTarget(String target) {this.target = target;}
+	public String getTarget() {return target;}
+	
+	public String getRoles() {return roles;}
+	public void setRoles(String roles) {this.roles = roles;}
+	public boolean hasRole(String role) {return roles.indexOf(role) >=0;}
 	
 	public boolean isFunction() {return function;}
 	public void setFunction(boolean fun) {function = fun;}

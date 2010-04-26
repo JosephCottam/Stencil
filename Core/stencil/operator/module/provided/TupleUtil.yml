@@ -6,12 +6,9 @@ defaults:
   defaultSpecializer: !spec "[]"
   facets:
     - {name: map,  function: true, type: PROJECT, prototype: !proto "VALUE"}
-    - {name: query,  function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: query,  target: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
 
 operators:
-  - name: Length
-  - {name: Len, target: Length}
+  - name: Enfold
   - name: Rename
-    facets:
-      - {name: map, function: true, type: PROJECT}
-      - {name: query, function: true, type: PROJECT}
+  - name: Size

@@ -116,11 +116,15 @@ tokens {
   ANIMATED = '<:';
   ANIMATED_DYNAMIC = '<:*';
 
-
-  //Operators
-  YIELDS  = '->';
-
-  GATE  = '=>';
+  //Value references
+  DEFAULT_VALUE = '_';
+  TUPLE_VALUE = '*';
+  
+  //Linkages
+  YIELDS  = '->';   // 1:1
+  FEED    = '>>';   // n:m
+  GATE    = '=>';   // test
+  
   TAG = '@';
 }
 
@@ -225,8 +229,8 @@ selector
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 
 streamDef
-  : STREAM name=ID tuple[true]  (consumesBlock["return"])+
-    -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+))*;
+  : STREAM name=ID tuple[true]  consumesBlock["return"]+
+    -> ^(STREAM[$name.text] tuple ^(LIST["Consumes"] consumesBlock+));
 
 layerDef
   : LAYER name=ID implantationDef defaultsBlock consumesBlock["glyph"]+
@@ -370,7 +374,8 @@ tupleRef
 
 private simpleRef
   : ID  -> ^(TUPLE_REF ID)
-  | '_' -> ^(TUPLE_REF NUMBER["0"])
+  | DEFAULT_VALUE -> ^(TUPLE_REF NUMBER["0"])
+  | TUPLE_VALUE -> ^(TUPLE_REF ALL)
   | ARG number CLOSE_ARG -> ^(TUPLE_REF number)
   | c=CANVAS -> ^(TUPLE_REF ID[$c.text])
   | l=LOCAL -> ^(TUPLE_REF ID[$l.text])
@@ -379,7 +384,7 @@ private simpleRef
 private qualifiedRef 
   : ARG i=ID CLOSE_ARG -> ^(TUPLE_REF $i)
   | ARG n=number CLOSE_ARG -> ^(TUPLE_REF $n)
-  | ARG '_' CLOSE_ARG -> ^(TUPLE_REF NUMBER["0"]);
+  | ARG DEFAULT_VALUE CLOSE_ARG -> ^(TUPLE_REF NUMBER["0"]);
 
 
 booleanOp
@@ -394,7 +399,8 @@ booleanOp
 
 passOp  
   : directYield
-  | guideYield;
+  | guideYield
+  | FEED;
 
 directYield
   : '-[' id=ID ']>' -> ^(DIRECT_YIELD[$id.text])

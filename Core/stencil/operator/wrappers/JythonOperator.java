@@ -32,9 +32,6 @@ public class JythonOperator implements StencilOperator {
 		
 	public String getName() {return operatorName;}
 
-	public Tuple map(Object... args) {return getFacet(MAIN_FACET).invoke(args);}
-	public Tuple query(Object... args) {return getFacet(QUERY_FACET).invoke(args);}
-
 	/**What is the legend data object for this encapsulation? 
 	 * This is not stored internally, so updates must be acquired by invoking
 	 * this method again.
