@@ -201,7 +201,7 @@ public final class Applet extends JApplet implements StencilListener.StencilChan
 		//Synch Sources
 		Set<TextSource> sources = new HashSet<TextSource>();
 		try {
-			for (Stream stream: program.getExternalStreams()) {
+			for (Stream stream: program.getStreams()) {
 				TextSource source;
 				if (SourceCache.weakContains(stream.getName())) {
 					source = (TextSource) SourceCache.weakGet(stream.getName());

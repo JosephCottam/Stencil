@@ -76,12 +76,13 @@ public final class DelimitedParser implements TupleStream {
 	
 	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
+		
 		this.name = name;
 		this.filename = filename;
 		this.skip = skip;
 		
 		String[] labels = parseLabels(delimitedLabels, splitter);
-
+		
 		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), delimiter);}
 		else {this.channel = new LooseChannel(Arrays.asList(labels), delimiter);}
 
