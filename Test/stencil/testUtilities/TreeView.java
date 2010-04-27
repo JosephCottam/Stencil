@@ -8,6 +8,7 @@ import java.util.Properties;
 import org.antlr.runtime.tree.*;
 
 import stencil.adapters.java2D.Adapter;
+import stencil.parser.ParseStencil;
 import stencil.parser.string.*;
 import stencil.testUtilities.treeView.ANTLRNode;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
@@ -53,7 +54,7 @@ public class TreeView {
 		
 
 		stencil.Configure.loadProperties(props);
-		tree = stencil.parser.string.ParseStencil.parse(text, Adapter.INSTANCE);
+		tree = stencil.parser.ParseStencil.parse(text, Adapter.INSTANCE);
 //			tree = pieceWise(text, Adapter.INSTANCE);
 		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
 		f.setVisible(true);

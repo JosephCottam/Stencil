@@ -26,7 +26,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.parser.string;
+package stencil.parser;
 
 import java.io.PrintStream;
 
@@ -37,7 +37,7 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.operator.module.ModuleCache;
 import stencil.adapters.Adapter;
-import stencil.parser.ProgramParseException;
+import stencil.parser.string.*;
 import stencil.parser.string.validators.*;
 import stencil.parser.tree.*;
 
@@ -176,7 +176,6 @@ public abstract class ParseStencil {
 		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
 		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) liftStreams.downup(p);
-
 		
 		//Group the operator chains
 		SeparateTargets targets = new SeparateTargets(treeTokens);

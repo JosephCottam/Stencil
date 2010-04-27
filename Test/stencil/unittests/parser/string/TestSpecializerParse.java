@@ -1,8 +1,8 @@
 package stencil.unittests.parser.string;
 
 import junit.framework.TestCase;
+import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
-import stencil.parser.string.ParseStencil;
 
 
 public class TestSpecializerParse extends TestCase {

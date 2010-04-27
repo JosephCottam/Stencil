@@ -1,6 +1,6 @@
 package stencil.unittests.operator.module;
 
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.operator.module.provided.StencilUtil;

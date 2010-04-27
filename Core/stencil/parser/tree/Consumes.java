@@ -10,12 +10,16 @@ public class Consumes extends StencilTree {
 
 	public String getStream() {return token.getText();}
 	
-	public Layer getLayer() {return (Layer) this.getAncestor(StencilParser.LAYER);}
+	public ContextNode getContext() {
+		ContextNode result = (ContextNode) this.getAncestor(StencilParser.LAYER);
+		if (result != null) {return result;}
+		return (ContextNode) this.getAncestor(StencilParser.STREAM_DEF);
+	}
 
 	public List<List<Predicate>> getFilters() {return (List<List<Predicate>>) getChild(0);}
 	public List<Rule> getPrefilterRules() {return (List<Rule>) getChild(1);}
 	public List<Rule> getLocalRules() {return (List<Rule>) getChild(2);}
-	public List<Rule> getGlyphRules() {return (List<Rule>) getChild(3);}
+	public List<Rule> getResultRules() {return (List<Rule>) getChild(3);}
 	public List<Rule> getViewRules() {return (List<Rule>) getChild(4);}
 	public List<Rule> getCanvasRules() {return (List<Rule>) getChild(5);}
 

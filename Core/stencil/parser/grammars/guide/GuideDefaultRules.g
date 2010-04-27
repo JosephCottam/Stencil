@@ -43,16 +43,16 @@ options {
    * to the results.
    */
 
-	package stencil.parser.string;
+   package stencil.parser.string;
 
-  import java.util.Arrays;
+   import java.util.Arrays;
 	
-	import static stencil.parser.ParserConstants.BIND_OPERATOR;
-	import stencil.parser.tree.*;
-	import stencil.tuple.prototype.*;
-	import stencil.tuple.prototype.TuplePrototype;
-	
-	
+   import stencil.parser.ParseStencil;
+   import stencil.parser.tree.*;
+   import stencil.tuple.prototype.*;
+   import stencil.tuple.prototype.TuplePrototype;
+
+   import static stencil.parser.ParserConstants.BIND_OPERATOR;	
 }
 
 @members {
@@ -78,7 +78,7 @@ options {
       parser.setTreeAdaptor(ParseStencil.TREE_ADAPTOR);
       
       try {
-         return (Rule) parser.rule("glyph").getTree();
+         return (Rule) parser.rule("result").getTree();
       } catch (Exception e) {
          throw new Error("Error constructing default rule for guides.",e);
       }

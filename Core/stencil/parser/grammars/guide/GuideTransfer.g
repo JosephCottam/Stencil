@@ -122,6 +122,7 @@ options {
       List<Id> path = sel.getPath();
       return key(path.get(0).getText(), path.get(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
     }
+    
     private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
     private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
     private String key(String layer, String attribute) {
@@ -138,14 +139,14 @@ options {
 
 	//EnsureGuideOp guarantees that a sample operator exists; this
 	//cuts things down so the generator only includes things after that point
-	private Tree trimCall(CallTarget tree) {
-    if (tree instanceof Pack) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
-    Function f = (Function) tree;
+   private Tree trimCall(CallTarget tree) {
+      if (tree instanceof Pack) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
+      Function f = (Function) tree;
 
-    //TODO: This is a crapy test for the sample operator...really needs to be fixed to something that can't be confused with user input
-    if (f.getText().startsWith("Echo")) {return (Tree) adaptor.dupTree(f);}
-    else {return trimCall(f.getCall());}
-	}
+      //TODO: This is a crapy test for the sample operator...really needs to be fixed to something that can't be confused with user input
+      if (f.getText().startsWith("Echo")) {return (Tree) adaptor.dupTree(f);}
+      else {return trimCall(f.getCall());}
+   }
     	
 	
 	private boolean isCategorize(Function f) {
@@ -175,9 +176,9 @@ options {
 }
 
 //Move mappings from the declarations in the consumes block up to the guides section
-buildMappings: ^(c=CONSUMES . . . ^(LIST mapping[((Consumes)$c).getLayer().getName()]*) . .);
+buildMappings: ^(c=CONSUMES . . . ^(LIST mapping[((Consumes)$c).getContext().getName()]*) . .);
 mapping[String layerName] 
-  : ^(RULE ^(GLYPH ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
+  : ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
 		{attDefs.put(key(layerName, field), group);};
 
 //Move in the appropriate mappings -----------------------------------------------
@@ -188,11 +189,11 @@ transferMappings
 	 	}
 	 	-> ^(GUIDE_DIRECT 
 	 	     ^(GUIDE $type $spec $selector $actions 
-	 	        ^(RULE ^(RETURN ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["Output"] DEFAULT))) {adaptor.dupTree(attDefs.get(key(selector)))})))
+	 	        ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["Output"] DEFAULT))) {adaptor.dupTree(attDefs.get(key(selector)))})))
 	 | ^(GUIDE_SUMMARIZATION ^(GUIDE type=ID spec=. selector=. actions=.))
 	   -> ^(GUIDE_SUMMARIZATION 
 	         ^(GUIDE $type $spec $selector $actions 
-	            ^(RULE ^(RETURN TUPLE_PROTOTYPE) ^(CALL_CHAIN PACK))));
+	            ^(RULE ^(RESULT TUPLE_PROTOTYPE) ^(CALL_CHAIN PACK))));
 
 
 //Update query creation -----------------------------------------------

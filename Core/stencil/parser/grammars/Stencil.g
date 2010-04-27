@@ -43,7 +43,7 @@ tokens {
   CANVAS_DEF;
   DIRECT_YIELD;
   FUNCTION;
-  GLYPH;        //Indicates the target is a layer's glyph (can only be derived, not specified)
+  GLYPH_TYPE;        	//Indicate layer type
   GUIDE_QUERY;
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
@@ -64,7 +64,7 @@ tokens {
   PROGRAM;
   PACK;
   PYTHON_FACET;
-  RETURN;       //Inidicates the target is an operator return value (can only be derived, not specified)
+  RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
   RULE;
   ROLE;         //Proxy object before facet resolution is done
   SIGIL_ARGS;
@@ -219,7 +219,7 @@ canvasLayer
     -> ^(CANVAS_DEF[$name.text] specializer ^(LIST["Guides"] guideDef+))
   | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER LIST) ^(LIST["Guides"]));
 
-guideDef: GUIDE ID specializer FROM selector rule["glyph"]* 
+guideDef: GUIDE ID specializer FROM selector rule["result"]* 
 			-> ^(GUIDE ID specializer selector ^(LIST["Rules"] rule*));
 
 selector
@@ -230,23 +230,23 @@ selector
 //////////////////////////////////////////// STREAM & LAYER ///////////////////////////
 
 streamDef
-  : STREAM name=ID tuple[true]  consumesBlock["return"]+
+  : STREAM name=ID tuple[true]  consumesBlock+
     -> ^(STREAM_DEF[$name.text] tuple ^(LIST["Consumes"] consumesBlock+));
 
 layerDef
-  : LAYER name=ID implantationDef defaultsBlock consumesBlock["glyph"]+
+  : LAYER name=ID implantationDef defaultsBlock consumesBlock+
     -> ^(LAYER[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+));
   
 implantationDef
-  : ARG type=ID CLOSE_ARG -> GLYPH[$type.text]
-  | -> GLYPH[DEFAULT_GLYPH_TYPE];
+  : ARG type=ID CLOSE_ARG -> GLYPH_TYPE[$type.text]
+  | -> GLYPH_TYPE[DEFAULT_GLYPH_TYPE];
     
 defaultsBlock
-  : DEFAULT rule["glyph"]+ -> ^(LIST["Defaults"] rule+)
+  : DEFAULT rule["result"]+ -> ^(LIST["Defaults"] rule+)
   | -> ^(LIST["Defaults"]);
   
-consumesBlock[String def]
-  : FROM stream=ID filter* rule[def]+ 
+consumesBlock
+  : FROM stream=ID filter* rule["result"]+ 
     -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filter*) ^(LIST["Rules"] rule+));
 
 filter: FILTER! predicate;
@@ -262,7 +262,7 @@ operatorDef
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
 operatorRule
-  : predicate GATE rule["return"]+
+  : predicate GATE rule["result"]+
     -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
@@ -309,9 +309,8 @@ target[String def]
   | VIEW^ tuple[false]
   | tuple[true]
     -> {def.equals("prefilter")}? ^(PREFILTER tuple)
-    -> {def.equals("glyph")}? ^(GLYPH tuple)
-    -> {def.equals("return")}? ^(RETURN tuple)
-    -> ^(DEFAULT tuple);
+    -> {def.equals("result")}? ^(RESULT tuple)
+    -> ^(DEFAULT tuple); //TODO: Can this case be removed???
 
 //////////////////////////////////////////// PYTHON ///////////////////////////
 

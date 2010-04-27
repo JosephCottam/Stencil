@@ -4,7 +4,7 @@ import static stencil.unittests.adapters.TestTupleLoader.OVERLAY_SHORT;
 import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import stencil.util.streams.txt.DelimitedParser;

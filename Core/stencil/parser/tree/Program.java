@@ -55,7 +55,7 @@ public class Program extends StencilTree {
 	}
 
 	/**What are the layers of this stencil?*/
-	public List<Layer> getStreamDefs() {
+	public List<StreamDef> getStreamDefs() {
 		assert verifyType(getChild(STREAM_DEFS), StencilParser.LIST);
 		return (List) getChild(STREAM_DEFS);
 	}

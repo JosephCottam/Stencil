@@ -32,7 +32,7 @@ import static stencil.explore.Application.reporter;
 import stencil.explore.ui.interactive.Interactive;
 import stencil.explore.ui.components.events.TextPositionChangedListener;
 import stencil.explore.coordination.*;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 
 import javax.swing.*;
 import javax.swing.event.CaretEvent;

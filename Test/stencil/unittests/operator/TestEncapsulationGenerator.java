@@ -5,7 +5,7 @@ import stencil.operator.module.ModuleCache;
 import stencil.operator.wrappers.EncapsulationGenerator;
 import stencil.operator.wrappers.JythonEncapsulation;
 import stencil.operator.wrappers.JythonOperator;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.operator.module.TestModuleCache;

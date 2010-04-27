@@ -30,6 +30,6 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-public class Return extends Target {
-	public Return(Token source) {super(source);}
+public class Result extends Target {
+	public Result(Token source) {super(source);}
 }

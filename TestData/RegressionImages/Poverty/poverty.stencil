@@ -57,7 +57,7 @@ from Items
 	WIDTH: 60
 	FONT_COLOR: @Color{GRAY40}
 
-layer Prime
+stream Prime ()
 from Postal
 	() : Abr.put(State, ID) -> ()
 from Regions

@@ -74,8 +74,8 @@ bottomup
   : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
 
 retarget
-  : ^(RETURN  ^(TUPLE_PROTOTYPE p=.+)) 
-      -> ^(RETURN ^(TUPLE_PROTOTYPE $p ^(TUPLE_FIELD_DEF STRING["Input"] STRING["DEFAULT"])));
+  : ^(RESULT ^(TUPLE_PROTOTYPE p=.+)) 
+      -> ^(RESULT ^(TUPLE_PROTOTYPE $p ^(TUPLE_FIELD_DEF STRING["Input"] STRING["DEFAULT"])));
       
 repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)

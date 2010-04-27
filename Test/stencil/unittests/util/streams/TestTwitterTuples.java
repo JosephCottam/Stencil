@@ -1,9 +1,9 @@
 package stencil.unittests.util.streams;
 
-import java.util.HashSet;
 import junit.framework.*;
-import stencil.tuple.Tuple;
-import stencil.util.streams.feed.*;
+//import java.util.HashSet;
+//import stencil.tuple.Tuple;
+//import stencil.util.streams.feed.*;
 
 
 public class TestTwitterTuples extends TestCase {
@@ -14,15 +14,16 @@ public class TestTwitterTuples extends TestCase {
 	public static final String FEED_NAME = "PublicTimeline";
 
 	public void testSubscription() throws Exception {
-		TwitterTuples feed = new TwitterTuples(FEED_NAME, TEST_FEED);
-		HashSet<Tuple> seen = new HashSet();
-
-		int counter = 100;
-		while (feed.hasNext() && counter >0) {
-			Tuple t = feed.next();
-			assertFalse("Repeat tuple!", seen.contains(t));
-			counter--;
-		}
-		assertEquals("Insufficient tuples found.", 0, counter);
+		throw new RuntimeException("Twitter format changed...this no longer works");
+//		TwitterTuples feed = new TwitterTuples(FEED_NAME, TEST_FEED);
+//		HashSet<Tuple> seen = new HashSet();
+//
+//		int counter = 100;
+//		while (feed.hasNext() && counter >0) {
+//			Tuple t = feed.next();
+//			assertFalse("Repeat tuple!", seen.contains(t));
+//			counter--;
+//		}
+//		assertEquals("Insufficient tuples found.", 0, counter);
 	}
 }

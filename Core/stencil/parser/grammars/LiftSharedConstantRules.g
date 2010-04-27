@@ -115,7 +115,7 @@ options {
 	private List<List<Rule>> allConstants(stencil.parser.tree.List<Consumes> consumes) {
 		List<List<Rule>> rules = new ArrayList();
 		for (Consumes c: consumes) {
-			rules.add(constants(c.getGlyphRules()));
+			rules.add(constants(c.getResultRules()));
 		}
 		return rules;
 	}
@@ -208,7 +208,7 @@ options {
     		
     	for (Rule constRule: sharedConstants) {
     		for (Consumes consume: consumes) {
-    			for (Rule rule: consume.getGlyphRules()) {
+    			for (Rule rule: consume.getResultRules()) {
     				if (treeEquals(constRule, rule)) {
     					toDelete.add(rule);
     				}

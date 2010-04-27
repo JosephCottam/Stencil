@@ -7,7 +7,7 @@ import stencil.operator.util.Invokeable;
 import stencil.operator.util.MethodInvokeFailedException;
 import stencil.operator.wrappers.SyntheticOperator;
 import stencil.operator.wrappers.SyntheticOperator.NoMatchException;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;

@@ -41,7 +41,7 @@ import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.MouseSource;
 import stencil.explore.model.sources.SourceCache;
 import stencil.explore.model.sources.StreamSource;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Stream;
 

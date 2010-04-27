@@ -12,7 +12,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;

@@ -31,9 +31,13 @@ package stencil.parser.tree;
 import java.util.List;
 import org.antlr.runtime.Token;
 import stencil.display.DisplayLayer;
+import stencil.interpreter.TupleStore;
+import stencil.parser.ParserConstants;
 import stencil.parser.string.StencilParser;
+import stencil.tuple.PrototypedTuple;
+import stencil.tuple.Tuple;
 
-public class Layer extends StencilTree {
+public class Layer extends StencilTree implements TupleStore, ContextNode {
 	private List<Consumes> groups;
 
 	private DisplayLayer displayLayer;
@@ -44,7 +48,7 @@ public class Layer extends StencilTree {
 	public String getName() {return token.getText();}
 	
 	public String getImplantation() {
-		return  findChild(StencilParser.GLYPH, null).getText();
+		return  findChild(StencilParser.GLYPH_TYPE, null).getText();
 	}
 
 	public List<Rule> getDefaults() {
@@ -56,7 +60,13 @@ public class Layer extends StencilTree {
 		return groups;
 	}
 
+	public void store(Tuple t) {displayLayer.makeOrFind(t);}
 	
+	public boolean canStore(Tuple t) {
+		return t instanceof PrototypedTuple &&
+				((PrototypedTuple) t).getPrototype().contains(ParserConstants.GLYPH_ID_FIELD);
+	}
+		
 	public DisplayLayer getDisplayLayer() {return displayLayer;}
 	public void setDisplayLayer(DisplayLayer displayLayer) {this.displayLayer= displayLayer;}
 

@@ -74,7 +74,7 @@ public class Rule extends StencilTree {
 			Consumes c = getGroup();
 			path.append(c.getStream());
 			path.append(".");
-			path.append(c.getLayer().getName());
+			path.append(c.getContext().getName());
 		} catch (RuntimeException e) {
 			//Operator....
 			path.append(this.getParent().getParent().getText());

@@ -1,7 +1,7 @@
 package stencil.unittests.operator.module;
 
 import stencil.operator.module.provided.Projection;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import stencil.types.color.ColorTuple;

@@ -36,28 +36,32 @@ options {
 }
 
 @header{
-	/** Ensures that a sample operator exists in the call chain.
-	 *  Sample operators are inserted where a #-> appears,
-	 *  after the last project operator in a chain or 
-	 *  at the start of the chain.
-	 **/
+  /** Ensures that a sample operator exists in the call chain.
+   *  Sample operators are inserted where a #-> appears,
+   *  after the last project operator in a chain or 
+   *  at the start of the chain.
+   **/
 	 
-	package stencil.parser.string;
+   package stencil.parser.string;
 	 
-	import java.util.Set;
-	import java.util.HashSet;
-	import stencil.util.MultiPartName;
-  import stencil.operator.module.*;
-  import stencil.util.collections.ArrayUtil;
-	import stencil.operator.StencilOperator;
-	import stencil.parser.tree.*;
+   import java.util.Set;
+   import java.util.HashSet;
+   
+   import stencil.util.MultiPartName;
+   import stencil.util.collections.ArrayUtil;
+   import stencil.operator.module.*;
+   import stencil.operator.StencilOperator;
+   import stencil.parser.tree.*;
+   import stencil.parser.ParseStencil;
+   
+   import static stencil.parser.ParserConstants.BIND_OPERATOR;
+   import static stencil.tuple.Tuples.stripQuotes;	
+   import static stencil.parser.ParserConstants.MAIN_FACET;
+   import static stencil.interpreter.guide.Samplers.CATEGORICAL;
+   import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
+   import static stencil.parser.ParserConstants.BIND_OPERATOR;
 	
-	import static stencil.parser.ParserConstants.BIND_OPERATOR;
-	import static stencil.tuple.Tuples.stripQuotes;	
-	import static stencil.parser.ParserConstants.MAIN_FACET;
-	import static stencil.interpreter.guide.Samplers.CATEGORICAL;
-	import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
-	 //TODO: Extend so we can handle more than the first field in a mapping definition
+   //TODO: Extend so we can handle more than the first field in a mapping definition
 }
 
 @members {
@@ -241,7 +245,7 @@ replaceCompactForm:
 		
 ensure:
 	^(r=RULE t=. c=. b=.)
-	    {t.getType()==GLYPH && requiresChanges((CallChain) c)}? ->
+	    {t.getType()==RESULT && requiresChanges((CallChain) c)}? ->
 		  ^(RULE $t ^(CALL_CHAIN ^(FUNCTION[selectOperator(getStart($c))]  {spec(getStart($c))} {echoArgs(getStart($c))} DIRECT_YIELD {adaptor.dupTree(((CallChain) c).getStart())})) $b); 
 		        
 		

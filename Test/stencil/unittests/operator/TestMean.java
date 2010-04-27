@@ -35,7 +35,7 @@ import stencil.operator.module.provided.Average;
 import stencil.operator.module.util.ModuleData;
 import stencil.operator.module.util.ModuleDataParser;
 import stencil.operator.util.Invokeable;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 
 public class TestMean extends TestCase {

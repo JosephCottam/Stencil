@@ -44,7 +44,8 @@ options {
 	package stencil.parser.string;
 
     import java.lang.reflect.Field;
-	
+    
+	import stencil.parser.ParseStencil;
 	import stencil.parser.tree.*;
 	import stencil.util.MultiPartName;
 	import stencil.operator.module.*;

@@ -13,7 +13,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
 
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.testUtilities.StringUtils;
 import stencil.tuple.prototype.TuplePrototype;

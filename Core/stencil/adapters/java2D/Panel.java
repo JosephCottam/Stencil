@@ -186,7 +186,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	
 	public void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
 		DisplayLayer layer= null;
-		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getLayer().getName())) {layer = t; break;}}
+		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getContext().getName())) {layer = t; break;}}
 		assert layer != null : "Table null after name-based search.";
 		
 		dynamicUpdater.addDynamicUpdate(glyph, rule, source, layer);

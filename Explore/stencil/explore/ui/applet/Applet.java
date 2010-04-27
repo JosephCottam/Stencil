@@ -49,7 +49,7 @@ import stencil.explore.model.Model;
 import stencil.explore.model.sources.SourceCache;
 import stencil.explore.model.sources.TextSource;
 import stencil.explore.ui.components.*;
-import stencil.parser.string.ParseStencil;
+import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Stream;
 import stencil.explore.Application;
