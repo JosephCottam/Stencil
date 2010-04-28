@@ -255,14 +255,6 @@ public final class Tuples {
 		if (idx >=0) {return source.get(idx);}
 		throw new InvalidNameException(name, source.getPrototype());
 	}
-	
-	/**Remove quotes from around a value (if present).*/
-	public static final String stripQuotes(String s) {
-        if (s.startsWith("\"")) {s = s.substring(1);}
-        if (s.endsWith("\"")) {s = s.substring(0,s.length()-1);}
-        return s;
-    }
-
 
 	/**Given a tuple and a prototype, re-arranges the values so the indexes of
 	 * the source match the indexes of the names.

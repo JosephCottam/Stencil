@@ -55,7 +55,6 @@ options {
    import stencil.parser.ParseStencil;
    
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
-   import static stencil.tuple.Tuples.stripQuotes;	
    import static stencil.parser.ParserConstants.MAIN_FACET;
    import static stencil.interpreter.guide.Samplers.CATEGORICAL;
    import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;

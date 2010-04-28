@@ -67,23 +67,6 @@ public class CallChain extends StencilTree {
 		return depth;
 	}	
 	
-	
-//	public Tuple apply(Environment env) throws Exception {
-//		Tuple result = env;
-//		CallTarget target = getStart();
-//		while (target instanceof Function) {
-//			Function func = (Function) target;
-//			result = func.apply(env);
-//			if (result == null) {return null;}
-//			env = env.extend(result);
-//			target = ((Function) target).getCall();
-//		}
-//		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
-//		assert (result != null) : "Call chain ended with null result.";
-//
-//		result = target.apply(env);
-//		return result;
-//	}
 	/**Execute the call chain, all the way through the pack.
 	 * 	 *
 	 * Short-circuiting occurs when the method invoked returns null.  If this is the case,

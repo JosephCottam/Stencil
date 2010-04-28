@@ -143,7 +143,6 @@ tokens {
 
 @lexer::header{
 	package stencil.parser.string;
-	import static stencil.tuple.Tuples.stripQuotes;	
 }
 
 @members {
@@ -168,8 +167,7 @@ tokens {
   public List getErrors() {return errors;}  
   
   public String customArgsCall(String call) {
-    return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;
-  }  
+    return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
 }
 
 program : imports* globalValue* externalStream* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
@@ -444,14 +442,14 @@ STRING
 @init{StringBuilder lBuf = new StringBuilder();}
     :   
            '"' 
-           ( escaped=ESC {lBuf.append(escaped.getText());} | 
+           ( escaped= ESCAPE_SEQUENCE {lBuf.append(getText());} | 
              normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 
            '"'     
            {setText(lBuf.toString());}
     ;
 
 fragment
-ESC
+ESCAPE_SEQUENCE
     :   '\\'
         (       'n'    {setText("\n");}
         |       'r'    {setText("\r");}
@@ -461,9 +459,8 @@ ESC
         |       '"'    {setText("\"");}
         |       '\''   {setText("\'");}
         |       '\\'   {setText("\\");}
-           )
+        )
     ;
-
 
 WS  : (' '|'\r'|'\t'|'\u000C'|'\n')+ {skip();};
 COMMENT :   '/*' (options {greedy=false;} :.)* '*/' {skip(); };
