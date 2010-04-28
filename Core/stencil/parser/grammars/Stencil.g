@@ -122,7 +122,8 @@ tokens {
   
   //Linkages
   YIELDS  = '->';   // 1:1
-  FEED    = '>>';   // n:m
+  MAP     = '>>';   // map
+  FOLD    = '>-';   // reduce
   GATE    = '=>';   // test
   
   TAG = '@';
@@ -168,7 +169,7 @@ tokens {
   
   public String customArgsCall(String call) {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;
-  }
+  }  
 }
 
 program : imports* globalValue* externalStream* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
@@ -400,7 +401,8 @@ booleanOp
 passOp  
   : directYield
   | guideYield
-  | FEED;
+  | MAP
+  | FOLD;
 
 directYield
   : '-[' id=ID ']>' -> ^(DIRECT_YIELD[$id.text])
@@ -438,20 +440,29 @@ fragment
 NESTED_BLOCK
     : '{' (options {greedy=false;k=2;}: NESTED_BLOCK | .)* '}';
 
-STRING
-      :  '"' ( ESCAPE_SEQUENCE | ~('\\'|'"') )* '"'
-        {setText(stripQuotes($text));}; //Strip the quotes
+STRING          
+@init{StringBuilder lBuf = new StringBuilder();}
+    :   
+           '"' 
+           ( escaped=ESC {lBuf.append(escaped.getText());} | 
+             normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 
+           '"'     
+           {setText(lBuf.toString());}
+    ;
 
 fragment
-ESCAPE_SEQUENCE
-    : '\\b' {setText($text.substring(0, $text.length()-2) + "\b");} 
-    | '\\t' {setText($text.substring(0, $text.length()-2) + "\t");}
-    | '\\n' {setText($text.substring(0, $text.length()-2) + "\n");}
-    | '\\f' {setText($text.substring(0, $text.length()-2) + "\f");}
-    | '\\r' {setText($text.substring(0, $text.length()-2) + "\r");}
-    | '\\\"'{setText($text.substring(0, $text.length()-2) + "\"");}
-    | '\\\''{setText($text.substring(0, $text.length()-2) + "\'");}
-    | '\\\\'{setText($text.substring(0, $text.length()-2) + "\\");};
+ESC
+    :   '\\'
+        (       'n'    {setText("\n");}
+        |       'r'    {setText("\r");}
+        |       't'    {setText("\t");}
+        |       'b'    {setText("\b");}
+        |       'f'    {setText("\f");}
+        |       '"'    {setText("\"");}
+        |       '\''   {setText("\'");}
+        |       '\\'   {setText("\\");}
+           )
+    ;
 
 
 WS  : (' '|'\r'|'\t'|'\u000C'|'\n')+ {skip();};

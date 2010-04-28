@@ -27,7 +27,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-tree grammar AllInvokeables;
+tree grammar MapFoldBalance;
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
@@ -35,10 +35,15 @@ options {
 }
 
 @header {
-/* Verifies that python blocks contain valid python code.
- * Corrects python block indentation for blocks that have are
- * indented on their first non-blank line. 
+/* In some contexts, every map must be eventually followed
+ * by a fold for the Stencil semantics to be clear (default setting, for example).
+ * This validates that map and fold passes are paired properly
+ * in such contexts. 
+ *
+ * TODO: Don't allow unbalanced map/Fold in dynamic bindings
+ *
  */
+
   package stencil.parser.string.validators;
   
   import stencil.parser.tree.*;
@@ -46,18 +51,26 @@ options {
   
 }
 
-@members {
-  private static final class OperatorMissingException extends ValidationException {
-  	public OperatorMissingException(String name) {
-  		super("Operator missing for \%1\$s.", name);
-  	}
-  }  
 
-  private void validate(AstInvokeable i) {
-      if (i.getInvokeable() == null) {throw new OperatorMissingException("AST Invokeable.");}
-  }
-}
+topdown: (layerDefault | prefilter | view | canvas | local);  //TODO: Should local really be included here?
 
-topdown: i = AST_INVOKEABLE {validate((AstInvokeable) i);};
-  
-  
+layerDefault: ^(LAYER . ^(LIST balancedRule*) .*);
+
+prefilter: ^(CONSUMES . ^(LIST balancedRule*) .*);
+local:     ^(CONSUMES . . ^(LIST balancedRule*) .*);
+view:      ^(CONSUMES . . . . ^(LIST balancedRule*) .*);
+canvas:    ^(CONSUMES . . . . . ^(LIST balancedRule*) .*);
+
+
+balancedRule: ^(RULE . callChain .);
+callChain
+   @after{if ($r.r != 0) {throw new ValidationException("Unbalanced map/fold in a context that requires balance.");}}
+   : ^(CALL_CHAIN r=chain[0] .);
+   
+   
+chain[int d] returns [int r]
+   @init {if (d<0) {throw new ValidationException("Improperly nested map/fold found while checking for balance.");}}
+   : ^(PACK .*)  {$r=d;}
+   | ^(FUNCTION . . DIRECT_YIELD c=chain[d]) {$r=$c.r;}
+   | ^(FUNCTION . . MAP c=chain[d+1]) {$r=$c.r;}
+   | ^(FUNCTION . . FOLD c=chain[d-1]) {$r=$c.r;};

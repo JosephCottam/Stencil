@@ -38,7 +38,7 @@ import stencil.tuple.prototype.TuplePrototypes;
 final class ArrayEnvironment extends Environment {
 	private static final String FRAME_PREFIX = "Frame";
 	private final Tuple[] frames;
-	private int size = 0;
+	private int filledSize = 0;
 	
 	
 	private ArrayEnvironment(int capacity) {
@@ -50,10 +50,10 @@ final class ArrayEnvironment extends Environment {
 	}
 	
 	public ArrayEnvironment extend(Tuple t) {
-		if (size >= frames.length) {throw new RuntimeException("Attempt to over-extend environment (max env size of " + frames.length + ")." );}
+		if (filledSize >= frames.length) {throw new RuntimeException("Attempt to over-extend environment (max env size of " + frames.length + ")." );}
 		
-		frames[size] = t;
-		size ++;
+		frames[filledSize] = t;
+		filledSize++;
 		return this;
 	}
 
@@ -74,26 +74,30 @@ final class ArrayEnvironment extends Environment {
 	
 	public boolean hasField(String name) {throw new UnsupportedOperationException();}
 	public String toString() {return Tuples.toString(this);}
-	public int size() {return size;}
+	public int size() {return filledSize;}
 	/* (non-Javadoc)
 	 * @see stencil.parser.tree.util.Environment#capacity()
 	 */
 	public int capacity() {return frames.length;}
 
-	/* (non-Javadoc)
-	 * @see stencil.parser.tree.util.Environment#extendCapacity(int)
-	 */
 	public ArrayEnvironment extendCapacity(int capacity) {
-		if (capacity <= size) {return this;}
+		if (capacity <= frames.length) {return this;}
 		
 		ArrayEnvironment env = new ArrayEnvironment(capacity);
-		System.arraycopy(frames, 0, env.frames, 0, size);
-		env.size = this.size;
+		System.arraycopy(frames, 0, env.frames, 0, filledSize);
+		env.filledSize = this.filledSize;
 		return env;
 	}
 	
 	public boolean isDefault(String name, Object value) {return false;}
 
+	public ArrayEnvironment clone() {
+		ArrayEnvironment result = new ArrayEnvironment(frames.length);
+		System.arraycopy(frames, 0, result.frames, 0, frames.length);
+		result.filledSize = filledSize;
+		return result;
+	}
+	
 	/**Order of the frames:
 	 * 	Canvas
 	 *  View
@@ -111,7 +115,7 @@ final class ArrayEnvironment extends Environment {
 		ArrayEnvironment e = new ArrayEnvironment(size);
 		System.arraycopy(frames, 0, e.frames, 0, frames.length);
 		for (int i=frames.length; i<size; i++) {e.frames[i] = Tuples.EMPTY_TUPLE;}
-		e.size = DEFAULT_SIZE;
+		e.filledSize = DEFAULT_SIZE;
 		return e;
 	}
 }

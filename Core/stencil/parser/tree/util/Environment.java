@@ -25,6 +25,8 @@ public abstract class Environment implements Tuple {
 	
 	public abstract Tuple get(int idx);
 
+	public abstract Environment clone();
+
 	/**Returns an environment with the same contents but potentially different
 	 * capacity than the original.  If the requested capacity is the
 	 * same or less than the current capacity, the environment will be returned;
@@ -38,5 +40,4 @@ public abstract class Environment implements Tuple {
 	public static Environment getDefault(Tuple... tuples) {
 		return ArrayEnvironment.getDefault(tuples);
 	}
-
 }

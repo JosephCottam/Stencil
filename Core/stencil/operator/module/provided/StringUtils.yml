@@ -10,10 +10,13 @@ defaults:
 
 operators:
   - name: Concatenate
+  - name: Delimit
   - name: Format
-  - name: Print
   - name: IndexOf
-  - name: ToString
+  - name: Print
+  - name: Replace
   - name: Substring
+  - name: ToString
   - name: Trim
   - name: Split
+  - name: Strip

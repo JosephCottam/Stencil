@@ -338,6 +338,9 @@ public abstract class ParseStencil {
 
 			OperatorPrefilter opPrefilter = new OperatorPrefilter(treeTokens);
 			opPrefilter.downup(t);
+			
+			MapFoldBalance mapFold = new MapFoldBalance(treeTokens);
+			mapFold.downup(t);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {e.printStackTrace();}

@@ -232,45 +232,6 @@ public final class Tuples {
 		
 		return new PrototypedTuple(names, values);
 	}
-
-
-	/**Create a tuple as if the first tuple were followed by
-	 * the second tuple.  If either is null or empty, then
-	 * the other is returned (no copy is made).
-	 * 
-	 * If both are null or empty, an empty or null tuple is returned.
-	 * Names found in the two tuples must be disjoint.  For copying values
-	 * from one tuple to replace those of another use Transfer.
-	 *
-	 * TODO: Replace all calls to merge with calls to append
-	 *
-	 * @param sourceName Where should the resulting tuple indicate it is from?
-	 * @param source1
-	 * @param source2
-	 * @return
-	 */
-	public static Tuple append(Tuple source1, Tuple source2) {
-		if (source1 == null) {source1 = EMPTY_TUPLE;}
-		if (source2 == null) {source2 = EMPTY_TUPLE;}		
-		if (source1 == EMPTY_TUPLE) {return source2;}
-		if (source2 == EMPTY_TUPLE) {return source1;}
-		
-		List<String> names = new ArrayList();
-		List<Object> values = new ArrayList();
-		
-		for (String name: TuplePrototypes.getNames(source1)) {
-			Object value = source1.get(name);
-			names.add(name);
-			values.add(value);
-		}
-		for (String name: TuplePrototypes.getNames(source2)) {
-			Object value = source2.get(name);
-			names.add(name);
-			values.add(value);
-		}
-		return new PrototypedTuple(names, values);
-	}
-	
 	
 	/**Produces an array version of a tuple.  Value are in the same order as the original tuple fields.**/
 	public static Object[] toArray(Tuple t) {
@@ -313,5 +274,13 @@ public final class Tuples {
 			values[i] = source.get(name);
 		}
 		return new ArrayTuple(values);
+	}
+	
+	public static Tuple[] alignAll(final Tuple[] sources, TuplePrototype prototype) {
+		Tuple[] results = new Tuple[sources.length];
+		for (int i=0; i< sources.length; i++) {
+			results[i] = align(sources[i], prototype);
+		}
+		return results;
 	}
 }

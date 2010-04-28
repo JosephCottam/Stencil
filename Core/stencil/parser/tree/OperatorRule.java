@@ -34,7 +34,7 @@ import org.antlr.runtime.Token;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
-import stencil.tuple.Tuples;
+import stencil.tuple.TupleAppender;
 
 
 /**A legend action is a filter plus a rule.
@@ -77,7 +77,7 @@ public class OperatorRule extends StencilTree {
 			}
 
 			if (buffer == null) {result = null; break;}
-			result= Tuples.append(buffer,result);
+			result= TupleAppender.append(buffer,result);
 			ruleCount++;
 		}
 

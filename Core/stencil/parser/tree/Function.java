@@ -64,6 +64,9 @@ public class Function extends CallTarget {
 		if (target == null) {target = (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
 		return target;
 	}
+	
+	public StencilTree getPass() {return (StencilTree) getChild(3);}
+	
 	public CallTarget getCall() {
 		if (call == null) {
 			call = (Function) getFirstChildWithType(StencilParser.FUNCTION);
@@ -75,7 +78,6 @@ public class Function extends CallTarget {
 	}
 
 	public boolean isTerminal() {return false;}
-
 
 	/**
 	 * Invokes the current function, and return the result.

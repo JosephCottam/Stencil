@@ -45,10 +45,29 @@ public class StringUtils extends BasicModule {
 	
 	/**Converts a value to a string value.*/
 	public static String toString(Object s) {return s.toString();}
-	
+
+	/**Given a delimiter and a list of strings, creates
+	 * a new string where each element of the list is separated
+	 * by the delimiter.
+	 * 
+	 * @param delimiter
+	 * @param values
+	 * @return
+	 */
+	public static String delimit(String delimiter, String... values) {
+		StringBuilder b  = new StringBuilder();
+		for (String v: values) {
+			b.append(v);
+			b.append(delimiter);
+		}
+		b.delete(b.length()-delimiter.length(), b.length());
+		return b.toString();
+	}
+
 	public static String[] split(String value, String pattern) {
 		return value.split(pattern);
 	}
+
 	
 	//TODO: Add range support to concatenate
 	public static String concatenate(Object... os) {
@@ -65,10 +84,12 @@ public class StringUtils extends BasicModule {
 		if (end >= 0) {return string.substring(start, end);}
 		else {return string.substring(start);}
 	}
-	
-	public static String trim(String string) {
-		return string.trim();
-	}
+
+	public static String replace(String value, String pattern, String with) {return value.replace(pattern, with);}
+
+	/**Retains only "word" characters characters.*/
+	public static String strip(String value) {return value.replaceAll("\\W", "");}
+	public static String trim(String string) {return string.trim();}
 	
 	public static int indexOf(String string, String target) {
 		return string.indexOf(target);

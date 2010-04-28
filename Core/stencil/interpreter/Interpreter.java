@@ -37,8 +37,10 @@ import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
+import stencil.tuple.MapMergeTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleAppender;
 import stencil.tuple.Tuples;
 import stencil.types.Converter;
 
@@ -92,7 +94,7 @@ public class Interpreter {
 					else {return null;}
 				}
 				
-				fullResult = Tuples.append(fullResult, result);
+				fullResult = TupleAppender.append(fullResult, result);
 			}
 			
 		} catch (RuleAbortException ra) {
@@ -124,8 +126,16 @@ public class Interpreter {
 			catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", target.getName()), e);}	
 			env.setFrame(Environment.LOCAL_FRAME, local);
 			try {
-				result = process(env, group.getResultRules());
-				if (result != null && target.canStore(result)) {target.store(result);}
+				result = process(env, group.getResultRules());				
+				if (result != null && result instanceof MapMergeTuple) {
+					for (int i=0; i< result.size(); i++) {
+						Tuple nt = Converter.toTuple(result.get(i));
+						if (target.canStore(result)) {target.store(nt);}
+					}
+				} else if (result != null && target.canStore(result)) {
+					target.store(result);
+				}
+
 			}
 			
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in layer %1$s", target.getName()), e);}
@@ -144,7 +154,83 @@ public class Interpreter {
 		return result;
 	}
 	
+	/**Takes a single tuple and works it through all applicable
+	 * transformation contexts.  This will add the tuple to all layers 
+	 * and generate all resulting stream tuples.  This does not drain
+	 * the stream queues.
+	 * 
+	 * @param source
+	 * @throws Exception
+	 */
+	private boolean processSingleTuple(SourcedTuple source) throws Exception {
+		boolean actionsTaken = false;
+		for (StreamDef stream: program.getStreamDefs()) {
+			stream.offer(StreamDef.DIVIDER);
+			for (Consumes group: stream.getGroups()) {
+				if (!group.getStream().equals(source.getSource())) {continue;}
+				process(source, stream, group);
+				actionsTaken = true;
+			}
+		}
+		
+		for (Layer layer:program.getLayers()) {			
+			for(Consumes group:layer.getGroups()) {
+				if (!group.getStream().equals(source.getSource())) {continue;}
+				Tuple result = process(source, layer, group);
+				actionsTaken = registerDynamics(layer, group, source, result) && actionsTaken;
+			}
+		}
+		return actionsTaken;
+	}
+
+	//TODO: What about locals in a dynamic binding?
+	//TODO: Move dynamic binding to a compile time group...
+	private boolean registerDynamics(Layer layer, Consumes group, SourcedTuple source, Tuple result) {
+		boolean actionsTaken = false;
+		if (result != null && result instanceof MapMergeTuple) {
+			for (int i=0; i<result.size(); i++) {
+				Tuple rslt = (Tuple) result.get(i);
+				singleRegisterDynamic(layer, group, source, rslt);
+			}
+		} else if (result != null) {
+			singleRegisterDynamic(layer, group, source, result);
+		}		
+		return actionsTaken;
+	}
+	
+	private boolean singleRegisterDynamic(Layer layer, Consumes group, SourcedTuple source, Tuple result) {
+		if (!layer.canStore(result)) {return false;}
+		try {
+			String id = Converter.toString(result.get(ParserConstants.GLYPH_ID_FIELD));
+			stencil.adapters.Glyph glyph = layer.getDisplayLayer().find(id);
+			assert glyph != null;
+			for (Rule rule: group.getResultRules()) {if (rule.isDynamic()) {panel.addDynamic(glyph, rule, source.getValues());}}
+			return true;
+		} catch (Exception e) {
+			throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);
+		}
+	}
+	
 	public void processTuple(SourcedTuple source) throws Exception {
+		processSingleTuple(source);
+
+		//Strip off dividers
+		for (StreamDef stream: program.getStreamDefs()) {
+			Tuple t = stream.poll();
+			assert t==StreamDef.DIVIDER;
+		}
+
+		for (StreamDef stream: program.getStreamDefs()) {
+			while (!stream.isEmpty() && !stream.isDivider()) {
+				SourcedTuple t = stream.poll();
+				processSingleTuple(t);
+			}
+		}
+		
+		
+	}
+	
+	public void processTupleOriginal(SourcedTuple source) throws Exception {
 		for (StreamDef stream: program.getStreamDefs()) {
 			stream.offer(StreamDef.DIVIDER);
 			for (Consumes group: stream.getGroups()) {

@@ -32,7 +32,10 @@ import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
+import stencil.tuple.MapMergeTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleAppender;
+import stencil.types.Converter;
 
 /**A call chain is a linear group of calls, ending in a pack.
  * Call chains MAY start with any call target.
@@ -41,19 +44,19 @@ import stencil.tuple.Tuple;
  *
  */
 public class CallChain extends StencilTree {
-	private CallTarget target;
+	private CallTarget chainStart;
 	private int depth = Integer.MIN_VALUE;
 	
 	public CallChain(Token source) {super(source);}
 
 	public CallTarget getStart() {
-		if (target == null) {
-			target = (Function) getFirstChildWithType(StencilParser.FUNCTION);
-			if (target == null) {
-				target = (Pack) getFirstChildWithType(StencilParser.PACK);
+		if (chainStart == null) {
+			chainStart = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+			if (chainStart == null) {
+				chainStart = (Pack) getFirstChildWithType(StencilParser.PACK);
 			}
 		}
-		return target;
+		return chainStart;
 	}
 	
 	/**How long is this call chain?*/
@@ -64,6 +67,23 @@ public class CallChain extends StencilTree {
 		return depth;
 	}	
 	
+	
+//	public Tuple apply(Environment env) throws Exception {
+//		Tuple result = env;
+//		CallTarget target = getStart();
+//		while (target instanceof Function) {
+//			Function func = (Function) target;
+//			result = func.apply(env);
+//			if (result == null) {return null;}
+//			env = env.extend(result);
+//			target = ((Function) target).getCall();
+//		}
+//		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
+//		assert (result != null) : "Call chain ended with null result.";
+//
+//		result = target.apply(env);
+//		return result;
+//	}
 	/**Execute the call chain, all the way through the pack.
 	 * 	 *
 	 * Short-circuiting occurs when the method invoked returns null.  If this is the case,
@@ -76,23 +96,54 @@ public class CallChain extends StencilTree {
 	 * @return
 	 * @throws Exception
 	 */
-	public Tuple apply(Environment env) throws Exception {		
+	public Tuple apply(Environment rootEnv) throws Exception {		
+		Environment[] envs = new Environment[]{rootEnv};
 		CallTarget target = getStart();
-
-		Tuple result = env;
-		while (target instanceof Function) {
-			Function func = (Function) target;
-			result = func.apply(env);
-			if (result == null) {return null;}
-			env = env.extend(result);
-			target = ((Function) target).getCall();
+		
+		while (!(target instanceof Pack)) {
+			final Function func = (Function) target;
+			Tuple[] results = new Tuple[envs.length];
+			for (int i=0; i< results.length; i++) {
+				results[i] = func.apply(envs[i]);
+				if (results[i] == null) {return null;}
+			}
+			
+			//Depending on the pass operator, there may be 1 or many results
+			switch (func.getPass().getType()) {
+				case StencilParser.DIRECT_YIELD :
+					for (int i=0; i<results.length; i++) {
+						envs[i].extend(results[i]);
+					}
+					break;
+				case StencilParser.MAP :
+					Environment[] newEnvs = new Environment[results[0].size()];  //HACK: The 0 here is because only one map is allowed to be used at a time...nesting them will require this to be in a loop AT LEAST
+					for (int i=0; i< newEnvs.length; i++) {
+						newEnvs[i] = envs[0].clone();								//make new env
+						newEnvs[i].extend(Converter.toTuple(results[0].get(i)));	//Add part of the most recent result to new env
+					}
+					envs = newEnvs;
+					break;
+				case StencilParser.FOLD :
+					//Construct a single tuple from the mass of envs
+					final Tuple[] tops = new Tuple[envs.length];
+					for (int i=0; i< tops.length; i++) {
+						tops[i] = envs[i].get(envs[i].size()-1);
+					}
+					Tuple folded = TupleAppender.append(tops);
+					envs = new Environment[]{envs[0]};
+					envs[0].extend(folded);
+					break;
+			}
+			target = ((Function) target).getCall();			
 		}
 
-		assert (target instanceof Pack) : "Call chain ending includes non-pack, non-function: " + target.getClass().getName();
-		assert (result != null) : "Call chain ended with null result.";
+		Tuple[] results = new Tuple[envs.length];
+		for (int i=0; i< results.length; i++) {
+			results[i] = target.apply(envs[i]);	//Target will be pack here
+		}
 		
-		result = target.apply(env);
-		return result;
+		if (results.length >1) {return new MapMergeTuple((Object[]) results);}
+		else {return results[0];}
 	}
 
 }

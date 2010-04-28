@@ -11,7 +11,7 @@ import stencil.tuple.prototype.TuplePrototypes;
  * This lightweight object can be used when all prototype an default related
  * operations are resolved at compile-time.
  */
-public final class ArrayTuple implements Tuple {
+public class ArrayTuple implements Tuple {
 	private static final String PREFIX = "***";
 	private final Object values;
 		
