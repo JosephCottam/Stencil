@@ -36,10 +36,10 @@ import stencil.parser.tree.util.Environment;
 public class Predicate extends StencilTree {
 	public Predicate(Token source) {super(source);}
 
-	public Atom getLHSValue(Environment env) {return getValue((Value) getChild(0), env);}
-	public Atom getRHSValue(Environment env) {return getValue((Value) getChild(2), env);}
-	private Atom getValue(Value source, Environment env) {
-		return Atom.Literal.instance(TupleRef.resolve(source, env));
+	public Object getLHSValue(Environment env) {return getValue((Value) getChild(0), env);}
+	public Object getRHSValue(Environment env) {return getValue((Value) getChild(2), env);}
+	private Object getValue(Value source, Environment env) {
+		return TupleRef.resolve(source, env);
 	}
 
 	public BooleanOp getOperator() {return (BooleanOp) getChild(1);}
@@ -47,7 +47,7 @@ public class Predicate extends StencilTree {
 	/**Does the passed environment match this predicate?*/
 	public boolean matches(Environment env) {
 		return (getChild(0) instanceof All) 
-				|| getOperator().evaluate(getLHSValue(env), getRHSValue(env));
+				|| getOperator().evaluate(getLHSValue(env), getRHSValue(env), ((Value) getChild(0)).isTupleRef());
 	}
 
 

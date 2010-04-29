@@ -238,11 +238,14 @@ public class Temp extends BasicModule {
 
 		final protected Map<Object, Object[]> map = new HashMap();
 		final String[] names;
-		boolean caseSensitive=true;
+		final boolean caseSensitive;
+		final Object[] defaultValues;
 
-		public Mapping(OperatorData opData, String...names) {
+		public Mapping(OperatorData opData, boolean caseSensitive, Object[] defaultValues, String...names) {
 			super(opData);
 			this.names = names;
+			this.defaultValues = defaultValues;
+			this.caseSensitive = caseSensitive;
 		}
 
 		public String getName() {return NAME;}
@@ -265,9 +268,7 @@ public class Temp extends BasicModule {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
 			Object[] results = map.get(key);
-			if (results == null) {
-				return null;
-			}			
+			if (results == null) {return defaultValues;}			
 			return results;
 		}
 
@@ -286,16 +287,29 @@ public class Temp extends BasicModule {
 			return od;
 		}
 
+		public Mapping duplicate() {return new Mapping(operatorData, caseSensitive, defaultValues, names);}
+		
 		public static StencilOperator instance(OperatorData opData, Specializer specializer) throws SpecializationException, NoSuchMethodException {
-			String[] names;
+			final String[] names;
 			
 			try {names = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), specializer, e);}
 
-			Mapping m = new Mapping(getOperatorData(opData, specializer), names);
-
-			if (specializer.getMap().containsKey("CaseInsensitive")) {m.caseSensitive = false;}
-
+			Object[] defaultValues = new Object[names.length];
+			boolean noneSet = true;
+			for (int i=0; i< names.length; i++) {
+				String key = String.format("dv%1$s", i);
+				if (specializer.containsKey(key)) {
+					defaultValues[i] = specializer.get(key).getValue();
+					noneSet = false;
+				}	
+			}
+			if (noneSet) {defaultValues = null;}
+			
+			boolean caseSensitive = !specializer.getMap().containsKey("case");
+			
+			Mapping m = new Mapping(getOperatorData(opData, specializer), caseSensitive, defaultValues, names);
+			
 			return m;
 		}
 		
@@ -303,7 +317,6 @@ public class Temp extends BasicModule {
 			return spec.get(NAMES).getText().split("\\s*,\\s*");
 		}
 
-		public Mapping duplicate() {return new Mapping(operatorData, names);}
 	}
 
 

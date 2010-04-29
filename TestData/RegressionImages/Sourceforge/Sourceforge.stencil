@@ -29,7 +29,7 @@ from NodePositions
 layer Overlay
 from Attributes
 	filter (ATT =~ "C|Java|Python")				/*Only continue with specific attributes*/
-	filter (NodesID !~ "[null]") 				/*...and with things in the other layer.*/
+	filter (NodesID != NULL) 				/*...and with things in the other layer.*/
 	prefilter(NodesID) :  Nodes.find(ID) -> ID
 
 	ID : ID

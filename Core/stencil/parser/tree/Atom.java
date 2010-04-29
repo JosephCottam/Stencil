@@ -99,6 +99,7 @@ public abstract class Atom extends Value {
 	public boolean isNumber() {return getType() == NUMBER;}
 	public boolean isAll() {return getType() == ALL;}
 	public boolean isLast() {return getType() == LAST;}
+	public boolean isNull() {return getType() == NULL;}
 	
 	/**Atoms ignore the getValue Tuple context.
 	 * Calling the single-argument getValue is identical to

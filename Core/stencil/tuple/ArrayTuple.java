@@ -36,7 +36,12 @@ public class ArrayTuple implements Tuple {
 	}
 
 	
-	public Object get(int idx) throws TupleBoundsException {return Array.get(values, idx);}
+	public Object get(int idx) throws TupleBoundsException {
+		try {return Array.get(values, idx);}
+		catch (ArrayIndexOutOfBoundsException e) {
+			throw new TupleBoundsException(idx, this);
+		}
+	}
 	public Object get(String name) throws InvalidNameException {
 		int idx=0;
 		if (!name.equals(PREFIX)) {idx = Integer.parseInt(name.substring(PREFIX.length()));}

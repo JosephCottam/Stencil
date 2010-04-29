@@ -84,44 +84,38 @@ options {
         				throw new ClassNotFoundException(pckgname + " (" + directory
         						+ ") does not appear to be a valid package");
         			}
-        			if (directory.exists()) {
-        				// Get the list of the files contained in the package
-        				String[] files = directory.list();
-        				for (int i = 0; i < files.length; i++) {
-        					// we are only interested in .class files
-        					String name = files[i];
-        					if (name.endsWith(".class")) {
-        						// removes the .class extension
-        						name = files[i].substring(0, files[i].length() - 6);
+           			if (directory.exists()) {
+            				// Get the list of the files contained in the package
+            				String[] files = directory.list();
+            				for (int i = 0; i < files.length; i++) {
+            					// we are only interested in .class files
+            					String name = files[i];
+            					if (name.endsWith(".class")) {
+            						// removes the .class extension
+            						name = files[i].substring(0, files[i].length() - 6);
+            						String key = name.toUpperCase();
+            						
+            						
+            						if (key.startsWith("STENCIL")) {
+            							key = key.substring("STENCIL".length());
+            						}
+        							classes.put(key, name);
+            					}
+            				}
+            			} else {
+            				throw new ClassNotFoundException(pckgname
+            						+ " does not appear to be a valid package");
+            			}
 
-        						if (name.startsWith("Stencil")) {
-        							String shortName = name.substring("Stencil".length());
-        							classes.put(shortName, name);
-        						} else {
-        							classes.put(name, name);
-        						}
-        					}
-        				}
-        			} else {
-        				throw new ClassNotFoundException(pckgname
-        						+ " does not appear to be a valid package");
-        			}
-
-        		}
+            		}
 
 
-        	public static String lookupClass(String name) {return classes.get(properCase(name));}
+             	public static String lookupClass(String name) {return classes.get(properCase(name));}
 
-        	public static String properCase(String name) {
-        		String[] parts = name.split("_");
-        		StringBuilder b = new StringBuilder();
-
-        		for (String part:parts) {
-        			b.append(Character.toUpperCase(part.charAt(0)));
-        			b.append(part.substring(1).toLowerCase());
-        		}
-        		return b.toString();
-        	}
+            	public static String properCase(String name) {
+            		String rslt = name.toUpperCase().replace("_", "");
+            		return rslt;
+            	}
 
         	public static boolean inDefaults(String name) {return !classes.containsKey(properCase(name));}
         	public static boolean inError(String name) {return error.contains(name);}

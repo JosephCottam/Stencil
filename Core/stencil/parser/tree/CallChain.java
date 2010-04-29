@@ -88,7 +88,6 @@ public class CallChain extends StencilTree {
 			Tuple[] results = new Tuple[envs.length];
 			for (int i=0; i< results.length; i++) {
 				results[i] = func.apply(envs[i]);
-				if (results[i] == null) {return null;}
 			}
 			
 			//Depending on the pass operator, there may be 1 or many results

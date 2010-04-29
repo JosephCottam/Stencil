@@ -215,21 +215,27 @@ public class Interpreter {
 	}
 	
 	public void processTuple(SourcedTuple source) throws Exception {
-		boolean actionsTaken = processSingleTuple(source);
+		processSingleTuple(source);
 
-		while (actionsTaken) {
-			actionsTaken =false;
+		
+		while (!allEmpty()) {
 			for (StreamDef stream: program.getStreamDefs()) {
 				Tuple divider = stream.poll();		//Strip off dividers
 				assert divider==StreamDef.DIVIDER;
 				while (!stream.isEmpty() && !stream.isDivider()) {
 					SourcedTuple t = stream.poll();
-					actionsTaken = processSingleTuple(t) || actionsTaken;
+					processSingleTuple(t);
 				}
 			}
 		}
-		
-		
+	}
+	
+	/**Are the stencil-defined streams all drained?*/
+	private boolean allEmpty() {
+		for (StreamDef stream: program.getStreamDefs()) {
+			if (!stream.isEmpty()) {return false;}
+		}
+		return true;
 	}
 
 	public StencilPanel getPanel() {return panel;}

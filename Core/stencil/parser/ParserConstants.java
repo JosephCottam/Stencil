@@ -40,24 +40,12 @@ public abstract class ParserConstants {
 	public static final String DEFAULT_FIELD_TYPE_LABEL="NOMINAL";
 	public static final String DEFAULT_LEGEND_BASE="Null";
 
-	public static final String NULL_PATTERN= "[null]";
-	
 	public static final String SEPARATOR = ",";
 	public static final String INITIATOR = "(";
 	public static final String TERMINATOR = ")";
 	public static final String SIGIL = "@";
 
 	public static final String GLYPH_ID_FIELD  = "ID";
-
-	public static final String REGULAR_EXPRESSION = "=~";
-	public static final String NEGATED_REGULAR_EXPRESSION = "!~";
-	public static final String GT = ">";
-	public static final String GTE = ">=";
-	public static final String LT = "<";
-	public static final String LTE = "<=";
-	public static final String EQ = "=";
-	public static final String NOT_EQ = "!=";
-
 
 	public static final String OPAQUE_DOUBLE = "1.0";
 	public static final String OPAQUE_INT	= "255";
@@ -90,6 +78,7 @@ public abstract class ParserConstants {
 	public static final String PREFILTER_FRAME = "prefilter";
 	
 	public static final String SOURCE_FIELD = "Source";
+	public static final String VALUES_FIELD = "Values";
 	
 	public static final String BIND_OPERATOR = ":";
 	

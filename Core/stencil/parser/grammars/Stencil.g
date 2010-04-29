@@ -36,7 +36,6 @@ options {
 tokens {
   AST_INVOKEABLE; //Holder for invokeables
   ANNOTATION;
-  BOOLEAN_OP;    //Boolean operator
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
@@ -66,7 +65,6 @@ tokens {
   PYTHON_FACET;
   RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
   RULE;
-  ROLE;         //Proxy object before facet resolution is done
   SIGIL_ARGS;
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
@@ -90,6 +88,7 @@ tokens {
   LAYER = 'layer';
   LAST ='LAST';     //Proxy value for n..n range
   LOCAL = 'local';  //Target to indicate temporary storage after filtering
+  NULL = 'NULL';
   OPERATOR= 'operator';
   ORDER = 'order';
   PREFILTER = 'prefilter'; //Target to indicate actions that occure before filters
@@ -109,6 +108,17 @@ tokens {
   //Name manipulation
   NAMESPACE  = '::';
   
+  //Boolean operators
+   GT  = '>';
+   GTE = '>='; 
+   LT  = '<';  
+   LTE = '<=';
+   EQ  = '='; 
+   NEQ = '!='; 
+   RE  = '=~'; 
+   NRE = '!~'; 
+  
+
 
   //Bindings
   DEFINE    = ':';
@@ -365,7 +375,7 @@ atomList: atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
 valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!; 
 		
 value : tupleRef | atom;
-atom  : number | STRING | DEFAULT | ALL | LAST;
+atom  : number | STRING | DEFAULT | ALL | LAST | NULL;
 
 tupleRef
   : TUPLE_VALUE -> ^(TUPLE_REF ALL)
@@ -385,16 +395,7 @@ private qualifiedRef
   | ARG n=number CLOSE_ARG -> ^(TUPLE_REF $n)
   | ARG DEFAULT_VALUE CLOSE_ARG -> ^(TUPLE_REF NUMBER["0"]);
 
-
-booleanOp
-  : t= '>'  -> BOOLEAN_OP[t]
-  | t= '>=' -> BOOLEAN_OP[t]
-  | t= '<'  -> BOOLEAN_OP[t]
-  | t= '<=' -> BOOLEAN_OP[t]
-  | t= '='  -> BOOLEAN_OP[t]
-  | t= '!=' -> BOOLEAN_OP[t]
-  | t= '=~' -> BOOLEAN_OP[t]
-  | t= '!~' -> BOOLEAN_OP[t];
+booleanOp : GT |  GTE | LT | LTE | EQ | NEQ | RE | NRE;
 
 passOp  
   : directYield

@@ -20,9 +20,12 @@ from Lines
    
 stream PrimeCentroid (X,Y)
 from Words
- (X,Y) : LineIndex.query(word) -> Delimit(_, ",", line) -> LineIndex(word, _)
+ (X,Y) : LineIndex.query(word) -> Extend(_, line) -> LineIndex(word, _)
 
-
+operator Extend (current, more) -> (full) 
+  (current = NULL) => full : more 
+  (ALL)         => full : Concatenate(current, ",", more)
+  
 layer Border[TEXT]
 from Lines
    ID: line
