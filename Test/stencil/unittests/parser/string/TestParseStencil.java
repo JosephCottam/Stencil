@@ -32,7 +32,7 @@ public class TestParseStencil extends TestCase {
 		
 		assertEquals(2, p.getLayers().size());
 		assertEquals(3, p.getLayers().get(1).getGroups().size());
-		assertEquals(4, p.getLayers().get(1).getGroups().get(1).getGlyphRules().size());
+		assertEquals(4, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
 	}
 
 	public void testParseNull() throws Exception {

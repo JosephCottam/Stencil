@@ -55,7 +55,6 @@ public class TreeView {
 
 		stencil.Configure.loadProperties(props);
 		tree = stencil.parser.ParseStencil.parse(text, Adapter.INSTANCE);
-//			tree = pieceWise(text, Adapter.INSTANCE);
 		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
 		f.setVisible(true);
 		
