@@ -41,7 +41,7 @@ import stencil.tuple.prototype.TuplePrototype;
 public interface SourcedTuple extends Tuple {
 	public static final int SOURCE=0;
 	public static final int VALUES=1;
-	public static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{ParserConstants.SOURCE_FIELD, "Values"}, new Class[]{String.class, Tuple.class});
+	public static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{ParserConstants.SOURCE_FIELD, ParserConstants.VALUES_FIELD}, new Class[]{String.class, Tuple.class});
 	
 	public String getSource();
 	public Tuple getValues();
@@ -57,7 +57,8 @@ public interface SourcedTuple extends Tuple {
 		
 		public Object get(String name) throws InvalidNameException {
 			if (ParserConstants.SOURCE_FIELD.equals(name)) {return source;}
-			else {return base.get(name);}
+			if (ParserConstants.VALUES_FIELD.equals(name)) {return base;}
+			throw new InvalidNameException(name, PROTOTYPE);
 		}
 		
 		public Object get(int idx) throws TupleBoundsException {
