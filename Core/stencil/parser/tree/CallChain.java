@@ -125,7 +125,7 @@ public class CallChain extends StencilTree {
 			results[i] = target.apply(envs[i]);	//Target will be pack here
 		}
 		
-		if (results.length >1) {return new MapMergeTuple((Object[]) results);}
+		if (results.length >1) {return new MapMergeTuple(results);}
 		else {return results[0];}
 	}
 

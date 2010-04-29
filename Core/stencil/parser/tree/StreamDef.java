@@ -14,7 +14,7 @@ import stencil.tuple.Tuple;
 
 public class StreamDef extends StencilTree implements TupleStore, ContextNode {
 	/**Value used to divide groups of tuples in the queue.*/
-	public static final SourcedTuple DIVIDER = new SourcedTuple.Wrapper("****RUNTIME****", new ArrayTuple());
+	public static final SourcedTuple DIVIDER = new SourcedTuple.Wrapper("****DIVIDER****", new ArrayTuple());
 
 	private Queue<SourcedTuple> queue = new LinkedList();	
 	private List<Consumes> groups;
@@ -45,5 +45,5 @@ public class StreamDef extends StencilTree implements TupleStore, ContextNode {
 	
 	public SourcedTuple poll() {return queue.poll();}
 	public boolean isDivider() {return queue.peek() == DIVIDER;}
-	public boolean isEmpty() {return queue.size() ==0;}
+	public boolean isEmpty() {return queue.size() == 0;}
 }

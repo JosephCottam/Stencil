@@ -35,8 +35,8 @@ public abstract class Value extends StencilTree {
 
 	public boolean isString() {return false;}
 	public boolean isNumber() {return false;}
-	public boolean isColor() {return false;}
 	public boolean isAll() {return false;}
+	public boolean isLast() {return false;}
 
 
 	public static Value instance(Token source) {

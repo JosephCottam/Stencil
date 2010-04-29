@@ -368,13 +368,13 @@ value : tupleRef | atom;
 atom  : number | STRING | DEFAULT | ALL | LAST;
 
 tupleRef
-  : simpleRef
+  : TUPLE_VALUE -> ^(TUPLE_REF ALL)
+  | simpleRef
   | simpleRef qualifiedRef+ -> ^(simpleRef qualifiedRef+);
 
 private simpleRef
   : ID  -> ^(TUPLE_REF ID)
   | DEFAULT_VALUE -> ^(TUPLE_REF NUMBER["0"])
-  | TUPLE_VALUE -> ^(TUPLE_REF ALL)
   | ARG number CLOSE_ARG -> ^(TUPLE_REF number)
   | c=CANVAS -> ^(TUPLE_REF ID[$c.text])
   | l=LOCAL -> ^(TUPLE_REF ID[$l.text])

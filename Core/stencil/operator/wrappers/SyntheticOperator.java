@@ -91,7 +91,7 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 					 result = Tuples.align(result, opDef.getResults());
 					 return result;
 				} catch (Exception e) {
-					throw new RuntimeException ("Error executing method.",e);
+					throw new RuntimeException (String.format("Error executing method in %1$s.", opDef.getName()),e);
 				}
 			}
 			

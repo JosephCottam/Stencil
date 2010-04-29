@@ -66,6 +66,11 @@ public class Specializer extends StencilTree {
 			|| (getMap().size() ==1 && containsKey(SPLIT))
 			|| (getMap().size() == 2 && (containsKey(RANGE) && containsKey(SPLIT)));
 	}
+	
+	public boolean isLowMem() {
+		return  ((containsKey(RANGE) && ((Atom) get(RANGE)).isLast()) || !containsKey(RANGE))
+		     && ((containsKey(SPLIT) && get(SPLIT).getValue().equals(0))         || !containsKey(SPLIT));
+	}
 
 	
 	public boolean equals(Object other) {

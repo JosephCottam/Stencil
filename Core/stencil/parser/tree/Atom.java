@@ -37,7 +37,7 @@ import static stencil.parser.string.StencilParser.*;
 
 public abstract class Atom extends Value {
 	public static final class Literal extends Atom {
-		private enum Type {String, Number, Color}
+		private enum Type {String, Number}
 		Object value;
 		Type type;
 		
@@ -48,8 +48,7 @@ public abstract class Atom extends Value {
 
 		private Literal(Object o) {
 			value = o;
-			if (o instanceof java.awt.Color) {type = Type.Color;}
-			else if (o instanceof Number) {type = Type.Number;}
+			if (o instanceof Number) {type = Type.Number;}
 			else if (o instanceof String) {type = Type.String;}
 			else {
 				//TODO: Fix when we have sigil-types
@@ -65,11 +64,6 @@ public abstract class Atom extends Value {
 		public Object getValue() {return value;}
 		public String getName() {throw new IllegalArgumentException("Literal atom cannot be a name.");}
 
-		public java.awt.Color getColor() {
-			if (isColor()) {return (java.awt.Color) value;}
-			throw new IllegalArgumentException(String.format("Literal tuple is of type %1$s, cannot retrieve as color.", type));
-		}
-
 		public java.lang.Number getNumber() {
 			if (isNumber()) {return (java.lang.Number) value;}
 			throw new IllegalArgumentException(String.format("Literal tuple is of type %1$s, cannot retrieve as number.", type));
@@ -82,7 +76,6 @@ public abstract class Atom extends Value {
 		}
 
 		public boolean isName() {return false;}
-		public boolean isColor() {return type == Type.Color;}
 		public boolean isNumber() {return type == Type.Number;}
 		public boolean isString() {return type == Type.String;}
 
@@ -105,7 +98,8 @@ public abstract class Atom extends Value {
 	public boolean isString() {return getType() == STRING;}
 	public boolean isNumber() {return getType() == NUMBER;}
 	public boolean isAll() {return getType() == ALL;}
-
+	public boolean isLast() {return getType() == LAST;}
+	
 	/**Atoms ignore the getValue Tuple context.
 	 * Calling the single-argument getValue is identical to
 	 * calling the zero-argument getValue.*/

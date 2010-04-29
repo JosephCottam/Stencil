@@ -5,5 +5,5 @@ package stencil.tuple;
  * an operator chain.  This should ONLY be used by the interpreter.
  */
 public class MapMergeTuple extends ArrayTuple {
-	public MapMergeTuple(Object... values) {super(values);}
+	public MapMergeTuple(Tuple... values) {super((Object[]) values);}
 }

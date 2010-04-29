@@ -74,8 +74,8 @@ public class Interpreter {
 	public static Tuple process(Environment env, Rule... rules) throws Exception {return process(env, Arrays.asList(rules));}	
 	public static Tuple process(Environment env, Iterable<Rule> rules) throws Exception {
 		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
-		
-		Tuple fullResult = Tuples.EMPTY_TUPLE;
+
+		List<Tuple> resultBuffer = new ArrayList();
 		
 		//Apply all rules
 		try {
@@ -94,7 +94,7 @@ public class Interpreter {
 					else {return null;}
 				}
 				
-				fullResult = TupleAppender.append(fullResult, result);
+				resultBuffer.add(result);
 			}
 			
 		} catch (RuleAbortException ra) {
@@ -103,14 +103,17 @@ public class Interpreter {
 			ra.printStackTrace();
 			return null;			//TODO: Handle rule aborts.
 		}
+		
+		Tuple fullResult = TupleAppender.crossAppend(resultBuffer);
+		
 		return fullResult;
 	}
 	
 	public static Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws Exception {
+		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
 		Tuple prefilter, local;
 		Tuple result = null;
-		
 		Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues());
 		
 		try {prefilter = process(env, group.getPrefilterRules());}
@@ -130,7 +133,7 @@ public class Interpreter {
 				if (result != null && result instanceof MapMergeTuple) {
 					for (int i=0; i< result.size(); i++) {
 						Tuple nt = Converter.toTuple(result.get(i));
-						if (target.canStore(result)) {target.store(nt);}
+						if (target.canStore(nt)) {target.store(nt);}
 					}
 				} else if (result != null && target.canStore(result)) {
 					target.store(result);
@@ -138,18 +141,18 @@ public class Interpreter {
 
 			}
 			
-			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in layer %1$s", target.getName()), e);}
+			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try {
 				Tuple viewUpdate = process(env, group.getViewRules());
 				if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global);}
 			}
-			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in layer %1$s.", target.getName()), e);}
+			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try{
 				Tuple canvasUpdate = process(env, group.getCanvasRules());
 				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global);}
-			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in layer %1$s.", target.getName()), e);}
+			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}
 		return result;
 	}
@@ -212,51 +215,21 @@ public class Interpreter {
 	}
 	
 	public void processTuple(SourcedTuple source) throws Exception {
-		processSingleTuple(source);
+		boolean actionsTaken = processSingleTuple(source);
 
-		//Strip off dividers
-		for (StreamDef stream: program.getStreamDefs()) {
-			Tuple t = stream.poll();
-			assert t==StreamDef.DIVIDER;
-		}
-
-		for (StreamDef stream: program.getStreamDefs()) {
-			while (!stream.isEmpty() && !stream.isDivider()) {
-				SourcedTuple t = stream.poll();
-				processSingleTuple(t);
+		while (actionsTaken) {
+			actionsTaken =false;
+			for (StreamDef stream: program.getStreamDefs()) {
+				Tuple divider = stream.poll();		//Strip off dividers
+				assert divider==StreamDef.DIVIDER;
+				while (!stream.isEmpty() && !stream.isDivider()) {
+					SourcedTuple t = stream.poll();
+					actionsTaken = processSingleTuple(t) || actionsTaken;
+				}
 			}
 		}
 		
 		
-	}
-	
-	public void processTupleOriginal(SourcedTuple source) throws Exception {
-		for (StreamDef stream: program.getStreamDefs()) {
-			stream.offer(StreamDef.DIVIDER);
-			for (Consumes group: stream.getGroups()) {
-				if (!group.getStream().equals(source.getSource())) {continue;}
-				process(source, stream, group);
-			}
-		}
-		
-		for (Layer layer:program.getLayers()) {			
-			for(Consumes group:layer.getGroups()) {
-				if (!group.getStream().equals(source.getSource())) {continue;}
-				Tuple result = process(source, layer, group);
-				if (result != null && layer.canStore(result)) {
-					try {
-						//TODO: What about locals in a dynamic binding?
-						//TODO: Move dynamic binding to a compile time group...
-						String id = Converter.toString(result.get(ParserConstants.GLYPH_ID_FIELD));
-						stencil.adapters.Glyph glyph = layer.getDisplayLayer().find(id);
-						assert glyph != null;
-						for (Rule rule: group.getResultRules()) {if (rule.isDynamic()) {panel.addDynamic(glyph, rule, source.getValues());}}
-					} catch (Exception e) {
-						throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);
-					}
-				} 
-			}
-		}
 	}
 
 	public StencilPanel getPanel() {return panel;}

@@ -30,9 +30,11 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
+import stencil.tuple.MapMergeTuple;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.types.Converter;
 
 /**Targets are things that can be on the left-hand-side
  * of a rule.  They consist of a target-type and
@@ -57,6 +59,18 @@ public abstract class Target extends StencilTree {
 	 * (such as a glyph, view or canvas) via merge.
 	 */
 	public final Tuple finalize(Tuple source) {
+		if (source instanceof MapMergeTuple) {
+			Tuple[] results = new Tuple[source.size()];
+			for (int i=0; i< source.size(); i++) {
+				results[i] = finalizeOne(Converter.toTuple(source.get(i)));
+			}
+			return new MapMergeTuple(results);
+		} else {
+			return finalizeOne(source);
+		}
+	}
+	
+	private final Tuple finalizeOne(Tuple source) {
 		String[] fields = TuplePrototypes.getNames(getPrototype());
 		Object[] values = new Object[fields.length];
 

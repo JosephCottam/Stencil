@@ -106,49 +106,46 @@ public final class TupleAppender {
 	 * @param source
 	 * @return
 	 */
-	public static Tuple[] crossAppend(Tuple[][] sources) {
+	public static Tuple crossAppend(List<Tuple> sources) {
 		int maxSize = Integer.MIN_VALUE;
-		int ofSize =0;
-		for (Tuple[] source: sources) {
-			if (source.length >1 					//In a complex situation
-					&& maxSize >0 					//but that was already known
-					&& maxSize != source.length) {	//but its a bad type of complexity
-				throw new RuntimeException("Cannot cross-append tuples of inconsistent lengths greater than 1.  Data: " + Arrays.deepToString(sources));
+		for (Tuple source: sources) {
+			if ((source instanceof MapMergeTuple)
+				&& (maxSize > 0 && source.size() != maxSize)) {
+				throw new RuntimeException("Cannot cross-append tuples of inconsistent lengths greater than 1.  Data: " + Arrays.deepToString(sources.toArray()));
 			}
-			if (source.length >1) {ofSize++;}
-			maxSize = Math.max(maxSize, source.length);
+			
+			if (source instanceof MapMergeTuple) {maxSize = Math.max(maxSize, source.size());}
 		}
 		
-		if (maxSize < 0) {return new Tuple[]{Tuples.EMPTY_TUPLE};}
-		else if (maxSize != 1) {return complexCross(sources, maxSize);}	
-		else {return new Tuple[]{simpleCross(sources)};}
+		if (maxSize > 0) {return complexCross(sources, maxSize);}	
+		else {return simpleCross(sources);}
 	}
 	
-	public static Tuple simpleCross(Tuple[][] sources) {
+	public static Tuple simpleCross(List<Tuple> sources) {
 		Tuple result = Tuples.EMPTY_TUPLE;
-		for (Tuple[] source: sources) {
-			result = append(result, source[0]);
+		for (Tuple source: sources) {
+			result = append(result, source);
 		}
 		return result;		
 	}
 	
 	
-	public static Tuple[] complexCross(final Tuple[][] sources, int size) {
+	public static MapMergeTuple complexCross(final List<Tuple> sources, int size) {
 		final Tuple[] results = new Tuple[size];
 
 		for (int i=0; i< results.length; i++) {
-			Tuple[][] tempSources = new Tuple[sources.length][];
+			List<Tuple> tempSources = new ArrayList(sources.size());
 			
-			for (int j=0; j<sources.length; i++) {
-				if (sources[j].length ==1) {
-					tempSources[i] = sources[j];					//Take the single value
+			for (int j=0; j<sources.size(); j++) {
+				if (sources.get(j) instanceof MapMergeTuple) {
+					tempSources.add((Tuple) sources.get(j).get(i));	//Take a single element from a longer value
 				} else {
-					tempSources[i] = new Tuple[]{sources[j][i]};	//Take a single element from a longer value
+					tempSources.add(sources.get(j));
 				}
 			}
 			results[i] = simpleCross(tempSources);
 		}
-		return results;
+		return new MapMergeTuple(results);
  	}
 }
 

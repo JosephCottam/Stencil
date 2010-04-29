@@ -77,5 +77,6 @@ public interface SourcedTuple extends Tuple {
 		
 		public String getSource() {return source;}
 		public Tuple getValues() {return base;}
+		public String toString() {return Tuples.toString(this);} 
 	}
 }

@@ -10,6 +10,7 @@ public class Last extends Atom {
 	public Last() {super();}
 
 	public Object getValue() {return VALUE;}
+	public boolean isLast() {return true;}
 
 	public boolean equals(Object other) {return other instanceof Last;}
 	public int hashCode() {return VALUE.hashCode();}
