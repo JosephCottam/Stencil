@@ -1,8 +1,8 @@
 STREAM: File
 NAME: RawLines
 HEADER: text
-SEPARATOR: [n/a]
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SEPARATOR: $^
+SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
@@ -16,17 +16,18 @@ from RawLines
 stream Words (line, word)
 from Lines
    line: line
-   word: split(text, "\\s+") -> strip(_)   /*Strip removes all non-letters from word front\rear*/
+   word: Split(text, "\\s+") >> Strip(_)   /*Strip removes all non-letters from word front\rear*/
    
 stream PrimeCentroid (X,Y)
 from Words
- (X,Y) : LineIndex.query(word) -> DelimitList(_, ",", line) -> LineIndex(word, _)
+ (X,Y) : LineIndex.query(word) -> Delimit(_, ",", line) -> LineIndex(word, _)
 
 
 layer Border[TEXT]
 from Lines
    ID: line
    TEXT: text
+   FONT_SIZE: 4
    (X,Y):* CircularLayout(line) 
 
 
@@ -51,7 +52,7 @@ operator Freq (word) -> (freq)
            -> Div(count[_], _)
 
 
-operator LineIndex base Index[fields: "lines"]
+operator LineIndex base Mapping[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   (ALL) =>
@@ -82,7 +83,7 @@ facet query(Seq) -> (X,Y) {
     Seq = float(Seq) +1
 
     radius = sqrt(max)+ max/100 * 20
-    offset = (Seq/max)*360*0.01745   #to radians
+    offset = (((Seq/max)*360)-90)*0.01745   #to radians
 
     X = radius * cos(offset)
     Y = radius * sin(offset)

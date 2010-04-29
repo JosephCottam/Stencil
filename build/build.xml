@@ -160,6 +160,12 @@
            outputdirectory="${parser}/validators/"
            libdirectory="${parser}"
        />
+ 		
+        <antlr
+           target="${grammars}/validators/MapFoldBalance.g"
+           outputdirectory="${parser}/validators/"
+           libdirectory="${parser}"
+       />
  	</target>
 
  	<target name="TreeAdapterGrammar" depends="StencilGrammar">
