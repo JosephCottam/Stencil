@@ -67,7 +67,7 @@ operator Centroid (word) -> (X,Y)
             Select[field: 1](LAST) -> Average[range: LAST](*)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
-operator Layout base CircularLayout[start: 0, size: 10]
+operator Layout base CircularLayout[start: 0, size: 10, ratio: .75]
 operator Contract (X,Y) -> (X,Y)
  (ALL) =>  X : Mult(X, .06) -[shift]> Mult(X, .88) -> Add(shift[_],_)
            Y : Mult(Y, .06) -[shift]> Mult(Y, .88) -> Add(shift[_],_)
