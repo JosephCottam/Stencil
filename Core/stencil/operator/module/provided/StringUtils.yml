@@ -16,7 +16,9 @@ operators:
   - name: Print
   - name: Replace
   - name: Substring
+  - name: ToLower
   - name: ToString
+  - name: ToUpper
   - name: Trim
   - name: Split
   - name: Strip

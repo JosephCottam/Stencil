@@ -95,7 +95,6 @@ options {
             						name = files[i].substring(0, files[i].length() - 6);
             						String key = name.toUpperCase();
             						
-            						System.out.println(key);
             						if (key.startsWith("STENCIL")) {
             							key = key.substring("STENCIL".length());
             						}

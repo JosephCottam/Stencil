@@ -19,4 +19,8 @@ operators:
      facets:
       - {name: map, type: PROJECT, function: false, prototype: !proto "Start, End, Bucket"}
       - {name: query, type: PROJECT, function: false, prototype: !proto "Start, End, Bucket"}
-   
+   - name: StopWords
+     facets:
+      - {name: query, type: PROJECT, function: false, prototype: !proto "stopWord"}
+      - {name: map, target: query, type: PROJECT, function: false, prototype: !proto "stopWord"}
+      

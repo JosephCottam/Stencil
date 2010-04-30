@@ -13,15 +13,23 @@ from RawLines
    line: Counter()
    words: text
 
-/**TODO: Filter this output for stopwords before doing centroid stuff.*/
-stream Words (line, word)
+stream RawWords (line, word)
 from Lines
    line: line
-   word: Split(text, "\\s+") >> Strip(_)   /*Strip removes all non-letters from word front\rear*/
+   word: Split(text, "\\s+") >> Strip(_) -> ToLower(_)
    
-stream PrimeCentroid ()
+stream Words (line, word)
+from RawWords
+   filter(stopWord !~ "true", word !~ "")
+   prefilter(stopWord) : StopWords(word)
+   line: line
+   word: word
+
+stream PrimeCenter ()
 from Words
  () : LineIndex.query(word) -> Extend(_, line) -> LineIndex.put(word, _)
+ () : WordCount(word)
+
 
 operator Extend (current, more) -> (full) 
   (current = NULL) => full : more 
@@ -33,27 +41,18 @@ from Lines
    TEXT: text
    (X,Y):* Layout(line) 
 
+
 layer Center[TEXT]
 from Words
    ID: word
    TEXT: word
-   (X,Y):* Centroid(word)
-   FONT_COLOR:* FreqColor(word)
-   FONT_SIZE:* FreqSize(word)
-   
+   (X,Y):* Centroid(word) -> Contract(X,Y) 
+   (FONT_COLOR, FONT_SIZE):* 
+        WordCount.query(word) -[count]> Max[range: ALL](_) -> Divide(count[_], _) -[freq]> 
+				HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) -[color]>
+				Scale[min: 50, max:1000](freq[_]) -> (color[_],_)
 
-operator FreqColor(word) -> (C)
-  (ALL) => C: Freq(word) 
-             -> HeatScale[cold: "Gray10", hot: "Gray90"](freq)
-
-operator FreqSize(word) -> (size)
-  (ALL) => size: Freq(word) 
-             -> Scale[min: 0, max: 20](freq)
-
-operator Freq (word) -> (freq)
-  (ALL) => freq: Count(word) -[count]> Max[range: ALL](_) 
-           -> Div(count[_], _)
-
+operator WordCount base Count
 
 operator LineIndex base Mapping[fields: "lines"]
 
@@ -69,3 +68,6 @@ operator Centroid (word) -> (X,Y)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout base CircularLayout[start: 0, size: 10]
+operator Contract (X,Y) -> (X,Y)
+ (ALL) =>  X : Mult(X, .06) -[shift]> Mult(X, .88) -> Add(shift[_],_)
+           Y : Mult(Y, .06) -[shift]> Mult(Y, .88) -> Add(shift[_],_)

@@ -68,6 +68,8 @@ public class StringUtils extends BasicModule {
 		return value.split(pattern);
 	}
 
+	public static String toUpper(String s) {return s.toUpperCase();}
+	public static String toLower(String s) {return s.toLowerCase();}	
 	
 	//TODO: Add range support to concatenate
 	public static String concatenate(Object... os) {

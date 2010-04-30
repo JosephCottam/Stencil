@@ -78,17 +78,8 @@ public class Projection extends BasicModule {
 		 * If the key passed cannot be parsed as number and 'throwExceptions' is set to false, black is returned.
 		 * If the key passed cannot be parsed and 'throwExceptions' is set to true, an exception is thrown.
 		 */
-		public Color map(Object key) {
-			float d;
-			float p =-1;
-			
-			try {
-				d = Float.parseFloat(key.toString());
-			} catch (Exception e) {
-				if (throwExceptions) {throw new RuntimeException("Could not parse value for heat scale:" + key.toString(), e);}
-				else {return new Color(0,0,0);}			
-			} 
-
+		public Color map(float d) {
+			float p =-1;			
 				
 			try {
 				if (d>max || Double.isNaN(max)) {max = d;}
@@ -96,7 +87,6 @@ public class Projection extends BasicModule {
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
 				return averageColors(p);
-//				t = BasicTuple.singleton(new Color(1.0f,p,p));
 			} catch (Exception e) {
 				if (throwExceptions) {throw new RuntimeException("Error creating colors with range point:" + p, e);}
 				return new Color(0,0,0);
@@ -131,11 +121,10 @@ public class Projection extends BasicModule {
 		/**Returns a color value if the first key object is between the current max and min.
 		 * Otherwise it returns null.
 		 */
-		public Color query(Object key) {
-			float d = Float.parseFloat(key.toString());
-			
-			if (d >= min && d<= max) {return map(key);}
-			else {return null;}
+		public Color query(float d) {
+		         if (d < min) {return cold;}
+			else if (d > max) {return hot;}
+			else              {return map(d);} //value is in the range of requested values 
 		}
 
 		public String getName() {return NAME;}
