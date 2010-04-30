@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g 2010-04-29 20:21:31
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g 2010-04-30 14:28:52
 
 	package stencil.parser.tree;
 
@@ -64,7 +64,7 @@ public class StencilTreeAdapterParser extends Parser {
     }
 
     public String[] getTokenNames() { return StencilTreeAdapterParser.tokenNames; }
-    public String getGrammarFileName() { return "/Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g"; }
+    public String getGrammarFileName() { return "/Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g"; }
 
 
        	private static abstract class Util {
@@ -154,7 +154,7 @@ public class StencilTreeAdapterParser extends Parser {
     };
 
     // $ANTLR start "entries"
-    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:1: entries : (e+= entry )+ -> adapter(clauses=$e);
+    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:1: entries : (e+= entry )+ -> adapter(clauses=$e);
     public final StencilTreeAdapterParser.entries_return entries() throws RecognitionException {
         StencilTreeAdapterParser.entries_return retval = new StencilTreeAdapterParser.entries_return();
         retval.start = input.LT(1);
@@ -162,10 +162,10 @@ public class StencilTreeAdapterParser extends Parser {
         List list_e=null;
         RuleReturnScope e = null;
         try {
-            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:8: ( (e+= entry )+ -> adapter(clauses=$e))
-            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:10: (e+= entry )+
+            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:8: ( (e+= entry )+ -> adapter(clauses=$e))
+            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:10: (e+= entry )+
             {
-            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:11: (e+= entry )+
+            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:11: (e+= entry )+
             int cnt1=0;
             loop1:
             do {
@@ -179,7 +179,7 @@ public class StencilTreeAdapterParser extends Parser {
 
                 switch (alt1) {
             	case 1 :
-            	    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:11: e+= entry
+            	    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:126:11: e+= entry
             	    {
             	    pushFollow(FOLLOW_entry_in_entries48);
             	    e=entry();
@@ -234,7 +234,7 @@ public class StencilTreeAdapterParser extends Parser {
     };
 
     // $ANTLR start "entry"
-    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:1: entry : (i= ID EQ v= INT -> {Util.inError($i.text)}? errorEntry(token=$i.textval=$v.text) -> {Util.inDefaults($i.text)}? defaultEntry(token=$i.text) -> entry(token=$i.textval=$v.textclass=Util.lookupClass($i.text)) | ID_IGNORE EQ INT );
+    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:1: entry : (i= ID EQ v= INT -> {Util.inError($i.text)}? errorEntry(token=$i.textval=$v.text) -> {Util.inDefaults($i.text)}? defaultEntry(token=$i.text) -> entry(token=$i.textval=$v.textclass=Util.lookupClass($i.text)) | ID_IGNORE EQ INT );
     public final StencilTreeAdapterParser.entry_return entry() throws RecognitionException {
         StencilTreeAdapterParser.entry_return retval = new StencilTreeAdapterParser.entry_return();
         retval.start = input.LT(1);
@@ -243,7 +243,7 @@ public class StencilTreeAdapterParser extends Parser {
         Token v=null;
 
         try {
-            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:7: (i= ID EQ v= INT -> {Util.inError($i.text)}? errorEntry(token=$i.textval=$v.text) -> {Util.inDefaults($i.text)}? defaultEntry(token=$i.text) -> entry(token=$i.textval=$v.textclass=Util.lookupClass($i.text)) | ID_IGNORE EQ INT )
+            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:7: (i= ID EQ v= INT -> {Util.inError($i.text)}? errorEntry(token=$i.textval=$v.text) -> {Util.inDefaults($i.text)}? defaultEntry(token=$i.text) -> entry(token=$i.textval=$v.textclass=Util.lookupClass($i.text)) | ID_IGNORE EQ INT )
             int alt2=2;
             int LA2_0 = input.LA(1);
 
@@ -261,7 +261,7 @@ public class StencilTreeAdapterParser extends Parser {
             }
             switch (alt2) {
                 case 1 :
-                    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:9: i= ID EQ v= INT
+                    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:127:9: i= ID EQ v= INT
                     {
                     i=(Token)match(input,ID,FOLLOW_ID_in_entry67); 
                     match(input,EQ,FOLLOW_EQ_in_entry69); 
@@ -289,7 +289,7 @@ public class StencilTreeAdapterParser extends Parser {
                     }
                     break;
                 case 2 :
-                    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:131:6: ID_IGNORE EQ INT
+                    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:131:6: ID_IGNORE EQ INT
                     {
                     match(input,ID_IGNORE,FOLLOW_ID_IGNORE_in_entry136); 
                     match(input,EQ,FOLLOW_EQ_in_entry138); 

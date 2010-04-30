@@ -1,0 +1,17 @@
+name: CircularLayout
+targetClass: stencil.operator.module.provided.Layout
+description: Layouts groups of nodes
+defaults: 
+  defaultSpecializer: !spec "[range: ALL, split: 0]"
+  facets: 
+    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
+    
+operators:
+  - name: CircularLayout
+    defaultSpecializer: !spec "[range: ALL, split: 0, pad: 1, start: 0, r: -1, count: -1]"
+    facets:
+    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
+    - {name: configure, type: OTHER, function: TRUE, prototype: !proto "angle, count, pad, r"}    
+  

@@ -2,7 +2,7 @@ STREAM: File
 NAME: RawLines
 HEADER: text
 SEPARATOR: $^
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
@@ -31,8 +31,7 @@ layer Border[TEXT]
 from Lines
    ID: line
    TEXT: text
-   FONT_SIZE: 4
-   (X,Y):* CircularLayout(line) 
+   (X,Y):* Layout(line) 
 
 layer Center[TEXT]
 from Words
@@ -62,36 +61,11 @@ operator LineIndex base Mapping[fields: "lines"]
 operator Centroid (word) -> (X,Y)
   (ALL) =>
     (X): LineIndex(word) -> Split(_, ",") 
-            >> CircularLayout.query(_) >-
+            >> Layout.query(_) >-
             Select[field: 0](LAST) -> Average[range: LAST](*)
     (Y): LineIndex(word) -> Split(_, ",") 
-            >> CircularLayout.query(_) >-
+            >> Layout.query(_) >-
             Select[field: 1](LAST) -> Average[range: LAST](*)
-            
-            
-/*TODO: Add a circular layout to the libary.*/
-/*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/
-python CircularLayout
-facet init {
-    from math import *
-    max =0
-}
-facet map(Seq) -> (X,Y) {
-    Seq = float(Seq) +1
-    if (Seq > max): max=Seq
 
-    radius = sqrt(max)+ max/100 * 20
-    offset = (Seq/max)*360*0.01745   #to radians
-
-    X = radius * cos(offset)
-    Y = radius * sin(offset)
-}
-facet query(Seq) -> (X,Y) {
-    Seq = float(Seq) +1
-
-    radius = sqrt(max)+ max/100 * 20
-    offset = (((Seq/max)*360)-90)*0.01745   #to radians
-
-    X = radius * cos(offset)
-    Y = radius * sin(offset)
-}
+/*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
+operator Layout base CircularLayout[start: 0, size: 10]
