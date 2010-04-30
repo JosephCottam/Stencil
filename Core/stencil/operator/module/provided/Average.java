@@ -136,6 +136,64 @@ public class Average extends BasicModule {
 	}
 
 
+	/**Takes a mean over exactly what is passed, keeps no memory*/
+	public static class SimpleMean extends BasicProject {
+		public SimpleMean(OperatorData opData) {super(opData);}
+		public double query(double...values) {
+			double sum =0;
+			for (double value: values) {sum += value;}
+			return sum/values.length;
+		}
+		
+		public double map(double... values) {return query(values);}
+		public SimpleMean duplicate() {return this;}
+	}
+	
+	public static class SimpleMode extends BasicProject {
+		public SimpleMode(OperatorData opData) {super(opData);}
+		public Object query(Object... values) {
+			HashMap<Object, Integer> m = new HashMap();
+			for (Object value: values) {
+				if (!m.containsKey(value)) {m.put(value,0);}
+				m.put(value, m.get(value)+1);
+			}
+			
+			int max = Integer.MIN_VALUE;
+			Object result = null;
+			for (Object key: m.keySet()) {
+				if (m.get(key) > max) {
+					max = m.get(key);
+					result = key;
+				}
+			}
+			
+			return result; 
+		}
+		
+		public Object map(Object... values) {return query(values);}
+		public SimpleMode duplicate() {return this;}
+	}
+	
+	
+	public static class SimpleMedian extends BasicProject {
+		public SimpleMedian(OperatorData opData) {super(opData);}
+		public Object query(Object... values) {
+			java.util.Arrays.sort(values);
+			int idx = (int) Math.floor(values.length/2);
+
+			//If an incomplete median can averaged...do so
+			if (values.length%2 != 0 
+					&& values[idx] instanceof Number && values[idx+1] instanceof Number) {
+				return (((Number) values[idx]).doubleValue() + ((Number)values[idx+1]).doubleValue())/2;
+			}
+			
+			return values[idx];
+		}
+		
+		public Object map(Object... values) {return query(values);}
+		public SimpleMedian duplicate() {return this;}
+	}
+	
 	/**Returns the median value of a range.  The median is defined
 	 * as either the middle-most value (when there are an odd number of elements
 	 * in the range) or he mean of the two middle-most values.  Median is computed
@@ -214,10 +272,7 @@ public class Average extends BasicModule {
 	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-		//Accept greater-than-zero ranges and no additional arguments (split is allowed).
-		if (new Range(specializer.get(Specializer.RANGE)).isSimple()) {
-			throw new SpecializationException(moduleData.getName(), name, specializer);
-		}
+		specializer.isBasic();
 	}
 
 
@@ -234,13 +289,17 @@ public class Average extends BasicModule {
 			if (name.equals("Average") || name.equals("Mean")) {
 				if (range.isFullRange()) {
 					target =  new FullMean(opData, specializer);
+				} else if (range.isSimple()) {
+					target = new SimpleMean(opData);
 				} else {
 					target = RangeHelper.makeOperator(range, new RangeMean(opData), RANGE_FACET);
 				}
 			} else if (name.equals(Median.NAME)) {
-				target = RangeHelper.makeOperator(range, new Median(opData), RANGE_FACET);
+				if (range.isSimple()) {target = new SimpleMedian(opData);}
+				else  {target = RangeHelper.makeOperator(range, new Median(opData), RANGE_FACET);}
 			} else if (name.equals(Mode.NAME)) {
-				target = RangeHelper.makeOperator(range, new Mode(opData), RANGE_FACET);
+				if (range.isSimple()) {target = new SimpleMode(opData);}
+				else {target = RangeHelper.makeOperator(range, new Mode(opData), RANGE_FACET);}
 			}else {
 				throw new IllegalArgumentException("Method name not found in package: " + name);
 			}

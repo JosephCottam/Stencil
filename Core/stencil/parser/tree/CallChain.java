@@ -34,7 +34,6 @@ import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.MapMergeTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleAppender;
 import stencil.types.Converter;
 
 /**A call chain is a linear group of calls, ending in a pack.
@@ -106,17 +105,12 @@ public class CallChain extends StencilTree {
 					envs = newEnvs;
 					break;
 				case StencilParser.FOLD :
-					//Construct a single tuple from the mass of envs
-					final Tuple[] tops = new Tuple[envs.length];
-					for (int i=0; i< tops.length; i++) {
-						tops[i] = envs[i].get(envs[i].size()-1);
-					}
-					Tuple folded = TupleAppender.append(tops);
+					Tuple folded = new MapMergeTuple(results);
 					envs = new Environment[]{envs[0]};
 					envs[0].extend(folded);
 					break;
 			}
-			target = ((Function) target).getCall();			
+			target = ((Function) target).getCall();
 		}
 
 		Tuple[] results = new Tuple[envs.length];

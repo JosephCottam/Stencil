@@ -4,6 +4,8 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
+import stencil.types.Converter;
 
 /**Unpack a tuple reference.*/
 public final class TupleRef extends Value {
@@ -72,6 +74,10 @@ public final class TupleRef extends Value {
 			return source.get(val);
 		} else if (ref.isName()) {
 			return source.get(((Id) ref).getName());
+		} else if (ref.isLast()) {
+			return Converter.toTuple(source.get(source.size()-1));
+		} else if (ref.isAll()) {
+			return Tuples.toArray(Converter.toTuple(source.get(source.size()-1)));
 		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}

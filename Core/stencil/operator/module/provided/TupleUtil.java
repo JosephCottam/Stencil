@@ -84,7 +84,7 @@ public class TupleUtil extends BasicModule {
 			Object[] values = new Object[t.size()];
 			for (int i=0; i< t.size() ;i++) {
 				if (t.get(i) instanceof Tuple) {
-					values[i] = ((Tuple) t.get(i)).get(field);
+					values[i] = Converter.toTuple(t.get(i)).get(field);
 				}
 			}
 			return values;

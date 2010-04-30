@@ -79,11 +79,24 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				validateTypes(arguments, paramTypes, 0, args.length-1, args);
 
 				//Prepare variable argument for last position of arguments array
-				Class type = paramTypes[paramTypes.length-1].getComponentType();
-				Object varArgs = Array.newInstance(type, (arguments.length-expectedNumArgs)+1);
-				for (int i=0; i< Array.getLength(varArgs); i++) {
-					Array.set(varArgs, i, Converter.convert(arguments[args.length +i-1], type));
-				}				
+				
+				
+				Object varArgs;
+				if (arguments[0] != null && arguments[0].getClass().isArray()) {
+					Class type = paramTypes[paramTypes.length-1];
+					 //Interesting case:  arguments contains a pre-packed var-args array
+					if (arguments[0].getClass().isAssignableFrom(type)) {
+						varArgs = type.cast(arguments[0]);
+					} else {
+						varArgs = validateType(arguments[0], type.getComponentType());
+					}
+					
+				} else {
+					Class type = paramTypes[paramTypes.length-1].getComponentType();
+					Object[] remainingArguments = new Object[arguments.length-expectedNumArgs+1];
+					System.arraycopy(arguments, expectedNumArgs-1, remainingArguments, 0, remainingArguments.length);
+					varArgs = validateType(remainingArguments, type);
+				}
 				args[args.length-1] = varArgs;
 			} else {
 				if (arguments.length != expectedNumArgs) {
@@ -118,4 +131,21 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			Array.set(result, i, Converter.convert(arguments[i], types[i]));
 		}
 	}
+
+	/**Copes values from an arguments array to the result array, converting them per the type along the way.
+	 * Each argument in arguments will be converted to the type given; the return result will
+	 * have be an array of the type passed as well.
+	 * 
+	 * @param arguments  An array object of the arguments to convert
+	 * @param type The type to convert into
+	 */
+	private Object validateType(Object arguments, Class type) {
+		Object varArgs = Array.newInstance(type, Array.getLength(arguments));
+		for (int i=0; i< Array.getLength(varArgs); i++) {
+			Array.set(varArgs, i, Converter.convert(Array.get(arguments, i), type));
+		}
+		return varArgs;
+	}
+	
+
 }

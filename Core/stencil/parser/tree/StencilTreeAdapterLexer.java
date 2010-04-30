@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g 2010-04-29 18:00:40
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g 2010-04-29 20:21:32
 package stencil.parser.tree;
 
 import org.antlr.runtime.*;
@@ -26,17 +26,17 @@ public class StencilTreeAdapterLexer extends Lexer {
         super(input,state);
 
     }
-    public String getGrammarFileName() { return "/Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g"; }
+    public String getGrammarFileName() { return "/Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g"; }
 
     // $ANTLR start "ID"
     public final void mID() throws RecognitionException {
         try {
             int _type = ID;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+ )
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:3: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+ )
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+
             {
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:136:5: ( 'a' .. 'z' | 'A' .. 'Z' | '_' )+
             int cnt1=0;
             loop1:
             do {
@@ -50,7 +50,7 @@ public class StencilTreeAdapterLexer extends Lexer {
 
                 switch (alt1) {
             	case 1 :
-            	    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:
+            	    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:
             	    {
             	    if ( (input.LA(1)>='A' && input.LA(1)<='Z')||input.LA(1)=='_'||(input.LA(1)>='a' && input.LA(1)<='z') ) {
             	        input.consume();
@@ -90,10 +90,10 @@ public class StencilTreeAdapterLexer extends Lexer {
         try {
             int _type = INT;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:4: ( ( '0' .. '9' )+ )
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: ( '0' .. '9' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:4: ( ( '0' .. '9' )+ )
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: ( '0' .. '9' )+
             {
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: ( '0' .. '9' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: ( '0' .. '9' )+
             int cnt2=0;
             loop2:
             do {
@@ -107,7 +107,7 @@ public class StencilTreeAdapterLexer extends Lexer {
 
                 switch (alt2) {
             	case 1 :
-            	    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: '0' .. '9'
+            	    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:137:6: '0' .. '9'
             	    {
             	    matchRange('0','9'); 
 
@@ -139,8 +139,8 @@ public class StencilTreeAdapterLexer extends Lexer {
         try {
             int _type = EQ;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:138:3: ( '=' )
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:138:5: '='
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:138:3: ( '=' )
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:138:5: '='
             {
             match('='); 
 
@@ -159,7 +159,7 @@ public class StencilTreeAdapterLexer extends Lexer {
         try {
             int _type = ID_IGNORE;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:2: ( '\\'' ( . )* '\\'' | ID INT )
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:2: ( '\\'' ( . )* '\\'' | ID INT )
             int alt4=2;
             int LA4_0 = input.LA(1);
 
@@ -177,10 +177,10 @@ public class StencilTreeAdapterLexer extends Lexer {
             }
             switch (alt4) {
                 case 1 :
-                    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:4: '\\'' ( . )* '\\''
+                    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:4: '\\'' ( . )* '\\''
                     {
                     match('\''); 
-                    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:9: ( . )*
+                    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:9: ( . )*
                     loop3:
                     do {
                         int alt3=2;
@@ -196,7 +196,7 @@ public class StencilTreeAdapterLexer extends Lexer {
 
                         switch (alt3) {
                     	case 1 :
-                    	    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:9: .
+                    	    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:143:9: .
                     	    {
                     	    matchAny(); 
 
@@ -213,7 +213,7 @@ public class StencilTreeAdapterLexer extends Lexer {
                     }
                     break;
                 case 2 :
-                    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:144:4: ID INT
+                    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:144:4: ID INT
                     {
                     mID(); 
                     mINT(); 
@@ -235,10 +235,10 @@ public class StencilTreeAdapterLexer extends Lexer {
         try {
             int _type = WS;
             int _channel = DEFAULT_TOKEN_CHANNEL;
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:4: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+ )
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:4: ( ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+ )
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+
             {
-            // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+
+            // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:145:6: ( ' ' | '\\r' | '\\t' | '\\u000C' | '\\n' )+
             int cnt5=0;
             loop5:
             do {
@@ -252,7 +252,7 @@ public class StencilTreeAdapterLexer extends Lexer {
 
                 switch (alt5) {
             	case 1 :
-            	    // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:
+            	    // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:
             	    {
             	    if ( (input.LA(1)>='\t' && input.LA(1)<='\n')||(input.LA(1)>='\f' && input.LA(1)<='\r')||input.LA(1)==' ' ) {
             	        input.consume();
@@ -289,40 +289,40 @@ public class StencilTreeAdapterLexer extends Lexer {
     // $ANTLR end "WS"
 
     public void mTokens() throws RecognitionException {
-        // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:8: ( ID | INT | EQ | ID_IGNORE | WS )
+        // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:8: ( ID | INT | EQ | ID_IGNORE | WS )
         int alt6=5;
         alt6 = dfa6.predict(input);
         switch (alt6) {
             case 1 :
-                // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:10: ID
+                // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:10: ID
                 {
                 mID(); 
 
                 }
                 break;
             case 2 :
-                // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:13: INT
+                // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:13: INT
                 {
                 mINT(); 
 
                 }
                 break;
             case 3 :
-                // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:17: EQ
+                // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:17: EQ
                 {
                 mEQ(); 
 
                 }
                 break;
             case 4 :
-                // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:20: ID_IGNORE
+                // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:20: ID_IGNORE
                 {
                 mID_IGNORE(); 
 
                 }
                 break;
             case 5 :
-                // /Volumes/scratch/jcottam/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:30: WS
+                // /Users/jcottam/Documents/workspace/Stencil/Stencil/Core/stencil/parser/grammars/StencilTreeAdapter.g:1:30: WS
                 {
                 mWS(); 
 

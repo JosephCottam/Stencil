@@ -32,7 +32,7 @@ package stencil.tuple;
 import java.util.*;
 import stencil.tuple.prototype.TuplePrototypes;
 
-/**Utility methods for working with tuples.*/
+/**Utility methods for appending groups of tupless.*/
 //final because it is a collection of utility methods and is not to be instantiated or overridden
 public final class TupleAppender {
 	private TupleAppender() {/*Utility class. Not instantiable.*/}

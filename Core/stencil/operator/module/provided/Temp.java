@@ -306,7 +306,7 @@ public class Temp extends BasicModule {
 			}
 			if (noneSet) {defaultValues = null;}
 			
-			boolean caseSensitive = !specializer.getMap().containsKey("case");
+			boolean caseSensitive = !specializer.getMap().containsKey("CaseInsensitive");
 			
 			Mapping m = new Mapping(getOperatorData(opData, specializer), caseSensitive, defaultValues, names);
 			
