@@ -2,7 +2,14 @@
     "-lib ./Library/antlr3-ant.jar" /-->
     
  <project name="Release" default="Release">
- 	<target name="Release">
+ 	<target name="CleanUpTests">
+ 		<delete>
+ 		   <fileset dir="." includes="**/TEST_*"/>
+ 		</delete>
+ 	</target>
+ 	
+ 	
+ 	<target name="Release" depends="CleanUpTests">
  		<property name="release" location="./release"/>
  		<property name="JarFile" value="Stencil.jar"/>
  		<tstamp><format property="today" pattern="ddMMMyyy"/></tstamp>

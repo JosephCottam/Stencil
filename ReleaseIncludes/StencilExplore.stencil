@@ -1,56 +1,40 @@
 STREAM: File
+NAME: VertexList
+HEADER: ID1,ID2
+SEPARATOR: ,
+SOURCE: ./ws_400_12_0.1.adj
+SKIP: 1
+STRICT: true
+STREAM: File
 NAME: BFS
 HEADER: ID
-SEPARATOR: \s+
-SOURCE: ./er_100_0.005.bfs
-CHECKHEADER: true
-STREAM: File
-NAME: VertexList
-HEADER: ID1, ID2
 SEPARATOR: ,
-SOURCE: ./er_100_0.005.adj
-CHECKHEADER: true
+SOURCE: ./ws_400_12_0.1.bfs
+SKIP: 1
+STRICT: true
 
-external stream BFS (ID) 
-external stream VertexList (ID1, ID2)
+stream VertexList(ID1, ID2)
+stream BFS(ID)
 
-order BFS > VertexList			/*Load the node list before the vertex list.*/
+order BFS > VertexList
 
-layer Nodes
-from BFS 
-	ID: ID
-	REGISTRATION : "CENTER"
-	(SHAPE, FILL_COLOR, SIZE) : ("ELLIPSE", @Color(BLUE), 10)
-	(X,Y) : Ordering(ID) -> Squarify(VALUE) -> (X,Y)
-	 
-
-layer Labels[TEXT]				/*Changes the glyph type. All layers have only one glyph type.*/
+layer VSM
+default
+    FILL_COLOR: @Color{RED}
+    (SIZE, SHAPE) : (1, "RECTANGLE")
+from VertexList
+   ID : Concatenate(ID1, ID2) 
+   X : Ordering(ID1)
+   Y : Ordering(ID2) -> Mult(_, -1)
+from VertexList
+   ID : Concatenate(ID2, ID1) 
+   X : Ordering(ID2) 
+   Y : Ordering(ID1) -> Mult(_, -1)
+ 
+layer Prime
 from BFS
-	ID : ID
-	(X,Y): Nodes.Find(ID) -> (X,Y)
-	(TEXT, FONT_SIZE, FONT_COLOR): (ID, 10, @Color(GRAY60))
+    () : Ordering(ID) -> ()
 
+operator Ordering (ID) -> (VALUE)
+    (ALL) => VALUE : Index(ID) -> VALUE
 
-layer Edges[LINE]
-from VertexList 
-	ID: Concatenate(ID1,ID2) -> (VALUE)
-	(X.1, Y.1): Nodes.Find(ID1) -> (X,Y)
-	(X.2, Y.2): Nodes.Find(ID2) ->  (X,Y)
-	STROKE_COLOR: @Color(0.3,0.3,0.3,0.8)
-
-
-operator Ordering (ID)->(VALUE)  
-	(all) => VALUE : Index(ID) -> (VALUE)
-
-python Squarify
-facet Init {
-	from math import sqrt
-	from math import ceil
-}
-
-facet Map (Seq) -> (X,Y) {
-	seq = int(Seq)+1
-	base = int(ceil(sqrt(seq)))
-	X = (seq/base) * 10 *base
-	Y = (seq%base) * 10 *base
-}

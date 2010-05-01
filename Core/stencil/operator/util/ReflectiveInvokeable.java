@@ -82,7 +82,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				
 				
 				Object varArgs;
-				if (arguments[0] != null && arguments[0].getClass().isArray()) {
+				if (arguments.length > 0 && arguments[0] != null && arguments[0].getClass().isArray()) {
 					Class type = paramTypes[paramTypes.length-1];
 					 //Interesting case:  arguments contains a pre-packed var-args array
 					if (arguments[0].getClass().isAssignableFrom(type)) {
