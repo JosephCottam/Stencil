@@ -8,16 +8,15 @@ import stencil.interpreter.NeedsGuides;
 import stencil.interpreter.UpdateGuides;
 import stencil.parser.tree.Program;
 
-public class GuideUpdater implements Runnable, Stopable {
-	private boolean run = true;
-	
+//TODO: Split this up so it is a task per-guide requested (they are independent, so they can be parallelized)
+public class GuideTask implements UpdateTask {	
 	private final NeedsGuides needsGuides;
 	private final UpdateGuides updateGuides;
 	
 	private final Program program;
 	private final StencilPanel panel;
 	
-	public GuideUpdater(Program program, StencilPanel panel) {
+	public GuideTask(Program program, StencilPanel panel) {
 		this.program=program;
 		this.panel = panel;
 		
@@ -35,29 +34,16 @@ public class GuideUpdater implements Runnable, Stopable {
 		updateGuides = ug;
 	}
 	
-	public void run() {
-		if (!required()) {return;}
-		
-		while (run) {
-			runOnce();
-			panel.repaint();
-		}
-	}
-	
-	public synchronized void runOnce() {
-		//Refresh the guides (if required)!
-		//TODO: Is there a faster way to check needsGuides?--> Collect all guide chain operators in the constructor and just check them instead of a tree traversal every time?
-		//TODO: Change over to while (need to make sure that nothing else is computing when that is done though...)
-		if (needsGuides != null && needsGuides.check(program)) {
-			updateGuides.updateGuides(panel);
-		}	
-	}
-		
-	public void signalStop() {run = false;}
-	
 	/**Is this updater required for the program it was passed?
 	 * Returns false if there were no guides specified in the program.
 	 * @return
 	 */
 	public boolean required() {return  needsGuides != null;}
+
+	public void conservativeUpdate() {if (needsUpdate()) {update();}}
+
+	//TODO: Is there a faster way to check needsGuides?--> Collect all guide chain operators in the constructor and just check them instead of a tree traversal every time?
+	public boolean needsUpdate() {return needsGuides != null && needsGuides.check(program);}
+
+	public void update() {updateGuides.updateGuides(panel);}
 }

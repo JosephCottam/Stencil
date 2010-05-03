@@ -7,14 +7,18 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.StencilPanel;
+import stencil.parser.tree.Rule;
+import stencil.tuple.Tuple;
 
-public final class Painter implements Runnable, Stopable, LayerUpdateListener {
+public final class Painter implements Runnable, LayerUpdateListener {
 	public static final RenderingHints HIGH_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	public static final RenderingHints  LOW_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	
@@ -27,7 +31,10 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	
 	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final BufferedImage[] buffers = new BufferedImage[2];
-	private int nextBuffer =0;
+	private int nextBuffer =0; 
+	
+	private final Map<Object, UpdateTask> updaters = new HashMap();
+
 	
 	//Cached transform, used to detect if a zoom/pan has occurred since the last render
 	private AffineTransform priorInverseTransform= new AffineTransform();
@@ -52,7 +59,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 			
 			if (resized() || transformed(inverse)
 				|| (updateBounds != null && updateBounds.intersects(inverse.createTransformedShape(target.getBounds()).getBounds()))) 
-			{	
+			{
 				BufferedImage i = selfBuffer();
 				target.setBackBuffer(i);
 				target.repaint();
@@ -60,7 +67,8 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 			Thread.yield(); 
 		}
 	}
-	
+
+
 	/**Render glyphs immediately onto the passed graphics object.
 	 * @param g Graphics object to render on
 	 * @param clipBounds Device-space size of the rendering area
@@ -94,6 +102,8 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	private final boolean transformed(AffineTransform updateCandidate) {return !priorInverseTransform.equals(updateCandidate);}
 	
 	private BufferedImage selfBuffer() {
+		doUpdates();
+		
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = target.getBounds();
 		AffineTransform priorTransform = target.getViewTransform();
@@ -114,8 +124,7 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 		try {
 			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
 			g.setPaint(target.getBackground());
-			Rectangle bounds = new Rectangle(0,0, size.width, size.height);
-			g.fill(bounds);
+			g.clearRect(0,0, size.width, size.height);
 
 			g.setTransform(priorTransform);
 			doDrawing(g);
@@ -148,4 +157,33 @@ public final class Painter implements Runnable, Stopable, LayerUpdateListener {
 	
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 	public void layerUpdated(Rectangle update) {layerUpdates.update(update);}
+	
+	public void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
+		DynamicUpdateTask updateTask;
+		if (updaters.containsKey(rule)) {
+			updateTask = (DynamicUpdateTask) updaters.get(rule);
+		} else {
+			DisplayLayer layer= null;
+			String ruleLayerName=rule.getGroup().getContext().getName();
+			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
+			assert layer != null : "Table null after name-based search.";
+			updateTask = new DynamicUpdateTask(layer, rule);
+			updaters.put(rule, updateTask);
+		}
+		updateTask.addUpdate(source, glyph);
+	}
+	
+	
+	public void addUpdaterTask(UpdateTask task) {updaters.put(task, task);}
+	
+	/**Run all update tasks.
+	 * 
+	 * To get a fully updated drawing, this should be run before drawing
+	 * and no new tuples inserted between the two.
+	 * 
+ 	 * TODO: Some update tasks (dynamic rules in particular) may need to be given a chance to quiesce, not just be run once....
+	 * */
+	public void doUpdates() {
+		for (UpdateTask updater: updaters.values()) {updater.conservativeUpdate();} 
+	}
 }

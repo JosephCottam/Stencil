@@ -11,8 +11,7 @@ import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.tuple.Tuple;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
-final class DynamicUpdateTask implements Runnable, Stopable {
-	private boolean run =true;
+public final class DynamicUpdateTask implements UpdateTask {
 	private final Rule rule;
 	private final DisplayLayer<Glyph2D> table;
 	private final Map<String, Tuple> sourceData = new ConcurrentHashMap();
@@ -21,18 +20,18 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 		this.table = table;
 		this.rule = rule;
 	}
-	
-	public void run() {
-		while(run) {
-			runOnce();
-			Thread.yield();
-		}
+		
+	public void addUpdate(Tuple sourceData, Glyph2D target) {
+		this.sourceData.put(target.getID(), sourceData);
 	}
 	
-	public void runOnce() {updateAll();}
-			
-	private void updateAll() {	
-		//TODO: Query to see if this rule needs to be run (has something in the rule changed its state?)
+
+	public void conservativeUpdate() {if (needsUpdate()) {update();}}
+
+	//TODO: Query to see if this rule needs to be run (has something in the rule changed its state?)
+	public boolean needsUpdate() {return true;}
+
+	public void update() {
 		//TODO: Add support for Local!
 		
 		//Update each element 
@@ -50,12 +49,6 @@ final class DynamicUpdateTask implements Runnable, Stopable {
 				ex.printStackTrace();
 			}
 			
-		}
-	}
-	
-	public void addUpdate(Tuple sourceData, Glyph2D target) {
-		this.sourceData.put(target.getID(), sourceData);
-	}
-	
-	public void signalStop() {run = false;}	
+		}		
+	}	
 }

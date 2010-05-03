@@ -51,7 +51,7 @@ public class StringUtils {
 		
 		for (File f:files) {
 			if (f.isHidden()) {continue;}
-			if (f.isDirectory()) {matchedFiles.addAll(allFiles(f.getCanonicalPath(), extension));}
+			if (f.isDirectory()) {matchedFiles.addAll(allFiles(f.getCanonicalPath(), extension)); continue;}
 			if (f.getName().startsWith("._")) {continue;}
 			matchedFiles.add(f.getCanonicalPath());
 		}

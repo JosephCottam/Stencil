@@ -29,8 +29,7 @@
 package stencil.adapters.java2D;
 
 import stencil.adapters.java2D.data.*;
-import stencil.adapters.java2D.util.DynamicUpdater;
-import stencil.adapters.java2D.util.GuideUpdater;
+import stencil.adapters.java2D.util.GuideTask;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Rule;
@@ -51,24 +50,11 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
-	private final DynamicUpdater dynamicUpdater = new DynamicUpdater();
-	private Thread dynamicUpdaterThread = new Thread(dynamicUpdater);
-	
-	private final GuideUpdater guideUpdater;
-	private final Thread guideUpdaterThread;
-	
 	public Panel(Program p) {
 		super(p, new Canvas(p.getCanvasDef(), p.getLayers()));
 		
-		 GuideUpdater updater = new GuideUpdater(p, this);
-		 if (updater.required()) {
-			 guideUpdater = updater;
-			 guideUpdaterThread = new Thread(guideUpdater);
-			 guideUpdaterThread.start();
-		 } else {
-			 guideUpdater = null;
-			 guideUpdaterThread = null;
-		 }
+		 GuideTask updater = new GuideTask(p, this);
+		 if (updater.required()) {canvas.painter.addUpdaterTask(updater);}
 	} 
 	
 	/**Listening to the panel is really listening to its canvas.
@@ -80,20 +66,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
-	@SuppressWarnings("deprecation")
-	public void dispose() {
-		dynamicUpdater.signalStop();
-		try {dynamicUpdaterThread.join(10000);}
-		catch (Exception e) {dynamicUpdaterThread.stop();}
-
-		if (guideUpdater !=null) {
-			guideUpdater.signalStop();
-			try {guideUpdaterThread.join(10000);}
-			catch (Exception e) {guideUpdaterThread.stop();}
-		}
-		
-		canvas.dispose();		
-	}
+	public void dispose() {canvas.dispose();}
 	
 	public void export(String filename, String type, Object info) throws Exception {
 		prepForExport();
@@ -109,13 +82,8 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	
 		
 	/**Prep for export by running the guides and dynamic rules.
-	 * 
-	 * TODO: Dynamic rules need to be given a chance to quiesce, not just be run once....
 	 * */
-	private void prepForExport() {
-		if (guideUpdater != null) {guideUpdater.runOnce();}
-		if (dynamicUpdater != null) {dynamicUpdater.runOnce();}
-	}
+	private void prepForExport() {canvas.painter.doUpdates();}
 	
 	
 	private void exportEPS(String filename, Rectangle bounds) throws Exception {
@@ -184,22 +152,8 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	}
 
 	
-	public void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
-		DisplayLayer layer= null;
-		for (DisplayLayer t: canvas.layers) {if (t.getName().equals(rule.getGroup().getContext().getName())) {layer = t; break;}}
-		assert layer != null : "Table null after name-based search.";
-		
-		dynamicUpdater.addDynamicUpdate(glyph, rule, source, layer);
-		
-		if (!dynamicUpdaterThread.isAlive()) {
-			try {dynamicUpdaterThread.start();}
-			catch (IllegalThreadStateException e) {
-				/*Ignored. Happens if an attempt is made to
-				 * start a thread after it has been started once.
-				 * Multi-threading loading can incur multiple starts, the subsequent ones are ignored.
-				 */				
-			}
-		}
+	public final void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
+		canvas.painter.addDynamic(glyph, rule, source);
 	}
 
 
@@ -223,5 +177,4 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 							bounds.width-(insets.left+insets.right),
 							bounds.height-(insets.top+insets.bottom));
 	}
-
 }
