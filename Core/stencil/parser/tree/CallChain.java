@@ -119,7 +119,8 @@ public class CallChain extends StencilTree {
 		}
 		
 		if (results.length >1) {return new MapMergeTuple(results);}
-		else {return results[0];}
+		else if (results.length ==1) {return results[0];}
+		else {return null;}
 	}
 
 }
