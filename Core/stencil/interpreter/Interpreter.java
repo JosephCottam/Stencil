@@ -207,7 +207,12 @@ public class Interpreter {
 			String id = Converter.toString(result.get(ParserConstants.GLYPH_ID_FIELD));
 			stencil.adapters.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
-			for (Rule rule: group.getResultRules()) {if (rule.isDynamic()) {panel.addDynamic(glyph, rule, source.getValues());}}
+			
+			for (Rule rule: group.getResultRules()) {
+				if (rule.isDynamic()) { 
+					panel.addDynamic(glyph, rule, source.getValues());
+				}
+			}
 			return true;
 		} catch (Exception e) {
 			throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);

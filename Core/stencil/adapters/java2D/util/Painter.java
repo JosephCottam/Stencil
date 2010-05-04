@@ -124,7 +124,7 @@ public final class Painter implements Runnable, LayerUpdateListener {
 		try {
 			g = (Graphics2D) buffer.getGraphics();	//Clear prior data off
 			g.setPaint(target.getBackground());
-			g.clearRect(0,0, size.width, size.height);
+			g.fillRect(0,0, size.width, size.height);
 
 			g.setTransform(priorTransform);
 			doDrawing(g);

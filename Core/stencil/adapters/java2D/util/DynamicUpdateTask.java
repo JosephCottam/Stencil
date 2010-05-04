@@ -18,7 +18,7 @@ public final class DynamicUpdateTask implements UpdateTask {
 	
 	public DynamicUpdateTask(DisplayLayer<Glyph2D> table, Rule rule) {
 		this.table = table;
-		this.rule = rule;
+		this.rule = stencil.interpreter.DynamicRule.toDynamic(rule);  //TODO: Remove when dynamic rules are created in the compiler
 	}
 		
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
