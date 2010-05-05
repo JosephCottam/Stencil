@@ -44,14 +44,16 @@ options {
 }
 
 @members {
+   private StencilTree siftRules(List<Rule> rules, int type) {return siftRules(adaptor, rules, type, -1, null);}
+ 
    //This binding check will be a problem when animated bindings come into play
-   private StencilTree sift(List<Rule> rules, int type, int binding) {
-      String label = StencilParser.tokenNames[type];
+   public static StencilTree siftRules(TreeAdaptor adaptor, List<Rule> rules, int type, int binding, String label) {
+      label = label != null ? label : StencilParser.tokenNames[type] ;
       StencilTree list = (StencilTree) adaptor.create(LIST, label);
       
       for(Rule r: rules) {
          if(r.getTarget().getType() == type) {
-            if (binding >=0 && r.getBinding().getType() == binding) {
+            if (binding < 0 || r.getBinding().getType() == binding) {
               adaptor.addChild(list, adaptor.dupTree(r));
             }
          }
@@ -59,12 +61,11 @@ options {
       return list;
    }
 
-   protected StencilTree local(CommonTree source) {return sift((List<Rule>) source, LOCAL, -1);}   
-   protected StencilTree canvas(CommonTree source) {return sift((List<Rule>) source, CANVAS, -1);}
-   protected StencilTree view(CommonTree source) {return sift((List<Rule>) source, VIEW, -1);}
-   protected StencilTree prefilter(CommonTree source) {return sift((List<Rule>) source, PREFILTER, -1);}
-   protected StencilTree result(CommonTree source) {return sift((List<Rule>) source, RESULT, -1);}
-   protected StencilTree dynamicResult(CommonTree source) {return sift((List<Rule>) source, RESULT, DYNAMIC);}
+   protected StencilTree local(CommonTree source)         {return siftRules((List<Rule>) source, LOCAL);}   
+   protected StencilTree canvas(CommonTree source)        {return siftRules((List<Rule>) source, CANVAS);}
+   protected StencilTree view(CommonTree source)          {return siftRules((List<Rule>) source, VIEW);}
+   protected StencilTree prefilter(CommonTree source)     {return siftRules((List<Rule>) source, PREFILTER);}
+   protected StencilTree result(CommonTree source)        {return siftRules((List<Rule>) source, RESULT);}
 }
 
 topdown : ^(CONSUMES filters=. rules=.) 
@@ -74,8 +75,7 @@ topdown : ^(CONSUMES filters=. rules=.)
 	       {local(rules)} 
 	       {result(rules)} 
 	       {view(rules)} 
-	       {canvas(rules)}
-	       {dynamicResult(rules)});
+	       {canvas(rules)});
 	 
 	 
 	 

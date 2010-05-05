@@ -54,12 +54,6 @@ public class Rule extends StencilTree {
 
 	public StencilTree getBinding() {return (StencilTree) getChild(2);}
 	
-	/**Is the binding dynamic?*/
-	public boolean isDynamic() {return getChild(2).getType() == StencilParser.DYNAMIC;}
-	
-	/**Is the binding static?*/
-	public boolean isStatic() {return getChild(2).getType() == StencilParser.DEFINE;}
-
 	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
 		Tree t = this.getAncestor(StencilParser.CONSUMES);

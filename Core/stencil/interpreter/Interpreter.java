@@ -89,7 +89,7 @@ public class Interpreter {
 				
 				//TODO: Have rules throw exception (instead of return null)
 				//TODO: Fix the creation issue.  Right now errors in dynamic rules are ignored (they will be retried later in the dynamic system)
-				if (result == null && !rule.isDynamic()) {
+				if (result == null) {
 					if (abortOnError) {throw new RuleAbortException(rule);}
 					else {return null;}
 				}
@@ -208,10 +208,8 @@ public class Interpreter {
 			stencil.adapters.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			
-			for (Rule rule: group.getResultRules()) {
-				if (rule.isDynamic()) { 
-					panel.addDynamic(glyph, rule, source.getValues());
-				}
+			for (DynamicRule rule: group.getDynamicRules()) {
+				panel.addDynamic(glyph, rule, source.getValues());
 			}
 			return true;
 		} catch (Exception e) {

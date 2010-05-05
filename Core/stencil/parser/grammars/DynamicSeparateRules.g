@@ -27,13 +27,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Ensures that each dynamic binding also has a simple
- * binding in the result list.  If a simple binding is 
- * explicitly provided, the dynamic binding is simply removed
- * from the simple-binding results.  If a simple binding is
- * not provided, the dynamic marker is removed.
+/** Splits dynamic rules into two parts: UpdateQuery and Base.
  **/
-tree grammar DynamicToSimple;
+tree grammar DynamicSeparateRules;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
@@ -44,48 +40,14 @@ options {
 @header{
   package stencil.parser.string;
 	
-  import org.antlr.runtime.tree.*;
-  import stencil.parser.tree.Rule;
-  import stencil.tuple.prototype.TuplePrototypes;
-  import java.util.Arrays;
-}
+  import stencil.parser.tree.*;
+  import static stencil.parser.string.SeparateRules.siftRules;
 
+}
 
 @members {
-  private boolean hasStaticBinding(String name, List<Rule> rules) {
-     for (Rule rule: rules) {
-        if (rule.getBinding().getType() == DEFINE) {continue;}
-        List<String> names = Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype()));
-        if (names.contains(name)) {return true;}
-     }
-     return false;
-  }
-
-  /**Is there an alternative binding for the attributes
-   * set by this dynamic rule elsewhere in the parent
-   * rule list?
-   */
-  private boolean altBindings(Rule rule) {
-     List<Rule> rules = (List) rule.getParent();
-     List<String> names = new ArrayList(Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype())));
-	 List<String> found = new ArrayList();
-	 
-     for (String name: names) {
-        if (hasStaticBinding(name, rules)) {
-           found.add(name);
-        } else {
-           break;
-        }
-     }
-     return names.size() == found.size();
-  }
+   protected StencilTree dynamicResults(CommonTree source) {return siftRules(adaptor, (List<Rule>) source, RESULT, DYNAMIC, "Dynamic");}
 }
 
-topdown: ^(CONSUMES f=. pf=. l=. r=result rest+=.*);
-      
-result: ^(LIST rule*);
-rule
-  : ^(r=RULE t=. cc=. b=.) 
-        -> {$b.getType() == DEFINE}? ^(RULE $t $cc $b)
-        -> {altBindings((Rule) $r)}?
-        -> ^(RULE $t $cc DEFINE[":"]);
+topdown: ^(CONSUMES filter=. prefilter=. local=. results=. view=. canvas=.)
+   -> ^(CONSUMES $filter $prefilter $local $results $view $canvas {dynamicResults($results)});

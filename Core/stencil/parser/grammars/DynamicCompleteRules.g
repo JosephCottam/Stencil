@@ -29,7 +29,7 @@
 
 /** Splits dynamic rules into two parts: UpdateQuery and Base.
  **/
-tree grammar CompleteDynamicRules;
+tree grammar DynamicCompleteRules;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	

@@ -25,7 +25,7 @@ from Values
   Y : Count(Category) -> Mult(VALUE, -11) -> VALUE
   SIZE: 10
   REGISTRATION: "CENTER"
-  FILL_COLOR:* Count(Category) -#> HeatScale[range: ALL, cold: "RED", hot: "GRAY90"](VALUE) -> VALUE
+  FILL_COLOR:* Count(Category) -#> HeatScale[cold: "RED", hot: "GRAY90"](VALUE) -> VALUE
   /*The above line uses two special forms: Dynamic bind and "reframe" map.*/
   /*Dyanmic bind ":*" keeps results up to date in a globally changing context.*/
   /*Reframe map "-#>" is used by operator generation to indicate that the results

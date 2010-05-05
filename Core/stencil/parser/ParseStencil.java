@@ -283,7 +283,21 @@ public abstract class ParseStencil {
 		guideClean.downup(p);
 
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
+
+		DynamicSeparateRules dynamicSeparate = new DynamicSeparateRules(treeTokens);
+		dynamicSeparate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) dynamicSeparate.downup(p);
 		
+		DynamicToSimple dynamicToSimple = new DynamicToSimple(treeTokens);
+	    dynamicToSimple.setTreeAdaptor(TREE_ADAPTOR);
+	    p = (Program) dynamicToSimple.downup(p);
+ 
+//	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
+//	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
+//	    p = (Program) completeDynamics.downup(p);
+		
+	    
+	    
 		TupleRefChain trc = new TupleRefChain(treeTokens);
 		trc.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) trc.downup(p);
