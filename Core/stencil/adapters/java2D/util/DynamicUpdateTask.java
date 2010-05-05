@@ -5,20 +5,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.interpreter.Interpreter;
-import stencil.parser.tree.Rule;
+import stencil.parser.tree.DynamicRule;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.tuple.Tuple;
 
 /**Executes a dynamic update rule on all relevant glyphs.*/
 public final class DynamicUpdateTask implements UpdateTask {
-	private final Rule rule;
+	private final DynamicRule rule;
 	private final DisplayLayer<Glyph2D> table;
 	private final Map<String, Tuple> sourceData = new ConcurrentHashMap();
 	
-	public DynamicUpdateTask(DisplayLayer<Glyph2D> table, Rule rule) {
+	public DynamicUpdateTask(DisplayLayer<Glyph2D> table, DynamicRule rule) {
 		this.table = table;
-		this.rule = stencil.interpreter.DynamicRule.toDynamic(rule);  //TODO: Remove when dynamic rules are created in the compiler
+		this.rule = rule;
 	}
 		
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
@@ -28,8 +28,7 @@ public final class DynamicUpdateTask implements UpdateTask {
 
 	public void conservativeUpdate() {if (needsUpdate()) {update();}}
 
-	//TODO: Query to see if this rule needs to be run (has something in the rule changed its state?)
-	public boolean needsUpdate() {return true;}
+	public boolean needsUpdate() {return rule.requiresUpdate();}
 
 	public void update() {
 		//TODO: Add support for Local!
@@ -40,7 +39,7 @@ public final class DynamicUpdateTask implements UpdateTask {
 			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
 			
 			try {
-				Tuple result = Interpreter.process(source, rule);
+				Tuple result = Interpreter.process(source, rule.getAction());
 				Glyph2D newGlyph = glyph.update(result);
 				if (result != newGlyph) {table.update(newGlyph);}
 			}

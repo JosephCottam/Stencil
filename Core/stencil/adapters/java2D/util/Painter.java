@@ -15,7 +15,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.StencilPanel;
-import stencil.parser.tree.Rule;
+import stencil.parser.tree.DynamicRule;
 import stencil.tuple.Tuple;
 
 public final class Painter implements Runnable, LayerUpdateListener {
@@ -158,7 +158,7 @@ public final class Painter implements Runnable, LayerUpdateListener {
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 	public void layerUpdated(Rectangle update) {layerUpdates.update(update);}
 	
-	public void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
+	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
 		DynamicUpdateTask updateTask;
 		if (updaters.containsKey(rule)) {
 			updateTask = (DynamicUpdateTask) updaters.get(rule);

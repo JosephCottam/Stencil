@@ -25,8 +25,11 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */ 
+ 
+/* Takes layer rules and separates them by target type.
  */
-tree grammar DynamicRule;
+tree grammar SeparateRules;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
@@ -34,56 +37,46 @@ options {
 	filter = true;
 }
 
-@header{
-	/** Converts a rule into a rule suitable for dynamic bindings.
-	 **/
-
-	package stencil.interpreter;
-		
-	import stencil.util.MultiPartName;
-	import stencil.parser.tree.Function;
-    import stencil.parser.tree.StencilTreeAdapter;
-    import stencil.parser.tree.AstInvokeable;
-	import stencil.parser.tree.Rule;
-	import static stencil.parser.ParserConstants.QUERY_FACET;
-
-	import java.util.Map;
-	import java.util.HashMap;
+@header {
+	package stencil.parser.string;
+	
+	import stencil.parser.tree.*;
 }
 
 @members {
-	/**Tree adaptor for translation and duplication.**/
-	private static StencilTreeAdapter treeAdaptor = new StencilTreeAdapter(); 
-	
-	/**Cache of rules that the dynamic representation has already been constructed for.**/
-	private static Map<Rule, Rule> mapCache  = new HashMap<Rule, Rule>();
-	
-	/** Convert a rule to its dynamic form. 
-	  * This method should be used instead of directly invoking topdown.
-	  * This method is memoized.
-	 **/
-	public static Rule toDynamic(Rule original) {
-		if (mapCache.containsKey(original)) {return mapCache.get(original);}
-	
-		Rule rule = (Rule) treeAdaptor.dupTree(original);
-		
-		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(rule);
-		DynamicRule dr = new DynamicRule(treeTokens);
-		dr.setTreeAdaptor(treeAdaptor);
-		rule = (Rule) dr.downup(rule);
-		
-		mapCache.put(original, rule);
-		return rule;
-	}
-    
-    
-    private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
+   //This binding check will be a problem when animated bindings come into play
+   private StencilTree sift(List<Rule> rules, int type, int binding) {
+      String label = StencilParser.tokenNames[type];
+      StencilTree list = (StencilTree) adaptor.create(LIST, label);
+      
+      for(Rule r: rules) {
+         if(r.getTarget().getType() == type) {
+            if (binding >=0 && r.getBinding().getType() == binding) {
+              adaptor.addChild(list, adaptor.dupTree(r));
+            }
+         }
+      }
+      return list;
+   }
+
+   protected StencilTree local(CommonTree source) {return sift((List<Rule>) source, LOCAL, -1);}   
+   protected StencilTree canvas(CommonTree source) {return sift((List<Rule>) source, CANVAS, -1);}
+   protected StencilTree view(CommonTree source) {return sift((List<Rule>) source, VIEW, -1);}
+   protected StencilTree prefilter(CommonTree source) {return sift((List<Rule>) source, PREFILTER, -1);}
+   protected StencilTree result(CommonTree source) {return sift((List<Rule>) source, RESULT, -1);}
+   protected StencilTree dynamicResult(CommonTree source) {return sift((List<Rule>) source, RESULT, DYNAMIC);}
 }
 
-topdown 
-  @after{
-    AstInvokeable inv=((Function) $topdown.tree).getTarget();
-    inv.changeFacet(QUERY_FACET);
-  }
-  : ^(f=FUNCTION i=AST_INVOKEABLE spec=. args=. yield=. target=.) -> ^(FUNCTION[queryName($f.getText())] $i $spec $args $yield $target);
-
+topdown : ^(CONSUMES filters=. rules=.) 
+	-> ^(CONSUMES 
+	       $filters 
+	       {prefilter(rules)} 
+	       {local(rules)} 
+	       {result(rules)} 
+	       {view(rules)} 
+	       {canvas(rules)}
+	       {dynamicResult(rules)});
+	 
+	 
+	 
+	 

@@ -1,0 +1,44 @@
+<!--If ANTLR3 task is not already installed, this script should be run with
+    "-lib ./Library/antlr3-ant.jar" /-->
+    
+ <project name="Validators" default="Validators">
+ 	<target name="Validators">
+        <antlr
+            target="${grammars}/validators/AllInvokeables.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+        <antlr
+            target="${grammars}/validators/OperatorPrefilter.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+        <antlr
+            target="${grammars}/validators/FullNumeralize.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+        <antlr
+            target="${grammars}/validators/SpecializerValidator.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+
+        <antlr
+            target="${grammars}/validators/StreamDeclarationValidator.g"
+            outputdirectory="${parser}/validators/"
+            libdirectory="${parser}"
+        />
+        <antlr
+           target="${grammars}/validators/TargetMatchesPack.g"
+           outputdirectory="${parser}/validators/"
+           libdirectory="${parser}"
+       />
+        
+        <antlr
+           target="${grammars}/validators/MapFoldBalance.g"
+           outputdirectory="${parser}/validators/"
+           libdirectory="${parser}"
+       />
+ 	</target>
+ </project>

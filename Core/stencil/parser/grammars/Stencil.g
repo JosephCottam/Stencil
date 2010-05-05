@@ -121,7 +121,7 @@ tokens {
 
 
   //Bindings
-  DEFINE    = ':';
+  DEFINE  = ':';
   DYNAMIC = ':*';//Rules that should be periodically re-evaluated
   ANIMATED = '<:';
   ANIMATED_DYNAMIC = '<:*';

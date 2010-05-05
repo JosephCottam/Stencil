@@ -25,11 +25,15 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */ 
- 
-/* Takes layer rules and separates them by target type.
  */
-tree grammar SeparateTargets;
+
+/** Ensures that each dynamic binding also has a simple
+ * binding in the result list.  If a simple binding is 
+ * explicitly provided, the dynamic binding is simply removed
+ * from the simple-binding results.  If a simple binding is
+ * not provided, the dynamic marker is removed.
+ **/
+tree grammar DynamicToSimple;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
@@ -37,35 +41,50 @@ options {
 	filter = true;
 }
 
-@header {
-	package stencil.parser.string;
+@header{
+  package stencil.parser.string;
 	
-	import stencil.parser.tree.*;
+  import org.antlr.runtime.tree.*;
+  import stencil.parser.tree.Rule;
+  import stencil.tuple.prototype.TuplePrototypes;
+  import java.util.Arrays;
 }
+
 
 @members {
-   private StencilTree sift(List<Rule> rules, int type) {
-      String label = StencilParser.tokenNames[type];
-      StencilTree list = (StencilTree) adaptor.create(LIST, label);
-      
-      for(Rule r: rules) {
-         if(r.getTarget().getType() == type) {
-            adaptor.addChild(list, adaptor.dupTree(r));
-         }
-      }
-      return list;
-   }
+  private boolean hasStaticBinding(String name, List<Rule> rules) {
+     for (Rule rule: rules) {
+        if (rule.isDynamic()) {continue;}
+        List<String> names = Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype()));
+        if (names.contains(name)) {return true;}
+     }
+     return false;
+  }
 
-   protected StencilTree local(CommonTree source) {return sift((List<Rule>) source, LOCAL);}   
-   protected StencilTree canvas(CommonTree source) {return sift((List<Rule>) source, CANVAS);}
-   protected StencilTree view(CommonTree source) {return sift((List<Rule>) source, VIEW);}
-   protected StencilTree prefilter(CommonTree source) {return sift((List<Rule>) source, PREFILTER);}
-   protected StencilTree result(CommonTree source) {return sift((List<Rule>) source, RESULT);}
+  /**Is there an alternative binding for the attributs
+   * set by this dynamic rule elsewhere in the parent
+   * rule list?
+   */
+  private boolean altBindings(Rule rule) {
+     List<Rule> rules = (List) rule.getParent();
+     List<String> names = new ArrayList(Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype())));
+
+     for (String name: names) {
+        if (hasStaticBinding(name, rules)) {
+           names.remove(name);
+        } else {
+           break;
+        }
+     }
+     return names.size() ==0;
+  }
 }
 
-topdown : ^(CONSUMES filters=. rules=.) 
-	-> ^(CONSUMES $filters {prefilter(rules)} {local(rules)} {result(rules)} {view(rules)} {canvas(rules)});
-	 
-	 
-	 
-	 
+topdown: ^(CONSUMES f=. pf=. l=. r=result rest+=.*);
+      
+result: ^(LIST rule*);
+rule
+  : ^(r=RULE t=. cc=. b=.) 
+        -> {$b.getType() == DEFINE}? ^(RULE $t $cc $b)
+        -> {altBindings((Rule) $r)}?
+        -> ^(RULE $t $cc DEFINE[":"]);

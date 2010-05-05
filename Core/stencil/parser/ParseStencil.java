@@ -178,9 +178,9 @@ public abstract class ParseStencil {
 		p = (Program) liftStreams.downup(p);
 		
 		//Group the operator chains
-		SeparateTargets targets = new SeparateTargets(treeTokens);
-		targets.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) targets.downup(p);
+		SeparateRules separate = new SeparateRules(treeTokens);
+		separate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) separate.downup(p);
 
 		//Ensure the proper order blocks
 		EnsureOrders orders = new EnsureOrders(treeTokens);

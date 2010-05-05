@@ -22,7 +22,7 @@
  		<antcall target="EclipseRefresh"/>
  	</target>
  	
- 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Interpreter, Validators">
+ 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Validators">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
@@ -30,20 +30,6 @@
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 
-
- 	
- 	<target name="Interpreter" depends="StencilGrammar">
- 		<property name="dest" location="${interpreter}"/>
- 		<property name="lib" location="${parser}"/>
- 		
- 		<antlr
- 			target="${interpreter}/DynamicRule.g"
-			outputdirectory="${dest}"
- 			libdirectory="${lib}"
- 		/>
-  	 	<antcall target="EclipseRefresh"/>
- 	</target>
-  	
 	<!-- Just the core stencil grammar, not the additional processing.-->
  	<target name="StencilGrammar">
  		<antlr 
@@ -102,7 +88,7 @@
 			outputdirectory="${parser}"
  		/> 
  		<antlr
- 			target="${grammars}/SeparateTargets.g"
+ 			target="${grammars}/SeparateRules.g"
 			outputdirectory="${parser}"
 		/> 	
  		<antlr
@@ -125,47 +111,20 @@
 			target="${grammars}/PrepareCustomArgs.g"
 			outputdirectory="${parser}"
  		/>
+        <antlr 
+            target="${grammars}/CompleteDynamicRules.g"
+            outputdirectory="${parser}"
+        />
+        <antlr 
+            target="${grammars}/DynamicToSimple.g"
+            outputdirectory="${parser}"
+        />
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 
  	<target name="Validators" depends="StencilGrammar">
-        <antlr
-            target="${grammars}/validators/AllInvokeables.g"
-            outputdirectory="${parser}/validators/"
-            libdirectory="${parser}"
-        />
-        <antlr
-            target="${grammars}/validators/OperatorPrefilter.g"
-            outputdirectory="${parser}/validators/"
-            libdirectory="${parser}"
-        />
-        <antlr
-            target="${grammars}/validators/FullNumeralize.g"
-            outputdirectory="${parser}/validators/"
-            libdirectory="${parser}"
-        />
-        <antlr
-            target="${grammars}/validators/SpecializerValidator.g"
-            outputdirectory="${parser}/validators/"
-            libdirectory="${parser}"
-        />
-
- 		<antlr
-			target="${grammars}/validators/StreamDeclarationValidator.g"
- 			outputdirectory="${parser}/validators/"
- 			libdirectory="${parser}"
-		/>
-        <antlr
-           target="${grammars}/validators/TargetMatchesPack.g"
-           outputdirectory="${parser}/validators/"
-           libdirectory="${parser}"
-       />
- 		
-        <antlr
-           target="${grammars}/validators/MapFoldBalance.g"
-           outputdirectory="${parser}/validators/"
-           libdirectory="${parser}"
-       />
+       <ant antfile="./build/Validators.xml" inheritRefs="true"/>
+       <antcall target="EclipseRefresh"/>
  	</target>
 
  	<target name="TreeAdapterGrammar" depends="StencilGrammar">

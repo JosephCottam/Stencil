@@ -40,9 +40,9 @@ import java.util.TreeSet;
 import stencil.adapters.Glyph;
 import stencil.interpreter.Interpreter;
 import stencil.parser.tree.Canvas;
+import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.Rule;
 import stencil.parser.tree.View;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
@@ -209,5 +209,5 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	/**Add a dynamic binding that will apply the given rule with the passed data
 	 * to the passed glyph object. 
 	 */
-	public abstract void addDynamic(T g, Rule rule, Tuple source);
+	public abstract void addDynamic(T g, DynamicRule rule, Tuple source);
 }

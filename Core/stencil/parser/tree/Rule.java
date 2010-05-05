@@ -52,6 +52,8 @@ public class Rule extends StencilTree {
 	/**What actions are being taken in this rule*/
 	public CallChain getAction() {return (CallChain) getChild(1);}
 
+	public StencilTree getBinding() {return (StencilTree) getChild(2);}
+	
 	/**Is the binding dynamic?*/
 	public boolean isDynamic() {return getChild(2).getType() == StencilParser.DYNAMIC;}
 	

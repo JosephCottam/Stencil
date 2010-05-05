@@ -197,7 +197,6 @@ transferMappings
 
 
 //Update query creation -----------------------------------------------
-//TODO: Extend to include actions and sampler
 copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=. .*))) ->
         ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(GUIDE_QUERY {adaptor.dupTree($chain)}));
 

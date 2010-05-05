@@ -31,8 +31,8 @@ package stencil.adapters.java2D;
 import stencil.adapters.java2D.data.*;
 import stencil.adapters.java2D.util.GuideTask;
 import stencil.display.StencilPanel;
+import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.Rule;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.epsExport.EpsGraphics2D;
@@ -152,7 +152,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	}
 
 	
-	public final void addDynamic(Glyph2D glyph, Rule rule, Tuple source) {
+	public final void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
 		canvas.painter.addDynamic(glyph, rule, source);
 	}
 
