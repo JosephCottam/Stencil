@@ -68,7 +68,7 @@ options {
 	}
 }
 
-topdown: ^(GUIDE_QUERY target*);
+topdown: ^(STATE_QUERY target*);
 target
 	: i=AST_INVOKEABLE 
 	  {needsGuide =  needsGuide || needsGuide(i);};

@@ -33,6 +33,7 @@ tree grammar DynamicCompleteRules;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
+	superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
 }
@@ -51,7 +52,7 @@ options {
    * that is not an AST_INVOKEABLE with properly set operator.
    */
   private Tree toCompactList(Tree tree) {
-     Tree rv = (Tree) adaptor.create(GUIDE_QUERY, "");
+     Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
      while (tree != null) {
        if (tree.getType() == AST_INVOKEABLE &&
           ((AstInvokeable) tree).getInvokeable() != null) {
@@ -61,12 +62,28 @@ options {
      }
      return rv;
   }
+  
+  public Object transform(Object t) {
+    t = changeType(t);
+    t = convertAll(t);;
+    return t;
+  } 
+  
+   private Object changeType(Object t) {
+     return downup(t, this, "changeType");
+   }
+
+   private Object convertAll(Object t) {
+     return downup(t, this, "convert");
+   }
 }
 
-duplicate:  ^(DYNAMIC_RULE rule=.) -> ^(DYNAMIC_RULE $rule $rule);
+changeType: ^(CONSUMES f=. pf=. l=. r=. v=. c=. ^(LIST toDynamic*));
+toDynamic:  ^(r=RULE rest+=.*) -> ^(DYNAMIC_RULE {adaptor.dupTree($r)} {adaptor.dupTree($r)});
             
-transform: ^(DYNMAIC_RULE . compactQuery);
-
+            
+       
+convert: ^(DYNAMIC_RULE . compactQuery);
 compactQuery: ^(RULE . cc=callChain .) -> {toCompactList($cc.tree)};
 callChain: ^(CALL_CHAIN target .) -> target;
 target
@@ -76,6 +93,7 @@ target
        if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
           Invokeable inv2 = op.getFacet(StencilOperator.STATE_FACET);
           ((AstInvokeable) ((CommonTree)$target.tree)).setInvokeable(inv2);
+          ((AstInvokeable) ((CommonTree)$target.tree)).setOperator(op);
        }
     }
   }

@@ -245,6 +245,6 @@ replaceCompactForm:
 ensure:
 	^(r=RULE t=. c=. b=.)
 	    {t.getType()==RESULT && requiresChanges((CallChain) c)}? ->
-		  ^(RULE $t ^(CALL_CHAIN ^(FUNCTION[selectOperator(getStart($c))]  {spec(getStart($c))} {echoArgs(getStart($c))} DIRECT_YIELD {adaptor.dupTree(((CallChain) c).getStart())})) $b); 
+		  ^(RULE $t ^(CALL_CHAIN ^(FUNCTION[selectOperator(getStart($c))] {spec(getStart($c))} {echoArgs(getStart($c))} DIRECT_YIELD {adaptor.dupTree(((CallChain) c).getStart())})) $b); 
 		        
 		

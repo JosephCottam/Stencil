@@ -11,7 +11,7 @@ import stencil.parser.string.StencilParser;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
-import static stencil.parser.string.StencilParser.GUIDE_QUERY;
+import static stencil.parser.string.StencilParser.STATE_QUERY;
 
 public class Guide extends StencilTree {
 	private SeedOperator seedOperator;
@@ -51,8 +51,8 @@ public class Guide extends StencilTree {
 		return (Rule) getChild(4).getChild(0);
 	}
 	
-	public StencilTree getGuideQuery() {
-		return (StencilTree) this.findChild(GUIDE_QUERY, null);
+	public StencilTree getStateQuery() {
+		return (StencilTree) this.findChild(STATE_QUERY, null);
 	}
 	
 	public String toString() {

@@ -61,4 +61,4 @@ query[Guide g]
       seedAInv.setOperator((StencilOperator) seedInv.getTarget());
       adaptor.addChild(gq, seedAInv);
    }
-   : ^(gq=GUIDE_QUERY .*); 
+   : ^(gq=STATE_QUERY .*); 

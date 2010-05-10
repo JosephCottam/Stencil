@@ -163,7 +163,7 @@ options {
 	 * that is not an AST_INVOKEABLE with properly set operator.
 	 */
 	private Tree toCompactList(Tree tree) {
-	   Tree rv = (Tree) adaptor.create(GUIDE_QUERY, "");
+	   Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
 	   while (tree != null) {
 	     if (tree.getType() == AST_INVOKEABLE &&
 	        ((AstInvokeable) tree).getInvokeable() != null) {
@@ -198,10 +198,10 @@ transferMappings
 
 //Update query creation -----------------------------------------------
 copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=. .*))) ->
-        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(GUIDE_QUERY {adaptor.dupTree($chain)}));
+        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(STATE_QUERY {adaptor.dupTree($chain)}));
 
 
-foldQuery: ^(GUIDE_QUERY qc=foldQueryChain) -> {toCompactList($qc.tree)};
+foldQuery: ^(STATE_QUERY qc=foldQueryChain) -> {toCompactList($qc.tree)};
 foldQueryChain
   @after{
      if ($f != null) {

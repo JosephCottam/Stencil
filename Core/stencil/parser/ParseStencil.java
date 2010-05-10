@@ -292,10 +292,9 @@ public abstract class ParseStencil {
 	    dynamicToSimple.setTreeAdaptor(TREE_ADAPTOR);
 	    p = (Program) dynamicToSimple.downup(p);
  
-//	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
-//	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
-//	    p = (Program) completeDynamics.downup(p);
-		
+	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
+	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
+	    p = (Program) completeDynamics.transform(p);
 	    
 	    
 		TupleRefChain trc = new TupleRefChain(treeTokens);

@@ -41,9 +41,9 @@ tokens {
   CALL_CHAIN;
   CANVAS_DEF;
   DIRECT_YIELD;
+  DYNAMIC_RULE;
   FUNCTION;
   GLYPH_TYPE;        	//Indicate layer type
-  GUIDE_QUERY;
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
   GUIDE_SUMMARIZATION;
@@ -66,6 +66,7 @@ tokens {
   RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
   RULE;
   SIGIL_ARGS;
+  STATE_QUERY;    //List of entities ot check if state has changed
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
   STREAM_DEF;		//Root of a stream definition

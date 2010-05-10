@@ -50,42 +50,10 @@ options {
   import java.util.Arrays;
 }
 
-
-@members {
-  private boolean hasStaticBinding(String name, List<Rule> rules) {
-     for (Rule rule: rules) {
-        if (rule.getBinding().getType() == DEFINE) {continue;}
-        List<String> names = Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype()));
-        if (names.contains(name)) {return true;}
-     }
-     return false;
-  }
-
-  /**Is there an alternative binding for the attributes
-   * set by this dynamic rule elsewhere in the parent
-   * rule list?
-   */
-  private boolean altBindings(Rule rule) {
-     List<Rule> rules = (List) rule.getParent();
-     List<String> names = new ArrayList(Arrays.asList(TuplePrototypes.getNames(rule.getTarget().getPrototype())));
-	 List<String> found = new ArrayList();
-	 
-     for (String name: names) {
-        if (hasStaticBinding(name, rules)) {
-           found.add(name);
-        } else {
-           break;
-        }
-     }
-     return names.size() == found.size();
-  }
-}
-
-topdown: ^(CONSUMES f=. pf=. l=. r=result rest+=.*);
+topdown: ^(CONSUMES . . . ^(LIST rule*) .*);
       
-result: ^(LIST rule*);
-rule
-  : ^(r=RULE t=. cc=. b=.) 
-        -> {$b.getType() == DEFINE}? ^(RULE $t $cc $b)
-        -> {altBindings((Rule) $r)}?
-        -> ^(RULE $t $cc DEFINE[":"]);
+rule: ^(RULE t=. cc=. b=.) -> ^(RULE $t $cc DEFINE[":"]);
+
+
+
+
