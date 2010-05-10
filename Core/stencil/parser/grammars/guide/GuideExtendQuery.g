@@ -41,10 +41,11 @@ options {
   
   package stencil.parser.string; 
   
+  import stencil.operator.StencilOperator;
   import stencil.operator.util.Invokeable;
   import stencil.operator.util.ReflectiveInvokeable;
-  import static stencil.operator.StencilOperator.STATE_FACET;
   import stencil.parser.tree.*;
+  import static stencil.operator.StencilOperator.STATE_FACET;
 }
 
 topdown:
@@ -56,7 +57,8 @@ query[Guide g]
    @after{
       Invokeable seedInv = new ReflectiveInvokeable(STATE_FACET, g.getSeedOperator());
       AstInvokeable seedAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "seed");
-      seedAInv.setInvokeable(seedInv);      
+      seedAInv.setInvokeable(seedInv);
+      seedAInv.setOperator((StencilOperator) seedInv.getTarget());
       adaptor.addChild(gq, seedAInv);
    }
    : ^(gq=GUIDE_QUERY .*); 

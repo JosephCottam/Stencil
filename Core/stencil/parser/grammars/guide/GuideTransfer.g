@@ -209,6 +209,7 @@ foldQueryChain
        if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
           Invokeable inv = op.getFacet(StencilOperator.STATE_FACET);
           ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setInvokeable(inv);
+          ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setOperator(op);
        }
     }
   }
