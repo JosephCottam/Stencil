@@ -58,6 +58,7 @@ public class Projection extends BasicModule {
 
 		private Color cold;
 		private Color hot;
+		private int stateID = Integer.MIN_VALUE;
 		
 		public HeatScale(OperatorData opData, Specializer spec) {
 			super(opData);
@@ -82,8 +83,8 @@ public class Projection extends BasicModule {
 			float p =-1;			
 				
 			try {
-				if (d>max || Double.isNaN(max)) {max = d;}
-				if (d<min || Double.isNaN(min)) {min = d;}
+				if (d>max || Double.isNaN(max)) {max = d; stateID++;}
+				if (d<min || Double.isNaN(min)) {min = d; stateID++;}
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
 				return averageColors(p);
@@ -130,6 +131,7 @@ public class Projection extends BasicModule {
 		public String getName() {return NAME;}
 		public boolean getThrowExceptions() {return throwExceptions;}
 		public void setThrowExceptions(boolean v) {throwExceptions = v;}
+		public int stateID() {return stateID;}
 		
 		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot);} 
 	}
@@ -146,7 +148,7 @@ public class Projection extends BasicModule {
 	 */
 	public static final class Index extends BasicProject {
 		public static final String NAME = "Index";
-		List<String> labels = new ArrayList<String>();
+		private List<String> labels = new ArrayList<String>();
 
 		public Index(OperatorData opData) {super(opData);}
 		
@@ -161,7 +163,7 @@ public class Projection extends BasicModule {
 		}
 
 		public String getName() {return NAME;}
-		
+		public int stateID() {return labels.size();}
 		public Index duplicate() {return new Index(operatorData);}
 	}
 
@@ -171,7 +173,8 @@ public class Projection extends BasicModule {
 	 * For query, items that have not been seen return 0 and are not added to the map.
 	 */
 	public static final class Count extends BasicProject {
-		Map<Object, Long> counts = new HashMap<Object, Long>();
+		private Map<Object, Long> counts = new HashMap<Object, Long>();
+		private int stateID = Integer.MIN_VALUE;
 		
 		public Count(OperatorData opData) {super(opData);}
 		
@@ -188,6 +191,7 @@ public class Projection extends BasicModule {
 				value = 1;
 				counts.put(key, value);
 			}
+			stateID++;
 			return value;
 		}
 
@@ -199,6 +203,8 @@ public class Projection extends BasicModule {
 			return value;
 		}
 
+		public int stateID() {return stateID;}
+		
 		public Count duplicate() {return new Count(operatorData);}
 	}
 
@@ -210,6 +216,7 @@ public class Projection extends BasicModule {
 		public String getName() {return "Count";}
 		public long map() {return count++;}
 		public long query() {return count;}		
+		public long stateID() {return count;}
 	}
 	
 	public Projection(ModuleData md) {super(md);}
