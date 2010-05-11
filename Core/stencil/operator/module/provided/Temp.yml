@@ -13,7 +13,8 @@ operators:
      keys: "min, max, n"
      facets:
       - {name: map, type: BOTH, function: false, prototype: !proto "VALUE"}
-      - {name: query, type: BOTH, function: false, prototype: !proto "VALUE"} 
+      - {name: query, type: BOTH, function: false, prototype: !proto "VALUE"}
+      - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"} 
    - name: Scale
    - name: Partition
      facets:

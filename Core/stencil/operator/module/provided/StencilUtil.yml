@@ -7,7 +7,7 @@ defaults:
   facets:
     - {name: map, function: false, type: CATEGORIZE}
     - {name: query, function: false, type: CATEGORIZE}
-    - {name: stateID, function: false, type: CATEGORIZE}
+    - {name: stateID, function: false, type: OTHER}
 
 operators:
   - name: EchoCategorize

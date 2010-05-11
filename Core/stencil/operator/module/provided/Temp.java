@@ -209,9 +209,9 @@ public class Temp extends BasicModule {
 			}
 		}
 
-		//TODO: Move to a concurrent set
-		private SortedSet set = Collections.synchronizedSortedSet(new TreeSet(new CompoundCompare()));
-		//		private TreeSet set = new TreeSet(new CompoundCompare());
+		//TODO: Investigate a concurrent set
+		private SortedSet set = new TreeSet(new CompoundCompare());
+		private int stateID = Integer.MIN_VALUE;
 
 		public int map(Object... values) {return rank(true, values);} 
 		public int query(Object... values) {return rank(false, values);}
@@ -223,10 +223,11 @@ public class Temp extends BasicModule {
 		 * @param add Should this set of values be added to the set if it is not already there?
 		 * @param values What set of values needs ranking?
 		 */
-		private int rank(boolean add, Object... values) {
+		private synchronized int rank(boolean add, Object... values) {
 			int rank;
 			if (add && !set.contains(values)) {
 				set.add(values);
+				stateID++;
 				rank = set.headSet(values).size();
 			}else if (set.contains(values)) {
 				rank = set.headSet(values).size();
@@ -237,6 +238,7 @@ public class Temp extends BasicModule {
 			return rank;
 		}
 
+		public int stateID() {return stateID;}
 		public Rank duplicate() {return new Rank(operatorData);}
 	}
 
