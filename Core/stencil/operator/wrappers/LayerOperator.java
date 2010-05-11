@@ -37,12 +37,13 @@ public final class LayerOperator implements StencilOperator {
 		this.layer = layer;
 
 		TuplePrototype prototype = layer.getPrototype();
-		operatorData = Modules.basicLegendData(module, getName());
+		operatorData = Modules.basicOperatorData(module, getName());
 		operatorData.addFacet(new FacetData(FIND_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(MAP_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(QUERY_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(REMOVE_FACET, TYPE_NA, false, prototype));
 		operatorData.addFacet(new FacetData(CONTAINS_FACET, TYPE_NA, false, prototype));
+		operatorData.addFacet(new FacetData(STATE_ID_FACET, TYPE_NA, false, "VALUE"));
 	}
 	
 	public String getName() {return layer.getName();}
@@ -56,6 +57,8 @@ public final class LayerOperator implements StencilOperator {
 			return new ReflectiveInvokeable(CONTAINS_METHOD, layer);
 		} else if (REMOVE_FACET.equals(facet)) {
 			return new ReflectiveInvokeable(REMOVE_METHOD, layer);
+		} else if (STATE_ID_FACET.equals(facet)) {
+			return new ReflectiveInvokeable(STATE_ID_FACET, layer);
 		}
 		throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 	}

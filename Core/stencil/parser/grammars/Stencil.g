@@ -57,6 +57,7 @@ tokens {
   OPERATOR_TEMPLATE; //Template used to create an operator instance
   OPERATOR_RULE;     //Combination of filter, return and function calls in a operator
   OPERATOR_BASE;
+  OPERATOR_FACET;
   POST;
   PRE;
   PREDICATE;
@@ -295,10 +296,10 @@ functionCallTarget
    
 
 functionCall
-  :(callName[MAIN_FACET] specializer valueList) =>
-   name=callName[MAIN_FACET] specializer valueList
+  :(callName[MAP_FACET] specializer valueList) =>
+   name=callName[MAP_FACET] specializer valueList
     -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList))
-  | name=callName[MAIN_FACET] specializer emptySet
+  | name=callName[MAP_FACET] specializer emptySet
     -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"]))
   | t=TAGGED_ID ISLAND_BLOCK
     -> ^(FUNCTION[customArgsCall($t.text)] ^(SPECIALIZER DEFAULT) ISLAND_BLOCK);  

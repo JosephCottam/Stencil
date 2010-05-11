@@ -28,26 +28,14 @@
  */
 package stencil.parser.tree;
 
-import java.util.List;
 import org.antlr.runtime.Token;
-
-import stencil.parser.string.StencilParser;
 
 public class Operator extends StencilTree {
 	public Operator(Token source) {super(source);}
 
 	public String getName() {return token.getText();}
 
-	public Yields getYields() {return (Yields) this.getFirstChildWithType(StencilParser.YIELDS);}
-	public TuplePrototype getArguments() {return getYields().getInput();}
-	public TuplePrototype getResults() {return getYields().getOutput();}
-
-	public List<OperatorRule> getRules() {
-		return (List<OperatorRule>) findChild(StencilParser.LIST, "Rules");
-	}
-	
-	public List<Rule> getPrefilterRules() {
-		return (List<Rule>) findChild(StencilParser.LIST, "Prefilters");
-	}
-
+	public OperatorFacet getMap() {return (OperatorFacet) getChild(0);}
+	public OperatorFacet getQuery() {return (OperatorFacet) getChild(1);}
+	public StateQuery getStateQuery() {return (StateQuery) getChild(2);}
 }

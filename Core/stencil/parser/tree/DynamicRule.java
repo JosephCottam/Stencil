@@ -8,18 +8,14 @@ import org.antlr.runtime.tree.Tree;
 import stencil.interpreter.Interpreter;
 import stencil.parser.string.StencilParser;
 import stencil.tuple.Tuple;
-import stencil.types.Converter;
 
 public class DynamicRule extends StencilTree {
-	private static final Object[] EMPTY_ARGS = new Object[0];
-	private int[] cachedIDs;
-	
 	public DynamicRule(Token token) {super(token);}
 
 	public Rule getAction() {return (Rule) getChild(0);}
 
 	/**What are the state facets of this query.*/
-	public List<AstInvokeable> getStateQuery() {return (StateQuery) getChild(1);}
+	public StateQuery getStateQuery() {return (StateQuery) getChild(1);}
 	
 	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
@@ -41,21 +37,6 @@ public class DynamicRule extends StencilTree {
 		
 	/**Should this dynamic rule be run now??*/
 	public boolean requiresUpdate() {
-		final List<AstInvokeable> lst = getStateQuery();
-		final int[] nowIDs = new int[lst.size()];
-		if (cachedIDs == null) {
-			cachedIDs = new int[nowIDs.length];
-		}
-		
-		for (int i=0; i< lst.size(); i++) {
-			nowIDs[i] = Converter.toInteger(lst.get(i).invoke(EMPTY_ARGS).get(0));
-		}		
-		
-		boolean matches = true;	//Do the two ID arrays match?
-		for (int i=0; matches && i < nowIDs.length; i++) {
-			matches = matches && (nowIDs[i] == cachedIDs[i]);
-		}
-		cachedIDs = nowIDs;
-		return !matches;
+		return getStateQuery().requiresUpdate();
 	}
 }

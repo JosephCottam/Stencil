@@ -24,14 +24,12 @@ public final class DynamicUpdateTask implements UpdateTask {
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
 		this.sourceData.put(target.getID(), sourceData);
 	}
-	
 
 	public void conservativeUpdate() {if (needsUpdate()) {update();}}
 
 	public boolean needsUpdate() {return rule.requiresUpdate();}
 
 	public void update() {
-		System.out.println("updating...");
 		//TODO: Add support for Local!
 		
 		//Update each element 

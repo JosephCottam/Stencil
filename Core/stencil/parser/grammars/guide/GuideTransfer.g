@@ -64,9 +64,9 @@ options {
   import stencil.operator.StencilOperator;
 
   import static stencil.operator.module.util.OperatorData.TYPE_CATEGORIZE;
-  import static stencil.parser.ParserConstants.GUIDE_FACET;
-  import static stencil.parser.ParserConstants.MAIN_FACET;
   import static stencil.parser.ParserConstants.QUERY_FACET;
+  import static stencil.parser.ParserConstants.STATE_ID_FACET;
+  import static stencil.parser.string.Utilities.*;
 }
 
 @members{
@@ -157,22 +157,6 @@ options {
    			return TYPE_CATEGORIZE.equals(opType);
    		} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.",e);}
 	}
-	
-	
-	/**Turns a chain into a list, discarding anything
-	 * that is not an AST_INVOKEABLE with properly set operator.
-	 */
-	public static Tree stateQueryList(TreeAdaptor adaptor, Tree tree) {
-	   Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
-	   while (tree != null) {
-	     if (tree.getType() == AST_INVOKEABLE &&
-	        ((AstInvokeable) tree).getInvokeable() != null) {
-         adaptor.addChild(rv, adaptor.dupNode(tree));
-	     }
-       tree = tree.getChild(0);
-	   }
-	   return rv;
-	}
 }
 
 //Move mappings from the declarations in the consumes block up to the guides section
@@ -206,8 +190,8 @@ foldQueryChain
   @after{
      if ($f != null) {
        StencilOperator op =((Function) f).getTarget().getOperator();
-       if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
-          Invokeable inv = op.getFacet(StencilOperator.STATE_FACET);
+       if (op.getOperatorData().hasFacet(STATE_ID_FACET)) {
+          Invokeable inv = op.getFacet(STATE_ID_FACET);
           ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setInvokeable(inv);
           ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setOperator(op);
        }

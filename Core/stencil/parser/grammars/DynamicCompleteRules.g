@@ -41,13 +41,13 @@ options {
 @header{
   package stencil.parser.string;
 	
-	import stencil.util.MultiPartName;
+  import stencil.util.MultiPartName;
   import stencil.parser.tree.*;
   import stencil.operator.StencilOperator;
   import stencil.operator.module.util.FacetData;
   import stencil.operator.module.util.OperatorData;
   import stencil.operator.util.Invokeable;
-  import static stencil.parser.string.GuideTransfer.stateQueryList;
+  import static stencil.parser.string.Utilities.stateQueryList;
   import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
@@ -89,8 +89,8 @@ target
        OperatorData od = op.getOperatorData();
        FacetData fd = od.getFacet(mpName.getFacet());
        if (fd.isFunction()) { //Do nothing...
-       } else if (!fd.isFunction() && od.hasFacet(StencilOperator.STATE_FACET)) {
-          Invokeable inv2 = op.getFacet(StencilOperator.STATE_FACET);
+       } else if (!fd.isFunction() && od.hasFacet(StencilOperator.STATE_ID_FACET)) {
+          Invokeable inv2 = op.getFacet(StencilOperator.STATE_ID_FACET);
           ((AstInvokeable) ((CommonTree)$target.tree)).setInvokeable(inv2);
           ((AstInvokeable) ((CommonTree)$target.tree)).setOperator(op);
        } else {

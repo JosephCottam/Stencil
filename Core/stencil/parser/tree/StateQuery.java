@@ -28,8 +28,48 @@
  */
 package stencil.parser.tree;
 
+import java.util.Arrays;
+
 import org.antlr.runtime.Token; 
 
+import stencil.types.Converter;
+
 public class StateQuery extends List {
+	private static final Object[] EMPTY_ARGS = new Object[0];
+	private int[] cachedIDs;
+	
 	public StateQuery(Token source) {super(source);}
+	
+	/**Get a StateID that is the composite of all current stateIDs.
+	 * (This will calculate new stateIDs, but not store them in the cache.)
+	 */
+	public int compositeStateID() {
+		final Integer[] nowIDs = new Integer[this.size()];
+		for (int i=0; i< this.size(); i++) {
+			AstInvokeable inv = (AstInvokeable) this.get(i);
+			nowIDs[i] = Converter.toInteger(inv.invoke(EMPTY_ARGS).get(0));
+		}
+		return Arrays.deepHashCode(nowIDs);
+	}
+	
+	
+	/**Has any of the contained stateID queries changed?*/
+	public boolean requiresUpdate() {
+		final int[] nowIDs = new int[this.size()];
+		if (cachedIDs == null) {
+			cachedIDs = new int[nowIDs.length];
+		}
+		
+		for (int i=0; i< this.size(); i++) {
+			AstInvokeable inv = (AstInvokeable) this.get(i);
+			nowIDs[i] = Converter.toInteger(inv.invoke(EMPTY_ARGS).get(0));
+		}		
+		
+		boolean matches = true;	//Do the two ID arrays match?
+		for (int i=0; matches && i < nowIDs.length; i++) {
+			matches = matches && (nowIDs[i] == cachedIDs[i]);
+		}
+		cachedIDs = nowIDs;
+		return !matches;
+	}
 }

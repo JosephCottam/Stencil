@@ -43,88 +43,9 @@
  	
  	<!--All of the tree manipulations prior to the interpreter-->
  	<target name="StencilTransformer" depends="StencilGrammar">
-        <antlr
-           target="${grammars}/PreparsePython.g"
-           outputdirectory="${parser}"
-           libdirectory="${parser}"
-       />
-
- 		<antlr
-           target="${grammars}/LiftStreamPrototypes.g"
-           outputdirectory="${parser}"
-           libdirectory="${parser}"
-       />
-
- 		<antlr
-			target="${grammars}/Imports.g"
-			outputdirectory="${parser}"
-		/>
- 		<antlr
- 			target="${grammars}/DefaultSpecializers.g"
- 			outputdirectory="${parser}"
- 		/>
- 		<antlr
- 			target="${grammars}/EnsureOrders.g"
-			outputdirectory="${parser}"
- 		/>
- 		<antlr
- 			target="${grammars}/AdHocOperators.g"
-			outputdirectory="${parser}"
- 		/>
- 		<antlr
- 			target="${grammars}/SetOperators.g"
-			outputdirectory="${parser}"
- 		/>
- 		<antlr
- 			target="${grammars}/DefaultPack.g"
- 			outputdirectory="${parser}"
- 		/>
- 		<antlr
- 			target="${grammars}/DereferenceOperators.g"
-			outputdirectory="${parser}"
- 		/> 
- 		<antlr
- 			target="${grammars}/TupleRefChain.g"
-			outputdirectory="${parser}"
- 		/> 
- 		<antlr
- 			target="${grammars}/SeparateRules.g"
-			outputdirectory="${parser}"
-		/> 	
- 		<antlr
- 			target="${grammars}/NumeralizeTupleRefs.g"
-			outputdirectory="${parser}"
- 		/> 
- 		<antlr
- 			target="${grammars}/FrameTupleRefs.g"
-			outputdirectory="${parser}"
- 		/> 
- 		<antlr 
-			target="${grammars}/LiftSharedConstantRules.g"
-			outputdirectory="${parser}"
- 		/> 		
- 		<antlr 
-			target="${grammars}/AnnotateEnvironmentSize.g"
-			outputdirectory="${parser}"
- 		/> 		
- 		<antlr 
-			target="${grammars}/PrepareCustomArgs.g"
-			outputdirectory="${parser}"
- 		/>
- 	    <antlr 
- 	        target="${grammars}/DynamicSeparateRules.g"
- 	        outputdirectory="${parser}"
- 	    />
- 		<antlr 
-            target="${grammars}/DynamicCompleteRules.g"
-            outputdirectory="${parser}"
-        />
-        <antlr 
-            target="${grammars}/DynamicToSimple.g"
-            outputdirectory="${parser}"
-        />
- 	 	<antcall target="EclipseRefresh"/>
- 	</target>
+        <ant antfile="./build/Transformers.xml" inheritRefs="true"/>
+ 		<antcall target="EclipseRefresh"/>
+	</target> 	
 
  	<target name="Validators" depends="StencilGrammar">
        <ant antfile="./build/Validators.xml" inheritRefs="true"/>
@@ -183,7 +104,5 @@
  	<target name="EclipseRefresh" if="eclipse.running">
  		<eclipse.refreshLocal resource="Stencil/Core/" depth="infinite" />
  	</target>
- 			
-
  
  </project>

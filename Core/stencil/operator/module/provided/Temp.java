@@ -88,8 +88,18 @@ public class Temp extends BasicModule {
 		}
 
 		public double map(double dv) {
-			inMin = Math.min(dv, inMin);
-			inMax = Math.max(dv, inMax);
+			double newInMin = Math.min(dv, inMin);
+			double newInMax = Math.max(dv, inMax);
+			if (newInMin != inMin) {
+				inMin = newInMin;
+				stateID++;
+			}
+			
+			if (newInMax != inMax) {
+				inMax = newInMax;
+				stateID++;
+			}
+			
 			return query(dv);   
 		}
 
@@ -211,7 +221,6 @@ public class Temp extends BasicModule {
 
 		//TODO: Investigate a concurrent set
 		private SortedSet set = new TreeSet(new CompoundCompare());
-		private int stateID = Integer.MIN_VALUE;
 
 		public int map(Object... values) {return rank(true, values);} 
 		public int query(Object... values) {return rank(false, values);}
@@ -238,7 +247,6 @@ public class Temp extends BasicModule {
 			return rank;
 		}
 
-		public int stateID() {return stateID;}
 		public Rank duplicate() {return new Rank(operatorData);}
 	}
 
@@ -269,6 +277,7 @@ public class Temp extends BasicModule {
 
 			if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
 				map.put(key, objects);
+				stateID++;
 			} else {
 				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
 			}
@@ -331,8 +340,8 @@ public class Temp extends BasicModule {
 
 	}
 
-
-
+	
+	
 	public Temp(ModuleData md) {super(md);}
 
 	public OperatorData getOperatorData(String name, Specializer specializer)

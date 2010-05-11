@@ -7,7 +7,6 @@ defaults:
   facets:
     - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
-    - {name: guide, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"}
 
 operators:

@@ -20,6 +20,7 @@ public class CircularLayout extends BasicProject {
 	private double ratio;		//Proportion of the X to the Y axis
 	private int elementCount;	//How many elements to expect
 	
+	
 	public CircularLayout(OperatorData opData, Specializer spec) {
 		super(opData);
 		startAngle = Converter.toDouble(spec.get(START_ANGLE));
@@ -34,7 +35,8 @@ public class CircularLayout extends BasicProject {
 		this.radius       = radius != null ? radius : this.radius;
 		this.size         = pad != null    ? pad    : this.size;
 		this.elementCount = count != null  ? count  : this.elementCount;
-		this.ratio		  = ratio != null  ? ratio  : this.ratio;	
+		this.ratio		  = ratio != null  ? ratio  : this.ratio;
+		stateID++; //TODO: Only update stateID when something actually changes...
 		return new ArrayTuple(startAngle, elementCount, pad, radius, ratio);
 	}
 	
@@ -58,9 +60,15 @@ public class CircularLayout extends BasicProject {
 
 		return new ArrayTuple(x,y);
 	}
-
+	
 	public Tuple map(int idx) {
-		elementCount = Math.max(elementCount, idx);
+		int max = Math.max(elementCount, idx);
+		
+		if (max != elementCount) {
+			elementCount = max;
+			stateID++;
+		}
+		
 		return query(idx);
 	}
 }

@@ -36,7 +36,6 @@ import stencil.parser.tree.PythonFacet;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
-import static stencil.parser.ParserConstants.INIT_FACET;
 
 import java.util.Arrays;
 import java.lang.reflect.Method;
@@ -61,7 +60,7 @@ public final class JythonEncapsulation {
 	protected final PyCode codeCache;
 
 	public JythonEncapsulation(Python python, PythonFacet facet, EncapsulationGenerator envSource) {
-		assert !facet.getName().equals(INIT_FACET) : "Should never create an encapusluation for init block.";
+		assert !facet.isInit() : "Should never create an encapusluation for init block.";
 
 		this.facet = facet;
 		environment = envSource.registerEnv(python.getEnvironment());

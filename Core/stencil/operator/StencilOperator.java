@@ -76,7 +76,7 @@ public interface StencilOperator {
 	/**Facet used to get the ID of the current state.
 	 * This is used to determine if update operations are required.
 	 */
-	public static final String STATE_FACET = "stateID";
+	public static final String STATE_ID_FACET = "stateID";
 	
 	/**Retrieve an invokable object.  This is a combined method and target.
 	 * IllegalArgumentException is thrown when the facet is not know.

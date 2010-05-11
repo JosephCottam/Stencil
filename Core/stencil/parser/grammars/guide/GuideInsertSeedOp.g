@@ -55,7 +55,7 @@ options {
    import stencil.parser.ParseStencil;
    
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
-   import static stencil.parser.ParserConstants.MAIN_FACET;
+   import static stencil.parser.ParserConstants.MAP_FACET;
    import static stencil.interpreter.guide.Samplers.CATEGORICAL;
    import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
@@ -167,7 +167,7 @@ options {
         operatorName = "EchoContinuous";
       }
       
-      return String.format("\%1\$s.\%2\$s", operatorName, MAIN_FACET);
+      return String.format("\%1\$s.\%2\$s", operatorName, MAP_FACET);
     }
  
     /**Construct the arguments section of an echo call block.

@@ -28,6 +28,7 @@
  */
 package stencil.parser;
 
+import stencil.operator.StencilOperator;
 import stencil.parser.tree.Specializer;
 
 public abstract class ParserConstants {
@@ -51,11 +52,10 @@ public abstract class ParserConstants {
 	public static final String OPAQUE_INT	= "255";
 
 	//Block tags (for Python and corresponding to Legend items)
-	public static final String MAIN_FACET = "map";
+	public static final String MAP_FACET = StencilOperator.MAP_FACET;
 	public static final String INIT_FACET = "init";
-	public static final String QUERY_FACET = "query";
-	public static final String GUIDE_FACET = "guide";
-	public static final String DO_GUIDE_FACET = "doGuide";
+	public static final String QUERY_FACET = StencilOperator.QUERY_FACET;
+	public static final String STATE_ID_FACET = StencilOperator.STATE_ID_FACET;
 	public static final String CUSTOM_PARSER_FACET = "argumentParser";
 	
 	public static final int RANGE_START_INT = 1;

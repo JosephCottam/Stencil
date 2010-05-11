@@ -28,8 +28,6 @@
  */
 package stencil.operator.wrappers;
 
-import static stencil.parser.ParserConstants.INIT_FACET;
-
 import org.python.util.PythonInterpreter;
 
 import stencil.operator.StencilOperator;
@@ -59,7 +57,7 @@ public class EncapsulationGenerator {
 		registerEnv(pythonSpec.getEnvironment());
 		JythonOperator operator = new JythonOperator(module.getModuleData().getName(), pythonSpec.getName());
 		for (PythonFacet b: pythonSpec.getFacets()) {
-			if (b.getName().equals(INIT_FACET)) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
+			if (b.isInit()) {invokeInitBlock(b, pythonSpec.getEnvironment()); continue;}
 			
 			try {operator.add(new JythonEncapsulation(pythonSpec,b,this), b);}
 			catch (Exception e) {throw new RuntimeException(String.format("Error creating encapsulation for facet %1$s (%2$s).", b.getName(), b.getBody()),e);}

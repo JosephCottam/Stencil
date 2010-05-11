@@ -6,7 +6,6 @@ defaults:
   facets: 
     - {name: map, type: PROJECT, function: FALSE, prototype: !proto VALUE}
     - {name: query, type: PROJECT, function: FALSE, prototype: !proto VALUE}
-    - {name: guide, type: PROJECT, function: FALSE, prototype: !proto VALUE}
     
 operators:
   - name: BrewerColors

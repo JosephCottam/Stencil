@@ -32,26 +32,28 @@ import java.util.Arrays;
 
 import stencil.interpreter.Interpreter;
 import stencil.operator.StencilOperator;
-import stencil.operator.module.util.Modules;
+import stencil.operator.module.util.FacetData;
+import stencil.operator.module.util.OperatorData;
 import static stencil.operator.module.util.OperatorData.TYPE_PROJECT;
+import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.ReflectiveInvokeable;
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.Canvas;
+import stencil.parser.tree.OperatorFacet;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.View;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.TuplePrototypes;
 
 /**Operator defined through a stencil definition.
  * 
  * TODO: Add compiler step to fold these operators directly into the call chains if only has one rule predicate on ALL and has no specialization
  * TODO: These aren't always projects...but they are for now!
- * TODO: Add support for multi-faceted synthetic operators
  * */
-public class SyntheticOperator extends stencil.operator.util.BasicProject implements StencilOperator {
+public class SyntheticOperator implements StencilOperator {
 	/**Exception to indicate that no rule matches the parameters passed to the given synthetic operator.*/
 	public static class NoMatchException extends RuntimeException {
 		public NoMatchException(String message) {super(message);}
@@ -67,53 +69,50 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 			this.opDef = source;
 		}
 		
-		public Tuple query(Object... values) {return map(values);}
-
-		/**Returns the mapping set in this operator.*/
-		public Tuple map(Object... values) {
-			if (opDef.getArguments().size() != values.length) {
-				int expected = opDef.getArguments().size();
+		public Tuple query(Object... values) {return process(opDef.getQuery(), values);}
+		public Tuple map(Object... values) {return process(opDef.getMap(), values);}
+		public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();} 
+			
+		private Tuple process(OperatorFacet facet, Object... values) {
+			if (facet.getArguments().size() != values.length) {
+				int expected = facet.getArguments().size();
 				throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
 			}
 			Tuple prefilter;
 			Tuple tuple = new ArrayTuple(values);
 			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
 			
-			try {prefilter = Interpreter.process(env, opDef.getPrefilterRules());}
-			catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s and tuple %2$s.", opDef.getName(), tuple.toString()));}
+			try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
+			catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}
 			env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 			
-			OperatorRule action = matchingAction(env);
+			OperatorRule action = matchingAction(facet, env);
 
 			if (action != null) {
 				try {
 					 Tuple result = action.invoke(env);
-					 result = Tuples.align(result, opDef.getResults());
+					 result = Tuples.align(result, facet.getResults());
 					 return result;
 				} catch (Exception e) {
-					throw new RuntimeException (String.format("Error executing method in %1$s.", opDef.getName()),e);
+					throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", opDef.getName(), facet.getName()),e);
 				}
 			}
 			
 			throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
-		}
-		
-
+		}		
+				
 		/**Find the action that matches the given tuple.  If none does, return null.*/
-		private OperatorRule matchingAction(Environment tuple) {
-			for (OperatorRule action: opDef.getRules()) {
+		private OperatorRule matchingAction(OperatorFacet facet, Environment tuple) {
+			for (OperatorRule action: facet.getRules()) {
 				if (action.matches(tuple)) {
 					return action;
 				}
 			}
 			return null;
 		}
-
 	}
 	
-	/**Indicates that rule exists to handle a value, may be returned from a query when a rule exists to handle a value.
-	 * Query will not invoke the rule (because it may have side-effects) but will instead return this value in a tuple.*/
-	public static final Object RULE_EXISTS = "EXISTS";
+	protected final OperatorData operatorData;
 
 	protected final String module;
 
@@ -121,20 +120,28 @@ public class SyntheticOperator extends stencil.operator.util.BasicProject implem
 	
 	/**Create a Stencil operator from a specification.*/
 	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
-		super(Modules.basicOperatorData(module, opDef.getName(), TYPE_PROJECT, TuplePrototypes.getNames(opDef.getResults())));
 		this.source = new SyntheticInvokeTarget(opDef);
 		this.module = module;
+
+		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER);
+		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, TYPE_PROJECT, false, opDef.getMap().getResults()));	
+		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));	
+		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));	
 	}
 
 	public Invokeable getFacet(String name) throws IllegalArgumentException {
 		try {
 			if (name.equals(StencilOperator.MAP_FACET) 
-				|| name.equals(StencilOperator.QUERY_FACET)) {
+				|| name.equals(StencilOperator.QUERY_FACET)
+			    || name.equals(StencilOperator.STATE_ID_FACET)) {
 				return new ReflectiveInvokeable(name, source);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
 		throw new IllegalArgumentException("Facet not defined: "+ name);
 	}
+
+	public String getName() {return operatorData.getName();}
+	public OperatorData getOperatorData() {return operatorData;}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}

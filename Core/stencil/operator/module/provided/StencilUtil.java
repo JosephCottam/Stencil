@@ -97,7 +97,7 @@ public class StencilUtil extends BasicModule {
 			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
 			ld.addFacet(fd);
 			
-			fd = ld.getFacet(StencilOperator.STATE_FACET);
+			fd = ld.getFacet(StencilOperator.STATE_ID_FACET);
 			ld.addFacet(fd);
 			
 			return ld;

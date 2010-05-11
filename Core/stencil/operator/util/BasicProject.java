@@ -9,6 +9,7 @@ import stencil.operator.module.util.OperatorData;
 
 public abstract class BasicProject implements StencilOperator {
 	protected final OperatorData operatorData;
+	protected int stateID = Integer.MIN_VALUE;
 	
 	protected BasicProject(OperatorData opData) {
 		this.operatorData = opData;
@@ -33,6 +34,8 @@ public abstract class BasicProject implements StencilOperator {
 	
 	public OperatorData getOperatorData() {return operatorData;}	
 	public String getName() {return operatorData.getName();}
+
+	public int StateID() {return stateID;}
 	
 	/**Unsupported operation in BasicProject, must be supplied by the 
 	 * actual implementation.

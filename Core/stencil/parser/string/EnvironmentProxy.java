@@ -64,7 +64,7 @@ public final class EnvironmentProxy {
 	 */
 	private static final class AncestryPackage {
 		final Consumes c;
-		final Operator o;
+		final OperatorFacet o;
 		final Guide g;
 		final Layer l;
 		final Program program;
@@ -73,7 +73,7 @@ public final class EnvironmentProxy {
 
 		public AncestryPackage(CommonTree t) {
 			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
-			o = (Operator) t.getAncestor(StencilParser.OPERATOR);
+			o = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
 			g = (Guide) t.getAncestor(StencilParser.GUIDE);
 			l= (Layer) t.getAncestor(StencilParser.LAYER);
 
@@ -111,7 +111,7 @@ public final class EnvironmentProxy {
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
 		if (anc.c != null) {return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();}
-		if (anc.o != null) {return anc.o.getYields().getInput();}
+		if (anc.o != null) {return anc.o.getArguments();}
 		if (anc.g != null) {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
 				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();

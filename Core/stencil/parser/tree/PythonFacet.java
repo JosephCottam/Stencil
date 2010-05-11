@@ -1,9 +1,6 @@
 package stencil.parser.tree;
 
 import static stencil.parser.ParserConstants.INIT_FACET;
-import static stencil.parser.ParserConstants.MAIN_FACET;
-import static stencil.parser.ParserConstants.QUERY_FACET;
-
 import java.util.Map;
 import org.antlr.runtime.Token;
 
@@ -35,7 +32,4 @@ public final class PythonFacet extends StencilTree {
 
 	//Blocks to test for special cases...
 	public boolean isInit() {return token.getText().endsWith(INIT_FACET);}
-	public boolean isMain() {return token.getText().endsWith(MAIN_FACET);}
-	public boolean isQuery() {return token.getText().endsWith(QUERY_FACET);}
-	
 }

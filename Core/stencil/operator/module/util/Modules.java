@@ -143,7 +143,7 @@ public final class Modules {
 	 * Default facet set is Map and Query.
 	 * 
 	 **/
-	public static OperatorData basicLegendData(String module, String name) {
+	public static OperatorData basicOperatorData(String module, String name) {
 		return basicOperatorData(module, name, TYPE_PROJECT, "VALUE");
 	}
 	
@@ -162,9 +162,8 @@ public final class Modules {
 	
 	public static OperatorData basicOperatorData(String module, String name, String type, List<String> fields) {
 		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER);
-		od.addFacet(new FacetData(ParserConstants.MAIN_FACET, type, false, fields));
+		od.addFacet(new FacetData(ParserConstants.MAP_FACET, type, false, fields));
 		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, type, false, fields));
-		od.addFacet(new FacetData(ParserConstants.GUIDE_FACET, type, false, fields));
 		return od;
 	}
 }
