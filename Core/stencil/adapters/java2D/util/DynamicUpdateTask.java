@@ -31,6 +31,7 @@ public final class DynamicUpdateTask implements UpdateTask {
 	public boolean needsUpdate() {return rule.requiresUpdate();}
 
 	public void update() {
+		System.out.println("updating...");
 		//TODO: Add support for Local!
 		
 		//Update each element 
@@ -41,7 +42,7 @@ public final class DynamicUpdateTask implements UpdateTask {
 			try {
 				Tuple result = Interpreter.process(source, rule.getAction());
 				Glyph2D newGlyph = glyph.update(result);
-				if (result != newGlyph) {table.update(newGlyph);}
+				if (glyph != newGlyph) {table.update(newGlyph);}
 			}
 			catch (Exception ex) {
 				System.err.println("Error in dynamic update.");

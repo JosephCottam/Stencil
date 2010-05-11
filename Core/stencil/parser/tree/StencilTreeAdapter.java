@@ -50,7 +50,7 @@ public class StencilTreeAdapter extends CommonTreeAdaptor {
 		case 7	: t = new Consumes(token); break;		//Token CONSUMES
 		case 85	: t = new Yields(token); break;		//Token YIELDS
 		//Default for TUPLE_VALUE
-		//Default for STATE_QUERY
+		case 36	: t = new StateQuery(token); break;		//Token STATE_QUERY
 		//Default for GROUP
 		//Default for ANIMATED_DYNAMIC
 		case 97	: throw new IllegalArgumentException("Attempted to create tree-node for token on error list: WS");

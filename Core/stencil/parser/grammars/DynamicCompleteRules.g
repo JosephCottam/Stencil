@@ -41,17 +41,21 @@ options {
 @header{
   package stencil.parser.string;
 	
+	import stencil.util.MultiPartName;
   import stencil.parser.tree.*;
   import stencil.operator.StencilOperator;
+  import stencil.operator.module.util.FacetData;
+  import stencil.operator.module.util.OperatorData;
   import stencil.operator.util.Invokeable;
   import static stencil.parser.string.GuideTransfer.stateQueryList;
-  
+  import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
 @members {
   public Object transform(Object t) {
     t = changeType(t);
-    t = convertAll(t);;
+    t = convertAll(t);
+    t = toQuery(t);
     return t;
   } 
   
@@ -62,6 +66,11 @@ options {
    private Object convertAll(Object t) {
      return downup(t, this, "convert");
    }
+   private Object toQuery(Object t) {
+     return downup(t, this, "toQuery");
+   }
+   
+   private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
 }
 
 changeType: ^(CONSUMES f=. pf=. l=. r=. v=. c=. ^(LIST toDynamic*));
@@ -75,15 +84,31 @@ callChain: ^(CALL_CHAIN target .) -> target;
 target
   @after{
      if ($f != null) {
+       MultiPartName mpName = new MultiPartName(((Function) f).getName());
        StencilOperator op =((Function) f).getTarget().getOperator();
-       if (op.getOperatorData().hasFacet(StencilOperator.STATE_FACET)) {
+       OperatorData od = op.getOperatorData();
+       FacetData fd = od.getFacet(mpName.getFacet());
+       if (fd.isFunction()) { //Do nothing...
+       } else if (!fd.isFunction() && od.hasFacet(StencilOperator.STATE_FACET)) {
           Invokeable inv2 = op.getFacet(StencilOperator.STATE_FACET);
           ((AstInvokeable) ((CommonTree)$target.tree)).setInvokeable(inv2);
           ((AstInvokeable) ((CommonTree)$target.tree)).setOperator(op);
+       } else {
+            System.out.println("Bad situation: Non-function with no state facet and no synthetic state operator: " + mpName.toString());
+//          throw new Error("Non-function with no state facet found...implement synthetic state operator.");
        }
     }
   }
   : ^(f=FUNCTION inv=. . . . target) -> ^(AST_INVOKEABLE[$f.text] target)
   | ^(PACK .*) -> ^(PACK);
   
+
+toQuery 
+  @after{
+    AstInvokeable inv=((Function) $toQuery.tree).getTarget();
+    inv.changeFacet(QUERY_FACET);
+  }
+  : ^(f=FUNCTION rest+=.*) 
+          {$f.getAncestor(DYNAMIC_RULE) != null}? ->
+          ^(FUNCTION[queryName($f.getText())]  $rest*);
 

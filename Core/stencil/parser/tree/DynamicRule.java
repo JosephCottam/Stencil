@@ -12,14 +12,14 @@ import stencil.types.Converter;
 
 public class DynamicRule extends StencilTree {
 	private static final Object[] EMPTY_ARGS = new Object[0];
-	private static int[] cachedIDs;
+	private int[] cachedIDs;
 	
 	public DynamicRule(Token token) {super(token);}
 
 	public Rule getAction() {return (Rule) getChild(0);}
 
 	/**What are the state facets of this query.*/
-	public List<AstInvokeable> getStateQuery() {return (List) getChild(1);}
+	public List<AstInvokeable> getStateQuery() {return (StateQuery) getChild(1);}
 	
 	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
@@ -48,16 +48,14 @@ public class DynamicRule extends StencilTree {
 		}
 		
 		for (int i=0; i< lst.size(); i++) {
-			nowIDs[i] = Converter.toInteger(lst.get(i).invoke(EMPTY_ARGS));
+			nowIDs[i] = Converter.toInteger(lst.get(i).invoke(EMPTY_ARGS).get(0));
 		}		
 		
-		boolean result = true;
-		for (int i=0; result && i < nowIDs.length; i++) {
-			result = result && nowIDs[i] == cachedIDs[i];
+		boolean matches = true;	//Do the two ID arrays match?
+		for (int i=0; matches && i < nowIDs.length; i++) {
+			matches = matches && (nowIDs[i] == cachedIDs[i]);
 		}
-		
 		cachedIDs = nowIDs;
-		
-		return !result;
+		return !matches;
 	}
 }
