@@ -230,7 +230,6 @@ options {
       Specializer strat = requestedGuides.get(key(layer.getName(), field));
       return operatorName(strat);
     }
-    
 }
 
 //Identify requested guides from canvas def
@@ -240,11 +239,15 @@ listRequirements: ^(GUIDE_DIRECT ^(GUIDE type=. spec=. sel=. actions=.))
 //Replace the #-> with an echo operator...
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD {adaptor.dupTree($t)}));  
+		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD $t));  
 		
 ensure:
-	^(r=RULE t=. c=. b=.)
-	    {t.getType()==RESULT && requiresChanges((CallChain) c)}? ->
-		  ^(RULE $t ^(CALL_CHAIN ^(FUNCTION[selectOperator(getStart($c))] {spec(getStart($c))} {echoArgs(getStart($c))} DIRECT_YIELD {adaptor.dupTree(((CallChain) c).getStart())})) $b); 
-		        
-		
+  ^(c=CALL_CHAIN t=. d=.)
+		  {$c.getParent().getChild(0).getType() == RESULT &&  requiresChanges((CallChain) $c)}? ->
+		    ^(CALL_CHAIN    
+		         ^(FUNCTION[selectOperator($t)] 
+                {spec($t)} 
+                {echoArgs($t)} 
+                DIRECT_YIELD 
+                $t)
+            $d);

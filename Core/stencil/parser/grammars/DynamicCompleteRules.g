@@ -44,25 +44,11 @@ options {
   import stencil.parser.tree.*;
   import stencil.operator.StencilOperator;
   import stencil.operator.util.Invokeable;
+  import static stencil.parser.string.GuideTransfer.stateQueryList;
   
 }
 
 @members {
-  /**Turns a chain into a list, discarding anything
-   * that is not an AST_INVOKEABLE with properly set operator.
-   */
-  private Tree toCompactList(Tree tree) {
-     Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
-     while (tree != null) {
-       if (tree.getType() == AST_INVOKEABLE &&
-          ((AstInvokeable) tree).getInvokeable() != null) {
-         adaptor.addChild(rv, adaptor.dupNode(tree));
-       }
-       tree = tree.getChild(0);
-     }
-     return rv;
-  }
-  
   public Object transform(Object t) {
     t = changeType(t);
     t = convertAll(t);;
@@ -84,7 +70,7 @@ toDynamic:  ^(r=RULE rest+=.*) -> ^(DYNAMIC_RULE {adaptor.dupTree($r)} {adaptor.
             
        
 convert: ^(DYNAMIC_RULE . compactQuery);
-compactQuery: ^(RULE . cc=callChain .) -> {toCompactList($cc.tree)};
+compactQuery: ^(RULE . cc=callChain .) -> {stateQueryList(adaptor, $cc.tree)};
 callChain: ^(CALL_CHAIN target .) -> target;
 target
   @after{

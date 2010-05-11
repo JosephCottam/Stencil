@@ -89,6 +89,6 @@ options {
 topdown 
   : (FUNCTION AST_INVOKEABLE ) => ^(f=FUNCTION AST_INVOKEABLE .*) 
   | ^(f=FUNCTION spec=. args=. yield=. pack=.) -> ^(FUNCTION {makeInvokeable($f)} $spec $args $yield $pack);
-//  | ^(f=FUNCTION rest=.*) -> ^(FUNCTION {makeInvokeable($f)} $rest*);
+//  | ^(f=FUNCTION rest+=.*) -> ^(FUNCTION {makeInvokeable($f)} $rest*);
 
 

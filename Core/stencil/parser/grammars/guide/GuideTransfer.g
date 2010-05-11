@@ -162,7 +162,7 @@ options {
 	/**Turns a chain into a list, discarding anything
 	 * that is not an AST_INVOKEABLE with properly set operator.
 	 */
-	private Tree toCompactList(Tree tree) {
+	public static Tree stateQueryList(TreeAdaptor adaptor, Tree tree) {
 	   Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
 	   while (tree != null) {
 	     if (tree.getType() == AST_INVOKEABLE &&
@@ -201,7 +201,7 @@ copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAI
         ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(STATE_QUERY {adaptor.dupTree($chain)}));
 
 
-foldQuery: ^(STATE_QUERY qc=foldQueryChain) -> {toCompactList($qc.tree)};
+foldQuery: ^(STATE_QUERY qc=foldQueryChain) -> {stateQueryList(adaptor, $qc.tree)};
 foldQueryChain
   @after{
      if ($f != null) {
