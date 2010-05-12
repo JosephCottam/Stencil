@@ -172,11 +172,11 @@ public abstract class ParseStencil {
 		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
 		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
 
-		//Group the operator chains
+		//Create prototype definitions for internally defined streams
 		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
 		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) liftStreams.downup(p);
-		
+
 		//Group the operator chains
 		SeparateRules separate = new SeparateRules(treeTokens);
 		separate.setTreeAdaptor(TREE_ADAPTOR);
@@ -200,12 +200,28 @@ public abstract class ParseStencil {
 		customArgs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) customArgs.downup(p);
 
+		//Prepare for multi-facet synthetic operators by converting all operator defs to template/ref pairs
+		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
+		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opToTemplate.downup(p);		
+		
 		//Add default specializers where required
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
-		defaultSpecializers.downup(p);
+		p = (Program) defaultSpecializers.downup(p);
+		
+		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
+		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opExplicit.downup(p);
+
+		//Expand operatorDefs to include query and stateID
+		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
+		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opExtendFacets.transform(p);
 		
 		//Remove all operator references
+		treeTokens = new CommonTreeNodeStream(p);
+		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
 		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
 		opTemplates.setTreeAdaptor(TREE_ADAPTOR);
 		opTemplates.downup(p);
@@ -214,11 +230,6 @@ public abstract class ParseStencil {
 		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
 		envSize.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) envSize.downup(p);
-
-		//Expand operatorDefs to include query and stateID
-		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
-		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExtendFacets.transform(p);
 		
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);

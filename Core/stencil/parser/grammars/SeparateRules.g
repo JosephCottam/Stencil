@@ -41,6 +41,7 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
+	import static stencil.parser.string.StencilParser.*;
 }
 
 @members {
@@ -68,14 +69,14 @@ options {
    protected StencilTree result(CommonTree source)        {return siftRules((List<Rule>) source, RESULT);}
 }
 
-topdown : ^(CONSUMES filters=. rules=.) 
-	-> ^(CONSUMES 
-	       $filters 
-	       {prefilter(rules)} 
-	       {local(rules)} 
-	       {result(rules)} 
-	       {view(rules)} 
-	       {canvas(rules)});
+topdown: ^(CONSUMES filters=. rules=.) 
+		-> ^(CONSUMES 
+              $filters 
+              {prefilter(rules)} 
+              {local(rules)} 
+              {result(rules)} 
+              {view(rules)} 
+              {canvas(rules)});
 	 
 	 
 	 

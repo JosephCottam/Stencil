@@ -40,6 +40,11 @@ public class OperatorTemplate extends StencilTree {
 	
 	public Operator instantiate(String name, Specializer specializer, TreeAdaptor adaptor) {
 		Operator op = (Operator) adaptor.create(OPERATOR, name);
+
+		for (int i=0; i<this.getChildCount(); i++) {
+			adaptor.addChild(op, adaptor.dupTree(this.getChild(i)));
+		}
+		
 		return op;
 	}
 }

@@ -27,9 +27,14 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Make sure a query and StateID facet exist for each operator.
+/**Make all anonymous operators explicit.  Anonymous operators are
+ * those used in call chains that do not exist as references.
+ *
+ * Since all synthetic operator definitions are converted into
+ * template/reference pairs, this preserves single-instance semantics
+ * for synthetic operators. 
  */
-tree grammar OperatorExtendFacets;
+tree grammar OperatorExplicit;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;
@@ -54,31 +59,38 @@ options {
 }
 
 @members {
-	public Object transform(Object t) {
-		t = replicate(t);
-		t = toQuery(t);
-		return t;
-	}	
+   /**Does the name appear as an operator def/proxy/ref?*/
+   private boolean covered(Tree target) {
+	  Program program = (Program) target.getAncestor(PROGRAM);
+	  List<? extends Tree> operators = program.getOperators();
+	  String name = target.getText();
+	  for (Tree o: operators) {
+	      if (o.getText().equals(name)) {return true;}
+	  }
+	  return false;
+   }
 
-	 //Build a mapping from the layer/attribute names to mapping trees
-	 private Object replicate(Object t) {
-	   return downup(t, this, "replicate");
-	 }
-	 
-	 private Object toQuery(Object t) {
-	   return downup(t, this, "toQuery");
-	 }
+   /**Create a cover reference for a given operator IF
+    * there is not an operator ref with the given name.
+    */
+   private String cover(CommonTree target) {
+      MultiPartName name = new MultiPartName(target.getText());
+      if (covered(target)) {return name.getName();} 
+	
+	  String newName = genSym(name.getName());    	  //create a new name
+	  Program program = (Program) target.getAncestor(PROGRAM);
+	  List operators = program.getOperators();
+	  
+	  Tree ref = (Tree) adaptor.create(OPERATOR_REFERENCE, newName);     	  //Cover operator
+	  adaptor.addChild(ref, adaptor.create(OPERATOR_BASE, name.getName()));
+	  adaptor.addChild(ref, adaptor.dupTree(target.getFirstChildWithType(SPECIALIZER)));
+	  
+	  adaptor.addChild(operators, ref);  	  //Add new operator to list
+	  
+	  return newName;
+   } 
+   
 }
 
-//Extend the operator definition to include the required facets 
-replicate: ^(r=OPERATOR_TEMPLATE proto=. prefilter=. rules=.) 
-	   -> ^(OPERATOR_TEMPLATE
-	          ^(OPERATOR_FACET[MAP_FACET] $proto $prefilter $rules) 
-	          ^(OPERATOR_FACET[QUERY_FACET] $proto $prefilter $rules)
-	          STATE_QUERY);//Query is filled in later...
-	          
-
-//Properly construct the query facet
-toQuery: ^(f=FUNCTION rest+=.*) 
-          {$f.getAncestor(OPERATOR_FACET) != null && $f.getAncestor(OPERATOR_FACET).getText().equals("query")}? ->
-          ^(FUNCTION[queryName($f.getText())]  $rest*);
+topdown
+   : ^(f=FUNCTION rest+=.*)  -> ^(FUNCTION[cover($f)] $rest*);

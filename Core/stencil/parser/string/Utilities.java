@@ -21,7 +21,7 @@ public class Utilities {
 	private static int gsCounter = 0;
 	public static String genSym(String name) {
 		if (gsCounter <0) {throw new Error("Exceed gensym guranteed namespace capacity.");}
-		return "#" + name + gsCounter;
+		return "#" + name + "_" + gsCounter++;
 	}
 	
 	

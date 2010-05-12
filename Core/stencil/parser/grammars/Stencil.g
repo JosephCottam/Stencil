@@ -191,9 +191,8 @@ program : imports* globalValue* externalStream* order canvasLayer (streamDef | l
           canvasLayer
           ^(LIST["Streams"] streamDef*) 
           ^(LIST["Layers"] layerDef*) 
-          ^(LIST["Operators"] operatorDef*) 
-          ^(LIST["Pythons"] pythonDef*) 
-          ^(LIST["OperatorTemplates"] operatorTemplate*));
+          ^(LIST["Operators"] operatorDef* operatorTemplate*) 
+          ^(LIST["Pythons"] pythonDef*));
 
 
 
