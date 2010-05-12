@@ -73,7 +73,6 @@ public class CallChain extends StencilTree {
 	 * actions will be taken in the chain.  If a 'null' is a valid return value from a given
 	 * function, then you must wrap it in a tuple and give it an appropriate key.
 	 *
-	 * TODO: Add better return logic when null is returned from the call.
 	 * @param source
 	 * @return
 	 * @throws Exception

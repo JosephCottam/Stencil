@@ -8,6 +8,11 @@
 			outputdirectory="${parser}"
 			libdirectory="${parser}"
 		/>
+        <antlr
+            target="${grammars}/OperatorToOpTemplate.g"
+            outputdirectory="${parser}"
+            libdirectory="${parser}"
+        />
 
 		<antlr
 			target="${grammars}/LiftStreamPrototypes.g"

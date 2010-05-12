@@ -25,17 +25,29 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */ 
+ 
+/**Convert operator definition to template/reference pairs.
  */
-package stencil.parser.tree;
-
-import org.antlr.runtime.Token;
-import static stencil.parser.string.StencilParser.OPERATOR_BASE;
-import static stencil.parser.string.StencilParser.SPECIALIZER;
-public class OperatorReference extends StencilTree {
-	public OperatorReference(Token t) {super(t);}
-	
-	public String getName() {return token.getText();}
-	
-	public OperatorBase getBase() {return (OperatorBase) getFirstChildWithType(OPERATOR_BASE);}
-	public Specializer getSpecializer() {return (Specializer) getFirstChildWithType(SPECIALIZER);}
+tree grammar OperatorToOpTemplate;
+options {
+	tokenVocab = Stencil;
+	ASTLabelType = CommonTree;	
+	output = AST;
+	filter = true;
 }
+
+@header{
+	package stencil.parser.string;
+	
+	import stencil.parser.tree.*;
+  import static stencil.parser.string.Utilities.genSym;
+}
+@members{
+   String newName;
+}
+
+topdown: ^(o=OPERATOR rest+=.*) {newName=genSym($o.text);}
+  ->
+  ^(OPERATOR_REFERENCE[$o.text] OPERATOR_BASE[newName] ^(SPECIALIZER DEFAULT))
+  ^(OPERATOR_TEMPLATE[newName] $rest*);

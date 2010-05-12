@@ -62,7 +62,7 @@ options {
   import stencil.operator.module.util.*;
   import stencil.operator.util.Invokeable;
   import stencil.operator.StencilOperator;
-
+  
   import static stencil.operator.module.util.OperatorData.TYPE_CATEGORIZE;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.STATE_ID_FACET;
@@ -130,12 +130,6 @@ options {
       String key = layer + ":" + att.getName();	//Trim to just the attribute name
       return key;
     }
-    
-    private String guideName(String name) {
-      //TODO: Add switch here to check if guide exists and only use Query if it doesn't
-      return new MultiPartName(name).modSuffix(QUERY_FACET).toString();
-    }       
-
 
 	//EnsureGuideOp guarantees that a sample operator exists; this
 	//cuts things down so the generator only includes things after that point
@@ -185,21 +179,7 @@ copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAI
         ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(STATE_QUERY {adaptor.dupTree($chain)}));
 
 
-foldQuery: ^(STATE_QUERY qc=foldQueryChain) -> {stateQueryList(adaptor, $qc.tree)};
-foldQueryChain
-  @after{
-     if ($f != null) {
-       StencilOperator op =((Function) f).getTarget().getOperator();
-       if (op.getOperatorData().hasFacet(STATE_ID_FACET)) {
-          Invokeable inv = op.getFacet(STATE_ID_FACET);
-          ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setInvokeable(inv);
-          ((AstInvokeable) ((CommonTree)$foldQueryChain.tree)).setOperator(op);
-       }
-    }
-  }
-  : ^(f=FUNCTION (options {greedy=false;} :.)* foldQueryChain) -> ^(AST_INVOKEABLE[$f.text] foldQueryChain)
-  | ^(PACK .*) -> ^(PACK);
-	
+foldQuery: ^(STATE_QUERY qc=.) -> {stateQueryList(adaptor, $qc)};	
 
 //trimMappings  -----------------------------------------------
 trimGuide
@@ -217,4 +197,4 @@ renameMappingsDown
      Function func = ((Function) $renameMappingsDown.tree);
      func.getTarget().changeFacet(QUERY_FACET);
    }
-   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[guideName($f.text)] $i $spec $args $style $c);
+   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);

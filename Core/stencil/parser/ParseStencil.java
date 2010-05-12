@@ -220,110 +220,110 @@ public abstract class ParseStencil {
 		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) opExtendFacets.transform(p);
 		
-//		//Create ad-hoc operators
-//		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-//		adHoc.downup(p);
-//		
-//		//Add default specializers to all function nodes
-//		defaultSpecializers.downup(p);
-//		
-//		//Add default packs where required
-//		DefaultPack defaultPack = new DefaultPack(treeTokens);
-//		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
-//		defaultPack.downup(p);
-//
-//		
-//		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-//		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);
-//		guideSelector.setTreeAdaptor(TREE_ADAPTOR);
-//		guideSelector.downup(p);
-//		
-//		//Distinguish between guide types
-//		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
-//		guideDistinguish.downup(p);
-//		
-//		//Ensure that auto-guide requirements are met
-//		GuideInsertSeedOp ensure = new GuideInsertSeedOp(treeTokens,modules); 
-//		ensure.setTreeAdaptor(TREE_ADAPTOR);		
-//		p = (Program) ensure.transform(p);
-//
-//		//Add default specializers to all function nodes (cover things recently added)
-//		defaultSpecializers.downup(p);
-//		
-//		//Prime tree nodes with operators from the modules cache
-//		SetOperators set = new SetOperators(treeTokens, modules);
-//		set.setTreeAdaptor(TREE_ADAPTOR);
-//		set.downup(p);
-//		
-//		GuideTransfer ag = new GuideTransfer(treeTokens, modules);
-//		ag.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) ag.transform(p);
-//		
-//		GuideLiftGenerator gLiftGenerator = new GuideLiftGenerator(treeTokens);
-//		gLiftGenerator.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) gLiftGenerator.downup(p);
-//
-//		GuideDefaultRules gDefaultRules = new GuideDefaultRules(treeTokens);
-//		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) gDefaultRules.downup(p);
-//
-//		defaultSpecializers.downup(p);
-//
-//		SetOperators set2 = new SetOperators(treeTokens, modules);
-//		set2.setTreeAdaptor(TREE_ADAPTOR);
-//		set2.downup(p);
-//
-//		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
-//		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
-//		gSampleOp.downup(p);
-//
-//		GuideExtendQuery guideExtend = new GuideExtendQuery(treeTokens);
-//		guideExtend.setTreeAdaptor(TREE_ADAPTOR);
-//		guideExtend.downup(p);
-//
-//		GuideClean guideClean = new GuideClean(treeTokens);
-//		guideClean.setTreeAdaptor(TREE_ADAPTOR);
-//		guideClean.downup(p);
-//
-//		//END GUIDE SYSTEM----------------------------------------------------------------------------------
-//		//BEGIN DYNAMIC BINDING ----------------------------------------------------------------------------------
-//
-//		DynamicSeparateRules dynamicSeparate = new DynamicSeparateRules(treeTokens);
-//		dynamicSeparate.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) dynamicSeparate.downup(p);
-//		
-//		DynamicToSimple dynamicToSimple = new DynamicToSimple(treeTokens);
-//	    dynamicToSimple.setTreeAdaptor(TREE_ADAPTOR);
-//	    p = (Program) dynamicToSimple.downup(p);
-// 
-//	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
-//	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
-//	    p = (Program) completeDynamics.transform(p);
-//		//END DYNAMIC BINDING ----------------------------------------------------------------------------------
-//	    
-//		TupleRefChain trc = new TupleRefChain(treeTokens);
-//		trc.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) trc.downup(p);
-//
-//		//Ensure that all tuple references have a frame reference
-//		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
-//		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) frameRefs.downup(p);
-//		
-//		//Numeralize all tuple references
-//		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
-//		numeralize.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) numeralize.downup(p);		
-//		
-//		//Since some transformations change chain lengths, this must be re-run.
-//		p = (Program) envSize.downup(p);
-//		
-//		//Move all constant rules up to the defaults section so they are only evaluated once.
-//		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
-//		sharedLifter.setTreeAdaptor(TREE_ADAPTOR);
-//		p = (Program) sharedLifter.transform(p);
-//
-//		validate(p);
+		//Create ad-hoc operators
+		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
+		adHoc.downup(p);
+		
+		//Add default specializers to all function nodes
+		defaultSpecializers.downup(p);
+		
+		//Add default packs where required
+		DefaultPack defaultPack = new DefaultPack(treeTokens);
+		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
+		defaultPack.downup(p);
+
+		
+		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
+		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);
+		guideSelector.setTreeAdaptor(TREE_ADAPTOR);
+		guideSelector.downup(p);
+		
+		//Distinguish between guide types
+		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
+		guideDistinguish.downup(p);
+		
+		//Ensure that auto-guide requirements are met
+		GuideInsertSeedOp ensure = new GuideInsertSeedOp(treeTokens,modules); 
+		ensure.setTreeAdaptor(TREE_ADAPTOR);		
+		p = (Program) ensure.transform(p);
+
+		//Add default specializers to all function nodes (cover things recently added)
+		defaultSpecializers.downup(p);
+		
+		//Prime tree nodes with operators from the modules cache
+		SetOperators set = new SetOperators(treeTokens, modules);
+		set.setTreeAdaptor(TREE_ADAPTOR);
+		set.downup(p);
+		
+		GuideTransfer ag = new GuideTransfer(treeTokens, modules);
+		ag.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) ag.transform(p);
+		
+		GuideLiftGenerator gLiftGenerator = new GuideLiftGenerator(treeTokens);
+		gLiftGenerator.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) gLiftGenerator.downup(p);
+
+		GuideDefaultRules gDefaultRules = new GuideDefaultRules(treeTokens);
+		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) gDefaultRules.downup(p);
+
+		defaultSpecializers.downup(p);
+
+		SetOperators set2 = new SetOperators(treeTokens, modules);
+		set2.setTreeAdaptor(TREE_ADAPTOR);
+		set2.downup(p);
+
+		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
+		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
+		gSampleOp.downup(p);
+
+		GuideExtendQuery guideExtend = new GuideExtendQuery(treeTokens);
+		guideExtend.setTreeAdaptor(TREE_ADAPTOR);
+		guideExtend.downup(p);
+
+		GuideClean guideClean = new GuideClean(treeTokens);
+		guideClean.setTreeAdaptor(TREE_ADAPTOR);
+		guideClean.downup(p);
+
+		//END GUIDE SYSTEM----------------------------------------------------------------------------------
+		//BEGIN DYNAMIC BINDING ----------------------------------------------------------------------------------
+
+		DynamicSeparateRules dynamicSeparate = new DynamicSeparateRules(treeTokens);
+		dynamicSeparate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) dynamicSeparate.downup(p);
+		
+		DynamicToSimple dynamicToSimple = new DynamicToSimple(treeTokens);
+	    dynamicToSimple.setTreeAdaptor(TREE_ADAPTOR);
+	    p = (Program) dynamicToSimple.downup(p);
+ 
+	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
+	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
+	    p = (Program) completeDynamics.transform(p);
+		//END DYNAMIC BINDING ----------------------------------------------------------------------------------
+	    
+		TupleRefChain trc = new TupleRefChain(treeTokens);
+		trc.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) trc.downup(p);
+
+		//Ensure that all tuple references have a frame reference
+		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
+		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) frameRefs.downup(p);
+		
+		//Numeralize all tuple references
+		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
+		numeralize.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) numeralize.downup(p);		
+		
+		//Since some transformations change chain lengths, this must be re-run.
+		p = (Program) envSize.downup(p);
+		
+		//Move all constant rules up to the defaults section so they are only evaluated once.
+		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
+		sharedLifter.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) sharedLifter.transform(p);
+
+		validate(p);
 		
 		return p;
 	}

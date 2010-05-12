@@ -76,32 +76,7 @@ options {
 changeType: ^(CONSUMES f=. pf=. l=. r=. v=. c=. ^(LIST toDynamic*));
 toDynamic:  ^(r=RULE rest+=.*) -> ^(DYNAMIC_RULE {adaptor.dupTree($r)} {adaptor.dupTree($r)});
             
-            
-       
-convert: ^(DYNAMIC_RULE . compactQuery);
-compactQuery: ^(RULE . cc=callChain .) -> {stateQueryList(adaptor, $cc.tree)};
-callChain: ^(CALL_CHAIN target .) -> target;
-target
-  @after{
-     if ($f != null) {
-       MultiPartName mpName = new MultiPartName(((Function) f).getName());
-       StencilOperator op =((Function) f).getTarget().getOperator();
-       OperatorData od = op.getOperatorData();
-       FacetData fd = od.getFacet(mpName.getFacet());
-       if (fd.isFunction()) { //Do nothing...
-       } else if (!fd.isFunction() && od.hasFacet(StencilOperator.STATE_ID_FACET)) {
-          Invokeable inv2 = op.getFacet(StencilOperator.STATE_ID_FACET);
-          ((AstInvokeable) ((CommonTree)$target.tree)).setInvokeable(inv2);
-          ((AstInvokeable) ((CommonTree)$target.tree)).setOperator(op);
-       } else {
-            System.out.println("Bad situation: Non-function with no state facet and no synthetic state operator: " + mpName.toString());
-//          throw new Error("Non-function with no state facet found...implement synthetic state operator.");
-       }
-    }
-  }
-  : ^(f=FUNCTION inv=. . . . target) -> ^(AST_INVOKEABLE[$f.text] target)
-  | ^(PACK .*) -> ^(PACK);
-  
+convert: ^(DYNAMIC_RULE r=. sq=.) -> ^(DYNAMIC_RULE $r {stateQueryList(adaptor, $sq)});  
 
 toQuery 
   @after{

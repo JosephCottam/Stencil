@@ -57,10 +57,9 @@ options {
 	public Object transform(Object t) {
 		t = replicate(t);
 		t = toQuery(t);
-		t = toStateQuery(t);
 		return t;
 	}	
-	
+
 	 //Build a mapping from the layer/attribute names to mapping trees
 	 private Object replicate(Object t) {
 	   return downup(t, this, "replicate");
@@ -69,32 +68,17 @@ options {
 	 private Object toQuery(Object t) {
 	   return downup(t, this, "toQuery");
 	 }
-	 
-	 private Object toStateQuery(Object t) {
-	   return downup(t, this, "toStateQuery");
-	 }
 }
- 
+
+//Extend the operator definition to include the required facets 
 replicate: ^(r=OPERATOR proto=. prefilter=. rules=.) 
 	   -> ^(OPERATOR 
 	          ^(OPERATOR_FACET[MAP_FACET] $proto $prefilter $rules) 
 	          ^(OPERATOR_FACET[QUERY_FACET] $proto $prefilter $rules)
-	          ^(STATE_QUERY $prefilter $rules));
+	          STATE_QUERY);//Query is filled in later...
 	          
 
+//Properly construct the query facet
 toQuery: ^(f=FUNCTION rest+=.*) 
           {$f.getAncestor(OPERATOR_FACET) != null && $f.getAncestor(OPERATOR_FACET).getText().equals("query")}? ->
           ^(FUNCTION[queryName($f.getText())]  $rest*);
-
-
-toStateQuery: ^(OPERATOR . . compactQuery);
-compactQuery: ^(STATE_QUERY ^(LIST or+=opRule*)) -> {stateQueryList(adaptor, $or.tree)}; //TODO: make a 'gather functions' operator....
-opRule: ^(OPERATOR_RULE pred=. rule) -> rule;											 //TODO: figure out how to tie operator instances across facets... 
-rule: ^(RULE . callChain .) -> callChain;
-callChain: ^(CALL_CHAIN target .) -> target;
-target
-  : ^(f=FUNCTION inv=. . . . target) -> ^(AST_INVOKEABLE[$f.text] target)
-  | ^(PACK .*) -> ^(PACK);
-
-
-
