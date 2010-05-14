@@ -81,7 +81,7 @@ options {
     	
        AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
        inv.setOperator(op);
-       inv.setInvokeable(op.getFacet(name.getSuffix()));
+       inv.setInvokeable(op.getFacet(name.getFacet()));
        return inv;
     }
 }

@@ -71,8 +71,8 @@ options {
 }
 
 //Extend the operator definition to include the required facets 
-replicate: ^(r=OPERATOR_TEMPLATE proto=. prefilter=. rules=.) 
-	   -> ^(OPERATOR_TEMPLATE
+replicate: ^(r=OPERATOR proto=. prefilter=. rules=.) 
+	   -> ^(OPERATOR
 	          ^(OPERATOR_FACET[MAP_FACET] $proto $prefilter $rules) 
 	          ^(OPERATOR_FACET[QUERY_FACET] $proto $prefilter $rules)
 	          STATE_QUERY);//Query is filled in later...

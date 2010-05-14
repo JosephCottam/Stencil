@@ -29,6 +29,7 @@
 package stencil.operator.wrappers;
 
 import stencil.operator.StencilOperator;
+import stencil.operator.module.util.FacetData;
 import stencil.operator.module.util.OperatorData;
 import stencil.operator.util.Invokeable;
 import stencil.operator.util.Range;
@@ -180,9 +181,14 @@ public abstract class RangeHelper implements StencilOperator {
 	protected RangeHelper(Range range, StencilOperator operator, String facetName) {
 		this.baseOperator = operator;
 		this.range = range;
-		this.operatorData =  null;
 		this.facetName = facetName;
 		this.baseFacet = operator.getFacet(facetName);
+		this.operatorData =  new OperatorData(operator.getOperatorData());
+		
+		for (FacetData fd: operatorData.getFacets()) {
+			fd.setFunction(false);
+		}
+		
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}

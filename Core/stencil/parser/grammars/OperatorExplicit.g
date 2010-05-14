@@ -39,7 +39,7 @@ options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;
 	superClass = TreeRewriteSequence;	
-    output = AST;
+  output = AST;
 	filter = true;
 }
 
@@ -53,9 +53,8 @@ options {
   import stencil.operator.module.util.OperatorData;
   import stencil.operator.util.Invokeable;
   import static stencil.parser.string.Utilities.*;
-  import static stencil.parser.ParserConstants.QUERY_FACET;
-  import static stencil.parser.ParserConstants.MAP_FACET;
-  import static stencil.parser.ParserConstants.STATE_ID_FACET;
+  import static stencil.parser.ParserConstants.NAME_SEPARATOR;
+  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 }
 
 @members {
@@ -63,9 +62,9 @@ options {
    private boolean covered(Tree target) {
 	  Program program = (Program) target.getAncestor(PROGRAM);
 	  List<? extends Tree> operators = program.getOperators();
-	  String name = target.getText();
+	  MultiPartName name = new MultiPartName(target.getText());
 	  for (Tree o: operators) {
-	      if (o.getText().equals(name)) {return true;}
+	      if (o.getText().equals(name.getName())) {return true;}
 	  }
 	  return false;
    }
@@ -75,22 +74,22 @@ options {
     */
    private String cover(CommonTree target) {
       MultiPartName name = new MultiPartName(target.getText());
-      if (covered(target)) {return name.getName();} 
+      if (covered(target)) {return target.getText() ;} 
 	
 	  String newName = genSym(name.getName());    	  //create a new name
 	  Program program = (Program) target.getAncestor(PROGRAM);
 	  List operators = program.getOperators();
 	  
 	  Tree ref = (Tree) adaptor.create(OPERATOR_REFERENCE, newName);     	  //Cover operator
-	  adaptor.addChild(ref, adaptor.create(OPERATOR_BASE, name.getName()));
+	  adaptor.addChild(ref, adaptor.create(OPERATOR_BASE, name.prefixedName()));
 	  adaptor.addChild(ref, adaptor.dupTree(target.getFirstChildWithType(SPECIALIZER)));
 	  
 	  adaptor.addChild(operators, ref);  	  //Add new operator to list
 	  
-	  return newName;
+	  return newName + NAME_SEPARATOR + name.getFacet();
    } 
    
 }
 
 topdown
-   : ^(f=FUNCTION rest+=.*)  -> ^(FUNCTION[cover($f)] $rest*);
+   : ^(f=FUNCTION s=. rest+=.*)  -> ^(FUNCTION[cover($f)] {adaptor.dupTree(EMPTY_SPECIALIZER)} $rest*);

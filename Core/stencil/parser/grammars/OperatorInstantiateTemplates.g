@@ -27,75 +27,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */ 
  
-/* Instantiate operator references and put them in the adhoc module.
- * Operator references are created with the operator keyword.
- */
-tree grammar AdHocOperators;
+/**Takes references to operator templates and instantiates the corresponding template.**/
+tree grammar OperatorInstantiateTemplates;
 
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree; 
+  ASTLabelType = CommonTree;
+  superClass = TreeRewriteSequence; 
+  output = AST;
   filter = true;
 }
 
-@header {
+@header{
   package stencil.parser.string;
-
-  import stencil.operator.*;
+  
+  import stencil.parser.tree.*;  
   import stencil.operator.module.*;
-  import stencil.operator.module.util.*;    
-  import stencil.operator.wrappers.*;
-  import stencil.parser.tree.*;
+  import stencil.operator.*;
+  import stencil.operator.module.util.OperatorData;
 }
 
-@members {
-  public static final UnknownTemplateException extends RuntimeException  {
-    private static final String names(List<OperatorTemplate> templates) {
-       StringBuilder b = new StringBuilder();
-       
-       for (OperatorTemplate t: templates) {
-         b.append(t.getName());
-         b.append(", ");
-       }
-       b.delete(2);
-       return b.toString();
-    }
+@members{
+  private Program program;
+  private ModuleCache modules;
   
-    public UnknownTemplateException(String name, List<OperatorTemplate> templates) {
-       super("No template named " + name + " found.  Valid names are " + names(templates));
-    }
-  }
-
-  protected MutableModule adHoc;
-  protected Program p;
-  
-  public AdHocOperators(TreeNodeStream input, Program p, ModuleCache modules) {
+  public OperatorInstantiateTemplates(TreeNodeStream input, ModuleCache modules) {
     super(input, new RecognizerSharedState());
-    assert modules != null : "Module cache must not be null.";
-    assert p != null;
+    this.modules = modules;
+    Object p = input.getTreeSource();
     
-    this.adHoc = modules.getAdHoc();
-    this.p = p;
-  }
-  
-  protected void makeOperator(OperatorReference ref) { 
-    OperatorTemplate t = findTemplate(ref.getName());
-    
-    StencilLegened instance = t.instantiate(ref.getSpecializer());
-    MutableModule adHoc = modules.getAdHoc();
-    adHoc.addOperator(instance);
-  
+    assert p instanceof Program : "Input source must be a Program tree.";
+    this.program = (Program) p;
   }
 
-  private OperatorTemplate findTemplate(String name) {
-    for (OperatorTemplate t:p.getOperatorTemplates()) {
-      if (name.equals(t.getName())) {return t;}
+
+  private StencilTree instantiate(OperatorReference opRef) {
+    OperatorTemplate t = findTemplate(opRef);
+    Specializer spec = (Specializer) opRef.getFirstChildWithType(SPECIALIZER);
+    String name = opRef.getName();
+    return t.instantiate(name, spec, adaptor);
+  }
+  
+  private OperatorTemplate findTemplate(CommonTree opRef) {
+    OperatorBase base = (OperatorBase) opRef.getFirstChildWithType(OPERATOR_BASE);
+    String name = base.getName();  
+
+    for (OperatorTemplate t:program.getOperatorTemplates()) {
+      if (name.equals(t.getName())) {return t;} 
     }
-    throw new UnknownTemplateException(name, p.getOperatorTemplates());   
+    return null;
   }
-
-  
 }
 
-topdown
-  : ^(op=OPERATOR_REFERENCE .*) {makeOperator((OperatorReference) $op);};
+topdown 
+  : ^(o=OPERATOR_REFERENCE base=. spec=.) 
+     {findTemplate($o) != null}? -> {instantiate((OperatorReference) o)};

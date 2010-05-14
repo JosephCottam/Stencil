@@ -169,7 +169,7 @@ options {
        	try{
     		Module m = modules.findModuleForOperator(name.prefixedName()).module;
     		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
-    		FacetData fd=od.getFacet(name.getSuffix());
+    		FacetData fd=od.getFacet(name.getFacet());
     		return fd.isFunction();
    		} catch (Exception e) {
    			throw new RuntimeException("Error getting module information for operator " + name, e);

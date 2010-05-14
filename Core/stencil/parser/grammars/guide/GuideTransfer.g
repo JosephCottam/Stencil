@@ -80,41 +80,41 @@ options {
 		this.modules = modules;
 	}
 		
-	public Object transform(Object t) {
-		t = build(t);
-		t = transfer(t);
-		t = copyQuery(t);
-		t = foldQuery(t);
-		t = trim(t);
-		t = rename(t);
-		return t;
+	public Program transform(Program p) {
+		p = build(p);
+		p = transfer(p);
+		p = copyQuery(p);
+		p = foldQuery(p);
+		p = trim(p);
+		p = rename(p);
+		return p;
 	}	
 	
 	 //Build a mapping from the layer/attribute names to mapping trees
-	 private Object build(Object t) {
+	 private Program build(Object t) {
 	   return downup(t, this, "buildMappings");
 	 }
 
-  private Object copyQuery(Object t) {
-    return downup(t, this, "copyQuery");
+  private Program copyQuery(Object t) {
+    return (Program) downup(t, this, "copyQuery");
   }
-  private Object foldQuery(Object t) {
-    return downup(t, this, "foldQuery");
+  private Program foldQuery(Object t) {
+    return (Program) downup(t, this, "foldQuery");
   }
     
     //Transfer appropriate mapping tree to the guide clause
-    private Object transfer(Object t) {
-      return downup(t, this, "transferMappings");
+    private Program transfer(Object t) {
+      return (Program) downup(t, this, "transferMappings");
     }
     
     //Trim each mapping chain to its last categorical operator
-    private Object trim(Object t) {
-      return downup(t, this, "trimGuide");
+    private Program trim(Object t) {
+      return (Program) downup(t, this, "trimGuide");
     }
     
     //Rename functions to use the guide channel
-    private Object rename(Object t) {
-      return downup(t, this, "renameMappingsDown");
+    private Program rename(Object t) {
+      return (Program) downup(t, this, "renameMappingsDown");
     }    
     
     private String key(Tree selector) {

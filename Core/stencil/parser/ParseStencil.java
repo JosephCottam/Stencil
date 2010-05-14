@@ -200,31 +200,31 @@ public abstract class ParseStencil {
 		customArgs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) customArgs.downup(p);
 
-		//Prepare for multi-facet synthetic operators by converting all operator defs to template/ref pairs
-		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
-		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opToTemplate.downup(p);		
-		
 		//Add default specializers where required
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) defaultSpecializers.downup(p);
-		
+
+		//Converting all operator defs to template/ref pairs
+		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
+		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opToTemplate.downup(p);		
+
+		//Remove all operator references
+		treeTokens = new CommonTreeNodeStream(p);
+		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
+		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
+		opInstTemplates.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opInstTemplates.downup(p);
+
 		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
 		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExplicit.downup(p);
-
+		p = (Program) opExplicit.downup(p);		
+		
 		//Expand operatorDefs to include query and stateID
 		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
 		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) opExtendFacets.transform(p);
-		
-		//Remove all operator references
-		treeTokens = new CommonTreeNodeStream(p);
-		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
-		DereferenceOperators opTemplates = new DereferenceOperators(treeTokens, modules);
-		opTemplates.setTreeAdaptor(TREE_ADAPTOR);
-		opTemplates.downup(p);
 
 		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
 		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
@@ -233,16 +233,14 @@ public abstract class ParseStencil {
 		
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-		adHoc.downup(p);
-		
-		//Add default specializers to all function nodes
-		defaultSpecializers.downup(p);
-		
+		adHoc.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) adHoc.transform(p);
+
 		//Add default packs where required
 		DefaultPack defaultPack = new DefaultPack(treeTokens);
 		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
 		defaultPack.downup(p);
-
+		
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);
@@ -316,6 +314,10 @@ public abstract class ParseStencil {
 		trc.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) trc.downup(p);
 
+		RemoveOpTemplates removeTemplates = new RemoveOpTemplates(treeTokens);
+		removeTemplates.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) removeTemplates.downup(p);
+		
 		//Ensure that all tuple references have a frame reference
 		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
 		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
@@ -343,7 +345,6 @@ public abstract class ParseStencil {
 	//Run common validators.
 	private static void validate(StencilTree t) {
 		try {
-			//Since validators don't permute the tree in any way, one token stream might be enough...
 			CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
 	
 			SpecializerValidator specializer = new SpecializerValidator(treeTokens);

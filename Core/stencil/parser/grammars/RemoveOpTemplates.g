@@ -25,48 +25,30 @@
  * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */ 
+ 
+/**Removes all operator templates from the program.
+ * 
+ * Operator templates are not needed at runtime, and
+ * interfere with certain optimizations, so they are 
+ * deleted before the last phases of the compiler.
  */
-package stencil.parser.tree;
-
-import org.antlr.runtime.Token;
-
-import stencil.operator.StencilOperator;
-import stencil.operator.module.ModuleCache;
-import stencil.operator.module.util.OperatorData;
-
-public class OperatorProxy extends StencilTree {
-	private StencilOperator operator;
-	private OperatorData operatorData;
-	
-	public OperatorProxy(Token t) {super(t);}
-	
-	public String getName() {return token.getText();}
-	
-	public void setOperator(StencilOperator operator, OperatorData operatorData) {
-		this.operator = operator;
-		if (!operatorData.getName().equals(getName())) {
-			this.operatorData = new OperatorData(operatorData);
-			this.operatorData.setModule(ModuleCache.AD_HOC_NAME);
-			((OperatorData)this.operatorData).setName(getName());
-		} else {
-			this.operatorData =operatorData; 
-		}
-	}
-	public StencilOperator getOperator() {return operator;}
-	
-	public OperatorData getOperatorData() {return operatorData;}
-	
-	public String toString() {
-		String result = super.toString();
-		if (operator == null) {result = result + " -Op";}
-		if (operatorData == null) {result = result + " -OpData";}
-		return result;
-	}
-
-	public OperatorProxy dupNode() {
-		OperatorProxy n = (OperatorProxy) super.dupNode();
-		n.operator = this.operator;
-		n.operatorData = this.operatorData;
-		return n;
-	}
+tree grammar RemoveOpTemplates;
+options {
+	tokenVocab = Stencil;
+	ASTLabelType = CommonTree;	
+	output = AST;
+	filter = true;
 }
+
+@header{
+  package stencil.parser.string;
+	
+  import stencil.parser.tree.*;
+  import static stencil.parser.string.Utilities.genSym;
+}
+                
+bottomup:
+    ^(PROGRAM i=. g=. s=. o=. cl=. sd=. l=. ops=. p=. t=.) 
+        -> ^(PROGRAM $i $g $s $o $cl $sd $l $ops $p);
+                 

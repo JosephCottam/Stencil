@@ -20,19 +20,10 @@ public class MutableModule implements Module {
 	public ModuleData getModuleData() {return moduleData;}
 
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
-		Specializer defaultSpecializer = getModuleData().getDefaultSpecializer(name);
-		if (!specializer.equals(defaultSpecializer)) {throw new SpecializationException(getName(),name, specializer);}
 		return moduleData.getOperator(name);		
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		StencilOperator op = operators.get(name);
-		Specializer defSpec = op.getOperatorData().getDefaultSpecializer();
-		if (op instanceof StencilOperator
-				&& !defSpec.equals(specializer)) {
-			throw new SpecializationException(getName(),name, specializer);
-		}
-		
 		return operators.get(name);
 	}
 
