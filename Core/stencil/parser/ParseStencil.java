@@ -295,6 +295,11 @@ public abstract class ParseStencil {
 		guideClean.downup(p);
 
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
+		
+		OperatorStateQuery osq = new OperatorStateQuery(treeTokens);
+		osq.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) osq.downup(p);
+		
 		//BEGIN DYNAMIC BINDING ----------------------------------------------------------------------------------
 
 		DynamicSeparateRules dynamicSeparate = new DynamicSeparateRules(treeTokens);
@@ -308,6 +313,8 @@ public abstract class ParseStencil {
 	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
 	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
 	    p = (Program) completeDynamics.transform(p);
+	    
+	    
 		//END DYNAMIC BINDING ----------------------------------------------------------------------------------
 	    
 		TupleRefChain trc = new TupleRefChain(treeTokens);

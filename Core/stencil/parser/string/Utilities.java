@@ -2,6 +2,8 @@ package stencil.parser.string;
 
 
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -50,7 +52,8 @@ public class Utilities {
 	 */
 	public static Tree stateQueryList(TreeAdaptor adaptor, Tree tree) {
 		List<AstInvokeable> invokeables = gatherInvokeables(tree);
-		Tree rv = (Tree) adaptor.create(STATE_QUERY, "STATE_QUERY");
+		Collection<AstInvokeable> targets = new HashSet();
+		
 		for (AstInvokeable aInv: invokeables) {
 			Invokeable inv = aInv.getInvokeable();
 			if (inv != null && inv.getTarget() instanceof StencilOperator) {
@@ -59,10 +62,15 @@ public class Utilities {
 					AstInvokeable newInv = (AstInvokeable) adaptor.dupNode(aInv);
 					newInv.getToken().setText(target.getName());
 					newInv.changeFacet(STATE_ID_FACET);
-					adaptor.addChild(rv, newInv);					
+					targets.add(newInv);
 				}
 			}
 		}
+
+		Tree rv = (Tree) adaptor.create(STATE_QUERY, "STATE_QUERY");
+		for (AstInvokeable target: targets) {
+			adaptor.addChild(rv, target);					
+		}		
 		return rv;
 	}
 }

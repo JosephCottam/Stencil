@@ -147,5 +147,17 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return varArgs;
 	}
 	
+	
+	public int hashCode() {return method.hashCode();}
+	
+	public boolean equals(Object other) {
+		if (this == other) {return true;}
+		if (!(other instanceof ReflectiveInvokeable)) {return false;}
+		
+		ReflectiveInvokeable o = (ReflectiveInvokeable) other;
+		boolean result = target.equals(o.target) && method.equals(o.method) && o.args.length == this.args.length; 
+		return result;
+	}
+	
 
 }

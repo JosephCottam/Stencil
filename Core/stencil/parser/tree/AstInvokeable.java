@@ -58,4 +58,13 @@ public final class AstInvokeable extends StencilTree {
 	/**Indicates if a changeFacet operation is possible.*/
 	public boolean canChangeFacet() {return op != null;}
 	
+	public int hashCode() {return inv.hashCode();}
+	public boolean equals(Object other) {
+		if (this == other) {return true;}
+		if (!(other instanceof AstInvokeable)) {return false;}
+		AstInvokeable o = (AstInvokeable) other;
+		boolean result = inv.equals(o.inv);
+		return result;
+	}
+	
 }
