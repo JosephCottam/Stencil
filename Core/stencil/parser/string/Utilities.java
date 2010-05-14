@@ -12,7 +12,6 @@ import org.antlr.runtime.tree.TreeAdaptor;
 
 import stencil.util.MultiPartName;
 import stencil.operator.StencilOperator;
-import stencil.operator.util.Invokeable;
 import stencil.parser.tree.AstInvokeable;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
 import static stencil.parser.ParserConstants.QUERY_FACET;
@@ -54,12 +53,11 @@ public class Utilities {
 		List<AstInvokeable> invokeables = gatherInvokeables(tree);
 		Collection<AstInvokeable> targets = new HashSet();
 		
-		for (AstInvokeable aInv: invokeables) {
-			Invokeable inv = aInv.getInvokeable();
-			if (inv != null && inv.getTarget() instanceof StencilOperator) {
-				StencilOperator target = (StencilOperator) aInv.getInvokeable().getTarget();
+		for (AstInvokeable inv: invokeables) {
+			StencilOperator target = inv.getOperator();
+			if (target != null) {
 				if (target.getOperatorData().hasFacet(STATE_ID_FACET)) {
-					AstInvokeable newInv = (AstInvokeable) adaptor.dupNode(aInv);
+					AstInvokeable newInv = (AstInvokeable) adaptor.dupNode(inv);
 					newInv.getToken().setText(target.getName());
 					newInv.changeFacet(STATE_ID_FACET);
 					targets.add(newInv);

@@ -47,7 +47,7 @@ import stencil.parser.tree.util.Environment;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-
+ 
 /**Operator defined through a stencil definition.
  * 
  * TODO: Add compiler step to fold these operators directly into the call chains if only has one rule predicate on ALL and has no specialization
@@ -118,12 +118,15 @@ public class SyntheticOperator implements StencilOperator {
 
 	protected final SyntheticInvokeTarget source;
 	
-	/**Create a Stencil operator from a specification.*/
+	/**Create a Stencil operator from a specification.
+	 * TODO: Some synthetic operators facets are functions...figure out a way to detect this!
+	 * */
 	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
 		this.source = new SyntheticInvokeTarget(opDef);
 		this.module = module;
 
 		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER);
+		
 		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, TYPE_PROJECT, false, opDef.getMap().getResults()));	
 		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));	
 		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));	
