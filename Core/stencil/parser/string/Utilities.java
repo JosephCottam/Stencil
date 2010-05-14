@@ -50,7 +50,7 @@ public class Utilities {
 	 */
 	public static Tree stateQueryList(TreeAdaptor adaptor, Tree tree) {
 		List<AstInvokeable> invokeables = gatherInvokeables(tree);
-		Tree rv = (Tree) adaptor.create(STATE_QUERY, "");
+		Tree rv = (Tree) adaptor.create(STATE_QUERY, "STATE_QUERY");
 		for (AstInvokeable aInv: invokeables) {
 			Invokeable inv = aInv.getInvokeable();
 			if (inv != null && inv.getTarget() instanceof StencilOperator) {

@@ -50,7 +50,7 @@ public final class ColorUtils extends BasicModule {
 	private static ColorTuple validate(Object o) {
 		if (o instanceof ColorTuple) {return (ColorTuple) o;}
 		if (o instanceof java.awt.Color) {return ColorCache.toTuple(((java.awt.Color) o).getRGB());}
-		else throw new RuntimeException("Not a known color format: " + o.toString());
+		else throw new RuntimeException(String.format("Not a known color format: %1$s (object type %2$s). ", o.toString(), o.getClass().getName()));
 	}
 
 	private static Tuple mod(Object source, int comp, Object v, String name) {

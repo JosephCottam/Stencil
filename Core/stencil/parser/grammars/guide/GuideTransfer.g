@@ -81,41 +81,13 @@ options {
 	}
 		
 	public Program transform(Program p) {
-		p = build(p);
-		p = transfer(p);
-		p = copyQuery(p);
-		p = foldQuery(p);
-		p = trim(p);
-		p = rename(p);
+		p = (Program) downup(p, this, "buildMappings");
+		p = (Program) downup(p, this, "transferMappings");
+		p = (Program) downup(p, this, "copyQuery");
+		p = (Program) downup(p, this, "trimGuide");
+		p = (Program) downup(p, this, "renameMappingsDown");
 		return p;
 	}	
-	
-	 //Build a mapping from the layer/attribute names to mapping trees
-	 private Program build(Object t) {
-	   return downup(t, this, "buildMappings");
-	 }
-
-  private Program copyQuery(Object t) {
-    return (Program) downup(t, this, "copyQuery");
-  }
-  private Program foldQuery(Object t) {
-    return (Program) downup(t, this, "foldQuery");
-  }
-    
-    //Transfer appropriate mapping tree to the guide clause
-    private Program transfer(Object t) {
-      return (Program) downup(t, this, "transferMappings");
-    }
-    
-    //Trim each mapping chain to its last categorical operator
-    private Program trim(Object t) {
-      return (Program) downup(t, this, "trimGuide");
-    }
-    
-    //Rename functions to use the guide channel
-    private Program rename(Object t) {
-      return (Program) downup(t, this, "renameMappingsDown");
-    }    
     
     private String key(Tree selector) {
       Selector sel=(Selector) selector;
@@ -176,10 +148,8 @@ transferMappings
 
 //Update query creation -----------------------------------------------
 copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=. .*))) ->
-        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} ^(STATE_QUERY {adaptor.dupTree($chain)}));
+        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} {stateQueryList(adaptor, $chain)});
 
-
-foldQuery: ^(STATE_QUERY qc=.) -> {stateQueryList(adaptor, $qc)};	
 
 //trimMappings  -----------------------------------------------
 trimGuide

@@ -37,7 +37,7 @@ import static stencil.parser.string.StencilParser.*;
 
 public abstract class Atom extends Value {
 	public static final class Literal extends Atom {
-		private enum Type {String, Number}
+		private enum Type {String, Number, Other}
 		Object value;
 		Type type;
 		
@@ -50,14 +50,7 @@ public abstract class Atom extends Value {
 			value = o;
 			if (o instanceof Number) {type = Type.Number;}
 			else if (o instanceof String) {type = Type.String;}
-			else {
-				//TODO: Fix when we have sigil-types
-				value = o.toString();
-				type = Type.String;
-			}
-//			else {
-//				throw new IllegalArgumentException(String.format("Literal tuple can only contain color, string or number.  Recieved %1$s of type %2$s", o, (o==null?"n/a":o.getClass().getName())));
-//			}
+			else {type = Type.Other;}
 		}
 
 		public boolean isLiteral() {return true;}

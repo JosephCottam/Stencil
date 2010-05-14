@@ -2,6 +2,9 @@
     "-lib ./Library/antlr3-ant.jar" /-->
     
  <project name="Stencil" default="Stencil" basedir="..">
+ 	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
+ 	<taskdef resource="org/apache/tools/ant/antlr/antlib.xml"/>
+ 	
  	<property name="src" location="Core" />
  	<property name="target" location="bin" />
  	<property name="runtimeLibrary" location="./Library/"/>
@@ -9,20 +12,8 @@
  	<property name="parser" location ="${src}/stencil/parser/string/"/>
  	<property name="ast" location ="${src}/stencil/parser/tree/"/>
  	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
- 	
- 	<target name="CurrentWorkingGrammar">
- 		<antlr 
-			target="${grammars}/Stencil.g"
-			outputdirectory="${parser}"
- 		/>
- 		<antlr 
-			target="${grammars}/PrepareCustomArgs.g"
-			outputdirectory="${parser}"
- 		/>
- 		<antcall target="EclipseRefresh"/>
- 	</target>
- 	
- 	<target name="Stencil" depends="GuideSystem, StencilTransformer, TreeAdapter, Validators">
+ 	 	
+ 	<target name="Stencil" depends="GuideSystem, Transformers, TreeAdapter, Validators">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
@@ -32,28 +23,51 @@
 
 	<!-- Just the core stencil grammar, not the additional processing.-->
  	<target name="StencilGrammar">
- 		<antlr 
+ 		<antlr3
 			target="${grammars}/Stencil.g"
 			outputdirectory="${parser}"
 		/>
-
  	 	<antcall target="EclipseRefresh"/>
  	</target>
 
  	
  	<!--All of the tree manipulations prior to the interpreter-->
- 	<target name="StencilTransformer" depends="StencilGrammar">
-        <ant antfile="./build/Transformers.xml" inheritRefs="true"/>
- 		<antcall target="EclipseRefresh"/>
-	</target> 	
+    <target name="Transformers" depends="StencilGrammar">
+        <foreach target="antlrBuild" param="file" inheritall="true">
+            <fileset dir="${grammars}/transformers"/>
+            <param name="antlrTarget" value="${parser}"/>
+        </foreach>
+        <antcall target="EclipseRefresh"/>
+    </target>
 
- 	<target name="Validators" depends="StencilGrammar">
-       <ant antfile="./build/Validators.xml" inheritRefs="true"/>
+    <target name="GuideSystem" depends="StencilGrammar">
+        <foreach target="antlrBuild" param="file" inheritall="true">
+            <fileset dir="${grammars}/guide"/>
+        	<param name="antlrTarget" value="${parser}"/>
+        </foreach>
+        <antcall target="EclipseRefresh"/>
+    </target>
+    	    
+ 	
+    <target name="Validators" depends="StencilGrammar">
+    	<foreach target="antlrBuild" param="file" inheritall="true">
+    	   <fileset dir="${grammars}/validators"/>
+           <param name="antlrTarget" value="${parser}/validators"/>
+    	</foreach>
        <antcall target="EclipseRefresh"/>
- 	</target>
+    </target>
 
+
+ 	<target name="antlrBuild">
+        <antlr3
+            target="${file}"
+            outputdirectory="${antlrTarget}"
+            libdirectory="${parser}"
+        />          
+    </target>
+ 	
  	<target name="TreeAdapterGrammar" depends="StencilGrammar">
- 		<antlr
+ 		<antlr3
  			target="${grammars}/StencilTreeAdapter.g"
  			outputdirectory="${ast}"
  		/>
@@ -88,12 +102,6 @@
  	<target name="Release">
  		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>
 	</target> 
-
- 	<target name="GuideSystem" depends="StencilGrammar">
- 		<ant antfile="./build/GuideSystem.xml" inheritRefs="true"/>
- 	 	<antcall target="EclipseRefresh"/>
- 	</target>
- 	
  	
 	<!--GUnit tests--> 	
  	<target name="RunTests" depends="StencilGrammar"> 
