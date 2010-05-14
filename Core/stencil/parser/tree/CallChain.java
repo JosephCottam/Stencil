@@ -61,7 +61,7 @@ public class CallChain extends StencilTree {
 	/**How long is this call chain?*/
 	public int getDepth() {
 		if (depth <0) {
-			depth = ((StencilNumber) getFirstChildWithType(StencilParser.NUMBER)).getNumber().intValue();
+			depth = ((StencilNumber) getFirstChildWithType(StencilParser.NUMBER)).intValue();
 		}
 		return depth;
 	}	

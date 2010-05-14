@@ -3,18 +3,21 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 import static stencil.parser.string.StencilParser.NUMBER;
 
-public class StencilNumber extends Atom {
-	Number value;
+public final class StencilNumber extends Atom {
+	private final Number value;
 
 	public StencilNumber(Token token) throws NumberFormatException {
 		super(token, NUMBER);
 		value = parseValue(token.getText());
 	}
 
-	public Number getNumber() {return getValue();}
-	public Number getValue() {return value;}
-	public int intValue() {return value.intValue();}
-	public double doubleValue() {return value.doubleValue();}
+	public final Number getValue() {return value;}
+
+	/**Getting the integer value is a common case (e.g. it is used during tuple de-referencing).  
+	 * This method can be used whenever getValue().intValue() is needed.
+	 * @return
+	 */
+	public final int intValue() {return value.intValue();}
 
 	private static final Number parseValue(String value) throws NumberFormatException {
 		try {return new Integer(value);}
@@ -31,8 +34,8 @@ public class StencilNumber extends Atom {
 		if (!(other instanceof StencilNumber)) {return false;}
 		StencilNumber alter = (StencilNumber) other;
 		
-		return this.getNumber().equals(alter.getNumber());
+		return value.equals(alter.getValue());
 	}
 	
-	public int hashCode() {return getNumber().hashCode();}
+	public int hashCode() {return getValue().hashCode();}
 }

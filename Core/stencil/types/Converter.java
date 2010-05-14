@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import stencil.parser.tree.Atom;
-import stencil.parser.tree.Id;
 import stencil.parser.tree.StencilString;
-import stencil.parser.tree.TupleRef;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
@@ -55,7 +53,6 @@ public final class Converter {
 		if (value instanceof StencilString) {return ((StencilString) value).getString();} 
 		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
 		if (value.getClass().isEnum()) {return ((Enum) value).name();}
-		if (value instanceof TupleRef && ((TupleRef) value).isNamedRef()) {return ((Id) ((TupleRef) value).getValue()).getName();}
 		if (WRAPPER_FOR.containsKey(value.getClass())) {return (String) WRAPPER_FOR.get(value.getClass()).convert(value, String.class);}
 		return value.toString();
 	}

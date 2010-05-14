@@ -72,7 +72,7 @@ callTarget[EnvironmentProxy env]
 valueE[EnvironmentProxy env]
   : ^(t=TUPLE_REF r=ID v=valueP[env.get(env.getFrameIndex($r.text))]) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] $v)
   | (TUPLE_REF ID) => ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))])
-  | ^(t=TUPLE_REF r=NUMBER v=valueP[env.get(((StencilNumber) $r).getNumber().intValue())])
+  | ^(t=TUPLE_REF r=NUMBER v=valueP[env.get(((StencilNumber) $r).getValue().intValue())])
   | (TUPLE_REF NUMBER) => ^(t=TUPLE_REF r=NUMBER)
   | .;
     catch[Exception e] {throw new RuntimeException(String.format("Error numeralizing \%1\$s.\n\%2\$s.", $t.toStringTree(), e.toString()));}

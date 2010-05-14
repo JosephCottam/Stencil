@@ -9,7 +9,10 @@ import stencil.types.Converter;
 
 /**Unpack a tuple reference.*/
 public final class TupleRef extends Value {
+	private static final TupleRef NO_SUB_REF = new TupleRef(null);
+	
 	private Atom value = null;
+	private TupleRef subRef;
 	
 	public TupleRef(Token source) {
 		super(source);
@@ -33,33 +36,21 @@ public final class TupleRef extends Value {
 
 	public TupleRef getSubRef() {
 		if (!hasSubRef()) {throw new RuntimeException("Attempt to get subref where none is present.");}
-		return (TupleRef) getChild(1);
+		return (TupleRef) subRef;
 	}
 	
 	public boolean isTupleRef() {return true;}	
-	public boolean isNumericRef() {return getValue().isNumber();}
-	public boolean isNamedRef() {return getValue().isName();}
-	public boolean hasSubRef() {return this.getChildCount() >= 2;}
-	
-	
-	/**Given the prototype, returns the numeric offset this represents in that prototype.
-	 * 
-	 * If this is a numeric reference, the prototype may safely be null, but a named 
-	 * reference requires the prototype to be non-null.
-	 * 
-	 * @param prototype
-	 * @return
-	 */
-	public int toNumericRef(String[] prototype) {
-		if (isNumericRef()) {return ((StencilNumber) getValue()).getNumber().intValue();}
-		else {
-			String name = getValue().getValue().toString();
-			for (int i=0; i< prototype.length; i++) {
-				if (name.equals(prototype[i])) {return i;}
+	public boolean hasSubRef() {
+		if (subRef == null) {
+			if (this.getChildCount() >= 2) {
+				subRef = (TupleRef) getChild(1);
+			} else {
+				subRef = NO_SUB_REF;
 			}
-			throw new IllegalArgumentException(String.format("Could not find %1$s in %2$s.", name, prototype.toString()));
 		}
+		return subRef != NO_SUB_REF;
 	}
+
 
 	/**Perform recursive de-referencing of this tuple against the passed 
 	 * tuple.
@@ -70,14 +61,14 @@ public final class TupleRef extends Value {
 	 */
 	private final Object doRef(Tuple source, Atom ref) {
 		if (ref.isNumber()){
-			int val = ((StencilNumber) ref).getNumber().intValue();
+			int val = ((StencilNumber) ref).intValue();
 			return source.get(val);
-		} else if (ref.isName()) {
-			return source.get(((Id) ref).getName());
 		} else if (ref.isLast()) {
 			return Converter.toTuple(source.get(source.size()-1));
 		} else if (ref.isAll()) {
 			return Tuples.toArray(Converter.toTuple(source.get(source.size()-1)));
+		} else if (ref.isName()) {
+			return source.get(((Id) ref).getName());
 		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}

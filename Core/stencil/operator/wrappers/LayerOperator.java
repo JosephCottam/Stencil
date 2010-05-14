@@ -29,6 +29,8 @@ public final class LayerOperator implements StencilOperator {
 	
 	private static final String CONTAINS_FACET = "contains";
 	private static final String CONTAINS_METHOD = "contains";
+
+	private static final String STATE_ID_METHOD = "getStateID";
 	
 	protected final DisplayLayer layer;
 	protected final OperatorData operatorData;
@@ -58,7 +60,7 @@ public final class LayerOperator implements StencilOperator {
 		} else if (REMOVE_FACET.equals(facet)) {
 			return new ReflectiveInvokeable(REMOVE_METHOD, layer);
 		} else if (STATE_ID_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(STATE_ID_FACET, layer);
+			return new ReflectiveInvokeable(STATE_ID_METHOD, layer);
 		}
 		throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 	}

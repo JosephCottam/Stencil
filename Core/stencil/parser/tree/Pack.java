@@ -1,11 +1,10 @@
 package stencil.parser.tree;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 
 /**End-of-call-chain entity that create a new tuple in its
@@ -27,30 +26,8 @@ public final class Pack extends CallTarget {
 	public Tuple apply(Tuple valueSource) {
 		List<? extends Value> formals = getArguments();
 		Object[] values = TupleRef.resolveAll(formals, valueSource);
-		String[] names = new String[values.length];
-		List namesList = Arrays.asList(names);
-
-		//Generate names...
-		for(int i=0; i< names.length; i++) {
-			if (formals.get(i).isTupleRef()) {
-				Atom ref = ((TupleRef) formals.get(i)).getValue();
-				if (ref.isName()) {
-					String name = ((Id) ref).getName();
-					if (!namesList.contains(name)) {names[i] = name;}
-					else {names[i] = generateName(i);}
-				} else if (ref.isNumber()) {
-					names[i] = generateName(i);
-				} else {
-					throw new RuntimeException("Could not de-reference tuple.");
-				}
-			} else {
-				names[i] = generateName(i);
-			}
-		}
-		return new PrototypedTuple(names, values);
+		return new ArrayTuple(values);
 	}
-
-	private static final String generateName(int seed) {return Integer.toString(seed);} //TODO: Updated autogen name when numerical de-referencing is the game
 
 	/**List of values that are being packed.*/
 	public List<Value> getArguments() {return new stencil.parser.tree.List.WrapperList<Value>(this);}

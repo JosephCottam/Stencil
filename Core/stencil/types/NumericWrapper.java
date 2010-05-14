@@ -22,7 +22,7 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof ValueEnum) {return toDouble(((ValueEnum) value).getValue());}
 		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
 		
-		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getNumber().doubleValue());}
+		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getValue().doubleValue());}
 		
 		return Double.parseDouble(value.toString());
 	}
@@ -30,7 +30,7 @@ public class NumericWrapper implements TypeWrapper {
 	public static  Float toFloat(Object value) {
 		if (value instanceof Float) {return (Float) value;}
 		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getNumber().floatValue());}
+		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getValue().floatValue());}
 		
 		return Float.parseFloat(value.toString());	
 	}
@@ -38,13 +38,13 @@ public class NumericWrapper implements TypeWrapper {
 	public static Integer toInteger(Object value) {
 		if (value instanceof Integer) {return (Integer) value;}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getNumber().intValue());}
+		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getValue().intValue());}
 
 		return toFloat(value).intValue();
 	}
 	
 	public static Long toLong(Object value) {
-		if (value instanceof StencilNumber) {return new Long(((StencilNumber) value).getNumber().longValue());}
+		if (value instanceof StencilNumber) {return new Long(((StencilNumber) value).getValue().longValue());}
 		if (value instanceof Number) {return ((Number) value).longValue();}
 		if (value instanceof ValueEnum) {return toLong(((ValueEnum)value).getValue());}
 		return new Long(Long.parseLong(value.toString()));
@@ -53,7 +53,7 @@ public class NumericWrapper implements TypeWrapper {
 	public static Number toNumber(Object value) {
 		if (value instanceof Number) {return (Number)value;}
 		if (value instanceof ValueEnum) {return toNumber(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return ((StencilNumber) value).getNumber();}
+		if (value instanceof StencilNumber) {return ((StencilNumber) value).getValue();}
 
 		String rep = value.toString();
 		if (rep.contains(".")) {return toDouble(rep);}
