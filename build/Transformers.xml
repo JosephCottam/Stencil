@@ -13,6 +13,11 @@
             outputdirectory="${parser}"
             libdirectory="${parser}"
         />
+        <antlr
+            target="${grammars}/RemoveOpTemplates.g"
+            outputdirectory="${parser}"
+            libdirectory="${parser}"
+        />
 
         <antlr
             target="${grammars}/OperatorExplicit.g"
@@ -55,7 +60,7 @@
 			outputdirectory="${parser}"
 		/>
 		<antlr
-			target="${grammars}/DereferenceOperators.g"
+			target="${grammars}/OperatorInstantiateTemplates.g"
 			outputdirectory="${parser}"
 		/>
 		<antlr

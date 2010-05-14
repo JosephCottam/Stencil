@@ -6,7 +6,7 @@ import stencil.operator.wrappers.JythonEncapsulation;
 import stencil.parser.tree.Python;
 import stencil.tuple.Tuple;
 import junit.framework.TestCase;
-import static stencil.parser.ParserConstants.MAIN_FACET;
+import static stencil.parser.ParserConstants.MAP_FACET;
 import static stencil.parser.ParserConstants.INIT_FACET;
 import static stencil.unittests.operator.TestEncapsulationGenerator.getPython;
 
@@ -29,7 +29,7 @@ public class TestJythonEncapsulation extends TestCase {
 		JythonEncapsulation e;
 		Tuple t;
 		
-		Python p = getPython("test1", MAIN_FACET, arguments, results, "rv = 1");
+		Python p = getPython("test1", MAP_FACET, arguments, results, "rv = 1");
 		e = new JythonEncapsulation(p, p.getFacets().get(0), g);
 		assertNotNull("Encapsulation name cannot be null", e.getName());
 		t = e.invoke(100);
@@ -58,7 +58,7 @@ public class TestJythonEncapsulation extends TestCase {
 		JythonEncapsulation e;
 		Tuple t;
 
-		Python p = getPython("test1", MAIN_FACET, arguments, results,"rv = value");
+		Python p = getPython("test1", MAP_FACET, arguments, results,"rv = value");
 		e = new JythonEncapsulation(p,p.getFacets().get(0), g);
 		t = e.invoke(100);
 		assertEquals(100, t.get(results.get(0)));
@@ -71,7 +71,7 @@ public class TestJythonEncapsulation extends TestCase {
 		JythonEncapsulation e;
 		Tuple t;
 
-		Python p = getPython("test1", MAIN_FACET,  arguments, results, "rv1 = value1 + value2\nrv2=value2+value3");
+		Python p = getPython("test1", MAP_FACET,  arguments, results, "rv1 = value1 + value2\nrv2=value2+value3");
 		e = new JythonEncapsulation(p,p.getFacets().get(0), g);
 
 		assertNotNull("Encapsulation name cannot be null", e.getName());
@@ -91,7 +91,7 @@ public class TestJythonEncapsulation extends TestCase {
 		g.generate(p, modules.getAdHoc());
 		
 		
-		p = getPython("test1", MAIN_FACET,  arguments, results,"rv = awt.Color(value,value,value)");
+		p = getPython("test1", MAP_FACET,  arguments, results,"rv = awt.Color(value,value,value)");
 		e = new JythonEncapsulation(p,p.getFacets().get(0), g);
 		t = e.invoke(100);
 		assertEquals(java.awt.Color.class, t.get(results.get(0)).getClass());
@@ -106,7 +106,7 @@ public class TestJythonEncapsulation extends TestCase {
 		Python p1 = getPython("test1", INIT_FACET, null, null, "from java.lang import Integer");
 		g.generate(p1, modules.getAdHoc());
 		
-		Python p2 = getPython("test1", MAIN_FACET, arguments, results, "rv = Integer(value)");
+		Python p2 = getPython("test1", MAP_FACET, arguments, results, "rv = Integer(value)");
 		JythonEncapsulation e2 = new JythonEncapsulation(p2,p2.getFacets().get(0), g);
 		
 		assertSame("Environments not equal when expected", g.getEnvironment(p1.getEnvironment()), g.getEnvironment(p2.getEnvironment()));

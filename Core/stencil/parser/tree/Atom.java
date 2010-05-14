@@ -75,11 +75,14 @@ public abstract class Atom extends Value {
 			throw new IllegalArgumentException(String.format("Literal tuple is of type %1$s, cannot retrieve as string.", type));
 		}
 
+		public boolean isNil() {return false;}
 		public boolean isName() {return false;}
 		public boolean isNumber() {return type == Type.Number;}
 		public boolean isString() {return type == Type.String;}
 
 		public String toString() {return value.toString();}
+		
+		public Literal dupNode() {return Literal.instance(value);}
 	}
 
 	public static final List<Integer> BASE_TYPES;

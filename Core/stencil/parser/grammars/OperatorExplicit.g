@@ -59,14 +59,16 @@ options {
 
 @members {
    /**Does the name appear as an operator def/proxy/ref?*/
-   private boolean covered(Tree target) {
-	  Program program = (Program) target.getAncestor(PROGRAM);
-	  List<? extends Tree> operators = program.getOperators();
-	  MultiPartName name = new MultiPartName(target.getText());
-	  for (Tree o: operators) {
-	      if (o.getText().equals(name.getName())) {return true;}
-	  }
-	  return false;
+   private boolean covered(CommonTree function) {
+	      Program program = (Program) function.getAncestor(PROGRAM);
+	      List<? extends CommonTree> operators = program.getOperators();
+	      MultiPartName name = new MultiPartName(function.getText());
+	      Specializer spec = (Specializer) function.getFirstChildWithType(SPECIALIZER);
+	      
+	      for (CommonTree o: operators) {
+	          if (o.getText().equals(name.getName())) {return true;}
+	      }
+	      return false;
    }
 
    /**Create a cover reference for a given operator IF

@@ -40,9 +40,9 @@ tree grammar LiftSharedConstantRules;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
+  superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
-	superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -52,13 +52,16 @@ options {
 	import java.util.HashSet;
 	import java.util.ArrayList;
 
-	import stencil.util.MultiPartName;
-	import stencil.tuple.prototype.TuplePrototypes;		
+  import stencil.util.MultiPartName;
+  import stencil.tuple.prototype.TuplePrototypes;		
   import stencil.parser.tree.util.Environment;
-	import stencil.parser.tree.*;
-	import stencil.parser.ParserConstants;	
-	import stencil.operator.module.*;
-	import stencil.operator.module.util.*;
+  import stencil.tuple.Tuple;
+  import stencil.tuple.Tuples;
+  import stencil.interpreter.Interpreter;
+  import stencil.parser.tree.*;
+  import stencil.parser.ParserConstants;	
+  import stencil.operator.module.*;
+  import stencil.operator.module.util.*;
 }
 
 @members {
@@ -71,25 +74,11 @@ options {
 	}
 	
 	public Object transform(Object t) throws Exception {
-		t = lift(t);
-		redefineLayers(t);
+	  t = (Program) downup(t, this, "evaluateConstantRules");
+		t = (Program) downup(t, this, "liftShared");
+		downup(t, this, "updateLayers");
 		return t;
 	}	
-
-	/**Build a list of things that need guides.**/
-	private Object lift(Object t) throws Exception {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return liftShared(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    return downup(t, down, up);
-    }
-
-	/**Build a list of things that need guides.**/
-	private void redefineLayers(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return updateLayers(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    downup(t, down, up);
-    }
-
 
 	private List<Rule> sharedConstants(stencil.parser.tree.List<Consumes> consumes) {
 		List<List<Rule>> ruleSet = allConstants(consumes);
@@ -162,11 +151,10 @@ options {
       return idx < Environment.DEFAULT_SIZE;
     }
 
-    //Is the passed Function Tree object include a facet that is a mathematical function?
+    //Is the passed Function using a facet that is a mathematical function?
     private boolean isFunction(Function f) {
     	MultiPartName name= new MultiPartName(f.getName());
-    
-       	try{
+      try{
     		Module m = modules.findModuleForOperator(name.prefixedName()).module;
     		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
     		FacetData fd=od.getFacet(name.getFacet());
@@ -184,9 +172,9 @@ options {
 		List<Rule> sharedConstants = sharedConstants(consumes);
 		
 		for (Rule rule: sharedConstants) {
-			Rule r =  (Rule) adaptor.dupTree(rule);
-			defaults.addChild(r);
-    		adaptor.setParent(r, defaults);
+      Rule r =  (Rule) adaptor.dupTree(rule);
+      defaults.addChild(r);
+      adaptor.setParent(r, defaults);
 		}
 		
 		return defaults;
@@ -230,10 +218,27 @@ options {
 	private void updateLayer(Layer layerDef) {
     	layerDef.getDisplayLayer().updatePrototype(layerDef);
 	}
+	
+	private CommonTree evaluate(Rule r) {
+	   Tuple result;
+	   try {result = Interpreter.process(Tuples.EMPTY_TUPLE, r);}
+	   catch (Exception e) {
+	      throw new RuntimeException("Error partially evaluating rule: " + r.toStringTree(), e);
+	   }
+	
+	   Pack p = (Pack) adaptor.create(PACK, "PACK");
+	   for (int i=0; i< result.size(); i++) {
+	      adaptor.addChild(p, Atom.Literal.instance(result.get(i)));
+	   }
+	   return p;
+	}
 }
+
+evaluateConstantRules
+  : ^(r=RULE result=. cc=. bind=.) {isConstant($r)}? 
+        -> ^(RULE $result ^(CALL_CHAIN {evaluate((Rule) $r)} ^(NUMBER["0"])) $bind); 
 
 liftShared: ^(LAYER impl=. defaults=. consumes=.)
 	-> ^(LAYER $impl {augmentDefaults(defaults, consumes)} {reduceRules(consumes)});
-	
 	
 updateLayers: ^(l=LAYER .*) {updateLayer((Layer)l);};

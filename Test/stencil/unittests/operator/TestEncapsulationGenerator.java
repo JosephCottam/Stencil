@@ -11,7 +11,7 @@ import stencil.testUtilities.StringUtils;
 import stencil.unittests.operator.module.TestModuleCache;
 import stencil.adapters.java2D.Adapter;
 import static stencil.parser.ParserConstants.INIT_FACET;
-import static stencil.parser.ParserConstants.MAIN_FACET;
+import static stencil.parser.ParserConstants.MAP_FACET;
 import junit.framework.*;
 
 import java.util.ArrayList;
@@ -112,7 +112,7 @@ public class TestEncapsulationGenerator extends TestCase {
 		assertEquals("Invalid value after init declared", 500, g.getEnvironment(p1.getEnvironment()).get("sv").__tojava__(Object.class));
 
 
-		Python p2 = getPython("test1", MAIN_FACET,  arguments, results,"rv=value");
+		Python p2 = getPython("test1", MAP_FACET,  arguments, results,"rv=value");
 		JythonEncapsulation e2 = new JythonEncapsulation(p2,p2.getFacets().get(0), g);
 
 		PythonInterpreter env1 = g.getEnvironment(p1.getEnvironment());

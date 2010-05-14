@@ -10,14 +10,12 @@ public class TestMultiPartName extends TestCase {
 		n = new MultiPartName("Pre", "Name", "Suf");
 		assertEquals("Pre", n.getPrefix());
 		assertEquals("Name", n.getName());
-		assertEquals("Suf", n.getSuffix());
 		assertEquals("Suf", n.getFacet());
 		assertEquals("Pre::Name.Suf", n.toString());
 		
 		n = new MultiPartName("", "Name", "Suf");
 		assertEquals("", n.getPrefix());
 		assertEquals("Name", n.getName());
-		assertEquals("Suf", n.getSuffix());
 		assertEquals("Suf", n.getFacet());
 		assertEquals("Name.Suf", n.toString());
 	}
@@ -28,14 +26,12 @@ public class TestMultiPartName extends TestCase {
 		n = new MultiPartName("Pre::Name.Suf");
 		assertEquals("Pre", n.getPrefix());
 		assertEquals("Name", n.getName());
-		assertEquals("Suf", n.getSuffix());
 		assertEquals("Suf", n.getFacet());
 		assertEquals("Pre::Name.Suf", n.toString());
 		
 		n = new MultiPartName("Name.Suf");
 		assertEquals("", n.getPrefix());
 		assertEquals("Name", n.getName());
-		assertEquals("Suf", n.getSuffix());
 		assertEquals("Suf", n.getFacet());
 		assertEquals("Name.Suf", n.toString());
 	}
