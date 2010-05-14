@@ -3,8 +3,6 @@ package stencil.unittests.parser.string;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
@@ -13,13 +11,24 @@ import stencil.operator.module.Module;
 import stencil.operator.module.ModuleCache;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.AdHocOperators;
+import stencil.parser.string.AnnotateEnvironmentSize;
+import stencil.parser.string.DefaultSpecializers;
+import stencil.parser.string.EnsureOrders;
 import stencil.parser.string.Imports;
-import stencil.parser.string.StencilLexer;
+import stencil.parser.string.LiftStreamPrototypes;
+import stencil.parser.string.OperatorExplicit;
+import stencil.parser.string.OperatorExtendFacets;
+import stencil.parser.string.OperatorInstantiateTemplates;
+import stencil.parser.string.OperatorToOpTemplate;
+import stencil.parser.string.PrepareCustomArgs;
+import stencil.parser.string.SeparateRules;
 import stencil.parser.string.StencilParser;
 import stencil.parser.string.PreparsePython;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
+
+import static stencil.parser.ParseStencil.TREE_ADAPTOR;
 
 public class TestFragments extends TestCase {
 	private interface Test {
@@ -32,17 +41,7 @@ public class TestFragments extends TestCase {
 		props.loadFromXML(new FileInputStream("./TestData/Stencil.properties"));
 		stencil.Configure.loadProperties(props);
 
-		ANTLRStringStream input = new ANTLRStringStream(source);
-		StencilTreeAdapter treeAdapter = new StencilTreeAdapter();
-
-		StencilLexer lexer = new StencilLexer(input);
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		StencilParser parser = new StencilParser(tokens);
-		parser.setTreeAdaptor(treeAdapter);
-		Program t= (Program) parser.program().getTree();
-
-		return t;
+		return ParseStencil.checkParse(source);
 	}
 	
 	public void testImport() throws Exception {
@@ -56,23 +55,75 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testAdHocPrime() throws Exception {
-		CommonTreeNodeStream treeTokens;
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
 		Program p = init(source);
 		Adapter adapter = Adapter.INSTANCE;
+		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
 
-		treeTokens = new CommonTreeNodeStream(p);
+
+		//Create prototype definitions for internally defined streams
+		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
+		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) liftStreams.downup(p);
+
+		//Group the operator chains
+		SeparateRules separate = new SeparateRules(treeTokens);
+		separate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) separate.downup(p);
+
+		//Ensure the proper order blocks
+		EnsureOrders orders = new EnsureOrders(treeTokens);
+		orders.setTreeAdaptor(TREE_ADAPTOR);
+		p = orders.ensureOrder(p);
+
+		//Do module imports
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(p);
+		
+		//Verify that Python operators are syntactically correct and appropriately indented
+		PreparsePython pyParse = new PreparsePython(treeTokens);
+		pyParse.downup(p);
 
-		//Create ad-hoc operators
+		//Parse custom argument blocks
+		PrepareCustomArgs customArgs = new PrepareCustomArgs(treeTokens);
+		customArgs.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) customArgs.downup(p);
+
+		//Add default specializers where required
+		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
+		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) defaultSpecializers.downup(p);
+
+		//Converting all operator defs to template/ref pairs
+		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
+		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opToTemplate.downup(p);		
+
+		//Remove all operator references
 		treeTokens = new CommonTreeNodeStream(p);
-		PreparsePython pyValidator = new PreparsePython(treeTokens);
-		pyValidator.downup(p);
+		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
+		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
+		opInstTemplates.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opInstTemplates.downup(p);
+
+		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
+		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opExplicit.downup(p);		
+		
+		//Expand operatorDefs to include query and stateID
+		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
+		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) opExtendFacets.transform(p);
+
+		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
+		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
+		envSize.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) envSize.downup(p);
 		
 		treeTokens = new CommonTreeNodeStream(p);
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-		adHoc.downup(p);
+		adHoc.setTreeAdaptor(TREE_ADAPTOR);
+		adHoc.transform(p);
 		
 		Module m = modules.getAdHoc();
 		int expected = p.getOperators().size() + p.getPythons().size() + p.getLayers().size();
