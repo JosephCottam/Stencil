@@ -13,7 +13,9 @@ import stencil.tuple.Tuple;
  * @author jcottam
  */
 public final class Pack extends CallTarget {
-	public Pack(Token source) {super(source);}
+	public Pack(Token source) {
+		super(source);
+	}
 
 	/**Creates a tuple from the values passed and the list of atoms given.
 	 * A pack may have literals or repeated names, so synthetic field names may

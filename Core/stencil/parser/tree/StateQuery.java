@@ -34,34 +34,38 @@ import org.antlr.runtime.Token;
 
 import stencil.types.Converter;
 
-public class StateQuery extends List {
+public class StateQuery extends StencilTree {
 	private static final Object[] EMPTY_ARGS = new Object[0];
 	private int[] cachedIDs;
 	
-	public StateQuery(Token source) {super(source);}
+	public StateQuery(Token source) {
+		super(source);
+	}
 	
 	/**Get a StateID that is the composite of all current stateIDs.
 	 * (This will calculate new stateIDs, but not store them in the cache.)
 	 */
 	public int compositeStateID() {
-		final Integer[] nowIDs = new Integer[this.size()];
-		for (int i=0; i< this.size(); i++) {
-			AstInvokeable inv = (AstInvokeable) this.get(i);
+		final Integer[] nowIDs = new Integer[getChildCount()];
+		for (int i=0; i< nowIDs.length; i++) {
+			AstInvokeable inv = (AstInvokeable) getChild(i);
 			nowIDs[i] = Converter.toInteger(inv.invoke(EMPTY_ARGS).get(0));
 		}
 		return Arrays.deepHashCode(nowIDs);
 	}
 	
+	public int[] getStateIDs() {return cachedIDs;}
 	
 	/**Has any of the contained stateID queries changed?*/
 	public boolean requiresUpdate() {
-		final int[] nowIDs = new int[this.size()];
+		final int[] nowIDs = new int[getChildCount()];
 		if (cachedIDs == null) {
 			cachedIDs = new int[nowIDs.length];
+			Arrays.fill(cachedIDs, Integer.MAX_VALUE-1);
 		}
 		
-		for (int i=0; i< this.size(); i++) {
-			AstInvokeable inv = (AstInvokeable) this.get(i);
+		for (int i=0; i< nowIDs.length; i++) {
+			AstInvokeable inv = (AstInvokeable) getChild(i);
 			nowIDs[i] = Converter.toInteger(inv.invoke(EMPTY_ARGS).get(0));
 		}		
 		
@@ -69,6 +73,7 @@ public class StateQuery extends List {
 		for (int i=0; matches && i < nowIDs.length; i++) {
 			matches = matches && (nowIDs[i] == cachedIDs[i]);
 		}
+		
 		cachedIDs = nowIDs;
 		return !matches;
 	}

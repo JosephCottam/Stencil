@@ -209,10 +209,11 @@ public abstract class ParseStencil {
 		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
 		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) opToTemplate.downup(p);		
-
-		//Remove all operator references
-		treeTokens = new CommonTreeNodeStream(p);
+		treeTokens = new CommonTreeNodeStream(p);	//Must be re-done because we make a new "Program" node in OperatorToOpTemplate
 		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
+
+		
+		//Remove all operator references
 		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
 		opInstTemplates.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) opInstTemplates.downup(p);

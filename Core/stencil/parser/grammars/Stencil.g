@@ -326,9 +326,9 @@ target[String def]
 
 pythonDef
   : (PYTHON ARG) => PYTHON ARG env=ID CLOSE_ARG name=ID pythonBlock+
-    -> ^(PYTHON[$name.text] ID pythonBlock+)
+    -> ^(PYTHON[$name.text] ID ^(LIST pythonBlock+))
   | PYTHON name=ID pythonBlock+
-    -> ^(PYTHON[$name.text] ID[buryID($name.text)] pythonBlock+);
+    -> ^(PYTHON[$name.text] ID[buryID($name.text)] ^(LIST pythonBlock+));
   
 pythonBlock
 	: FACET 'init' ISLAND_BLOCK

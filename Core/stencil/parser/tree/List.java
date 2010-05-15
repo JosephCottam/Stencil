@@ -10,28 +10,16 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 /**Supports the List node type, and read interface elements of java.util.List.*/
-public class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
+public final class List<E extends StencilTree> extends StencilTree implements java.util.List<E> {
 	/**Object to wrap an arbitrary tree in a java.util.List interface.
-	 * Note, all indexes returned from this class are relative to the list, which
-	 * may be offset from the list of children.  To convert from the list index to the
-	 * root-child index, use toTree(int).
 	 * */ 
 	public final static class WrapperList<T extends StencilTree> implements java.util.List<T> {
-		protected Tree root; 
-		protected int offset;
+		protected final Tree root; 
 		
 		/**@param root Which node's children are making a list?
 		 * @param offset What is the first child that should be in the list? (Default is 0, indicating all children.)
 		 */
-		public WrapperList(Tree root, int offset) {
-			this.root = root;
-			this.offset = offset;
-		}
-		
-		public WrapperList(Tree root) {this(root, 0);}
-		
-		/**Given a list index, return the tree-child index.*/
-		private int toTree(int idx) {return idx+offset;}
+		public WrapperList(Tree root) {this.root = root;}
 		
 		public boolean contains(Object o) {
 			if (!(o instanceof Tree)) {return containsValue(o);}
@@ -53,27 +41,26 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 			return contains;
 		}
 
-		public T get(int index) {return (T) root.getChild(toTree(index));}
+		public T get(int index) {return (T) root.getChild(index);}
 
 		public int indexOf(Object o) {
 			if (o== null) {return -1;}
 
-			for (int i=offset; i < root.getChildCount(); i++) {
+			for (int i=0; i < root.getChildCount(); i++) {
 				Tree t = root.getChild(i);
-				if (o.equals(t)) {return i-offset;}
+				if (o.equals(t)) {return i;}
 			}
 			return -1;
 		}
 
-		public boolean isEmpty() {return (root.getChildCount()-offset)==0;}
+		public boolean isEmpty() {return (root.getChildCount())==0;}
 
-		private static class StencilListIterator implements Iterator {
-			int idx;
+		private static final class StencilListIterator implements Iterator {
+			int idx=0 ;
 			final int max;
 			final Tree root;
 			
-			public StencilListIterator(int offset, Tree root) {
-				idx = offset;
+			public StencilListIterator(Tree root) {
 				max = root.getChildCount();
 				this.root = root;
 			}
@@ -83,15 +70,15 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 			public void remove() {throw new UnsupportedOperationException("Cannot remove from a Stencil Tree List.");}			
 		}
 		public Iterator<T> iterator() {
-			return new StencilListIterator(offset, root);
+			return new StencilListIterator(root);
 		}
 
 		public int lastIndexOf(Object o) {
 			if (o== null) {return -1;}
 
-			for (int i = root.getChildCount()-1; i!=offset; i--) {
+			for (int i = root.getChildCount()-1; i>0; i--) {
 				Tree t = root.getChild(i);
-				if (o.equals(t)) {return i-offset;}
+				if (o.equals(t)) {return i;}
 			}
 			return -1;
 		}
@@ -102,13 +89,13 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 		public java.util.List<T> subList(int fromIndex, int toIndex) {
 			ArrayList<T> children = new ArrayList(toIndex - fromIndex);
 			for (int i=0; i< children.size(); i++) {
-				children.set(i, get(fromIndex+toTree(i)));
+				children.set(i, get(fromIndex+i));
 			}
 			return children;
 		}
 
 		public Object[] toArray() {
-			Object[] children = new Object[root.getChildCount()-offset];
+			Object[] children = new Object[root.getChildCount()];
 			return copyInto(children);
 		}
 		
@@ -121,7 +108,7 @@ public class List<E extends StencilTree> extends StencilTree implements java.uti
 		
 		private Object[] copyInto(Object[] target) {	
 			for (int i=0; i< size(); i++) {
-				target[i] = root.getChild(toTree(i));
+				target[i] = root.getChild(i);
 			}
 			return target;
 		}

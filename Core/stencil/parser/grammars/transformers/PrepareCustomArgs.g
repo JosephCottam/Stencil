@@ -97,7 +97,7 @@ options {
 
    public Tree printfArgs(Tree args) {return printfArgs(args, adaptor);}
    public static Tree printfArgs(Tree args, TreeAdaptor adaptor) {
-     List<Tree> splitArgs = new stencil.parser.tree.List.WrapperList(splitArgs(stripBraces(args), adaptor), 0);
+     List<Tree> splitArgs = new stencil.parser.tree.List.WrapperList(splitArgs(stripBraces(args), adaptor));
      StringBuilder format = new StringBuilder();
      List<Tree> refArgs = new ArrayList();
      
