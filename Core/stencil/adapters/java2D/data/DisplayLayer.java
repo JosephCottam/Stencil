@@ -31,6 +31,7 @@ package stencil.adapters.java2D.data;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -53,7 +54,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import stencil.util.collections.ListSet;
 
 public final class DisplayLayer<T extends Glyph2D> implements stencil.display.DisplayLayer<T> {
-	private ConcurrentHashMap<String, T> index = new ConcurrentHashMap<String, T>();
+	private final ConcurrentHashMap<String, T> index = new ConcurrentHashMap<String, T>();
 	private final String name; 
 	private T prototypeGlyph;
 	private final Set<LayerUpdateListener> updateListeners = new ListSet();
@@ -69,11 +70,13 @@ public final class DisplayLayer<T extends Glyph2D> implements stencil.display.Di
 	
 	public String getName() {return name;}
 
-	public Iterator<T> iterator() {
+	public Collection<T> renderOrder() {
 		List<T> renderOrder = new ArrayList(index.values()); //TODO: Cache and clear on changes (resort if update is to change values only)
 		Collections.sort(renderOrder, Z_SORTER);
-		return renderOrder.iterator();
+		return renderOrder;		
 	}
+
+	public Iterator<T> iterator() {return index.values().iterator();}
 	
 	public T find(String ID) {return index.get(ID);}
 

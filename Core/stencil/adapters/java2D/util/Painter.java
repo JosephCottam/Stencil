@@ -78,7 +78,7 @@ public final class Painter implements Runnable, LayerUpdateListener {
 		AffineTransform base = g.getTransform();
 
 		for (DisplayLayer<? extends Glyph2D> table: layers) {
-			for (Glyph2D glyph: table) {
+			for (Glyph2D glyph: table.renderOrder()) {
 				if (!glyph.isVisible()) {continue;}
 				Rectangle2D r = glyph.getBoundsReference();
 				if (g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {
