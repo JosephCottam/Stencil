@@ -107,6 +107,7 @@ public final class StencilRunner extends Thread {
 				loader.load();
 				reporter.addMessage("Finished load of %1$s.", names);
 				panel.repaint();
+				
 			}
 			adapter.finalize(panel);
 		} catch (Throwable e) {

@@ -9,10 +9,19 @@ defaults:
     
 operators:
   - name: CircularLayout
-    defaultSpecializer: !spec "[range: ALL, split: 0, pad: 1, start: 0, r: -1, count: -1, ratio: 1]"
+    defaultSpecializer: !spec "[range: ALL, split: 0, pad: 1, start: 0, r: -1, count: -1, ratio: 1, X: 0, Y: 0]"
     facets:
     - {name: map, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
     - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
     - {name: configure, type: OTHER, function: FALSE, prototype: !proto "angle, count, pad, r, ratio"}    
     - {name: stateID, type: OTHER,   function: FALSE, prototype: !proto "VALUE"}    
+  - name: RadialLayout
+    defaultSpecializer: !spec "[range: ALL, split: 0, gap: 50, fallOff: 0, rule: \"simple\", X:0, Y: 0]"
+    facets:
+     - {name: map,   type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+     - {name: add,   type: PROJECT, function: FALSE, prototype: !proto "newRoot"}
+     - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+     - {name: slice, type: PROJECT, function: FALSE, prototype: !proto "r, t1, t2"}
+    
+  
   

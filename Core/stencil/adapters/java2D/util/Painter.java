@@ -85,9 +85,8 @@ public final class Painter implements Runnable, LayerUpdateListener {
 					glyph.render(g, base);
 				}
 			}
-			
-			for (Guide2D guide: target.getGuides()) {guide.render(g, base);}
-		}
+		}		
+		for (Guide2D guide: target.getGuides()) {guide.render(g, base);}
 	}
 	
 	private boolean resized() {
@@ -184,6 +183,6 @@ public final class Painter implements Runnable, LayerUpdateListener {
  	 * TODO: Some update tasks (dynamic rules in particular) may need to be given a chance to quiesce, not just be run once....
 	 * */
 	public void doUpdates() {
-		for (UpdateTask updater: updaters.values()) {updater.conservativeUpdate();} 
+		for (UpdateTask updater: updaters.values()) {updater.update();} 
 	}
 }
