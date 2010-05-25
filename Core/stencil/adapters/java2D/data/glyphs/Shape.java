@@ -51,12 +51,16 @@ public class Shape extends Filled {
 	private static final Attribute<StandardShape> SHAPE = new Attribute("SHAPE", StandardShape.ELLIPSE);
 	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);
 	private static final Attribute<Double> SIZE = new Attribute("SIZE", 5.0d);
+	private static final Attribute<Double> WIDTH = new Attribute("WIDTH", 5.0d);
+	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 5.0d);
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);
 	
 	static {
 		ATTRIBUTES.add(SHAPE);
 		ATTRIBUTES.add(SIZE);
+		ATTRIBUTES.add(WIDTH);
+		ATTRIBUTES.add(HEIGHT);
 		ATTRIBUTES.add(ROTATION);
 		ATTRIBUTES.add(X);
 		ATTRIBUTES.add(Y);
@@ -65,7 +69,8 @@ public class Shape extends Filled {
 	private final SoftReference<java.awt.Shape> glyphRef;
 
 	private final StandardShape shape;
-	private final double size;
+	private final double width;
+	private final double height;
 	
 	private final double rotation;
 	private final double regX;
@@ -75,7 +80,8 @@ public class Shape extends Filled {
 		super(layer, id);
 		
 		shape =  SHAPE.defaultValue;
-		size = SIZE.defaultValue;
+		width = WIDTH.defaultValue;
+		height= HEIGHT.defaultValue;
 		regX = X.defaultValue;
 		regY = Y.defaultValue;
 		rotation = ROTATION.defaultValue;	
@@ -92,7 +98,8 @@ public class Shape extends Filled {
 	
 		this.glyphRef = source.glyphRef;
 		this.shape = source.shape;
-		this.size = source.size;
+		this.width = source.width;
+		this.height = source.height;
 		this.rotation = source.rotation;
 		this.regX = source.regX;
 		this.regY = source.regY;
@@ -104,8 +111,17 @@ public class Shape extends Filled {
 		super(source, option, UNSETTABLES);
 		
 		shape = switchCopy(source.shape, safeGet(option, SHAPE));
-		size = switchCopy(source.size, safeGet(option, SIZE));
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
+
+		Double size = safeGet(option, SIZE);
+		if (size == null) {
+			width = switchCopy(source.width, safeGet(option, WIDTH));
+			height = switchCopy(source.height, safeGet(option, HEIGHT));
+		} else {
+			width = size;
+			height = size;
+		}
+		
 		
 		regX = switchCopy(source.regX, safeGet(option, X));
 		regY = switchCopy(source.regY, safeGet(option, Y));		
@@ -116,10 +132,10 @@ public class Shape extends Filled {
 	}
 
 	private final java.awt.Shape createShape() {
-		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, size, size);
-		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), size, size);
+		Point2D topLeft = Registrations.registrationToTopLeft(registration, regX, regY, width, height);
+		Rectangle2D bounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), width, height);
 		
-		java.awt.Shape s = Shapes.getShape(shape, bounds.getX()-regX, bounds.getY()-regY, size, size);
+		java.awt.Shape s = Shapes.getShape(shape, bounds.getX()-regX, bounds.getY()-regY, width, height);
 		s = AffineTransform.getRotateInstance(Math.toRadians(rotation)).createTransformedShape(s);
 		s = AffineTransform.getTranslateInstance(regX, regY).createTransformedShape(s);
 		
@@ -130,8 +146,10 @@ public class Shape extends Filled {
 			 if (SHAPE.is(name)) {return shape;}
 		else if (X.is(name)) {return regX;}
 		else if (Y.is(name)) {return regY;}
-		else if (SIZE.is(name)) {return size;}
+		else if (SIZE.is(name)) {return Math.max(width, height);}
 		else if (ROTATION.is(name)) {return rotation;}
+		else if (WIDTH.is(name)) {return width;}
+		else if (HEIGHT.is(name)) {return height;}
 		else {return super.get(name);}
 	}
 	

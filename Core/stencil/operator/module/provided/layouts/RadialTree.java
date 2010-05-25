@@ -1,7 +1,5 @@
 package stencil.operator.module.provided.layouts;
 
-import java.awt.geom.Point2D;
-
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
@@ -101,7 +99,6 @@ public class RadialTree extends Layout{
     
     protected boolean layoutStale = true;
     
-    protected Point2D origin;		//Where to center the layout
     protected LayoutTree root;		//Tree to layout
     
     /**
@@ -111,12 +108,8 @@ public class RadialTree extends Layout{
      * either a Graph or Tree instance.
      */
     public RadialTree(OperatorData opData, Specializer spec) {
-    	super(opData);
+    	super(opData, spec);
         radiusInc = DEFAULT_RADIUS;
-        
-        final double x = Converter.toDouble(spec.get(X));
-        final double y = Converter.toDouble(spec.get(Y));
-        origin = new Point2D.Double(x,y);
         
         radiusInc = Converter.toDouble(spec.get(RADIUS_INC));
         fallOff = Math.pow(Math.sqrt(2), Converter.toDouble(spec.get(FALL_OFF)));
@@ -131,12 +124,12 @@ public class RadialTree extends Layout{
     	int idx = child.getIdx();
     	if (rule.equals(SIMPLE_RULE)) {
 	    	double span = parentAllocation.size()/parent.children().size();  //radians per-child
-	    	double start = parentAllocation.theta1 + span*idx;										 //theta0 for this child
+	    	double start = parentAllocation.theta1 + span*idx;				 //theta1 for this child
 	    	return new Allocation(start, start+span);
     	} else {
     		double percent, start, span;
     		
-    		if (rule.equals(TOTAL_RULE)) {percent = child.totalDescendents/parent.totalDescendents;} //TODO: MIGHT NOT BE SAFE to do this division if the tree has one node...
+    		if (rule.equals(TOTAL_RULE)) {percent = child.totalDescendents/parent.totalDescendents;}
     		else if (rule.equals(AVG_RULE)) {percent = child.totalDescendents/parent.avgDescendents;}
     		else {throw new RuntimeException("Unrecognized radial layout allocation rule: " + rule);}
     		span = parentAllocation.size()*percent;
@@ -159,12 +152,12 @@ public class RadialTree extends Layout{
     	layoutStale = false;
     }
 
-    public final static double calcRadius(final int level, final double radiusInc, final double fallOff) {
+    private final static double calcRadius(final int level, final double radiusInc, final double fallOff) {
     	if (fallOff == 1) {return level*radiusInc;}
     	else {return radiusInc * (1 - Math.pow(fallOff, level))/(1-fallOff);}
     }
 
-    public static void layout(LayoutTree root, int level, Allocation space, double radiusInc, double fallOff, String rule) {
+    private static void layout(LayoutTree root, int level, Allocation space, double radiusInc, double fallOff, String rule) {
     	root.setR(calcRadius(level, radiusInc, fallOff));
     	root.setTheta1(space.theta1);
     	root.setTheta2(space.theta2);
@@ -173,7 +166,7 @@ public class RadialTree extends Layout{
     	}
     }
     
-    public static int countChildren(LayoutTree root) {
+    private static int countChildren(LayoutTree root) {
     	if (root.children().size()==0) {
     		root.totalDescendents=0;
     		return 0;
@@ -188,7 +181,7 @@ public class RadialTree extends Layout{
     }
 
     //Method "countChildren" MUST be run before this method to get correct results
-    public static int avgChildren(LayoutTree root) {
+    private static int avgChildren(LayoutTree root) {
     	if (root.children().size()==0) {
     		root.avgDescendents =0;
     		return 0;
@@ -204,12 +197,13 @@ public class RadialTree extends Layout{
     
     /**What is the point-representation of the allocation for the given node?
      * This returns the center-point of the allocation, on the radius line.
+     * 
      * TODO: Make a point2D tuple and return a Point2D from here.
      * */
     public double[] query(Object id) {
     	if (layoutStale) {layout();}
     	
-    	LayoutTree node = findNode(root, id);
+    	LayoutTree node = Tree.findNode(root, id);
     	if (node != null) {
     		return new double[]{node.x, node.y};
     	} else {
@@ -220,7 +214,6 @@ public class RadialTree extends Layout{
     /**Add a node and report where it was placed.*/
     public double[] map(Object id, Object parentID) {
     	add(id, parentID);
-    	layout();
     	return query(id);
     }
     
@@ -231,7 +224,8 @@ public class RadialTree extends Layout{
      * @return         Did adding this node introduce a new root?
      */
     public boolean add(Object id, Object parentID) {
-    	LayoutTree parent = findNode(root, parentID);
+    	LayoutTree parent = Tree.findNode(root, parentID);
+    	stateID++;
     	
     	this.layoutStale=true;
     	if (parent == null) {
@@ -250,24 +244,9 @@ public class RadialTree extends Layout{
     public double[] slice(Object id) {
     	if (layoutStale) {layout();}
     	
-    	LayoutTree node = findNode(root, id);
+    	LayoutTree node = Tree.findNode(root, id);
     	if (node != null) {
     		return new double[]{node.r, node.theta1, node.theta2};
-    	}
-    	return null;
-    }
-    
-    
-    /**Search the tree for the given ID.  
-     * Return the node if found, otherwise return null.
-     */
-    private static LayoutTree findNode(LayoutTree root, Object id) {
-    	if (root == null) {return null;}
-    	
-    	if (root.getID().equals(id)) {return root;}
-    	for (LayoutTree child: root.children()) {
-    		LayoutTree c = findNode(child, id);
-    		if (c!= null) {return c;}
     	}
     	return null;
     }

@@ -1,6 +1,7 @@
 package stencil.util.collections;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Tree<D extends Tree> {
@@ -8,6 +9,7 @@ public class Tree<D extends Tree> {
 	final protected Object id;
 	final protected List<D> children;
 	
+	public Tree(Object id) {this(id, null);}
 	public Tree(Object id, D parent) {
 		this.id = id;
 		this.parent = parent != null ? parent : (D) this;
@@ -37,4 +39,53 @@ public class Tree<D extends Tree> {
 	public void setParent(D parent) {this.parent = parent;}
 	public D getParent() {return parent;}
 	public boolean isRoot() {return parent==this;}
+	
+	public String toString() {return toString(0);}
+	
+	private String toString(int nest) {
+		String pad = new String();
+		for (int i=0; i<nest; i++) {pad = pad + "  ";}
+		
+		StringBuilder children = new StringBuilder();
+		for (Tree child: children()) {
+			children.append(child.toString(nest+1));
+		}
+		
+		return pad + id + "\n" + children;
+	}
+	
+	/**What is the path to this node?
+	 * Path is the child indicies.  The root has a path of zero-length.
+	 * 
+	 * @return
+	 */
+	public Integer[] getPath() {
+		if (parent == this) {return new Integer[0];}
+		
+		LinkedList<Integer> path = new LinkedList();
+		Tree node = this;
+		while (node != node.parent) {
+			path.push(node.getIdx());
+			node = node.parent;
+		}
+		
+		return path.toArray(new Integer[path.size()]);		
+	}
+	
+	
+    
+    /**Search the tree for the given ID.  
+     * Return the node if found, otherwise return null.
+     */
+    public static <C extends Tree> C findNode(Tree<C> root, Object id) {
+    	if (root == null) {return null;}
+    	
+    	if (root.getID().equals(id)) {return (C) root;}
+    	for (Tree<C> child: root.children()) {
+    		Tree<C> c = findNode(child, id);
+    		if (c!= null) {return (C) c;}
+    	}
+    	return null;
+    }
+
 }

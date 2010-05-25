@@ -20,7 +20,9 @@ public class Layout extends BasicModule {
 			return new Circular(operatorData, specializer);
 		} else if (operatorData.getName().equals(RadialTree.NAME)) {
 			return new RadialTree(operatorData, specializer);
-		} 
+		} else if (operatorData.getName().equals(TreeMap.NAME)) {
+			return new TreeMap(operatorData, specializer);
+		}
 		
 		throw new Error("Not sure how you go here...");
 	}

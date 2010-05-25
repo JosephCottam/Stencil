@@ -15,6 +15,7 @@ operators:
     - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
     - {name: configure, type: OTHER, function: FALSE, prototype: !proto "angle, count, pad, r, ratio"}    
     - {name: stateID, type: OTHER,   function: FALSE, prototype: !proto "VALUE"}    
+
   - name: RadialLayout
     defaultSpecializer: !spec "[range: ALL, split: 0, gap: 50, fallOff: 0, rule: \"simple\", X:0, Y: 0]"
     facets:
@@ -22,6 +23,11 @@ operators:
      - {name: add,   type: PROJECT, function: FALSE, prototype: !proto "newRoot"}
      - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
      - {name: slice, type: PROJECT, function: FALSE, prototype: !proto "r, t1, t2"}
-    
   
+  - name: TreeMap
+    defaultSpecializer: !spec "[range: ALL, split: 0, style: \"square\", X:0, Y: 0, W:100, H:100]"
+    facets:
+     - {name: map,   type: PROJECT, function: FALSE, prototype: !proto "X,Y,W,H"}
+     - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y,W,H"}
+     - {name: add,   type: PROJECT, function: FALSE, prototype: !proto "newRoot"}
   

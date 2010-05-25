@@ -1,5 +1,7 @@
 package stencil.operator.module.provided.layouts;
 
+import java.awt.geom.Point2D;
+
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.ArrayTuple;
@@ -16,8 +18,6 @@ public class Circular extends Layout {
 	private static final String RATIO = "ratio";
 	
 	
-	private double cx;			//Centerpoint X-value
-	private double cy;			//Centerpoint Y-value
 	private double startAngle;	//Where to start the layout
 	private double radius;		//How big should the circle be?
 	private double size;		//If doing auto-layout, how many pixels in the circumference per element
@@ -26,14 +26,12 @@ public class Circular extends Layout {
 	
 	
 	public Circular(OperatorData opData, Specializer spec) {
-		super(opData);
+		super(opData, spec);
 		startAngle = Converter.toDouble(spec.get(START_ANGLE));
 		radius = Converter.toDouble(spec.get(RADIUS));
 		size = Converter.toDouble(spec.get(SIZE));
 		ratio = Converter.toDouble(spec.get(RATIO));
 		elementCount = Converter.toInteger(spec.get(ELEMENT_COUNT));
-		cx = Converter.toDouble(spec.get(X));
-		cy = Converter.toDouble(spec.get(Y));
 	}
 	
 	public Tuple configure(Double angle, Integer count, Double pad, Double radius, Double ratio, Double cx, Double cy) {
@@ -42,8 +40,8 @@ public class Circular extends Layout {
 		this.size         = pad != null    ? pad    : this.size;
 		this.elementCount = count != null  ? count  : this.elementCount;
 		this.ratio		  = ratio != null  ? ratio  : this.ratio;
-		this.cx 		  = cx != null     ? cx     : this.cx;
-		this.cy 		  = cy != null     ? cy     : this.cy;
+		this.origin = new Point2D.Double(cx != null ? cx : origin.getX(), cy != null ? cy : origin.getY());
+
 		stateID++; //TODO: Only update stateID when something actually changes...
 		return new ArrayTuple(startAngle, elementCount, pad, radius, ratio);
 	}
@@ -63,8 +61,8 @@ public class Circular extends Layout {
 		double x,y;
 		double xRadius = radius;
 		double yRadius = radius * ratio;
-		x = xRadius * Math.cos(angle) + cx;
-		y = yRadius * Math.sin(angle) + cy;			
+		x = xRadius * Math.cos(angle) + origin.getX();
+		y = yRadius * Math.sin(angle) + origin.getY();			
 
 		return new ArrayTuple(x,y);
 	}
