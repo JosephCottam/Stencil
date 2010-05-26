@@ -7,7 +7,7 @@ import stencil.util.collections.Tree;
 
 
 //TODO: add a fit-to-specific-width option
-//TODO: add ability to handle multiple trees
+/**Based on the prefuse radial layout routines.*/
 public class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	
@@ -150,6 +150,7 @@ public class RadialTree extends Layout{
     	
     	layout(root, 0, ROOT_ALLOCATION, radiusInc, fallOff, rule);
     	layoutStale = false;
+    	System.out.println(root.toString());
     }
 
     private final static double calcRadius(final int level, final double radiusInc, final double fallOff) {
@@ -221,20 +222,40 @@ public class RadialTree extends Layout{
      * 
      * @param id 	   Identity of new node
      * @param parentID Identity of parent
-     * @return         Did adding this node introduce a new root?
+     * @return         Did adding this node change anything?
      */
     public boolean add(Object id, Object parentID) {
+    	LayoutTree node = Tree.findNode(root, id);
     	LayoutTree parent = Tree.findNode(root, parentID);
-    	stateID++;
+    	if (node!= null && node.getParent() == parent) {return false;}
     	
-    	this.layoutStale=true;
+    	stateID++;
+    	layoutStale = true;
+    	    	
     	if (parent == null) {
-    		root = new LayoutTree(id);
-    		return true;
-    	} else {
-    		 parent.children().add(new LayoutTree(id, parent));
-    		 return false;
+    		parent = new LayoutTree(parentID);
+
+    		if (root == null || root.getID() != null) {//Create a synthetic root when needed
+        		LayoutTree newRoot = new LayoutTree(null);
+        		if (root != null) {newRoot.addChild(root);}
+        		root = newRoot;
+    		}    		
+    		root.addChild(parent);
     	}
+    	
+    	if (node == null && !parentID.equals(id)) { //If parentID == id, then the node will have been created when creating the parent
+    		node = new LayoutTree(id, parent);
+    	} else if (node != null) {
+    		parent.addChild(node);
+    	}
+    	
+    	
+    	if (root.getID() == null && root.children().size() == 1) {//Remove a synthetic root when needed
+    		parent.setParent(parent);
+    		root = parent;
+    	}
+    	
+    	return true;
 
     }
     

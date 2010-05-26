@@ -12,13 +12,18 @@ public class Tree<D extends Tree> {
 	public Tree(Object id) {this(id, null);}
 	public Tree(Object id, D parent) {
 		this.id = id;
-		this.parent = parent != null ? parent : (D) this;
 		children = new ArrayList(2);
+		if (parent != this && parent != null) {parent.addChild(this);}
+		if (this.parent == null) {this.parent = (D) this;}
 	}
 	
 	public List<D> children() {return children;}
 	public void addChild(D child) {
 		children.add(child);
+		if (child.getParent() != null) {
+			child.getParent().removeChild(child);
+		}
+		child.setParent(this);
 	}
 
 	/**What is the index of the given child?*/
@@ -80,7 +85,7 @@ public class Tree<D extends Tree> {
     public static <C extends Tree> C findNode(Tree<C> root, Object id) {
     	if (root == null) {return null;}
     	
-    	if (root.getID().equals(id)) {return (C) root;}
+    	if (root.getID() != null && root.getID().equals(id)) {return (C) root;}
     	for (Tree<C> child: root.children()) {
     		Tree<C> c = findNode(child, id);
     		if (c!= null) {return (C) c;}
