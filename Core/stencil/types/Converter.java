@@ -18,6 +18,7 @@ public final class Converter {
 		//TODO: Move to something like the modules mechanism, loaded from a configuration file
 		registerWrapper(new NumericWrapper());
 		registerWrapper(new stencil.types.color.ColorWrapper());
+		registerWrapper(new stencil.types.geometry.GeometryWrapper());
 	}
 	
 	public static final void registerWrapper(TypeWrapper wrapper) {

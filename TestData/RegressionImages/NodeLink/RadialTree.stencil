@@ -2,7 +2,7 @@ STREAM: File
 NAME: VertexList
 HEADER: ID1, ID2
 SEPARATOR: ,
-SOURCE: ./tree.tree
+SOURCE: ./treeMultiRoot.tree
 SKIP: 1
 STRICT: true
 
@@ -26,5 +26,13 @@ from VertexList
 	(X.1, Y.1):* Nodes.find(parent) -> (X,Y)
 	(X.2, Y.2):* Nodes.find(child) ->  (X,Y)
 	STROKE_COLOR: @Color{GRAY30,80}
+
+layer Labels[TEXT]
+from VertexList
+	ID : child
+	(X,Y):* Nodes.find(child) -> (X,Y)
+	(TEXT, FONT_SIZE): (child, 10)
+	FONT_COLOR: @Color{GRAY60}
+
 
 operator Layout base RadialLayout

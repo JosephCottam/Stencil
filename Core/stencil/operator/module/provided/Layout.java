@@ -5,6 +5,7 @@ import stencil.operator.module.SpecializationException;
 import stencil.operator.module.provided.layouts.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
+import stencil.operator.module.util.ModuleIncompleteError;
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
@@ -24,7 +25,7 @@ public class Layout extends BasicModule {
 			return new TreeMap(operatorData, specializer);
 		}
 		
-		throw new Error("Not sure how you go here...");
+		throw new ModuleIncompleteError(name);
 	}
 
 }

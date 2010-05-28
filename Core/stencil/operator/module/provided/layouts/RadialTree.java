@@ -1,5 +1,7 @@
 package stencil.operator.module.provided.layouts;
 
+import java.awt.geom.Point2D;
+
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
@@ -150,7 +152,6 @@ public class RadialTree extends Layout{
     	
     	layout(root, 0, ROOT_ALLOCATION, radiusInc, fallOff, rule);
     	layoutStale = false;
-    	System.out.println(root.toString());
     }
 
     private final static double calcRadius(final int level, final double radiusInc, final double fallOff) {
@@ -201,19 +202,19 @@ public class RadialTree extends Layout{
      * 
      * TODO: Make a point2D tuple and return a Point2D from here.
      * */
-    public double[] query(Object id) {
+    public Point2D query(Object id) {
     	if (layoutStale) {layout();}
     	
     	LayoutTree node = Tree.findNode(root, id);
     	if (node != null) {
-    		return new double[]{node.x, node.y};
+    		return new Point2D.Double(node.x, node.y);
     	} else {
     		return null;
     	}
     }
 
     /**Add a node and report where it was placed.*/
-    public double[] map(Object id, Object parentID) {
+    public Point2D map(Object id, Object parentID) {
     	add(id, parentID);
     	return query(id);
     }

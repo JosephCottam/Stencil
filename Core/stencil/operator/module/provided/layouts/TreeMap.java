@@ -1,5 +1,7 @@
 package stencil.operator.module.provided.layouts;
 
+import java.awt.geom.Rectangle2D;
+
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
@@ -63,14 +65,14 @@ public class TreeMap extends Layout {
 	}
 	
 	
-	public double[] query(final Object id) {
+	public Rectangle2D query(final Object id) {
 		Mappable layoutNode = layoutFor(id); 
 		Rect r = layoutNode.getBounds();
-		double[] values = new double[]{r.x, r.y, r.w, r.h};
-		return values;
+		Rectangle2D result = new Rectangle2D.Double(r.x, r.y, r.w, r.h);
+		return result;
 	}
 	
-	public double[] map(final Object id, final Object parent, double value) {
+	public Rectangle2D map(final Object id, final Object parent, double value) {
 		add(id, parent, value);
 		return query(id);
 	}
