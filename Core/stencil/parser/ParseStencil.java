@@ -236,6 +236,10 @@ public abstract class ParseStencil {
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
 		adHoc.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) adHoc.transform(p);
+		
+		//Validate the ad-hocs are all created
+		NoOperatorReferences noRefs = new NoOperatorReferences(treeTokens);
+		noRefs.downup(p);
 
 		//Add default packs where required
 		DefaultPack defaultPack = new DefaultPack(treeTokens);
