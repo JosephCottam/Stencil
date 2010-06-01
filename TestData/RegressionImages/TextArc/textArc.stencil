@@ -27,14 +27,9 @@ from RawWords
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> Extend(_, line) -> LineIndex.put(word, _)
+ () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, LAST)
  () : WordCount(word)
 
-
-operator Extend (current, more) -> (full) 
-  (current = NULL) => full : more 
-  (ALL)            => full : Concatenate(current, ",", more)
-  
 layer Border[TEXT]
 from Lines
    ID: line
@@ -60,11 +55,9 @@ operator LineIndex base Mapping[fields: "lines"]
 /*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)
   (ALL) =>
-    (X): LineIndex(word) -> Split(_, ",") 
-            >> Layout.query(_) >-
+    (X): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
             Select[field: 0](LAST) -> Average[range: LAST](*)
-    (Y): LineIndex(word) -> Split(_, ",") 
-            >> Layout.query(_) >-
+    (Y): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
             Select[field: 1](LAST) -> Average[range: LAST](*)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            

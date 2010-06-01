@@ -7,6 +7,7 @@ import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
 
 
@@ -91,6 +92,34 @@ public class TupleUtil extends BasicModule {
 		}
 	}
 	
+	
+	/**Takes a tuple and extends it by the passed values.
+	 * Resulting tuple can only safely be numerically dereferenced.
+	 * */
+	public static final class ExtendTuple extends BasicProject {
+		public ExtendTuple(OperatorData opData) {super(opData);}
+		
+		public Tuple query(Tuple t, Object... more) {
+			if (t == null) {t = new ArrayTuple();}
+			Object[] values = Tuples.toArray(t);
+			Object[] target = new Object[values.length + more.length];
+			
+			System.arraycopy(values, 0, target, 0, values.length);
+			System.arraycopy(more, 0, target, values.length, more.length);
+			
+			return new ArrayTuple(target);
+		}
+	}
+	
+	public static final class Get extends BasicProject {
+		public Get(OperatorData opData) {super(opData);}
+		public Tuple query(Tuple t, int i) {return Converter.toTuple(t.get(i));}
+	}
+	
+	public static final class ToTuple extends BasicProject {
+		public ToTuple(OperatorData opData) {super(opData);}
+		public Tuple query(Object o) {return Converter.toTuple(o);}
+	}
 	
 	public TupleUtil(ModuleData md) {super(md);}
 		

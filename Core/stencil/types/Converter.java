@@ -33,6 +33,7 @@ public final class Converter {
 	 * @return
 	 */
 	public static Tuple toTuple(Object value) {
+		if (value == null) {return null;}
 		if (value instanceof Tuple) {return (Tuple) value;}
 		
 		Class clazz = value.getClass();

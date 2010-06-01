@@ -10,6 +10,9 @@ defaults:
 
 operators:
   - name: Enfold
+  - name: ExtendTuple
+  - name: Get
   - name: Rename
   - name: Size
   - name: Select
+  - name: ToTuple
