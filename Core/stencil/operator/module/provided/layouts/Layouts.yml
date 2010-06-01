@@ -1,5 +1,5 @@
 name: Layout
-targetClass: stencil.operator.module.provided.Layout
+targetClass: stencil.operator.module.provided.layouts.Layouts
 description: Layouts groups of nodes
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split: 0]"

@@ -8,7 +8,7 @@ import stencil.types.Converter;
 import stencil.util.collections.Tree;
 import edu.umd.cs.treemap.*;
 
-public class TreeMap extends Layout {
+class TreeMap extends Layout {
 	public static final String NAME = "TreeMap";
 
 	public static final String STYLE_KEY = "style";

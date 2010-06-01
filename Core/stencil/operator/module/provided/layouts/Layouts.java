@@ -1,17 +1,16 @@
-package stencil.operator.module.provided;
+package stencil.operator.module.provided.layouts;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.SpecializationException;
-import stencil.operator.module.provided.layouts.*;
 import stencil.operator.module.util.BasicModule;
 import stencil.operator.module.util.ModuleData;
 import stencil.operator.module.util.ModuleIncompleteError;
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
-public class Layout extends BasicModule {
+class Layouts extends BasicModule {
 
-	public Layout(ModuleData md) {super(md);}
+	public Layouts(ModuleData md) {super(md);}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);

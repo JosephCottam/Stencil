@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="Explore"/>
 	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="src" path="Core"/>
+	<classpathentry kind="src" path="Modules"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Stencil"/>
 	<classpathentry kind="lib" path="Library/antlr-3.2.jar" sourcepath="/Users/jcottam/Library/Java/antlr-3.2/runtime/Java/src/main/java"/>
@@ -16,15 +17,10 @@
 	<classpathentry kind="lib" path="Library/snakeyaml-1.5.jar"/>
 	<classpathentry kind="lib" path="Library/ant-contrib-1.0b3.jar"/>
 	<classpathentry kind="lib" path="Library/umdTreeMaps.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG.jar" sourcepath="/JUNG/src"/>
-	<classpathentry kind="lib" path="Library/JUNG/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/colt-1.2.0.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/concurrent-1.3.4.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/jung-algorithms-2.0.1.jar" sourcepath="/JUNG/library/jung-algorithms-2.0.1-sources.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/jung-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="Library/JUNG/jung-algorithms-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-graph-impl-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/stax-api-1.0.1.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/vecmath-1.3.1.jar"/>
-	<classpathentry kind="lib" path="Library/JUNG/wstx-asl-3.2.6.jar"/>
+	<classpathentry kind="lib" path="Library/JUNG/collections-generic-4.01.jar"/>
+	<classpathentry kind="lib" path="Library/JUNG/jung-api-2.0.1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

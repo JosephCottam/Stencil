@@ -1,0 +1,24 @@
+name: JUNG
+targetClass: stencil.operator.module.provided.jung.JUNG
+description: Module to provide access to JUNG operators in Stencil
+defaults: 
+  defaultSpecializer: !spec "[range: ALL, split: 0, width: 500, height: 500, steps: 50]"
+  facets: 
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
+    - {name: add, type: PROJECT, function: TRUE, prototype: !proto "modified"}
+    
+operators:
+    - name: BalloonLayout
+      defaultSpecializer: !spec "[range: ALL, split: 0, width: 500, height: 500]"    
+    - name: FRLayout
+    - name: ISOMLayout
+    - name: KKLayout
+    - name: RadialTreeLayout
+    - name: SpringLayout
+    - name: CircleLayout
+      defaultSpecializer: !spec "[range: ALL, split: 0, width: 500, height: 500, radius: 100, sort: \"SEQ\"]"
+    - name: TreeLayout
+      defaultSpecializer: !spec "[range: ALL, split: 0, distX: 50, distY: 50]"
+      
+    

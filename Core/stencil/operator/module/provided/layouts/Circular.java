@@ -8,7 +8,7 @@ import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
-public class Circular extends Layout {
+class Circular extends Layout {
 	public static final String NAME = "CircularLayout";
 	
 	private static final String START_ANGLE = "start";

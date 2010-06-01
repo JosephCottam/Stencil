@@ -10,7 +10,7 @@ import stencil.util.collections.Tree;
 
 //TODO: add a fit-to-specific-width option
 /**Based on the prefuse radial layout routines.*/
-public class RadialTree extends Layout{
+class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	
 	private class LayoutTree extends Tree<LayoutTree> {
