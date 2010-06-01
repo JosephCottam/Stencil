@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.jung;
+package stencil.modules.jung;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.SpecializationException;

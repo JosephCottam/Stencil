@@ -1,11 +1,11 @@
-package stencil.operator.module.provided.jung;
+package stencil.modules.jung;
 
 import edu.uci.ics.jung.graph.DelegateForest;
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
 
-final class SpringLayout extends GraphOperator.StepOperator {
+public final class SpringLayout extends GraphOperator.StepOperator {
 	public SpringLayout(OperatorData opData, Specializer spec) {
 		super(opData, spec); 
 	}

@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.layouts;
+package stencil.modules.layouts;
 
 import stencil.operator.StencilOperator;
 import stencil.operator.module.SpecializationException;
@@ -8,7 +8,7 @@ import stencil.operator.module.util.ModuleIncompleteError;
 import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
-class Layouts extends BasicModule {
+public class Layouts extends BasicModule {
 
 	public Layouts(ModuleData md) {super(md);}
 

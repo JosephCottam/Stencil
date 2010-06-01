@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.layouts;
+package stencil.modules.layouts;
 
 import java.awt.geom.Rectangle2D;
 
@@ -8,7 +8,7 @@ import stencil.types.Converter;
 import stencil.util.collections.Tree;
 import edu.umd.cs.treemap.*;
 
-class TreeMap extends Layout {
+public class TreeMap extends Layout {
 	public static final String NAME = "TreeMap";
 
 	public static final String STYLE_KEY = "style";

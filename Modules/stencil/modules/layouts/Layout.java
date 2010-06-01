@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.layouts;
+package stencil.modules.layouts;
 
 import java.awt.geom.Point2D;
 
@@ -7,7 +7,7 @@ import stencil.operator.util.BasicProject;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
-abstract class Layout extends BasicProject {
+public abstract class Layout extends BasicProject {
 	protected static final String X = "X";
 	protected static final String Y = "Y";
 	

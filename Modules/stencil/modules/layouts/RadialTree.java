@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.layouts;
+package stencil.modules.layouts;
 
 import java.awt.geom.Point2D;
 
@@ -10,7 +10,7 @@ import stencil.util.collections.Tree;
 
 //TODO: add a fit-to-specific-width option
 /**Based on the prefuse radial layout routines.*/
-class RadialTree extends Layout{
+public class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	
 	private class LayoutTree extends Tree<LayoutTree> {

@@ -1,5 +1,5 @@
 name: JUNG
-targetClass: stencil.operator.module.provided.jung.JUNG
+targetClass: stencil.modules.jung.JUNG
 description: Module to provide access to JUNG operators in Stencil
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split: 0, width: 500, height: 500, steps: 50]"

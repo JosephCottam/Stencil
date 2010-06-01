@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.jung;
+package stencil.modules.jung;
 
 import java.util.Comparator;
 
@@ -7,7 +7,7 @@ import stencil.operator.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
-final class CircleLayout extends GraphOperator.SizedOperator {
+public final class CircleLayout extends GraphOperator.SizedOperator {
 	private static final String RADIUS = "radius";
 	private static final String SORTER_KEY ="sort";
 

@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.layouts;
+package stencil.modules.layouts;
 
 import java.awt.geom.Point2D;
 
@@ -8,7 +8,17 @@ import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
-class Circular extends Layout {
+/**Lays elements out around an ellipse.
+ * 
+ * Ellipse can be constructed as a circle (ratio of 1.0).
+ * 
+ * Size of ellipse can be specified as either the radius of the  major axis
+ * OR the number of pixels of circumference be given to each element .
+ * 
+ * @author jcottam
+ *
+ */
+public class Circular extends Layout {
 	public static final String NAME = "CircularLayout";
 	
 	private static final String START_ANGLE = "start";
@@ -30,7 +40,7 @@ class Circular extends Layout {
 		startAngle = Converter.toDouble(spec.get(START_ANGLE));
 		radius = Converter.toDouble(spec.get(RADIUS));
 		size = Converter.toDouble(spec.get(SIZE));
-		ratio = Converter.toDouble(spec.get(RATIO));
+		ratio = Math.pow(Math.sqrt(2), Converter.toDouble(spec.get(RATIO)));
 		elementCount = Converter.toInteger(spec.get(ELEMENT_COUNT));
 	}
 	

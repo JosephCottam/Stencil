@@ -1,4 +1,4 @@
-package stencil.operator.module.provided.jung;
+package stencil.modules.jung;
 
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
@@ -18,7 +18,7 @@ import stencil.types.Converter;
 /**Utility class for building JUNG graph operators.  This covers 
  * graph creation/storage, layout storage and position queries.
  */
-abstract class GraphOperator extends BasicProject implements StencilOperator {
+public abstract class GraphOperator extends BasicProject implements StencilOperator {
 	protected final DirectedGraph graph = new DirectedSparseGraph();
 	protected Layout<Object, Object> layout;	
 	
