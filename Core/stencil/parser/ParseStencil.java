@@ -35,7 +35,7 @@ import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
-import stencil.operator.module.ModuleCache;
+import stencil.module.ModuleCache;
 import stencil.adapters.Adapter;
 import stencil.parser.string.*;
 import stencil.parser.string.validators.*;

@@ -1,0 +1,31 @@
+name: Filters
+targetClass: stencil.modules.Filters
+description: Module for doing boolean comparisons.  These are the operators used in the Filter operations.
+
+defaults: 
+  defaultSpecializer: !spec "[range: LAST, split: 0]"
+  facets: 
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "V"}
+
+
+operators:
+   - name: GTE
+   - name: GTEI
+   - name: GT
+   - name: GTI
+   - name: LTE
+   - name: LTEI
+   - name: LT
+   - name: LTI
+   - name: EQ
+   - name: EQI
+   - name: NEQ
+   - name: NEQI
+   - name: EQS
+   - name: NEQS
+   - name: TrivialTrue
+   - name: TrivialFalse
+   - name: RE
+     defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"
+   - name: NRE
+     defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"

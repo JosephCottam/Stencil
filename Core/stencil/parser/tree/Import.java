@@ -2,7 +2,7 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.operator.module.ModuleCache;
+import stencil.module.ModuleCache;
 
 public class Import extends StencilTree {
 	Import(Token token) {super(token);}

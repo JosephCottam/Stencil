@@ -8,9 +8,9 @@ import edu.uci.ics.jung.algorithms.util.IterativeContext;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import stencil.operator.StencilOperator;
-import stencil.operator.module.util.OperatorData;
-import stencil.operator.util.BasicProject;
+import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.BasicProject;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 

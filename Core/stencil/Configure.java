@@ -30,7 +30,7 @@ public class Configure {
 		}
 
 
-		stencil.operator.module.ModuleCache.registerModules(props);
+		stencil.module.ModuleCache.registerModules(props);
 	}
 
 	public static void loadProperties(String... urls) throws Exception {

@@ -28,7 +28,7 @@
  */
 package stencil.parser;
 
-import stencil.operator.StencilOperator;
+import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.Specializer;
 
 public abstract class ParserConstants {

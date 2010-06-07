@@ -1,16 +1,17 @@
 package stencil.testUtilities;
 
-import stencil.operator.StencilOperator;
-import stencil.operator.module.*;
-import stencil.operator.module.util.*;
-import stencil.operator.util.Invokeable;
-import stencil.operator.util.ReflectiveInvokeable;
-import stencil.operator.wrappers.InvokeableOperator;
+import stencil.module.Module;
+import stencil.module.SpecializationException;
+import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.Invokeable;
+import stencil.module.operator.util.ReflectiveInvokeable;
+import stencil.module.operator.wrappers.InvokeableOperator;
+import stencil.module.util.*;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import static stencil.operator.module.util.OperatorData.*;
+import static stencil.module.util.OperatorData.*;
 
 import java.lang.reflect.*;
  

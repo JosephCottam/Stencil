@@ -7,8 +7,8 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.java2D.Adapter;
-import stencil.operator.module.Module;
-import stencil.operator.module.ModuleCache;
+import stencil.module.Module;
+import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.AdHocOperators;
 import stencil.parser.string.AnnotateEnvironmentSize;

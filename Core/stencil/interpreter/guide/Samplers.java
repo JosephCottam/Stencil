@@ -2,8 +2,8 @@ package stencil.interpreter.guide;
 
 import stencil.display.DisplayLayer;
 import stencil.interpreter.guide.samplers.*;
-import stencil.operator.util.Invokeable;
-import stencil.operator.util.ReflectiveInvokeable;
+import stencil.module.operator.util.Invokeable;
+import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Layer;
 
 import java.util.HashMap;

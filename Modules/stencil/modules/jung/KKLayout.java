@@ -1,7 +1,7 @@
 package stencil.modules.jung;
 
 import edu.uci.ics.jung.graph.DelegateForest;
-import stencil.operator.module.util.OperatorData;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
 

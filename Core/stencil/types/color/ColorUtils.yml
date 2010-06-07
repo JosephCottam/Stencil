@@ -1,4 +1,4 @@
-name: Color
+name: ColorUtils
 targetClass: stencil.types.color.ColorUtils
 description: Create and modify colors.
 

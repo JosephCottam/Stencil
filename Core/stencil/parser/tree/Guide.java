@@ -6,7 +6,7 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.interpreter.guide.*;
-import stencil.operator.util.Invokeable;
+import stencil.module.operator.util.Invokeable;
 import stencil.parser.string.StencilParser;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;

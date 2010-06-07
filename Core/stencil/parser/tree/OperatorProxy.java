@@ -30,9 +30,9 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.operator.StencilOperator;
-import stencil.operator.module.ModuleCache;
-import stencil.operator.module.util.OperatorData;
+import stencil.module.ModuleCache;
+import stencil.module.operator.StencilOperator;
+import stencil.module.util.OperatorData;
 
 public class OperatorProxy extends StencilTree {
 	private StencilOperator operator;

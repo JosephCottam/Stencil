@@ -2,8 +2,8 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.operator.StencilOperator;
-import stencil.operator.util.Invokeable;
+import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.Invokeable;
 import stencil.tuple.Tuple;
 
 /**Holder for invokeables, independent of context.

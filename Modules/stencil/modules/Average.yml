@@ -1,0 +1,18 @@
+name: Average
+targetClass: stencil.modules.Average
+description: Module for handling the average, in various manners
+defaults: 
+  defaultSpecializer: !spec "[range: ALL, split: 0]"
+  facets: 
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto VALUE}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto VALUE}
+    - {name: range, type: PROJECT, function: FALSE, prototype: !proto VALUE}
+    
+operators:
+  - name: Mean
+  - name: Median
+  - name: Mode
+  - {name: Average, target: Mean}
+  - {name: Avg, target: Mean}
+    
+  

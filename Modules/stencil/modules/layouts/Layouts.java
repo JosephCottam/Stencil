@@ -1,11 +1,11 @@
 package stencil.modules.layouts;
 
-import stencil.operator.StencilOperator;
-import stencil.operator.module.SpecializationException;
-import stencil.operator.module.util.BasicModule;
-import stencil.operator.module.util.ModuleData;
-import stencil.operator.module.util.ModuleIncompleteError;
-import stencil.operator.module.util.OperatorData;
+import stencil.module.SpecializationException;
+import stencil.module.operator.StencilOperator;
+import stencil.module.util.BasicModule;
+import stencil.module.util.ModuleData;
+import stencil.module.util.ModuleIncompleteError;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
 public class Layouts extends BasicModule {

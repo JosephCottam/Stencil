@@ -5,7 +5,7 @@ import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
-import stencil.operator.module.ModuleCache;
+import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;

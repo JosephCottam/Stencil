@@ -10,7 +10,7 @@ import stencil.adapters.Adapter;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
-import stencil.unittests.operator.module.TestModuleCache;
+import stencil.unittests.module.TestModuleCache;
 
 
 public class TestParseStencil extends TestCase {

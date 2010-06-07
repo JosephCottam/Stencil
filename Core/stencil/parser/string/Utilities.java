@@ -11,7 +11,7 @@ import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 import stencil.util.MultiPartName;
-import stencil.operator.StencilOperator;
+import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.AstInvokeable;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
 import static stencil.parser.ParserConstants.QUERY_FACET;

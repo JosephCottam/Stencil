@@ -2,8 +2,8 @@ package stencil.modules.layouts;
 
 import java.awt.geom.Point2D;
 
-import stencil.operator.module.util.OperatorData;
-import stencil.operator.util.BasicProject;
+import stencil.module.operator.util.BasicProject;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 

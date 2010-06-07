@@ -3,7 +3,7 @@ package stencil.modules.jung;
 import java.util.Comparator;
 
 import edu.uci.ics.jung.graph.DelegateForest;
-import stencil.operator.module.util.OperatorData;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 

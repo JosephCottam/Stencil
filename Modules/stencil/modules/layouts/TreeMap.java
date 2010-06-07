@@ -2,7 +2,7 @@ package stencil.modules.layouts;
 
 import java.awt.geom.Rectangle2D;
 
-import stencil.operator.module.util.OperatorData;
+import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import stencil.util.collections.Tree;

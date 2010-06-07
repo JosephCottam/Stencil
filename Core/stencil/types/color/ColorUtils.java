@@ -31,10 +31,10 @@ package stencil.types.color;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import stencil.operator.module.util.BasicModule;
-import stencil.operator.module.util.ModuleData;
-import stencil.operator.module.util.OperatorData;
-import stencil.operator.util.BasicProject;
+import stencil.module.operator.util.BasicProject;
+import stencil.module.util.BasicModule;
+import stencil.module.util.ModuleData;
+import stencil.module.util.OperatorData;
 
 public final class ColorUtils extends BasicModule {
 	private enum DIR {up, down, full, none}
