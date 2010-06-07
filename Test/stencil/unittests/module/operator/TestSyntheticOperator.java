@@ -11,6 +11,7 @@ import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.unittests.module.TestModuleCache;
 import junit.framework.TestCase;
 
 public class TestSyntheticOperator extends TestCase {
@@ -18,6 +19,9 @@ public class TestSyntheticOperator extends TestCase {
 	public static final String basicOperatorSource = "operator basic(A,B,C,D,E,F,G) -> (Z,Y,X) (A != NULL) => (Z,Y,X): (A,E,G)";
 	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.INSTANCE;
 	
+	public void setUp() throws Exception {
+		TestModuleCache.initCache();
+	}
 	
 	public void testGenerate() throws Exception {
 		Program program = ParseStencil.parse(fullOperatorSource, ADAPTER);
