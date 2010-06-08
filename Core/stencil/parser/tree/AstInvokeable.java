@@ -11,9 +11,9 @@ import stencil.tuple.Tuple;
  * Text is usually related to the invokeable, but is not
  * necessarily a consistent relationship across contexts.
  * */
-public final class AstInvokeable extends StencilTree {
+public final class AstInvokeable<R> extends StencilTree {
 	private StencilOperator op;
-	private Invokeable inv;
+	private Invokeable<R> inv;
 	
 	public AstInvokeable(Token token) {
 		super(token);
@@ -24,6 +24,8 @@ public final class AstInvokeable extends StencilTree {
 	public StencilOperator getOperator() {return op;}
 	public Invokeable getInvokeable() {return inv;}
 
+	public R directInvoke(Object[] args) {return inv.invoke(args);}
+	
 	public Tuple invoke(Object[] args) {
 		return inv.tupleInvoke(args);
 	}

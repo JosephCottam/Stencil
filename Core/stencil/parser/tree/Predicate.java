@@ -31,7 +31,6 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.Tuple;
 
 
 public class Predicate extends StencilTree {
@@ -43,8 +42,7 @@ public class Predicate extends StencilTree {
 	/**Does the passed environment match this predicate?*/
 	public boolean matches(Environment env) {
 		Object[] formals = TupleRef.resolveAll(getArguments(), env);
-		Tuple results = getInvokeable().invoke(formals);
-		return (Boolean) results.get(0);
+		return (Boolean) getInvokeable().directInvoke(formals);
 	}
 
 	

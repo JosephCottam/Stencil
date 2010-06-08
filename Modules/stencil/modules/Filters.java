@@ -10,29 +10,29 @@ import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.BooleanSingleton;
 import stencil.types.Converter;
 
 public class Filters extends BasicModule {
 
-	public static final BooleanSingleton gte(double n1, double n2) {return BooleanSingleton.instance(n1 >= n2);}
-	public static final BooleanSingleton gteI(int n1, int n2) {return BooleanSingleton.instance(n1 >= n2);}
+	public static final boolean gte(double n1, double n2) {return n1 >= n2;}
+	public static final boolean gteI(int n1, int n2) {return n1 >= n2;}
 
-	public static final BooleanSingleton gt(double n1, double n2) {return BooleanSingleton.instance(n1 > n2);}
-	public static final BooleanSingleton gtI(int n1, int n2) {return BooleanSingleton.instance(n1 > n2);}
+	public static final boolean gt(double n1, double n2) {return n1 > n2;}
+	public static final boolean gtI(int n1, int n2) {return n1 > n2;}
 
-	public static final BooleanSingleton lt(double n1, double n2) {return BooleanSingleton.instance(n1 < n2);}
-	public static final BooleanSingleton ltI(int n1, int n2) {return BooleanSingleton.instance(n1 < n2);}
+	public static final boolean lt(double n1, double n2) {return n1 < n2;}
+	public static final boolean ltI(int n1, int n2) {return n1 < n2;}
 
-	public static final BooleanSingleton lteq(double n1, double n2) {return BooleanSingleton.instance(n1 <= n2);}
-	public static final BooleanSingleton lteqI(int n1, int n2) {return BooleanSingleton.instance(n1 <= n2);}
+	public static final boolean lteq(double n1, double n2) {return n1 <= n2;}
+	public static final boolean lteqI(int n1, int n2) {return n1 <= n2;}
 	
-	public static final BooleanSingleton eqD(double n1, double n2) {return BooleanSingleton.instance(n1 == n2);}
-	public static final BooleanSingleton eqI(int n1, int n2) {return BooleanSingleton.instance(n1 == n2);}
-	public static final BooleanSingleton neqD(double n1, double n2) {return BooleanSingleton.instance(n1 != n2);}
-	public static final BooleanSingleton neqI(int n1, int n2) {return BooleanSingleton.instance(n1 != n2);}
+	public static final boolean eqD(double n1, double n2) {return n1 == n2;}
+	public static final boolean eqI(int n1, int n2) {return n1 == n2;}
+	public static final boolean neqD(double n1, double n2) {return n1 != n2;}
+	public static final boolean neqI(int n1, int n2) {return n1 != n2;}
 
-	private static final boolean eqsBase(Object lhs, Object rhs) {
+	
+	public static final boolean eqs(Object lhs, Object rhs) {
 		if (rhs == null || lhs == null) {return lhs == rhs;}
 		if (rhs instanceof Number || lhs instanceof Number) {
 			double l = Converter.toDouble(lhs).doubleValue();
@@ -42,15 +42,11 @@ public class Filters extends BasicModule {
 			return lhs.equals(rhs);
 		}
 	}
-	
-	public static final BooleanSingleton eqs(Object lhs, Object rhs) {
-		return BooleanSingleton.instance(eqsBase(lhs, rhs));
-	}
-	public static final BooleanSingleton neqs(Object lhs, Object rhs) {return BooleanSingleton.instance(!eqsBase(lhs, rhs));}
+	public static final boolean neqs(Object lhs, Object rhs) {return !eqs(lhs, rhs);}
 
 
-	public static final BooleanSingleton trivialTrue(Object... args) {return BooleanSingleton.TRUE;}
-	public static final BooleanSingleton trivialFalse(Object... args) {return BooleanSingleton.FALSE;}
+	public static final boolean trivialTrue(Object... args) {return true;}
+	public static final boolean trivialFalse(Object... args) {return false;}
 		
 	public static class RegExp extends BasicProject {
 		private static final String PATTERN_KEY = "pattern";
@@ -64,14 +60,14 @@ public class Filters extends BasicModule {
 			this.negated = negated;
 		}
 		
-		public BooleanSingleton query(String value, String pattern) {			
+		public boolean query(String value, String pattern) {			
 			Pattern matcher = patternCache != null ? patternCache : Pattern.compile(pattern);
-			return BooleanSingleton.instance(!negated == matcher.matcher(value).matches());
+			return !negated == matcher.matcher(value).matches();
 		}
 		
-		public BooleanSingleton match(String value) {
+		public boolean match(String value) {
 			assert patternCache != null;
-			return BooleanSingleton.instance(!negated == patternCache.matcher(value).matches());
+			return !negated == patternCache.matcher(value).matches();
 		}
 
 	
