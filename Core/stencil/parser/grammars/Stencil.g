@@ -46,6 +46,7 @@ tokens {
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
   TUPLE_REF;
+  TYPE;
   
   //General Keywords
   ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n

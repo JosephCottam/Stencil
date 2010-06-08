@@ -31,25 +31,21 @@ package stencil.parser.tree;
 import org.antlr.runtime.Token;
 
 import stencil.parser.tree.util.Environment;
+import stencil.tuple.Tuple;
 
 
 public class Predicate extends StencilTree {
 	public Predicate(Token source) {super(source);}
-
-	public Object getLHSValue(Environment env) {return getValue((Value) getChild(0), env);}
-	public Object getRHSValue(Environment env) {return getValue((Value) getChild(2), env);}
-	private Object getValue(Value source, Environment env) {
-		return TupleRef.resolve(source, env);
-	}
-
-	public BooleanOp getOperator() {return (BooleanOp) getChild(1);}
-
+	
+	public AstInvokeable getInvokeable() {return (AstInvokeable) getChild(0);}
+	public List<Value> getArguments() {return (List<Value>) getChild(1);}
+	
 	/**Does the passed environment match this predicate?*/
 	public boolean matches(Environment env) {
-		return (getChild(0) instanceof All) 
-				|| getOperator().evaluate(getLHSValue(env), getRHSValue(env), ((Value) getChild(0)).isTupleRef());
+		Object[] formals = TupleRef.resolveAll(getArguments(), env);
+		Tuple results = getInvokeable().invoke(formals);
+		return (Boolean) results.get(0);
 	}
-
 
 	
 	/**Does the passed environment match the given predicates?*/

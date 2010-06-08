@@ -52,11 +52,8 @@ public class Interpreter {
 		//Apply all rules
 		try {
 			for (Rule rule: rules) {
-				Tuple result;
-				int callDepth = rule.getAction().getDepth();
-				Environment callEnv = env.extendCapacity(env.size() + callDepth);
-				
-				try {result = rule.apply(callEnv);}
+				Tuple result;				
+				try {result = rule.apply(env);}
 				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
 				
 				//TODO: Have rules throw exception (instead of return null)

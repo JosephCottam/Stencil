@@ -13,7 +13,7 @@
  	<property name="ast" location ="${src}/stencil/parser/tree/"/>
  	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
  	 	
- 	<target name="Stencil" depends="GuideSystem, Transformers, TreeAdapter, Validators">
+ 	<target name="Stencil" depends="GuideSystem, Transformers, TreeAdapter, Validators, Interpreter">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
@@ -51,13 +51,22 @@
  	
     <target name="Validators" depends="StencilGrammar">
     	<foreach target="antlrBuild" param="file" inheritall="true">
-    	   <fileset dir="${grammars}/validators"/>
+    	   <fileset dir="${grammars}/validators" />
            <param name="antlrTarget" value="${parser}/validators"/>
     	</foreach>
        <antcall target="EclipseRefresh"/>
     </target>
 
+    <target name="Interpreter" depends="StencilGrammar">
+    	<foreach target="antlrBuild" param="file" inheritall="true">
+    	   <fileset dir="${interpreter}" includes="*.g"/>
+           <param name="antlrTarget" value="${interpreter}"/>
+    	</foreach>
+       <antcall target="EclipseRefresh"/>
+    </target>
 
+ 	
+ 	
  	<target name="antlrBuild">
         <antlr3
             target="${file}"

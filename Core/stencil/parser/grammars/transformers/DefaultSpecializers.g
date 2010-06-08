@@ -27,6 +27,8 @@ options {
 @members{
   protected ModuleCache modules;
   protected Adapter adapter;
+  
+  public boolean BLEND = true;
     
   public DefaultSpecializers(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
     super(input, new RecognizerSharedState());
@@ -106,4 +108,4 @@ options {
 topdown
   options{backtrack=true;}
   : ^(s=SPECIALIZER DEFAULT) -> {getDefault((Specializer) s)}
-  | ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};
+  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};

@@ -17,15 +17,17 @@ operators:
    - name: LTEI
    - name: LT
    - name: LTI
-   - name: EQ
-   - name: EQI
-   - name: NEQ
-   - name: NEQI
-   - name: EQS
-   - name: NEQS
+   - {name: EQ, target: eqs}
+   - {name: NEQ, target: neqs}
    - name: TrivialTrue
    - name: TrivialFalse
    - name: RE
      defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"
+     facets:
+       - {name: query, type: PROJECT, function: TRUE, prototype: !proto "V"}
+       - {name: match, type: PROJECT, function: TRUE, prototype: !proto "V"}
    - name: NRE
      defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"
+     facets:
+       - {name: query, type: PROJECT, function: TRUE, prototype: !proto "V"}
+       - {name: match, type: PROJECT, function: TRUE, prototype: !proto "V"}     

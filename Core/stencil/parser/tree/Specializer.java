@@ -115,21 +115,21 @@ public class Specializer extends StencilTree {
 	}
 	
 	public static Specializer blendMaps(Specializer defaults, Specializer update, TreeAdaptor adaptor) {
-		Specializer result = (Specializer) adaptor.dupTree(update);
+		Specializer result = (Specializer) adaptor.create(StencilParser.SPECIALIZER, "SPECIALIZER");
 		StencilTree mapList = (StencilTree) adaptor.create(StencilParser.LIST, "<map args>");
-
+		adaptor.addChild(result, mapList);
+		
 		Map<String, Atom> entries = new HashMap();
 		entries.putAll(defaults.getMap());
 		entries.putAll(update.getMap());
 
 		for (String key: entries.keySet()) {
-			MapEntry entry = (MapEntry) adaptor.create(StencilParser.MAP_ENTRY, key);
+			Object entry = adaptor.create(StencilParser.MAP_ENTRY, key);
 			adaptor.addChild(entry, adaptor.dupTree(entries.get(key)));
 			adaptor.addChild(mapList, entry);
 		}
+		
 
-		int mapIdx = result.getMap().getSource().getChildIndex();    
-		adaptor.replaceChildren(result, mapIdx, mapIdx, mapList);
 		return result;
 	}
 }

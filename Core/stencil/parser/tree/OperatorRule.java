@@ -52,9 +52,7 @@ public class OperatorRule extends StencilTree {
 	public List<Rule> getRules() {return (List<Rule>) getChild(1);}
 
 	/**Legend actions 'match' when all of their predicates do.*/
-	public boolean matches(Environment env) {
-		return Predicate.matches(getFilters(), env);
-	}
+	public boolean matches(Environment env) {return Predicate.matches(getFilters(), env);}
 
 	/**Apply the rules of this legend action to the passed tuple.
 	 * This is independent of 'matches', but should only be invoked
@@ -68,9 +66,8 @@ public class OperatorRule extends StencilTree {
 		Tuple result = null;
 		for (Rule rule: getRules()) {
 			Tuple buffer;
-			Environment ruleEnv = env.extendCapacity(env.size() + rule.getAction().getDepth());
 			
-			try {buffer = rule.apply(ruleEnv);}
+			try {buffer = rule.apply(env);}
 			catch (Exception e) {
 				String operatorName = this.getAncestor(StencilParser.OPERATOR).getText();
 				throw new RuntimeException(String.format("Error invoking sub rule %1$d on operator %2$s.", ruleCount, operatorName),e);

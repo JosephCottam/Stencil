@@ -8,7 +8,9 @@ import stencil.module.operator.util.BasicProject;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
+import stencil.types.Converter;
 
 public class Filters extends BasicModule {
 
@@ -24,14 +26,23 @@ public class Filters extends BasicModule {
 	public static final boolean lteq(double n1, double n2) {return n1 <= n2;}
 	public static final boolean lteqI(int n1, int n2) {return n1 <= n2;}
 	
-	public static final boolean eq(double n1, double n2) {return n1 == n2;}
+	public static final boolean eqD(double n1, double n2) {return n1 == n2;}
 	public static final boolean eqI(int n1, int n2) {return n1 == n2;}
-	public static final boolean neq(double n1, double n2) {return n1 != n2;}
+	public static final boolean neqD(double n1, double n2) {return n1 != n2;}
 	public static final boolean neqI(int n1, int n2) {return n1 != n2;}
 
 	
-	public static final boolean eqs(Object n1, Object n2) {return n1.equals(n2);}
-	public static final boolean neqs(Object n1, Object n2) {return n1.equals(n2);}
+	public static final boolean eqs(Object lhs, Object rhs) {
+		if (rhs == null || lhs == null) {return lhs == rhs;}
+		if (rhs instanceof Number || lhs instanceof Number) {
+			double l = Converter.toDouble(lhs).doubleValue();
+			double r = Converter.toDouble(rhs).doubleValue();
+			return l == r;
+		} else {
+			return lhs.equals(rhs);
+		}
+	}
+	public static final boolean neqs(Object lhs, Object rhs) {return !eqs(lhs, rhs);}
 
 
 	public static final boolean trivialTrue(Object... args) {return true;}
@@ -44,8 +55,8 @@ public class Filters extends BasicModule {
 
 		public RegExp(OperatorData opData, Specializer specializer, boolean negated) {
 			super(opData);
-			String pattern = specializer.get(PATTERN_KEY).getText();
-			patternCache = pattern == null ? null : Pattern.compile(pattern);
+			Atom pattern = specializer.get(PATTERN_KEY);
+			patternCache = (pattern == null || pattern.isNull()) ? null : Pattern.compile(pattern.getText());
 			this.negated = negated;
 		}
 		
@@ -54,6 +65,12 @@ public class Filters extends BasicModule {
 			return !negated == matcher.matcher(value).matches();
 		}
 		
+		public boolean match(String value) {
+			assert patternCache != null;
+			return !negated == patternCache.matcher(value).matches();
+		}
+
+	
 	}
 	
 	public Filters(ModuleData md) {super(md);}

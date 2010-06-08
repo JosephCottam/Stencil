@@ -69,19 +69,20 @@ public final class EnvironmentProxy {
 		final Layer l;
 		final Program program;
 		final CommonTree focus;
-		final boolean inRuleList;	//Is this operator in a rule list, or just a single rule?
-
+		final boolean inRuleList;
+		
 		public AncestryPackage(CommonTree t) {
 			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
 			o = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
 			g = (Guide) t.getAncestor(StencilParser.GUIDE);
-			l= (Layer) t.getAncestor(StencilParser.LAYER);
+			l = (Layer) t.getAncestor(StencilParser.LAYER);
 
-			Rule r= (Rule) t.getAncestor(StencilParser.RULE);
-
-			//r can be null if we are in a predicate
-			inRuleList = (r !=null && r.getParent().getType() == StencilParser.LIST);
-
+			StencilTree r= (StencilTree) t.getAncestor(StencilParser.RULE);
+			inRuleList = (r==null) ? false : r.getParent().getType() == StencilParser.LIST;
+			
+			
+			
+			
 			program = (Program) t.getAncestor(StencilParser.PROGRAM);
 			focus = t;
 		}
@@ -112,6 +113,7 @@ public final class EnvironmentProxy {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
 		if (anc.c != null) {return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();}
 		if (anc.o != null) {return anc.o.getArguments();}
+		
 		if (anc.g != null) {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
 				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();

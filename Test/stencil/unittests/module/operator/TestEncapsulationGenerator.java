@@ -62,7 +62,7 @@ public class TestEncapsulationGenerator extends TestCase {
 		Map<String, String> programs = StringUtils.allPrograms(StringUtils.STENCIL_CACHE_DIRECTORY);
 		
 		for (String name: programs.keySet()) {
-			System.out.println("Reading " + name);
+//			System.out.println("Reading " + name);
 			String source = programs.get(name);
 			foundStencils = true;
 			

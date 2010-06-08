@@ -158,7 +158,6 @@ public abstract class ParseStencil {
 		
 		return p;
 	}
-
 	
 	/**
 	 *
@@ -200,6 +199,11 @@ public abstract class ParseStencil {
 		customArgs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) customArgs.downup(p);
 
+		//Convert filters to standard rule chains
+		Predicate_Expand predicate_expand = new Predicate_Expand(treeTokens);
+		predicate_expand.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) predicate_expand.downup(p);
+		
 		//Add default specializers where required
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
@@ -262,6 +266,7 @@ public abstract class ParseStencil {
 		p = (Program) ensure.transform(p);
 
 		//Add default specializers to all function nodes (cover things recently added)
+		defaultSpecializers.BLEND = false;
 		defaultSpecializers.downup(p);
 		
 		//Prime tree nodes with operators from the modules cache
@@ -281,6 +286,7 @@ public abstract class ParseStencil {
 		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) gDefaultRules.downup(p);
 
+		defaultSpecializers.BLEND = false;
 		defaultSpecializers.downup(p);
 
 		SetOperators set2 = new SetOperators(treeTokens, modules);
@@ -339,6 +345,12 @@ public abstract class ParseStencil {
 		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
 		numeralize.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) numeralize.downup(p);		
+
+		//Improve performance of filter rules by removing all the scaffolding
+		Predicate_Compact predicate_compact = new Predicate_Compact(treeTokens);
+		predicate_compact.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) predicate_compact.downup(p);
+
 		
 		//Since some transformations change chain lengths, this must be re-run.
 		p = (Program) envSize.downup(p);
