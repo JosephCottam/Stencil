@@ -45,13 +45,23 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testImport() throws Exception {
-		fail("Not tested");
-//		CommonTreeNodeStream treeTokens;
-//		Tree t = init("");
-//
-//		treeTokens = new CommonTreeNodeStream(t);
-//		Imports imports = new Imports(treeTokens);
-//		ModuleCache modules = imports.processImports(t);
+		CommonTreeNodeStream treeTokens;
+		Tree t = init("import JUNG");
+
+		treeTokens = new CommonTreeNodeStream(t);
+		Imports imports = new Imports(treeTokens);
+		ModuleCache modules = imports.processImports(t);
+		
+		assertNotNull("Import unsuccessful.", modules.getModule("JUNG"));
+
+		
+		t = init("import JUNG as JG");
+
+		treeTokens = new CommonTreeNodeStream(t);
+		imports = new Imports(treeTokens);
+		modules = imports.processImports(t);
+		
+		assertNotNull("Proxy name import unsuccessful.", modules.getModule("JG"));
 	}
 	
 	public void testAdHocPrime() throws Exception {

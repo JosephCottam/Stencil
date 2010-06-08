@@ -1,4 +1,4 @@
-name: StringUtils
+name: StringUtil
 targetClass: stencil.modules.StringUtil
 description: String manipulation.
 

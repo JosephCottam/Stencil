@@ -52,18 +52,6 @@ import stencil.parser.tree.Specializer;
  *
  */
 public class ModuleCache {
-	/**Key on properties in a properties list that indicates module to be registered.*/
-	public static final String MODULE_KEY = "module";
-
-	/**Name that should be used to identify the ad-hoc module.**/
-	public static final String AD_HOC_NAME = "AdHoc";
-
-	/**An index of known Modules.
-	 * The Module store is retained for an entire run, it feeds information to the
-	 * more transient methodIndex.
-	 * */
-	protected static Map<String, Module> registeredModules = new TreeMap();
-
 	/**Wrapper for keeping modules and prefixes separate.*/
 	public static final class PrefixedModule {
 		public String prefix;
@@ -81,8 +69,6 @@ public class ModuleCache {
 	/**Modules that have been loaded from the registered modules.*/
 	protected Queue<PrefixedModule> importedModules;
 
-	
-	
 	/**Identifier for a ModuleCache instance.  Used for debugging, and cannot be null.
 	 * Attempting to set this value to null will not return an error, but will not have an effect either.*/
 	private String cacheName = "";
@@ -95,14 +81,12 @@ public class ModuleCache {
 
 	public String getName() {return cacheName;}
 
-	/**Resets the method index.
-s	 */
+	/**Resets the imported modules list.*/
 	public void reset() {
 		importedModules = new LinkedList<PrefixedModule>();
 		importedModules.add(new PrefixedModule("", new MutableModule(AD_HOC_NAME)));
-
-		//TODO: Only import a sub-set, use the import statement to get the rest
-		for (String module: registeredModules.keySet()) {
+		
+		for (String module: defaultModules) {
 			importModule(module, "");
 		}
 	}
@@ -155,12 +139,13 @@ s	 */
 		importedModules.offer(pm);
 	}
 
-	/**Get a module. Gives preference to loaded modules over just known modules.*/
+	/**Get a module.  Only examines imported modules (does not consider "known" modules, 
+	 * static methods should be used to access "known" modules).*/
 	public Module getModule(String name) {
 		for(PrefixedModule pm: importedModules) {
 			if (pm.getModuleName().equals(name)) {return pm.module;}
 		}
-		return registeredModules.get(name);
+		throw new RuntimeException("Request made for module that has not been imported: " + name);
 	}
 
 	/**Return the ad-hoc module of this module cache.*/
@@ -170,6 +155,22 @@ s	 */
 		throw new Error("Could not locate a module suitable for ad-hoc use.");
 	}
 
+
+	/**Key on properties in a properties list that indicates module to be registered.*/
+	public static final String MODULE_KEY = "module";
+
+	/**Name that should be used to identify the ad-hoc module.**/
+	public static final String AD_HOC_NAME = "AdHoc";
+
+	public static final String DEFAULT_MODULES_KEY ="defaultModules";
+	
+	/**An index of known Modules.
+	 * The Module store is retained for an entire run, it feeds information to the
+	 * more transient methodIndex.
+	 * */
+	protected static Map<String, Module> registeredModules = new TreeMap();
+
+	protected static String[] defaultModules = new String[0];
 	
 	/**Load module entries from a property set.
 	 * 
@@ -203,6 +204,11 @@ s	 */
 				
 				register(m);
 			}
+		}
+		
+		String defaults = props.get(DEFAULT_MODULES_KEY).toString();
+		if (defaults  != null) {
+			defaultModules = defaults.trim().split("\\s*,\\s*");
 		}
 	}
 
