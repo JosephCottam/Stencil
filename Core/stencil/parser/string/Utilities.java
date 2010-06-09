@@ -10,9 +10,9 @@ import java.util.List;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 
-import stencil.util.MultiPartName;
 import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.AstInvokeable;
+import stencil.parser.tree.util.MultiPartName;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
 import static stencil.parser.ParserConstants.QUERY_FACET;
 import static stencil.parser.ParserConstants.STATE_ID_FACET;

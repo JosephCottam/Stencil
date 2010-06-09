@@ -19,7 +19,7 @@ options {
    import java.util.Set;
    import java.util.HashSet;
    
-   import stencil.util.MultiPartName;
+   import stencil.parser.tree.util.*;
    import stencil.util.collections.ArrayUtil;
    import stencil.module.*;
    import stencil.module.operator.StencilOperator;

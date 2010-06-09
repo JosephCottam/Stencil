@@ -8,8 +8,8 @@ import stencil.module.ModuleCache;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
+import stencil.parser.tree.util.MultiPartName;
 import stencil.tuple.prototype.SimplePrototype;
-import stencil.util.MultiPartName;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -163,7 +163,7 @@ public final class EnvironmentProxy {
 		MultiPartName name= new MultiPartName(call.getName());
 		Module m;
 		try{
-			m = modules.findModuleForOperator(name.prefixedName()).module;
+			m = modules.findModuleForOperator(name.prefixedName());
 		} catch (Exception e) {
 			throw new RuntimeException("Error getting module information for operator " + name, e);
 		}

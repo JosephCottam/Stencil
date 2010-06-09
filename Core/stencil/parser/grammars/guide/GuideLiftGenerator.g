@@ -26,7 +26,7 @@ topdown
     if (seed != null) {
        g.setSeedOperator(((Function) seed).getTarget().getInvokeable());
     } else {
-       String layerName = g.getSelector().getPath().get(0).getName();
+       String layerName = g.getSelector().getPath().get(0).getID();
        Layer layer = ((Program) g.getAncestor(PROGRAM)).getLayer(layerName);
        SeedOperator op = new LayerSampler.SeedOperator(layer);
        g.setSeedOperator(new ReflectiveInvokeable("getSeed", op));

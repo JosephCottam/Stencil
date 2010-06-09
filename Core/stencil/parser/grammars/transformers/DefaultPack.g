@@ -13,7 +13,7 @@ options {
 	 **/
 	package stencil.parser.string;
 	
-	import stencil.util.MultiPartName;
+    import stencil.parser.string.tree.util;
 	import stencil.module.*;
 	import stencil.module.util.*;
 	import stencil.parser.tree.*;

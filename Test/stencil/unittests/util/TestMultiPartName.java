@@ -1,7 +1,7 @@
 package stencil.unittests.util;
 
 import junit.framework.TestCase;
-import stencil.util.MultiPartName;
+import stencil.parser.tree.util.MultiPartName;
 
 public class TestMultiPartName extends TestCase {
 	public void testByParts() throws Exception {

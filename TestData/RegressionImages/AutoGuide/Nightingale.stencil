@@ -6,6 +6,8 @@ SOURCE: ./NightingaleCrimeaSplit.csv
 SKIP: 1
 STRICT: true
 
+import BrewerPallets
+
 stream Deaths(date, type, count)
 
 canvas Main

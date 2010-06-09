@@ -7,20 +7,20 @@ options {
 }
 
 @header{
-	/** Make sure all elements with specializers have
-	 * all properties defined in their default specializer.	  
-	 **/
-	package stencil.parser.string;
+ /** Make sure all elements with specializers have
+  * all properties defined in their default specializer.	  
+  **/
+  package stencil.parser.string;
 
-    import java.lang.reflect.Field;
+  import java.lang.reflect.Field;
     
-	import stencil.parser.ParseStencil;
-	import stencil.parser.tree.*;
-	import stencil.util.MultiPartName;
-	import stencil.module.*;
-	import stencil.module.util.*;
-	import stencil.adapters.Adapter;
-	import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
+  import stencil.parser.ParseStencil;
+  import stencil.parser.tree.*;
+  import stencil.parser.tree.util.*;
+  import stencil.module.*;
+  import stencil.module.util.*;
+  import stencil.adapters.Adapter;
+  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 	
 }
 
@@ -85,7 +85,7 @@ options {
     ModuleData md;
     
     try {
-        Module m = modules.findModuleForOperator(name.prefixedName()).module;
+        Module m = modules.findModuleForOperator(name.prefixedName());
         md = m.getModuleData();
     } catch (Exception e) {
       throw new RuntimeException("Error getting module information for operator " + name.toString(), e);
@@ -108,4 +108,4 @@ options {
 topdown
   options{backtrack=true;}
   : ^(s=SPECIALIZER DEFAULT) -> {getDefault((Specializer) s)}
-  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};
+  |{BLEND}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};

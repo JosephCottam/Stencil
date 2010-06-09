@@ -5,8 +5,8 @@ import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.Specializer;
+import stencil.parser.tree.util.MultiPartName;
 import stencil.unittests.module.TestModuleCache;
-import stencil.util.MultiPartName;
 
 public class TestModules extends TestCase {
 	public void setUp() throws Exception {

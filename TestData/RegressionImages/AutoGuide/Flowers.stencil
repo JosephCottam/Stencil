@@ -6,6 +6,8 @@ SOURCE: ./AndersonsFlowers.csv
 SKIP: 1
 STRICT: true
 
+import BrewerPallets
+
 stream flowers(sepalL, petalW, sepalW, 
                         petalL, species, obs)
 

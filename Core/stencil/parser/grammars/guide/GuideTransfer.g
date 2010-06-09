@@ -29,7 +29,7 @@ options {
   import org.antlr.runtime.tree.*;
 
   import stencil.parser.tree.*;
-  import stencil.util.MultiPartName;
+  import stencil.parser.tree.util.*;
   import stencil.module.*;
   import stencil.module.util.*;
   import stencil.module.operator.util.Invokeable;
@@ -89,7 +89,7 @@ options {
 	
 	private boolean isCategorize(Function f) {
    		MultiPartName name = new MultiPartName(f.getName());
-   		Module m = modules.findModuleForOperator(name.prefixedName()).module;
+   		Module m = modules.findModuleForOperator(name.prefixedName());
    		try {
    			String opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacet(name.getFacet()).getType();;
    			return TYPE_CATEGORIZE.equals(opType);

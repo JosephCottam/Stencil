@@ -6,6 +6,7 @@ SOURCE: ./Tweets.txt
 SKIP: 1
 STRICT: TRUE
 
+import ViewCanvas
 
 stream Tweets(MESSAGE)
 

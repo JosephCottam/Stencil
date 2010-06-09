@@ -59,7 +59,7 @@ options {
      TuplePrototype p = g.getPrototype();
      List<String> names = Arrays.asList(TuplePrototypes.getNames(p));
      List<Rule> rules = g.getRules();
-     String layer = g.getSelector().getPath().get(0).getName();
+     String layer = g.getSelector().getPath().get(0).getID();
 
 
      if (g.getGuideType().equals("pointLabels")) {

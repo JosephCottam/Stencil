@@ -52,7 +52,8 @@ public class TestFragments extends TestCase {
 		Imports imports = new Imports(treeTokens);
 		ModuleCache modules = imports.processImports(t);
 		
-		assertNotNull("Import unsuccessful.", modules.getModule("JUNG"));
+		assertNotNull("Import unsuccessful; could not find module by name.", modules.getModule("JUNG"));
+		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("BalloonLayout"));		
 
 		
 		t = init("import JUNG as JG");
@@ -61,7 +62,9 @@ public class TestFragments extends TestCase {
 		imports = new Imports(treeTokens);
 		modules = imports.processImports(t);
 		
-		assertNotNull("Proxy name import unsuccessful.", modules.getModule("JG"));
+		assertNotNull("Proxy name import unsuccessful; could not find  module by prefix.", modules.getModule("JG"));
+		
+		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG.BalloonLayout"));
 	}
 	
 	public void testAdHocPrime() throws Exception {

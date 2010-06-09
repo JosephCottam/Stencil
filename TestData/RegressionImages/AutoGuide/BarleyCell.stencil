@@ -6,6 +6,8 @@ SOURCE: ./BeckersBarley.csv
 SKIP: 1
 STRICT: true
 
+import BrewerPallets
+
 stream Barley(year, site, yield, variety)
 
 canvas Main

@@ -9,7 +9,7 @@ public class Import extends StencilTree {
 
 	public String getName() {return token.getText();}
 	public java.util.List<Atom> getArguments() {return (List) getChild(1);}
-	public String getPrefix() {return ((Id) getChild(0)).getName();}
+	public String getPrefix() {return ((Id) getChild(0)).getID();}
 
 
 	/**Import the module specified by this node to the

@@ -53,7 +53,7 @@ import stencil.parser.tree.Specializer;
  */
 public class ModuleCache {
 	/**Wrapper for keeping modules and prefixes separate.*/
-	public static final class PrefixedModule {
+	private static final class PrefixedModule {
 		public String prefix;
 		public Module module;
 		public PrefixedModule(String prefix, Module module) {
@@ -101,10 +101,10 @@ public class ModuleCache {
 	 */
 	public StencilOperator instance(String name, Specializer specializer) throws MethodInstanceException {		
 		try {
-			PrefixedModule pm = findModuleForOperator(name);
+			Module module = findModuleForOperator(name);
 			String operatorName = Modules.removePrefix(name);
 
-			StencilOperator operator = pm.module.instance(operatorName, specializer);
+			StencilOperator operator = module.instance(operatorName, specializer);
 			return operator;
 		}
 		catch (Exception e) {throw new MethodInstanceException(name, true, e);}		
@@ -114,11 +114,11 @@ public class ModuleCache {
 	 * @return Prefixed Module which contains the operator.
 	 * @throws IllegalArgumentException Name does not indicate any known operator 
 	 */
-	public PrefixedModule findModuleForOperator(String name) throws IllegalArgumentException {
+	public Module findModuleForOperator(String name) throws IllegalArgumentException {
 		for (PrefixedModule pm: importedModules) {
 			for (String operatorName: pm.module.getModuleData().getOperatorNames()) {
 				if (name.equals(Modules.prefixName(pm.prefix, operatorName))) {
-					return pm;
+					return pm.module;
 				}
 			}
 		}
@@ -143,7 +143,11 @@ public class ModuleCache {
 	 * static methods should be used to access "known" modules).*/
 	public Module getModule(String name) {
 		for(PrefixedModule pm: importedModules) {
-			if (pm.getModuleName().equals(name)) {return pm.module;}
+			if (pm.prefix.equals("")) {
+				if (pm.getModuleName().equals(name)) {return pm.module;}	
+			} else {
+				if (pm.prefix.equals(name)) {return pm.module;}
+			}
 		}
 		throw new RuntimeException("Request made for module that has not been imported: " + name);
 	}

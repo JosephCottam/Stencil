@@ -15,7 +15,7 @@ options {
 	import java.lang.Iterable;
 	
 	import stencil.parser.tree.*;	
-	import stencil.util.MultiPartName;
+	import stencil.parser.tree.util.*;
 	import stencil.display.*;
 	import stencil.module.*;
 	import stencil.tuple.prototype.*;
@@ -40,7 +40,7 @@ options {
 	private void apply(Guide g) {
 		Specializer details = g.getSpecializer();
 		SeedOperator seedOp = g.getSeedOperator();
-		String layerName = g.getSelector().getPath().get(0).getName();
+		String layerName = g.getSelector().getPath().get(0).getID();
 		String attribute = g.getSelector().getAttribute();
 		List<Tuple> sample, projection, pairs, results;
 		

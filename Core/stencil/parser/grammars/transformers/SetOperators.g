@@ -23,6 +23,7 @@ options {
     import stencil.parser.tree.Specializer;
     import stencil.parser.tree.StencilTree;
     import stencil.parser.tree.AstInvokeable;
+	import stencil.parser.tree.util.*;
     import stencil.util.*;
 
 }

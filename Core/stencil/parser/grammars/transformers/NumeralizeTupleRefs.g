@@ -17,7 +17,7 @@ options {
   import stencil.parser.ParserConstants;  
   import stencil.parser.tree.*;
   import stencil.module.*;
-  import stencil.util.MultiPartName;
+  import stencil.parser.tree.util.*;
   import stencil.tuple.prototype.TuplePrototype;
   import static stencil.parser.string.EnvironmentProxy.initialEnv;
   import static stencil.parser.string.EnvironmentProxy.extend;

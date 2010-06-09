@@ -109,7 +109,7 @@ options {
       String name = ref.getName();  
   
       Module module; 
-      try {module = modules.findModuleForOperator(baseName).module;}
+      try {module = modules.findModuleForOperator(baseName);}
       catch (Exception e) {return null;}
           
       StencilOperator op;

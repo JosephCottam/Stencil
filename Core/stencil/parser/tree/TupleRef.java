@@ -68,7 +68,7 @@ public final class TupleRef extends Value {
 		} else if (ref.isAll()) {
 			return Tuples.toArray(Converter.toTuple(source.get(source.size()-1)));
 		} else if (ref.isName()) {
-			return source.get(((Id) ref).getName());
+			return source.get(((Id) ref).getID());
 		}
 		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
 	}

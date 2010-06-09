@@ -23,7 +23,7 @@ options {
 	import java.util.HashSet;
 	import java.util.ArrayList;
 
-  import stencil.util.MultiPartName;
+  import stencil.parser.tree.util.*;
   import stencil.tuple.prototype.TuplePrototypes;		
   import stencil.parser.tree.util.Environment;
   import stencil.tuple.Tuple;
@@ -126,7 +126,7 @@ options {
     private boolean isFunction(Function f) {
     	MultiPartName name= new MultiPartName(f.getName());
       try{
-    		Module m = modules.findModuleForOperator(name.prefixedName()).module;
+    		Module m = modules.findModuleForOperator(name.prefixedName());
     		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
     		FacetData fd=od.getFacet(name.getFacet());
     		return fd.isFunction();

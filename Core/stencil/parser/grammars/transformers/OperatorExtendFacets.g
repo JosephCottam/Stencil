@@ -14,7 +14,7 @@ options {
  
   package stencil.parser.string;
 
-  import stencil.util.MultiPartName;
+  import stencil.parser.tree.util.*;
   import stencil.parser.tree.*;
   import stencil.module.operator.StencilOperator;
   import stencil.module.operator.util.Invokeable;
