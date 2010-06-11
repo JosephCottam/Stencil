@@ -6,6 +6,8 @@ SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/NodeL
 SKIP: 1
 STRICT: true
 
+import JUNG
+
 stream VertexList (parent, child)
 
 stream Prime ()

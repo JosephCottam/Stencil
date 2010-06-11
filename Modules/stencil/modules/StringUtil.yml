@@ -5,14 +5,18 @@ description: String manipulation.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-    - {name: map, type: PROJECT, function: true, prototype: !proto "VALUE"}
-    - {name: query, type: PROJECT, function: true, prototype: !proto "VALUE"}
+    - {name: map, type: PROJECT, function: true, prototype: !proto "String VALUE"}
+    - {name: query, type: PROJECT, function: true, prototype: !proto "String VALUE"}
 
 operators:
   - name: Concatenate
   - name: Delimit
   - name: Format
   - name: IndexOf
+  - name: Length
+    facets:
+    - {name: map, type: PROJECT, function: true, prototype: !proto "int VALUE"}
+    - {name: query, type: PROJECT, function: true, prototype: !proto "int VALUE"}
   - name: Print
   - name: Replace
   - name: Substring

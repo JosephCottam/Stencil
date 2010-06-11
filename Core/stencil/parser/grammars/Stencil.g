@@ -341,7 +341,10 @@ tuple[boolean allowEmpty] //TODO: Add optionally permitted types
   | ID
     -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT))
   | GROUP ID (SEPARATOR ID)* CLOSE_GROUP
-    -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT)+);
+    -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT)+)
+  | GROUP t+=ID n+=ID (SEPARATOR t+=ID n+=ID)* CLOSE_GROUP
+    -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF $n $t)+);
+
 
 emptySet: GROUP! CLOSE_GROUP!;
 

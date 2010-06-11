@@ -11,14 +11,14 @@ defaults:
 operators: 
    - name: Mapping
    - name: Rank
-     keys: "min, max, n"      
+     keys: "min, max, n"
    - name: Scale
    - name: Partition
      facets:
-      - {name: map, type: PROJECT, function: true, prototype: !proto "Start, End, Bucket"}
-      - {name: query, type: PROJECT, function: true, prototype: !proto "Start, End, Bucket"}
+      - {name: map, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
+      - {name: query, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
    - name: StopWords
      facets:
-      - {name: query, type: PROJECT, function: true, prototype: !proto "stopWord"}
-      - {name: map, target: query, type: PROJECT, function: true, prototype: !proto "stopWord"}
+      - {name: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
+      - {name: map, target: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
       

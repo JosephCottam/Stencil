@@ -96,6 +96,8 @@ public class StringUtil extends BasicModule {
 	public static int indexOf(String string, String target) {
 		return string.indexOf(target);
 	}
+	
+	public static int length(String string) {return string.length();}
 
 	public StringUtil(ModuleData md) {super(md);}
 }

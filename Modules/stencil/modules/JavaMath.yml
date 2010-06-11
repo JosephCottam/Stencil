@@ -5,8 +5,8 @@ description: Math functions taken from java.lang.Math directly.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "VALUE"}
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
 
 operators:
    - name: Abs

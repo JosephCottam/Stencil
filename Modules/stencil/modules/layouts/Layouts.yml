@@ -1,4 +1,4 @@
-name: Layout
+name: Layouts
 targetClass: stencil.modules.layouts.Layouts
 description: Layouts groups of nodes
 defaults: 

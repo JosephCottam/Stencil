@@ -16,6 +16,7 @@ import stencil.types.Converter;
 public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	/**Method to be invoked.*/
 	private final Method method;
+	private final boolean returnsTuple;
 	
 	/**Object to invoke method on, null for static methods.*/
 	private final T target;
@@ -40,6 +41,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		this.target =target;
 		paramTypes = method.getParameterTypes();
 		args = new Object[paramTypes.length];
+		returnsTuple = Tuple.class.isAssignableFrom(method.getReturnType());
 	}
 
 	//Find the method amidst the class
@@ -60,7 +62,8 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {
 		R result = invoke(arguments);
 		Tuple t=null;
-		if (result != null) {t=Converter.toTuple(result);}
+		if (returnsTuple) {t=(Tuple) result;}
+		else if (result != null) {t=Converter.toTuple(result);}
 		return t;
 	}
 	
@@ -158,6 +161,4 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		boolean result = target.equals(o.target) && method.equals(o.method) && o.args.length == this.args.length; 
 		return result;
 	}
-	
-
 }

@@ -6,6 +6,8 @@ SOURCE: ./treeMultiRoot.tree
 SKIP: 1
 STRICT: true
 
+import Layouts
+
 stream VertexList (parent, child)
 
 stream Prime ()

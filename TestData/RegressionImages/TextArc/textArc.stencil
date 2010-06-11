@@ -6,6 +6,8 @@ SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
+import Layouts
+
 stream RawLines(text)
 
 stream Lines (line, text)

@@ -5,9 +5,9 @@ description: Set to set transformations, filed under a really bad name.
 defaults:
   defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets:
-    - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
-    - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
-    - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"}
+    - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+    - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+    - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
 
 operators:
     - name: Count
@@ -15,4 +15,8 @@ operators:
     - name: Index
     - name: Justify
     - name: HeatScale
-      defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\"]"            
+      defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\"]"
+      facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
+      - {name: stateID, type: OTHER, function: false, prototype: !proto "Color VALUE"}

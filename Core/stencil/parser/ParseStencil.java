@@ -107,7 +107,7 @@ public abstract class ParseStencil {
 			
 			return p;
 		} catch (Exception e) {
-			throw new ProgramParseException(String.format("Error parsing specializer: '%1$s'.", source), e);
+			throw new ProgramParseException(String.format("Error parsing prototype: '%1$s'.", source), e);
 		}	
 	}
 	
