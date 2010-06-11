@@ -106,8 +106,24 @@ public class Temp extends BasicModule {
 		public double query(double v) {
 			double percent = (v-inMin)/inMax;
 			double value = span*percent + outMin;
-			return value;}
+			return value;
+		}
 	}
+	
+	
+	/**Perform a linear interpolation.*/
+	public static final class LinearInterp extends BasicProject {
+		public LinearInterp(OperatorData opData) {super(opData);}
+		
+		public double map(double step, double steps, double min, double max) {
+			return query(step, steps, min, max);
+		}
+		
+		public double query(double step, double steps, double min, double max) {
+			return ((step/steps) * (min-max)) + min; 
+		}
+	}
+	
 
 
 	/**Takes a range of values and creates a set of partitions of that range.

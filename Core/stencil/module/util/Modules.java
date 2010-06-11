@@ -72,7 +72,7 @@ public final class Modules {
 
 	public static String prefixName(String prefix, String name) {
 		if (prefix == null || prefix.trim().equals("")) {prefix = "";}
-		else {prefix = prefix + NAME_SEPARATOR;}
+		else {prefix = prefix + NAME_SPACE;}
 		return prefix + name;
 	}
 

@@ -1,0 +1,74 @@
+STREAM: File
+NAME: RawLines
+HEADER: text
+SEPARATOR: $^
+SOURCE: ./AliceInWonderland.txt
+SKIP: 0
+STRICT: true
+
+import Layouts
+import Geometry as Geo
+
+stream RawLines(text)
+
+canvas main [BACKGROUND_COLOR: "BLACK"]
+
+stream Lines (line, text)
+from RawLines
+   line: Counter()
+   words: text
+
+stream RawWords (line, word)
+from Lines
+   line: line
+   word: Split(text, "\\s+") >> Strip(_) -> ToLower(_)
+   
+stream Words (line, word)
+from RawWords
+   filter(stopWord !~ "true", word !~ "")
+   prefilter(stopWord) : StopWords(word)
+   line: line
+   word: word
+
+stream PrimeCenter ()
+from Words
+ () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, LAST)
+ () : WordCount(word)
+
+layer Border[TEXT]
+from Lines
+   ID: line
+   TEXT: text
+   (X,Y):* Layout(line) 
+   FONT_COLOR: @Color{Gray70}
+
+layer Center[TEXT]
+from Words
+   ID: word
+   TEXT: word
+   (X,Y):* Centroid(word) -> Contract(X,Y) 
+   REGISTRATION: "CENTER"
+   (FONT_COLOR, FONT_SIZE):* Freq(word) -> 
+   								HeatScale[hot: "Gray90", cold: "Gray30"](freq) -[color]>
+   								Scale[min: 50, max:500](freq) -> (color[_], _)
+  
+operator Contract base Geo::Scale[by: .94]
+operator Outer base CircularLayout[start:0, size: 10, ratio: -.75]
+operator Inner base Geo::Scale[by: .95]
+operator WordCount base Count
+operator LineIndex base Mapping[fields: "lines"]
+
+operator Layout (i) -> (X,Y)
+  (ALL) => (X,Y) : Max[range:ALL](i) -[Max]> Outer(i) -[Outer]> Inner(X,Y) -[Inner]> 
+                   LinearInterp(i, Max[_], Inner[X], Outer[X]) -[X]> 
+                   LinearInterp(i, Max[_], Inner[Y], Outer[Y]) -[Y]>
+                   (X[_], Y[_])
+
+operator Freq (word) -> (freq)
+  (ALL) => freq: WordCount.query(word) -[count]> Max[range: ALL](_) -> Divide(count[_], _) 
+
+operator Centroid (word) -> (X,Y)
+  prefilter(positions) :LineIndex(word) -> ToTuple(_) >> Layout.query(_) >- LAST
+  (ALL) =>
+    (X): Select[field: 0](positions) -> Average[range: LAST](*)
+    (Y): Select[field: 1](positions) -> Average[range: LAST](*)

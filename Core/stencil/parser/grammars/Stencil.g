@@ -198,8 +198,8 @@ externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 
 canvasLayer
-  : CANVAS name=ID specializer guideDef+ 
-    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST["Guides"] guideDef+))
+  : CANVAS name=ID specializer guideDef* 
+    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST["Guides"] guideDef*))
   | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER LIST) ^(LIST["Guides"]));
 
 guideDef: GUIDE ID specializer FROM selector rule["result"]* 
@@ -241,9 +241,14 @@ operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text])
 operatorDef
   : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Prefilters"] $pf*) ^(LIST["Rules"] operatorRule+))
-  | OPERATOR name=ID BASE base=ID specializer
+  | OPERATOR name=ID BASE base=opName specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
+//Apply defaultCall to functions that have no explicit call
+opName
+  : pre=ID NAMESPACE post=ID -> ID[$pre + "::" + $post] 
+  | ID;
+
 operatorRule
   : predicate GATE rule["result"]+
     -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));

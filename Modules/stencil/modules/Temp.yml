@@ -13,6 +13,10 @@ operators:
    - name: Rank
      keys: "min, max, n"
    - name: Scale
+   - name: LinearInterp
+     facets:
+      - {name: map, type: PROJECT, function: true, prototype: !proto "VALUE"}
+      - {name: query, type: PROJECT, function: true, prototype: !proto "VALUE"}
    - name: Partition
      facets:
       - {name: map, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}

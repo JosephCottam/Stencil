@@ -7,6 +7,7 @@ SKIP: 0
 STRICT: true
 
 import Layouts
+import Geometry as Geo
 
 stream RawLines(text)
 
@@ -64,6 +65,4 @@ operator Centroid (word) -> (X,Y)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout base CircularLayout[start: 0, size: 10, ratio: .75]
-operator Contract (X,Y) -> (X,Y)
- (ALL) =>  X : Mult(X, .06) -[shift]> Mult(X, .88) -> Add(shift[_],_)
-           Y : Mult(Y, .06) -[shift]> Mult(Y, .88) -> Add(shift[_],_)
+operator Contract base Geo::Scale[by: .94]

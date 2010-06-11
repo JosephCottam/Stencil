@@ -6,6 +6,8 @@ import ViewCanvas
 
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
+canvas main[BACKGROUND_COLOR: "BLACK"]
+
 layer Heat
 from Mouse
 	ID : Count(" ") -> VALUE
@@ -13,7 +15,6 @@ from Mouse
 	FILL_COLOR: Colorize(META) -> C
 	SIZE: 10
 	STROKE_COLOR : @Color{CLEAR}
-	canvas(BACKGROUND_COLOR): @Color{BLACK}
 
 layer Nav
 from Mouse

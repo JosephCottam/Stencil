@@ -22,6 +22,7 @@ options {
   import stencil.module.util.*;    
   import stencil.module.operator.wrappers.*;
   import stencil.parser.tree.*;
+  import stencil.parser.tree.util.MultiPartName;
 }
 
 @members {
@@ -111,11 +112,12 @@ options {
       Module module; 
       try {module = modules.findModuleForOperator(baseName);}
       catch (Exception e) {return null;}
-          
+      
+      
+      String opName  = (new MultiPartName(baseName)).getName();
       StencilOperator op;
-      OperatorData od;
       try {
-        op = module.instance(baseName, spec);
+          op = module.instance(opName, spec);
       } catch (Exception e) {throw new RuntimeException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, name), e);}
       return op;  
   }

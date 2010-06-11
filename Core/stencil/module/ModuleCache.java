@@ -63,7 +63,7 @@ public class ModuleCache {
 
 		public String getModuleName() {return  module.getModuleData().getName();}
 		
-		public String toString() {return prefix + "." + module.getModuleData().getName();}
+		public String toString() {return prefix + " [" + module.getModuleData().getName() + "]";}
 	}
 
 	/**Modules that have been loaded from the registered modules.*/
