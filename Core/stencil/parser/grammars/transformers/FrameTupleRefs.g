@@ -15,8 +15,9 @@ options {
   package stencil.parser.string;
   
   import stencil.module.*;
-  import static stencil.parser.string.EnvironmentProxy.initialEnv;
-  import static stencil.parser.string.EnvironmentProxy.extend;
+  import stencil.parser.string.util.EnvironmentProxy;  
+  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
+  import static stencil.parser.string.util.EnvironmentProxy.extend;
 }
 
 @members {

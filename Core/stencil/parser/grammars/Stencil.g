@@ -19,7 +19,6 @@ tokens {
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
   GUIDE_SUMMARIZATION;
-  GUIDE_YIELD;
   LIST;
   MAP_ENTRY;
   NUMBER;
@@ -106,10 +105,11 @@ tokens {
   TUPLE_VALUE = '*';
   
   //Linkages
-  YIELDS  = '->';   // 1:1
-  MAP     = '>>';   // map
-  FOLD    = '>-';   // reduce
-  GATE    = '=>';   // test
+  YIELDS  	 	 = '->';   // 1:1
+  GUIDE_YIELD    = '-#>';   // 1:1, but moves the sample operator
+  MAP    		 = '>>';   // map
+  FOLD 	  		 = '>-';   // reduce
+  GATE  	  	 = '=>';   // test
   
   TAG = '@';
 }
@@ -267,10 +267,19 @@ callChainMember
   
   
 functionCallTarget
-  : (functionCall passOp)=> f1=functionCall passOp f2=callChainMember 
-     -> ^($f1 passOp $f2)
-  | f1=functionCall -> ^($f1 DIRECT_YIELD ^(PACK DEFAULT));
+  : (frameLabel functionCall passOp["a"]) => 
+  		l=frameLabel f1=functionCall passOp[$l.label] f2=callChainMember
+  		-> ^($f1 passOp $f2)
+  | (functionCall passOp["a"]) => 
+  		f1=functionCall passOp[(String) null] f2=callChainMember    
+  		-> ^($f1 passOp $f2)
+  | l=frameLabel f1=functionCall 
+    -> ^($f1 DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
+  | f1=functionCall 
+    -> ^($f1 DIRECT_YIELD[(String) null] ^(PACK DEFAULT));
    
+frameLabel returns [String label]: ARG ID CLOSE_ARG {$label=$ID.text;} -> ID;
+
 
 functionCall
   :(callName[MAP_FACET] specializer valueList) =>
@@ -381,19 +390,11 @@ private qualifiedRef
 
 booleanOp : GT |  GTE | LT | LTE | EQ | NEQ | RE | NRE;
 
-passOp  
-  : directYield
-  | guideYield
-  | MAP
-  | FOLD;
-
-directYield
-  : '-[' id=ID ']>' -> ^(DIRECT_YIELD[$id.text])
-  | YIELDS -> ^(DIRECT_YIELD[(String) null]);
-
-guideYield
-  : '-[' id=ID ']#>' -> ^(GUIDE_YIELD[$id.text])
-  | '-#>' -> ^(GUIDE_YIELD[(String) null]);
+passOp[String label]  
+  : YIELDS -> DIRECT_YIELD[label]
+  | GUIDE_YIELD -> GUIDE_YIELD[label]
+  | MAP -> MAP[label]
+  | FOLD -> FOLD[label];
 
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.
 number  :  doubleNum | intNum;

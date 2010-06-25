@@ -19,8 +19,9 @@ options {
   import stencil.module.*;
   import stencil.parser.tree.util.*;
   import stencil.tuple.prototype.TuplePrototype;
-  import static stencil.parser.string.EnvironmentProxy.initialEnv;
-  import static stencil.parser.string.EnvironmentProxy.extend;
+  import stencil.parser.string.util.EnvironmentProxy;
+  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
+  import static stencil.parser.string.util.EnvironmentProxy.extend;
 }
 
 @members {

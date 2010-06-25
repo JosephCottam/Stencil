@@ -47,8 +47,9 @@ from Words
    (X,Y):* Centroid(word) -> Contract(X,Y) 
    REGISTRATION: "CENTER"
    (FONT_COLOR, FONT_SIZE):* 
-        WordCount.query(word) -[count]> Max[range: ALL](_) -> Divide(count[_], _) -[freq]> 
-				HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) -[color]>
+        [count] WordCount.query(word) -> Max[range: ALL](_) -> 
+        [freq]  Divide(count[_], _) -> 
+		[color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) ->
 				Scale[min: 50, max:1000](freq[_]) -> (color[_],_)
 
 operator WordCount base Count

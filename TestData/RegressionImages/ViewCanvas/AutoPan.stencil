@@ -29,8 +29,8 @@ from Stocks
     filter(Margin < 50)
     filter(TimeStep < RIGHT)
     prefilter(TimeStep, Margin, RIGHT) : 
-        TranslateRegistration("TOP_LEFT", view[X], view[Y], view[WIDTH], view[HEIGHT], "RIGHT") -[Right]>
-        TimeStep(Date) -[Time]> Sub(Right[X], _) -> (Time[VALUE], VALUE, Right[X]) 
+        [Right] TranslateRegistration("TOP_LEFT", view[X], view[Y], view[WIDTH], view[HEIGHT], "RIGHT") ->
+        [Time] TimeStep(Date) -> Sub(Right[X], _) -> (Time[VALUE], VALUE, Right[X]) 
     
     view(X): Add(3, view[X])
 

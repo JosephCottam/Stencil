@@ -51,8 +51,8 @@ facet query(Min, X1,Y1,X,Y) -> (X,Y) {
 }
 
 operator ParseDate (d) -> (m,y)
-   (ALL) => (m,y): IndexOf(d, "/") -[s]> 
-                     Substring(d, 0, s[0]) -[m]>
+   (ALL) => (m,y): [s] IndexOf(d, "/") -> 
+                   [m] Substring(d, 0, s[0]) ->
                      Add1(s[0]) -> Substring(d, _, -1) -> (m[0], _) 
 
 operator MakeLabel(id) -> (text)
@@ -60,8 +60,8 @@ operator MakeLabel(id) -> (text)
    (ALL) => text: ""
 
 operator Partition(n) -> (start, end)
-   (ALL) => (start, end): Sub(12, n) -> Sub(_,4) -[n]> 
-                          Mult(30, n[0]) -[end]>
+   (ALL) => (start, end): Sub(12, n) -> [n] Sub(_,4) -> 
+                          [end] Mult(30, n[0]) ->
                           Add1(n[0]) -> Mult(30,_) -> (_,end[_])
 
 

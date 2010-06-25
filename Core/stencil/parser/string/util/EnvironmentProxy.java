@@ -1,4 +1,4 @@
-package stencil.parser.string;
+package stencil.parser.string.util;
 
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
@@ -6,6 +6,7 @@ import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.module.util.OperatorData;
+import stencil.parser.string.StencilParser;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.parser.tree.util.MultiPartName;

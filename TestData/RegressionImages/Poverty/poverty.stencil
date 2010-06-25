@@ -84,9 +84,9 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Children") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Children, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Children.find(State) -[L1]>
-				  Children2.find(State) -[L2]>
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
+	FONT_COLOR :* [L1] Children.find(State) ->
+				  [L2] Children2.find(State) ->
+				  [Delta] Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) ->
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -104,9 +104,9 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Total") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Total, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Total.find(State) -[L1]>
-				  Total2.find(State) -[L2]>
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
+	FONT_COLOR :* [L1] Total.find(State) ->
+				  [L2] Total2.find(State) ->
+				  [Delta] Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) ->
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -124,9 +124,9 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Elderly") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Elderly, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Elderly.find(State) -[L1]>
-				  Elderly2.find(State) -[L2]>
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
+	FONT_COLOR :* [L1] Elderly.find(State) ->
+				  [L2] Elderly2.find(State) ->
+				  [Delta] Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) ->
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
@@ -144,14 +144,14 @@ from Poverty
 	TEXT: Abr(State) -> id
 	X: XLayout("Adult") -> Add(30, X) -> (VALUE)
 	Y :* Pop(State) -> Rank(Adults, State) -> Mult(15, VALUE) -> VALUE
-	FONT_COLOR :* Adults.find(State) -[L1]>
-				  Adults2.find(State) -[L2]>
-				  Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) -[Delta]>
+	FONT_COLOR :* [L1] Adults.find(State) ->
+				  [L2] Adults2.find(State) ->
+				  [Delta] Sub(L1[Y], L2[Y]) -> Abs(_) -> Div(_,765) ->
 				  Reg(State) -> Color2(Division, Delta[_]) -> C
 
 
 operator Color2 (State, Alpha) -> (C)
-(ALL) => (C): Coloring(State) -[Root]> 
+(ALL) => (C): [Root] Coloring(State) -> 
 					Mult(Alpha,.5) -> Add(64, VALUE) ->
 				  	SetAlpha(VALUE, Root[C]) -> VALUE
 
