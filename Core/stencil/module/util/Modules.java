@@ -30,6 +30,7 @@ package stencil.module.util;
 
 import static stencil.parser.ParserConstants.*;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
@@ -106,7 +107,7 @@ public final class Modules {
 		for (Class c: source.getClasses()) {
 			if (!Modifier.isStatic(c.getModifiers())) {continue;}
 			if (!StencilOperator.class.isAssignableFrom(c)) {continue;}
-			if (!Modifier.isPublic(c.getModifiers())) {continue;} //Might be a superfluous test
+			if (!Modifier.isPublic(c.getModifiers())) {continue;}
 
 			try {
 				if (target.equals(c.getSimpleName().toUpperCase())) {
@@ -115,7 +116,8 @@ public final class Modules {
 					System.arraycopy(args, 0, fullArgs, 1, args.length);
 					Class[] argTypes = new Class[fullArgs.length];
 					for (int i=0; i< fullArgs.length; i++) {argTypes[i] = fullArgs[i].getClass();}
-					return (StencilOperator) c.getConstructor(argTypes).newInstance(fullArgs);
+					Constructor constr = c.getConstructor(argTypes);
+					return (StencilOperator) constr.newInstance(fullArgs);
 				}
 			}
 			catch (Exception e) {/*Ignore, must not be the right thing if it can't be instantiated!*/}

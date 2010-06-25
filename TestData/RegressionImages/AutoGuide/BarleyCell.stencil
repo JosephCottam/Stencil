@@ -6,7 +6,7 @@ SOURCE: ./BeckersBarley.csv
 SKIP: 1
 STRICT: true
 
-import BrewerPallets
+import BrewerPalettes
 
 stream Barley(year, site, yield, variety)
 
@@ -25,7 +25,7 @@ layer BarleySite
   from Barley
     filter(site =~ "University Farm") 
     ID: Concatenate(variety,year)
-    STROKE_COLOR: BrewerColors[pallet: "PuRd"](year)
+    STROKE_COLOR: BrewerColors[palette: "PuRd"](year)
     FILL_COLOR: @Color{CLEAR}
     X:* Scale[min: 10, max:100, inMin: 10, inMax: 100](yield)
     Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)

@@ -14,21 +14,21 @@ import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 
-public class BrewerPallets  extends BasicModule {
+public class BrewerPalettes  extends BasicModule {
 
-	public BrewerPallets(ModuleData md) {super(md);}
+	public BrewerPalettes(ModuleData md) {super(md);}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 		if (name.equals("BrewerColors")) {
-			return Modules.instance(this.getClass(), operatorData, specializer);			
+			return Modules.instance(this.getClass(), operatorData, specializer);
 		}else {
 			throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toString()));
 		}
 	}
 	
 	public static final class BrewerColors extends BasicProject {
-		private static String PALLET = "pallet";
+		private static String PALETTE = "palette";
 		private static String RESERVE = "reserve";
 		
 		final List seen = new ArrayList();
@@ -37,7 +37,7 @@ public class BrewerPallets  extends BasicModule {
 
 		public BrewerColors(OperatorData od, Specializer spec) {
 			super(od);
-			rootPallet = spec.get(PALLET).getText().toUpperCase();
+			rootPallet = spec.get(PALETTE).getText().toUpperCase();
 			reserve = stencil.types.color.ColorCache.get(spec.get(RESERVE).getText());
 		}
 

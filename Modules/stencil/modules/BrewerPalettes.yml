@@ -1,0 +1,11 @@
+name: BrewerPalettes
+targetClass: stencil.modules.BrewerPalettes
+description: Encoding of the color palette found at ColorBrewer.org (by Cynthia A. Brewer, Penn State).
+defaults: 
+  defaultSpecializer: !spec "[palette: \"Set1\", reserve: \"BLACK\"]"
+  facets: 
+    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "Color VALUE"}
+    - {name: query, type: PROJECT, function: FALSE, prototype: !proto "Color VALUE"}
+    
+operators:
+  - name: BrewerColors
