@@ -120,6 +120,9 @@ public class TupleUtil extends BasicModule {
 		public ToTuple(OperatorData opData) {super(opData);}
 		public Tuple query(Object o) {return Converter.toTuple(o);}
 	}
+
+	/**Takes a tuple, returns a singleton tuple whose value is an array of the original tuples values.*/
+	public static final Tuple toArray(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
 	
 	public TupleUtil(ModuleData md) {super(md);}
 		

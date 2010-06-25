@@ -50,4 +50,5 @@ value[EnvironmentProxy env]
        -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n $v))
   | ^(TUPLE_REF n=ID)   -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n))
   | ^(TUPLE_REF NUMBER) -> ^(TUPLE_REF NUMBER[Integer.toString(env.currentIndex())] ^(TUPLE_REF NUMBER))
+  | ^(TUPLE_REF ALL) -> ^(TUPLE_REF NUMBER[Integer.toString(env.currentIndex())])
   | .;

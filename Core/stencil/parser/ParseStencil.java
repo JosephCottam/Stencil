@@ -204,6 +204,11 @@ public abstract class ParseStencil {
 		predicate_expand.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) predicate_expand.downup(p);
 		
+		//Ensure that all tuple references have a frame reference
+		TupleRefDeLast deLast = new TupleRefDeLast(treeTokens);
+		deLast.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) deLast.downup(p);
+		
 		//Add default specializers where required
 		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);

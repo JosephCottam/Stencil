@@ -117,8 +117,7 @@ options {
 
     //A runtime ref is any reference that looks at runtime specific values
     private boolean runtimeRef(TupleRef ref) {
-      Atom a = ref.getValue();
-      int idx = ((Number) a.getValue()).intValue();
+      int idx = ref.getValue();
       return idx < Environment.DEFAULT_SIZE;
     }
 

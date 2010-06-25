@@ -4,14 +4,12 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
-import stencil.tuple.Tuples;
-import stencil.types.Converter;
 
 /**Unpack a tuple reference.*/
 public final class TupleRef extends Value {
 	private static final TupleRef NO_SUB_REF = new TupleRef(null);
 	
-	private Atom value = null;
+	private Integer value = null;
 	private TupleRef subRef;
 	
 	public TupleRef(Token source) {
@@ -19,8 +17,9 @@ public final class TupleRef extends Value {
 	}
 
 	/**Get the simple value portion of this reference (what will be used to de-reference the tuple)*/
-	public Atom getValue() {
-		if (value == null) {value = (Atom) getChild(0);}
+	public Integer getValue() {
+		assert ((Atom) getChild(0)).isNumber();
+		if (value == null) {value = ((StencilNumber) getChild(0)).intValue();}
 		return value;
 	}
 
@@ -28,7 +27,8 @@ public final class TupleRef extends Value {
 	public Object getValue(Tuple source) {
 		if (source == null) {return null;}
 
-		Object value = doRef(source, getValue());
+		int val = getValue();
+		Object value = source.get(val);
 		
 		if (hasSubRef()) {return getSubRef().getValue((Tuple) value);}
 		else {return value;}
@@ -50,27 +50,6 @@ public final class TupleRef extends Value {
 		}
 		return subRef != NO_SUB_REF;
 	}
-
-
-	/**Perform recursive de-referencing of this tuple against the passed 
-	 * tuple.
-	 * 
-	 * @param source
-	 * @param ref
-	 * @return
-	 */
-	private final Object doRef(Tuple source, Atom ref) {
-		if (ref.isNumber()){
-			int val = ((StencilNumber) ref).intValue();
-			return source.get(val);
-		} else if (ref.isLast()) {
-			return Converter.toTuple(source.get(source.size()-1));
-		} else if (ref.isAll()) {
-			return Tuples.toArray(Converter.toTuple(source.get(source.size()-1)));
-		}
-		throw new RuntimeException("Could not get tuple ref with value of type " + typeName(getType()));
-	}
-	
 	
 	/**Given a potential reference and source, gets a Java value.
 	 * Values are resolved in the following order of precedence:

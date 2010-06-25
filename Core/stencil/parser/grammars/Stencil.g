@@ -378,6 +378,7 @@ private simpleRef
   | DEFAULT_VALUE -> ^(TUPLE_REF NUMBER["0"])
   | TUPLE_VALUE -> ^(TUPLE_REF ALL)
   | LAST -> ^(TUPLE_REF LAST)
+  | ALL -> ^(TUPLE_REF ALL)
   | ARG number CLOSE_ARG -> ^(TUPLE_REF number)
   | c=CANVAS -> ^(TUPLE_REF ID[$c.text])
   | l=LOCAL -> ^(TUPLE_REF ID[$l.text])

@@ -30,7 +30,7 @@ from RawWords
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, LAST)
+ () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, *)
  () : WordCount(word)
 
 layer Border[TEXT]
@@ -60,9 +60,9 @@ operator LineIndex base Mapping[fields: "lines"]
 operator Centroid (word) -> (X,Y)
   (ALL) =>
     (X): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
-            Select[field: 0](LAST) -> Average[range: LAST](*)
+            Select[field: 0](*) -> Average[range: LAST](LAST)
     (Y): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
-            Select[field: 1](LAST) -> Average[range: LAST](*)
+            Select[field: 1](*) -> Average[range: LAST](LAST)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout base CircularLayout[start: 0, size: 10, ratio: .75]

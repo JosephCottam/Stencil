@@ -13,6 +13,17 @@
  	<property name="ast" location ="${src}/stencil/parser/tree/"/>
  	<property name="interpreter" location ="${src}/stencil/interpreter/"/>
  	 	
+ 	
+	<!-- Just the core stencil grammar, not the additional processing.-->
+ 	<target name="WorkingGrammar">
+ 		<antlr3
+			target="${grammars}/transformers/TupleRefDeLast.g"
+			outputdirectory="${parser}"
+		/>
+ 	 	<antcall target="EclipseRefresh"/>
+ 	</target>
+ 		
+ 		
  	<target name="Stencil" depends="GuideSystem, Transformers, TreeAdapter, Validators, Interpreter">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>

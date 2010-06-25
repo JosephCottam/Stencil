@@ -15,4 +15,5 @@ operators:
   - name: Rename
   - name: Size
   - name: Select
+  - name: ToArray
   - name: ToTuple

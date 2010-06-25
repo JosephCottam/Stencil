@@ -32,7 +32,7 @@ from RawWords
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, LAST)
+ () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, ALL)
  () : WordCount(word)
 
 layer Border[TEXT]
@@ -68,7 +68,7 @@ operator Freq (word) -> (freq)
   (ALL) => freq: [count] WordCount.query(word) -> Max[range: ALL](_) -> Divide(count[_], _) 
 
 operator Centroid (word) -> (X,Y)
-  prefilter(positions) :LineIndex(word) -> ToTuple(_) >> Layout.query(_) >- LAST
+  prefilter(positions) :LineIndex(word) -> ToTuple(_) >> Layout.query(_) >- ALL
   (ALL) =>
-    (X): Select[field: 0](positions) -> Average[range: LAST](*)
-    (Y): Select[field: 1](positions) -> Average[range: LAST](*)
+    (X): Select[field: 0](positions) -> Average[range: LAST](LAST)
+    (Y): Select[field: 1](positions) -> Average[range: LAST](LAST)

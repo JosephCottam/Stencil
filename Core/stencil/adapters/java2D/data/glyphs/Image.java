@@ -193,7 +193,7 @@ public final class Image extends Basic {
 		
 		if (sx != oldSX || sy != oldSY) {	
 			AffineTransformOp op = new AffineTransformOp(AffineTransform.getScaleInstance(sx, sy), AffineTransformOp.TYPE_BICUBIC);
-			display = op.createCompatibleDestImage(base,base.getColorModel());
+			display = op.createCompatibleDestImage(base,null);
 			op.filter(base, display);
 			oldSX = sx;
 			oldSY = sy;
