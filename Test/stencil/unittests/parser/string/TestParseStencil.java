@@ -78,7 +78,19 @@ public class TestParseStencil extends TestCase {
 
 	private static final class AncestryException extends RuntimeException {
 		public AncestryException(Tree child) {
-			super("Parent/Child mis-match at " + child.toStringTree());
+			super("Parent/Child mis-match at " + calcPath(child));
+		}
+		
+		private static String calcPath(Tree child) {
+			StringBuilder b = new StringBuilder();
+			b.append(child.toString());
+			Tree parent = child.getParent();
+			while (parent != null) {
+				b.append(" <- ");
+				b.append(parent.getText());
+				parent = parent.getParent();
+			}
+			return b.toString();
 		}
 	}
 	

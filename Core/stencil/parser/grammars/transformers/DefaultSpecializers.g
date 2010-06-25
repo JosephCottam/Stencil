@@ -52,7 +52,7 @@ options {
 	     if (c != null) {return ParseStencil.parseSpecializer(CanvasDef.DEFAULT_SPECIALIZER);}
 	     	     
 	     Import i = (Import) spec.getAncestor(IMPORT);
-	     if (i != null) {return EMPTY_SPECIALIZER;} 
+	     if (i != null) {return (Specializer) adaptor.dupTree(EMPTY_SPECIALIZER);} 
 	     
 	     OperatorReference ref = (OperatorReference) spec.getAncestor(OPERATOR_REFERENCE);
 	     if (ref != null) {return getOperatorDefault(ref.getBase().getName());}

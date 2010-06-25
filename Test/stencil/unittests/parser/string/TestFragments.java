@@ -64,7 +64,7 @@ public class TestFragments extends TestCase {
 		
 		assertNotNull("Proxy name import unsuccessful; could not find  module by prefix.", modules.getModule("JG"));
 		
-		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG.BalloonLayout"));
+		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG::BalloonLayout"));
 	}
 	
 	public void testAdHocPrime() throws Exception {
