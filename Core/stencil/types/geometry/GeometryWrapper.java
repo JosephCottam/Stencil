@@ -58,7 +58,7 @@ public class GeometryWrapper implements TypeWrapper {
 			return new Rectangle2D.Double(x,y,w,h);
 			
 		}
-		throw new RuntimeException("Could not externalize....");
+		throw new RuntimeException("Could not externalize: " + t.toString());
 	}
 
 	@Override

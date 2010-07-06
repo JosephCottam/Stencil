@@ -42,7 +42,6 @@ layer BarleySite
 layer Barley[BarleySite]
 from Barley
   ID: site
-   X:  
    Y: Index(site) -> Mult(100)
    (year, yield, variety): (year, yield, variety)
      

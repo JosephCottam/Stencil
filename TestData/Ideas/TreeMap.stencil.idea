@@ -10,27 +10,32 @@ Layer Horizontal
      prefilter(len): length(path)
      
      ID: path[0]
-     height:* Sum(value) -> Div(sum, value) -> Mult(Self[width], _)
-     width: Self[height] 
+     width:* Sum(value) -> Div(sum, value) -> Mult(Self[width], _)
+     height: Self[height] 
      path: subTuple(path, 1, len)
 
      
 Layer Vertical
-  stream Data(path, value, x,y, width, height)
+  stream Data(path, value, width, height)
 
   element Self[SHAPE]
   from data
-     (X,Y,WIDTH,HEIGHT): (x,y,width,height)
+     (WIDTH,HEIGHT): (width,height)
      
   group Children[Horizontal]
      filter(len >0)
      prefilter(len): length(path)
      
-     ID: path[0]
-     width:* Sum(value) -> Div(sum, value) -> Mult(Self[width], _)
-     height: Self[height] 
+     local(id) :  path[0]
+     ID: id
+     Y:* calcHeight(value) -> sub(_ 
+     height:* calcHeight(value)
+     width: Self[height] 
      path: subTuple(path, 1, len)
      
+     
+  operator calcHeight (value) -> (height)
+     (all) => height: Sum(value) -> Div(sum, value) -> Mult(Self[height], _)
      
 stream Data(path, value)
 

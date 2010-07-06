@@ -1,0 +1,21 @@
+name: FontUtils
+targetClass: stencil.types.font.FontUtils
+description: Create and modify fonts (a font is family+size+style).
+
+defaults:
+  defaultSpecializer: !spec "[range: ALL, split:0]"
+  facets:
+    - {name: map, function: true, type: PROJECT, prototype: !proto "Font font"}
+    - {name: query, function: true, type: PROJECT, prototype: !proto "Font font"}
+
+operators:
+  - name: Bold
+  - name: Italic
+  - name: Family
+  - name: Plain
+  - name: Size
+  - name: SetFamily
+  - name: Fonts
+    facets:
+      - {name: argumentParser, function: true, target: query, type: PROJECT, prototype: !proto "Font font"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "Font font"}

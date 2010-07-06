@@ -35,6 +35,7 @@ import stencil.adapters.general.Fills;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.types.Converter;
 
 /**Utility methods for working with tuples.*/
 //final because it is a collection of utility methods and is not to be instantiated or overridden
@@ -275,4 +276,14 @@ public final class Tuples {
 		}
 		return results;
 	}
+	
+	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
+	public static final <T> T safeGet(String field, Tuple source, TuplePrototype p, T def) {
+		return safeGet(field, source, p, (Class<T>) def.getClass(), def);
+	}
+
+	public static final <T> T safeGet(String field, Tuple source, TuplePrototype p, Class<T>  type, T def) {
+		return (!source.getPrototype().contains(field)) ? def : (T) Converter.convert(source.get(field), type);
+	}
+	
 }

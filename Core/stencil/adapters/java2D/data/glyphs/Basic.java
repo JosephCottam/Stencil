@@ -204,8 +204,7 @@ public abstract class Basic implements Glyph2D {
 	
 	/**Get a value from the passed tuple; return null if the field is not present in the tuple.*/
 	protected static final <T> T safeGet(Tuple source, Attribute<T> att) {
-		String field = att.name;
-		return (!source.getPrototype().contains(field)) ? null : (T) Converter.convert(source.get(field), att.type);
+		return Tuples.safeGet(att.name, source, source.getPrototype(), att.type, null);
 	}
 	
 	/**REturn either the candidate value -or- if it is null, the defaultValue.*/

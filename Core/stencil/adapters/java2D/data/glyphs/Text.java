@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.data.glyphs;
 
-import java.awt.Component;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
@@ -11,14 +12,9 @@ import java.awt.geom.GeneralPath;
 import java.lang.ref.SoftReference;
 import java.util.regex.Pattern;
 
-import static stencil.adapters.general.TextFormats.TextProperty;
-import static stencil.adapters.general.TextFormats.Format;
-
 import static stencil.adapters.Adapter.REFERENCE_GRAPHICS;
-import static stencil.util.enums.EnumUtils.contains;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.general.TextFormats;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -27,9 +23,12 @@ import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
+import stencil.types.font.FontTuple;
 import stencil.util.DoubleDimension;
 
 public final class Text extends Basic {
+	/**Describes the valid justifications**/
+	public static enum Justification {LEFT, RIGHT, CENTER}
 	
 	/**Results of computing a layout.*/
 	private static final class LayoutDescription {
@@ -69,6 +68,10 @@ public final class Text extends Basic {
 	private static final Attribute<Double> ROTATION = new Attribute("ROTATION", 0d);
 	private static final Attribute<Double> WIDTH = new Attribute(StandardAttribute.WIDTH.name(), AUTO_SIZE, Double.class);
 	private static final Attribute<Double> HEIGHT = new Attribute(StandardAttribute.HEIGHT.name(), AUTO_SIZE, Double.class);
+	private static final Attribute<Justification> JUSTIFY = new Attribute("JUSTIFY", Justification.LEFT); 
+	private static final Attribute<Color>  COLOR = new Attribute("COLOR", Color.BLACK);
+	private static final Attribute<Font>   FONT = new Attribute("FONT", FontTuple.DEFAULT_FONT);
+	
 	protected static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "ALL");
 		
 	static {
@@ -79,14 +82,18 @@ public final class Text extends Basic {
 		ATTRIBUTES.add(ROTATION);
 		ATTRIBUTES.add(HEIGHT);
 		ATTRIBUTES.add(WIDTH);
-		
-		for (TextProperty p:TextProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
+		ATTRIBUTES.add(FONT);
+		ATTRIBUTES.add(COLOR);
+		ATTRIBUTES.add(JUSTIFY);
+	
 		PROTOTYPE = new SimplePrototype(ATTRIBUTES.getNames(), ATTRIBUTES.getTypes());
 	}
 
 	private final String text;
 	private final String scaleBy;
-	private final Format format;
+	private final Font font;
+	private final Color color;
+	private final Justification justify;
 	
 	private final boolean autoWidth;
 	private final boolean autoHeight;
@@ -101,7 +108,9 @@ public final class Text extends Basic {
 		
 		text = TEXT.defaultValue;
 		scaleBy = SCALE_BY.defaultValue;
-		format = new Format();
+		font = FONT.defaultValue;
+		color = COLOR.defaultValue;
+		justify = JUSTIFY.defaultValue;
 		rotation = ROTATION.defaultValue;
 		autoWidth = true;
 		autoHeight = true;
@@ -116,7 +125,9 @@ public final class Text extends Basic {
 		
 		this.text = source.text;
 		this.scaleBy = source.scaleBy;
-		this.format = source.format;
+		this.font = source.font;
+		this.color = source.color;
+		this.justify = source.justify;
 		this.autoHeight = source.autoHeight;
 		this.autoWidth = source.autoWidth;
 		this.horizontalBounds = source.horizontalBounds;
@@ -130,8 +141,10 @@ public final class Text extends Basic {
 		scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
 		text = switchCopy(source.text, safeGet(option, TEXT));
 		rotation = switchCopy(source.rotation, safeGet(option, ROTATION));
-		format = TextFormats.make(source, option);
-		
+		font = switchCopy(source.font, safeGet(option, FONT));
+		color = switchCopy(source.color, safeGet(option, COLOR));
+		justify = switchCopy(source.justify, safeGet(option, JUSTIFY));
+
 		if (option.getPrototype().contains(HEIGHT.name)) {
 			double height = Converter.toDouble(option.get(HEIGHT.name));
 			autoHeight = (height <= AUTO_SIZE);
@@ -144,7 +157,9 @@ public final class Text extends Basic {
 
 		//If there was no change to layout, just copy it; otherwise, recompute it
 		if (text.equals(source.text)
-			&& format.equals(source.format)
+			&& font.equals(source.font)
+			&& color.equals(source.color)
+			&& justify.equals(source.justify)
 			&& !option.getPrototype().contains(X.name)
 			&& !option.getPrototype().contains(Y.name) 
 			&& !option.getPrototype().contains(WIDTH.name)
@@ -154,7 +169,7 @@ public final class Text extends Basic {
 			super.updateBoundsRef(source.bounds);
 			this.horizontalBounds = source.horizontalBounds;
 		} else {
-			LayoutDescription ld = computeLayout(text, format);
+			LayoutDescription ld = computeLayout(text, font);
 			
 			if (!autoWidth) {
 				ld.fullWidth = switchCopy(source.horizontalBounds.getWidth(), safeGet(option, WIDTH));
@@ -185,8 +200,8 @@ public final class Text extends Basic {
 	}
 	
 	private GeneralPath renderText() {
-		LayoutDescription ld = computeLayout(text, format);
-		GeneralPath renderedText = layoutText(text, ld, format);
+		LayoutDescription ld = computeLayout(text, font);
+		GeneralPath renderedText = layoutText(text, ld, font, justify);
 		Point2D reg = new Point2D.Double((Double) get("X"), (Double) get("Y"));
 		renderedText.transform(AffineTransform.getTranslateInstance(horizontalBounds.getX()-reg.getX(), horizontalBounds.getY()-reg.getY()));
 		renderedText.transform(AffineTransform.getRotateInstance(Math.toRadians(rotation)));
@@ -208,7 +223,9 @@ public final class Text extends Basic {
 		if (ROTATION.is(name)) {return rotation;}
 		if (HEIGHT.is(name)) {return horizontalBounds.getHeight();}
 		if (WIDTH.is(name)) {return horizontalBounds.getWidth();}
-		if (contains(TextProperty.class,name)) {return TextFormats.get(name, format);}
+		if (FONT.is(name)) {return font;}
+		if (COLOR.is(name)) {return color;}
+		if (JUSTIFY.is(name)) {return justify;}
 		return super.get(name);
 	}
 
@@ -234,8 +251,8 @@ public final class Text extends Basic {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-		g.setFont(format.font);
-		g.setPaint(format.textColor);
+		g.setFont(font);
+		g.setPaint(color);
 		
 		
 		//Figure out where to render the thing while potentially ignoring the view transform.
@@ -258,10 +275,10 @@ public final class Text extends Basic {
 		super.postRender(g, base);
 	}	
 	
-	private static GeneralPath layoutText(String text, LayoutDescription ld, Format format) {
+	private static GeneralPath layoutText(String text, LayoutDescription ld, Font font, Justification justify) {
 		Graphics2D g = REFERENCE_GRAPHICS;
 		FontRenderContext context = g.getFontRenderContext();
-		FontMetrics fm = g.getFontMetrics(format.font);
+		FontMetrics fm = g.getFontMetrics(font);
 		final String[] lines =SPLITTER.split(text);
 
 		GeneralPath compound = new GeneralPath();
@@ -270,10 +287,10 @@ public final class Text extends Basic {
 			final DoubleDimension dim = ld.dims[i];
 			String line = lines[i];
 			
-			double x = horizontalOffset(dim.width, ld.fullWidth, format.justification);
+			double x = horizontalOffset(dim.width, ld.fullWidth, justify);
 			double y = dim.height * i + fm.getAscent();
 			
-			java.awt.Shape s = format.font.createGlyphVector(context, line).getOutline((float) x, (float) y);
+			java.awt.Shape s = font.createGlyphVector(context, line).getOutline((float) x, (float) y);
 			compound.append(s, false);
 		}
 
@@ -283,9 +300,9 @@ public final class Text extends Basic {
 	/**Get the appropriate metrics for the layout of the requested text.
 	 */
 	//TODO: Do width-based line wrapping, will have to pass in width to do so
-	private static LayoutDescription computeLayout(String text, Format format) {
+	private static LayoutDescription computeLayout(String text, Font font) {
 		Graphics2D g = REFERENCE_GRAPHICS;
-		FontMetrics fm = g.getFontMetrics(format.font);
+		FontMetrics fm = g.getFontMetrics(font);
 
         LayoutDescription ld = new LayoutDescription(SPLITTER.split(text));
         
@@ -306,14 +323,13 @@ public final class Text extends Basic {
         return ld;
 	}
 
-	private static double horizontalOffset(double lineWidth, double spaceWidth, float justification) {
-		if (justification == Component.LEFT_ALIGNMENT) {return 0;}
-
-		if (justification == Component.RIGHT_ALIGNMENT) {return spaceWidth- lineWidth;}
-		
-		if (justification == Component.CENTER_ALIGNMENT) {return spaceWidth/2.0 - lineWidth/2.0;}
-		
-		throw new RuntimeException("Unknown justification value: " + justification);
+	private static double horizontalOffset(double lineWidth, double spaceWidth, Justification justification) {
+		switch (justification) {
+		   case LEFT: return 0;
+		   case RIGHT: return spaceWidth- lineWidth;
+		   case CENTER: return spaceWidth/2.0 - lineWidth/2.0;
+		   default: throw new RuntimeException("Unknown justification value: " + justification);
+		}
 	}
 	
 	public Text update(Tuple t) throws IllegalArgumentException {

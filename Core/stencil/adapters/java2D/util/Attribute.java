@@ -32,13 +32,13 @@ import stencil.tuple.prototype.TupleFieldDef;
 
 public class Attribute<T> implements TupleFieldDef{
 	public String name;
-	public Class type;
+	public Class<T> type;
 	public T defaultValue;
 
 	public Attribute(String name, T defaultValue) {
 		this.name = name;
 		this.defaultValue = defaultValue;
-		this.type = defaultValue.getClass();
+		this.type = (Class<T>) defaultValue.getClass();
 	}
 	
 	public Attribute(String name, T defaultValue, Class type) {
