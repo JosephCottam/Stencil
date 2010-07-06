@@ -1,0 +1,39 @@
+Layer Horizontal
+  stream Data(path, value, x,y, width, height)
+
+  element Self[SHAPE]
+  from data
+     (X,Y,WIDTH,HEIGHT): (x,y,width,height)
+     
+  group Children[Vertical]
+     filter(len >0)
+     prefilter(len): length(path)
+     
+     ID: path[0]
+     height:* Sum(value) -> Div(sum, value) -> Mult(Self[width], _)
+     width: Self[height] 
+     path: subTuple(path, 1, len)
+
+     
+Layer Vertical
+  stream Data(path, value, x,y, width, height)
+
+  element Self[SHAPE]
+  from data
+     (X,Y,WIDTH,HEIGHT): (x,y,width,height)
+     
+  group Children[Horizontal]
+     filter(len >0)
+     prefilter(len): length(path)
+     
+     ID: path[0]
+     width:* Sum(value) -> Div(sum, value) -> Mult(Self[width], _)
+     height: Self[height] 
+     path: subTuple(path, 1, len)
+     
+     
+stream Data(path, value)
+
+element Root[Horizontal]
+from Data
+	(path, value, x, y, width, height): (path, value, 0,0,100,100)     

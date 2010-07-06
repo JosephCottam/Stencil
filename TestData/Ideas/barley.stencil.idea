@@ -1,0 +1,48 @@
+import BrewerPalettes
+
+stream Barley(year, site, yield, variety)
+
+canvas Main
+  guide 
+    axis[axisLabel: "Yield", 
+         sample: "LINEAR", seed.min: 10, seed.max: 100] 
+    from BarleySite X
+
+  guide 
+    sidebar[X: 75, Y: -60] 
+    from BarleySite STROKE_COLOR
+      example.FILL_COLOR: @Color{GRAY90}
+
+layer BarleySite
+  stream SiteValues(year, yield, variety)
+  guide axis[axisLabel: "Variety"] from BarleySite SiteValues Y
+  
+  element Title[TEXT]
+      TEXT: super[ID]
+      X,Y: Center(Offset[X], Offset[Y], Offset[HEIGHT], Offset[WIDTH])
+      //X,Y: Center(Offset[X, Y, HEIGHT WIDTH]) <--This would be nice.  Essential a "with"/"using" clause
+      
+  element Offset[SHAPE]
+      HEIGHT: 10
+      WIDTH: SiteValues[WIDTH]
+      FILL_COLOR: @Color{bisque}
+      
+  element Border[SHAPE]
+  		(X,Y,HEIGHT, WIDTH): SiteValues[X], SiteValues[Y], SiteValues[HEIGHT] ,SiteValues[WIDTH]
+
+  layer SiteValues
+  from SiteValues
+    ID: Concatenate(variety,year)
+    STROKE_COLOR: BrewerColors[palette: "PuRd"](year)
+    FILL_COLOR: @Color{CLEAR}
+    X:* Scale[min: 10, max:100, inMin: 10, inMax: 100](yield)
+    Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)
+    REGISTRATION: "CENTER"
+
+layer Barley[BarleySite]
+from Barley
+  ID: site
+   X:  
+   Y: Index(site) -> Mult(100)
+   (year, yield, variety): (year, yield, variety)
+     
