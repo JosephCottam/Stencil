@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stencil.adapters.general.ImplicitArgumentException;
-import stencil.adapters.general.Strokes;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
@@ -117,7 +116,7 @@ public abstract class Poly extends Stroked {
 	private final String scaleBy;
 	
 	public Poly(DisplayLayer layer, String id, boolean connect) {
-		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
+		super(layer, id);
 		this.connect = connect;
 		
 		points = new ArrayList();

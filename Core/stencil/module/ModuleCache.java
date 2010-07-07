@@ -34,6 +34,7 @@ import java.util.*;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.*;
 import stencil.parser.tree.Specializer;
+import stencil.util.collections.PropertyUtils;
 
 
 /**Utilities for handling module->method conversions.
@@ -186,28 +187,25 @@ public class ModuleCache {
 	 * @param props
 	 */
 	public static void registerModules(Properties props) {
-		for (Object ky: props.keySet()) {
-			String key = (String) ky;
-			if (key.startsWith(MODULE_KEY)) {
-				String filename = props.getProperty(key);
-				
-				Module m;
-				ModuleData md;
-				
-				InputStream stream = ModuleCache.class.getResourceAsStream(filename);
+		for (String key: PropertyUtils.filter(props, MODULE_KEY)) {
+			String filename = props.getProperty(key);
+			
+			Module m;
+			ModuleData md;
+			
+			InputStream stream = ModuleCache.class.getResourceAsStream(filename);
 
-				try {md = ModuleDataParser.load(stream);} 
-				catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}
-				
-				if (!key.endsWith(md.getName())) {
-					throw new RuntimeException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), md.getName()));
-				}
- 				
-				try {m = md.getModule();}
-				catch (Exception e) {throw new RuntimeException(String.format("Error instantiating module %1$s.", md.getName()), e);}
-				
-				register(m);
+			try {md = ModuleDataParser.load(stream);} 
+			catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}
+			
+			if (!key.endsWith(md.getName())) {
+				throw new RuntimeException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), md.getName()));
 			}
+			
+			try {m = md.getModule();}
+			catch (Exception e) {throw new RuntimeException(String.format("Error instantiating module %1$s.", md.getName()), e);}
+			
+			register(m);
 		}
 		
 		String defaults = props.get(DEFAULT_MODULES_KEY).toString();

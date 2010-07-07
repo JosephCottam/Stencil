@@ -28,27 +28,28 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
-import static stencil.util.enums.EnumUtils.contains;
-
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.Stroke;
 
-import stencil.adapters.general.Strokes;
-import stencil.adapters.general.Strokes.ColoredStroke;
-import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.types.color.ColorCache;
+import stencil.types.stroke.StrokeTuple;
 
 public abstract class Stroked extends Basic {
 	protected static final AttributeList ATTRIBUTES;
+	protected static final Attribute<BasicStroke> PEN = new Attribute("PEN", StrokeTuple.DEFAULT_STROKE);
+	protected static final Attribute<Color> PEN_COLOR = new Attribute("PEN_COLOR", Color.BLACK);
 	static {
 		ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
-		for (StrokeProperty p: StrokeProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
+		ATTRIBUTES.add(PEN);
+		ATTRIBUTES.add(PEN_COLOR);
 	}
 
 	protected final Stroke outlineStyle;
@@ -61,6 +62,8 @@ public abstract class Stroked extends Basic {
 		this.outlineStyle = source.outlineStyle;
 	}
 	
+	
+	protected Stroked(DisplayLayer layer, String id) {this(layer, id, PEN.defaultValue, PEN_COLOR.defaultValue);}
 	protected Stroked(DisplayLayer layer, String id, Stroke outlineStyle, Paint outlinePaint) {
 		super(layer, id);
 		this.outlineStyle = outlineStyle;
@@ -69,16 +72,15 @@ public abstract class Stroked extends Basic {
 	
 	protected Stroked(Stroked source, Tuple option, AttributeList unsettables) {
 		super(source, option, unsettables);
-		ColoredStroke s = Strokes.makeStroke(source, option);
-		outlineStyle = s.style;
-		outlinePaint = s.paint;
+		outlineStyle = switchCopy(source.outlineStyle, safeGet(option, PEN));
+		outlinePaint = switchCopy(source.outlinePaint, safeGet(option, PEN_COLOR));
 	}
 	
 	/**Gets fill-related properties.*/
 	public Object get(String name) {
-		if (contains(StrokeProperty.class, name)) {
-			return Strokes.get(name, outlineStyle, outlinePaint);
-		} else {return super.get(name);}
+		if (PEN.is(name)) {return outlineStyle;}
+		if (PEN_COLOR.is(name)) {return outlinePaint;}
+		return super.get(name);
 	}
 
 	protected void render(Graphics2D g, Shape s) {

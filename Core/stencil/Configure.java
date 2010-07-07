@@ -31,6 +31,7 @@ public class Configure {
 
 
 		stencil.module.ModuleCache.registerModules(props);
+		stencil.types.Converter.registerWrappers(props);
 	}
 
 	public static void loadProperties(String... urls) throws Exception {

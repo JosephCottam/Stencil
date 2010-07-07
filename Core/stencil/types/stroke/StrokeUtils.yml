@@ -1,0 +1,21 @@
+name: StrokeUtils
+targetClass: stencil.types.stroke.StrokeUtils
+description: Create and modify strokes.  Strokes control non-color aspects of drawing.
+
+defaults:
+  defaultSpecializer: !spec "[range: LAST, split:0]"
+  facets:
+    - {name: map, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
+    - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
+
+operators:
+  - name: Width
+  - name: Join
+  - name: Cap
+  - name: Phase
+  - name: Limit
+  - name: Pattern
+  - name: Strokes
+    facets:
+      - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}

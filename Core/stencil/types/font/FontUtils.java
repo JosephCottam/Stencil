@@ -17,6 +17,17 @@ public final class FontUtils extends BasicModule {
 	public static final Font Plain(Font f) {return f.deriveFont(Font.PLAIN);}
 	public static final Font Size(Font f, double size) {return f.deriveFont((float) size);}
 	 
+	
+	/**Fonts are specified with a comma-separated list (order does not matter).
+	 *   
+	 * The words "bold" or "italic" will toggle on the indicated value.
+	 * A numeric value will be taken as the size.
+	 * A string value will be taken as the family.
+	 * Extra values may be given, but they will likely be ignored...
+	 * 
+	 * @author jcottam
+	 *
+	 */
 	public static class Fonts extends BasicProject {
 		public Fonts(OperatorData opData) {super(opData);}
 		public FontTuple query(String arg) {

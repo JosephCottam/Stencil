@@ -1,7 +1,9 @@
 package stencil.types;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.StencilString;
@@ -9,16 +11,29 @@ import stencil.tuple.ArrayTuple;
 import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
 import stencil.util.ConversionException;
+import stencil.util.collections.PropertyUtils;
 import stencil.util.enums.ValueEnum;
 
 public final class Converter {
 	private static final Map<Class, TypeWrapper> WRAPPER_FOR = new HashMap();
+	public static final String WRAPPER_KEY = "wrapper";
+	
+	public static final Map<Class, TypeWrapper> getWrappers() {
+		return Collections.unmodifiableMap(WRAPPER_FOR);
+	}
+	
+	public static final void registerWrappers(Properties props) {
+		for (String key: PropertyUtils.filter(props, WRAPPER_KEY)) {
+			String className = props.getProperty(key);
 
-	static {
-		//TODO: Move to something like the modules mechanism, loaded from a configuration file
-		registerWrapper(new NumericWrapper());
-		registerWrapper(new stencil.types.color.ColorWrapper());
-		registerWrapper(new stencil.types.geometry.GeometryWrapper());
+			try {
+				TypeWrapper wrapper = (TypeWrapper) Class.forName(className).getConstructor().newInstance();
+				registerWrapper(wrapper);
+			} catch (Exception e) {
+				throw new Error("Error loading type wrapper: " + key + ": " + className, e);
+			}
+			
+		}
 	}
 	
 	public static final void registerWrapper(TypeWrapper wrapper) {

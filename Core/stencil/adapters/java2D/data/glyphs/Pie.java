@@ -36,8 +36,6 @@ import java.awt.geom.Point2D;
 
 import stencil.adapters.general.Pies;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.general.Strokes;
-import stencil.adapters.general.Strokes.StrokeProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
@@ -90,7 +88,7 @@ public final class Pie extends Stroked {
 	
 	
 	public Pie(DisplayLayer layer, String id) {
-		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
+		super(layer, id);
 		
 		size = SIZE.defaultValue;
 		slicePaint = SLICE_COLOR.defaultValue;
@@ -99,8 +97,8 @@ public final class Pie extends Stroked {
 		field = FIELD.defaultValue;
 		slice = SLICE.defaultValue;
 
-		arc = Pies.makeSlice(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
-		outline = Pies.makePieOutline(angle, getPercent(), X.defaultValue, Y.defaultValue, size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		arc = Pies.makeSlice(angle, getPercent(), X.defaultValue, Y.defaultValue, size, 1d, outlinePaint);		//HACK: The 1d is a fill in value...should we even be trying to take into account stroke???
+		outline = Pies.makePieOutline(angle, getPercent(), X.defaultValue, Y.defaultValue, size, 1d, outlinePaint); //HACK: The 1d is a fill in value...should we even be trying to take into account stroke???
 		super.updateBoundsRef(outline.getBounds2D());
 	}
 	
@@ -141,8 +139,8 @@ public final class Pie extends Stroked {
 		Double y = switchCopy(source.bounds.getY(), safeGet(option, Y));
 		Point2D topLeft = new Point2D.Double(x,y);
 		
-		arc = Pies.makeSlice(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
-		outline = Pies.makePieOutline(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, (Double) get(StrokeProperty.STROKE_WEIGHT.name()), outlinePaint);
+		arc = Pies.makeSlice(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, 1d, outlinePaint);//HACK: The 1d is a fill in value...should we even be trying to take into account stroke???
+		outline = Pies.makePieOutline(angle, getPercent(), topLeft.getX(), topLeft.getY(), size, 1d, outlinePaint);//HACK: The 1d is a fill in value...should we even be trying to take into account stroke???
 		super.updateBoundsRef(outline.getBounds2D());
 	}
 	

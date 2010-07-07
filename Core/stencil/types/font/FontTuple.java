@@ -24,7 +24,6 @@ public final class FontTuple implements Tuple {
 	static final Boolean DEFAULT_ITALIC = false;
 	public static final Font DEFAULT_FONT = new Font(DEFAULT_FAMILY, Font.PLAIN, DEFAULT_SIZE.intValue());
 	
-	
 	private static final String[] FIELDS = new String[]{SELF, FAMILY, SIZE, BOLD, ITALIC};
 	private static Class[] TYPES = new Class[] {Font.class, String.class, Double.class, Boolean.class, Boolean.class};
 	private static TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
@@ -68,6 +67,10 @@ public final class FontTuple implements Tuple {
 	public TuplePrototype getPrototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {
+		if (name.equals(FAMILY)) {return DEFAULT_FAMILY.equals(value);}
+		if (name.equals(SIZE)) {return DEFAULT_SIZE.equals(value);}
+		if (name.equals(BOLD)) {return DEFAULT_BOLD.equals(value);}
+		if (name.equals(ITALIC)) {return DEFAULT_ITALIC.equals(value);}
 		return false;
 	}
 

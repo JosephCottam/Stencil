@@ -35,7 +35,6 @@ import java.awt.Paint;
 import java.awt.Shape;
 
 import stencil.adapters.general.Fills;
-import stencil.adapters.general.Strokes;
 import stencil.adapters.general.Fills.FillProperty;
 import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
@@ -55,7 +54,7 @@ public abstract class Filled extends Stroked {
 	protected final Paint fill;
 	
 	protected Filled(DisplayLayer layer, String id) {
-		super(layer, id, Strokes.DEFAULT_STROKE, STROKE_COLOR.defaultValue);
+		super(layer, id, Stroked.PEN.defaultValue, STROKE_COLOR.defaultValue);
 		fill = Fills.getDefault();
 	}
 	

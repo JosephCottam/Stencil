@@ -33,15 +33,14 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.lang.ref.SoftReference;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.types.Converter;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
-import stencil.adapters.general.Strokes;
 import stencil.adapters.general.Registrations.Registration;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.data.DisplayLayer;
@@ -97,7 +96,7 @@ public final class Line extends Stroked {
 	private final SoftReference<Line2D> glyph;
 	
 	public Line(DisplayLayer layer, String id) {
-		super(layer, id, Strokes.DEFAULT_STROKE, Strokes.DEFAULT_PAINT);
+		super(layer, id);
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
 		x2 = X2.defaultValue;
@@ -200,7 +199,7 @@ public final class Line extends Stroked {
 		Line2D toRender = fixTransform(scaleBy, g,l);
 		
 		super.render(g,toRender);
-		endPoints(g, toRender, Converter.toDouble(super.get("STROKE_WEIGHT")), cap1, cap2);
+		endPoints(g, toRender, ((BasicStroke) outlineStyle).getLineWidth(), cap1, cap2);
 		super.postRender(g, base);
 	}
 

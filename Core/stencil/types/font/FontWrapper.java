@@ -8,7 +8,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.TypeWrapper;
 import stencil.util.ConversionException;
 
-public class TextFormatWrapper implements TypeWrapper {
+public class FontWrapper implements TypeWrapper {
 	private static Class[] ACCEPTS = {Font.class};
 
 	public Class[] appliesTo() {return ACCEPTS;}
