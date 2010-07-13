@@ -29,14 +29,14 @@
 package stencil.adapters.java2D;
 
 import java.awt.Color;
+
+import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
-import stencil.display.StencilPanel;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.data.guides.*;
 import stencil.adapters.java2D.util.Painter;
@@ -49,8 +49,9 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private boolean defaultMouse;
 	
 	public Panel generate(Program program) {
-		Panel panel = new Panel(program);
-		constructGuides(panel, program);
+		Canvas canvas = new Canvas(program.getCanvasDef(), program.getLayers());
+		constructGuides(canvas, program);
+		Panel panel = new Panel(canvas, program);
 		
 		if (defaultMouse) {
 			ZoomPanHandler zp = new ZoomPanHandler();
@@ -69,7 +70,10 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
 
-	public DisplayLayer makeLayer(Layer l) {return DisplayLayer.instance(l);}
+	public stencil.display.DisplayLayer makeLayer(Layer l) {
+		return DoubleBufferLayer.instance(l);
+	}
+
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
 	public void setDebugColor(Color c) {Basic.DEBUG_COLOR = c;}
 	
@@ -83,8 +87,6 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			throw new IllegalArgumentException("Could not set render quality to unknown value: " + value);
 		}
 	}
-
-	public void finalize(StencilPanel panel) {/**No finalization required...yet**/}
 	
 	public Panel compile(String programSource) throws Exception {
 		return generate(ParseStencil.parse(programSource, this));
@@ -92,9 +94,8 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	
 	//TODO: Lift out into a grammar pass...
-	private void constructGuides(Panel panel, Program program) {
+	private void constructGuides(Canvas canvas, Program program) {
 		int sidebarCount = 0;//How many side-bars have been created?
-		Canvas canvas = panel.getCanvas().getComponent();
 		
 		for (Guide guideDef : program.getCanvasDef().getGuides()) {
 			stencil.parser.tree.Selector sel = guideDef.getSelector();
@@ -103,9 +104,6 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			if (guideType.equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
 				canvas.addGuide(sel, guide);
-				
-				
-				//TODO: If an X and Y for the same selector path exist on this canvas, make the axes meet
 			} else if (guideType.equals("sidebar")) {
 				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
 				canvas.addGuide(sel, guide);

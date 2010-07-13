@@ -28,6 +28,8 @@
  */
 package stencil.parser.tree.util;
 
+import java.util.Arrays;
+
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -43,6 +45,7 @@ final class ArrayEnvironment extends Environment {
 	
 	private ArrayEnvironment(int capacity) {
 		frames = new Tuple[capacity];
+		Arrays.fill(frames, Tuples.EMPTY_TUPLE);
 	}
 	
 	public void setFrame(int frame, Tuple t) {
@@ -80,7 +83,7 @@ final class ArrayEnvironment extends Environment {
 	 */
 	public int capacity() {return frames.length;}
 
-	public ArrayEnvironment extendCapacity(int capacity) {
+	public ArrayEnvironment ensureCapacity(int capacity) {
 		if (capacity <= frames.length) {return this;}
 		
 		ArrayEnvironment env = new ArrayEnvironment(capacity);
@@ -93,7 +96,7 @@ final class ArrayEnvironment extends Environment {
 
 	public ArrayEnvironment clone() {
 		ArrayEnvironment result = new ArrayEnvironment(frames.length);
-		System.arraycopy(frames, 0, result.frames, 0, frames.length);
+		System.arraycopy(frames, 0, result.frames, 0, filledSize);
 		result.filledSize = filledSize;
 		return result;
 	}

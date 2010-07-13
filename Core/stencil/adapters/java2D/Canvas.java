@@ -41,14 +41,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.DisplayLayer;
 import stencil.adapters.java2D.data.Guide2D;
-import stencil.adapters.java2D.util.LayerUpdateListener;
-import stencil.adapters.java2D.util.Painter;
 import stencil.display.CanvasTuple;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
+import stencil.display.DisplayLayer;
 import stencil.parser.tree.CanvasDef;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Selector;
@@ -56,60 +55,44 @@ import stencil.parser.tree.Selector;
 
 /**Some of this is derived from Prefuse's display and related objects.*/
 
-public final class Canvas extends DisplayCanvas implements LayerUpdateListener {	
-	final Painter painter;
-	final Thread painterThread;
-	BufferedImage buffer;
+public final class Canvas extends DisplayCanvas {	
+	private BufferedImage buffer;
 	
 	private AffineTransform viewTransform = new AffineTransform();
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
-	private final LayerUpdateListener.AtomicCompositeUpdate layerUpdates = new LayerUpdateListener.AtomicCompositeUpdate();
 	private final Map<Selector, Guide2D> guides  = new ConcurrentHashMap();
 	
-	private Rectangle2D contentBounds;
-	final DisplayLayer<? extends Glyph2D>[] layers;
+	final DoubleBufferLayer<? extends Glyph2D>[] layers;
 
 	/**Point used in many navigation operations.*/
 	private final Point2D tempPoint = new Point2D.Double();
-
 	
 	public Canvas(CanvasDef def, List<Layer> layers) {
 		String colorKey = def.getSpecializer().getMap().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name()).toString();
 		Color c = stencil.types.color.ColorCache.get(colorKey);
 		this.setBackground(c);
 		
-		this.layers = new DisplayLayer[layers.size()];
+		//Copy display layers out of the layer objects
+		this.layers = new DoubleBufferLayer[layers.size()];
 		for (int i=0;i< layers.size();i++) {
-			this.layers[i] = (DisplayLayer) layers.get(i).getDisplayLayer();
+			this.layers[i] = (DoubleBufferLayer) layers.get(i).getDisplayLayer();
 		}
-		painter = new Painter(this.layers, this);
-		painterThread = new Thread(painter);
-		painterThread.start();
-
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
-		
-		for (DisplayLayer l: this.layers) {
-			l.addLayerUpdateListener(this);
-		}
 	}
 	
-	@SuppressWarnings("deprecation")
-	public void dispose() {
-		painter.signalStop();
-		try {painterThread.join(10000);} //Wait for a while
-		catch (Exception e) {painterThread.stop();}	//Unsafe stop if it didn't stop yet
+	public synchronized void paintComponent(Graphics g) {
+		g.drawImage(buffer, 0, 0, null);
 	}
-		
-	public void paintComponent(Graphics g) {g.drawImage(buffer, 0, 0, null);}
 	
-	public void setBackBuffer(BufferedImage i) {this.buffer = i;}
+	public synchronized void setBackBuffer(BufferedImage i) {
+		this.buffer = i;
+	}
 	
 	public DisplayGuide getGuide(Selector sel) {return guides.get(sel);}
 	public void addGuide(Selector sel, Guide2D guide) {guides.put(sel, guide);}
 	public boolean hasGuide(Selector sel) {return guides.containsKey(sel);}
 	public Collection<Guide2D> getGuides() {return guides.values();}
-
 	
 	/**What are the bounds of everything currently on this canvas 
 	 * (not just visible or in window).
@@ -117,32 +100,16 @@ public final class Canvas extends DisplayCanvas implements LayerUpdateListener {
 	 * @return
 	 */
 	public Rectangle getContentBounds() {
-		Rectangle2D bounds =contentBounds;
-		Rectangle updateBounds = layerUpdates.clear();
-
-		if (contentBounds == null 
-			|| (updateBounds != null  && !contentBounds.contains(updateBounds))) 
-		{
-			for (DisplayLayer<? extends Glyph2D> t: layers) {
-				for (Glyph2D g: t) {
-					if (bounds == null) {
-						bounds = (Rectangle2D) g.getBoundsReference().clone();
-					} else {
-						bounds.add(g.getBoundsReference());
-					}
-				}
-			}
-			
-			for (Guide2D g: guides.values()) {
-				if (bounds == null) {
-					bounds =(Rectangle2D) g.getBoundsReference().clone();
-				}else {
-					bounds.add(g.getBoundsReference());
-				}
-			}
-		}			
+		final Rectangle2D bounds = new Rectangle(layers[0].getView().getBoundsReference());
+		for (DisplayLayer<? extends Glyph2D> l: layers) {
+			bounds.add(l.getView().getBoundsReference());
+		}
 		
-		if (bounds == null) {return new Rectangle(0,0,0,0);}
+		for (Guide2D g: guides.values()) {
+			bounds.add(g.getBoundsReference());
+		}
+		
+		if (bounds.isEmpty()) {return new Rectangle(0,0,0,0);}
 		else {return bounds.getBounds();}
 	}
 	
@@ -280,6 +247,4 @@ public final class Canvas extends DisplayCanvas implements LayerUpdateListener {
 	 */
 	public AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
 	public AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
-
-	public void layerUpdated(Rectangle update) {layerUpdates.update(update);}
 }

@@ -5,19 +5,17 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
-import junit.framework.TestCase;
 import stencil.module.MethodInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
 import stencil.parser.ParserConstants;
+import stencil.unittests.StencilTestCase;
 
-public class TestModuleCache extends TestCase {
-	public static final String PROPERTIES_FILE ="./TestData/Stencil.properties";
-
+public class TestModuleCache extends StencilTestCase {
 	public void setUp() {ModuleCache.clear();}
 	public static void initCache() throws Exception {
 		Properties props = new Properties();
-		props.loadFromXML(new FileInputStream(PROPERTIES_FILE));		
+		props.loadFromXML(new FileInputStream(DEFAULT_PROPERTIES_FILE));		
 		ModuleCache.registerModules(props);
 	}
 	
@@ -26,7 +24,7 @@ public class TestModuleCache extends TestCase {
 		
 		initCache();
 		
-		BufferedReader r = new BufferedReader(new FileReader(PROPERTIES_FILE));
+		BufferedReader r = new BufferedReader(new FileReader(DEFAULT_PROPERTIES_FILE));
 		int expected=0;
 		while (r.ready()) {
 			if (r.readLine().contains(".yml")) {expected++;}

@@ -35,7 +35,7 @@ public abstract class Environment implements Tuple {
 	 * 
 	 * The environment size should not change, but the capacity does.
 	 */
-	public abstract Environment extendCapacity(int capacity);
+	public abstract Environment ensureCapacity(int capacity);
 	
 	public static Environment getDefault(Tuple... tuples) {
 		return ArrayEnvironment.getDefault(tuples);

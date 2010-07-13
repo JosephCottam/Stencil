@@ -355,13 +355,17 @@ public abstract class ParseStencil {
 		Predicate_Compact predicate_compact = new Predicate_Compact(treeTokens);
 		predicate_compact.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) predicate_compact.downup(p);
-
 		
 		//Since some transformations change chain lengths, this must be re-run.
 		p = (Program) envSize.downup(p);
 		
 		//Move all constant rules up to the defaults section so they are only evaluated once.
-		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens, modules);
+		ReplaceConstantOps constOps = new ReplaceConstantOps(treeTokens, modules);
+		constOps.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) constOps.transform(p);
+		
+		//Move all constant rules up to the defaults section so they are only evaluated once.
+		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens);
 		sharedLifter.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) sharedLifter.transform(p);
 

@@ -65,7 +65,7 @@ public final class TestRecord {
 		StringBuilder b = new StringBuilder();
 		b.append(getProfileCommand());
 
-		b.append("-png 200 " + getBaseTestPNG());
+		b.append("-png2 1000 -1 " + getBaseTestPNG());
 		return b.toString();			
 	}
 			

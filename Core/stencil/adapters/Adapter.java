@@ -31,6 +31,7 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import stencil.display.Glyph;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Layer;
@@ -70,10 +71,6 @@ public interface Adapter<T extends Glyph> {
 	/**Given a guide type, return the corresponding class.*/
 	public Class getGuideClass(String name);
 
-	
-	//TODO: Re-think adapter-based finalize.. why not just invoke this on the panel?  Is there a time that the adapter knows something the panel does not?
-	public void finalize(StencilPanel panel);
-	
 	/**Given a stencil program as a string, return a new panel ready to go...*/
 	public StencilPanel compile(String programSource)  throws Exception;
 	

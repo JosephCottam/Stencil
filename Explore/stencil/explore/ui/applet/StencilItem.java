@@ -44,7 +44,6 @@ public class StencilItem {
 		correctIndent();
 	}
 
-	//TODO: Write a real pretty-printer...
 	private void correctIndent() {
 		BufferedReader reader = new BufferedReader(new StringReader(stencil));
 		int indentSize = 0;

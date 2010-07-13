@@ -2,10 +2,10 @@ package stencil.unittests.tuple;
 
 import java.util.HashMap;
 
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.MutableTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.unittests.util.TestBasicTuple;

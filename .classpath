@@ -13,7 +13,7 @@
 	<classpathentry kind="lib" path="Library/rome-1.0.jar"/>
 	<classpathentry kind="lib" path="Library/stringtemplate-3.2.jar"/>
 	<classpathentry kind="lib" path="Library/twitter4j-2.0.8.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6.0 (MacOS X Default)"/>
 	<classpathentry kind="lib" path="Library/snakeyaml-1.5.jar"/>
 	<classpathentry kind="lib" path="Library/ant-contrib-1.0b3.jar"/>
 	<classpathentry kind="lib" path="Library/umdTreeMaps.jar"/>

@@ -44,7 +44,7 @@ import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.InvalidNameException;

@@ -5,9 +5,9 @@ import static java.lang.String.format;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 

@@ -30,9 +30,9 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.MapMergeTuple;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 

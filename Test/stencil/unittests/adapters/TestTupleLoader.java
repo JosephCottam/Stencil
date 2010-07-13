@@ -2,6 +2,7 @@ package stencil.unittests.adapters;
 
 import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
+import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
@@ -16,25 +17,31 @@ public class TestTupleLoader extends TestCase {
 	public static final String OVERLAY_SHORT = "./TestData/RegressionImages/Sourceforge/suppliments/project_troves_fragment.txt";
 	public static final String OVERLAY_FULL = "./TestData/RegressionImages/Sourceforge/project_troves.txt";
 
+	private Panel panel;
 
+	public void tearDown() {
+		if (panel != null) {panel.dispose();}
+	}
+	
 	public void testLoad() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 		
 		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
-		Panel panel = Adapter.INSTANCE.generate(program);
+		panel = Adapter.INSTANCE.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
 		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
-		assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").size());
+		((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
+		assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").getView().size());
 	}
 
 	public void testThread() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 
 		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
-		Panel panel = Adapter.INSTANCE.generate(program);
+		panel = Adapter.INSTANCE.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);
 		TupleLoader loader = new TupleLoader(panel, input);
@@ -49,6 +56,6 @@ public class TestTupleLoader extends TestCase {
 		assertTrue(loader.isStopped());
 
 		//Nothing should load because we don't load the other data.  The filter's never pass, so nothing ever loads.
-		assertEquals("Unexpected number of items loaded.", 0, panel.getLayer("Overlay").size());
+		assertEquals("Unexpected number of items loaded.", 0, panel.getLayer("Overlay").getView().size());
 	}
 }

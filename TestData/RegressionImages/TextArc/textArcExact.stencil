@@ -40,7 +40,7 @@ from Lines
    ID: line
    TEXT: text
    (X,Y):* Layout(line) 
-   FONT_COLOR: @Color{Gray70}
+   COLOR: @Color{Gray70}
 
 layer Center[TEXT]
 from Words
@@ -48,9 +48,9 @@ from Words
    TEXT: word
    (X,Y):* Centroid(word) -> Contract(X,Y) 
    REGISTRATION: "CENTER"
-   (FONT_COLOR, FONT_SIZE):* Freq(word) -> 
+   (COLOR, FONT):* Freq(word) -> 
         [color] HeatScale[hot: "Gray90", cold: "Gray30"](freq) ->
-   		Scale[min: 50, max:500](freq) -> (color[_], _)
+   		Scale[min: 50, max:500](freq) -> @Font{_} -> (color[_], _)
   
 operator Contract base Geo::Scale[by: .94]
 operator Outer base CircularLayout[start:0, size: 10, ratio: -.75]

@@ -15,14 +15,15 @@ canvas Main
     TEXT: MakeLabel(ID)
     (X,Y): MinRadius.query(50, X, Y, OUTERX, OUTERY)
     REGISTRATION: "CENTER"
-    FONT_SIZE: 4
+    FONT: @Font{4}
 
 layer Rose[SLICE]
 from Deaths
    local(month, year) : ParseDate(date)
    ID: Concatenate(type, ":", month)
    FILL_COLOR: ColorBy(type)
-   STROKE_COLOR: @Color{Gray70}
+   PEN: @Stroke{.5}
+   PEN_COLOR: @Color{Gray70}
    HEIGHT:* Scale[min:0, max:250](count)
    Z: Mult(-1, count)
    (X,Y): (0,0)

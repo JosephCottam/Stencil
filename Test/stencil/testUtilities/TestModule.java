@@ -9,8 +9,8 @@ import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.module.util.*;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.PrototypedTuple;
 import static stencil.module.util.OperatorData.*;
 
 import java.lang.reflect.*;

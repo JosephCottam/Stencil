@@ -1,5 +1,9 @@
-package stencil.tuple;
+package stencil.tuple.instances;
 
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
+import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class NumericSingleton extends Number implements Tuple {

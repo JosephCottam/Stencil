@@ -40,8 +40,6 @@ import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
 import stencil.explore.util.StencilRunner;
-import stencil.types.Converter;
-
 
 import stencil.WorkingDirectory;
 
@@ -111,7 +109,6 @@ public class Headless {
 		//Load new stream sources
 		String[] sourceRewrites = getSourceRewrites(args);
 
-		//TODO: Move to a source-rewrite file (instead of the command switch series)
 		Collection<StreamSource> sources = model.getSources();
 
 		for (int i=0; i< sourceRewrites.length; i= i+1) {
@@ -147,14 +144,13 @@ public class Headless {
 	
 				if (idx >=0) {
 					String format = Application.FORMATS[idx];
-					Class argClass = Application.ARG_CLASS.get(format);
+					int argCount = Application.ARG_CLASS.get(format);
 	
-					if (argClass == null) {
-						model.export(prefix + args[i+1], format, null);
-					} else {
-						Object arg = Converter.convert(args[i+1], argClass);
-						model.export(prefix + args[i+2], format,  arg);
+					Object[] arguments = new Object[argCount];
+					for (int arg=0; arg< argCount; arg++) {
+						arguments[arg] = args[i+arg+1];
 					}
+					model.export(prefix + args[i+argCount+1], format, arguments);
 				}
 			}
 		} catch (Exception e) {

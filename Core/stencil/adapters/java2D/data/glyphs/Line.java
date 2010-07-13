@@ -43,7 +43,7 @@ import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Registrations.Registration;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
@@ -141,6 +141,7 @@ public final class Line extends Stroked {
 		Line2D s = makeLine();
 		glyph = new SoftReference(s);		
 		super.updateBoundsRef(outlineStyle.createStrokedShape(s).getBounds2D());
+		fixGradient(new Point2D.Double(x1, y1), new Point2D.Double(x2,y2));
 	}
 
 	public String getImplantation() {return IMPLANTATION;} 

@@ -34,10 +34,10 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.parser.tree.View;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.EnumUtils;

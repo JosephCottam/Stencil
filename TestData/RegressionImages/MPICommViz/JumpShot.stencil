@@ -25,7 +25,7 @@ from ranks
 	TEXT: label
 	X: -10
 	Y: Layout(rank)
-	FONT_COLOR: @Color{GRAY70}
+	COLOR: @Color{GRAY70}
 	REGISTRATION: "RIGHT"
 from overheads
 	filter (start > margin)
@@ -35,7 +35,7 @@ from overheads
 	TEXT: start
 	X: Timescale(skewedStart)
 	Y: -10    
-	FONT_COLOR: @Color{GRAY70}
+	COLOR: @Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
 	() : Spacer.map(start)
@@ -47,7 +47,7 @@ from overheads
 	TEXT: end
 	X: Timescale(skewedEnd)
 	Y: -10    
-	FONT_COLOR: @Color{GRAY70}
+	COLOR: @Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
@@ -58,12 +58,12 @@ layer baseline[LINE]
 from overheads
 	ID: rank
 	X.2: Timescale(skewedStart) -> Max[range: ALL](_)
-	STROKE_COLOR: @Color{Gray90}
+	PEN_COLOR: @Color{Gray90}
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
 	ID: source
 	X.2: Timescale(skewedStart) -> Max[range: ALL](_) ->(_,_)
-	STROKE_COLOR: @Color{Gray90}
+	PEN_COLOR: @Color{Gray90}
 	(Y.1,Y.2): Layout(source) ->(_,_)
 
 
@@ -84,8 +84,8 @@ from overheads
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 	X.1: Timescale(skewedStart)
 	X.2: Timescale(skewedEnd)
-	STROKE_COLOR : ColorByOp(op)
-    STROKE_WEIGHT: WeightByOp(op)
+	PEN_COLOR : ColorByOp(op)
+    PEN: WeightByOp(op)
 
 
 layer coms[LINE]
@@ -95,7 +95,7 @@ from trans
 	Y.2: Layout(dest)
 	X.1: Timescale(skewedStart)
 	X.2: Timescale(skewedEnd)
-	STROKE_COLOR : ColorByOp(op)
+	PEN_COLOR : ColorByOp(op)
 	CAP2: "ARROW"
 
 operator ColorByOp(op) -> (C)
@@ -105,10 +105,10 @@ operator ColorByOp(op) -> (C)
 	ALL => C: @Color{BLACK, .5}
 
 operator WeightByOp(op) -> (W)
-	(op =~ "osend") => W : 1
- 	(op =~ "orecv") => W : 1
-	(op =~ "transmission") => W: .5
-	ALL => W: 2
+	(op =~ "osend") => W : @Stroke{1}
+ 	(op =~ "orecv") => W : @Stroke{1}
+	(op =~ "transmission") => W: @Stroke{5}
+	ALL => W: @Stroke{2}
    
 	
 operator Layout (rank)->(Y)

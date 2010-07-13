@@ -95,11 +95,13 @@ public class StrokeTuple implements Tuple {
 		if (name.equals(WIDTH)) {return value.equals(DEFAULT_WIDTH);}
 		if (name.equals(JOIN)) {return value.equals(DEFAULT_JOIN);}
 		if (name.equals(CAP)) {return value.equals(DEFAULT_CAP);}
-		if (name.equals(PATTERN)) {return value.equals(DEFAULT_PATTERN);}
+		if (name.equals(PATTERN)) {return value == null;}
 		if (name.equals(PHASE)) {return value.equals(DEFAULT_PHASE);}
 		if (name.equals(LIMIT)) {return value.equals(DEFAULT_LIMIT);}
 		return false;
 	}
 
 	public int size() {return FIELDS.length;}
+	public String toString() {return Tuples.toString("Stroke", this, 1);}
+
 }

@@ -85,7 +85,7 @@ public class Rule extends StencilTree {
 	 * @return
 	 */
 	public Tuple apply(Environment env) throws Exception {
-		Environment ruleEnv = env.extendCapacity(env.size() + getAction().getDepth());
+		Environment ruleEnv = env.ensureCapacity(env.size() + getAction().getDepth());
 
 		Tuple t = getAction().apply(ruleEnv);
 		if (t == null) {return t;}

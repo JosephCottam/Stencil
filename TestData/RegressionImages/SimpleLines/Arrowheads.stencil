@@ -24,7 +24,7 @@ from Degrees
   Y.1 : Add(90, Deg) -> Sine(_) -> Mult(_,-50)
   X.2 : Add(90, Deg) -> Cosine(_) -> Mult(_,50)
   Y.2 : Add(90, Deg) -> Sine(_) -> Mult(_,50)
-  STROKE_COLOR: @Color{GRAY70}
+  PEN_COLOR: @Color{GRAY70}
 
 
 layer SingleLines2[LINE]
@@ -33,7 +33,7 @@ from Degrees
 	(X.1, Y.1) : (125,0)
 	X.2 : Cosine(Deg) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Sine(Deg) -> Mult(_,50) 
-	STROKE_COLOR: @Color{RED}
+	PEN_COLOR: @Color{RED}
 	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
@@ -41,21 +41,20 @@ from Degrees
 	X.2 : Add(90, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(90, Deg) -> Sine(_) -> Mult(_,50) 
 	CAP2: "ARROW"
-	STROKE_COLOR: @Color{FireBrick}
-	CAP2: "ARROW"
+	PEN_COLOR: @Color{FireBrick}
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(180, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(180, Deg) -> Sine(_) -> Mult(_,50) 
-	STROKE_COLOR: @Color{CRIMSON}
+	PEN_COLOR: @Color{CRIMSON}
 	CAP2: "ARROW"
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
 	X.2 : Add(270, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 125)
 	Y.2 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
-	STROKE_COLOR: @Color{MAROON}
+	PEN_COLOR: @Color{MAROON}
 	CAP2: "ARROW"
 
 
@@ -67,24 +66,24 @@ from Degrees
 	(X.2, Y.2) : (250, 0)
 	X.1 : Cosine(Deg) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Sine(Deg) -> Mult(_,50) 
-	STROKE_COLOR: @Color{PURPLE}
+	PEN_COLOR: @Color{PURPLE}
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250, 0)
 	X.1 : Add(90, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(90, Deg) -> Sine(_) -> Mult(_,50) 
-	STROKE_COLOR: @Color{VIOLET}
+	PEN_COLOR: @Color{VIOLET}
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250,0)
 	X.1 : Add(180, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(180, Deg) -> Sine(_) -> Mult(_,50) 
-	STROKE_COLOR: @Color{PLUM}
+	PEN_COLOR: @Color{PLUM}
 from Degrees
 	ID  : IDS("")
 	(X.2, Y.2) : (250,0)
 	X.1 : Add(270, Deg) -> Cosine(_) -> Mult(_,50) -> Add(_, 250)
 	Y.1 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
-	STROKE_COLOR: @Color{MediumPurple}
+	PEN_COLOR: @Color{MediumPurple}
 
 operator IDS base Count

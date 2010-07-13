@@ -15,7 +15,7 @@ operators:
   - name: Plain
   - name: Size
   - name: SetFamily
-  - name: Fonts
+  - name: Font
     facets:
       - {name: argumentParser, function: true, target: query, type: PROJECT, prototype: !proto "Font font"}
       - {name: query, function: true, type: PROJECT, prototype: !proto "Font font"}

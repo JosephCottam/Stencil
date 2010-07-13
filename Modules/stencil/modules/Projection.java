@@ -58,7 +58,6 @@ public class Projection extends BasicModule {
 
 		private Color cold;
 		private Color hot;
-		private int stateID = Integer.MIN_VALUE;
 		
 		public HeatScale(OperatorData opData, Specializer spec) {
 			super(opData);
@@ -131,7 +130,6 @@ public class Projection extends BasicModule {
 		public String getName() {return NAME;}
 		public boolean getThrowExceptions() {return throwExceptions;}
 		public void setThrowExceptions(boolean v) {throwExceptions = v;}
-		public int stateID() {return stateID;}
 		
 		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot);} 
 	}
@@ -216,7 +214,7 @@ public class Projection extends BasicModule {
 		public String getName() {return "Count";}
 		public long map() {return count++;}
 		public long query() {return count;}		
-		public long stateID() {return count;}
+		public int stateID() {return (int) count % Integer.MAX_VALUE;}
 	}
 	
 	public Projection(ModuleData md) {super(md);}

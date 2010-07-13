@@ -30,6 +30,9 @@ package stencil.tuple;
 
 
 import java.util.*;
+
+import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 
 /**Utility methods for appending groups of tupless.*/

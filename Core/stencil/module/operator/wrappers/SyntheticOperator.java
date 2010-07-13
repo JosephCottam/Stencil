@@ -44,9 +44,9 @@ import stencil.parser.tree.OperatorFacet;
 import stencil.parser.tree.OperatorRule;
 import stencil.parser.tree.View;
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
  
 /**Operator defined through a stencil definition.
  * 

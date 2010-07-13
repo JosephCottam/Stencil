@@ -33,8 +33,8 @@ import org.python.core.*;
 
 import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
 
 import java.util.Arrays;

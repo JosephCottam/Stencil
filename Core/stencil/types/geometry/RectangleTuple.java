@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 
 import stencil.tuple.AbstractTuple;
 import stencil.tuple.TupleBoundsException;
+import stencil.tuple.Tuples;
 
 public final class RectangleTuple extends AbstractTuple {
 	private static final String[] FIELDS = new String[]{"X","Y","W","H"};
@@ -23,4 +24,5 @@ public final class RectangleTuple extends AbstractTuple {
 		throw new TupleBoundsException(idx, this);
 	}
 
+	public String toString() {return Tuples.toString("Rectangle", this, 0);}
 }

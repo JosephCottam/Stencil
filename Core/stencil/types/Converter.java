@@ -7,9 +7,9 @@ import java.util.Properties;
 
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.StencilString;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
+import stencil.tuple.instances.*;
 import stencil.util.ConversionException;
 import stencil.util.collections.PropertyUtils;
 import stencil.util.enums.ValueEnum;
@@ -48,11 +48,16 @@ public final class Converter {
 	 * @return
 	 */
 	public static Tuple toTuple(Object value) {
-		if (value == null) {return null;}
+		if (value == null) {return Tuples.EMPTY_TUPLE;}
 		if (value instanceof Tuple) {return (Tuple) value;}
 		
 		Class clazz = value.getClass();
-		if (clazz.isArray()) {return new ArrayTuple(value, true);}
+		if (clazz.isArray()) {
+			clazz = clazz.getComponentType();
+			if (clazz.equals(double.class)) {return new Doubles((double[]) value);}
+			if (clazz.equals(int.class)) {return new Ints((int[]) value);}			
+			return new ArrayTuple(value);
+		}
 		
 		if (WRAPPER_FOR.containsKey(clazz)) {
 			TypeWrapper w = WRAPPER_FOR.get(clazz);
@@ -61,11 +66,12 @@ public final class Converter {
 		
 		if (Number.class.isAssignableFrom(clazz)) {return new NumericSingleton((Number) value);}
 		
-		return new ArrayTuple(value);
+		return new Singleton(value);
 	}
 	
 	
 	public static String toString(Object value) {
+		if (value == null) {return null;}
 		if (value instanceof String) {return (String) value;}
 		if (value instanceof StencilString) {return ((StencilString) value).getString();} 
 		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
@@ -101,6 +107,7 @@ public final class Converter {
 	 */
 	public static final Object convert(Object value, Class target) throws ConversionException {
 		try {
+			if (value == null) {return null;}
 			if (value == null || target.equals(Object.class) || target.isInstance(value)) {return value;}
 			if (value instanceof Atom) {return convert(((Atom) value).getValue(), target);}
 						

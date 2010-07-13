@@ -48,9 +48,6 @@ public abstract class Examples extends TestCase {
 	public void testNodeLinkText() throws Throwable {new NodeLink(configs).testTXT();}
 	public void testNodeLinkImage() throws Throwable {new NodeLink(configs).testPNG();}
 
-	public void testPovertyText() throws Throwable {new Poverty(configs).testTXT();}
-	public void testPovertyImage() throws Throwable {new Poverty(configs).testPNG();}
-
 	public void testRegistrationText() throws Throwable {new Registration(configs).testTXT();}
 	public void testRegistrationImage() throws Throwable {new Registration(configs).testPNG();}
 	
@@ -72,8 +69,8 @@ public abstract class Examples extends TestCase {
 	public void testTweetCountText() throws Throwable {new TweetCount(configs).testTXT();}
 	public void testTweetCountImage() throws Throwable {new TweetCount(configs).testPNG();}
 	
-	public void testVSMText() throws Throwable {new VSM_FillGrid(configs).testTXT();}
-	public void testVSMImage() throws Throwable {new VSM_FillGrid(configs).testPNG();}
+	public void testFillGridText() throws Throwable {new VSM_FillGrid(configs).testTXT();}
+	public void testFillGridImage() throws Throwable {new VSM_FillGrid(configs).testPNG();}
 
 	public void testVSM2Text() throws Throwable {new VSM(configs).testTXT();}
 	public void testVSM2Image() throws Throwable {new VSM(configs).testPNG();}

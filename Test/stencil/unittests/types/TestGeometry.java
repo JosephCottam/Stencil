@@ -1,14 +1,14 @@
 package stencil.unittests.types;
 
-import junit.framework.TestCase;
 import java.awt.geom.*;
 
 import stencil.tuple.Tuple;
 import stencil.types.geometry.*;
 import stencil.types.Converter;
+import stencil.unittests.StencilTestCase;
 
 
-public class TestGeometry extends TestCase {
+public class TestGeometry extends StencilTestCase {
 	public void testPointTuple() {
 		for (int i=0; i<100; i++) {
 			Point2D v = new Point2D.Double(i*2,-i/2);

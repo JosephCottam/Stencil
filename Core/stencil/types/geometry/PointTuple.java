@@ -4,6 +4,7 @@ import java.awt.geom.Point2D;
 
 import stencil.tuple.AbstractTuple;
 import stencil.tuple.TupleBoundsException;
+import stencil.tuple.Tuples;
 
 public final class PointTuple extends AbstractTuple {
 	private static final String[] FIELDS = new String[]{"X","Y"};
@@ -20,4 +21,6 @@ public final class PointTuple extends AbstractTuple {
 		if (idx ==1) {return content.getY();}
 		throw new TupleBoundsException(idx, this);
 	}
+	
+	public String toString() {return Tuples.toString("Point", this, 0);}
 }

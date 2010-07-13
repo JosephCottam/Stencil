@@ -34,8 +34,8 @@ from MTTSource
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
 	(X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
 	SIZE: 13
-	STROKE_WEIGHT: 3
-	STROKE_COLOR: RelativeFails(fail, pass)
+	PEN: @Stroke{3}
+	PEN_COLOR: RelativeFails(fail, pass)
 	SLICE: fail
 	FIELD: pass
 	SLICE_COLOR: Palet("FAIL")
@@ -59,11 +59,11 @@ from MTTSource
 	ID: local[ID]
 	(X,Y): Others.find(local[ID]) -> (X,Y)
 	TEXT: suite_name
-	FONT_SIZE: 5
+	FONT: @Font{5}
 	ROTATION: -45
 	REGISTRATION: "CENTER"
 	FONT_STYLE: "BOLD"
-	FONT_COLOR: @Color{0,0,0,166}
+	COLOR: @Color{0,0,0,166}
 
 layer Labels[TEXT]
 from MTTSource
@@ -98,13 +98,13 @@ from MTTSource
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
 	Y.1 :-5
 	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
-	STROKE_COLOR : Palet("GRID")
+	PEN_COLOR : Palet("GRID")
 from MTTSource
 	ID : Concatenate(axis2A, axis2B) -> VALUE
 	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
 	X.1 : -5
 	X.2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
-	STROKE_COLOR: Palet("GRID") -> (C)
+	PEN_COLOR: Palet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
 	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[range: ALL](VALUE)

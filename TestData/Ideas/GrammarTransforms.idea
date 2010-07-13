@@ -1,10 +1,4 @@
-* Lift out constant settings to a defaults mechanism and set them in the layer prototype.  
-Then that rule doesn't need to be done at runtime.
-
 * Named value (e.g. runtime constants)
 	-> Some way to set values that can be referenced from rules
 	-> Set at stencil compile time
 	-> May be taken in as an argument to the stencil compiler
-	
-* Separate static and dynamic binding rules.
-	-> Static rule runs the first time, dynamic rule thereafter

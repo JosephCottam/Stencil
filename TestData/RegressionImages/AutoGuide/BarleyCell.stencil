@@ -11,21 +11,21 @@ import BrewerPalettes
 stream Barley(year, site, yield, variety)
 
 canvas Main
-  guide axis[axisLabel: "Variety"] from BarleySite Y
+  guide axis[axisLabel: "Variety", connect: "TRUE"] from BarleySite Y
   guide 
     axis[axisLabel: "Yield", 
-         sample: "LINEAR", seed.min: 10, seed.max: 100] 
+         sample: "LINEAR", seed.min: 10, seed.max: 100, connect: "TRUE"]
     from BarleySite X
   guide 
     sidebar[X: 75, Y: -60] 
-    from BarleySite STROKE_COLOR
+    from BarleySite PEN_COLOR
       example.FILL_COLOR: @Color{GRAY90}
 
 layer BarleySite
   from Barley
     filter(site =~ "University Farm") 
     ID: Concatenate(variety,year)
-    STROKE_COLOR: BrewerColors[palette: "PuRd"](year)
+    PEN_COLOR: BrewerColors[palette: "PuRd"](year)
     FILL_COLOR: @Color{CLEAR}
     X:* Scale[min: 10, max:100, inMin: 10, inMax: 100](yield)
     Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)

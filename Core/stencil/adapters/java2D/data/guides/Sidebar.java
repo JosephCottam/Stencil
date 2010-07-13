@@ -15,34 +15,30 @@ import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
-import stencil.interpreter.Interpreter;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Guide;
-import stencil.parser.tree.Rule;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
 import stencil.types.Converter;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.collections.ArrayUtil;
 
-public class Sidebar implements Guide2D {
+public class Sidebar extends Guide2D {
 	
 	public static final String IMPLANTATION_NAME = "SIDE_BAR";
 	public static final String LABEL_PROPERTY_TAG = "label";
 	public static final String EXAMPLE_PROPERTY_TAG = "example";
 	
-	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT_SIZE: 4, label.FONT_COLOR: \"BLACK\", example.SIZE: 4, spacing: .25, displayOn: \"" + SIMPLE_DEFAULT + "\"]";
+	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT: 4, label.FCOLOR: \"BLACK\", example.SIZE: 4, spacing: .25, displayOn: \"" + SIMPLE_DEFAULT + "\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
 		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
 	}
-
-	private List<Rule> formatter;
 	
 	private Text prototypeLabel = new Text(null, "prototype");
 	private Shape prototypeExample = new Shape(null, "prototype");
@@ -73,7 +69,7 @@ public class Sidebar implements Guide2D {
 	private final int value_idx;
 	
 	public Sidebar(Guide guideDef, int idx) {
-		this.formatter = guideDef.getRules();
+		super(guideDef);
 		Specializer specializer = guideDef.getSpecializer();
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
@@ -134,20 +130,16 @@ public class Sidebar implements Guide2D {
 	
 	private Collection<Glyph2D> createLabeledBox(Tuple contents, int idx) {
 		float indexOffset = (idx * exampleHeight) + (idx * vSpacing);  
-		Tuple result;
-
-		try {result = Interpreter.process(contents, formatter);}
-		catch (Exception e) {throw new RuntimeException("Error updating guide with descriptor pair: " + contents.toString(), e);}
 		
 		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
 		Object[] labelValues = new Object[]{hSpacing, indexOffset, contents.get(label_idx), "LEFT"};
 		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
-		label = label.update(Tuples.sift("label.", result));
+		label = label.update(Tuples.sift("label.", contents));
 		
 		String[] exampleFields = new String[]{"Y", displayOn, "REGISTRATION"};
 		Object[] exampleValues = new Object[]{indexOffset, contents.get(value_idx), "RIGHT"};
 		Shape example = prototypeExample.update(new PrototypedTuple(exampleFields, exampleValues));
-		example = example.update(Tuples.sift("example.", result));
+		example = example.update(Tuples.sift("example.", contents));
 		
 		return Arrays.asList(new Glyph2D[]{label, example});
 	}	

@@ -1,6 +1,0 @@
-Associate a tuple class with a particular java class in the converter.
-Association is independent of creation.  If an object of the associated class
-is referenced, it is wrapped in the tuple class.  Most tuple class will include
-'self' as the default value.
-
-Modules could introduce tuple classes with the constructor method...

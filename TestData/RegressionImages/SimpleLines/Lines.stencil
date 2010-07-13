@@ -17,8 +17,8 @@ from LineSource
 	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (X)
 	Y.1: -5
 	Y.2: 10
-	STROKE_COLOR: @Color{GRAY80}
-	STROKE_WEIGHT: 3
+	PEN_COLOR: @Color{GRAY80}
+	PEN: @Stroke{3}
 
 operator Spacing (ID) -> (X) 
 	ALL => X : Index(ID) -> Mult(VALUE, 5) -> (VALUE)

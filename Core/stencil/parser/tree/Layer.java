@@ -34,8 +34,8 @@ import stencil.display.DisplayLayer;
 import stencil.interpreter.TupleStore;
 import stencil.parser.ParserConstants;
 import stencil.parser.string.StencilParser;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.PrototypedTuple;
 
 public class Layer extends StencilTree implements TupleStore, ContextNode {
 	private List<Consumes> groups;

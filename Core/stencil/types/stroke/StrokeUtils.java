@@ -1,7 +1,6 @@
 package stencil.types.stroke;
 
 import java.awt.BasicStroke;
-import java.awt.Stroke;
 
 import stencil.module.operator.util.BasicProject;
 import stencil.module.util.BasicModule;
@@ -14,12 +13,12 @@ import stencil.types.stroke.StrokeTuple.Join;
 import static stencil.types.stroke.StrokeTuple.*;
 
 public final class StrokeUtils extends BasicModule {
-	public static final Stroke Width(BasicStroke s, float w) {return new BasicStroke(w, s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
-	public static final Stroke Join(BasicStroke s, Join join) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), join.v, s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
-	public static final Stroke Cap(BasicStroke s, Cap cap) {return new BasicStroke(s.getLineWidth(), cap.v, s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
-	public static final Stroke Phase(BasicStroke s, float phase) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), phase);}
-	public static final Stroke Limit(BasicStroke s, float limit) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), limit, s.getDashArray(), s.getDashPhase());}
-	public static final Stroke Pattern(BasicStroke s, Object... input) {
+	public static final java.awt.Stroke Width(BasicStroke s, float w) {return new BasicStroke(w, s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+	public static final java.awt.Stroke Join(BasicStroke s, Join join) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), join.v, s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+	public static final java.awt.Stroke Cap(BasicStroke s, Cap cap) {return new BasicStroke(s.getLineWidth(), cap.v, s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+	public static final java.awt.Stroke Phase(BasicStroke s, float phase) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), phase);}
+	public static final java.awt.Stroke Limit(BasicStroke s, float limit) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), limit, s.getDashArray(), s.getDashPhase());}
+	public static final java.awt.Stroke Pattern(BasicStroke s, Object... input) {
 		float[] pattern = Pattern.SOLD.mask;
 		
 		if (input.length ==1 && input[0] instanceof String) {
@@ -35,11 +34,12 @@ public final class StrokeUtils extends BasicModule {
 	/**The  format for strokes is "weight:pattern";
 	 * all other properties must be set with other methods.
 	 */
-	public static class Strokes extends BasicProject {
-		public Strokes(OperatorData opData) {super(opData);}
+	public static class Stroke extends BasicProject {
+		public Stroke(OperatorData opData) {super(opData);}
 		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
 		
-		public BasicStroke argumentParser(String arg) {
+		public BasicStroke argumentParser(String arg) {return parse(arg);}
+		public static BasicStroke parse(String arg) { 
 			String[] parts = arg.split(":");
 			float weight = Converter.toFloat(parts[0]);
 			float[] pattern = Pattern.SOLD.mask;

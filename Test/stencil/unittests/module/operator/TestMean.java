@@ -28,7 +28,6 @@
  */
 package stencil.unittests.module.operator;
 
-import junit.framework.TestCase;
 import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
@@ -37,10 +36,11 @@ import stencil.module.util.ModuleDataParser;
 import stencil.modules.Average;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
+import stencil.unittests.StencilTestCase;
 
-public class TestMean extends TestCase {
+public class TestMean extends StencilTestCase {
 	final Module average;
-
+	
 	public TestMean() throws Exception {
 		ModuleData MD = ModuleDataParser.load("./modules/stencil/modules/Average.yml");
 		average = new Average(MD);

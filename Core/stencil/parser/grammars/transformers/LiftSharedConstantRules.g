@@ -23,31 +23,18 @@ options {
 	import java.util.HashSet;
 	import java.util.ArrayList;
 
-  import stencil.parser.tree.util.*;
-  import stencil.tuple.prototype.TuplePrototypes;		
-  import stencil.parser.tree.util.Environment;
+  import stencil.tuple.prototype.TuplePrototypes;   
   import stencil.tuple.Tuple;
   import stencil.tuple.Tuples;
   import stencil.interpreter.Interpreter;
   import stencil.parser.tree.*;
-  import stencil.parser.ParserConstants;	
-  import stencil.module.*;
-  import stencil.module.util.*;
+  import stencil.parser.ParserConstants;  
 }
 
-@members {
-	protected ModuleCache modules;
-
-	public LiftSharedConstantRules(TreeNodeStream input, ModuleCache modules) {
-		super(input, new RecognizerSharedState());
-		assert modules != null : "ModuleCache must not be null.";
-		this.modules = modules;
-	}
-	
+@members {	
 	public Object transform(Object t) throws Exception {
-	  t = (Program) downup(t, this, "evaluateConstantRules");
 		t = (Program) downup(t, this, "liftShared");
-		downup(t, this, "updateLayers");
+		t = (Program) downup(t, this, "updateLayers");
 		return t;
 	}	
 
@@ -99,40 +86,14 @@ options {
    		return false;
    	}
 	
-	  //Is the give rule a constant rule?
-	  //Constant rules have no tuple refs and include only functions
-    private boolean isConstant(Tree rule) {
-        int children = rule.getChildCount();
-        for (int i=0; i<children; i++) {
-          Tree child = rule.getChild(i);
-          if (child instanceof TupleRef) {
-            return !runtimeRef((TupleRef) child);
-          }
-            if (child instanceof Function &&
-              !isFunction((Function) child)) {return false;}
-          if (!isConstant(child)) {return false;}
-        }
-        return true;
-    }
-
-    //A runtime ref is any reference that looks at runtime specific values
-    private boolean runtimeRef(TupleRef ref) {
-      int idx = ref.getValue();
-      return idx < Environment.DEFAULT_SIZE;
-    }
-
-    //Is the passed Function using a facet that is a mathematical function?
-    private boolean isFunction(Function f) {
-    	MultiPartName name= new MultiPartName(f.getName());
-      try{
-    		Module m = modules.findModuleForOperator(name.prefixedName());
-    		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
-    		FacetData fd=od.getFacet(name.getFacet());
-    		return fd.isFunction();
-   		} catch (Exception e) {
-   			throw new RuntimeException("Error getting module information for operator " + name, e);
-		}
-	
+	  /**Is the give rule a constant rule?
+	    Constant rules have pack as the only component in their call target and
+	    do not contain any tuple refs.
+	  **/
+    private boolean isConstant(Rule rule) {
+      StencilTree target = rule.getAction().getStart();
+      return target instanceof Pack
+             && target.getFirstChildWithType(TUPLE_REF) == null;
     }
     
 	private StencilTree augmentDefaults(Tree d, Tree c) {
@@ -186,27 +147,15 @@ options {
 	}
 	
 	private void updateLayer(Layer layerDef) {
-    	layerDef.getDisplayLayer().updatePrototype(layerDef);
+     try {
+	      Tuple defaults = Interpreter.processSequential(Tuples.EMPTY_TUPLE, layerDef.getDefaults());	
+    	  layerDef.getDisplayLayer().updatePrototype(defaults);
+     } catch (Exception e) {
+        throw new RuntimeException("Error updating layer defaults.", e);
+     }
 	}
-	
-	private CommonTree evaluate(Rule r) {
-	   Tuple result;
-	   try {result = Interpreter.process(Tuples.EMPTY_TUPLE, r);}
-	   catch (Exception e) {
-	      throw new RuntimeException("Error partially evaluating rule: " + r.toStringTree(), e);
-	   }
-	
-	   Pack p = (Pack) adaptor.create(PACK, "PACK");
-	   for (int i=0; i< result.size(); i++) {
-	      adaptor.addChild(p, Atom.Literal.instance(result.get(i)));
-	   }
-	   return p;
-	}
-}
 
-evaluateConstantRules
-  : ^(r=RULE result=. cc=. bind=.) {isConstant($r)}? 
-        -> ^(RULE $result ^(CALL_CHAIN {evaluate((Rule) $r)} ^(NUMBER["0"])) $bind); 
+}
 
 liftShared: ^(LAYER impl=. defaults=. consumes=.)
 	-> ^(LAYER $impl {augmentDefaults(defaults, consumes)} {reduceRules(consumes)});

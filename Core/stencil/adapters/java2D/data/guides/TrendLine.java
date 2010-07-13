@@ -12,17 +12,17 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.Line;
 import stencil.parser.tree.Guide;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 import static stencil.adapters.java2D.data.guides.GuideUtils.SAMPLE_KEY;
 
-public class TrendLine  implements Guide2D {
+public class TrendLine  extends Guide2D {
 	public static final String IMPLANTATION_NAME = "TREND_LINE";
 	private static String[] UPDATE_NAMES = new String[]{"X.1", "Y.1", "X.2", "Y.2"};
 	private static enum SAMPLE_TYPE {LINEAR, SIMPLE}
@@ -38,6 +38,7 @@ public class TrendLine  implements Guide2D {
 	protected final SAMPLE_TYPE sampleType;
 	
 	public TrendLine(Guide guideDef) {
+		super(guideDef);
 		TuplePrototype p = guideDef.getPrototype();		//Get input prototype
 		x_idx = ArrayUtil.indexOf("X", TuplePrototypes.getNames(p));
 		y_idx = ArrayUtil.indexOf("Y", TuplePrototypes.getNames(p));

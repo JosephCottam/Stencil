@@ -1,0 +1,17 @@
+name: GradientUtils
+targetClass: stencil.types.gradient.GradientUtils
+description: Create gradients.
+
+defaults:
+  defaultSpecializer: !spec "[range: ALL, split:0]"
+  facets:
+    - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: guide, function: true, type: PROJECT, prototype: !proto "VALUE"}
+
+operators:
+  - name: Gradient
+    facets:
+      - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      

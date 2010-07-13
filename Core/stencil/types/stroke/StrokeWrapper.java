@@ -17,10 +17,16 @@ public class StrokeWrapper implements TypeWrapper {
 	
 	public Class[] appliesTo() {return ACCEPTS;}
 	public Object convert(Object v, Class c) {
-		if (v instanceof BasicStroke && c.isAssignableFrom(StrokeTuple.class)) {
-			return new StrokeTuple((BasicStroke) v);
-		} else if (v instanceof StrokeTuple && c.isAssignableFrom(BasicStroke.class)) {
+		if (v instanceof StrokeTuple && Stroke.class.isAssignableFrom(c)) {
 			return ((StrokeTuple) v).getStroke();
+		} else if (v instanceof BasicStroke && c.equals(String.class)) {
+			return new StrokeTuple((BasicStroke) v).toString(); 
+		} else if (v instanceof StrokeTuple && c.equals(String.class)) {
+			return v.toString();
+		} else if (v instanceof BasicStroke && c.isAssignableFrom(StrokeTuple.class)) {
+			return new StrokeTuple((BasicStroke) v);
+		} else if (Stroke.class.isAssignableFrom(c) || c.equals(StrokeTuple.class)) {
+			return StrokeUtils.Stroke.parse(v.toString());
 		}
 		throw new ConversionException(v,c);
 	}

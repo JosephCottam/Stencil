@@ -66,14 +66,14 @@ public class StateQuery extends StencilTree {
 		
 		for (int i=0; i< nowIDs.length; i++) {
 			AstInvokeable inv = (AstInvokeable) getChild(i);
-			nowIDs[i] = Converter.toInteger(inv.invoke(EMPTY_ARGS).get(0));
+			nowIDs[i] = Converter.toInteger(inv.directInvoke(EMPTY_ARGS));
 		}		
-		
+				
 		boolean matches = true;	//Do the two ID arrays match?
 		for (int i=0; matches && i < nowIDs.length; i++) {
 			matches = matches && (nowIDs[i] == cachedIDs[i]);
 		}
-		
+				
 		cachedIDs = nowIDs;
 		return !matches;
 	}

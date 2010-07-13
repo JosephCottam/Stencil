@@ -28,8 +28,8 @@
  */
 package stencil.types.color;
 
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.types.Converter;
 import stencil.module.operator.util.BasicProject;
 import stencil.module.util.BasicModule;

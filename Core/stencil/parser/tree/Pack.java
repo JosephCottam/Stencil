@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.ArrayTuple;
 
 /**End-of-call-chain entity that create a new tuple in its
  * apply with all of the proper names aligned.

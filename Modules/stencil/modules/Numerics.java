@@ -28,15 +28,16 @@
  */
 package stencil.modules;
 
+import java.util.List;
+
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.BasicProject;
 import stencil.module.operator.util.Range;
 import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.util.*;
+import stencil.util.collections.ConstantList;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
-import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
 
@@ -60,14 +61,19 @@ public class Numerics extends BasicModule {
  			return sum;
  		}
  		
-		public Tuple map(double... args) {
+		public double map(double... args) {
 			sum += sum(args);
-			return new ArrayTuple(sum);
+			stateID++;
+			return sum;
 		}
 
 		/**Arguments are ignored.*/
-		public Tuple query(Object... args) {
-			return new ArrayTuple(sum);
+		public double query(Object... args) {
+			return sum;
+		}
+		
+		public List<Double> range(Double[][] args) {
+			return new ConstantList(sum, args.length);
 		}
 
 
@@ -92,15 +98,24 @@ public class Numerics extends BasicModule {
 			}
 			return min;
  		}
- 		public Tuple map(double... values) {
- 			min = Math.min(min, min(values));
-			return new ArrayTuple(min);
+ 		public double map(double... values) {
+ 			double newMin = Math.min(min, min(values));
+ 			if (newMin != min) {
+ 				stateID++;
+ 				min = newMin;
+ 			}
+			return min;
 		}
 
 		/**Arguments are ignored.*/
-		public Tuple query(Object... args) {
-			return new ArrayTuple(min);
+		public double query(Object... args) {
+			return min;
 		}
+		
+		public List<Double> range(Double[][] args) {
+			return new ConstantList(min, args.length);
+		}
+
 
 		public String getName() {return NAME;}
 		public FullMin duplicate() {return new FullMin(operatorData);}
@@ -123,16 +138,24 @@ public class Numerics extends BasicModule {
 			return max;
  		}
  		
-		public Tuple map(double... values) {
- 			max = Math.max(max, max(values));
- 			return new ArrayTuple(max);
+		public double map(double... values) {
+ 			double newMax = Math.max(max, max(values));
+ 			if (newMax != max) {
+ 				max = newMax;
+ 				stateID++;
+ 			}
+ 			return max;
 		}
 		
 		/**Arguments are ignored.*/
-		public Tuple query(Object... args) {
-			return new ArrayTuple(max);
+		public double query(Object... args) {
+			return max;
 		}
 
+		public List<Double> sum(Double[][] args) {
+			return new ConstantList(max, args.length);
+		}
+		
 		public String getName() {return NAME;}
 		public FullMax duplicate() {return new FullMax(operatorData);}
 

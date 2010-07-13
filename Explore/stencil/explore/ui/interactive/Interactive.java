@@ -157,9 +157,10 @@ public class Interactive implements Runnable {
 				messages.addError("Error stopping Stencil program (may not be 100% stopped).");
 				messages.addError(e.getMessage());
 			}
+		} else {
+			reporter.clear();
 		}
-
-		reporter.clear();
+		
 		try {model.compile();}
 		catch (Exception e) {
 			stencilContentPanel.removeAll();

@@ -2,20 +2,48 @@ package stencil.types.gradient;
 
 import java.awt.Color;
 import java.awt.GradientPaint;
+import java.awt.Paint;
+import java.awt.PaintContext;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ColorModel;
+
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.util.collections.ArrayUtil;
 
-public class GradientTuple implements Tuple {
-	private static String SELF = "self";
-	private static final String[] FIELDS = new String[]{SELF};
-	private static final Class[] TYPES = new Class[]{GradientTuple.class};
-	private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+/**Implements paint only to allow it to be used in the Stroked implementation
+ * that expects a paint based on PEN_COLOR.  THIS SHOULD BE FIXED SOMEHOW....ANY
+ * PAINT MEHTODS WILL THROW AN EXCEPTION!!!!
+ * 
+ * @author jcottam
+ *
+ */
+public class GradientTuple implements Tuple, Paint {
+	private static String SELF_LABEL = "self";
+	private static String START_LABEL = "start";
+	private static String END_LABEL = "end";
+	private static String LENGTH_LABEL = "length";
+	private static String ABSOLUTE_LABEL = "absolute";
+	private static String CYCLIC_LABEL = "cyclic";
 	
+	private static final String[] FIELDS = new String[]{SELF_LABEL, START_LABEL, END_LABEL, LENGTH_LABEL, ABSOLUTE_LABEL, CYCLIC_LABEL};
+	private static final Class[] TYPES = new Class[]{GradientTuple.class, Color.class, Color.class, double.class, boolean.class, boolean.class};
+	private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+	public static final int SELF = ArrayUtil.indexOf(SELF_LABEL, FIELDS);
+	public static final int START = ArrayUtil.indexOf(START_LABEL, FIELDS);
+	public static final int END = ArrayUtil.indexOf(END_LABEL, FIELDS);
+	public static final int LENGTH = ArrayUtil.indexOf(LENGTH_LABEL, FIELDS);
+	public static final int ABSOLUTE = ArrayUtil.indexOf(ABSOLUTE_LABEL, FIELDS);
+	public static final int CYCLIC = ArrayUtil.indexOf(CYCLIC_LABEL, FIELDS);
+
 	
 	private final Color one;
 	private final Color two;
@@ -35,7 +63,12 @@ public class GradientTuple implements Tuple {
 	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 
 	public Object get(int idx) throws TupleBoundsException {
-		if (idx==0) {return this;}
+		if (idx==SELF) {return this;}
+		if (idx==START) {return one;}
+		if (idx==END) {return two;}
+		if (idx==LENGTH) {return length;}
+		if (idx==ABSOLUTE) {return absolute;}
+		if (idx==CYCLIC) {return cyclic;}
 		throw new TupleBoundsException(idx,size());
 	}
 
@@ -63,4 +96,10 @@ public class GradientTuple implements Tuple {
 		return new GradientPaint(start, one, end, two, cyclic);
 	}
 
+
+	public int getTransparency() {throw new Error("Implements paint because of a Hack only!!!");}
+	public PaintContext createContext(ColorModel cm, Rectangle deviceBounds,
+			Rectangle2D userBounds, AffineTransform xform, RenderingHints hints) {
+		throw new Error("Implements paint because of a Hack only!!!");
+	}
 }

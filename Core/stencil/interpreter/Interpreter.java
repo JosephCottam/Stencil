@@ -1,48 +1,47 @@
 package stencil.interpreter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.ref.WeakReference;
+import java.util.*;
 import java.util.List;
+
+
 import static java.lang.String.format;
 
+import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.MapMergeTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleAppender;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.MapMergeTuple;
 import stencil.types.Converter;
 
 public class Interpreter {
-	private final StencilPanel panel;
+	private final WeakReference<StencilPanel> panel;	//
 	private final Program program;
 	
-	private static boolean abortOnError = false;
+	public static boolean abortOnError = false;
 	
 	public Interpreter(StencilPanel panel) {
-		this.panel = panel;
+		this.panel = new WeakReference(panel);
 		this.program = panel.getProgram();
 	}
 	
-
-	public static List<Tuple> processAll(Iterable<Tuple> sources ,Rule... rules) throws Exception{return processAll(sources, Arrays.asList(rules));}
-	public static List<Tuple> processAll(Iterable<Tuple> sources ,Iterable<Rule> rules) throws Exception{
-		List<Tuple> results = new ArrayList();
-		for (Tuple source: sources) {
-			results.add(process(source, rules));
-		}
-		return results;
-	}
-	
-	public static Tuple process(Tuple streamTuple, Rule... rules) throws Exception {return process(streamTuple, Arrays.asList(rules));}
-	public static Tuple process(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
+	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws Exception {return processSequential(streamTuple, Arrays.asList(rule));}
+	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
 		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
+		return processSequential(env, rules);
+	}
+
+	public static Tuple processSequential(Environment env, Rule rule) throws Exception {return processSequential(env, Arrays.asList(rule));}
+	public static Tuple processSequential(Environment env, Iterable<Rule> rules) throws Exception {
 		return process(env, rules);
 	}
-	
+
+			
 	public static Tuple process(Environment env, Rule... rules) throws Exception {return process(env, Arrays.asList(rules));}	
 	public static Tuple process(Environment env, Iterable<Rule> rules) throws Exception {
 		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
@@ -78,7 +77,8 @@ public class Interpreter {
 		return fullResult;
 	}
 	
-	public static Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws Exception {
+	//Parallelize here???  Checks all groups in parallel...
+	public Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws Exception {
 		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
 		Tuple prefilter, local;
@@ -110,6 +110,7 @@ public class Interpreter {
 
 			}
 			
+			catch (IDException IDex) {throw IDex;}
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try {
@@ -174,11 +175,11 @@ public class Interpreter {
 		if (!layer.canStore(result)) {return false;}
 		try {
 			String id = Converter.toString(result.get(ParserConstants.GLYPH_ID_FIELD));
-			stencil.adapters.Glyph glyph = layer.getDisplayLayer().find(id);
+			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			
 			for (DynamicRule rule: group.getDynamicRules()) {
-				panel.addDynamic(glyph, rule, source.getValues());
+				panel.get().addDynamic(glyph, rule, source.getValues());
 			}
 			return true;
 		} catch (Exception e) {
@@ -210,5 +211,5 @@ public class Interpreter {
 		return true;
 	}
 
-	public StencilPanel getPanel() {return panel;}
+	public StencilPanel getPanel() {return panel.get();}
 }

@@ -15,7 +15,7 @@ operators:
   - name: Phase
   - name: Limit
   - name: Pattern
-  - name: Strokes
+  - name: Stroke
     facets:
       - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
       - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}

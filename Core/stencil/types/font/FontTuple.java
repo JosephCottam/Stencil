@@ -55,7 +55,7 @@ public final class FontTuple implements Tuple {
 	}
 
 	public Object get(final int idx) throws TupleBoundsException {
-		if (idx == SELF_IDX) {return font;}
+		if (idx == SELF_IDX) {return this;}
 		if (idx == FONT_IDX) {return font.getFamily();}
 		if (idx == SIZE_IDX) {return font.getSize2D();}
 		if (idx == BOLD_IDX) {return font.isBold();}
@@ -75,4 +75,6 @@ public final class FontTuple implements Tuple {
 	}
 
 	public int size() {return FIELDS.length;}
+	public String toString() {return Tuples.toString("Font", this, 1);}
+
 }

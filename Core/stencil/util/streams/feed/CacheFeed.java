@@ -66,7 +66,7 @@ public abstract class CacheFeed<T> implements TupleStream {
 	public boolean hasNext() {return feed != null;}
 	public boolean ready() {
 		if (entryCache.isEmpty() && updater == null) {
-			updater = new Thread() {public void run() {synchUpdateEntryCache(); updater = null;}};
+			updater = new Thread("CacheFeed: Updater") {public void run() {synchUpdateEntryCache(); updater = null;}};
 			updater.start();
 		}
 		return entryCache.isEmpty();

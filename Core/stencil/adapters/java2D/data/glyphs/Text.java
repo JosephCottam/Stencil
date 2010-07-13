@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 import static stencil.adapters.Adapter.REFERENCE_GRAPHICS;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;

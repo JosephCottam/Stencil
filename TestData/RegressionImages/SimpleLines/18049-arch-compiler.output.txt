@@ -36,5 +36,3 @@
  ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | intel      |  1193 |   43
  ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | mpicxx     |     6 |    0
  ompi-nightly-trunk : 1.3a1r18049 | i86pc    | SunOS   | 64      | sun           | trivial    |    24 |    0
-(38 rows)
-

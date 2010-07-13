@@ -16,7 +16,17 @@ operators:
   - name: Div
   - name: Divide
   - name: Max
+    facets:
+     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+     - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
+     - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
   - name: Min
+    facets:
+     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+     - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
+     - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}
   - name: Mod
   - name: Mult
   - name: Negate
@@ -31,5 +41,8 @@ operators:
     keys: range, split
     target: Add
     facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
+      - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+      - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
+      - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
+      

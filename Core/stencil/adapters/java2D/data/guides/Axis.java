@@ -15,16 +15,16 @@ import stencil.adapters.java2D.data.glyphs.*;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 
-public class Axis implements Guide2D {
+public class Axis extends Guide2D {
 	/**Fields used in creating marks.*/
 	private final String[] LABEL_FIELDS =  new String[]{"TEXT", "X","Y", "ROTATION"};
 	private final String[] LINE_FIELDS = new String[]{"X.1", "Y.1","X.2","Y.2"};
@@ -41,7 +41,7 @@ public class Axis implements Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT_SIZE: 4, label.FONT_COLOR: \"BLACK\", line.STROKE_WEIGHT: .4, line.STROKE_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, tickCount: 10, axisOffset: 0, connect: \"FALSE\"]";
+	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, tickCount: 10, axisOffset: 0, connect: \"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
@@ -91,7 +91,8 @@ public class Axis implements Guide2D {
 	protected Text axisLabel;
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
-	public Axis(Guide guideDef) {		
+	public Axis(Guide guideDef) {
+		super(guideDef);
 		axis = AXIS.valueOf(guideDef.getSelector().getAttribute());
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
@@ -123,7 +124,7 @@ public class Axis implements Guide2D {
 			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
 			int rotation = axis==AXIS.X ? 0 : 270;
 			registration = axis==AXIS.X ? "TOP" : "BOTTOM";
-			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT_SIZE", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
+			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
 			
 			axisLabel = axisLabel.update(update);
 		}		
@@ -162,7 +163,7 @@ public class Axis implements Guide2D {
 	
 	/**Create the major axial line for the axis.*/
 	private Glyph2D createLine(List<Tuple> elements) {
-		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeLine.get("STROKE_COLOR"))) {return null;}
+		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeLine.get("PEN_COLOR"))) {return null;}
 
 		Collections.sort(elements, sorter);
 		
@@ -210,7 +211,7 @@ public class Axis implements Guide2D {
 	
 	/**Make a tick-mark label.*/
 	private Glyph2D makeLabel(String text, double value, Tuple formatting) {
-		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeText.get("FONT_COLOR"))) {return null;}
+		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeText.get("COLOR"))) {return null;}
 
 		Object[] values = new Object[LABEL_FIELDS.length];
 
@@ -233,7 +234,7 @@ public class Axis implements Guide2D {
 	
 	/**Make an actual tick mark.*/
 	private Glyph2D makeTick(double offset, Tuple formatting) {
-		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeLine.get("STROKE_COLOR"))) {return null;}
+		if (stencil.types.color.ColorCache.isTransparent((java.awt.Color) prototypeLine.get("PEN_COLOR"))) {return null;}
 	
 		String[] fields = new String[]{"X.1", "Y.1","X.2","Y.2"};
 		Double[] values = new Double[fields.length];

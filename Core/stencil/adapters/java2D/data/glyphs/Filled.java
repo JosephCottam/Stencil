@@ -36,7 +36,7 @@ import java.awt.Shape;
 
 import stencil.adapters.general.Fills;
 import stencil.adapters.general.Fills.FillProperty;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -45,16 +45,16 @@ import stencil.types.color.ColorCache;
 public abstract class Filled extends Stroked {
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
 	
-	protected static final Attribute<Paint> STROKE_COLOR = new Attribute<Paint>("STROKE_COLOR", new java.awt.Color(0,0,0, ColorCache.CLEAR_INT));
+	protected static final Attribute<Paint> PEN_COLOR = new Attribute<Paint>("PEN_COLOR", new java.awt.Color(0,0,0, ColorCache.CLEAR_INT));
 	static {
 		for (FillProperty p: FillProperty.values()) {ATTRIBUTES.add(new Attribute(p));}
-		ATTRIBUTES.add(STROKE_COLOR); //Override the standard stroke default value
+		ATTRIBUTES.add(PEN_COLOR); //Override the standard stroke default value
 	}
 	
 	protected final Paint fill;
 	
 	protected Filled(DisplayLayer layer, String id) {
-		super(layer, id, Stroked.PEN.defaultValue, STROKE_COLOR.defaultValue);
+		super(layer, id, Stroked.PEN.defaultValue, PEN_COLOR.defaultValue);
 		fill = Fills.getDefault();
 	}
 	

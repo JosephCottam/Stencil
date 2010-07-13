@@ -37,7 +37,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
-import stencil.adapters.Glyph;
 import stencil.interpreter.Interpreter;
 import stencil.parser.tree.Canvas;
 import stencil.parser.tree.DynamicRule;
@@ -54,6 +53,9 @@ import stencil.tuple.Tuple;
  * C -- The canvas type
  * */
 public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C extends Component> extends javax.swing.JPanel {
+	/**Instance lock.  Used to prevent pre-paint/analysis concurrency issues.*/
+	public final Object visLock = new Object(); 
+	
 	/**Set flag to true when default interaction states are desired.
 	 * Set to false when all interaction should be handled in stencil rules.
 	 * Default state is true.
@@ -70,7 +72,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	
 	protected Program program;
 	protected C canvas;
-	private Interpreter interpreter;
+	protected Interpreter interpreter;
 	
 	
 	public static int ABSTRACT_SCREEN_RESOLUTION = 72;
@@ -90,12 +92,6 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		this.add(canvas, BorderLayout.CENTER);
 	}
 	
-	/**Clean up any system resources/threads/etc. required
-	 * by this panel.  The default implementation does nothing
-	 * as some adapters may have nothing to dispose of.
-	 */
-	public void dispose() {/*By default, no action is taken*/}
-
 	/**Returns an unmodifiable copy of the current layers mapping.*/
 	public List<String> getLayers() {
 		String[] layers = new String[program.getLayers().size()];
@@ -107,11 +103,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	}
 
 	/**Get a named layer from the layers map.  Returns null if no layer was found.
-	 * TODO: Is this cast really the right way to go?  Can we do a runtime-type check?  
-	 * Can we use the generics to do it at compile time (ensure that the Layer generic arguments equals the Parser argument)?
-	 *    --> Would require us to parameterize the TreeAdapter with the instance type.  Then we would need to instantiate
-	 *        the TreeAdapter, adapter and panel through the same process.  Maybe the adapter could provide the tree adapter...is that wierd?
-	 * */
+	 **/
 	public L getLayer(String name) {return (L) program.getLayer(name).getDisplayLayer();}
 
 	/**Returns an unmodifiable set of the underlying rules.*/
@@ -122,6 +114,9 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 
 	/**Get a tuple representation of the view.*/
 	public abstract ViewTuple getView();
+	
+	/**Run clean-up actions.*/
+	public abstract void dispose();	
 	
 	/**Exports the panel to a the file specified.  Export type is determined
 	 * by the type parameter; panel instance determines the appropriate
@@ -170,7 +165,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		for (Layer l: program.getLayers()) {
 			TreeSet<Tuple> s  =new TreeSet<Tuple>(comp);
 			DisplayLayer<? extends Tuple> layer = l.getDisplayLayer();
-			for (Tuple t: layer) {s.add(t);}
+			for (Tuple t: layer.getView()) {s.add(t);}
 			for (Tuple t: s) {
 				writer.write(t.toString().replace("\n", "\\n"));
 				writer.write("\n");
@@ -184,19 +179,19 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 			String s1 = o1.get("ID").toString();
 			String s2 = o2.get("ID").toString();
 			return s1.compareTo(s2);
-		}
-		
+		}	
 	}
-	
-	/**Return a list of the valid 'type' arguments to the Export command.
-	 * May return a zero-length array, but should never return null.*/
-	public String[] getExports() {return new String[0];}
-	
 	
 	//------------------------------------------------------------------------------------------
 	//Interpreter Operators
-	public void processTuple(SourcedTuple source) throws Exception {interpreter.processTuple(source);}
+	/**Process a tuple for this visualization.  This is the preferred means
+	 * to add values to a visualization. 
+	 */
+	public final void processTuple(SourcedTuple source) throws Exception {
+		synchronized(visLock) {interpreter.processTuple(source);}
+	}
 	
+	/**Actions that must be taken before the run will be valid.*/
 	public void preRun() {
 		//TODO: Modify when view and canvas can have multiple instances
 		View.global = getView();

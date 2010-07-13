@@ -5,9 +5,9 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.BasicProject;
 import stencil.module.util.*;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 
 
@@ -100,7 +100,7 @@ public class TupleUtil extends BasicModule {
 		public ExtendTuple(OperatorData opData) {super(opData);}
 		
 		public Tuple query(Tuple t, Object... more) {
-			if (t == null) {t = new ArrayTuple();}
+			if (t == null) {t = Tuples.EMPTY_TUPLE;}
 			Object[] values = Tuples.toArray(t);
 			Object[] target = new Object[values.length + more.length];
 			

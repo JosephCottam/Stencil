@@ -14,15 +14,14 @@ import stencil.adapters.java2D.data.glyphs.*;
 import stencil.parser.tree.Guide;
 import stencil.tuple.Tuple;
 
-public class PointLabel implements Guide2D {
+public class PointLabel extends Guide2D {
 	protected Glyph2D prototypeText = new Text(null, "prototype");
 	
 	protected final Collection<Glyph2D> marks = new ArrayList();
 
 	protected Rectangle2D bounds = new Rectangle2D.Double();
 	
-	public PointLabel(Guide guideDef) {
-	}	
+	public PointLabel(Guide guideDef) {super(guideDef);}
 		
 	public synchronized void setElements(List<Tuple> elements) {
 		marks.clear();

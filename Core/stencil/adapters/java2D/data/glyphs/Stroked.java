@@ -32,20 +32,28 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Paint;
+import java.awt.PaintContext;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.image.ColorModel;
 
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.types.color.ColorCache;
+import stencil.types.gradient.GradientTuple;
 import stencil.types.stroke.StrokeTuple;
 
 public abstract class Stroked extends Basic {
 	protected static final AttributeList ATTRIBUTES;
 	protected static final Attribute<BasicStroke> PEN = new Attribute("PEN", StrokeTuple.DEFAULT_STROKE);
-	protected static final Attribute<Color> PEN_COLOR = new Attribute("PEN_COLOR", Color.BLACK);
+	protected static final Attribute<Color> PEN_COLOR = new Attribute("PEN_COLOR", Color.BLACK, Paint.class);
 	static {
 		ATTRIBUTES = new AttributeList(Basic.ATTRIBUTES);
 		ATTRIBUTES.add(PEN);
@@ -54,12 +62,30 @@ public abstract class Stroked extends Basic {
 
 	protected final Stroke outlineStyle;
 	protected final Paint outlinePaint;
+	protected final GradientTuple gradientSource;
+	
+	/**Hack job that allows a gradient to be
+	 * generated when the bounds of the object are know...
+	 */
+	protected static final class MutablePaintWrapper implements Paint {
+		private Paint backing;
+		public MutablePaintWrapper(Paint backing) {this.backing= backing;}
+		public void setBacking(Paint backing) {this.backing = backing;}
+		public PaintContext createContext(ColorModel cm,
+				Rectangle deviceBounds, Rectangle2D userBounds,
+				AffineTransform xform, RenderingHints hints) {
+			return backing.createContext(cm, deviceBounds, userBounds, xform, hints);
+		}
+
+		public int getTransparency() {return backing.getTransparency();}		
+	}
 	
 	protected Stroked(String id, Stroked source) {
 		super(id, source);
 		
 		this.outlinePaint = source.outlinePaint;
 		this.outlineStyle = source.outlineStyle;
+		this.gradientSource = null;
 	}
 	
 	
@@ -68,12 +94,27 @@ public abstract class Stroked extends Basic {
 		super(layer, id);
 		this.outlineStyle = outlineStyle;
 		this.outlinePaint = outlinePaint;
+		this.gradientSource = null;
 	}
 	
 	protected Stroked(Stroked source, Tuple option, AttributeList unsettables) {
 		super(source, option, unsettables);
 		outlineStyle = switchCopy(source.outlineStyle, safeGet(option, PEN));
-		outlinePaint = switchCopy(source.outlinePaint, safeGet(option, PEN_COLOR));
+		Paint maybeGradient = switchCopy(source.outlinePaint, safeGet(option, PEN_COLOR));
+		if (maybeGradient instanceof GradientTuple) {
+			outlinePaint = new MutablePaintWrapper(null);
+			gradientSource = (GradientTuple) maybeGradient;
+		} else {
+			outlinePaint = maybeGradient;
+			gradientSource = null;
+		}
+	}
+	
+	/**Given a stroked object, sets up the actual gradient...*/
+	protected void fixGradient(Point2D start, Point2D end) {
+		if (gradientSource != null) {
+			((MutablePaintWrapper) outlinePaint).setBacking(gradientSource.getPaint(start, end));
+		}
 	}
 	
 	/**Gets fill-related properties.*/

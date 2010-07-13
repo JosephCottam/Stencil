@@ -36,7 +36,7 @@ import java.awt.geom.Point2D;
 
 import stencil.adapters.general.Pies;
 import stencil.adapters.general.Registrations;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.tuple.Tuple;

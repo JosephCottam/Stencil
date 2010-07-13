@@ -1,6 +1,5 @@
 package stencil.unittests.parser.string;
 
-import junit.framework.TestCase;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -10,16 +9,12 @@ import stencil.adapters.Adapter;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
-import stencil.unittests.module.TestModuleCache;
+import stencil.unittests.StencilTestCase;
 
 
-public class TestParseStencil extends TestCase {
+public class TestParseStencil extends StencilTestCase {
 	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.INSTANCE;
-	
-	public void setUp() throws Exception {
-		TestModuleCache.initCache();
-	}
-	
+		
 	public void testParse() throws Exception {
 		Program p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);

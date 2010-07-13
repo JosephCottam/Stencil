@@ -17,9 +17,15 @@ public final class TupleRef extends Value {
 	}
 
 	/**Get the simple value portion of this reference (what will be used to de-reference the tuple)*/
-	public Integer getValue() {
-		assert ((Atom) getChild(0)).isNumber();
-		if (value == null) {value = ((StencilNumber) getChild(0)).intValue();}
+	public final Atom getValue() {return ((Atom) getChild(0));}
+
+	/**After numeralization, the value should always be numeric.  This method
+	 * gets the value, based on the assumption that a number will be returned.
+	 * This method is memoized.
+	 */
+	public final Integer getRefValue() {
+		assert (getValue()).isNumber() : "Non number: " + this.getParent().toStringTree();
+		if (value == null) {value = ((StencilNumber) getValue()).intValue();}
 		return value;
 	}
 
@@ -27,19 +33,28 @@ public final class TupleRef extends Value {
 	public Object getValue(Tuple source) {
 		if (source == null) {return null;}
 
-		int val = getValue();
+		int val = getRefValue();
 		Object value = source.get(val);
 		
 		if (hasSubRef()) {return getSubRef().getValue((Tuple) value);}
 		else {return value;}
 	}
 
+	/**Get the sub-reference (if any).
+	 * This method is memoized.
+	 * 
+	 * @throws RuntimeException When there is no sub-ref, but this method is called then this exception is thrown.
+	 */
 	public TupleRef getSubRef() {
 		if (!hasSubRef()) {throw new RuntimeException("Attempt to get subref where none is present.");}
 		return (TupleRef) subRef;
 	}
 	
 	public boolean isTupleRef() {return true;}	
+	
+	/**Does this tuple-ref include a sub-ref?
+	 * This method is memoized. 
+	 */
 	public boolean hasSubRef() {
 		if (subRef == null) {
 			if (this.getChildCount() >= 2) {

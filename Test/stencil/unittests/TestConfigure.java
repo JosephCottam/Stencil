@@ -4,18 +4,15 @@ import java.io.FileInputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
-import junit.framework.TestCase;
 import stencil.types.Converter;
 import stencil.util.collections.PropertyUtils;
 
-public class TestConfigure extends TestCase {
-	public static String propertiesFile = "./TestData/Stencil.properties";
-	
-	private Properties props;
-	
+public class TestConfigure extends StencilTestCase {
+	private Properties props = new Properties();
+
 	public void setUp() throws Exception {
-		stencil.Configure.loadProperties(propertiesFile);		
-		props.loadFromXML(new FileInputStream(propertiesFile));
+		super.setUp();
+		props.loadFromXML(new FileInputStream(DEFAULT_PROPERTIES_FILE));
 	}
 	
 	public void testWrapperRegister() {

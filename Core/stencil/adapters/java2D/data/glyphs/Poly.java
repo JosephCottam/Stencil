@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stencil.adapters.general.ImplicitArgumentException;
-import stencil.adapters.java2D.data.DisplayLayer;
+import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;

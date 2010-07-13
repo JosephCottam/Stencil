@@ -39,7 +39,6 @@ import static stencil.explore.Application.reporter;
 import stencil.explore.model.Model;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
-import stencil.adapters.Adapter;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.ConcurrentStream;
 import stencil.parser.tree.Order;
@@ -67,6 +66,7 @@ public final class StencilRunner extends Thread {
 	private boolean keepRunning = true;
 
 	public StencilRunner(Model model) {
+		super("StencilRunner");
 		this.model = model;
 		this.setDaemon(true);	//Don't wait for it to finish before quitting
 	}
@@ -76,7 +76,6 @@ public final class StencilRunner extends Thread {
 			running = true;
 
 			Map<String, StreamSource> streamSources = model.getSourcesMap();
-			Adapter adapter = model.getAdapterOpts().getAdapter();
 			StencilPanel panel = model.getStencilPanel();
 			Order order = panel.getProgram().getStreamOrder();
 
@@ -109,7 +108,6 @@ public final class StencilRunner extends Thread {
 				panel.repaint();
 				
 			}
-			adapter.finalize(panel);
 		} catch (Throwable e) {
 			running = false;
 			throwable = e;

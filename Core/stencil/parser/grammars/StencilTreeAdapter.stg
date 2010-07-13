@@ -21,12 +21,6 @@ public class StencilTreeAdapter extends CommonTreeAdaptor {
 		}
 		return t;
 	}
-
-	@Override
-	public Object dupNode(Object t) {
-		// TODO Auto-generated method stub
-		return super.dupNode(t);
-	}
 }
 >>
 

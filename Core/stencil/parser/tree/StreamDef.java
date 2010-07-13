@@ -8,13 +8,13 @@ import org.antlr.runtime.Token;
 
 import stencil.interpreter.TupleStore;
 import stencil.parser.string.StencilParser;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 
 public class StreamDef extends StencilTree implements TupleStore, ContextNode {
 	/**Value used to divide groups of tuples in the queue.*/
-	public static final SourcedTuple DIVIDER = new SourcedTuple.Wrapper("****DIVIDER****", new ArrayTuple());
+	public static final SourcedTuple DIVIDER = new SourcedTuple.Wrapper("****DIVIDER****", Tuples.EMPTY_TUPLE);
 
 	private Queue<SourcedTuple> queue = new LinkedList();	
 	private List<Consumes> groups;

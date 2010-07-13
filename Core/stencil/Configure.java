@@ -15,9 +15,10 @@ import java.net.URL;
  */
 public class Configure {
 	private static final String DEFAULT_STENCIL_CONFIGURATION_FILE = "Stencil.properties";
-	
 	public static String stencilConfig = DEFAULT_STENCIL_CONFIGURATION_FILE;
 
+	public static final String THREAD_POOL_SIZE_KEY = "threadPoolSize";
+	public static int threadPoolSize = 2;
 	
 	private Configure() {/*Utility, non-instantiable class.*/}
 
@@ -29,9 +30,13 @@ public class Configure {
 			e.printStackTrace();
 		}
 
-
 		stencil.module.ModuleCache.registerModules(props);
 		stencil.types.Converter.registerWrappers(props);
+		
+		threadPoolSize = Integer.parseInt(props.getProperty(THREAD_POOL_SIZE_KEY,"-1")); 
+		if (threadPoolSize <1) {
+			threadPoolSize = (int) (Runtime.getRuntime().availableProcessors()/2f)+1;
+		}
 	}
 
 	public static void loadProperties(String... urls) throws Exception {

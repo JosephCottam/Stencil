@@ -14,7 +14,7 @@ from Mouse
 	(X,Y) : (X,Y)
 	FILL_COLOR: Colorize(META) -> C
 	SIZE: 10
-	STROKE_COLOR : @Color{CLEAR}
+	PEN_COLOR : @Color{CLEAR}
 
 layer Nav
 from Mouse

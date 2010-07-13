@@ -28,28 +28,28 @@
  */
 package stencil.display;
 
-import java.util.Iterator;
-import stencil.adapters.Glyph;
-import stencil.parser.tree.Layer;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
-public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
+public interface DisplayLayer<T extends Glyph>  {
 	/**Name of the method that should be invoked by clients wanting to use this legend*/
 	public static final String FIND_METHOD  = "find";
 	public static final String MAKE_METHOD = "make";
 	public static final String MAKE_OR_FIND_METHOD ="makeOrFind";
 
-	/**Return an iterator of the tuples of this layer*/
-	public Iterator<T> iterator();
-
+	
+	/**Get a view of this layer.
+	 * A view is a consistent look at the state of a layer.
+	 * */
+	public LayerView<T> getView();
+	
 	/**Creates a new item of type T in this layer.
 	 * The properties of the new item are dictated by the values
 	 * passed.  This must include an ID field.
 	 *  
-	 * @throws DuplicateIDException Thrown when the ID already exists in the layer
+	 * @throws IDException Thrown when the ID already exists in the layer
 	 * */
-	public Glyph make(Tuple values) throws DuplicateIDException;
+	public Glyph make(Tuple values) throws IDException;
 
 	/**Returns the item associated with the name on this layer.
 	 * Returns null if no item is associated.*/
@@ -67,6 +67,15 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	 * @return Tuple with the given ID
 	 */
 	public Glyph makeOrFind(Tuple values);
+	
+	/**Update an existing tuple in the table.
+	 * The update tuple must have an ID that is already
+	 * present in the table. 
+	 * 
+	 * @throws IllegalArgumentException Update ID not found in table.
+	 * 
+	 */
+	public void update(T update) throws IllegalArgumentException;
 
 	/**Given an ID, remove the associated tuple from the layer*/
 	public void remove(String ID);
@@ -77,9 +86,6 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	/**What is the name of this layer*/
 	public String getName();
 
-	/**How many elements are in this layer?*/
-	public int size();
-	
 	/**Identifier for the current state**/
 	public int getStateID();
 	
@@ -87,5 +93,5 @@ public interface DisplayLayer<T extends Tuple> extends Iterable<T> {
 	 * This is derived directly from the implantation type.
 	 */
 	public TuplePrototype getPrototype();
-	public void updatePrototype(Layer layerDef);
+	public void updatePrototype(Tuple defaults);
 }

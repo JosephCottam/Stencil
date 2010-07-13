@@ -4,8 +4,8 @@ import java.awt.geom.Point2D;
 
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 
 /**Lays elements out around an ellipse.

@@ -28,16 +28,12 @@
  */
 package stencil.explore.ui.components;
 
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
 
-import java.io.PrintStream;
-import java.io.OutputStream;
-import java.io.IOException;
 import java.util.Arrays;
 
 import javax.swing.JButton;
@@ -54,12 +50,6 @@ import stencil.explore.util.MessageReporter;
  *  window.
  */
 public class MessagePanel extends JPanel implements MessageReporter {
-	private static final PrintStream ERR = System.err;
-	private static final PrintStream OUT = System.out;
-
-	/**Should messages added to this panel also be echoed on the corresponding System stream?*/
-	public static boolean ECHO = true;
-	
 	protected JList messages;
 	protected JButton clear;
 
@@ -121,66 +111,30 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		clear();
 	}
 
-	public void clear() {
+	public synchronized void clear() {
 		messages.setModel(new DefaultListModel()); 
 	}
 
 	
-	public void addMessage(String message, Object...args) {
+	public synchronized void addMessage(String message, Object...args) {
 		if (message == null) {throw new RuntimeException(String.format("Null message add requested (args are %1$s).", Arrays.deepToString(args)));}
 		
 		if (args.length >0) {addMessage(String.format(message,args), false);}
 		else{addMessage(message, false);}
 	}
-	public void addError(String message, Object...args) {
+	
+	public synchronized void addError(String message, Object...args) {
 		if (message == null) {addMessage("Error occured.  Please check logs.", true); return;}
 		
 		if (args.length >0) {addMessage(String.format(message,args), true);}
 		else {addMessage(message, true);}
 	}
 
-	protected void addMessage(String message, boolean error) {
+	protected synchronized void addMessage(String message, boolean error) {
 		final String mssg = message;
 		message = message.trim();
 
 		Entry e = new Entry(mssg, error);
 		((DefaultListModel) messages.getModel()).addElement(e);
 	}
-
-	/**Create a link to this messagePanel that is a PrintStream.
-	 * NOTE: Doesn't always do the right thing with newlines...but its getting better.
-	 */
-	public PrintStream streamLink(boolean error) {
-		final boolean err = error;
-		final OutputStream echo = err ? ERR : OUT;
-
-		java.io.OutputStream out = new OutputStream()
-		{
-			public String buffer = "";
-			public void write(byte[] b) throws IOException {
-				if (ECHO) {echo.write(b);}
-				bufferMessage(String.valueOf(new String(b)));
-			}
-			public void write(int b) throws IOException {
-				if (ECHO) {echo.write(b);}
-				bufferMessage(String.valueOf((char) b));
-			}
-			public void write(byte[] b, int off, int len) throws IOException {
-				if (ECHO) {echo.write(b, off, len);}
-				bufferMessage(new String(b, off, len));
-			}
-
-			private void bufferMessage(String message) {
-				buffer = buffer + message;
-				if (buffer.contains("\n")) {
-					addMessage(buffer, err);
-					buffer = "";
-				}
-
-			}
-		};
-
-		return new PrintStream(out, true);
-	}
-
 }

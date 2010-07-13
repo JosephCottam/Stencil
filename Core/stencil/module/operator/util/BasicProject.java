@@ -1,11 +1,15 @@
 package stencil.module.operator.util;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+
 import static java.lang.String.format;
 
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
+import stencil.tuple.Tuple;
 
 public abstract class BasicProject implements StencilOperator {
 	protected final OperatorData operatorData;
@@ -36,6 +40,17 @@ public abstract class BasicProject implements StencilOperator {
 	public String getName() {return operatorData.getName();}
 
 	public int StateID() {return stateID;}
+	
+	/**Synthetic state-based operation.*/
+	public List<Tuple> state(Object[][] args) {
+		Tuple[] results = new Tuple[args.length];
+		Invokeable query = getFacet("query");
+		for (int i=0; i< args.length;i++) {
+			Object[] argSet = args[i];
+			results[i] = query.tupleInvoke(argSet);
+		}
+		return Arrays.asList(results);
+	}
 	
 	/**Unsupported operation in BasicProject, must be supplied by the 
 	 * actual implementation.

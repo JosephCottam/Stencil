@@ -12,8 +12,6 @@ import stencil.tuple.Tuple;
  * to facilitate this, if the type passed to the two-argument constructor
  * does not match the token type, a new token with the passed tokens text but
  * of the passed type instead of passed tokens type will be created.
- *
- *
  */
 public abstract class Value extends StencilTree {
 	public Value(Token source) {super(source);}

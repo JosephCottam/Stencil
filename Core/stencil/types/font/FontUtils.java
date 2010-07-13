@@ -1,6 +1,5 @@
 package stencil.types.font;
 
-import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -11,11 +10,11 @@ import stencil.module.util.OperatorData;
 import stencil.types.Converter;
 
 public final class FontUtils extends BasicModule {
-	public static final Font Bold(Font f) {return f.deriveFont(Font.BOLD);}
-	public static final Font Italic(Font f) {return f.deriveFont(Font.ITALIC);}
-	public static final Font Family(Font f, String family) {return new Font(family, f.getStyle(), f.getSize()).deriveFont(f.getSize2D());}
-	public static final Font Plain(Font f) {return f.deriveFont(Font.PLAIN);}
-	public static final Font Size(Font f, double size) {return f.deriveFont((float) size);}
+	public static final java.awt.Font Bold(java.awt.Font f) {return f.deriveFont(java.awt.Font.BOLD);}
+	public static final java.awt.Font Italic(java.awt.Font f) {return f.deriveFont(java.awt.Font.ITALIC);}
+	public static final java.awt.Font Family(java.awt.Font f, String family) {return new java.awt.Font(family, f.getStyle(), f.getSize()).deriveFont(f.getSize2D());}
+	public static final java.awt.Font Plain(java.awt.Font f) {return f.deriveFont(java.awt.Font.PLAIN);}
+	public static final java.awt.Font Size(java.awt.Font f, double size) {return f.deriveFont((float) size);}
 	 
 	
 	/**Fonts are specified with a comma-separated list (order does not matter).
@@ -28,9 +27,11 @@ public final class FontUtils extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
-	public static class Fonts extends BasicProject {
-		public Fonts(OperatorData opData) {super(opData);}
-		public FontTuple query(String arg) {
+	public static class Font extends BasicProject {
+		public Font(OperatorData opData) {super(opData);}
+		
+		public FontTuple query(String arg) {return toTuple(arg);}
+		public static FontTuple toTuple(String arg) {
 			final ArrayList<String> parts = new ArrayList(Arrays.asList(arg.trim().toLowerCase().split(",\\s+")));
 			String family = FontTuple.DEFAULT_FAMILY;
 			double size = -1;

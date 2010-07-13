@@ -3,6 +3,7 @@ package stencil.unittests.types;
 import java.awt.Color; 
 
 
+import stencil.tuple.instances.*;
 import stencil.types.Converter;
 import junit.framework.TestCase;
 
@@ -33,6 +34,14 @@ public class TestConverter extends TestCase {
 		assertEquals("203", Converter.toString(203));
 		assertEquals("1.0", Converter.toString(1.0));
 		assertEquals("@Color{255,0,0}", Converter.toString(Color.RED));
+	}
+	
+	public void testToTuple() {
+		assertEquals(Singleton.class, Converter.toTuple("Hello").getClass());
+		assertEquals(Ints.class, Converter.toTuple(new int[]{1,2,3}).getClass());
+		assertEquals(Doubles.class, Converter.toTuple(new double[]{1.0,2.0,3.0}).getClass());
+		assertEquals(NumericSingleton.class, Converter.toTuple(1.0).getClass());
+		assertEquals(NumericSingleton.class, Converter.toTuple(1).getClass());
 	}
 	
 }

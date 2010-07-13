@@ -32,10 +32,13 @@ package stencil.tuple;
 import java.util.*;
 
 import stencil.adapters.general.Fills;
+import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
+import static stencil.parser.ParserConstants.SIGIL;
 
 /**Utility methods for working with tuples.*/
 //final because it is a collection of utility methods and is not to be instantiated or overridden
@@ -50,7 +53,7 @@ public final class Tuples {
 		public TuplePrototype getPrototype() {return new SimplePrototype();}
 		public int size() {return 0;}
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}
-		public String toString() {return Tuples.toString(this);}
+		public String toString() {return "EMPTY TUPLE";}
 	};
 
 	
@@ -141,7 +144,7 @@ public final class Tuples {
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
 			if (targetValue == sourceValue ||
-				(targetValue != null && !targetValue.equals(sourceValue))) {return false;}
+				(targetValue != null && !targetValue.equals(sourceValue))) {return false;} //TODO: Why is there this "TargetValue != null" ??? IS this part of layer attribute defaulting?  This messes up some things.
 		}
 		return true;
 	}
@@ -158,16 +161,28 @@ public final class Tuples {
 	 * **/
 	public static String toString(Tuple t) {return toString(t, TuplePrototypes.getNames(t));}
 	
+	/**String tuple representation with a prefix.  
+	 * This mimics the sigil operator style: @<prefix>{<values>}.
+	 * 
+	 * @param prefix Type prefix
+	 * @param t
+	 * @return
+	 */
+	public static String toString(String prefix, Tuple t, int start) {
+		String[] names = TuplePrototypes.getNames(t);
+		String[] printNames = new String[names.length - start];
+		System.arraycopy(names, start, printNames, 0, printNames.length);
+		
+		String base = toString(t, printNames);
+		base = base.substring(1, base.length()-1);
+		return SIGIL + prefix + "{" + base + "}";
+	}
+	
 	/**Provide a string representation of the tuple, 
 	 * but only include the fields in the passed list.
 	 */
-	public static String toString(Tuple t, String[] fieldNames) {
+	public static String toString(Tuple t, String[] fields) {
 		StringBuilder rv = new StringBuilder("(");
-
-		//Copy must be made because Arrays.sort is in-place
-		String[] fields = new String[fieldNames.length];
-		System.arraycopy(fieldNames, 0, fields, 0, fieldNames.length);
-		Arrays.sort(fields);
 		
 		for (String name: fields){
 			Object value =t.get(name);
@@ -184,7 +199,10 @@ public final class Tuples {
 				value = Arrays.deepToString((Object[]) value);
 			} else if (value == t) {
 				value = "<self>";
+			} else {
+				value = Converter.toString(value);
 			}
+			
 			rv.append(String.format("%1$s:%2$s; ", name, value));
 		}
 

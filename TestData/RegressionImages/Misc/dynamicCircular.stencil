@@ -24,12 +24,12 @@ from Edges
 
 layer Edges[LINE]
 default
-	STROKE_COLOR: @Color{GRAY80, .8}
+	PEN_COLOR: @Color{GRAY80, .8}
 from Edges 
 	ID: Concatenate(ID1,ID2) -> (VALUE)
 	(X.1, Y.1):* Nodes.find(ID1) -> (X,Y)
 	(X.2, Y.2):* Nodes.find(ID2) ->  (X,Y)
-	STROKE_WEIGHT: .25
+	PEN: @Stroke{.25}
 
 operator Ordering (ID)->(VALUE)  
 	(ALL) => VALUE : Index(ID) -> (VALUE)

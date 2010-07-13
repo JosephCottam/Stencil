@@ -6,5 +6,6 @@ Sigils parsers needed:
 		* Fill
 	* Date
 	* Font/Text formats
+	* Math
 
-A sigil parser takes a string and creates a tuple based on that string (it has its own parser).
+A sigil is an alternative grammar environment.  A tuple-reference syntax is supplied.  Stencil parses the tuple-references and does textual substations (but nothing else).  The operator is responsible for completing the parse on the resulting text.

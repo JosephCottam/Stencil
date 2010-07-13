@@ -1,8 +1,8 @@
 package stencil.types;
 
  import stencil.parser.tree.StencilNumber;
-import stencil.tuple.NumericSingleton;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.NumericSingleton;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.ValueEnum;
 
@@ -37,6 +37,7 @@ public class NumericWrapper implements TypeWrapper {
 	
 	public static Integer toInteger(Object value) {
 		if (value instanceof Integer) {return (Integer) value;}
+		if (value instanceof Long) {return ((Long) value).intValue();}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getValue().intValue());}
 

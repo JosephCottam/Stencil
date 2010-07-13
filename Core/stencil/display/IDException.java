@@ -26,32 +26,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.adapters.java2D.util;
+package stencil.display;
 
-import java.awt.Rectangle;
-import java.util.concurrent.atomic.AtomicReference;
+/**Error adding an element to a layer based on ID issues.
+ * ID issues are:
+ *   1) Duplicate ID
+ *   2) Null ID
+ * @author jcottam
+ *
+ */
+public class IDException extends RuntimeException {
+	private static final long serialVersionUID = 1L;
 
-public interface LayerUpdateListener {
-	public void layerUpdated(Rectangle update);
-	
-	/**Helper class for storing updates in a thread-safe manner.
-	 * 
-	 * This class can be used in the body of a layerUpdated method
-	 * to store the composite bounds of many updates.
-	 * 
-	 */
-	public final static class AtomicCompositeUpdate {
-		AtomicReference<Rectangle> bounds = new AtomicReference(null);
-
-		public void update(Rectangle r) {
-			Rectangle old, update;
-			do {
-				old = bounds.get();
-				update = old == null ? r : old.union(r);	
-			} while(!bounds.compareAndSet(old, update));
-		}
-		
-		public Rectangle get() {return bounds.get();}		
-		public Rectangle clear() {return bounds.getAndSet(null);}
+	public IDException(String layerName) {
+		super("Could not add item with null id to layer " + layerName + ".");
+	}
+ 	
+	public IDException(String ID, String layerName) {
+		super("Could not add item with ID " + ID + " to layer " + layerName + ".");
 	}
 }

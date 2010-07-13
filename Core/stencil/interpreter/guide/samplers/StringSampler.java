@@ -6,8 +6,9 @@ import java.util.List;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.ArrayTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.Singleton;
 
 public class StringSampler implements SampleOperator {
 
@@ -19,7 +20,7 @@ public class StringSampler implements SampleOperator {
 			if (v.getClass().isArray()) {
 				sample.add(new ArrayTuple((Object[]) v));
 			} else {
-				sample.add(new ArrayTuple(v.toString()));
+				sample.add(new Singleton(v.toString()));
 			}
 		}
 		return sample;

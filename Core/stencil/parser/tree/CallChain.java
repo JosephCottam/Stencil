@@ -32,8 +32,8 @@ import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
-import stencil.tuple.MapMergeTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.MapMergeTuple;
 import stencil.types.Converter;
 
 /**A call chain is a linear group of calls, ending in a pack.

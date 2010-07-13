@@ -12,14 +12,14 @@ stream Values(Category)
 /*Specializers (things in square brackets) define the graphic design*/
 canvas Main
     guide axis[sample: "LINEAR", tickCount: 10, tickSize: 5, textOffset: 6] from Chart Y
-        label.FONT_SIZE: 10
-        line.STROKE_WEIGHT: 1
+        label.FONT: @Font{10}
+        line.PEN: @Stroke{1}
         label.REGISTRATION: "RIGHT"
 
     guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Chart X
         label.REGISTRATION: "LEFT"
-        label.FONT_SIZE: 10
-        line.STROKE_WEIGHT: 1 
+        label.FONT: @Font{10}
+        line.PEN: @Stroke{1} 
         
 layer Chart
 from Values

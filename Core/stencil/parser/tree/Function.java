@@ -35,7 +35,6 @@ import stencil.tuple.Tuple;
 import stencil.parser.string.StencilParser;
 
 public class Function extends CallTarget {
-	private Specializer spec;
 	private List<Value> args;
 	private AstInvokeable target;
 	private CallTarget call;
@@ -51,8 +50,7 @@ public class Function extends CallTarget {
 	public String getName() {return token.getText();}
 	
 	public Specializer getSpecializer() {
-		if (spec == null) {spec= (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);}
-		return spec;
+		return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);
 	}
 	
 	public List<Value> getArguments() {

@@ -28,6 +28,7 @@
  */
 package stencil.explore.model;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Collection;
 import java.util.Map;
@@ -107,7 +108,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 		final long startTime= System.currentTimeMillis();
 		runner.start();
 
-		Thread listener = new Thread() {
+		Thread listener = new Thread("Stencil Termination Listener") {
 			public void run() {
 				try {runner.join();}
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
@@ -137,7 +138,11 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	 * @throws Exception Any exception thrown by the adapter's StencilPanel
 	 */
 	public void export(String filename, String type, Object info) throws Exception {
-		reporter.addMessage("Starting %1$s export to %2$s (additional args: %3$s).", type, filename, info);
+		String infoString = info.toString();
+		if (info.getClass().isArray()) {
+			infoString = Arrays.deepToString((Object[]) info);
+		}
+		reporter.addMessage("Starting %1$s export to %2$s (additional args: %3$s).", type, filename, infoString);
 
 		try {
 			stencilPanel.export(filename, type, info);

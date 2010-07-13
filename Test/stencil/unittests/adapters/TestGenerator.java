@@ -11,13 +11,15 @@ import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class TestGenerator extends junit.framework.TestCase {
 	private static final String sourceFile = "./TestData/RegressionImages/SeeTest/SeeTest.stencil"; 
-
+	private StencilPanel panel;
+	
 	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}
+	public void tearDown() {if (panel !=null) {panel.dispose();}}
 	
 	public StencilPanel testGenerate(Adapter adapter) throws Exception {
 		String streamRules = StringUtils.getContents(sourceFile);
 		Program program = ParseStencil.parse(streamRules, adapter);
-		StencilPanel panel = adapter.generate(program);
+		panel = adapter.generate(program);
 
 		assertNotNull("Program not found", panel.getProgram());
 		assertEquals("Program not as expected", program, panel.getProgram());
@@ -35,7 +37,7 @@ public abstract class TestGenerator extends junit.framework.TestCase {
 	public TupleLoader testMakeLoader(Adapter adapter) throws Exception {
 		String streamRules = StringUtils.getContents(sourceFile);
 		Program program = ParseStencil.parse(streamRules, adapter);
-		StencilPanel panel = adapter.generate(program);
+		panel = adapter.generate(program);
 		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_SHORT, "\\|", true,1);
 		TupleLoader loader = new TupleLoader(panel, stream);
 

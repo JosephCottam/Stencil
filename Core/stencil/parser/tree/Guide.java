@@ -1,13 +1,19 @@
 package stencil.parser.tree;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.antlr.runtime.Token;
 
+import stencil.display.DisplayGuide;
+import stencil.display.StencilPanel;
+import stencil.interpreter.Interpreter;
 import stencil.interpreter.guide.*;
+import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.module.operator.util.Invokeable;
 import stencil.parser.string.StencilParser;
+import stencil.tuple.Tuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
@@ -51,8 +57,8 @@ public class Guide extends StencilTree {
 		return (Rule) getChild(4).getChild(0);
 	}
 	
-	public StencilTree getStateQuery() {
-		return (StencilTree) this.findChild(STATE_QUERY, null);
+	public StateQuery getStateQuery() {
+		return (StateQuery) getFirstChildWithType(STATE_QUERY);
 	}
 	
 	public String toString() {
@@ -80,5 +86,43 @@ public class Guide extends StencilTree {
 		}
 		
 		return new SimplePrototype(names);
+	}
+	
+	public void update(StencilPanel panel) {
+		Specializer details = getSpecializer();
+		SeedOperator seedOp = getSeedOperator();
+		List<Tuple> sample, projection, results;
+
+		if (seedOp instanceof LayerSampler.SeedOperator) {
+			sample = getSampleOperator().sample(null, details);
+			projection = sample;
+		} else {
+			SampleSeed seed = seedOp.getSeed();
+
+			try {
+				sample = getSampleOperator().sample(seed, details);
+				projection = processAll(sample, getGenerator());
+			} catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
+		}
+
+		try {results = processAll(projection, getRules());}
+		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
+
+
+		//TODO: Remove null check when scheduling is improved.
+		DisplayGuide guide = panel.getCanvas().getComponent().getGuide(getSelector());
+		if (guide != null) {guide.setElements(results);}
+	}
+	
+	private List<Tuple> processAll(List<Tuple> sources, Rule rule) throws Exception {
+		return processAll(sources, Arrays.asList(rule));
+	}
+	
+	private List<Tuple> processAll(List<Tuple> sources, List<Rule> rules) throws Exception {
+		List<Tuple> results = new ArrayList();
+		for (Tuple source: sources) {
+			results.add(Interpreter.processSequential(source, rules));
+		}
+		return results;
 	}
 }

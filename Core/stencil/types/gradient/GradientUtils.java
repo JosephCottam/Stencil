@@ -11,9 +11,9 @@ import stencil.types.Converter;
 
 public class GradientUtils extends BasicModule {
 
-	public static class Gradients extends BasicProject {
+	public static class Gradient extends BasicProject {
 
-		public Gradients(OperatorData opData) {super(opData);}
+		public Gradient(OperatorData opData) {super(opData);}
 		public GradientTuple query(Color one, Color two, double len, boolean abs, boolean cyclic) {
 			return new GradientTuple(one, two, len, abs, cyclic);
 		}
@@ -27,7 +27,7 @@ public class GradientUtils extends BasicModule {
 		 * @param arg
 		 * @return
 		 */
-		private static final Pattern SPLIT_PATTERN = Pattern.compile("(\\s*->\\s*)|(\\s*,\\s*)|(\\s*:\\s*)");
+		private static final Pattern SPLIT_PATTERN = Pattern.compile("(\\s*->\\s*)|(\\s*:\\s*)");
 		public GradientTuple argumentParser(String arg) {
 			String[] args = SPLIT_PATTERN.split(arg);
 			Color one = (Color) Converter.convert(args[0], Color.class);

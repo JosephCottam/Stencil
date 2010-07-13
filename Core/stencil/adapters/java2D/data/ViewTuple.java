@@ -131,7 +131,6 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 			}
 		}
 
-		//TODO: Remove when math works better
 		if (name.equals("RIGHT")) {return (Double) get("X") + (Double) get("WIDTH");}
 		if (name.equals("BOTTOM")) {return (Double) get("Y") + (Double) get("HEIGHT");}
 		throw new IllegalArgumentException("Unknown field, cannot query " + name + " on view.");

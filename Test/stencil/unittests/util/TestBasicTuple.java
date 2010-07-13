@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Arrays;
 
 import stencil.parser.ParserConstants;
-import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.PrototypedTuple;
 
 public class TestBasicTuple extends TestCase {
 	private Tuple reference;

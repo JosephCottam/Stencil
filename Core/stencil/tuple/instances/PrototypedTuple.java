@@ -26,11 +26,14 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package stencil.tuple;
+package stencil.tuple.instances;
 
 import java.util.Arrays;
 import java.util.List;
 
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
+import stencil.tuple.TypeValidationException;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;

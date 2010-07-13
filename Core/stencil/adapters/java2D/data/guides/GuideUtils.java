@@ -38,7 +38,7 @@ import java.lang.reflect.*;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
-import stencil.tuple.PrototypedTuple;
+import stencil.tuple.instances.PrototypedTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;

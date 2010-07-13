@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stencil.display.DisplayLayer;
+import stencil.display.Glyph;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.parser.tree.Layer;
@@ -30,8 +31,8 @@ public final class LayerSampler implements SampleOperator {
 
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		List<Tuple> l = new ArrayList();
-		for (Tuple t: getDisplayLayer()) {l.add(t);}
+		for (Glyph t: getDisplayLayer().getView()) {l.add(t);}
 		return l;
 	}
-	public final DisplayLayer<Tuple> getDisplayLayer() {return layer;}
+	public final DisplayLayer<Glyph> getDisplayLayer() {return layer;}
 }

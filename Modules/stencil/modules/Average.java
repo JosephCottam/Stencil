@@ -29,6 +29,7 @@
 package stencil.modules;
 
 import java.util.HashMap;
+import java.util.List;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
@@ -41,6 +42,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
+import stencil.util.collections.ConstantList;
 
 import static stencil.parser.tree.Specializer.RANGE;
 import static stencil.parser.tree.Specializer.SPLIT;
@@ -56,7 +58,7 @@ public class Average extends BasicModule {
 	 * An empty range is considered to have a mean of 0.
 	 * Can be used with zero-length range (n..n) to indicate 'mean of current arguments'
 	 * */
-	protected static class RangeMean extends BasicProject {
+	public static class RangeMean extends BasicProject {
 		protected RangeMean(OperatorData opData) {super(opData);}
 
 		private static final String NAME = "Mean";
@@ -132,6 +134,10 @@ public class Average extends BasicModule {
 			return value;
 		}
 		
+		public List<Double> range(Double[][] args) {
+			return new ConstantList(total/count, args.length);
+		}
+		
 		public FullMean duplicate() {return new FullMean(operatorData, start);}
 	}
 
@@ -199,7 +205,7 @@ public class Average extends BasicModule {
 	 * in the range) or he mean of the two middle-most values.  Median is computed
 	 * the same for full range as sub-range.
 	 */
-	protected static class Median extends BasicProject {
+	public static class Median extends BasicProject {
 		private static final String NAME = "Median";
 
 		protected Median(OperatorData opData) {super(opData);}
@@ -207,6 +213,7 @@ public class Average extends BasicModule {
 		public double range(Object... args) {
 			return map((double[]) RangeHelper.flatten(args, double.class));
 		}
+		
 		public double map(double... args) {
 			if (args.length == 0) {throw new RuntimeException("Cannot compute median on empty list");}
 
@@ -221,7 +228,7 @@ public class Average extends BasicModule {
 		public String getName() {return NAME;}
 
 		public double query(double... args) {return map(args);}
-		
+				
 		public Median duplicate() {return new Median(operatorData);}
 	}
 
@@ -229,7 +236,7 @@ public class Average extends BasicModule {
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
-	protected static class Mode extends BasicProject {
+	public static class Mode extends BasicProject {
 		private static final String NAME = "Mode";
 
 		public Mode(OperatorData opData) {super(opData);}

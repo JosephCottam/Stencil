@@ -1,4 +1,6 @@
-package stencil.tuple;
+package stencil.tuple.instances;
+
+import stencil.tuple.Tuple;
 
 /**
  * Tuple representing the result of merging a map split in

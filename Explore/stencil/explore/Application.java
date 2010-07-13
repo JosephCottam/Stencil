@@ -62,14 +62,15 @@ public class Application {
 
 	/**Which formats may be used?
 	 * This array must be sorted.*/
-	public static final String[] FORMATS = new String[]{"PDF", "PNG", "TXT"};
+	public static final String[] FORMATS = new String[]{"PDF", "PNG", "PNG2", "TXT"};
 
 	/**How many arguments does the format require?*/
-	public static final Map<String, Class> ARG_CLASS = new TreeMap<String, Class>();
+	public static final Map<String, Integer> ARG_CLASS = new TreeMap<String, Integer>();
 
 	static {
-		for (String format: FORMATS) {ARG_CLASS.put(format, null);}
-		ARG_CLASS.put("PNG", Integer.class);
+		for (String format: FORMATS) {ARG_CLASS.put(format, 0);}
+		ARG_CLASS.put("PNG",  1);
+		ARG_CLASS.put("PNG2", 2);
 	}
 
 	/**Get the file flagged with the open flag (if any).
