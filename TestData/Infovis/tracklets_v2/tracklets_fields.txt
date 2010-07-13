@@ -1,1 +1,0 @@
-id, start_id, end_id, start_time, end_time
