@@ -19,7 +19,10 @@ public abstract class TestLayer extends junit.framework.TestCase {
 
 	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}
 	public void tearDown() {
-		if (panel != null) {panel.dispose();}
+		if (panel != null) {
+			panel.dispose();
+			panel = null;
+		}
 	}
 	
 	private DisplayLayer loadData(Adapter adapter) throws Exception {
@@ -27,9 +30,12 @@ public abstract class TestLayer extends junit.framework.TestCase {
 		panel= adapter.generate(program);
 		DisplayLayer layer = panel.getLayer("Layer1");
 
-		for (int i=0; i<TUPLE_COUNT; i++) {
-			Tuple values = new PrototypedTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
-			layer.make(values);
+		synchronized(panel.visLock) {
+			for (int i=0; i<TUPLE_COUNT; i++) {
+				Tuple values = new PrototypedTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
+				layer.make(values);
+			}
+			((DoubleBufferLayer) layer).changeGenerations();
 		}
 		return layer;
 	}
@@ -40,13 +46,16 @@ public abstract class TestLayer extends junit.framework.TestCase {
 
 		DisplayLayer layer = panel.getLayer("Layer1");
 
-		for (int i=0; i<TUPLE_COUNT; i++) {
-			String id = Integer.toString(i);
-			assertEquals(i, layer.getView().size());
-			Tuple t = layer.make(PrototypedTuple.singleton("ID", id));
-			assertEquals(id, t.get(StandardAttribute.ID.name()));
-			((DoubleBufferLayer) layer).changeGenerations();
+		synchronized(panel.visLock) {
+			for (int i=0; i<TUPLE_COUNT; i++) {
+				String id = Integer.toString(i);
+				assertEquals(i, layer.getView().size());
+				Tuple t = layer.make(PrototypedTuple.singleton("ID", id));
+				assertEquals(id, t.get(StandardAttribute.ID.name()));
+				((DoubleBufferLayer) layer).changeGenerations();
+			}
 		}
+
 	}
 
 	public DisplayLayer testFind(Adapter gen) throws Exception {
@@ -73,17 +82,19 @@ public abstract class TestLayer extends junit.framework.TestCase {
 
 		assertEquals(layer.getView().size(), TUPLE_COUNT);
 		
-		for (int i=0; i< TUPLE_COUNT; i++) {
-			Glyph source = layer.find(Integer.toString(i));
-			try {
-			layer.remove((String) source.get("ID"));
-			((DoubleBufferLayer) layer).changeGenerations();
-			expectedSize = expectedSize -1;
-			} catch (Exception e) {
-				fail("Exception on element " + i + ": " + e.getMessage());
+		synchronized(panel.visLock) {
+			for (int i=0; i< TUPLE_COUNT; i++) {
+				Glyph source = layer.find(Integer.toString(i));
+				try {
+					layer.remove((String) source.get("ID"));
+					((DoubleBufferLayer) layer).changeGenerations();
+					expectedSize = expectedSize -1;
+				} catch (Exception e) {
+					fail("Exception on element " + i + ": " + e.getMessage());
+				}
+	
+				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.getView().size());
 			}
-
-			assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.getView().size());
 		}
 	}
 }
