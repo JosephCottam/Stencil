@@ -16,18 +16,29 @@ options {
   
   import stencil.module.*;
   import stencil.parser.string.util.EnvironmentProxy;  
-  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
   import static stencil.parser.string.util.EnvironmentProxy.extend;
+  import stencil.parser.string.util.GlobalsTuple;
+  import stencil.parser.tree.Program;
+  import stencil.tuple.prototype.TuplePrototype;
+  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
+  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
+  
 }
 
 @members {
   private ModuleCache modules;
+  private GlobalsTuple globals;
   
-  public FrameTupleRefs(TreeNodeStream input, ModuleCache modules) {
+  public FrameTupleRefs(TreeNodeStream input, ModuleCache modules, Program p) {
     super(input, new RecognizerSharedState());
+
     assert modules != null : "ModuleCache must not be null.";
+    assert p != null : "Program cannot be null (used to handle globals properly).";
+  	
     this.modules = modules;
+  	globals = new GlobalsTuple(p.getGlobals());
   }
+  
 }
 
 topdown
@@ -46,9 +57,12 @@ callTarget[EnvironmentProxy env]
 value[EnvironmentProxy env]
   options{backtrack=true;}
   : ^(TUPLE_REF n=ID v=.) 
-       -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n $v)		//Already is a frame ref, no need to extend 
-       -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n $v))
-  | ^(TUPLE_REF n=ID)   -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n))
+      -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n $v)		//Already is a frame ref, no need to extend 
+      -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n $v))
   | ^(TUPLE_REF NUMBER) -> ^(TUPLE_REF NUMBER[Integer.toString(env.currentIndex())] ^(TUPLE_REF NUMBER))
   | ^(TUPLE_REF ALL) -> ^(TUPLE_REF NUMBER[Integer.toString(env.currentIndex())])
+  | ^(TUPLE_REF n=ID)  
+  		-> {env.canFrame($n.text)}? ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] ^(TUPLE_REF $n))
+  	    -> {globals.getPrototype().contains($n.text)}? ^(TUPLE_REF ID[GLOBALS_FRAME] ^(TUPLE_REF $n))
+  	    -> {env.frameRefFor($n.text)} //invoked to get a good exception out of it...
   | .;

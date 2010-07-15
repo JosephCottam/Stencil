@@ -218,6 +218,14 @@ public final class EnvironmentProxy {
 		return index;
 	} 
 
+	public boolean canFrame(String name) {
+		try {
+			frameRefFor(name);
+			return true;
+		}
+		catch (FrameException e) {return false;}
+	}
+	
 	public int frameRefFor(String name) {
 		if (prototype.contains(name)) {return currentIndex();}
 		if (label != null && label.equals(name)) {return currentIndex();}

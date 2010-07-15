@@ -62,7 +62,7 @@ public class Program extends StencilTree {
 
 	
 	/**What are the layers of this stencil?*/
-	public List<Layer> getGlobals() {
+	public List<Const> getGlobals() {
 		assert verifyType(getChild(GLOBALS), StencilParser.LIST);
 		return (List) getChild(GLOBALS);
 	}

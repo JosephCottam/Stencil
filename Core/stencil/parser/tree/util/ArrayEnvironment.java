@@ -113,7 +113,7 @@ final class ArrayEnvironment extends Environment {
 	 *  If more than the standard frames are supplied, the extras will still be put in the environment.
 	 *  
 	 */
-	public final static ArrayEnvironment getDefault(Tuple...frames) {
+	final static ArrayEnvironment makeDefault(Tuple...frames) {
 		int size = Math.max(DEFAULT_SIZE, frames.length);
 		ArrayEnvironment e = new ArrayEnvironment(size);
 		System.arraycopy(frames, 0, e.frames, 0, frames.length);

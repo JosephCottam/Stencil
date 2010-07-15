@@ -18,4 +18,6 @@ options {
   import stencil.parser.string.ValidationException;
 }
 
-topdown: ^(s=SPECIALIZER DEFAULT) {throw new ValidationException("Default specializer found after all supposedly removed.");};
+topdown
+	: ^(s=SPECIALIZER DEFAULT) {throw new ValidationException("Default specializer found after all supposedly removed.");}
+	| id=ID {if ($id.getAncestor(SPECIALIZER) != null) {throw new ValidationException("Non-constant ID found in specializer: " + $id.text);}};

@@ -2,7 +2,7 @@ tree grammar ReplaceConstantOps;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
-  superClass = TreeRewriteSequence;
+	superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
 }

@@ -342,9 +342,14 @@ public abstract class ParseStencil {
 		p = (Program) removeTemplates.downup(p);
 		
 		//Ensure that all tuple references have a frame reference
-		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules);
+		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules, p);
 		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) frameRefs.downup(p);
+
+		//Move all constant rules up to the defaults section so they are only evaluated once.
+		ReplaceConstants consts = new ReplaceConstants(treeTokens, p);
+		consts.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) consts.downup(p);
 		
 		//Numeralize all tuple references
 		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
@@ -358,7 +363,7 @@ public abstract class ParseStencil {
 		
 		//Since some transformations change chain lengths, this must be re-run.
 		p = (Program) envSize.downup(p);
-		
+
 		//Move all constant rules up to the defaults section so they are only evaluated once.
 		ReplaceConstantOps constOps = new ReplaceConstantOps(treeTokens, modules);
 		constOps.setTreeAdaptor(TREE_ADAPTOR);

@@ -17,10 +17,9 @@
 	<!-- Just the core stencil grammar, not the additional processing.-->
  	<target name="WorkingGrammar">
  		<antlr3
-			target="${grammars}/transformers/TupleRefDeLast.g"
+			target="${grammars}/Stencil.g"
 			outputdirectory="${parser}"
 		/>
- 	 	<antcall target="EclipseRefresh"/>
  	</target>
  		
  		
@@ -29,7 +28,6 @@
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
 		</javac>
- 	 	<antcall target="EclipseRefresh"/>
  	</target>
 
 	<!-- Just the core stencil grammar, not the additional processing.-->
@@ -38,7 +36,6 @@
 			target="${grammars}/Stencil.g"
 			outputdirectory="${parser}"
 		/>
- 	 	<antcall target="EclipseRefresh"/>
  	</target>
 
  	
@@ -48,7 +45,6 @@
             <fileset dir="${grammars}/transformers"/>
             <param name="antlrTarget" value="${parser}"/>
         </foreach>
-        <antcall target="EclipseRefresh"/>
     </target>
 
     <target name="GuideSystem" depends="StencilGrammar">
@@ -56,7 +52,6 @@
             <fileset dir="${grammars}/guide"/>
         	<param name="antlrTarget" value="${parser}"/>
         </foreach>
-        <antcall target="EclipseRefresh"/>
     </target>
     	    
  	
@@ -65,7 +60,6 @@
     	   <fileset dir="${grammars}/validators" />
            <param name="antlrTarget" value="${parser}/validators"/>
     	</foreach>
-       <antcall target="EclipseRefresh"/>
     </target>
 
     <target name="Interpreter" depends="StencilGrammar">
@@ -73,7 +67,6 @@
     	   <fileset dir="${interpreter}" includes="*.g"/>
            <param name="antlrTarget" value="${interpreter}"/>
     	</foreach>
-       <antcall target="EclipseRefresh"/>
     </target>
 
  	
@@ -91,7 +84,6 @@
  			target="${grammars}/StencilTreeAdapter.g"
  			outputdirectory="${ast}"
  		/>
- 	 	<antcall target="EclipseRefresh"/>
 	</target>
 
  	<target name="TreeAdapter" depends="TreeAdapterGrammar, StencilBuild">
@@ -105,7 +97,6 @@
 			<arg value="${grammars}/StencilTreeAdapter.stg" />
 			<arg value="${ast}/StencilTreeAdapter.java" />
 		</java>
- 	 	<antcall target="EclipseRefresh"/> 		
  	</target>
 
  	<target name="StencilBuild">
@@ -115,11 +106,8 @@
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
  		</javac>
  	</target>
-
  	
- 	<target name="Release_With_Build" depends="Stencil,Release" />
- 	
- 	<target name="Release">
+ 	<target name="Release" depends="Stencil">
  		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>
 	</target> 
  	
@@ -127,10 +115,4 @@
  	<target name="RunTests" depends="StencilGrammar"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
-
-
- 	<target name="EclipseRefresh" if="eclipse.running">
- 		<eclipse.refreshLocal resource="Stencil/Core/" depth="infinite" />
- 	</target>
- 
  </project>

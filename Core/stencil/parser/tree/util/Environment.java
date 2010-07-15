@@ -38,6 +38,6 @@ public abstract class Environment implements Tuple {
 	public abstract Environment ensureCapacity(int capacity);
 	
 	public static Environment getDefault(Tuple... tuples) {
-		return ArrayEnvironment.getDefault(tuples);
+		return ArrayEnvironment.makeDefault(tuples);
 	}
 }

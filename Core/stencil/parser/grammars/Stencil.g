@@ -155,7 +155,7 @@ tokens {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
 }
 
-program : imports* globalValue* externalStream* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+program : imports* (globalValue | externalStream)* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           ^(LIST["Global Values"] globalValue*)
@@ -190,8 +190,9 @@ orderRef
   | GROUP ID ('|' ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
 
 globalValue
-  : (CONST ID atom) => CONST name=ID DEFINE atom
-  | CONST name=ID;
+//  options{backtrack=true;}
+  : CONST name=ID DEFINE atom -> ^(CONST[$name] atom);
+//  | CONST name=ID -> ^(CONST[$name]);
 
 externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 

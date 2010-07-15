@@ -33,11 +33,6 @@ public class Interpreter {
 	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws Exception {return processSequential(streamTuple, Arrays.asList(rule));}
 	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
 		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
-		return processSequential(env, rules);
-	}
-
-	public static Tuple processSequential(Environment env, Rule rule) throws Exception {return processSequential(env, Arrays.asList(rule));}
-	public static Tuple processSequential(Environment env, Iterable<Rule> rules) throws Exception {
 		return process(env, rules);
 	}
 

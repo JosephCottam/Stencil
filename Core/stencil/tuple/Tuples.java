@@ -55,6 +55,12 @@ public final class Tuples {
 		public boolean isDefault(String name, Object value) {throw new InvalidNameException(name);}
 		public String toString() {return "EMPTY TUPLE";}
 	};
+	
+	/**Placeholder object that indicats that a value in a tuple
+	 * was not set.  Since 'null' is a valid value in some places,
+	 * this is used in some circumstances to indicate that a value was not explicitly set.
+	 */
+	public static final Object UNSET_FIELD = new Object() {public String toString() {return "Unset Field: " + super.toString();}};
 
 	
 	/**Given a source tuple, returns a new tuple with only those fields that were
