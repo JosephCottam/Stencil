@@ -54,6 +54,7 @@ tokens {
   CANVAS  = 'canvas';
   CONST = 'const';
   DEFAULT = 'default';
+  ELEMENt = 'element';
   FACET = 'facet';
   FILTER  = 'filter';
   FROM  = 'from';
@@ -155,7 +156,7 @@ tokens {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
 }
 
-program : imports* (globalValue | externalStream)* order canvasLayer (streamDef | layerDef | operatorDef | pythonDef | operatorTemplate)*
+program : imports* (globalValue | externalStream)* order canvasLayer (elementDef | layerDef | operatorDef | operatorTemplate | streamDef | pythonDef)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           ^(LIST["Global Values"] globalValue*)
@@ -163,7 +164,7 @@ program : imports* (globalValue | externalStream)* order canvasLayer (streamDef 
           order 
           canvasLayer
           ^(LIST["Streams"] streamDef*) 
-          ^(LIST["Layers"] layerDef*) 
+          ^(LIST["Layers"] layerDef* elementDef*) 
           ^(LIST["Operators"] operatorDef* operatorTemplate*) 
           ^(LIST["Pythons"] pythonDef*));
 
@@ -211,7 +212,7 @@ selector
   : att=ID DEFINE path+=ID+ -> ^(SELECTOR[$att.text] $att ^(LIST["path"] $path+))
   |               path+=ID+ -> ^(SELECTOR["DEFAULT"] DEFAULT ^(LIST["path"] $path+));
 
-//////////////////////////////////////////// STREAM & LAYER ///////////////////////////
+//////////////////////////////////////////// STREAM, LAYER, ELEMENT ///////////////////////////
 
 streamDef
   : STREAM name=ID tuple[true]  consumesBlock+
@@ -220,6 +221,11 @@ streamDef
 layerDef
   : LAYER name=ID implantationDef defaultsBlock consumesBlock+
     -> ^(LAYER[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+));
+
+elementDef
+  : ELEMENT name=ID implantationDef defaultsBlock consumesBlock+
+  	->^(LAYER[$name.text] ^(ELEMENT implantationDef) defaultsBlock ^(LIST["Consumes"] consumesBlock+)); 
+
   
 implantationDef
   : ARG type=ID CLOSE_ARG -> GLYPH_TYPE[$type.text]
