@@ -54,7 +54,7 @@ tokens {
   CANVAS  = 'canvas';
   CONST = 'const';
   DEFAULT = 'default';
-  ELEMENt = 'element';
+  ELEMENT = 'element';
   FACET = 'facet';
   FILTER  = 'filter';
   FROM  = 'from';
@@ -224,7 +224,7 @@ layerDef
 
 elementDef
   : ELEMENT name=ID implantationDef defaultsBlock consumesBlock+
-  	->^(LAYER[$name.text] ^(ELEMENT implantationDef) defaultsBlock ^(LIST["Consumes"] consumesBlock+)); 
+  	->^(ELEMENT[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+)); 
 
   
 implantationDef

@@ -44,7 +44,7 @@ public class NumericSampler implements SampleOperator {
 	private static List<Number> buildRange(double max, double min, int tickCount, boolean useIntegers) {
 		double range = niceNum(max-min, false);							//'Nice' range
 		double spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
-		if (spacing < 1) {spacing =1;}									//Ensure some spacing occurs
+		if (spacing < Double.MIN_NORMAL) {spacing =1;}									//Ensure some spacing occurs
 		double graphMin = Math.floor(min/spacing) * spacing;			//Smallest value on the graph
 		double graphMax = Math.ceil(max/spacing) * spacing;				//Largest value on the graph
 		List<Number> nums = new ArrayList();
@@ -84,3 +84,4 @@ public class NumericSampler implements SampleOperator {
 	}
 }
 
+ 	

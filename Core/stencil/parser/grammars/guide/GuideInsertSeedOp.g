@@ -12,6 +12,8 @@ options {
    *  Sample operators are inserted where a #-> appears,
    *  after the last project operator in a chain or 
    *  at the start of the chain.
+   *
+   *  TODO: Needs to be fixed so that constants don't mess this up...ARG!!!!
    **/
 	 
    package stencil.parser.string;

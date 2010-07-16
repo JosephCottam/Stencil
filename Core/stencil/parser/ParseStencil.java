@@ -220,7 +220,6 @@ public abstract class ParseStencil {
 		p = (Program) opToTemplate.downup(p);		
 		treeTokens = new CommonTreeNodeStream(p);	//Must be re-done because we make a new "Program" node in OperatorToOpTemplate
 		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
-
 		
 		//Remove all operator references
 		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
@@ -240,6 +239,12 @@ public abstract class ParseStencil {
 		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
 		envSize.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) envSize.downup(p);
+		
+		//Create ad-hoc operators
+		ElementToLayer deElement = new ElementToLayer(treeTokens);
+		deElement.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) deElement.downup(p);
+		
 		
 		//Create ad-hoc operators
 		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);

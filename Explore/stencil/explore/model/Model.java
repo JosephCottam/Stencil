@@ -138,10 +138,14 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	 * @throws Exception Any exception thrown by the adapter's StencilPanel
 	 */
 	public void export(String filename, String type, Object info) throws Exception {
-		String infoString = info.toString();
-		if (info.getClass().isArray()) {
+		String infoString;
+		if (info == null) {infoString = "none";}
+		else if(info.getClass().isArray()) {
 			infoString = Arrays.deepToString((Object[]) info);
+		} else {
+			infoString = info.toString();
 		}
+		
 		reporter.addMessage("Starting %1$s export to %2$s (additional args: %3$s).", type, filename, infoString);
 
 		try {

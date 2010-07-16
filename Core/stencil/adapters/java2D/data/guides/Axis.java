@@ -69,8 +69,8 @@ public class Axis extends Guide2D {
 	 * rather used by continuous guide ops to influence the sample points.
 	 * 
 	 * This value is only a suggestion.  It will be approximately the number
-	 * of tick marks used, but the exact number is determined by the continuous guide
-	 * operator and may take into account the strategy and the range.
+	 * of tick marks used, but the exact number is determined by the sampler
+	 * and may take into account the strategy and the range.
 	 * 
 	 * */
 	public float tickCount;

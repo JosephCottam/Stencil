@@ -33,8 +33,11 @@ public class TestTupleLoader extends TestCase {
 		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
-		((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
-		assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").getView().size());
+		
+		synchronized(panel.visLock) {
+			((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
+			assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").getView().size());
+		}
 	}
 
 	public void testThread() throws Exception {
