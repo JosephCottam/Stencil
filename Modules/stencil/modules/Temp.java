@@ -32,9 +32,8 @@ import java.util.*;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
-import static stencil.module.util.OperatorData.*;
 import stencil.parser.tree.*;
 import stencil.types.Converter;
 
@@ -46,7 +45,7 @@ public class Temp extends BasicModule {
 	 * List taken from http://www.textfixer.com/resources/common-english-words.txt.
 	 * 
 	 * */
-	public static class StopWords extends BasicProject {
+	public static class StopWords extends AbstractOperator {
 		String[] words = new String[]{"a","able","about","across","after","all","almost","also","am","among","an","and","any","are","as","at","be","because","been","but","by","can","cannot","could","dear","did","do","does","either","else","ever","every","for","from","get","got","had","has","have","he","her","hers","him","his","how","however","i","if","in","into","is","it","its","just","least","let","like","likely","may","me","might","most","must","my","neither","no","nor","not","of","off","often","on","only","or","other","our","own","rather","said","say","says","she","should","since","so","some","than","that","the","their","them","then","there","these","they","this","tis","to","too","twas","us","wants","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","yet","you","your"};
 		
 		public StopWords(OperatorData opData) {super(opData);}		
@@ -62,7 +61,7 @@ public class Temp extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
-	public static final class Scale extends BasicProject {
+	public static final class Scale extends AbstractOperator {
 		private static final String IN_MAX = "inMax";
 		private static final String IN_MIN = "inMin";
 		private static final String OUT_MAX = "max";
@@ -112,7 +111,7 @@ public class Temp extends BasicModule {
 	
 	
 	/**Perform a linear interpolation.*/
-	public static final class LinearInterp extends BasicProject {
+	public static final class LinearInterp extends AbstractOperator {
 		public LinearInterp(OperatorData opData) {super(opData);}
 		
 		public double map(double step, double steps, double min, double max) {
@@ -133,7 +132,7 @@ public class Temp extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
-	public static final class Partition extends BasicProject {
+	public static final class Partition extends AbstractOperator {
 		private static final String MIN = "min";
 		private static final String MAX = "max";
 		private static final String BUCKETS = "n";
@@ -183,7 +182,7 @@ public class Temp extends BasicModule {
 	/**Keeps sorted lists of elements, reporting back
 	 * the position in the list on lookup.
 	 */
-	public static class Rank extends BasicProject {
+	public static class Rank extends AbstractOperator {
 		public Rank(OperatorData opData) {super(opData);}
 
 		public static final String NAME = "Rank";
@@ -266,115 +265,12 @@ public class Temp extends BasicModule {
 		public Rank duplicate() {return new Rank(operatorData);}
 	}
 
-	/**Maps one element to a set of other elements*/
-	public static class Mapping extends BasicProject {
-		public static final String NAMES = "fields";
-		public static final String NAME = "Mapping";
-		public static final String PUT_FACET = "put";
-
-		final protected Map<Object, Object[]> map = new HashMap();
-		final String[] names;
-		final boolean caseSensitive;
-		final Object[] defaultValues;
-
-		public Mapping(OperatorData opData, boolean caseSensitive, Object[] defaultValues, String...names) {
-			super(opData);
-			this.names = names;
-			this.defaultValues = defaultValues;
-			this.caseSensitive = caseSensitive;
-		}
-
-		public String getName() {return NAME;}
-
-		public Object[] put(Object key, Object... values) {
-			Object[] objects = new Object[values.length];
-			System.arraycopy(values, 0, objects, 0, values.length);	//Copy is required for storage.
-			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
-
-			if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
-				map.put(key, objects);
-				stateID++;
-			} else {
-				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
-			}
-			return objects;
-		}
-
-		public Object[] map(Object key, Object... args) {return query(key, args);}
-		public Object[] query(Object key, Object... args) {
-			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
-
-			Object[] results = map.get(key);
-			if (results == null) {return defaultValues;}			
-			return results;
-		}
-
-		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
-			String module = basic.getModule();
-			String name = basic.getName();
-			String[] fields;
-			
-			try {fields = getNames(specializer);}
-			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
-
-			OperatorData od = new OperatorData(basic);
-			od.addFacet(new FacetData(PUT_FACET, TYPE_PROJECT, false,  fields));
-			od.addFacet(new FacetData(MAP_FACET, TYPE_PROJECT, false, fields));
-			od.addFacet(new FacetData(QUERY_FACET, TYPE_PROJECT, false, fields));
-			return od;
-		}
-
-		public Mapping duplicate() {return new Mapping(operatorData, caseSensitive, defaultValues, names);}
-		
-		public static StencilOperator instance(OperatorData opData, Specializer specializer) throws SpecializationException, NoSuchMethodException {
-			final String[] names;
-			
-			try {names = getNames(specializer);}
-			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), specializer, e);}
-
-			Object[] defaultValues = new Object[names.length];
-			boolean noneSet = true;
-			for (int i=0; i< names.length; i++) {
-				String key = String.format("dv%1$s", i);
-				if (specializer.containsKey(key)) {
-					defaultValues[i] = specializer.get(key).getValue();
-					noneSet = false;
-				}	
-			}
-			if (noneSet) {defaultValues = null;}
-			
-			boolean caseSensitive = !specializer.getMap().containsKey("CaseInsensitive");
-			
-			Mapping m = new Mapping(getOperatorData(opData, specializer), caseSensitive, defaultValues, names);
-			
-			return m;
-		}
-		
-		private static String[] getNames(Specializer spec) {
-			return spec.get(NAMES).getText().split("\\s*,\\s*");
-		}
-
-	}
-
-	
 	
 	public Temp(ModuleData md) {super(md);}
 
-	public OperatorData getOperatorData(String name, Specializer specializer)
-	throws SpecializationException {
-
-		if(name.equals("Mapping")) {
-			return Mapping.getOperatorData(getModuleData().getOperator(name), specializer);
-		}
-
-		return super.getOperatorData(name, specializer);
-	}
-
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		try {
-			if (name.equals("Mapping")) {
-				return Mapping.instance(getOperatorData(name, specializer), specializer);
-			} else if (name.equals("Scale")) {
+			if (name.equals("Scale")) {
 				return new Scale(getOperatorData(name, specializer), specializer);
 			} else if (name.equals("Partition")) {
 				return new Partition(getOperatorData(name, specializer), specializer);

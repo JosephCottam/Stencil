@@ -8,6 +8,7 @@ defaults:
     - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
     - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
+    - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
 
 operators:
     - name: Count
@@ -20,3 +21,5 @@ operators:
       - {name: map, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
       - {name: query, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
       - {name: stateID, type: OTHER, function: false, prototype: !proto "Color VALUE"}
+      - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "Color VALUE"}
+      

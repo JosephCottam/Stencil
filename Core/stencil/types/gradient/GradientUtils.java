@@ -3,7 +3,7 @@ package stencil.types.gradient;
 import java.awt.Color;
 import java.util.regex.Pattern;
 
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -11,7 +11,7 @@ import stencil.types.Converter;
 
 public class GradientUtils extends BasicModule {
 
-	public static class Gradient extends BasicProject {
+	public static class Gradient extends AbstractOperator {
 
 		public Gradient(OperatorData opData) {super(opData);}
 		public GradientTuple query(Color one, Color two, double len, boolean abs, boolean cyclic) {

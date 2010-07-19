@@ -34,7 +34,7 @@ import java.awt.Color;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Range;
 import stencil.module.operator.util.Split;
 import stencil.module.util.BasicModule;
@@ -42,13 +42,14 @@ import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.color.ColorCache;
+import stencil.util.collections.ConstantList;
 
 public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
 	//TODO: Lift the throws-exception out to a wrapping class.  If throws Exception is requested, use the wrapper; otherwise use this class directly.  Change argument types to float.
-	public static final class HeatScale extends BasicProject {
+	public static final class HeatScale extends AbstractOperator {
 		public static final String NAME = "HeatScale";
 		public static final boolean DEFAULT_THROW_EXCEPTIONS = true;
 
@@ -144,7 +145,7 @@ public class Projection extends BasicModule {
 	 *
 	 * TODO: Update so it can use a comparator for arbitrary sorting orders, then have it default to 'natural' order
 	 */
-	public static final class Index extends BasicProject {
+	public static final class Index extends AbstractOperator {
 		public static final String NAME = "Index";
 		private List<String> labels = new ArrayList<String>();
 
@@ -170,7 +171,7 @@ public class Projection extends BasicModule {
 	 * For mapping, items that have not been seen before return 1 the first time, incremented there-after.
 	 * For query, items that have not been seen return 0 and are not added to the map.
 	 */
-	public static final class Count extends BasicProject {
+	public static final class Count extends AbstractOperator {
 		private Map<Object, Long> counts = new HashMap<Object, Long>();
 		private int stateID = Integer.MIN_VALUE;
 		
@@ -207,7 +208,7 @@ public class Projection extends BasicModule {
 	}
 
 	/**Counting when there are no keys to worry about.**/
-	public static final class Counter extends BasicProject {
+	public static final class Counter extends AbstractOperator {
 		private long count =1;
 		public Counter(OperatorData opData) {super(opData);}
 		public StencilOperator duplicate() {return new Counter(operatorData);}
@@ -215,6 +216,7 @@ public class Projection extends BasicModule {
 		public long map() {return count++;}
 		public long query() {return count;}		
 		public int stateID() {return (int) count % Integer.MAX_VALUE;}
+		public List<Long> vectorQuery(Object[][] args) {return new ConstantList(count, args.length);}
 	}
 	
 	public Projection(ModuleData md) {super(md);}

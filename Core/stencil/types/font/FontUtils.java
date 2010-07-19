@@ -3,7 +3,7 @@ package stencil.types.font;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -27,7 +27,7 @@ public final class FontUtils extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
-	public static class Font extends BasicProject {
+	public static class Font extends AbstractOperator {
 		public Font(OperatorData opData) {super(opData);}
 		
 		public FontTuple query(String arg) {return toTuple(arg);}

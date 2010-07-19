@@ -29,9 +29,12 @@
 package stencil.module.operator.wrappers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import stencil.interpreter.Interpreter;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.UnknownFacetException;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
@@ -59,93 +62,87 @@ public class SyntheticOperator implements StencilOperator {
 		public NoMatchException(String message) {super(message);}
 	}
 	
-	/**Container for holding a stencil-defined operator.
-	 * @author jcottam
-	 *
-	 */
-	public static class SyntheticInvokeTarget {
-		stencil.parser.tree.Operator opDef;
-		public SyntheticInvokeTarget (stencil.parser.tree.Operator source) {
-			this.opDef = source;
-		}
-		
-		public Tuple query(Object... values) {return process(opDef.getQuery(), values);}
-		public Tuple map(Object... values) {return process(opDef.getMap(), values);}
-		public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();} 
+	stencil.parser.tree.Operator opDef;
 			
-		private Tuple process(OperatorFacet facet, Object... values) {
-			if (facet.getArguments().size() != values.length) {
-				int expected = facet.getArguments().size();
-				throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
-			}
-			Tuple prefilter;
-			Tuple tuple = new ArrayTuple(values);
-			Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
-			
-			try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
-			catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}
-			env.setFrame(Environment.PREFILTER_FRAME, prefilter);
-			
-			OperatorRule action = matchingAction(facet, env);
-
-			if (action != null) {
-				try {
-					 Tuple result = action.invoke(env);
-					 result = Tuples.align(result, facet.getResults());
-					 return result;
-				} catch (Exception e) {
-					throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", opDef.getName(), facet.getName()),e);
-				}
-			}
-			
-			throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
-		}		
-				
-		/**Find the action that matches the given tuple.  If none does, return null.*/
-		private OperatorRule matchingAction(OperatorFacet facet, Environment tuple) {
-			for (OperatorRule action: facet.getRules()) {
-				if (action.matches(tuple)) {
-					return action;
-				}
-			}
-			return null;
-		}
-	}
 	
 	protected final OperatorData operatorData;
 
 	protected final String module;
-
-	protected final SyntheticInvokeTarget source;
 	
 	/**Create a Stencil operator from a specification.
 	 * TODO: Some synthetic operators facets are functions...figure out a way to detect this!
 	 * */
 	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
-		this.source = new SyntheticInvokeTarget(opDef);
 		this.module = module;
+		this.opDef = opDef;
 
 		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER);
 		
 		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, TYPE_PROJECT, false, opDef.getMap().getResults()));	
 		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));	
+		operatorData.addFacet(new FacetData(ParserConstants.VECTOR_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));
+		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));
 	}
 
-	public Invokeable getFacet(String name) throws IllegalArgumentException {
+	public Invokeable getFacet(String name) throws UnknownFacetException {
 		try {
 			if (name.equals(StencilOperator.MAP_FACET) 
 				|| name.equals(StencilOperator.QUERY_FACET)
-			    || name.equals(StencilOperator.STATE_ID_FACET)) {
-				return new ReflectiveInvokeable(name, source);
+			    || name.equals(StencilOperator.STATE_ID_FACET) 
+				|| name.equals(StencilOperator.VECTOR_FACET)) {
+				return new ReflectiveInvokeable(name, this);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
-		throw new IllegalArgumentException("Facet not defined: "+ name);
+		throw new UnknownFacetException(operatorData.getName(), name, operatorData.getFacetNames());
 	}
 
 	public String getName() {return operatorData.getName();}
 	public OperatorData getOperatorData() {return operatorData;}
+	public Tuple query(Object... values) {return process(opDef.getQuery(), values);}
+	public Tuple map(Object... values) {return process(opDef.getMap(), values);}
+	public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();}
+	public List<Tuple> vectorQuery(Object[][] args) {
+		return AbstractOperator.doVectorQuery(this, args);
+	}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
+
+	private Tuple process(OperatorFacet facet, Object... values) {
+		if (facet.getArguments().size() != values.length) {
+			int expected = facet.getArguments().size();
+			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
+		}
+		Tuple prefilter;
+		Tuple tuple = new ArrayTuple(values);
+		Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
+		
+		try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
+		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}
+		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
+		
+		OperatorRule action = matchingAction(facet, env);
+
+		if (action != null) {
+			try {
+				 Tuple result = action.invoke(env);
+				 result = Tuples.align(result, facet.getResults());
+				 return result;
+			} catch (Exception e) {
+				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", opDef.getName(), facet.getName()),e);
+			}
+		}
+		
+		throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
+	}		
+			
+	/**Find the action that matches the given tuple.  If none does, return null.*/
+	private OperatorRule matchingAction(OperatorFacet facet, Environment tuple) {
+		for (OperatorRule action: facet.getRules()) {
+			if (action.matches(tuple)) {
+				return action;
+			}
+		}
+		return null;
+	}
 }

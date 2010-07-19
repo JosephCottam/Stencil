@@ -22,5 +22,6 @@
 	<classpathentry kind="lib" path="Library/JUNG/jung-graph-impl-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-api-2.0.1.jar"/>
+	<classpathentry kind="lib" path="Library/clojure-1.1.0.jar" sourcepath="Library/clojure-sources-1.1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -7,9 +7,9 @@ defaults:
     - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
     - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"} 
+    - {name: vectorQuery, type: PROJECT, function: false, prototype: !proto "VALUE"} 
 
 operators: 
-   - name: Mapping
    - name: Rank
      keys: "min, max, n"
    - name: Scale
@@ -17,12 +17,15 @@ operators:
      facets:
       - {name: map, type: PROJECT, function: true, prototype: !proto "VALUE"}
       - {name: query, type: PROJECT, function: true, prototype: !proto "VALUE"}
+      - {name: vectorQuery, type: PROJECT, function: false, prototype: !proto "VALUE"} 
    - name: Partition
      facets:
       - {name: map, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
       - {name: query, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
+      - {name: vectorQuery, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}      
    - name: StopWords
      facets:
       - {name: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
       - {name: map, target: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
+      - {name: vectorQuery, type: PROJECT, function: false, prototype: !proto "boolean stopWord"} 
       

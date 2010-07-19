@@ -13,9 +13,11 @@ operators:
     facets: 
      - {name: map, target: query, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y"}
      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y"}
+     - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y"}
   - name: ScaleRect
     defaultSpecializer: !spec "[range: ALL, split: 0, by: 1]"
     facets: 
      - {name: map, target: query, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y, double Width, double Height"}
      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y, double Width, double Height"}
+     - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double X, double Y, double Width, double Height"}
         

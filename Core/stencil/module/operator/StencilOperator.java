@@ -59,19 +59,20 @@ import stencil.module.util.OperatorData;
  * be reflected in all roles.  Operators instances of the same base type
  * are completely independent. 
  * 
+ * TODO: Eliminate the getFacet and return to a more regular interface...
+ *  
  * @author jcottam
  *
  */
 public interface StencilOperator {
-	//TODO:Move these names to ParserConstants...
 	/**Name of the facet used by default in contexts where mutation is permitted.*/
 	public static final String MAP_FACET ="map";
 
 	/**Name of the facet used by default in contexts where mutation is NOT permitted.*/
 	public static final String QUERY_FACET ="query";
 	
-	/**Suggested facet name for use in ranged operations using Stencils range helpers.*/
-	public static final String RANGE_FACET ="range";
+	/**Name of the facet used to process dynamic bindings in bulk.*/
+	public static final String VECTOR_FACET ="vectorQuery";
 	
 	/**Facet used to get the ID of the current state.
 	 * This is used to determine if update operations are required.
@@ -81,7 +82,7 @@ public interface StencilOperator {
 	/**Retrieve an invokable object.  This is a combined method and target.
 	 * IllegalArgumentException is thrown when the facet is not know.
 	 * */
-	public Invokeable getFacet(String facet) throws IllegalArgumentException;
+	public Invokeable getFacet(String facet) throws UnknownFacetException;
 	
 	/**Retrieve the operator data for the current operator.*/ 
 	public OperatorData getOperatorData();

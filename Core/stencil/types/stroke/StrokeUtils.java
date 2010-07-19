@@ -2,7 +2,7 @@ package stencil.types.stroke;
 
 import java.awt.BasicStroke;
 
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -34,7 +34,7 @@ public final class StrokeUtils extends BasicModule {
 	/**The  format for strokes is "weight:pattern";
 	 * all other properties must be set with other methods.
 	 */
-	public static class Stroke extends BasicProject {
+	public static class Stroke extends AbstractOperator {
 		public Stroke(OperatorData opData) {super(opData);}
 		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
 		

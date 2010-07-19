@@ -54,7 +54,7 @@ from Words
 
 operator WordCount base Count
 
-operator LineIndex base Mapping[fields: "lines"]
+operator LineIndex base Dict[fields: "lines"]
 
 /*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)

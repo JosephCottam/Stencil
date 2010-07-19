@@ -2,7 +2,7 @@ package stencil.modules;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -16,7 +16,7 @@ public class TupleUtil extends BasicModule {
 	/**Rename the components of a tuple with new names, 
 	 * like an echo but with variable name.
 	 */
-	public static final class Rename extends BasicProject {
+	public static final class Rename extends AbstractOperator {
 		private static String NAMES = "names";
 
 		String[] keys;
@@ -45,7 +45,7 @@ public class TupleUtil extends BasicModule {
 	 * as arguments. If no tuple is passed, the result is 
 	 * equal to the number of arguments.
 	 * */
-	public static final class Size extends BasicProject {
+	public static final class Size extends AbstractOperator {
 		protected Size(OperatorData opData) {super(opData);}
 		public int query(Tuple t) {return t.size();}
 		public Size duplicate() {return this;}
@@ -55,7 +55,7 @@ public class TupleUtil extends BasicModule {
 	/**Takes a tuple and returns a new tuple where every element
 	 * of the original tuple is now a tuple in the new tuple.
 	 */
-	public static final class EnfoldValues extends BasicProject {
+	public static final class EnfoldValues extends AbstractOperator {
 		protected EnfoldValues(OperatorData opData) {super(opData);}
 		public Tuple[] query(Tuple t) {
 			Tuple[] ts = new Tuple[t.size()];
@@ -73,7 +73,7 @@ public class TupleUtil extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
-	public static final class Select extends BasicProject {
+	public static final class Select extends AbstractOperator {
 		private final int field;
 		
 		public Select(OperatorData opData, Specializer spec) {
@@ -96,7 +96,7 @@ public class TupleUtil extends BasicModule {
 	/**Takes a tuple and extends it by the passed values.
 	 * Resulting tuple can only safely be numerically dereferenced.
 	 * */
-	public static final class ExtendTuple extends BasicProject {
+	public static final class ExtendTuple extends AbstractOperator {
 		public ExtendTuple(OperatorData opData) {super(opData);}
 		
 		public Tuple query(Tuple t, Object... more) {
@@ -111,12 +111,12 @@ public class TupleUtil extends BasicModule {
 		}
 	}
 	
-	public static final class Get extends BasicProject {
+	public static final class Get extends AbstractOperator {
 		public Get(OperatorData opData) {super(opData);}
 		public Tuple query(Tuple t, int i) {return Converter.toTuple(t.get(i));}
 	}
 	
-	public static final class ToTuple extends BasicProject {
+	public static final class ToTuple extends AbstractOperator {
 		public ToTuple(OperatorData opData) {super(opData);}
 		public Tuple query(Object o) {return Converter.toTuple(o);}
 	}

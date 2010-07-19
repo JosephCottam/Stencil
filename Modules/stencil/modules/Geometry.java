@@ -2,7 +2,7 @@ package stencil.modules;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -10,7 +10,7 @@ import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
 public class Geometry extends BasicModule {
-	public static class Scale extends BasicProject {
+	public static class Scale extends AbstractOperator {
 		private static final String SCALE_KEY = "by";
 		
 		final double scale;
@@ -28,7 +28,7 @@ public class Geometry extends BasicModule {
 		}
 	}
 
-	public static class ScaleRect extends BasicProject {
+	public static class ScaleRect extends AbstractOperator {
 		private static final String SCALE_KEY = "by";
 		
 		final double shift;

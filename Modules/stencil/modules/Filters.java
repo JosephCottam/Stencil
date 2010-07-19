@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -48,7 +48,7 @@ public class Filters extends BasicModule {
 	public static final boolean trivialTrue(Object... args) {return true;}
 	public static final boolean trivialFalse(Object... args) {return false;}
 		
-	public static class RegExp extends BasicProject {
+	public static class RegExp extends AbstractOperator {
 		private static final String PATTERN_KEY = "pattern";
 		private final Pattern patternCache; 
 		private final boolean negated;

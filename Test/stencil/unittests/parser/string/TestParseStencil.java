@@ -51,6 +51,7 @@ public class TestParseStencil extends StencilTestCase {
 			}
 			catch (Throwable e) {
 				errors.add(name +  ":"+ e.getClass().getSimpleName());
+				e.printStackTrace();
 			}			
 		}
 

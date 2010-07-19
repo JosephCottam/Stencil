@@ -2,14 +2,18 @@ package stencil.module.operator.wrappers;
 
 import static java.lang.String.format;
 
+import java.util.List;
+
 import stencil.display.DisplayLayer;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import static stencil.module.util.OperatorData.TYPE_NA;
+import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
 /**Wraps a layer as an operator. 
@@ -67,4 +71,7 @@ public final class LayerOperator implements StencilOperator {
 
 	public OperatorData getOperatorData() {return operatorData;}
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
+	public List<Tuple> vectorQuery(Object[][] args) {
+		return AbstractOperator.doVectorQuery(this, args);
+	}
 }

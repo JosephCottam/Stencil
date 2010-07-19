@@ -31,7 +31,7 @@ package stencil.types.color;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.types.Converter;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
@@ -98,7 +98,7 @@ public final class ColorUtils extends BasicModule {
 	public static Tuple setAlpha(Object v, Object o) {return mod(o, ColorTuple.ALPHA, v, "setAlpha");}
 	public static Tuple opaque(Object o) {return mod(o, ColorTuple.ALPHA, DIR.full, "Opque");}
 
-	public static class Color extends BasicProject {
+	public static class Color extends AbstractOperator {
 		public Color(OperatorData opData) {super(opData);}
 		public Tuple argumentParser(String arg) {
 			return ColorCache.get(arg);

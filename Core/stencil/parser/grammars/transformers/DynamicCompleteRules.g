@@ -25,7 +25,7 @@ options {
   public Object transform(Object t) {
     t = changeType(t);
     t = convertAll(t);
-    t = toQuery(t);
+    t = vectorize(t);
     return t;
   } 
   
@@ -36,11 +36,11 @@ options {
    private Object convertAll(Object t) {
      return downup(t, this, "convert");
    }
-   private Object toQuery(Object t) {
-     return downup(t, this, "toQuery");
+   private Object vectorize(Object t) {
+     return downup(t, this, "toVector");
    }
    
-   private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
+   private String vectorName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
 }
 
 changeType: ^(CONSUMES f=. pf=. l=. r=. v=. c=. ^(LIST toDynamic*));
@@ -48,12 +48,12 @@ toDynamic:  ^(r=RULE rest+=.*) -> ^(DYNAMIC_RULE {adaptor.dupTree($r)} {adaptor.
             
 convert: ^(DYNAMIC_RULE r=. sq=.) -> ^(DYNAMIC_RULE $r {stateQueryList(adaptor, $sq)});  
 
-toQuery 
+toVector
   @after{
-    AstInvokeable inv=((Function) $toQuery.tree).getTarget();
+    AstInvokeable inv=((Function) $toVector.tree).getTarget();
     inv.changeFacet(QUERY_FACET);
   }
   : ^(f=FUNCTION rest+=.*) 
           {$f.getAncestor(DYNAMIC_RULE) != null}? ->
-          ^(FUNCTION[queryName($f.getText())]  $rest*);
+          ^(FUNCTION[vectorName($f.getText())]  $rest*);
 

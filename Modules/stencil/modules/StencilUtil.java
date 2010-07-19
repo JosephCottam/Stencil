@@ -40,6 +40,7 @@ import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.SeedOperator;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.BasicModule;
@@ -104,6 +105,9 @@ public class StencilUtil extends BasicModule {
 		}
 		
 		public int stateID() {return stateID;}
+		public List<Tuple> vectorQuery(Object[][] args) {
+			return AbstractOperator.doVectorQuery(this, args);
+		}
 	}
 
 	
@@ -163,6 +167,9 @@ public class StencilUtil extends BasicModule {
 		}
 
 		public Tuple query(Object... args) {return new ArrayTuple(args);}
+		public List<Tuple> vectorQuery(Object[][] args) {
+			return AbstractOperator.doVectorQuery(this, args);
+		}
 	}
 	
 	/**Returns exactly what it was passed, but
@@ -195,6 +202,10 @@ public class StencilUtil extends BasicModule {
 
 		public Tuple query(Object... args) {
 			return new ArrayTuple(args);
+		}
+		
+		public List<Tuple> vectorQuery(Object[][] args) {
+			return AbstractOperator.doVectorQuery(this, args);
 		}
 	}
 	

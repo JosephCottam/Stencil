@@ -1,0 +1,13 @@
+name: PersistentData
+targetClass: stencil.modules.PersistentData
+
+defaults: 
+  defaultSpecializer: !spec "[range: ALL, split:0]"
+  facets: 
+    - {name: map,     type: PROJECT, function: false, prototype: !proto "VALUE"}
+    - {name: query,   type: PROJECT, function: false, prototype: !proto "VALUE"}
+    - {name: put,     type: PROJECT, function: false, prototype: !proto "VALUE"}
+    - {name: stateID, type: OTHER,   function: false, prototype: !proto "VALUE"} 
+
+operators: 
+   - name: Dict      

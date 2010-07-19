@@ -5,22 +5,20 @@ import java.util.List;
 import java.util.Map;
 import static java.lang.String.format;
 
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.UnknownFacetException;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
-import stencil.module.operator.util.UnknownFacetException;
 import stencil.module.util.OperatorData;
 import stencil.tuple.Tuple;
 import stencil.util.collections.KeysetConstantMap;
 
 
-/**Associates a list of invokeables with corresponding 
- * facet names.  Duplicate is NOT supported for non-functions.
- * 
- * TODO: Add support for duplicate.  Have the underlying
- * object of a facet support duplicate...
+/**Associates a list of invokeables with corresponding facet names.
+ * This class is used to build an operator out of static methods.
+ * Duplicate is NOT supported if the method indicate is not a function.
  */
-public final class InvokeableOperator extends BasicProject {
+public final class InvokeableOperator extends AbstractOperator {
 	private final String name;
 	private final Map<String, ReflectiveInvokeable> facets;
 	

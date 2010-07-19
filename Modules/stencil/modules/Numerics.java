@@ -32,7 +32,7 @@ import java.util.List;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Range;
 import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.util.*;
@@ -47,7 +47,7 @@ public class Numerics extends BasicModule {
 	/**Sum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 **/
-	public static final class FullSum extends BasicProject {
+	public static final class FullSum extends AbstractOperator {
 		private static final String NAME = "Sum";
  		private double sum = 0;
  		
@@ -72,7 +72,7 @@ public class Numerics extends BasicModule {
 			return sum;
 		}
 		
-		public List<Double> range(Double[][] args) {
+		public List<Double> vectorQuery(Double[][] args) {
 			return new ConstantList(sum, args.length);
 		}
 
@@ -84,7 +84,7 @@ public class Numerics extends BasicModule {
 	/**Minimum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 */
-	public static final class FullMin extends BasicProject {
+	public static final class FullMin extends AbstractOperator {
  		private static final String NAME = "Min";
  		private double min = Double.MAX_VALUE;
 
@@ -112,7 +112,7 @@ public class Numerics extends BasicModule {
 			return min;
 		}
 		
-		public List<Double> range(Double[][] args) {
+		public List<Double> vectorApply(Double[][] args) {
 			return new ConstantList(min, args.length);
 		}
 
@@ -124,7 +124,7 @@ public class Numerics extends BasicModule {
 	/**Maximum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 */
-	public static class FullMax extends BasicProject {
+	public static class FullMax extends AbstractOperator {
  		private static final String NAME = "Max";
  		private double max = -Double.MAX_VALUE;	
 
@@ -151,8 +151,8 @@ public class Numerics extends BasicModule {
 		public double query(Object... args) {
 			return max;
 		}
-
-		public List<Double> sum(Double[][] args) {
+		
+		public List<Double> vectorApply(Double[][] args) {
 			return new ConstantList(max, args.length);
 		}
 		

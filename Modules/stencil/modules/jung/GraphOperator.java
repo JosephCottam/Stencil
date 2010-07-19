@@ -9,7 +9,7 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
@@ -18,7 +18,7 @@ import stencil.types.Converter;
 /**Utility class for building JUNG graph operators.  This covers 
  * graph creation/storage, layout storage and position queries.
  */
-public abstract class GraphOperator extends BasicProject implements StencilOperator {
+public abstract class GraphOperator extends AbstractOperator implements StencilOperator {
 	protected final DirectedGraph graph = new DirectedSparseGraph();
 	protected Layout<Object, Object> layout;	
 	

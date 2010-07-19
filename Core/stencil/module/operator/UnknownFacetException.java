@@ -1,4 +1,4 @@
-package stencil.module.operator.util;
+package stencil.module.operator;
 
 import java.util.Arrays;
 import java.util.Collection;

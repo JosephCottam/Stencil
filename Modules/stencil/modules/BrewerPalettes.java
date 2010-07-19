@@ -6,7 +6,7 @@ import java.lang.reflect.*;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.Modules;
@@ -27,7 +27,7 @@ public class BrewerPalettes  extends BasicModule {
 		}
 	}
 	
-	public static final class BrewerColors extends BasicProject {
+	public static final class BrewerColors extends AbstractOperator {
 		private static String PALETTE = "palette";
 		private static String RESERVE = "reserve";
 		

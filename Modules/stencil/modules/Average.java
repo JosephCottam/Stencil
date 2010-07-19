@@ -33,7 +33,7 @@ import java.util.List;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.BasicProject;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Range;
 import stencil.module.operator.util.Split;
 import stencil.module.operator.wrappers.RangeHelper;
@@ -46,19 +46,22 @@ import stencil.util.collections.ConstantList;
 
 import static stencil.parser.tree.Specializer.RANGE;
 import static stencil.parser.tree.Specializer.SPLIT;
-import static stencil.module.operator.StencilOperator.RANGE_FACET;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
 public class Average extends BasicModule {
+	/**Facet name for use in ranged operations using Stencils range helpers.*/
+	private static final String RANGE_FACET ="range";
+
 	public static final String MODULE_NAME = "Average";
+	
 
 
 	/**Returns a mean over a range.
 	 * An empty range is considered to have a mean of 0.
 	 * Can be used with zero-length range (n..n) to indicate 'mean of current arguments'
 	 * */
-	public static class RangeMean extends BasicProject {
+	public static class RangeMean extends AbstractOperator {
 		protected RangeMean(OperatorData opData) {super(opData);}
 
 		private static final String NAME = "Mean";
@@ -91,7 +94,7 @@ public class Average extends BasicModule {
 	 * TODO: Implement the 'calculate but do not render' message to handle case where minimum range has not bee reached
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
-	public static class FullMean extends BasicProject {
+	public static class FullMean extends AbstractOperator {
 		private static final String NAME = "Mean";
 		int start;
 		double total =0;
@@ -134,7 +137,7 @@ public class Average extends BasicModule {
 			return value;
 		}
 		
-		public List<Double> range(Double[][] args) {
+		public List<Double> vectorQuery(Double[][] args) {
 			return new ConstantList(total/count, args.length);
 		}
 		
@@ -143,7 +146,7 @@ public class Average extends BasicModule {
 
 
 	/**Takes a mean over exactly what is passed, keeps no memory*/
-	public static class SimpleMean extends BasicProject {
+	public static class SimpleMean extends AbstractOperator {
 		public SimpleMean(OperatorData opData) {super(opData);}
 		public double query(double...values) {
 			double sum =0;
@@ -155,7 +158,7 @@ public class Average extends BasicModule {
 		public SimpleMean duplicate() {return this;}
 	}
 	
-	public static class SimpleMode extends BasicProject {
+	public static class SimpleMode extends AbstractOperator {
 		public SimpleMode(OperatorData opData) {super(opData);}
 		public Object query(Object... values) {
 			HashMap<Object, Integer> m = new HashMap();
@@ -181,7 +184,7 @@ public class Average extends BasicModule {
 	}
 	
 	
-	public static class SimpleMedian extends BasicProject {
+	public static class SimpleMedian extends AbstractOperator {
 		public SimpleMedian(OperatorData opData) {super(opData);}
 		public Object query(Object... values) {
 			java.util.Arrays.sort(values);
@@ -205,7 +208,7 @@ public class Average extends BasicModule {
 	 * in the range) or he mean of the two middle-most values.  Median is computed
 	 * the same for full range as sub-range.
 	 */
-	public static class Median extends BasicProject {
+	public static class Median extends AbstractOperator {
 		private static final String NAME = "Median";
 
 		protected Median(OperatorData opData) {super(opData);}
@@ -236,7 +239,7 @@ public class Average extends BasicModule {
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
-	public static class Mode extends BasicProject {
+	public static class Mode extends AbstractOperator {
 		private static final String NAME = "Mode";
 
 		public Mode(OperatorData opData) {super(opData);}
