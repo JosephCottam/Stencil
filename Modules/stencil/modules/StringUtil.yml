@@ -7,7 +7,6 @@ defaults:
   facets:
     - {name: map, type: PROJECT, function: true, prototype: !proto "String VALUE"}
     - {name: query, type: PROJECT, function: true, prototype: !proto "String VALUE"}
-    - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "String VALUE"}
 
 operators:
   - name: Concatenate
@@ -18,7 +17,6 @@ operators:
     facets:
     - {name: map, type: PROJECT, function: true, prototype: !proto "int VALUE"}
     - {name: query, type: PROJECT, function: true, prototype: !proto "int VALUE"}
-    - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "int VALUE"}
   - name: Print
   - name: Replace
   - name: Substring

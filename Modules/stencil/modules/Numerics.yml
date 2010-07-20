@@ -7,7 +7,6 @@ defaults:
   facets:
     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-    - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
 
 operators:
   - name: Abs
@@ -21,7 +20,6 @@ operators:
      - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
      - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
-     - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
      - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
   - name: Min
     facets:
@@ -29,7 +27,6 @@ operators:
      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
      - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
      - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}
-     - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
   - name: Mod
   - name: Mult
   - name: Negate
@@ -48,5 +45,4 @@ operators:
       - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
       - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
       - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
-      - {name: vectorQuery, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
       
