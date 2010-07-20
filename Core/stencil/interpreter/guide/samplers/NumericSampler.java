@@ -4,6 +4,8 @@ import static stencil.parser.ParserConstants.FALSE_STRING;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
@@ -47,14 +49,14 @@ public class NumericSampler implements SampleOperator {
 		if (spacing < Double.MIN_NORMAL) {spacing =1;}									//Ensure some spacing occurs
 		double graphMin = Math.floor(min/spacing) * spacing;			//Smallest value on the graph
 		double graphMax = Math.ceil(max/spacing) * spacing;				//Largest value on the graph
-		List<Number> nums = new ArrayList();
+		Set<Number> nums = new TreeSet();
 		
 		for (double v=graphMin; v<(graphMax+.5*spacing); v+=spacing) {
 			if (useIntegers) {nums.add((int) v);}
 			else {nums.add(v);}
 		}
 		
-		return nums;
+		return new ArrayList(nums);
 	}
 	
 
