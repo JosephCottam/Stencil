@@ -1,6 +1,6 @@
 package stencil.unittests.adapters.examples;
 
-public class TextArc extends RestrictedImageTest {
+public class TextArc extends ImageTest {
 	public TextArc(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/TextArc/",
 									  "textArc.stencil",
