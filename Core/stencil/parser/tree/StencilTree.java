@@ -62,10 +62,10 @@ public class StencilTree extends CommonTree {
 	
 	public static boolean verifyType(Tree tree, int type) {return tree.getType() == type;}
 	
-	public Tree dupNode() {
+	public StencilTree dupNode() {
 		try {
 			Constructor c = this.getClass().getConstructor(Token.class);
-			return (Tree) c.newInstance(this.getToken());
+			return (StencilTree) c.newInstance(this.getToken());
 		} catch (Exception e) {
 			throw new Error(String.format("Error reflectively duplicating node to node of same type (%1$s).", this.getClass().getName()), e);
 		}

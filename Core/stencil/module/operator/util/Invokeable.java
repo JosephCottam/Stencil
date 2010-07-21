@@ -5,7 +5,6 @@ import stencil.tuple.Tuple;
 public interface Invokeable<R> {
 	public Object getTarget();
 
-	
 	/**Same as invoke, but the returned value will be a tuple.
 	 * If the returned value would be wrapped as an array tuple, 
 	 * the passed 'container' tuple will be used.  The container
