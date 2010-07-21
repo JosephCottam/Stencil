@@ -1,9 +1,11 @@
 package stencil.adapters.java2D.util;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.parser.tree.DynamicRule;
+import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
 import stencil.tuple.Tuple;
@@ -30,8 +32,13 @@ public final class DynamicUpdateTask extends UpdateTask {
 
 	public boolean needsUpdate() {return rule.requiresUpdate();}
 
-	public void update() {
-		rule.apply(table, sourceData);
+	public Finisher update() {
+		final List<Tuple> result = rule.apply(table, sourceData);
+		return new Finisher() {
+			public void finish() {
+				((DoubleBufferLayer) table).updateAll(result);
+			}
+		};
 	}
 	
 	public String toString() {return "Dynamic update for " + table.getName() + ": " + rule.getAction().getTarget().getPrototype().toStringTree();}

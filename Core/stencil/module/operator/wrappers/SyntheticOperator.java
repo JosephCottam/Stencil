@@ -80,7 +80,6 @@ public class SyntheticOperator implements StencilOperator {
 		
 		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, TYPE_PROJECT, false, opDef.getMap().getResults()));	
 		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.VECTOR_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));
 		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));
 	}
 
@@ -88,8 +87,7 @@ public class SyntheticOperator implements StencilOperator {
 		try {
 			if (name.equals(StencilOperator.MAP_FACET) 
 				|| name.equals(StencilOperator.QUERY_FACET)
-			    || name.equals(StencilOperator.STATE_ID_FACET) 
-				|| name.equals(StencilOperator.VECTOR_FACET)) {
+			    || name.equals(StencilOperator.STATE_ID_FACET)) {
 				return new ReflectiveInvokeable(name, this);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}

@@ -111,7 +111,7 @@ final class ArrayEnvironment extends Environment {
 	 *  If any frame is missing or not applicable, its place should be held by an empty tuple in the array.
 	 *  If not enough frames are supplied, empty tuples will be added.
 	 *  If more than the standard frames are supplied, the extras will still be put in the environment.
-	 *  
+	 *  Regardless of the frames passed, the result will have at least unfilled empty frames at the end.
 	 */
 	final static ArrayEnvironment makeDefault(Tuple...frames) {
 		int size = Math.max(DEFAULT_SIZE, frames.length);

@@ -7,7 +7,6 @@ defaults:
   facets:
     - {name: map, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
     - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
-    - {name: vectorQuery, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
 
 operators:
   - name: Width
@@ -20,5 +19,4 @@ operators:
     facets:
       - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
       - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
-      - {name: vectorQuery, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
       

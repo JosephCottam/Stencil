@@ -21,7 +21,6 @@ import stencil.display.DisplayLayer;
 import stencil.parser.ParserConstants;
 import stencil.parser.string.util.EnvironmentProxy;
 import stencil.parser.tree.Consumes;
-import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Layer;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
@@ -126,10 +125,12 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 
 	public void updatePrototype(Tuple defaults) {prototype = (T) prototype.update(defaults);}
 	
-	public synchronized void updateAll(List<DynamicRule.Update> updates) {
-		for (DynamicRule.Update update: updates) {
-			T glyph = (T) find(update.ID);
-			T newGlyph = (T) glyph.update(update.update);
+	public synchronized void updateAll(List<Tuple> updates) {
+		for (Tuple update: updates) {
+			assert update.getPrototype().get(0).getFieldName().equals("ID");
+
+			T glyph = (T) find((String) update.get(0));
+			T newGlyph = (T) glyph.update(update);
 			if (glyph != newGlyph) {update(newGlyph);}
 		}
 		changeGenerations();

@@ -7,12 +7,16 @@ import java.util.Map;
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
-import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
-import stencil.interpreter.Interpreter;
+import stencil.display.LayerView;
+import stencil.module.operator.StencilOperator;
 import stencil.parser.string.StencilParser;
+import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleAppender;
+import stencil.tuple.instances.PrototypedTuple;
+import stencil.types.Converter;
 
 public class DynamicRule extends StencilTree {
 	public DynamicRule(Token token) {super(token);}
@@ -35,24 +39,55 @@ public class DynamicRule extends StencilTree {
 		}
 	}
 	
-	public void apply(DisplayLayer<Glyph> table, Map<String, Tuple> sourceData) {
-		java.util.List<Update> results = new ArrayList(table.getView().size());
+	public java.util.List<Tuple> apply(DisplayLayer<Glyph> table, Map<String, Tuple> sourceData) {
+		LayerView<Glyph> view = table.getView();
 		
-		for (Glyph glyph: table.getView()) {
-			Tuple source = sourceData.get(glyph.getID());		//Get associated source data
-			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
-			
-			try {
-				Tuple update = Interpreter.processSequential(source, getAction());
-				if (update != null) {results.add(new Update(glyph.getID(), update));}
-			}
-			catch (Exception ex) {
-				System.err.println("Error in dynamic update.");
-				ex.printStackTrace();
-			}			
+		final Rule rule = getAction();
+		final CallChain chain = rule.getAction();
+		
+		Environment[] envs = new Environment[view.size()];
+		int idx=0;
+		for (Glyph glyph: view) {
+			Tuple streamTuple = sourceData.get(glyph.getID());
+			envs[idx] = Environment.getDefault(Canvas.global, View.global, streamTuple);
+			envs[idx] = envs[idx].ensureCapacity(envs[idx].size() + chain.getDepth());
+			idx++;
 		}
-		
-		((DoubleBufferLayer) table).updateAll(results);
+
+		CallTarget action = chain.getStart();		
+		//TODO: Extend to handle >> and >-; currently does -> for everything		
+		while (!(action instanceof Pack)) {
+			final Function func = (Function) action;
+			
+			final AstInvokeable inv = func.getTarget();
+			final StencilOperator op = inv.getOperator();
+			final java.util.List<Value> formals = func.getArguments();
+			final Object[][] args = new Object[envs.length][formals.size()]; 
+			
+			for (int i=0; i< args.length; i++) {
+				for (int j=0; j<formals.size(); j++) {
+					args[i][j] = formals.get(j).getValue(envs[i]); 
+				}				
+			}
+			
+			final java.util.List result = op.vectorQuery(args);
+			
+			for (int i=0; i< envs.length; i++) {
+				envs[i].extend(Converter.toTuple(result.get(i)));
+			}
+			
+			action = func.getCall();
+		}
+
+		Pack pack = (Pack) action;
+		java.util.List<Tuple> updates = new ArrayList(envs.length);
+		int i=0;
+		for (Glyph glyph: view) {
+			Tuple result = rule.getTarget().finalize(pack.apply(envs[i++]));
+			Tuple id = PrototypedTuple.singleton("ID", glyph.getID());
+			updates.add(TupleAppender.append(id, result));
+		}
+		return updates;
 	}	
 		
 	/**Should this dynamic rule be run now??*/

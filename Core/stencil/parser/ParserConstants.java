@@ -56,7 +56,6 @@ public abstract class ParserConstants {
 	public static final String INIT_FACET = "init";
 	public static final String QUERY_FACET = StencilOperator.QUERY_FACET;
 	public static final String STATE_ID_FACET = StencilOperator.STATE_ID_FACET;
-	public static final String VECTOR_FACET = StencilOperator.VECTOR_FACET;
 	public static final String CUSTOM_PARSER_FACET = "argumentParser";
 	
 	public static final int RANGE_START_INT = 1;

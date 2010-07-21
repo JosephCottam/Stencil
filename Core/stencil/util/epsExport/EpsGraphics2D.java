@@ -1896,7 +1896,7 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 	 * Finalises the object.
 	 * @since 0.1
 	 */
-	public void finalize()
+	public void finish()
 	{
 		super.finalize();
 	}

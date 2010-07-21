@@ -6,7 +6,7 @@ import stencil.parser.tree.Guide;
 /**Update a single guide's data.
  * This is essentially a wrapper for the StencilTree's GuideDef.
  **/
-public class GuideTask extends UpdateTask {	
+public class GuideTask extends UpdateTask {
 	private final StencilPanel panel;
 	private final Guide guideDef;
 
@@ -17,7 +17,10 @@ public class GuideTask extends UpdateTask {
 
 	public boolean needsUpdate() {return guideDef.getStateQuery().requiresUpdate();}
 
-	public void update() {guideDef.update(panel);}
+	public Finisher update() {
+		guideDef.update(panel);
+		return UpdateTask.NO_WORK;
+	}
 	
 	public String toString() {return "Guide update for " + guideDef.getSelector().toString();}
 }

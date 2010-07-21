@@ -17,7 +17,7 @@
 	<!-- Just the core stencil grammar, not the additional processing.-->
  	<target name="WorkingGrammar">
  		<antlr3
-			target="${grammars}/transformers/ElementToLayer.g"
+			target="${grammars}/transformers/DynamicCompleteRules.g"
 			outputdirectory="${parser}"
 		/>
  	</target>

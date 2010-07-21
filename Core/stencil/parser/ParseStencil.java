@@ -333,7 +333,7 @@ public abstract class ParseStencil {
  
 	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
 	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
-	    p = (Program) completeDynamics.transform(p);
+	    p = (Program) completeDynamics.downup(p);
 	    
 	    
 		//END DYNAMIC BINDING ----------------------------------------------------------------------------------

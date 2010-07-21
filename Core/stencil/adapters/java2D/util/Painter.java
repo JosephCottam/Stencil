@@ -334,8 +334,13 @@ public final class Painter implements Runnable {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
 					
-					updatePool.invokeAll(updaters.values());  //PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
-														//SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":n*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
+					List<Future<Finisher>> results = updatePool.invokeAll(updaters.values());  //PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
+															  									  //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":n*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
+					for (Future<Finisher> f: results) {
+						Finisher finalizer = f.get();
+						finalizer.finish();
+					}
+					
 					painters = new ArrayList(); 
 					
 					for (int i=0; i< layers.length; i++) {

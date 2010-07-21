@@ -7,12 +7,10 @@ defaults:
   facets:
     - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
     - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
-    - {name: vectorQuide, function: true, type: PROJECT, prototype: !proto "VALUE"}
 
 operators:
   - name: Gradient
     facets:
       - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
       - {name: query, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
-      - {name: vectorQuery, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
       
