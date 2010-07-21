@@ -91,6 +91,7 @@ public class MessagePanel extends JPanel implements MessageReporter {
 
 	public MessagePanel() {
 		messages = new JList();
+		messages.setModel(new DefaultListModel()); 
 		messages.setCellRenderer(new ElementRenderer());
 
 		clear = new JButton("Clear");
@@ -131,10 +132,11 @@ public class MessagePanel extends JPanel implements MessageReporter {
 	}
 
 	protected synchronized void addMessage(String message, boolean error) {
-		final String mssg = message;
 		message = message.trim();
 
-		Entry e = new Entry(mssg, error);
+		Entry e = new Entry(message, error);
 		((DefaultListModel) messages.getModel()).addElement(e);
+		if (error) {System.err.println(message);}
+		else {System.out.println(message);}
 	}
 }
