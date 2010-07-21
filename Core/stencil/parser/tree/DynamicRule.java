@@ -9,14 +9,11 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
-import stencil.display.LayerView;
-import stencil.module.operator.StencilOperator;
+import stencil.interpreter.Interpreter;
 import stencil.parser.string.StencilParser;
-import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleAppender;
 import stencil.tuple.instances.PrototypedTuple;
-import stencil.types.Converter;
 
 public class DynamicRule extends StencilTree {
 	public DynamicRule(Token token) {super(token);}
@@ -30,64 +27,27 @@ public class DynamicRule extends StencilTree {
 		return (Consumes) t;
 	}
 
-	public static final class Update {
-		public String ID; 
-		public Tuple update;
-		public Update(String ID, Tuple update) {
-			this.ID = ID;
-			this.update = update;
-		}
-	}
-	
 	public java.util.List<Tuple> apply(DisplayLayer<Glyph> table, Map<String, Tuple> sourceData) {
-		LayerView<Glyph> view = table.getView();
+		java.util.List<Tuple> results = new ArrayList(table.getView().size());
 		
-		final Rule rule = getAction();
-		final CallChain chain = rule.getAction();
-		
-		Environment[] envs = new Environment[view.size()];
-		int idx=0;
-		for (Glyph glyph: view) {
-			Tuple streamTuple = sourceData.get(glyph.getID());
-			envs[idx] = Environment.getDefault(Canvas.global, View.global, streamTuple);
-			envs[idx] = envs[idx].ensureCapacity(envs[idx].size() + chain.getDepth());
-			idx++;
-		}
-
-		CallTarget action = chain.getStart();		
-		//TODO: Extend to handle >> and >-; currently does -> for everything		
-		while (!(action instanceof Pack)) {
-			final Function func = (Function) action;
+		for (Glyph glyph: table.getView()) {
+			Tuple source = sourceData.get(glyph.getID());		//Get associated source data
+			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
 			
-			final AstInvokeable inv = func.getTarget();
-			final StencilOperator op = inv.getOperator();
-			final java.util.List<Value> formals = func.getArguments();
-			final Object[][] args = new Object[envs.length][formals.size()]; 
-			
-			for (int i=0; i< args.length; i++) {
-				for (int j=0; j<formals.size(); j++) {
-					args[i][j] = formals.get(j).getValue(envs[i]); 
-				}				
+			try {
+				Tuple result = Interpreter.processSequential(source, getAction());
+				if (result != null) {
+					Tuple id = PrototypedTuple.singleton("ID", glyph.getID());
+					Tuple update = TupleAppender.append(id, result);
+					results.add(update);
+				}
 			}
-			
-			final java.util.List result = op.vectorQuery(args);
-			
-			for (int i=0; i< envs.length; i++) {
-				envs[i].extend(Converter.toTuple(result.get(i)));
-			}
-			
-			action = func.getCall();
+			catch (Exception ex) {
+				System.err.println("Error in dynamic update.");
+				ex.printStackTrace();
+			}			
 		}
-
-		Pack pack = (Pack) action;
-		java.util.List<Tuple> updates = new ArrayList(envs.length);
-		int i=0;
-		for (Glyph glyph: view) {
-			Tuple result = rule.getTarget().finalize(pack.apply(envs[i++]));
-			Tuple id = PrototypedTuple.singleton("ID", glyph.getID());
-			updates.add(TupleAppender.append(id, result));
-		}
-		return updates;
+		return results;
 	}	
 		
 	/**Should this dynamic rule be run now??*/
