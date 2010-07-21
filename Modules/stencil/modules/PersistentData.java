@@ -9,14 +9,14 @@ import stencil.module.util.FacetData;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
-import clojure.lang.*;
+import org.pcollections.*;
 
 public class PersistentData extends BasicModule {
 	public static class Dict extends AbstractOperator {		
 		public static final String NAMES = "fields";
 		public static final String NAME = "Dict";
 
-		private IPersistentMap dict;
+		private PMap<Object, Object[]> dict;
 		private final String[] names;
 		private final boolean caseSensitive;
 
@@ -26,10 +26,10 @@ public class PersistentData extends BasicModule {
 		}
 
 		protected Dict(OperatorData opData,  boolean caseSensitive, String...names) {
-			this(PersistentHashMap.create(), opData, caseSensitive, names);
+			this(HashTreePMap.empty(), opData, caseSensitive, names);
 		}
 
-		protected Dict(IPersistentMap dict, OperatorData opData,  boolean caseSensitive, String...names) {
+		protected Dict(PMap dict, OperatorData opData,  boolean caseSensitive, String...names) {
 			super(opData);
 			this.dict = dict;
 			this.caseSensitive = caseSensitive;
@@ -43,7 +43,7 @@ public class PersistentData extends BasicModule {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
 			if (objects.length== names.length){ //TODO: Add compile-time call-site verification of argument lengths
-				dict = dict.assoc(key, objects);
+				dict = dict.plus(key, objects);
 				stateID++;
 			} else {
 				throw new IllegalArgumentException("Objects to store list must match the prototype names list length.");
@@ -56,7 +56,7 @@ public class PersistentData extends BasicModule {
 		public Object[] query(Object key, Object... args) {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
-			Object result = dict.valAt(key);
+			Object result = dict.get(key);
 			if (result == null) {return null;}
 			else {return (Object[]) result;}	//TODO: Store the tuple itself, will always end up wrapped anyway...
 		}
