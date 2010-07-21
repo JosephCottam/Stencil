@@ -1,7 +1,6 @@
 package stencil.module.operator.wrappers;
 
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.util.Split;
@@ -148,10 +147,6 @@ public abstract class SplitHelper implements StencilOperator {
 	public StencilOperator duplicate() {
 		StencilOperator op = operator.duplicate();
 		return makeOperator(split, op);
-	}
-	
-	public List<Tuple> vectorQuery(Object[][] args) {
-		return AbstractOperator.doVectorQuery(this, args);
 	}
 	
 	//TODO: Support compound operator types.  Then split is a combined categorize followed by a project.

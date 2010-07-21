@@ -29,7 +29,6 @@
 package stencil.modules;
 
 import java.util.HashMap;
-import java.util.List;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
@@ -42,7 +41,6 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
-import stencil.util.collections.ConstantList;
 
 import static stencil.parser.tree.Specializer.RANGE;
 import static stencil.parser.tree.Specializer.SPLIT;
@@ -135,10 +133,6 @@ public class Average extends BasicModule {
 			double value =0;
 			if (count > 0) {value = total/count;}
 			return value;
-		}
-		
-		public List<Double> vectorQuery(Double[][] args) {
-			return new ConstantList(total/count, args.length);
 		}
 		
 		public FullMean duplicate() {return new FullMean(operatorData, start);}

@@ -1,6 +1,5 @@
 package stencil.module.operator.wrappers;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -11,7 +10,6 @@ import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.*;
@@ -58,10 +56,6 @@ public class JythonOperator implements StencilOperator {
 		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in legend %2$s", name, operatorName));
 	}
 	
-	public List<Tuple> vectorQuery(Object[][] args) {
-		return AbstractOperator.doVectorQuery(this, args);
-	}
-
 	//TODO: Can we do something with all of the encapsulations to duplicate them and support duplicate?
 	public JythonOperator duplicate() {throw new UnsupportedOperationException();}
 }

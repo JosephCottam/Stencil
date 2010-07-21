@@ -71,11 +71,6 @@ public class Numerics extends BasicModule {
 		public double query(Object... args) {
 			return sum;
 		}
-		
-		public List<Double> vectorQuery(Double[][] args) {
-			return new ConstantList(sum, args.length);
-		}
-
 
  		public String getName() {return NAME;}
  		public FullSum duplicate() {return new FullSum(operatorData);}

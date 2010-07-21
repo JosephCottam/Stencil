@@ -29,12 +29,10 @@
 package stencil.module.operator.wrappers;
 
 import java.util.Arrays;
-import java.util.List;
 
 import stencil.interpreter.Interpreter;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.UnknownFacetException;
-import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
@@ -99,9 +97,6 @@ public class SyntheticOperator implements StencilOperator {
 	public Tuple query(Object... values) {return process(opDef.getQuery(), values);}
 	public Tuple map(Object... values) {return process(opDef.getMap(), values);}
 	public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();}
-	public List<Tuple> vectorQuery(Object[][] args) {
-		return AbstractOperator.doVectorQuery(this, args);
-	}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}

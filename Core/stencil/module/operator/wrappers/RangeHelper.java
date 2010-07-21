@@ -29,7 +29,6 @@
 package stencil.module.operator.wrappers;
 
 import stencil.module.operator.StencilOperator;
-import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.Range;
 import stencil.module.util.FacetData;
@@ -277,10 +276,6 @@ public abstract class RangeHelper implements StencilOperator {
 	public StencilOperator duplicate() {
 		StencilOperator op = baseOperator.duplicate();
 		return makeOperator(range, op, facetName);
-	}
-	
-	public List<Tuple> vectorQuery(Object[][] args) {
-		return AbstractOperator.doVectorQuery(this, args);
 	}
 	
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}

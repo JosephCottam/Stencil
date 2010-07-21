@@ -42,7 +42,6 @@ import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.color.ColorCache;
-import stencil.util.collections.ConstantList;
 
 public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
@@ -216,7 +215,6 @@ public class Projection extends BasicModule {
 		public long map() {return count++;}
 		public long query() {return count;}		
 		public int stateID() {return (int) count % Integer.MAX_VALUE;}
-		public List<Long> vectorQuery(Object[][] args) {return new ConstantList(count, args.length);}
 	}
 	
 	public Projection(ModuleData md) {super(md);}

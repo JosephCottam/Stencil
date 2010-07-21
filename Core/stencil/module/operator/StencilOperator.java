@@ -29,8 +29,6 @@
 package stencil.module.operator;
 
 
-import java.util.List;
-
 import stencil.module.operator.util.Invokeable;
 import stencil.module.util.OperatorData;
 
@@ -109,15 +107,4 @@ public interface StencilOperator {
 	 * @throws UnsupportedOperationException
 	 */
 	public StencilOperator duplicate() throws UnsupportedOperationException;
-	
-	
-	/**Calculates the result of apply the query facet to the given
-	 * set of arguments.  The arguments must be packed and ready 
-	 * for query application HOWEVER the operator is free to provide
-	 * its own more efficient implementation (does not actually need
-	 * to call the query facet).
-	 * 
-	 * @return A list of the results; results do not need to be packed as tuples.
-	 */
-	public List vectorQuery(Object[][] arguments);
 }
