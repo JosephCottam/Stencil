@@ -229,6 +229,10 @@ public abstract class ParseStencil {
 		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
 		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) opExplicit.downup(p);		
+
+		OperatorInlineSimple inlineSimpleOp = new OperatorInlineSimple(treeTokens);
+		inlineSimpleOp.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) inlineSimpleOp.transform(p);		
 		
 		//Expand operatorDefs to include query and stateID
 		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
