@@ -4,7 +4,9 @@ import static java.lang.String.format;
 
 
 import stencil.display.DisplayLayer;
+import stencil.display.LayerView;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.UnknownFacetException;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
@@ -67,5 +69,39 @@ public final class LayerOperator implements StencilOperator {
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
+	public StencilOperator viewPoint() {
+		return new LayerViewOperator(layer.getView());
+	}
+	
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
+	
+	private static class LayerViewOperator implements StencilOperator {
+		final LayerView view;
+		public LayerViewOperator(LayerView view) {this.view = view;}
+		public StencilOperator duplicate() throws UnsupportedOperationException {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Invokeable getFacet(String facet) throws UnknownFacetException {
+			if (StencilOperator.MAP_FACET.equals(facet) 
+					|| StencilOperator.QUERY_FACET.equals(facet)
+					|| FIND_FACET.equals(facet)) {
+					return new ReflectiveInvokeable(FIND_METHOD, view);
+			} 
+			throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
+		}
+
+		public String getName() {return view.getLayerName();}
+
+		public OperatorData getOperatorData() {
+			throw new UnsupportedOperationException();
+		}
+
+		public StencilOperator viewPoint() {
+			throw new UnsupportedOperationException();
+		}
+		
+	}
+	
 }

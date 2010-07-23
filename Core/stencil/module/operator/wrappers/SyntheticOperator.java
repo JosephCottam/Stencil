@@ -99,7 +99,10 @@ public class SyntheticOperator implements StencilOperator {
 	public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
-	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
+	public SyntheticOperator duplicate() {throw new UnsupportedOperationException();}
+	public StencilOperator viewPoint() {
+		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
+	}
 
 	private Tuple process(OperatorFacet facet, Object... values) {
 		if (facet.getArguments().size() != values.length) {

@@ -107,4 +107,16 @@ public interface StencilOperator {
 	 * @throws UnsupportedOperationException
 	 */
 	public StencilOperator duplicate() throws UnsupportedOperationException;
+	
+	/**A viewpoint is the operator as it current exists.  
+	 * Viewpoints are allowed to reflect future updates to the source operator.
+	 * They are not allowed to modify state.  The only thing an operator
+	 * viewpoint is guaranteed to correctly respond to are 'stateID' and 'query'.
+	 * All other facets MAY throw an exception. Query should respond
+	 * as if it were being called on the memory state in the operator at
+	 * the time the viewpoint was created.
+	 * 
+	 * @return
+	 */
+	public StencilOperator viewPoint();
 }

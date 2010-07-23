@@ -19,21 +19,29 @@ options {
 }
 
 @members {
-  public Program transform(Program p, TreeAdaptor adaptor) {
-     Program copy = (Program) adaptor.dupTree(p);
-     this.downup(copy);     
+ private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
+ private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream());
+
+ //TODO: Take care of re-instantiating synthetic operators....somehow 
+ public static Program viewPoint(Program p) {
+    //this.viewPointer = new MakeViewPoint(new CommonTreeNodeStream(program));
+     Program copy = (Program) DUPLICATOR.dupTree(p);
+     INSTANCE.downup(copy);     
      return copy;
-  }
+ }
+
 }
 
 topdown: i=AST_INVOKEABLE 
 	{AstInvokeable inv = (AstInvokeable) i;
 	 StencilOperator op = inv.getOperator();
 	 if (op == null) {return;}
-	 StencilOperator viewPoint = op.getViewPoint();
+	 StencilOperator viewPoint = op.viewPoint();
 	 inv.setOperator(viewPoint);
-	 inv.changeFacet("query"); //HACK:  Usually right where it matters...but not always!
+	 inv.changeFacet("query"); //HACK: Probably correct where it matters...but not always!
 	};
+	
+
 
 
 

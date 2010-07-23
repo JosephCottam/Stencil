@@ -36,4 +36,6 @@ public interface LayerView<T extends Glyph> extends Iterable<T>{
 	
 	/**Get the stateID That corresponds to this view.*/
 	public int getStateID();
+	
+	public T find(String id);
 }

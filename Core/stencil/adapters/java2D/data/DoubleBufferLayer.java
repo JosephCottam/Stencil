@@ -241,13 +241,13 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			return bounds;
 		}
 		
-		public Glyph2D get(Object id) {
+		public T find(String id) {
 			if (storeStateID != creationGeneration) {throw new ConcurrentModificationException();}
 
-			Glyph2D g = null;
+			T g = null;
 			Integer idx = index.get(id);
 			if (idx != null) {
-				g = store.get(idx);
+				g = (T) store.get(idx);
 			}
 			return g;
 		}

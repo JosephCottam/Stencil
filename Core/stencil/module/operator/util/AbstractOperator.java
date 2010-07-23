@@ -8,7 +8,7 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 
-public abstract class AbstractOperator implements StencilOperator {
+public abstract class AbstractOperator implements StencilOperator, Cloneable {
 	protected final OperatorData operatorData;
 	protected int stateID = Integer.MIN_VALUE;
 	
@@ -42,4 +42,15 @@ public abstract class AbstractOperator implements StencilOperator {
 	 * actual implementation.
 	 */
 	public StencilOperator duplicate() {throw new UnsupportedOperationException();}
+
+	/**Default viewpoint creation is to just clone the underlying operator.
+	 * This is sufficient if the operator is state-less or only value-state is
+	 * retained.  If reference state is retained, it may still be sufficient, provided
+	 * the referenced object and everything it transitively refers to is immutable.
+	 * Otherwise, care must be taken to create a proper viewPoint.
+	 **/
+	public StencilOperator viewPoint() {
+		try {return (StencilOperator) this.clone();}
+		catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
+	}
 }

@@ -58,4 +58,10 @@ public class JythonOperator implements StencilOperator {
 	
 	//TODO: Can we do something with all of the encapsulations to duplicate them and support duplicate?
 	public JythonOperator duplicate() {throw new UnsupportedOperationException();}
+
+	//TODO: Implement properly
+	//HACK: This keeps things running, but if the jython encapsulation is used the correctness guarantee cannot be made.
+	public JythonOperator viewPoint() {
+		return this;
+	}
 }

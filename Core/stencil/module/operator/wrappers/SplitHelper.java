@@ -149,6 +149,10 @@ public abstract class SplitHelper implements StencilOperator {
 		return makeOperator(split, op);
 	}
 	
+	public StencilOperator viewPoint() {
+		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
+	}
+	
 	//TODO: Support compound operator types.  Then split is a combined categorize followed by a project.
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));} //TODO: Handle as a compound categorize and project.  Needs to return list of categorize (split values) and the results of each.  May not work for ordered splits.  
 	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));}

@@ -27,7 +27,9 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
+import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
+import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
 

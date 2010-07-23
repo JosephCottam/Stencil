@@ -5,7 +5,7 @@ import org.antlr.runtime.Token;
 import stencil.module.ModuleCache;
 
 public class Import extends StencilTree {
-	Import(Token token) {super(token);}
+	public Import(Token token) {super(token);}
 
 	public String getName() {return token.getText();}
 	public java.util.List<Atom> getArguments() {return (List) getChild(1);}

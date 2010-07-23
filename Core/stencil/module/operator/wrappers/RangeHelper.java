@@ -278,6 +278,11 @@ public abstract class RangeHelper implements StencilOperator {
 		return makeOperator(range, op, facetName);
 	}
 	
+	public StencilOperator viewPoint() {
+		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
+	}
+
+	
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
 	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
 	
