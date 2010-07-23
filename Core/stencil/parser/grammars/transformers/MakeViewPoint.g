@@ -1,8 +1,9 @@
 tree grammar MakeViewPoint;
 options {
-	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
-	filter = true;
+   tokenVocab = Stencil;
+   ASTLabelType = CommonTree;	
+   filter = true;
+   superClass = TreeFilterSequence;
 }
 
 @header{
@@ -16,33 +17,49 @@ options {
 
   import stencil.parser.tree.*;
   import stencil.module.operator.StencilOperator;
+  import stencil.module.operator.wrappers.SyntheticOperator;
 }
 
 @members {
  private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
  private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream(null));
 
- //TODO: Take care of re-instantiating synthetic operators....somehow 
- public static Program viewPoint(Program p) {
+ private static final Map<String, SyntheticOperator> synthetics = new HashMap();
+
+ public synchronized static Program viewPoint(Program p) {
     //this.viewPointer = new MakeViewPoint(new CommonTreeNodeStream(program));
+     synthetics.clear();
      Program copy = (Program) DUPLICATOR.dupTree(p);
-     INSTANCE.downup(copy);     
+     INSTANCE.downup(copy, INSTANCE, "instantiate");
+     INSTANCE.downup(copy, INSTANCE, "change");
      return copy;
  }
-
+ 
 }
 
-topdown: i=AST_INVOKEABLE 
-	{AstInvokeable inv = (AstInvokeable) i;
-	 StencilOperator op = inv.getOperator();
-	 if (op == null) {return;}
-	 StencilOperator viewPoint = op.viewPoint();
-	 inv.setOperator(viewPoint);
-	 inv.changeFacet("query"); //HACK: Probably correct where it matters...but not always!
-	};
+//instantiate new synethetic operators that pointer here (they don't need to be updated yet since they run off the actual AST).
+instantiate: ^(opDef=OPERATOR .*) 
+{
+    SyntheticOperator op = new SyntheticOperator("", (Operator) opDef);
+    synthetics.put(op.getName(), op);   
+};
+
+
+//Replace AST instances with pointers to new viewpoints
+//Uses the new synthetic instances when necessary
+change: i=AST_INVOKEABLE 
+{
+   AstInvokeable inv = (AstInvokeable) i;
+   StencilOperator op = inv.getOperator();
+   if (op == null) {return;}
+   StencilOperator viewPoint;
+   if (synthetics.containsKey(op.getName())) {
+      viewPoint = synthetics.get(op.getName());
+   } else {
+      viewPoint = op.viewPoint();
+   }
+   
+   inv.setOperator(viewPoint);
+   inv.changeFacet("query"); //Probably correct where it matters...but maybe not always
+};
 	
-
-
-
-
-

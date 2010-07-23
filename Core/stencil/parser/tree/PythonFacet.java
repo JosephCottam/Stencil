@@ -8,7 +8,7 @@ import org.antlr.runtime.Token;
  * code.  Each of these is a Facet...captured here!
  */
 public final class PythonFacet extends StencilTree {
-	PythonFacet(Token token) {super(token);}
+	public PythonFacet(Token token) {super(token);}
 
 	public String getName() {return token.getText();}
 	

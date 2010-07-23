@@ -52,7 +52,7 @@ import java.util.List;
  * 
  */
 
-public abstract class RangeHelper implements StencilOperator {
+public abstract class RangeHelper implements StencilOperator, Cloneable {
 	private static abstract class AbstractRangeTarget implements Invokeable {
 		final RangeHelper helper;
 		final Invokeable base;
@@ -279,7 +279,8 @@ public abstract class RangeHelper implements StencilOperator {
 	}
 	
 	public StencilOperator viewPoint() {
-		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
+		try {return (StencilOperator) this.clone();}
+		catch (Exception e) {throw new Error("Error creating viewpoint in range helper.");}
 	}
 
 	

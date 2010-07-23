@@ -25,6 +25,7 @@ public class TestModule implements Module {
 		
 		OperatorData od = MODULE_DATA.getOperator("FilterFail");
 		od.addFacet(new FacetData("map", TYPE_PROJECT, true, "VALUE"));
+		od.addFacet(new FacetData("query", TYPE_PROJECT, true, "VALUE"));
 	}
 	
 	public static TestModule instance() {return instance;}

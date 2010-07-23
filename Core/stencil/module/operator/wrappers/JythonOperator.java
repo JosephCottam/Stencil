@@ -53,6 +53,7 @@ public class JythonOperator implements StencilOperator {
 
 	public Invokeable<Tuple> getFacet(String name) throws IllegalArgumentException {
 		if (invokeables.containsKey(name)) {return invokeables.get(name);}
+		if (name.equals("query")) {return invokeables.get("map");}	//HACK: Default to 'map' if 'query' wasn't found.
 		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in legend %2$s", name, operatorName));
 	}
 	

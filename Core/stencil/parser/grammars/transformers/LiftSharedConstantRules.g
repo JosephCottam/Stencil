@@ -1,10 +1,10 @@
 tree grammar LiftSharedConstantRules;
 options {
-	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
-  superClass = TreeRewriteSequence;
-	output = AST;
-	filter = true;
+    tokenVocab = Stencil;
+    ASTLabelType = CommonTree;	
+    superClass = TreeRewriteSequence;
+    output = AST;
+    filter = true;
 }
 
 @header {

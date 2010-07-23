@@ -8,8 +8,7 @@ options {
 }
 
 @header {
-/** Ensures that stencil native and python operators are defined in the 
- *  ad-hoc module.  Does NOT modify the AST, just populates the ad-hoc module.
+/** Ensures that stencil native and python operators are defined in the ad-hoc module.  
  **/
 
   package stencil.parser.string;

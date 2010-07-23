@@ -72,7 +72,6 @@ public final class JythonEncapsulation {
 		assert environment != null;
 		
 		synchronized(environment) {
-		
 			//Stock the Python interpreter with the appropriate values
 			for (int i=0; i< args.length; i++) {
 				String name = getArguments().get(i).getFieldName();
