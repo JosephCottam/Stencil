@@ -62,7 +62,7 @@ public class PersistentData extends BasicModule {
 		}
 
 		public Dict duplicate() {return new Dict(operatorData, caseSensitive, names);}
-		public Dict snapshot() {return new Dict(dict, operatorData, caseSensitive, names);}
+		public Dict viewPoint() {return new Dict(dict, operatorData, caseSensitive, names);}
 		
 		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
 			String module = basic.getModule();

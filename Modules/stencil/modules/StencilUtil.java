@@ -56,7 +56,7 @@ import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
 public class StencilUtil extends BasicModule {
-	public static abstract class EchoBase implements StencilOperator, SeedOperator {
+	public static abstract class EchoBase implements StencilOperator, SeedOperator, Cloneable {
 		private final String FIELDS = "fields";
 		
 		final OperatorData operatorData;
@@ -104,6 +104,11 @@ public class StencilUtil extends BasicModule {
 		}
 		
 		public int stateID() {return stateID;}
+		
+		public StencilOperator viewPoint() {
+			try {return (StencilOperator) this.clone();}
+			catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
+		}
 	}
 
 	
@@ -135,7 +140,7 @@ public class StencilUtil extends BasicModule {
 		}
 		
 		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype, rangeLock);}
-
+		
 		public String getName() {return NAME;}
 
 		public SampleSeed getSeed() {
@@ -144,7 +149,7 @@ public class StencilUtil extends BasicModule {
 
 		public Tuple map(Object... args) {
 			assert args.length == 1;
-			double value = Converter.toNumber(args[0]).doubleValue();  //TODO: Remove when typed calls work
+			double value = Converter.toNumber(args[0]).doubleValue();
 
 			if (!rangeLock) {
 			

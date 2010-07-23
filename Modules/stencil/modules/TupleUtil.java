@@ -14,7 +14,7 @@ import stencil.types.Converter;
 public class TupleUtil extends BasicModule {
 	
 	/**Rename the components of a tuple with new names, 
-	 * like an echo but with variable name.
+	 * like an echo but with variable names.
 	 */
 	public static final class Rename extends AbstractOperator {
 		private static String NAMES = "names";
