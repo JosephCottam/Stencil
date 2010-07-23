@@ -49,7 +49,9 @@ public class StencilTree extends CommonTree {
 		return StencilParser.tokenNames[type];
 	}
 	
-	protected CommonTree findChild(int type, String content) {
+	public StencilTree findChild(int type) {return (StencilTree) this.getFirstChildWithType(type);}
+	
+	public CommonTree findChild(int type, String content) {
 		for (int i=0; children != null && i < children.size(); i++) {
 			CommonTree t = (CommonTree) children.get(i);
 			if (t.getType() == type 

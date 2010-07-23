@@ -12,3 +12,9 @@ defaults:
 operators:
   - name: EchoCategorize
   - name: EchoContinuous
+  - name: Rename
+    defaultSpecializer: !spec "[]"
+    facets: 
+      - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+  

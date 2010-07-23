@@ -25,28 +25,21 @@ options {
     public DefaultPackExpansionException(String msg) {super(msg);}
   }
 
-	public Pack fromDefault(Pack pack) {
-	  Rule rule = pack.getRule();
-	  Target target = rule.getTarget();
-    TuplePrototype targetPrototype = target.getPrototype();
-    
-    Function call = pack.getPriorCall();
-	  if (call == null) {throw new DefaultPackExpansionException("Cannot use implicit pack in a call-free chain.");}
-    TuplePrototype callPrototype = target.getPrototype();
-    
-    if (callPrototype.size() != targetPrototype.size()) {throw new DefaultPackExpansionException("Default pack cannot be created because tuple prototypes are of different lengths.");}
-
-    Pack newPack = (Pack) adaptor.dupNode(pack);
+  public Pack fromDefault(Pack pack) {
+      Rule rule = pack.getRule();
+      Target target = rule.getTarget();
+      TuplePrototype targetPrototype = target.getPrototype();
+      
+      Pack newPack = (Pack) adaptor.dupNode(pack);
         
-    for (int i=0; i< targetPrototype.size(); i++) {
-       TupleRef ref = (TupleRef) adaptor.create(TUPLE_REF,"<autogen>");
-       adaptor.addChild(ref, adaptor.create(NUMBER, Integer.toString(i)));
-       adaptor.addChild(newPack, ref);
-    }
+      for (int i=0; i< targetPrototype.size(); i++) {
+         TupleRef ref = (TupleRef) adaptor.create(TUPLE_REF,"<autogen>");
+         adaptor.addChild(ref, adaptor.create(NUMBER, Integer.toString(i)));
+         adaptor.addChild(newPack, ref);
+      }
     
-    return newPack;
-	}
-
+      return newPack;
+  }
 }
 
 topdown: ^(r=PACK DEFAULT) -> {fromDefault((Pack) $r)};		

@@ -20,7 +20,7 @@ options {
 
 @members {
  private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
- private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream());
+ private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream(null));
 
  //TODO: Take care of re-instantiating synthetic operators....somehow 
  public static Program viewPoint(Program p) {

@@ -214,6 +214,12 @@ public abstract class ParseStencil {
 		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) defaultSpecializers.downup(p);
 
+		//Add default packs where required
+		DefaultPack defaultPack = new DefaultPack(treeTokens);
+		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
+		defaultPack.downup(p);
+
+		
 		//Converting all operator defs to template/ref pairs
 		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
 		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
@@ -258,12 +264,6 @@ public abstract class ParseStencil {
 		//Validate the ad-hocs are all created
 		NoOperatorReferences noRefs = new NoOperatorReferences(treeTokens);
 		noRefs.downup(p);
-
-		//Add default packs where required
-		DefaultPack defaultPack = new DefaultPack(treeTokens);
-		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
-		defaultPack.downup(p);
-		
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);

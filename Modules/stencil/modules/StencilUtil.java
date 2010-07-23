@@ -40,6 +40,7 @@ import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.SeedOperator;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.BasicModule;
@@ -55,7 +56,58 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
+
+/**Operators used in various stencil transformations.*/
 public class StencilUtil extends BasicModule {
+
+	/**Rename the components of a tuple with new names; 
+	 * like an echo but with variable names updated in the prototype.
+	 */
+	public static final class Rename extends AbstractOperator {
+		private static String NAMES = "names";
+
+		private final String[] keys;
+
+		public Rename(OperatorData opData, Specializer specializer) {
+			super(opData);
+			keys = getNames(specializer);
+		}
+
+		public Rename(OperatorData opData, String...keys) {
+			super(opData);
+			this.keys = keys;
+		}
+
+		
+		public Tuple map(Object... values) {return query(values);}
+		public Tuple query(Object... values) {
+			assert keys.length == values.length : "Keys and values lengths do not match.";
+			
+			return new ArrayTuple(values);
+		}
+		
+		public Rename duplicate() {return new Rename(operatorData, keys);}
+		
+		private static String[] getNames(Specializer spec) {
+			return spec.get(NAMES).getText().split("\\s+,\\s+");
+		}
+		
+		public static OperatorData complete(OperatorData base, Specializer spec) {
+			OperatorData od = new OperatorData(base);
+			String[] keys  = getNames(spec);
+			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
+			fd = new FacetData(fd.getName(), fd.getType(), false, keys);
+			od.addFacet(fd);
+			
+			fd = od.getFacet(StencilOperator.QUERY_FACET);
+			fd = new FacetData(fd.getName(), fd.getType(), false, keys);
+			od.addFacet(fd);
+			return od;
+		}
+		
+	}
+
+	
 	public static abstract class EchoBase implements StencilOperator, SeedOperator, Cloneable {
 		private final String FIELDS = "fields";
 		
@@ -88,19 +140,19 @@ public class StencilUtil extends BasicModule {
 				
 		/**Complete the legend data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
-			OperatorData ld = new OperatorData(base);
-			FacetData fd = ld.getFacet(StencilOperator.MAP_FACET);
+			OperatorData od = new OperatorData(base);
+			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
 			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
-			ld.addFacet(fd);
+			od.addFacet(fd);
 			
-			fd = ld.getFacet(StencilOperator.QUERY_FACET);
+			fd = od.getFacet(StencilOperator.QUERY_FACET);
 			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
-			ld.addFacet(fd);
+			od.addFacet(fd);
 			
-			fd = ld.getFacet(StencilOperator.STATE_ID_FACET);
-			ld.addFacet(fd);
+			fd = od.getFacet(StencilOperator.STATE_ID_FACET);
+			od.addFacet(fd);
 			
-			return ld;
+			return od;
 		}
 		
 		public int stateID() {return stateID;}
@@ -211,12 +263,13 @@ public class StencilUtil extends BasicModule {
 	
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
-		OperatorData ld = moduleData.getOperator(name);
+		OperatorData od = moduleData.getOperator(name);
 
-		ld = EchoBase.complete(ld, specializer);
+		if (name.equals("Rename")) {return Rename.complete(od, specializer);}
+		od = EchoBase.complete(od, specializer);
 
-		if (ld.isComplete()) {return ld;}
-		throw new MetaDataHoleException(moduleData.getName(), name, specializer, ld);
+		if (od.isComplete()) {return od;}
+		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
@@ -224,7 +277,8 @@ public class StencilUtil extends BasicModule {
 		OperatorData opData = getOperatorData(name, specializer);
 		if (name.equals("EchoCategorize")) {return new EchoCategorize(opData, specializer);}
 		else if (name.equals("EchoContinuous")) {return new EchoContinuous(opData, specializer);}
-
+		else if (name.equals("Rename")) {return new Rename(opData, specializer);}
+		
 		throw new RuntimeException(String.format("Legend name not known: %1$s.", name));
 	}
 }

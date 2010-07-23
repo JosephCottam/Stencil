@@ -12,34 +12,6 @@ import stencil.types.Converter;
 
 
 public class TupleUtil extends BasicModule {
-	
-	/**Rename the components of a tuple with new names, 
-	 * like an echo but with variable names.
-	 */
-	public static final class Rename extends AbstractOperator {
-		private static String NAMES = "names";
-
-		String[] keys;
-
-		public Rename(OperatorData opData, Specializer specializer) {
-			super(opData);
-			keys = specializer.get(NAMES).getText().split("\\s+,\\s+");
-		}
-
-		public Rename(OperatorData opData, String...keys) {
-			super(opData);
-			this.keys = keys;
-		}
-
-		public Tuple query(Object... values) {
-			assert keys.length == values.length : "Keys and values lengths do not match.";
-			
-			return new ArrayTuple(values);
-		}
-		
-		public Rename duplicate() {return new Rename(operatorData, keys);}
-	}
-
 	/**How many elements does the given tuple have?
 	 * This does a single-level descent into all tuples passed
 	 * as arguments. If no tuple is passed, the result is 
@@ -128,17 +100,16 @@ public class TupleUtil extends BasicModule {
 		
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
-		OperatorData ld = moduleData.getOperator(name);
+		OperatorData od = moduleData.getOperator(name);
 
-		if (ld.isComplete()) {return ld;}
-		throw new MetaDataHoleException(moduleData.getName(), name, specializer, ld);
+		if (od.isComplete()) {return od;}
+		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
 	}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		validate(name, specializer);
 		OperatorData opData = getOperatorData(name, specializer);
 
-		if (name.equals("Rename")) {return new Rename(opData, specializer);}
 		if (name.equals("Select")) {return new Select(opData, specializer);}
 		else {return super.instance(name, specializer);}
 	}
