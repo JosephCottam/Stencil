@@ -30,6 +30,7 @@ import stencil.display.LayerView;
 import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Program;
+import stencil.parser.tree.util.Path;
 import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
 
@@ -306,6 +307,7 @@ public final class Painter implements Runnable {
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 	
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
+		Path path = new Path(rule);
 		DynamicUpdateTask updateTask;
 		if (updaters.containsKey(rule)) {
 			updateTask = (DynamicUpdateTask) updaters.get(rule);

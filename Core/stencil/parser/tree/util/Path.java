@@ -29,4 +29,22 @@ public final class Path {
 		}
 		return root;
 	}
+	
+	public boolean equals(Object other) {
+		if (!(other instanceof Path)) {return false;}
+		Path op = (Path) other;
+		if (op.turns.size() != turns.size()) {return false;}
+		for (int i=0; i< turns.size(); i++) {
+			if (!op.turns.get(i).equals(turns.get(i))) {return false;}
+		}
+		return true;
+	}
+	
+	public int hashCode() {
+		int code=1;
+		for (int i=0; i<turns.size(); i++) {
+			code = (turns.get(i) ^ code);
+		}
+		return code;
+	}
 }
