@@ -64,7 +64,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		super(p, canvas);
 		painter = new Painter(canvas.layers, canvas, this);
 		for (Guide g: p.getCanvasDef().getGuides()) {
-			painter.addUpdaterTask(new GuideTask(g, this));			
+			painter.addTask(new GuideTask(g, this));			
 		}
 		painterThread = new Thread(painter, "Painter");
 		

@@ -124,18 +124,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	}
 
 	public void updatePrototype(Tuple defaults) {prototype = (T) prototype.update(defaults);}
-	
-	public synchronized void updateAll(List<Tuple> updates) {
-		for (Tuple update: updates) {
-			assert update.getPrototype().get(0).getFieldName().equals("ID");
-
-			T glyph = (T) find((String) update.get(0));
-			T newGlyph = (T) glyph.update(update);
-			if (glyph != newGlyph) {update(newGlyph);}
-		}
-		changeGenerations();
-	}
-	
+		
 	/**Merge the accumulated update into the store.
 	 * Returns a view into the updated store.
 	 * Prior created views will still work if no changes are actually
@@ -152,17 +141,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		for (String id: updateIndex.keySet()) {
 			int updateIDX = updateIndex.get(id);
 			Glyph2D value = update.get(updateIDX);
-			Integer storeIDX = index.get(id);
-			if (value == DELETE && storeIDX != null) {
-				store.set(storeIDX, DELETE); //HACK: Causes an index leak (in the long run, a very slow memory leak)
-				index.remove(id);
- 			} else if (storeIDX != null) {
-				store.set(storeIDX, value);
-			} else {
-				store.add(value);
-				storeIDX = store.size()-1;
-				index.put(id, storeIDX);
-			}
+			directUpdate(id, value);
 		}
 
 		if (update.size() >0) {storeStateID=stateID;}
@@ -174,6 +153,39 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		
 		return getView();
 	}
+	
+	/**Directly change a single glyph in the tenured collection.*/
+	private void directUpdate(String id, Glyph2D glyph) {
+		Integer storeIDX = index.get(id);
+		if (glyph == DELETE && storeIDX != null) {
+			store.set(storeIDX, DELETE); //HACK: Causes an index leak (in the long run, a very slow memory leak)
+			index.remove(id);
+			} else if (storeIDX != null) {
+			store.set(storeIDX, glyph);
+		} else {
+			store.add(glyph);
+			storeIDX = store.size()-1;
+			index.put(id, storeIDX);
+		}
+	}
+	
+	/**For internal use only.
+	 * Updates the tenured collection directly to include
+	 * the glyphs indicated.
+	 * @param glyph
+	 */
+	public void directUpdate(List<Tuple> updates) {
+		for (Tuple update: updates) {
+			assert update.getPrototype().get(0).getFieldName().equals("ID");
+
+			T glyph = (T) find((String) update.get(0));
+			T newGlyph = (T) glyph.update(update);
+			String id = glyph.getID();
+			if (glyph != newGlyph) {directUpdate(id, newGlyph);}
+		}		
+	}
+
+	
 	
 	public StoreView getView() {
 		return new StoreView(storeStateID);

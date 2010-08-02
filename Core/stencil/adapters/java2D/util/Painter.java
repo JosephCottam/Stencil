@@ -29,14 +29,13 @@ import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
 import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
-import stencil.parser.tree.Program;
 import stencil.parser.tree.util.Path;
 import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
 
 /**Paint a panel.
  * 
- * TODO: Make paint tasks render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. 
+ * TODO: Make paint tasks render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. Switch to this special task if the layer hasn't change for a while. 
  * */
 public final class Painter implements Runnable {
 	//Prevents updates from occurring while actively painting (not required if store wont' throw a ConcurrentModificationException)
@@ -151,7 +150,8 @@ public final class Painter implements Runnable {
 	private int nextBuffer =0; 
 	protected boolean keepRunning = true;
 	
-	private final Map<Object, UpdateTask> updaters = new HashMap();
+	private final List<UpdateTask> guideUpdaters = new ArrayList();
+	private final Map<Path, DynamicUpdateTask> dynamicUpdaters = new HashMap();
 	private AffineTransform renderedViewTransform = AffineTransform.getRotateInstance(Math.PI);
 
 	public Painter(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
@@ -309,21 +309,20 @@ public final class Painter implements Runnable {
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
 		Path path = new Path(rule);
 		DynamicUpdateTask updateTask;
-		if (updaters.containsKey(rule)) {
-			updateTask = (DynamicUpdateTask) updaters.get(rule);
+		if (dynamicUpdaters.containsKey(path)) {
+			updateTask = (DynamicUpdateTask) dynamicUpdaters.get(path);
 		} else {
 			DisplayLayer layer= null;
 			String ruleLayerName=rule.getGroup().getContext().getName();
 			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
 			assert layer != null : "Table null after name-based search.";
 			updateTask = new DynamicUpdateTask(layer, rule);
-			updaters.put(rule, updateTask);
+			dynamicUpdaters.put(path, updateTask);
 		}
 		updateTask.addUpdate(source, glyph);
 	}
 	
-	
-	public void addUpdaterTask(UpdateTask task) {updaters.put(task, task);}
+	public void addTask(GuideTask task) {guideUpdaters.add(task);}
 	
 	/**Run all update tasks.
 	 * 
@@ -337,17 +336,14 @@ public final class Painter implements Runnable {
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
-					
+
 					MakeViewPoint.viewPoint(panel.getProgram());
 					
-					List<Future<Finisher>> results = updatePool.invokeAll(updaters.values());  //PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
-															  									  //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":n*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
-					for (Future<Finisher> f: results) {
-						Finisher finalizer = f.get();
-						finalizer.finish();
-					}
+					executeAll(guideUpdaters);
+					executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
+														 //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":n*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
 					
-					painters = new ArrayList(); 
+					painters = new ArrayList(layers.length); 
 					
 					for (int i=0; i< layers.length; i++) {
 						DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
@@ -359,6 +355,20 @@ public final class Painter implements Runnable {
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error running asynchronous updates.", e);
+		}
+	}
+	
+	/**Replacement method for a thread-pool invokeAll when using an udpate task.
+	 * Executes the task, and then executes the finishers sequentially.
+	 * 
+	 * @param targets
+	 * @throws Exception
+	 */
+	private void executeAll(Collection<? extends UpdateTask> targets) throws Exception {
+		List<Future<Finisher>> results = updatePool.invokeAll(targets);
+		for (Future<Finisher> f: results) {
+			Finisher finalizer = f.get();
+			finalizer.finish();
 		}
 	}
 }

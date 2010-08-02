@@ -36,7 +36,7 @@ public final class DynamicUpdateTask extends UpdateTask {
 		final List<Tuple> result = rule.apply(table, sourceData);
 		return new Finisher() {
 			public void finish() {
-				((DoubleBufferLayer) table).updateAll(result);
+				((DoubleBufferLayer) table).directUpdate(result);
 			}
 		};
 	}
