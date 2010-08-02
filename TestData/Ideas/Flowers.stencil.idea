@@ -1,0 +1,53 @@
+STREAM: File
+NAME: flowers
+HEADER: sepalLength, petalWidth, sepalWidth, petalLength, species, obs
+SEPARATOR: \s*,\s*
+SOURCE: ./AndersonsFlowers.csv
+SKIP: 1
+STRICT: true
+
+import BrewerPalettes
+
+stream flowers(sepalL, petalW, sepalW, petalL, species, obs)
+
+group ScatterPlot
+  stream data(obs, dep, ind, cat)
+  guide Bounds[color: "Gray30"] from ScatterPlot
+
+  from data
+     ID: obs
+     X:* Scale[min: 0, max:100](dep)
+     Y:* Scale[min: 0, max:100](ind) -> Mult(_,-1)
+     FILL_COLOR: BrewerColors(cat) -> SetAlpha(50,_)
+     REGISTRATION: "CENTER"
+
+j                                                                                                                                               `11E72666666666536.-+
+
+
+
+
+
+layer Trellis[ScatterPlot]
+from flowers
+  ID: "sl/sw"
+  obs: obs
+  dep: sepalL
+  ind: sepalW
+  cat: species
+
+
+canvas Main
+  guide trend[sample: "SIMPLE"] from FlowerPlot ID 
+  guide sidebar[X: 15, Y: -90] from FlowerPlot FILL_COLOR
+  guide axis[sample: "Linear", axisLabel: "Petal Length"] 
+    from FlowerPlot Y
+  guide axis[sample: "Linear", axisLabel: "Petal Width"] 
+     from FlowerPlot X
+
+layer FlowerPlot
+from flowers
+   ID: obs
+   X:* Scale[min: 0, max:100](petalL)
+   Y:* Scale[min: 0, max:100](petalW) -> Mult(_,-1)
+   FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
+   REGISTRATION: "CENTER"

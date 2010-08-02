@@ -28,7 +28,8 @@ layer BarleySite
   guide title[height: LABEL_HEIGHT, fill: "bisque"] from ID
   
   element Border[SHAPE]
-  		(X,Y,HEIGHT, WIDTH): SiteValues[X], SiteValues[Y], SiteValues[HEIGHT] ,SiteValues[WIDTH]
+      SHAPE: "RECTANGLE"
+  	  (X,Y,HEIGHT, WIDTH): Values[X], Values[Y], Values[HEIGHT], Values[WIDTH]
 
   layer Values
   from SiteValues
