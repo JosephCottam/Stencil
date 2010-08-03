@@ -119,13 +119,14 @@ options {
 }
 
 //Identify operators that only have one branch
-search: ^(OPERATOR . LIST rules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
-rules: ^(LIST ^(OPERATOR_RULE ^(LIST predicate) .*));   //This step ensures there is only one rule (part of being in-line-able)
-predicate: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=.)))
-  {if ($f.getText().startsWith("#TrivialTrue")) {
-     Tree op = f.getAncestor(OPERATOR);
+search: ^(OPERATOR . LIST opRules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
+opRules: ^(LIST ^(OPERATOR_RULE ^(LIST pred=predicate) ^(LIST .)))   //This step ensures there is only one rule (part of being in-line-able)  TODO: Inline multiple rules
+  {if ($pred.pred.getText().startsWith("#TrivialTrue")) {
+     Tree op = pred.tree.getAncestor(OPERATOR);
      simple.put(op.getText(), (StencilTree) op);
   }};
+
+predicate returns [Tree pred]: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=.))) {$pred = $f;};
 
 
 replace: ^(cc=CALL_CHAIN chain[cc]);
