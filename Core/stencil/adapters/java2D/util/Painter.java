@@ -18,6 +18,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.*;
 
 import stencil.Configure;
 import stencil.adapters.java2D.Canvas;
@@ -29,18 +30,21 @@ import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
 import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
-import stencil.parser.tree.util.Path;
+import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
+
 
 /**Paint a panel.
  * 
  * TODO: Make paint tasks render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. Switch to this special task if the layer hasn't change for a while. 
  * */
 public final class Painter implements Runnable {
-	//Prevents updates from occurring while actively painting (not required if store wont' throw a ConcurrentModificationException)
-	//TODO: Move store to a concurrent collection and remove this lock
-	private final Object paintLock = new Object(); 
+	//TODO: Would moving store to a concurrent collection remove this lock?
+	//Prevents pre-paint from occurring while paint is occurring
+	//   Can happen when an export is requested in interactive mode 
+	//   (not required if layers store implementation won't throw a ConcurrentModificationException)
+	private final Lock paintLock = new ReentrantLock();
 	
 	/**Root class for paint related tasks.*/
 	private static abstract class PaintTask implements Callable<BufferedImage> {
@@ -151,7 +155,7 @@ public final class Painter implements Runnable {
 	protected boolean keepRunning = true;
 	
 	private final List<UpdateTask> guideUpdaters = new ArrayList();
-	private final Map<Path, DynamicUpdateTask> dynamicUpdaters = new HashMap();
+	private final Map<DynamicRule, DynamicUpdateTask> dynamicUpdaters = new HashMap();
 	private AffineTransform renderedViewTransform = AffineTransform.getRotateInstance(Math.PI);
 
 	public Painter(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
@@ -216,14 +220,15 @@ public final class Painter implements Runnable {
 	public void doDrawing(BufferedImage buffer, Graphics2D g) {
 		g.addRenderingHints(renderQuality);
 		
-		synchronized (paintLock) {
+		paintLock.lock();
+		try {
 			renderedViewTransform = g.getTransform();
 			g.setTransform(AffineTransform.getTranslateInstance(0,0));
 			try {
 				for (PaintTask painter: painters) {
 					painter.createBuffer(buffer, renderedViewTransform);
 				}
-
+	
 				List<Future<BufferedImage>> results =  renderPool.invokeAll(painters);
 				//Composite images as the return
 				for (Future<BufferedImage> f: results) {
@@ -235,7 +240,7 @@ public final class Painter implements Runnable {
 					stateIDs[i] = layers[i].getStateID();
 				}
 			} catch (Exception e) {throw new RuntimeException("Error in mulit-thread painting.", e);}
-		}
+		 } finally {paintLock.unlock();}
 	}
 	
 		
@@ -307,17 +312,16 @@ public final class Painter implements Runnable {
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 	
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
-		Path path = new Path(rule);
 		DynamicUpdateTask updateTask;
-		if (dynamicUpdaters.containsKey(path)) {
-			updateTask = (DynamicUpdateTask) dynamicUpdaters.get(path);
+		if (dynamicUpdaters.containsKey(rule)) {
+			updateTask = (DynamicUpdateTask) dynamicUpdaters.get(rule);
 		} else {
 			DisplayLayer layer= null;
 			String ruleLayerName=rule.getGroup().getContext().getName();
 			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
 			assert layer != null : "Table null after name-based search.";
 			updateTask = new DynamicUpdateTask(layer, rule);
-			dynamicUpdaters.put(path, updateTask);
+			dynamicUpdaters.put(rule, updateTask);
 		}
 		updateTask.addUpdate(source, glyph);
 	}
@@ -332,40 +336,49 @@ public final class Painter implements Runnable {
 	public void doUpdates() {
 		try {
 			synchronized(panel.visLock) {
-				synchronized(paintLock) {
+				paintLock.lock();
+				try {
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
-
-					MakeViewPoint.viewPoint(panel.getProgram());
+	
+					Program viewPoint = MakeViewPoint.viewPoint(panel.getProgram());
 					
-					executeAll(guideUpdaters);
-					executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
-														 //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":n*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
-					
-					painters = new ArrayList(layers.length); 
-					
-					for (int i=0; i< layers.length; i++) {
-						DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
-						LayerView view = layer.changeGenerations();
-						painters.add(PaintTask.newTask(view));
-					}
-					for (Guide2D guide: target.getGuides()) {painters.add(PaintTask.newTask(guide));}		
+					for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
+					for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
+				} catch (Exception e) {
+					paintLock.unlock(); //only release here if an exception occurs, otherwise the lock needs to be released at the end of the method.
+					throw e;
 				}
-			}
+			} 
+				
+			try {
+				executeAll(guideUpdaters);
+				executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
+													//SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":[n]*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
+							
+				painters = new ArrayList(layers.length);
+							
+				for (int i=0; i< layers.length; i++) {
+					DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
+					LayerView view = layer.getView();
+					painters.add(PaintTask.newTask(view));
+				}
+				for (Guide2D guide: target.getGuides()) {painters.add(PaintTask.newTask(guide));}
+			} finally {paintLock.unlock();}
 		} catch (Exception e) {
 			throw new RuntimeException("Error running asynchronous updates.", e);
 		}
 	}
 	
-	/**Replacement method for a thread-pool invokeAll when using an udpate task.
+	/**Replacement method for a thread-pool invokeAll when using an update task.
 	 * Executes the task, and then executes the finishers sequentially.
 	 * 
 	 * @param targets
 	 * @throws Exception
 	 */
 	private void executeAll(Collection<? extends UpdateTask> targets) throws Exception {
-		List<Future<Finisher>> results = updatePool.invokeAll(targets);
+		List<Future<Finisher>> results = updatePool.invokeAll((Collection<? extends Callable<Finisher>>) targets); //HACK: Why is this cast required???
 		for (Future<Finisher> f: results) {
 			Finisher finalizer = f.get();
 			finalizer.finish();

@@ -98,7 +98,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
 	public void export(String filename, String type, Object info) throws Exception {
-		synchronized(visLock) {	
+		synchronized(visLock) {
 			painter.doUpdates();
 			
 			if (type.equals("PNG") || type.equals("RASTER")) {

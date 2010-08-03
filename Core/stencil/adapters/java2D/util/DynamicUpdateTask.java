@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.parser.tree.DynamicRule;
+import stencil.parser.tree.util.Path;
 import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
@@ -22,6 +23,7 @@ public final class DynamicUpdateTask extends UpdateTask {
 	private final Map<String, Tuple> sourceData = new ConcurrentHashMap();
 		
 	public DynamicUpdateTask(DisplayLayer table, DynamicRule rule) {
+		super(new Path(rule));
 		this.table = table;
 		this.rule = rule;
 	}
