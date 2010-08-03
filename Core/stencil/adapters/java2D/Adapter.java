@@ -44,7 +44,7 @@ import stencil.adapters.java2D.util.ZoomPanHandler;
 import twitter4j.Trend;
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
-	public static final Adapter INSTANCE = new Adapter();
+	public static final Adapter ADAPTER = new Adapter();
 	
 	private boolean defaultMouse;
 	

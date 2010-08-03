@@ -84,7 +84,7 @@ public final class AdapterOpts {
 		try {
 			className = adapterMap.get(adapterName);
 			Class clss = Class.forName(className);
-			a = (Adapter) clss.getField("INSTANCE").get(null);
+			a = (Adapter) clss.getField("ADAPTER").get(null);
 		} catch (Exception e) {
 			throw new IllegalArgumentException(String.format("Could not select proper adapter for %1$s given class name %1$s.", adapterName, className) ,e);
 		}

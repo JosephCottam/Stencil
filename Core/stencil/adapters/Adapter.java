@@ -45,7 +45,7 @@ import stencil.display.DisplayLayer;
  *
  * In addition to the methods listed here, to work with the Explore
  * application's adapter switching a public static variable
- * named INSTANCE must also be included.
+ * named ADAPTER must also be included.
  *
  * @author jcottam
  *

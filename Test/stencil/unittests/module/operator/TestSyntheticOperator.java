@@ -17,7 +17,7 @@ import junit.framework.TestCase;
 public class TestSyntheticOperator extends TestCase {
 	public static final String fullOperatorSource = "operator full(X,Y,Z) -> (X,Y,Z) (X != NULL) => (X,Y,Z) : (Z,Y,X)";			
 	public static final String basicOperatorSource = "operator basic(A,B,C,D,E,F,G) -> (Z,Y,X) (A != NULL) => (Z,Y,X): (A,E,G)";
-	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.INSTANCE;
+	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.ADAPTER;
 	
 	public void setUp() throws Exception {
 		TestModuleCache.initCache();

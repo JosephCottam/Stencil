@@ -5,16 +5,13 @@ import java.util.Map;
 
 import org.antlr.runtime.tree.Tree;
 
-import stencil.adapters.Adapter;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
-
+import static stencil.adapters.java2D.Adapter.ADAPTER;
 
 public class TestParseStencil extends StencilTestCase {
-	public static final Adapter ADAPTER = stencil.adapters.java2D.Adapter.INSTANCE;
-		
 	public void testParse() throws Exception {
 		Program p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);

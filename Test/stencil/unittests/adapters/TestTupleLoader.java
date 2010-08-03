@@ -26,8 +26,8 @@ public class TestTupleLoader extends TestCase {
 	public void testLoad() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 		
-		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
-		panel = Adapter.INSTANCE.generate(program);
+		Program program = ParseStencil.parse(ruleSource, Adapter.ADAPTER);
+		panel = Adapter.ADAPTER.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
 		TupleLoader loader = new TupleLoader(panel, input);
@@ -43,8 +43,8 @@ public class TestTupleLoader extends TestCase {
 	public void testThread() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 
-		Program program = ParseStencil.parse(ruleSource, Adapter.INSTANCE);
-		panel = Adapter.INSTANCE.generate(program);
+		Program program = ParseStencil.parse(ruleSource, Adapter.ADAPTER);
+		panel = Adapter.ADAPTER.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);
 		TupleLoader loader = new TupleLoader(panel, input);

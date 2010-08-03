@@ -70,7 +70,7 @@ public class TestFragments extends TestCase {
 	public void testAdHocPrime() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
 		Program p = init(source);
-		Adapter adapter = Adapter.INSTANCE;
+		Adapter adapter = Adapter.ADAPTER;
 		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
 
 
@@ -145,7 +145,7 @@ public class TestFragments extends TestCase {
 	
 	public void testOpCreate() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
-		Adapter adapter = Adapter.INSTANCE;
+		Adapter adapter = Adapter.ADAPTER;
 
 		Program program = ParseStencil.parse(source, adapter);
 		Test test = new Test() {
@@ -171,7 +171,7 @@ public class TestFragments extends TestCase {
 	
 	public void testSpecializer() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
-		Adapter adapter = Adapter.INSTANCE;
+		Adapter adapter = Adapter.ADAPTER;
 		Program program = ParseStencil.parse(source, adapter);
 		Test test = new Test() {
 
@@ -191,7 +191,7 @@ public class TestFragments extends TestCase {
 	
 	public void testLiftConstantRules() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
-		Adapter adapter = Adapter.INSTANCE;
+		Adapter adapter = Adapter.ADAPTER;
 		Program program = ParseStencil.parse(source, adapter);
 		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Nodes").getDefaults().size()); 
 		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Edges").getDefaults().size()); 

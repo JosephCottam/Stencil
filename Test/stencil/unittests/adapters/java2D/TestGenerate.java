@@ -11,13 +11,13 @@ public class TestGenerate extends stencil.unittests.adapters.TestGenerator {
 	}
 	
 	public void testGenerate() throws Exception{
-		panel = (Panel) super.testGenerate(Adapter.INSTANCE);
+		panel = (Panel) super.testGenerate(Adapter.ADAPTER);
 		//Make sure all parts are present
 		assertNotNull(panel.getCanvas());
 	}
 
 	public void testMakeLoader() throws Exception {
-		super.testMakeLoader(Adapter.INSTANCE);
+		super.testMakeLoader(Adapter.ADAPTER);
 	}
 
 }

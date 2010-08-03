@@ -46,7 +46,7 @@ public class TestEncapsulationGenerator extends TestCase {
 		}
 		
 		String source = String.format(mainFormat, env, facet, yields, body);	
-		Program p = ParseStencil.parse(source, Adapter.INSTANCE);
+		Program p = ParseStencil.parse(source, Adapter.ADAPTER);
 		return p.getPythons().get(0);
 	}
 	
@@ -67,7 +67,7 @@ public class TestEncapsulationGenerator extends TestCase {
 			foundStencils = true;
 			
 			Program program;
-			try {program  = ParseStencil.parse(source, stencil.adapters.java2D.Adapter.INSTANCE);}
+			try {program  = ParseStencil.parse(source, stencil.adapters.java2D.Adapter.ADAPTER);}
 			catch (Exception e) {errors.add(name); continue;}
 			
 			ModuleCache modules = new ModuleCache();

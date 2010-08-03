@@ -14,9 +14,11 @@ public final class Path {
 	public Path(StencilTree target) {
 		List turns = new LinkedList();
 		
-		while (target != null) {
+		int idx = target.getChildIndex();
+		while (idx >= 0) {
 			turns.add(0, target.getChildIndex());
 			target = target.getParent();
+			idx = target.getChildIndex();
 		}
 		this.turns = Collections.unmodifiableList(turns);
 	}
