@@ -18,6 +18,9 @@ options {
   import stencil.parser.tree.*;
   import stencil.module.operator.StencilOperator;
   import stencil.module.operator.wrappers.SyntheticOperator;
+  import stencil.parser.tree.util.MultiPartName;
+  import stencil.module.util.FacetData;
+  import stencil.module.util.OperatorData;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.STATE_ID_FACET;
 }
@@ -39,7 +42,7 @@ options {
  
 }
 
-//instantiate new synethetic operators that pointer here (they don't need to be updated yet since they run off the actual AST).
+//instantiate new synthetic operators that pointer here (they don't need to be updated yet since they run off the actual AST).
 instantiate: ^(opDef=OPERATOR .*) 
 {
     SyntheticOperator op = new SyntheticOperator("", (Operator) opDef);
@@ -49,11 +52,19 @@ instantiate: ^(opDef=OPERATOR .*)
 
 //Replace AST instances with pointers to new viewpoints
 //Uses the new synthetic instances when necessary
-change: i=AST_INVOKEABLE 
+change:  i=AST_INVOKEABLE 
 {
    AstInvokeable inv = (AstInvokeable) i;
    StencilOperator op = inv.getOperator();
    if (op == null) {return;}
+   
+   MultiPartName name = new MultiPartName(inv.getParent().getText());
+   if (!name.getFacet().equals("")) {//If this is a true facet operator AND it is a function, nothing more needs to be done.
+     OperatorData od = op.getOperatorData();   
+     FacetData fd = od.getFacet(name.getFacet());
+     if (fd.isFunction()) {return;}
+   }
+   
    StencilOperator viewPoint;
    if (synthetics.containsKey(op.getName())) {
       viewPoint = synthetics.get(op.getName());
@@ -70,4 +81,3 @@ change: i=AST_INVOKEABLE
        inv.changeFacet(QUERY_FACET); 
    }
 };
-	

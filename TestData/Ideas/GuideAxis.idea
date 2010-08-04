@@ -1,0 +1,37 @@
+group LabeledTick
+   stream data(text, x)
+   const Y
+   const SIZE
+   const OFFSET: Div(SIZE, 2) 
+   
+   element Label[TEXT]
+   from data
+      TEXT: text
+      X: x
+      Y: Mult(1.5, offset) -> Sub(Y, _)
+      
+   element Tick[LINE]
+   from data
+      (X.1, X.2) : (X,X) 
+      Y.1:  Sub(Y, OFFSET)
+      Y.2:  Add(Y, OFFSET)
+
+group XAxis
+   data (text, x)
+   const Y
+   const SIZE
+   
+   element axis[LINE]
+   from data
+      X.1 : Min(x)
+      X.2 : Max(x) 
+      
+   
+   layer ticks[LabeledTick][Y: Y, SIZE: SIZE]
+   from data
+      filter (ALL = STREAM_START)
+      (): ticks.clear()
+   from data
+      ID: Counter()
+      (text, x): (text,x)
+      

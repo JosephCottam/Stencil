@@ -112,7 +112,7 @@ public final class PainterThread implements Runnable {
 	
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {painter.addDynamic(glyph, rule, source);}
-	public void addTask(GuideTask task) {painter.addTask(task);}
 	
+	public void doUpdates() {painter.doUpdates();}
 }
 

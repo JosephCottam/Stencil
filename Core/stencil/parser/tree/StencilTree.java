@@ -29,6 +29,7 @@
 package stencil.parser.tree;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
@@ -49,8 +50,16 @@ public class StencilTree extends CommonTree {
 		return StencilParser.tokenNames[type];
 	}
 	
+	
+	/**Find child of this given type.  
+	 * This is a proxy for getfirstchildWithType, provided for symetry with other findChild variants.
+	 **/
 	public StencilTree findChild(int type) {return (StencilTree) this.getFirstChildWithType(type);}
 	
+	
+	/**Find a child with the given type and the given content value.
+	 * Content value is treated as a string literal (not a pattern or prefix).
+	 **/
 	public CommonTree findChild(int type, String content) {
 		for (int i=0; children != null && i < children.size(); i++) {
 			CommonTree t = (CommonTree) children.get(i);
@@ -60,6 +69,26 @@ public class StencilTree extends CommonTree {
 			}
 		}
 		return null;
+	}
+
+	
+	/**Find all descendants of the given type.
+	 * Will search in children that match the given type, so the list
+	 * may contain nodes with internal ancestor/descendant relationships. 
+	 */
+	public java.util.List<CommonTree> allDescendants(int type) {
+		java.util.List<CommonTree> results = new ArrayList();
+		if (this.getChildren() == null) {return results;}
+		
+		for (Object child: this.getChildren()) {
+			if (child instanceof CommonTree && ((Tree) child).getType() == type) {
+				results.add((CommonTree) child);
+			}
+			if (child instanceof StencilTree) {
+				results.addAll(((StencilTree) child).allDescendants(type));
+			}
+		}
+		return results;
 	}
 	
 	public static boolean verifyType(Tree tree, int type) {return tree.getType() == type;}

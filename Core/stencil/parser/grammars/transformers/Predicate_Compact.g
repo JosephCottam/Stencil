@@ -19,5 +19,5 @@ options {
 }
 
 
-topdown: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(FUNCTION inv=. spec=. args=. .+) size=.))) -> ^(PREDICATE $inv $args); 
+topdown: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. spec=. args=. .+) size=.))) -> ^(PREDICATE[$f.text] $inv $args); 
   		

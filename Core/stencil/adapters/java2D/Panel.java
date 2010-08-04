@@ -32,12 +32,10 @@ import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.CanvasTuple;
 import stencil.adapters.java2D.data.ViewTuple;
-import stencil.adapters.java2D.util.GuideTask;
 import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.DynamicRule;
-import stencil.parser.tree.Guide;
 import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -63,9 +61,6 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public Panel(Canvas canvas, Program p) {
 		super(p, canvas);
 		painter = new PainterThread(canvas.layers, canvas, this);
-		for (Guide g: p.getCanvasDef().getGuides()) {
-			painter.addTask(new GuideTask(g, this));			
-		}
 		painterThread = new Thread(painter, "Painter");
 		
 		if (continuousPainting) {painterThread.start();}
@@ -100,9 +95,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public void export(String filename, String type, Object info) throws Exception {
 		synchronized(program) {
 			synchronized(visLock) {
-				//Regardless of target, put the visualization into a consistent state
-				MultiThreadPainter updater = new MultiThreadPainter(canvas, canvas.layers, visLock, program);
-				updater.doUpdates();
+				painter.doUpdates();
 	
 				
 				if (type.equals("PNG") || type.equals("RASTER")) {

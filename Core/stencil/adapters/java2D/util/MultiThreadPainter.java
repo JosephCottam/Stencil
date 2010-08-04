@@ -27,9 +27,11 @@ import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
 import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
+import stencil.parser.tree.Guide;
 import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
+import static stencil.parser.string.StencilParser.DYNAMIC_RULE;
 
 
 /**Paint visualization.
@@ -80,7 +82,7 @@ public final class MultiThreadPainter {
 		}		
 		
 		/**Paint a single layer to a buffer.*/
-		public static final class Layer extends PaintTask {
+		private static final class Layer extends PaintTask {
 			private final DisplayLayer layer;
 			protected boolean forceUpdate = true;
 
@@ -112,7 +114,7 @@ public final class MultiThreadPainter {
 		}
 		
 		/**Paint all the guides from a given canvas.*/
-		public static final class Guide extends PaintTask {
+		private static final class Guide extends PaintTask {
 			private Guide2D guideDef;
 			
 			public boolean updateRequired(){return true;}
@@ -163,13 +165,27 @@ public final class MultiThreadPainter {
 		renderPool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("render"));
 		updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update"));
 		
-		
 		painters = new ArrayList();		
+		
+		
+		for (Guide g: program.getCanvasDef().getGuides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
+		for (Object r : program.allDescendants(DYNAMIC_RULE)) {
+			DynamicRule rule = (DynamicRule) r;
+			DisplayLayer layer= null;
+			String ruleLayerName=rule.getGroup().getContext().getName();
+			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
+			assert layer != null : "Table null after name-based search.";
+			DynamicUpdateTask updateTask = new DynamicUpdateTask(layer, rule);
+			dynamicUpdaters.put(rule, updateTask);
+		}
+		
+
 		for (int i=0; i< layers.length; i++) {
 			DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
 			painters.add(PaintTask.newTask(layer));
 		}
 		for (Guide2D guide: canvas.getGuides()) {painters.add(PaintTask.newTask(guide));}
+		
 	}
 
 	public void signalShutdown() {
@@ -202,7 +218,7 @@ public final class MultiThreadPainter {
 
 			g.addRenderingHints(renderQuality);			
 			try {
-				for (PaintTask painter: painters) {painter.createBuffer(buffer, renderedViewTransform);}
+				for (PaintTask painter: painters) {painter.createBuffer(buffer, trans);}
 
 				List<Future<BufferedImage>> results =  renderPool.invokeAll(painters);
 				//Composite images as the return
@@ -221,17 +237,8 @@ public final class MultiThreadPainter {
 	}
 
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
-		DynamicUpdateTask updateTask;
-		if (dynamicUpdaters.containsKey(rule)) {
-			updateTask = (DynamicUpdateTask) dynamicUpdaters.get(rule);
-		} else {
-			DisplayLayer layer= null;
-			String ruleLayerName=rule.getGroup().getContext().getName();
-			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
-			assert layer != null : "Table null after name-based search.";
-			updateTask = new DynamicUpdateTask(layer, rule);
-			dynamicUpdaters.put(rule, updateTask);
-		}
+		DynamicUpdateTask updateTask = (DynamicUpdateTask) dynamicUpdaters.get(rule);
+		assert updateTask != null : "Unexpected dynamic update task requested: " + rule;
 		updateTask.addUpdate(source, glyph);
 	}
 	

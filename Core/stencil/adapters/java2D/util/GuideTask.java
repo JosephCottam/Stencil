@@ -1,24 +1,29 @@
 package stencil.adapters.java2D.util;
 
-import stencil.display.StencilPanel;
+import stencil.display.DisplayCanvas;
+import stencil.display.DisplayGuide;
 import stencil.parser.tree.Guide;
+import stencil.parser.tree.Selector;
 import stencil.parser.tree.util.Path;
 
 /**Update a single guide's data.
  * This is essentially a wrapper for the StencilTree's GuideDef.
  **/
 public class GuideTask extends UpdateTask<Guide> {
-	private final StencilPanel panel;
-
-	public GuideTask(Guide guideDef, StencilPanel panel) {
+	private final DisplayCanvas canvas;
+	private final Selector selector;
+	
+	public GuideTask(Guide guideDef, DisplayCanvas canvas) {
 		super(new Path(guideDef));
-		this.panel = panel;
+		this.canvas = canvas;
+		this.selector = guideDef.getSelector();
 	}
 
 	public boolean needsUpdate() {return fragment.getStateQuery().requiresUpdate();}
 
 	public Finisher update() {
-		fragment.update(panel);
+		DisplayGuide guide = canvas.getGuide(selector);
+		fragment.update(guide);
 		return UpdateTask.NO_WORK;
 	}
 	

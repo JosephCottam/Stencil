@@ -171,7 +171,11 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	
 	/**For internal use only.
 	 * Updates the tenured collection directly to include
-	 * the glyphs indicated.
+	 * the glyphs indicated.  This method is used for dynamic updates
+	 * to permit results of such updates to be cached even if new data
+	 * is loaded while they are being calculated.   If this method is removed,
+	 * find can be simplified to no longer do its own dynamic binding calculation.
+	 * 
 	 * @param glyph
 	 */
 	public void directUpdate(List<Tuple> updates) {

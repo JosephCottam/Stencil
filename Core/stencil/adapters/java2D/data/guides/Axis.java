@@ -257,6 +257,7 @@ public class Axis extends Guide2D {
 	}
 	
 	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
+		System.out.println("Rendering with: " + viewTransform);
 		for (Glyph2D glyph: marks) {glyph.render(g, viewTransform);}
 	}
 }

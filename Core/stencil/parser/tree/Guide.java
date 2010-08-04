@@ -7,7 +7,6 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.display.DisplayGuide;
-import stencil.display.StencilPanel;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.guide.*;
 import stencil.interpreter.guide.samplers.LayerSampler;
@@ -88,7 +87,9 @@ public class Guide extends StencilTree {
 		return new SimplePrototype(names);
 	}
 	
-	public void update(StencilPanel panel) {
+	public void update(DisplayGuide guide) {
+		assert guide != null : "Null guide passed.";
+		
 		Specializer details = getSpecializer();
 		SeedOperator seedOp = getSeedOperator();
 		List<Tuple> sample, projection, results;
@@ -108,10 +109,7 @@ public class Guide extends StencilTree {
 		try {results = processAll(projection, getRules());}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 
-
-		//TODO: Remove null check when scheduling is improved.
-		DisplayGuide guide = panel.getCanvas().getComponent().getGuide(getSelector());
-		if (guide != null) {guide.setElements(results);}
+		guide.setElements(results);
 	}
 	
 	private List<Tuple> processAll(List<Tuple> sources, Rule rule) throws Exception {

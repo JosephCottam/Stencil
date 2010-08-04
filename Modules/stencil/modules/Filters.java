@@ -69,8 +69,6 @@ public class Filters extends BasicModule {
 			assert patternCache != null;
 			return !negated == patternCache.matcher(value).matches();
 		}
-
-	
 	}
 	
 	public Filters(ModuleData md) {super(md);}
