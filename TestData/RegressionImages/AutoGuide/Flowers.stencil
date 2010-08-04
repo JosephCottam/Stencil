@@ -11,6 +11,7 @@ import BrewerPalettes
 stream flowers(sepalL, petalW, sepalW, 
                         petalL, species, obs)
 
+/*
 canvas Main
   guide trend[sample: "SIMPLE"] from FlowerPlot ID 
   guide sidebar[X: 15, Y: -90] from FlowerPlot FILL_COLOR
@@ -18,6 +19,7 @@ canvas Main
     from FlowerPlot Y
   guide axis[sample: "Linear", axisLabel: "Petal Width"] 
      from FlowerPlot X
+*/
 
 layer FlowerPlot
 from flowers

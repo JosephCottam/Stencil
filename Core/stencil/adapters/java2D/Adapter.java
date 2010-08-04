@@ -39,7 +39,7 @@ import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.data.guides.*;
-import stencil.adapters.java2D.util.Painter;
+import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 import twitter4j.Trend;
 
@@ -80,9 +80,9 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		if (value.equals("LOW")) {
-			Painter.renderQuality = Painter.LOW_QUALITY;
+			MultiThreadPainter.renderQuality = MultiThreadPainter.LOW_QUALITY;
 		} else if (value.equals("HIGH")) {
-			Painter.renderQuality = Painter.HIGH_QUALITY;
+			MultiThreadPainter.renderQuality = MultiThreadPainter.HIGH_QUALITY;
 		} else {
 			throw new IllegalArgumentException("Could not set render quality to unknown value: " + value);
 		}

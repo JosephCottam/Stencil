@@ -1,15 +1,14 @@
 package stencil.adapters.java2D.util;
 
 import java.awt.AlphaComposite;
-import java.awt.GraphicsEnvironment;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,11 +17,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.locks.*;
 
 import stencil.Configure;
 import stencil.adapters.java2D.Canvas;
-import stencil.adapters.java2D.Panel;
 import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
@@ -35,22 +32,18 @@ import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
 
 
-/**Paint a panel.
+/**Paint visualization.
+ * This implementation uses a set of thread pools to perform updates and do the actual painting.
  * 
- * TODO: Make paint tasks render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. Switch to this special task if the layer hasn't change for a while. 
+ * TODO: Make a paint task to render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. Switch to this special task if the layer hasn't change for a while. 
  * */
-public final class Painter implements Runnable {
-	//TODO: Would moving store to a concurrent collection remove this lock?
-	//Prevents pre-paint from occurring while paint is occurring
-	//   Can happen when an export is requested in interactive mode 
-	//   (not required if layers store implementation won't throw a ConcurrentModificationException)
-	private final Lock paintLock = new ReentrantLock();
-	
+public final class MultiThreadPainter {
 	/**Root class for paint related tasks.*/
 	private static abstract class PaintTask implements Callable<BufferedImage> {
 		protected BufferedImage buffer;
 		protected Graphics2D g;
 		protected AffineTransform base;
+		protected int stateID = Integer.MAX_VALUE;
 
 		/**Does the current painter need an update based on its backing information?
 		 * This method should be as conservative about updating as safe.
@@ -61,6 +54,8 @@ public final class Painter implements Runnable {
 		 */
 		protected abstract void forceUpdate();
 
+		/**The stateID of the last rendering;*/
+		public int stateID() {return stateID;}
 		
 		public void createBuffer(BufferedImage prototype, AffineTransform base) {
 			//Only allocate a new buffer if the shape changed, otherwise use the old buffer
@@ -85,19 +80,19 @@ public final class Painter implements Runnable {
 		}		
 		
 		/**Paint a single layer to a buffer.*/
-		private static final class LayerPainter extends PaintTask {
-			private final LayerView<Glyph2D> view;
-			protected int stateID = Integer.MAX_VALUE;
+		public static final class Layer extends PaintTask {
+			private final DisplayLayer layer;
 			protected boolean forceUpdate = true;
+
+			public Layer(DisplayLayer layer) {this.layer = layer;}
 			
-			LayerPainter(LayerView view) {this.view = view;}
-					
-			public boolean updateRequired() {return forceUpdate || stateID != view.getStateID();}
+			public boolean updateRequired() {return forceUpdate || stateID != layer.getView().getStateID();}
 			public void forceUpdate() {forceUpdate = true;}
 			
 			public BufferedImage call() {
 				if (!updateRequired()) {return buffer;}
-
+				LayerView<Glyph2D> view = layer.getView();
+				
 				for (Glyph2D glyph: view.renderOrder()) {
 					if (!glyph.isVisible()) {continue;}
 					Rectangle2D r = glyph.getBoundsReference();
@@ -113,17 +108,17 @@ public final class Painter implements Runnable {
 				return buffer;
 			}
 			
-			public String toString() {return "Layer Painter for " + view.getLayerName();}
+			public String toString() {return "Layer Painter for " + layer.getName();}
 		}
 		
 		/**Paint all the guides from a given canvas.*/
-		private static final class GuidePainter extends PaintTask {
+		public static final class Guide extends PaintTask {
 			private Guide2D guideDef;
 			
 			public boolean updateRequired(){return true;}
 			public void forceUpdate() {}
 			
-			public GuidePainter(Guide2D guide) {this.guideDef = guide;}
+			public Guide(Guide2D guide) {this.guideDef = guide;}
 			public BufferedImage call() {
 				guideDef.render(g, base);
 				return buffer;
@@ -132,185 +127,104 @@ public final class Painter implements Runnable {
 		}
 		
 		//Factory methods....
-		public static PaintTask newTask(LayerView view) {return new LayerPainter(view);}		
-		public static PaintTask newTask(Guide2D guide) {return new GuidePainter(guide);}
+		public static PaintTask newTask(DisplayLayer layer) {return new Layer(layer);}		
+		public static PaintTask newTask(Guide2D guide) {return new Guide(guide);}
 	}
 	
 	public static final RenderingHints HIGH_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	public static final RenderingHints LOW_QUALITY = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	
-	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	public static RenderingHints renderQuality = HIGH_QUALITY;
 	
 	private final DisplayLayer[] layers;
-	private final int[] stateIDs;
-	private       Collection<PaintTask> painters;
+	private final List<PaintTask> painters;
 	private final ExecutorService renderPool;
 	private final ExecutorService updatePool;
-	private final Canvas target;
-	private final Panel panel;
-	
-	private final BufferedImage[] buffers = new BufferedImage[2];
-	private int nextBuffer =0; 
-	protected boolean keepRunning = true;
+	private final Program program;
 	
 	private final List<UpdateTask> guideUpdaters = new ArrayList();
 	private final Map<DynamicRule, DynamicUpdateTask> dynamicUpdaters = new HashMap();
-	private AffineTransform renderedViewTransform = AffineTransform.getRotateInstance(Math.PI);
+	private final Object visLock;
 
-	public Painter(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
+	private AffineTransform renderedViewTransform = AffineTransform.getRotateInstance(Math.PI);
+	private Dimension renderedSize = new Dimension(0,0);
+
+	
+	/**@param Canvas Canvas being rendered on (TODO: currently only used to acquire guides, remove when guides are translated into layers)
+	 * @param layers Layers to render
+	 * @param visLock Object to use to ensure rendering is done in a consistent state
+	 * @param program The program used for the visualization
+	 */
+	public MultiThreadPainter(Canvas canvas, DoubleBufferLayer[] layers, Object visLock, Program program) {
 		this.layers = layers;
-		this.target = target;
-		this.panel = panel;
-		this.stateIDs = new int[layers.length];
-		
-		Arrays.fill(stateIDs, Integer.MAX_VALUE);
+		this.visLock = visLock;
+		this.program = program;
 		
 		renderPool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("render"));
 		updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update"));
-		painters = new ArrayList();
+		
+		
+		painters = new ArrayList();		
+		for (int i=0; i< layers.length; i++) {
+			DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
+			painters.add(PaintTask.newTask(layer));
+		}
+		for (Guide2D guide: canvas.getGuides()) {painters.add(PaintTask.newTask(guide));}
 	}
 
-	public void dispose() {
+	public void signalShutdown() {
 		if (!renderPool.isShutdown()) {renderPool.shutdown();}
 		if (!updatePool.isShutdown()) {updatePool.shutdown();}
 	}
 	
-	public synchronized void signalStop() {
-		keepRunning =false;
-		renderPool.shutdownNow();
-		updatePool.shutdownNow();
-	}
+	public boolean isShutdown() {return renderPool.isShutdown();}
 	
-	public void run() {
-		while(keepRunning) {
-			if (requiresUpdate()) {runOnce();}
-			Thread.yield();
-		}
-	}
-	
-	private synchronized void runOnce() {
-		if (renderPool.isShutdown()) {return;}
-		
-		BufferedImage i = selfBuffer();
-		target.setBackBuffer(i);
-		target.repaint();
-	}
-
-	
-	public final boolean requiresUpdate() { 
-		BufferedImage img = buffers[nextBuffer];
-		if (img == null) {return true;}
-		
-		for (int i=0; i< stateIDs.length; i++) {
-			if (layers[i].getStateID() != stateIDs[i]) {return true;}
+	public boolean requiresUpdate(AffineTransform trans, Rectangle2D bounds) {
+		for (int i=0; i< layers.length; i++) {
+			if (layers[i].getStateID() != painters.get(i).stateID()) {return true;}
 		}
 		
-		Rectangle targetBounds = this.target.getBounds();
-		return (targetBounds.getHeight() != img.getHeight()) 
-				|| (targetBounds.getWidth() != img.getWidth())
-				|| !renderedViewTransform.equals(target.getViewTransformRef());
-		
+		return (bounds.getHeight() != renderedSize.getHeight()) 
+				|| (bounds.getWidth() != renderedSize.getWidth())
+				|| !renderedViewTransform.equals(trans);		
 	}
+	
+	public void render(Paint background, BufferedImage buffer, AffineTransform trans) {
+		doUpdates();
+		Graphics2D g = buffer.createGraphics();	
 
-	/**Render glyphs immediately onto the passed graphics object.
-	 * @param g Graphics object to render on
-	 * @param clipBounds Device-space size of the rendering area
-	 * */
-	public void doDrawing(BufferedImage buffer, Graphics2D g) {
-		g.addRenderingHints(renderQuality);
-		
-		paintLock.lock();
 		try {
-			renderedViewTransform = g.getTransform();
+			//Clear prior data off
+			g.setComposite(AlphaComposite.Src);
+			g.setPaint(background);
+			g.fillRect(0,0, buffer.getWidth(), buffer.getHeight());
+			g.setComposite(AlphaComposite.SrcOver);
+			
+			g.setTransform(trans);
+
+
+			g.addRenderingHints(renderQuality);
+			
 			g.setTransform(AffineTransform.getTranslateInstance(0,0));
 			try {
-				for (PaintTask painter: painters) {
-					painter.createBuffer(buffer, renderedViewTransform);
-				}
-	
+				for (PaintTask painter: painters) {painter.createBuffer(buffer, renderedViewTransform);}
+
 				List<Future<BufferedImage>> results =  renderPool.invokeAll(painters);
 				//Composite images as the return
 				for (Future<BufferedImage> f: results) {
 					g.drawImage(f.get(), 0,0, null);						
 				}
-				
-				//record that painting occured
-				for(int i=0; i<layers.length;i++) {
-					stateIDs[i] = layers[i].getStateID();
-				}
 			} catch (Exception e) {throw new RuntimeException("Error in mulit-thread painting.", e);}
-		 } finally {paintLock.unlock();}
-	}
-	
-		
-	private BufferedImage selfBuffer() {
-		doUpdates();
-		
-		BufferedImage buffer = buffers[nextBuffer];
-		Rectangle size = target.getBounds();
-		AffineTransform priorTransform = target.getViewTransform();
-		
-		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
-		
-		//Ensure that the buffer is the 'right' size
-		if (buffer == null ||
-			buffer.getWidth() != size.width ||
-			buffer.getHeight() != size.height) 
-		{
-			buffers[nextBuffer] = newBuffer(target, size.width, size.height);
-			buffer= buffers[nextBuffer];
-		}
 
-		
-		Graphics2D g =null;
-		try {
-			g = buffer.createGraphics();	//Clear prior data off
-			g.setComposite(AlphaComposite.Src);
-			g.setPaint(target.getBackground());
-			g.fillRect(0,0, size.width, size.height);
-			g.setComposite(AlphaComposite.SrcOver);
-			
-			g.setTransform(priorTransform);
-			doDrawing(buffer, g);
+			renderedSize = new Dimension(buffer.getWidth(), buffer.getHeight());
+			renderedViewTransform = g.getTransform();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (g !=null) {g.dispose();}
 		}
-		
-		updateNextBuffer();
-		return buffer;
 	}
 
-	/**Create a new buffer if required.
-	 * The buffer will be created for the target canvas.
-	 * A buffer will only be 'required' if the size or transparency of the passed
-	 * buffer do not match the passed target size or passed transparency.
-	 * 
-	 * @param target
-	 * @param buffer
-	 * @param transparent
-	 * @return
-	 */
-    protected BufferedImage newBuffer(Canvas canvas, int width, int height) {
-       BufferedImage img = null;
-        if ( !GraphicsEnvironment.isHeadless() ) {
-            try {
-                img = (BufferedImage)canvas.createImage(width, height);
-            } catch ( Exception e ) {
-                img = null;
-            }
-        }
-        if ( img == null ) {
-            return new BufferedImage(width, height,
-                                     BufferedImage.TYPE_INT_RGB);
-        }
-        return img;
-    }
-	
-	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
-	
 	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
 		DynamicUpdateTask updateTask;
 		if (dynamicUpdaters.containsKey(rule)) {
@@ -335,37 +249,22 @@ public final class Painter implements Runnable {
 	 * */
 	public void doUpdates() {
 		try {
-			synchronized(panel.visLock) {
-				paintLock.lock();
-				try {
+			synchronized(program) {
+				synchronized(visLock) { //Suspend analysis until the viewpoint is ready
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
 	
-					Program viewPoint = MakeViewPoint.viewPoint(panel.getProgram());
+					Program viewPoint = MakeViewPoint.viewPoint(program);
 					
 					for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
 					for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
-				} catch (Exception e) {
-					paintLock.unlock(); //only release here if an exception occurs, otherwise the lock needs to be released at the end of the method.
-					throw e;
-				}
-			} 
-				
-			try {
-				executeAll(guideUpdaters);
+				} 
+					
 				executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
-													//SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":[n]*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
-							
-				painters = new ArrayList(layers.length);
-							
-				for (int i=0; i< layers.length; i++) {
-					DoubleBufferLayer layer = (DoubleBufferLayer) layers[i]; 
-					LayerView view = layer.getView();
-					painters.add(PaintTask.newTask(view));
-				}
-				for (Guide2D guide: target.getGuides()) {painters.add(PaintTask.newTask(guide));}
-			} finally {paintLock.unlock();}
+													 //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":[n]*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
+				executeAll(guideUpdaters);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error running asynchronous updates.", e);
 		}

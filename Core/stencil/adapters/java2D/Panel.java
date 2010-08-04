@@ -33,7 +33,8 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.CanvasTuple;
 import stencil.adapters.java2D.data.ViewTuple;
 import stencil.adapters.java2D.util.GuideTask;
-import stencil.adapters.java2D.util.Painter;
+import stencil.adapters.java2D.util.MultiThreadPainter;
+import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
 import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Guide;
@@ -42,7 +43,6 @@ import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.epsExport.EpsGraphics2D;
 
-import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.MouseListener;
@@ -57,12 +57,12 @@ import java.lang.reflect.Array;
 import javax.imageio.ImageIO;
 
 public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
-	private final Painter painter;
+	private final PainterThread painter;
 	private final Thread painterThread;	//Thread for painting after loading is complete
 
 	public Panel(Canvas canvas, Program p) {
 		super(p, canvas);
-		painter = new Painter(canvas.layers, canvas, this);
+		painter = new PainterThread(canvas.layers, canvas, this);
 		for (Guide g: p.getCanvasDef().getGuides()) {
 			painter.addTask(new GuideTask(g, this));			
 		}
@@ -98,18 +98,23 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
 	public void export(String filename, String type, Object info) throws Exception {
-		synchronized(visLock) {
-			painter.doUpdates();
-			
-			if (type.equals("PNG") || type.equals("RASTER")) {
-				exportPNG(filename, Converter.toInteger(Array.get(info,0)));
-			} else if (type.equals("PNG2")) {
-				exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
-			} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
-				exportEPS(filename);
-			} else if (type.equals("EPS2") || type.equals("VECTOR")) {
-				exportEPS(filename, (Rectangle) info);
-			} else {super.export(filename, type, info);}
+		synchronized(program) {
+			synchronized(visLock) {
+				//Regardless of target, put the visualization into a consistent state
+				MultiThreadPainter updater = new MultiThreadPainter(canvas, canvas.layers, visLock, program);
+				updater.doUpdates();
+	
+				
+				if (type.equals("PNG") || type.equals("RASTER")) {
+					exportPNG(filename, Converter.toInteger(Array.get(info,0)));
+				} else if (type.equals("PNG2")) {
+					exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
+				} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
+					exportEPS(filename);
+				} else if (type.equals("EPS2") || type.equals("VECTOR")) {
+					exportEPS(filename, (Rectangle) info);
+				} else {super.export(filename, type, info);}
+			}
 		}
 	}
 	
@@ -164,16 +169,12 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 			buffer = new BufferedImage((int) width,  (int) height, BufferedImage.TYPE_INT_ARGB);
 		}		
 		
-		Graphics2D g = buffer.createGraphics();
-		g.setPaint(canvas.getBackground());
-		Rectangle bounds = new Rectangle(0,0, (int) width, (int) height); 
-		g.fill(bounds);
-
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
 		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
-		g.transform(exportViewTransform);
 		
-		painter.doDrawing(buffer, g);
+		MultiThreadPainter exportPainter = new MultiThreadPainter(canvas, canvas.layers, visLock, program);
+		exportPainter.render(canvas.getBackground(), buffer, exportViewTransform);
+
 		ImageIO.write(buffer, "png", new java.io.File(filename));
 	}
 	
