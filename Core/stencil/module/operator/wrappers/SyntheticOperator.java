@@ -51,7 +51,6 @@ import stencil.tuple.instances.ArrayTuple;
  
 /**Operator defined through a stencil definition.
  * 
- * TODO: Add compiler step to fold these operators directly into the call chains if only has one rule predicate on ALL and has no specialization
  * TODO: These aren't always projects...but they are for now!
  * */
 public class SyntheticOperator implements StencilOperator {

@@ -196,8 +196,6 @@ public class Axis extends Guide2D {
 		marks.ensureCapacity(elements.size() *2);
 		
 		for (Tuple t: elements) {
-			if (t == null) {continue;}	//TODO: HACK!!!! This is because the guide creation is not properly scheduled right now
-
 			String labelText = Converter.toString(t.get(label_idx));
 			double location = Converter.toDouble(t.get(offset_idx));
 
@@ -257,7 +255,6 @@ public class Axis extends Guide2D {
 	}
 	
 	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
-		System.out.println("Rendering with: " + viewTransform);
 		for (Glyph2D glyph: marks) {glyph.render(g, viewTransform);}
 	}
 }

@@ -32,9 +32,9 @@ package stencil.util.streams.txt;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.*;
 
 import stencil.tuple.SourcedTuple;
@@ -72,9 +72,8 @@ public final class DelimitedParser implements TupleStream {
 	private final NextChannel channel;
 	
 	/**Stored tuple, returned before anything new will be read.
-	 * TODO: THIS IS NOT THREAD SAFE!!!!
 	 * */
-	private Queue<SourcedTuple> tupleCache = new LinkedList();
+	private Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
 	
 	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
@@ -124,7 +123,7 @@ public final class DelimitedParser implements TupleStream {
 	private void loadCache() {
 		SourcedTuple t;
 		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
-		if (tupleCache.size() == 0) {
+		if (tupleCache.isEmpty()) {
 			Object[] values; 
 			
 			for (int i=0; i< 100; i++) {
@@ -160,16 +159,16 @@ public final class DelimitedParser implements TupleStream {
 	 */
 	public boolean hasNext() {
 		if (source == null ) {return false;}
-		if (tupleCache.size() > 0) {return true;}
+		if (!tupleCache.isEmpty()) {return true;}
 		loadCache();
-		return tupleCache.size() >0;
+		return !tupleCache.isEmpty();
 	}
 
 	
 	/**Is a tuple immediately available?*/
 	public boolean ready() {
 		hasNext();	
-		return tupleCache != null;
+		return !tupleCache.isEmpty();
 	}
 
 	public String getName() {return name;}

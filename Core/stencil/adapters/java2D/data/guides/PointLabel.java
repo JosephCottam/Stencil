@@ -27,7 +27,6 @@ public class PointLabel extends Guide2D {
 		marks.clear();
 		
 		for (Tuple t: elements) {
-			if (t == null) {continue;}	//TODO: HACK!!!! This is because the guide creation is not properly scheduled right now
 			Glyph2D label = prototypeText.update(t);
 			marks.add(label);
 		}

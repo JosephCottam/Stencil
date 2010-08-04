@@ -152,7 +152,6 @@ public class Interpreter {
 	}
 
 	//TODO: What about locals in a dynamic binding?
-	//TODO: Move dynamic binding to a compile time group...
 	private boolean registerDynamics(Layer layer, Consumes group, SourcedTuple source, Tuple result) {
 		boolean actionsTaken = false;
 		if (result != null && result instanceof MapMergeTuple) {

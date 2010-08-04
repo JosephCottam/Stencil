@@ -122,7 +122,6 @@ public class Sidebar extends Guide2D {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);
 		for (int i=0; i< elements.size(); i++) {
 			Tuple t = elements.get(i);
-			if (t == null) {continue;}	//TODO: HACK!!!! This is because the guide creation is not properly scheduled right now
 			marks.addAll(createLabeledBox(t, i));
 		}
 		return marks;

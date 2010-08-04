@@ -11,8 +11,6 @@ options {
  * This validates that map and fold passes are paired properly
  * in such contexts. 
  *
- * TODO: Don't allow unbalanced map/Fold in dynamic bindings
- *
  */
 
   package stencil.parser.string.validators;
@@ -23,7 +21,7 @@ options {
 }
 
 
-topdown: (layerDefault | prefilter | view | canvas | local);  //TODO: Should local really be included here?
+topdown: (layerDefault | prefilter | view | canvas | local);
 
 layerDefault: ^(LAYER . ^(LIST balancedRule*) .*);
 

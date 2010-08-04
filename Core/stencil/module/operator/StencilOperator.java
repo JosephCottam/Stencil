@@ -59,7 +59,7 @@ import stencil.module.util.OperatorData;
  * be reflected in all roles.  Operators instances of the same base type
  * are completely independent. 
  * 
- * TODO: Eliminate the getFacet and return to a more regular interface...
+ * TODO: Evaluate eliminating the getFacet and return to a more regular interface (requires call type data in the meta-data definition)
  *  
  * @author jcottam
  *
