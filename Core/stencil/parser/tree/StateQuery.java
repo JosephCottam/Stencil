@@ -77,4 +77,10 @@ public class StateQuery extends StencilTree {
 		cachedIDs = nowIDs;
 		return !matches;
 	}
+	
+	public StateQuery dupNode() {
+		StateQuery dup = (StateQuery) super.dupNode();
+		dup.cachedIDs = this.cachedIDs;
+		return dup;
+	}
 }

@@ -217,7 +217,7 @@ public final class MultiThreadPainter {
 			} catch (Exception e) {throw new RuntimeException("Error in mulit-thread painting.", e);}
 
 			renderedSize = new Dimension(buffer.getWidth(), buffer.getHeight());
-			renderedViewTransform = g.getTransform();
+			renderedViewTransform = trans;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

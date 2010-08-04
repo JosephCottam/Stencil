@@ -15,8 +15,7 @@ import stencil.tuple.Tuple;
  * 
  * TODO: Implement using data state operators
  * */
-public final class DynamicUpdateTask extends UpdateTask {
-	private final DynamicRule rule;
+public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	private final DisplayLayer table;
 	
 	//TODO: Move the store data to the layer (makes this automatically respect deletes, can reduce the amount of data retained...super great if it were a column store!)
@@ -25,17 +24,16 @@ public final class DynamicUpdateTask extends UpdateTask {
 	public DynamicUpdateTask(DisplayLayer table, DynamicRule rule) {
 		super(new Path(rule));
 		this.table = table;
-		this.rule = rule;
 	}
 		
 	public void addUpdate(Tuple sourceData, Glyph2D target) {
 		this.sourceData.put(target.getID(), sourceData);
 	}
 
-	public boolean needsUpdate() {return rule.requiresUpdate();}
+	public boolean needsUpdate() {return fragment.requiresUpdate();}
 
 	public Finisher update() {
-		final List<Tuple> result = rule.apply(table, sourceData);
+		final List<Tuple> result = fragment.apply(table, sourceData);
 		return new Finisher() {
 			public void finish() {
 				((DoubleBufferLayer) table).directUpdate(result);
@@ -43,5 +41,5 @@ public final class DynamicUpdateTask extends UpdateTask {
 		};
 	}
 	
-	public String toString() {return "Dynamic update for " + table.getName() + ": " + rule.getAction().getTarget().getPrototype().toStringTree();}
+	public String toString() {return "Dynamic update for " + table.getName() + ": " + fragment.getAction().getTarget().getPrototype().toStringTree();}
 }

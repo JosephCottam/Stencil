@@ -18,6 +18,8 @@ options {
   import stencil.parser.tree.*;
   import stencil.module.operator.StencilOperator;
   import stencil.module.operator.wrappers.SyntheticOperator;
+  import static stencil.parser.ParserConstants.QUERY_FACET;
+  import static stencil.parser.ParserConstants.STATE_ID_FACET;
 }
 
 @members {
@@ -60,6 +62,12 @@ change: i=AST_INVOKEABLE
    }
    
    inv.setOperator(viewPoint);
-   inv.changeFacet("query"); //Probably correct where it matters...but maybe not always
+   
+   //Probably correct where it matters...but maybe not always
+   if (inv.getAncestor(STATE_QUERY) != null) {
+       inv.changeFacet(STATE_ID_FACET);
+   } else {
+       inv.changeFacet(QUERY_FACET); 
+   }
 };
 	
