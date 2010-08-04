@@ -53,9 +53,8 @@ public final class PainterThread implements Runnable {
 		if (painter.isShutdown()) {return;}
 		
 		BufferedImage i = selfBuffer();
-		updateNextBuffer();
 		target.setBackBuffer(i);
-		target.repaint();
+		updateNextBuffer();
 	}
 
 	
@@ -64,7 +63,6 @@ public final class PainterThread implements Runnable {
 		
 		BufferedImage buffer = buffers[nextBuffer];
 		Rectangle size = target.getBounds();
-		AffineTransform priorTransform = target.getViewTransform();
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 		
@@ -78,7 +76,7 @@ public final class PainterThread implements Runnable {
 		}
 
 		try {
-			painter.render(target.getBackground(), buffer, priorTransform);
+			painter.render(target.getBackground(), buffer, target.getViewTransform());
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 

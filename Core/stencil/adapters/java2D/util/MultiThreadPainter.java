@@ -199,13 +199,8 @@ public final class MultiThreadPainter {
 			g.setPaint(background);
 			g.fillRect(0,0, buffer.getWidth(), buffer.getHeight());
 			g.setComposite(AlphaComposite.SrcOver);
-			
-			g.setTransform(trans);
 
-
-			g.addRenderingHints(renderQuality);
-			
-			g.setTransform(AffineTransform.getTranslateInstance(0,0));
+			g.addRenderingHints(renderQuality);			
 			try {
 				for (PaintTask painter: painters) {painter.createBuffer(buffer, renderedViewTransform);}
 

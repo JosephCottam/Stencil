@@ -87,6 +87,7 @@ public final class Canvas extends DisplayCanvas {
 	
 	public synchronized void setBackBuffer(BufferedImage i) {
 		this.buffer = i;
+		this.repaint();
 	}
 	
 	public DisplayGuide getGuide(Selector sel) {return guides.get(sel);}
