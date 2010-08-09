@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.parser.tree.DynamicRule;
-import stencil.parser.tree.util.Path;
 import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.display.DisplayLayer;
@@ -22,7 +21,7 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	private final Map<String, Tuple> sourceData = new ConcurrentHashMap();
 		
 	public DynamicUpdateTask(DisplayLayer table, DynamicRule rule) {
-		super(new Path(rule));
+		super(rule);
 		this.table = table;
 	}
 		
@@ -30,16 +29,18 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 		this.sourceData.put(target.getID(), sourceData);
 	}
 
-	public boolean needsUpdate() {return fragment.requiresUpdate();}
+	public boolean needsUpdate() {return originalFragment.requiresUpdate();}
 
 	public Finisher update() {
-		final List<Tuple> result = fragment.apply(table, sourceData);
+		System.out.println("running update: " + toString());
+		final List<Tuple> result = viewPointFragment.apply(table, sourceData);		
 		return new Finisher() {
 			public void finish() {
+				System.out.println("finishing update: " + toString());
 				((DoubleBufferLayer) table).directUpdate(result);
 			}
 		};
 	}
 	
-	public String toString() {return "Dynamic update for " + table.getName() + ": " + fragment.getAction().getTarget().getPrototype().toStringTree();}
+	public String toString() {return "Dynamic update for " + table.getName() + ": " + originalFragment.getAction().getTarget().getPrototype().toStringTree();}
 }

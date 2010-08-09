@@ -55,6 +55,16 @@ public final class ArrayUtil {
 		return target;
 	}
 	
+
+	/**Deep to string for the primtive int type.**/
+	public static final String deepToString(int[] ids) {
+		StringBuilder b = new StringBuilder("[");
+		for (int i: ids) {b.append(i); b.append(", ");}
+		b.deleteCharAt(b.length()-1);
+		b.append("]");
+		return b.toString();
+	}
+	
 	/**List implementation backed by an array that cannot be re-sized.
 	 * This IS NOT an immutable, elements may still be set.  However, it
 	 * cannot be grown/shrunk. 
@@ -139,6 +149,5 @@ public final class ArrayUtil {
 		public T remove(int index) {throw new UnsupportedOperationException();}
 		public boolean removeAll(Collection<?> c) {throw new UnsupportedOperationException();}
 		public boolean retainAll(Collection<?> c) {throw new UnsupportedOperationException();}
-
 	}
 }

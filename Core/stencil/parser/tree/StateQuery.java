@@ -54,13 +54,12 @@ public class StateQuery extends StencilTree {
 		return Arrays.deepHashCode(nowIDs);
 	}
 	
-	public int[] getStateIDs() {return cachedIDs;}
-	
 	/**Has any of the contained stateID queries changed?*/
 	public boolean requiresUpdate() {
-		final int[] nowIDs = new int[getChildCount()];
+		int children = getChildCount();
+		final int[] nowIDs = new int[children];
 		if (cachedIDs == null) {
-			cachedIDs = new int[nowIDs.length];
+			cachedIDs = new int[children];
 			Arrays.fill(cachedIDs, Integer.MAX_VALUE-1);
 		}
 		
@@ -73,14 +72,7 @@ public class StateQuery extends StencilTree {
 		for (int i=0; matches && i < nowIDs.length; i++) {
 			matches = matches && (nowIDs[i] == cachedIDs[i]);
 		}
-				
 		cachedIDs = nowIDs;
 		return !matches;
-	}
-	
-	public StateQuery dupNode() {
-		StateQuery dup = (StateQuery) super.dupNode();
-		dup.cachedIDs = this.cachedIDs;
-		return dup;
 	}
 }
