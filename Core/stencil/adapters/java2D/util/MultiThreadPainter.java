@@ -252,16 +252,17 @@ public final class MultiThreadPainter {
 	public void doUpdates() {
 		try {
 			synchronized(program) {
-				synchronized(visLock) { //Suspend analysis until the viewpoint is ready
+				Program viewPoint;
+
+				synchronized(visLock) { 				//Suspend analysis until the viewpoint is ready
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
-	
-					Program viewPoint = MakeViewPoint.viewPoint(program);
-					
-					for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
-					for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
+					viewPoint = MakeViewPoint.viewPoint(program);	
 				} 
+
+				for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
+				for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
 					
 				executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
 													 //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":[n]*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
@@ -280,7 +281,7 @@ public final class MultiThreadPainter {
 	 */
 	private void executeAll(Collection<? extends UpdateTask> targets) throws Exception {
 		List<Future<Finisher>> results = updatePool.invokeAll((Collection<? extends Callable<Finisher>>) targets); //HACK: Why is this cast required???
-		for (Future<Finisher> f: results) {
+		for (Future<Finisher> f: results) {//TODO: Finisher could PROBABLY be removed if the layer were a column store...
 			Finisher finalizer = f.get();
 			finalizer.finish();
 		}

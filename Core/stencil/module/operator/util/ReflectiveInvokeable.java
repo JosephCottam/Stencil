@@ -70,7 +70,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
 		int expectedNumArgs = paramTypes.length;
 		boolean isVarArgs =method.isVarArgs();
-		R result;
 
 		try {
 			if (isVarArgs) {
@@ -113,11 +112,10 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		}
 			
 		try {
-			result = (R) method.invoke(target, args);
+			return (R) method.invoke(target, args);	//99% of method time spent on this one line...
 		} catch (Exception e) {
 		 	throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, e);
 		}
-		return result;
 	}
 	
 	/**Copies values from the arguments array to the result array, converting them per the type along the way.
