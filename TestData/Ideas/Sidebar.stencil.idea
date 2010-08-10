@@ -1,0 +1,32 @@
+group labeledGlyph
+    const SPACING: 2
+    
+    element glyph[SHAPE]
+    defaults
+        Y: parent[Y]
+        REGISTRATION: RIGHT
+        X: Sub(parent[X], SPACING)
+        
+    element label[TEXT]
+    defaults
+        ID: label
+        TEXT: label
+        Y : parent[Y]
+        REGISTRATION: LEFT
+        X: Add(parent[X], SPACING)
+
+group VertDiscreteSidebar
+    const SPACING: 10
+    
+    stream data (key, label, shape, fill, outline)
+
+    element Title[TEXT]
+    defaults
+        REGISTRATION : "CENTER"
+        
+    group elements[labeledGlyph]
+    from data
+        ID: label
+        glyph[SHAPE, FILL, OUTLINE] : (shape, fill, outline)
+        Y: parent.size() -> Mult(_, SPACING)
+        X: parent[X]

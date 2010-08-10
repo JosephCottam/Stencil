@@ -1,41 +1,72 @@
-group LabeledTick
-   stream data(text, x)
-   const Y
+group HTick
    const SIZE
    const OFFSET: Div(SIZE, 2) 
    
    element Label[TEXT]
-   from data
+   defaults
       TEXT: text
-      X: x
-      Y: Mult(1.5, offset) -> Sub(Y, _)
+      X: Mult(1.5, OFFSET) -> Sub(parent[X], _)
       
    element Tick[LINE]
-   from data
-      (X.1, X.2) : (X,X) 
-      Y.1:  Sub(Y, OFFSET)
-      Y.2:  Add(Y, OFFSET)
+   defaults
+      X.1:  Sub(parent[X], OFFSET)
+      X.2:  Add(parent[X], OFFSET)
 
-group XAxis
-   stream data (text, x)
-   const Y
-   const SIZE
-   const TITLE
+group YAxis
+   const SIZE: 10
+
+   stream data (label, y)
    
    element title[TEXT]
-   TEXT: TITLE
+   
+   element axis[LINE]
+   from data
+      Y.1 : Min(x)
+      Y.2 : Max(x) 
+      (X.1, X.2) : parent[X]
+
+   layer ticks[HTick]
+   from data
+      ID: Counter()
+      (text): (label)
+      (X,Y) : (parent[X], y)
+      
+
+
+
+
+group VTick
+   const SIZE
+   const OFFSET: Div(SIZE, 2) 
+   
+   element Label[TEXT]
+   defaults
+      TEXT: text
+      Y: Mult(1.5, OFFSET) -> Sub(parent[Y], _)
+      
+   element Tick[LINE]
+   defaults
+      Y.1:  Sub(parent[Y], OFFSET)
+      Y.2:  Add(parent[Y], OFFSET)
+
+
+
+group XAxis
+   const SIZE: 10
+
+   stream data (label, x)
+   
+   element title[TEXT]
    
    element axis[LINE]
    from data
       X.1 : Min(x)
       X.2 : Max(x) 
-      
-   
-   layer ticks[LabeledTick][Y: Y, SIZE: SIZE]
-   from data
-      filter (STREAM_START)
-      (): ticks.clear()
+      (Y.1, Y.2) : parent[Y]
+
+   layer ticks[VTick]
    from data
       ID: Counter()
-      (text, x): (text,x)
+      (text): (label)
+      (X,Y) : (x, parent[Y])
       
