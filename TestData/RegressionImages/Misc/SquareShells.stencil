@@ -1,7 +1,7 @@
 STREAM: File
 NAME: EntityFeed
-HEADER: ID X Y
-SEPARATOR: \s+
+HEADER: ID
+SEPARATOR: $^
 SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
 STRICT: true
@@ -12,11 +12,11 @@ STRICT: true
   Shells are filled top-down, the right-to-left.
 */
 
-stream EntityFeed(ID, X,Y)  /*Precomputed layout*/
+stream Entities(ID)
 
 
 layer Nodes
-from EntityFeed
+from Entities
 	SIZE: 1
 	ID: Counter()
 	(X,Y) : Counter() -> [v] Sub(_,1) -> Layout(_) 

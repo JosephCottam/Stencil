@@ -1,5 +1,4 @@
-<!--If ANTLR3 task is not already installed, this script should be run with
-    "-lib ./Library/antlr3-ant.jar" /-->
+<!--Should be run from the command line with "-lib ../Library/" /-->
     
  <project name="Stencil" default="Stencil" basedir="..">
  	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
@@ -110,6 +109,10 @@
  	<target name="Release" depends="Stencil">
  		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>
 	</target> 
+
+    <target name="Release-NoBuild">
+        <ant antfile="./build/Deploy.xml" inheritRefs="true"/>
+    </target> 
  	
 	<!--GUnit tests--> 	
  	<target name="RunTests" depends="StencilGrammar"> 

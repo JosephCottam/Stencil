@@ -122,8 +122,10 @@ public class Application {
 			Interactive.main(args);
 		} else if (args[0].equals(HEADLESS_FLAG)) {
 			Headless.main(args);
+			System.exit(0);
 		} else if (args[0].equals(BATCH_FLAG)) {
 			Batch.main(args);
+			System.exit(0);
 		} else if (args[0].startsWith(HELP_FLAG)) {
 			help();
 		} else {

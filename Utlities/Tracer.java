@@ -7,7 +7,7 @@ import static com.sun.btrace.BTraceUtils.*;
  * all of the btrace jars and Tracer.class THEN the results go to 
  * Tracer.class.btrace.
  * 
- * java -javaagent:btrace-agent.jar=script=Tracer.class -jar Stencil.jar
+ * java -javaagent:btrace-agent.jar=script=Tracer.class -jar Stencil.jar -headless -open ./StencilExplore.stencil
  * @author jcottam
  *
  */
@@ -36,7 +36,7 @@ public class Tracer {
     public static void loadEnter() {println(strcat("Load: Entry: ", str(timeMillis())));}
 
     @OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.RETURN))
-    public static void LoadExit() {println(strcat("Load: Entry: ", str(timeMillis())));}
+    public static void LoadExit() {println(strcat("Load: Return: ", str(timeMillis())));}
 
     
 }

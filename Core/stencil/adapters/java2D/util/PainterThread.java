@@ -33,7 +33,10 @@ public final class PainterThread implements Runnable {
 
 	public synchronized void finalize() {painter.signalShutdown();}
 	
-	public synchronized void signalStop() {keepRunning =false;}
+	public synchronized void signalStop() {
+		keepRunning =false;
+		painter.signalShutdown();
+	}
 	
 	public void run() {
 		while(keepRunning) {

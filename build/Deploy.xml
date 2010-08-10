@@ -1,6 +1,3 @@
-<!--If ANTLR3 task is not already installed, this script should be run with
-    "-lib ./Library/antlr3-ant.jar" /-->
-    
  <project name="Release" default="Release">
  	<target name="CleanUpTests">
  		<delete>
