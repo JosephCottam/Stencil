@@ -17,9 +17,13 @@ group LabeledTick
       Y.2:  Add(Y, OFFSET)
 
 group XAxis
-   data (text, x)
+   stream data (text, x)
    const Y
    const SIZE
+   const TITLE
+   
+   element title[TEXT]
+   TEXT: TITLE
    
    element axis[LINE]
    from data
@@ -29,7 +33,7 @@ group XAxis
    
    layer ticks[LabeledTick][Y: Y, SIZE: SIZE]
    from data
-      filter (ALL = STREAM_START)
+      filter (STREAM_START)
       (): ticks.clear()
    from data
       ID: Counter()
