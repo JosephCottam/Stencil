@@ -266,6 +266,85 @@ public class Temp extends BasicModule {
 	}
 
 	
+	public static class Oscillate extends AbstractOperator {
+		public static enum STYLE {CIRCLE, SINE, SINE2}
+		
+		public static final String STATES_KEY = "states";	//How many states should it oscillate through (may either be an int or a coma-separated list)
+		public static final String STYLE_KEY = "styles";	//circle (A B C A B C A B C)  or sine (A B C B A B C B A) or sine2 (A B C C B A A B C C B A)
+		
+		private final Object[] states;
+		private final STYLE style;
+		
+		private int idx=0;
+		private boolean goingUp;
+		
+		protected Oscillate(OperatorData opData, Specializer spec) {
+			super(opData);
+			style = STYLE.valueOf(Converter.toString(spec.get(STYLE_KEY)).toUpperCase());
+		
+			Object[] candidate;
+			try {
+				int stateCount = Converter.toInteger(spec.get(STYLE_KEY));
+				candidate = new Integer[stateCount];
+				for (int i =0; i< candidate.length; i++) {candidate[i] =i;}
+			}
+			catch (NumberFormatException ex) {
+				String states  = Converter.toString(spec.get(STYLE_KEY));
+				candidate = states.split("\\s*,\\s*");
+			}
+			states = candidate;
+			if (states.length ==1) {throw new RuntimeException("Oscillate specified with only one state: " + Arrays.deepToString(states));}
+
+
+			if (!(style.equals("CIRCLE") || style.equals("SINE") || style.equals("SINE2"))) {throw new RuntimeException("Invalid style specified.  Must be circle, sine or sine2.");} 
+		}
+			
+			
+		public Object query() {return states[idx];}
+		
+		public Object map(){
+			Object rv = states[idx];
+			
+			switch (style) {
+			case CIRCLE : idx = idx+1%states.length; break;
+			case SINE :
+				if (goingUp) {
+					idx = idx+1;
+					if (idx == states.length) {
+						idx = states.length-2;
+						goingUp = false;
+					} 
+				} else {
+					idx = idx -1;
+					if (idx <0) {
+						idx = 1;
+						goingUp = true;
+					}
+				}
+				break;
+			case SINE2 :
+				if (goingUp) {
+					idx = idx+1;
+					if (idx == states.length) {
+						idx = states.length-1;
+						goingUp = false;
+					} 
+				} else {
+					idx = idx -1;
+					if (idx <0) {
+						idx = 0;
+						goingUp = true;
+					}
+				}
+				break;
+			default : throw new Error("cycle style not covered: " + style.toString());
+			}
+			return rv;
+		}
+		
+		
+	}
+	
 	public Temp(ModuleData md) {super(md);}
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
