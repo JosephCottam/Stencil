@@ -3,11 +3,10 @@ import static com.sun.btrace.BTraceUtils.*;
 
 
 /**
- * IF Stenic.jar (and related config files) are in the same directory as
- * all of the btrace jars and Tracer.class THEN the results go to 
- * Tracer.class.btrace.
+ * Assuming the btrace jars are one level below stencil and assuming the tracer
+ * is with them then this will trace properly:
  * 
- * java -javaagent:btrace-agent.jar=script=Tracer.class -jar Stencil.jar -headless -open ./StencilExplore.stencil
+ * java -javaagent:../btrace-agent.jar=script=../Tracer.class -jar Stencil.jar -headless -open ./StencilExplore.stencil -sources Entities ../DataSets/count_50000.txt
  * @author jcottam
  *
  */

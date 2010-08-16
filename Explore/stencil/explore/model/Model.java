@@ -149,6 +149,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 		reporter.addMessage("Starting %1$s export to %2$s (additional args: %3$s).", type, filename, infoString);
 
 		try {
+			stencilPanel.doUpdates();
 			stencilPanel.export(filename, type, info);
 			reporter.addMessage("Export to %1$s done.", filename);
 		} catch (Exception e) {

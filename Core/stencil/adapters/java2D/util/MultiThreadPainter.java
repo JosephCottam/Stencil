@@ -204,9 +204,9 @@ public final class MultiThreadPainter {
 				|| (bounds.getWidth() != renderedSize.getWidth())
 				|| !renderedViewTransform.equals(trans);		
 	}
-	
+
+	/**Render to the given.*/
 	public void render(Paint background, BufferedImage buffer, AffineTransform trans) {
-		doUpdates();
 		Graphics2D g = buffer.createGraphics();	
 
 		try {

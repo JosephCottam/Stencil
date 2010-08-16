@@ -234,4 +234,6 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 							bounds.width-(insets.left+insets.right),
 							bounds.height-(insets.top+insets.bottom));
 	}
+	
+	public void doUpdates() {painter.doUpdates();}
 }

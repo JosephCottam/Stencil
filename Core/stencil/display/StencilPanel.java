@@ -205,4 +205,10 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * to the passed glyph object. 
 	 */
 	public abstract void addDynamic(T g, DynamicRule rule, Tuple source);
+	
+	/**Force updates to run now.  Updates method should take precautions
+	 * to maintain a consistent visualization.  As such, this method should
+	 * NEVER be invoked as part of data analysis.
+	 */
+	public abstract void doUpdates();
 }
