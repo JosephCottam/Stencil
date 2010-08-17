@@ -23,7 +23,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 	//Cache objects common allocated/referenced while invoking but never materially changing
 	private final Class[] paramTypes;
-	private final Object[] args;
 	
 	public ReflectiveInvokeable(Method method) {this(method, null);}
 	public ReflectiveInvokeable(String method, Class target) {this(findMethod(method, target), null);}
@@ -40,7 +39,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		this.method = method;
 		this.target =target;
 		paramTypes = method.getParameterTypes();
-		args = new Object[paramTypes.length];
 		returnsTuple = Tuple.class.isAssignableFrom(method.getReturnType());
 	}
 
@@ -70,6 +68,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
 		int expectedNumArgs = paramTypes.length;
 		boolean isVarArgs =method.isVarArgs();
+		Object[] args = new Object[paramTypes.length];
 
 		try {
 			if (isVarArgs) {
@@ -156,7 +155,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		if (!(other instanceof ReflectiveInvokeable)) {return false;}
 		
 		ReflectiveInvokeable o = (ReflectiveInvokeable) other;
-		boolean result = target.equals(o.target) && method.equals(o.method) && o.args.length == this.args.length; 
+		boolean result = target.equals(o.target) && method.equals(o.method) && paramTypes.length == this.paramTypes.length; 
 		return result;
 	}
 }
