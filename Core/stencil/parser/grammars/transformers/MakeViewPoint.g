@@ -29,11 +29,11 @@ options {
  private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
  private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream(null));
 
- private static final Map<String, SyntheticOperator> synthetics = new HashMap();
+ private static final Map<String, StencilOperator> instances = new HashMap();
 
  public synchronized static Program viewPoint(Program p) {
     //this.viewPointer = new MakeViewPoint(new CommonTreeNodeStream(program));
-     synthetics.clear();
+     instances.clear();
      Program copy = (Program) DUPLICATOR.dupTree(p);
      INSTANCE.downup(copy, INSTANCE, "instantiate");
      INSTANCE.downup(copy, INSTANCE, "change");
@@ -42,12 +42,18 @@ options {
  
 }
 
-//instantiate new synthetic operators that pointer here (they don't need to be updated yet since they run off the actual AST).
-instantiate: ^(opDef=OPERATOR .*) 
-{
-    SyntheticOperator op = new SyntheticOperator("", (Operator) opDef);
-    synthetics.put(op.getName(), op);   
-};
+//instantiate new synthetic operators that point to the new tree (Instatiated operators are later used to thread values through).
+instantiate 
+    : proxy=OPERATOR_PROXY 
+      {
+         StencilOperator op =  ((OperatorProxy) proxy).getOperator();
+         instances.put(op.getName(), op.viewPoint());
+      }
+    | ^(opDef=OPERATOR .*) 
+      {
+          SyntheticOperator op = new SyntheticOperator("", (Operator) opDef);
+          instances.put(op.getName(), op);   
+      };
 
 
 //Replace AST instances with pointers to new viewpoints
@@ -66,12 +72,8 @@ change:  i=AST_INVOKEABLE
      if (fd.isFunction()) {return;}
    }
    
-   StencilOperator viewPoint;
-   if (synthetics.containsKey(op.getName())) {
-      viewPoint = synthetics.get(op.getName());
-   } else {
-      viewPoint = op.viewPoint();
-   }
+   StencilOperator viewPoint = instances.get(op.getName());
+   if (viewPoint == null) {throw new RuntimeException("Could not find viewpoint for operator " + op.getName());}
    
    inv.setOperator(viewPoint);
    

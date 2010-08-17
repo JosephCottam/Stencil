@@ -96,11 +96,11 @@ public class StencilUtil extends BasicModule {
 			OperatorData od = new OperatorData(base);
 			String[] keys  = getNames(spec);
 			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), false, keys);
+			fd = new FacetData(fd.getName(), fd.getType(), true, keys);
 			od.addFacet(fd);
 			
 			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), false, keys);
+			fd = new FacetData(fd.getName(), fd.getType(), true, keys);
 			od.addFacet(fd);
 			return od;
 		}
@@ -277,7 +277,9 @@ public class StencilUtil extends BasicModule {
 		OperatorData opData = getOperatorData(name, specializer);
 		if (name.equals("EchoCategorize")) {return new EchoCategorize(opData, specializer);}
 		else if (name.equals("EchoContinuous")) {return new EchoContinuous(opData, specializer);}
-		else if (name.equals("Rename")) {return new Rename(opData, specializer);}
+		else if (name.equals("Rename")) {
+			return new Rename(opData, specializer);
+		}
 		
 		throw new RuntimeException(String.format("Legend name not known: %1$s.", name));
 	}
