@@ -25,6 +25,12 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	private final Class[] paramTypes;
 	
 	//TODO: Try a thread-local array to handle an argument cache (removes a short-lived object but adds state here).
+	private static final class ArgCache extends ThreadLocal<Object[]> {
+		private final int size;
+		public ArgCache (int size) {this.size = size;}
+		protected Object[] initialValue() {return new Object[size];}
+	}
+	private final ThreadLocal<Object[]> args;	
 	
 	public ReflectiveInvokeable(Method method) {this(method, null);}
 	public ReflectiveInvokeable(String method, Class target) {this(findMethod(method, target), null);}
@@ -42,6 +48,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		this.target =target;
 		paramTypes = method.getParameterTypes();
 		returnsTuple = Tuple.class.isAssignableFrom(method.getReturnType());
+		args = new ArgCache(paramTypes.length);
 	}
 
 	//Find the method amidst the class
@@ -70,7 +77,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
 		int expectedNumArgs = paramTypes.length;
 		boolean isVarArgs =method.isVarArgs();
-		Object[] args = new Object[paramTypes.length];
+		Object[] args = this.args.get();
 
 		try {
 			if (isVarArgs) {
