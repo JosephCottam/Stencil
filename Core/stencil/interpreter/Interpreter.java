@@ -172,9 +172,8 @@ public class Interpreter {
 			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			
-			for (DynamicRule rule: group.getDynamicRules()) {
-				panel.get().addDynamic(glyph, rule, source.getValues());
-			}
+			layer.getDisplayLayer().addDynamic(glyph, source.getValues());
+
 			return true;
 		} catch (Exception e) {
 			throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);

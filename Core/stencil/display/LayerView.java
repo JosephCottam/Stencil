@@ -3,6 +3,8 @@ package stencil.display;
 import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Map;
+import stencil.tuple.Tuple;
 
 
 /**Access to the consistent state of a layer.
@@ -38,4 +40,7 @@ public interface LayerView<T extends Glyph> extends Iterable<T>{
 	public int getStateID();
 	
 	public T find(String id);
+	
+	/**Get the source data for dynamic bindings related to this layer.*/
+	public Map<String, Tuple> getSourceData();
 }

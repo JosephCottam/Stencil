@@ -53,4 +53,5 @@ public final class NumericSingleton extends Number implements Tuple {
 	}
 
 	public int size() {return 1;}	
+	public String toString() {return Tuples.toString(this);}
 }

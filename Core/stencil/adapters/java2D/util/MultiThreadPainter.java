@@ -29,7 +29,6 @@ import stencil.parser.string.MakeViewPoint;
 import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Program;
-import stencil.tuple.Tuple;
 import stencil.util.StencilThreadFactory;
 import static stencil.parser.string.StencilParser.DYNAMIC_RULE;
 
@@ -234,12 +233,6 @@ public final class MultiThreadPainter {
 		} finally {
 			if (g !=null) {g.dispose();}
 		}
-	}
-
-	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
-		DynamicUpdateTask updateTask = (DynamicUpdateTask) dynamicUpdaters.get(rule);
-		assert updateTask != null : "Unexpected dynamic update task requested: " + rule;
-		updateTask.addUpdate(source, glyph);
 	}
 	
 	public void addTask(GuideTask task) {guideUpdaters.add(task);}

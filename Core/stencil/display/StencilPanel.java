@@ -39,7 +39,6 @@ import java.util.TreeSet;
 
 import stencil.interpreter.Interpreter;
 import stencil.parser.tree.Canvas;
-import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.View;
@@ -200,11 +199,6 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	
 	//------------------------------------------------------------------------------------------
 	//Runtime support operations.  These are methods called by the interpreter.
-	
-	/**Add a dynamic binding that will apply the given rule with the passed data
-	 * to the passed glyph object. 
-	 */
-	public abstract void addDynamic(T g, DynamicRule rule, Tuple source);
 	
 	/**Force updates to run now.  Updates method should take precautions
 	 * to maintain a consistent visualization.  As such, this method should

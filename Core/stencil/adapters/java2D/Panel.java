@@ -35,7 +35,6 @@ import stencil.adapters.java2D.data.ViewTuple;
 import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
-import stencil.parser.tree.DynamicRule;
 import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
@@ -207,12 +206,6 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		
 		exportPNG(filename, (int) width, (int) height);
 	}
-
-	
-	public final void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {
-		painter.addDynamic(glyph, rule, source);
-	}
-
 
 	public Glyph2D transfer(Tuple source, Glyph2D target) throws Exception {
 		Glyph2D result = target.update(source);

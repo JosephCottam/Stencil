@@ -28,20 +28,23 @@ import stencil.tuple.TupleBoundsException;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
-/**Layer with two related stores (Permanant and Update) to 
+/**Layer with two related stores (Permanent and Update) to 
  * allow concurrent editing and iteration.  
  * 
  * The Update store is accumulated until a generation change,
- * then it is moved to the Permanant store when a generation change made.
+ * then it is moved to the Permanent store when a generation change made.
  */
 public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private static final String PROTOTYPE_ID = "PROTOTYPE ID -- IF YOU EVER READ THIS IN OUTPUT, ITS PROBABLY AN ERROR.";
 	
 	private Map<Object, Integer> index = new HashMap(); //TODO: Look at tree-map for large layers...
+	private Map<String, Tuple> sourceData = new HashMap();
 	private List<Glyph2D> store = new ArrayList();
 
 	private Map<String, Integer> updateIndex = new HashMap();
+	private Map<String, Tuple> updateSources = new HashMap();	
 	private List<Glyph2D> update = new ArrayList();
+	
 	
 	private int storeStateID = Integer.MIN_VALUE;
 	protected int stateID = Integer.MIN_VALUE; 
@@ -143,10 +146,15 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			Glyph2D value = update.get(updateIDX);
 			directUpdate(id, value);
 		}
+		
+		for (String id: updateSources.keySet()) {
+			sourceData.put(id, updateSources.get(id));
+		}
 
 		if (update.size() >0) {storeStateID=stateID;}
 		
 		// Remove the update
+		updateSources.clear();
 		updateIndex.clear();
 		update.clear();
 
@@ -189,7 +197,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		}		
 	}
 
-	
+	public void addDynamic(T target, Tuple sourceData) {updateSources.put(target.getID(), sourceData);}
 	
 	public StoreView getView() {
 		return new StoreView(storeStateID);
@@ -268,6 +276,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			return g;
 		}
 		
+		public Map<String, Tuple> getSourceData() {return sourceData;}
 		public int getStateID() {return creationGeneration;}
 		public String getLayerName() {return name;}
 		public int size() {return index.size();}

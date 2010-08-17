@@ -9,6 +9,7 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
+import stencil.display.LayerView;
 import stencil.interpreter.Interpreter;
 import stencil.parser.string.StencilParser;
 import stencil.tuple.Tuple;
@@ -27,12 +28,16 @@ public class DynamicRule extends StencilTree {
 		return (Consumes) t;
 	}
 
-	public java.util.List<Tuple> apply(DisplayLayer<Glyph> table, Map<String, Tuple> sourceData) {
-		java.util.List<Tuple> results = new ArrayList(table.getView().size());
+	public java.util.List<Tuple> apply(DisplayLayer<Glyph> table) {
+		LayerView<Glyph> view = table.getView();
 		
-		for (Glyph glyph: table.getView()) {
+		java.util.List<Tuple> results = new ArrayList(view.size());
+		Map<String, Tuple> sourceData = view.getSourceData();
+		
+		for (Glyph glyph: view) {
 			Tuple source = sourceData.get(glyph.getID());		//Get associated source data
-			if (source == null) {continue;} 					//This dynamic updater does not apply to this glyph
+			
+			//TODO: Resolve how to ensure dynamic bindings are only run when needed...Do single-consumes layers make sense again???
 			
 			try {
 				Tuple result = Interpreter.processSequential(source, getAction());

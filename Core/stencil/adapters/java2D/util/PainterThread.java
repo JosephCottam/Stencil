@@ -8,9 +8,6 @@ import java.awt.image.BufferedImage;
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.Panel;
 import stencil.adapters.java2D.data.DoubleBufferLayer;
-import stencil.adapters.java2D.data.Glyph2D;
-import stencil.parser.tree.DynamicRule;
-import stencil.tuple.Tuple;
 
 
 /**Automatically paints a panel.
@@ -114,7 +111,6 @@ public final class PainterThread implements Runnable {
     }
 	
 	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
-	public void addDynamic(Glyph2D glyph, DynamicRule rule, Tuple source) {painter.addDynamic(glyph, rule, source);}
 	
 	public void doUpdates() {painter.doUpdates();}
 }

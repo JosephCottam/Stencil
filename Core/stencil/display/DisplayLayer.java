@@ -94,4 +94,7 @@ public interface DisplayLayer<T extends Glyph>  {
 	 */
 	public TuplePrototype getPrototype();
 	public void updatePrototype(Tuple defaults);
+	
+	/**Register the input values with the given glyph.*/
+	public void addDynamic(T g, Tuple t);
 }
