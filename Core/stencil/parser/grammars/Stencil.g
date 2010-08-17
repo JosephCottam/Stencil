@@ -300,8 +300,8 @@ functionCall
 //Apply defaultCall to functions that have no explicit call
 callName[String defaultCall]
   : pre=ID NAMESPACE post=ID 
-    -> {post.getText().indexOf(".") > 0}? ID[$pre.text + NAMESPACE + $post.text]
-    ->                    ID[$pre.text + NAMESPACE + $post.text + "." + defaultCall]
+    -> {post.getText().indexOf(".") > 0}? ID[$pre.text + "::" + $post.text]
+    ->                    ID[$pre.text + "::" + $post.text + "." + defaultCall]
   | name=ID
     -> {name.getText().indexOf(".") > 0}? ID[$name.text] 
     ->                    ID[$name.text + "." + defaultCall];

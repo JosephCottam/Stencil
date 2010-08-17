@@ -1,0 +1,45 @@
+name: LongMath
+targetClass: stencil.modules.LongMath
+description: Math functions that are defined in terms of longs instead of doubles
+
+defaults:
+  defaultSpecializer: !spec "[range: LAST, split: 0]"
+  facets:
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+
+operators:
+  - name: Abs
+  - name: Add
+  - name: Add1
+  - name: AsNumber
+  - name: Div
+  - name: Divide
+  - name: Max
+    facets:
+     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+     - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}
+     - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}  
+  - name: Min
+    facets:
+     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+     - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}  
+     - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}
+  - name: Mod
+  - name: Mult
+  - name: Negate
+  - name: Nearest
+  - name: Sub
+  - name: Sub1
+  - name: Sum
+    defaultSpecializer: !spec "[range: ALL, split:0]"
+    keys: range, split
+    target: Add
+    facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "long VALUE"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "long VALUE"}
+      - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}  
+      - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}  
+      

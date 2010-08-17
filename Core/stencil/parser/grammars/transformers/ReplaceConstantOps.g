@@ -31,14 +31,22 @@ options {
   
   
   //Fixed point for updating constants
-  private boolean changed = true; 
+  private boolean changed; 
   public Program transform(Program p) {
+     
+     changed = true;
      while(changed) {
        changed = false;
        p=(Program) downup(p, this, "replaceOps");
        p=(Program) downup(p, this, "propogateValues");
      }
-     p=(Program) downup(p, this, "removeConsts");
+     
+     changed= true;
+     while (changed) {
+       changed = false;     
+       p=(Program) downup(p, this, "removeConsts");
+     }
+     
      return p;
   }
     
@@ -138,5 +146,6 @@ chain[Environment env]
     
 //Remove all CONST entities with their targets    
 removeConsts
-  : ^(CALL_CHAIN ^(CONST . target=.) depth=.) -> ^(CALL_CHAIN $target $depth)
+  @after{changed=true;}
+  : ^(CALL_CHAIN ^(CONST . target=.) depth=.) -> ^(CALL_CHAIN $target $depth) 
   | ^(FUNCTION inv=. spec=. args=. yield=. ^(CONST constYield=. target=.)) -> ^(FUNCTION $inv $spec $args $constYield $target);

@@ -28,11 +28,15 @@
  */
 package stencil.modules;
 
+import static stencil.parser.tree.Specializer.SPLIT;
+
 import java.util.*;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
+import stencil.module.operator.util.Split;
+import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.parser.tree.*;
 import stencil.types.Converter;
@@ -270,7 +274,7 @@ public class Temp extends BasicModule {
 		public static enum STYLE {CIRCLE, SINE, SINE2}
 		
 		public static final String STATES_KEY = "states";	//How many states should it oscillate through (may either be an int or a coma-separated list)
-		public static final String STYLE_KEY = "styles";	//circle (A B C A B C A B C)  or sine (A B C B A B C B A) or sine2 (A B C C B A A B C C B A)
+		public static final String STYLE_KEY = "style";	//circle (A B C A B C A B C)  or sine (A B C B A B C B A) or sine2 (A B C C B A A B C C B A)
 		
 		private final Object[] states;
 		private final STYLE style;
@@ -284,29 +288,36 @@ public class Temp extends BasicModule {
 		
 			Object[] candidate;
 			try {
-				int stateCount = Converter.toInteger(spec.get(STYLE_KEY));
+				int stateCount = Converter.toInteger(spec.get(STATES_KEY));
 				candidate = new Integer[stateCount];
 				for (int i =0; i< candidate.length; i++) {candidate[i] =i;}
 			}
 			catch (NumberFormatException ex) {
-				String states  = Converter.toString(spec.get(STYLE_KEY));
+				String states  = Converter.toString(spec.get(STATES_KEY));
 				candidate = states.split("\\s*,\\s*");
 			}
 			states = candidate;
 			if (states.length ==1) {throw new RuntimeException("Oscillate specified with only one state: " + Arrays.deepToString(states));}
-
-
-			if (!(style.equals("CIRCLE") || style.equals("SINE") || style.equals("SINE2"))) {throw new RuntimeException("Invalid style specified.  Must be circle, sine or sine2.");} 
+		}
+		
+		protected Oscillate(OperatorData opData, Object[] states, STYLE style) {
+			super(opData);
+			this.states = states;
+			this.style = style;
 		}
 			
 			
-		public Object query() {return states[idx];}
+		public Object query() {
+			stateID--;
+			return map();
+		}
 		
 		public Object map(){
 			Object rv = states[idx];
+			stateID++;
 			
 			switch (style) {
-			case CIRCLE : idx = idx+1%states.length; break;
+			case CIRCLE : idx = (idx+1)%states.length; break;
 			case SINE :
 				if (goingUp) {
 					idx = idx+1;
@@ -342,6 +353,10 @@ public class Temp extends BasicModule {
 			return rv;
 		}
 		
+		public StencilOperator duplicate() {
+			StencilOperator nop = new Oscillate(operatorData, states, style);
+			return nop;
+		}
 		
 	}
 	
@@ -349,13 +364,19 @@ public class Temp extends BasicModule {
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		try {
+			StencilOperator op;
 			if (name.equals("Scale")) {
-				return new Scale(getOperatorData(name, specializer), specializer);
+				op = new Scale(getOperatorData(name, specializer), specializer);
 			} else if (name.equals("Partition")) {
-				return new Partition(getOperatorData(name, specializer), specializer);
+				op = new Partition(getOperatorData(name, specializer), specializer);
+			} else if (name.equals("Oscillate")) {
+				op = new Oscillate(getOperatorData(name, specializer), specializer);
+			} else {
+				op = super.instance(name, specializer);
 			}
 			
-			return super.instance(name, specializer);
+			Split split = new Split(specializer.get(SPLIT));
+			return SplitHelper.makeOperator(split, op);
 		} catch (Exception e) {throw new Error("Error retriving " + name + " method.",e);}
 	}
 }

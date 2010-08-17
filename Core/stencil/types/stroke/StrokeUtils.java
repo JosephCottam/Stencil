@@ -31,7 +31,7 @@ public final class StrokeUtils extends BasicModule {
 		return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), pattern, s.getDashPhase());
 	}
 	
-	/**The  format for strokes is "weight:pattern";
+	/**The  format for strokes is "weight:pattern:cap";
 	 * all other properties must be set with other methods.
 	 */
 	public static class Stroke extends AbstractOperator {
@@ -39,25 +39,38 @@ public final class StrokeUtils extends BasicModule {
 		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
 		
 		public BasicStroke argumentParser(String arg) {return parse(arg);}
+		
+		
 		public static BasicStroke parse(String arg) { 
 			String[] parts = arg.split(":");
+			
 			float weight = Converter.toFloat(parts[0]);
+			
+			//Parse a pattern, if provided
 			float[] pattern = Pattern.SOLD.mask;
-			if (parts.length >1) {
-				parts = parts[1].split("\\s*,\\s*");
-				if (parts.length ==1) {					
-					try {pattern = Pattern.valueOf(parts[0]).mask;}
+			if (parts.length >1 && !parts[1].trim().equals("")) {
+				String[] patternParts = parts[1].split("\\s*,\\s*");
+				if (patternParts .length ==1) {					
+					try {pattern = Pattern.valueOf(patternParts[0]).mask;}
 					catch (Exception e) {}
 				}
 
-				if (parts.length >0 && pattern == null) {
-					pattern = new float[parts.length];
-					for (int i=0; i< parts.length;i++) {
-						pattern[i] = Converter.toFloat(parts[i]);
+				if (patternParts.length >0 && pattern == null) {
+					pattern = new float[patternParts .length];
+					for (int i=0; i< patternParts.length ;i++) {
+						pattern[i] = Converter.toFloat(patternParts [i]);
 					}
 				}
-			}			
-			return new BasicStroke(weight, DEFAULT_CAP.v, DEFAULT_JOIN.v, DEFAULT_LIMIT, pattern, 0f);
+			} 
+
+			//If a cap was provided, parse it
+			Cap cap = DEFAULT_CAP;
+			if (parts.length >2) {
+				String part = parts[2];
+				cap = Cap.valueOf(part.trim().toUpperCase());
+			}
+			
+			return new BasicStroke(weight, cap.v, DEFAULT_JOIN.v, DEFAULT_LIMIT, pattern, 0f);
 		}
 	}
 	

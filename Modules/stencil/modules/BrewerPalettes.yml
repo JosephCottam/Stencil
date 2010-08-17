@@ -4,8 +4,8 @@ description: Encoding of the color palette found at ColorBrewer.org (by Cynthia 
 defaults: 
   defaultSpecializer: !spec "[palette: \"Set1\", reserve: \"BLACK\"]"
   facets: 
-    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "Color VALUE"}
-    - {name: query, type: PROJECT, function: FALSE, prototype: !proto "Color VALUE"}
+    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "Color color"}
+    - {name: query, type: PROJECT, function: FALSE, prototype: !proto "Color color"}
     
 operators:
   - name: BrewerColors

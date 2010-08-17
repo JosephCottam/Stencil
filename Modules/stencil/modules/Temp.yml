@@ -25,4 +25,8 @@ operators:
       - {name: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
       - {name: map, target: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
    - name: Oscillate
-     defaultSpecializer: !spec  "[range: ALL, split:0, style: \"cycle\", states:2]"
+     defaultSpecializer: !spec  "[range: ALL, split:0, style: \"CIRCLE\", states: 2]"
+     facets:
+      - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
+      - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
+     

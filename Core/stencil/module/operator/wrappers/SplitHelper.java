@@ -47,6 +47,16 @@ public abstract class SplitHelper implements StencilOperator {
 			return operators.get(key);
 		}
 
+		public StencilOperator viewPoint() {
+			UnorderedHelper nop = new UnorderedHelper(split, operator);
+			for (Object key: operators.keySet()) {
+				StencilOperator op = operators.get(key);
+				StencilOperator view = op.viewPoint();
+				nop.operators.put(key, view);
+			}
+			return nop;
+		}
+		
 	}
 	
 	/**Handle ordered split cases in a more memory efficient way.*/
@@ -68,7 +78,13 @@ public abstract class SplitHelper implements StencilOperator {
 			Invokeable inv = operator.getFacet(facet);
 			return inv.invoke(newArgs);
 		}
-		
+
+		public StencilOperator viewPoint() {
+			OrderedHelper nop = new OrderedHelper(super.split, super.operator);
+			nop.oldKey = this.oldKey;
+			return nop;
+		}
+	
 	}
 	
 	private static class SplitTarget implements Invokeable {
@@ -148,11 +164,7 @@ public abstract class SplitHelper implements StencilOperator {
 		StencilOperator op = operator.duplicate();
 		return makeOperator(split, op);
 	}
-	
-	public StencilOperator viewPoint() {
-		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
-	}
-	
+		
 	//TODO: Support compound operator types.  Then split is a combined categorize followed by a project.
 	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));} //TODO: Handle as a compound categorize and project.  Needs to return list of categorize (split values) and the results of each.  May not work for ordered splits.  
 	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));}
