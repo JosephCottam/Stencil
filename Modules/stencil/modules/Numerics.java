@@ -154,6 +154,11 @@ public class Numerics extends BasicModule {
 		
 		public String getName() {return NAME;}
 		public FullMax duplicate() {return new FullMax(operatorData);}
+		public StencilOperator viewPoint() {
+			StencilOperator op = super.viewPoint();
+			System.out.printf("Viewpoint : %1$d/%2$d (%3$s) --------------------------------\n", (long) this.max, (long) ((FullMax) op).max, op.toString());
+			return op;
+		}
 	}
 
 	public static double abs(double d) {return Math.abs(d);}//Included here to ensure that the floating point version is grabbed...
