@@ -22,7 +22,8 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	public boolean needsUpdate() {return originalFragment.requiresUpdate();}
 
 	public Finisher update() {
-		final List<Tuple> result = viewPointFragment.apply(table);		
+		final List<Tuple> result = viewPointFragment.apply(table);
+		
 		return new Finisher() {
 			public void finish() {
 				((DoubleBufferLayer) table).directUpdate(result);

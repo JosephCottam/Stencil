@@ -31,11 +31,11 @@ package stencil.module.operator.wrappers;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.Range;
-import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
+import static stencil.module.util.Utilities.noFunctions;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -183,12 +183,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 		this.range = range;
 		this.facetName = facetName;
 		this.baseFacet = operator.getFacet(facetName);
-		this.operatorData =  new OperatorData(operator.getOperatorData());
-		
-		for (FacetData fd: operatorData.getFacets()) {
-			fd.setFunction(false);
-		}
-		
+		this.operatorData =  noFunctions(operator.getOperatorData());		
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
@@ -288,7 +283,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
 	
 	
-	/**Produce an operator that works over the requested range specificiation.
+	/**Produce an operator that works over the requested range specification.
 	 * 
 	 * @param range  Range to operator over
 	 * @param operator The base operator instance (also the default return value, if the range is simple) 

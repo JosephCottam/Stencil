@@ -56,8 +56,8 @@ public class Projection extends BasicModule {
 		private float max = Float.NaN;
 		private boolean throwExceptions = DEFAULT_THROW_EXCEPTIONS;
 
-		private Color cold;
-		private Color hot;
+		private final Color cold;
+		private final Color hot;
 		
 		public HeatScale(OperatorData opData, Specializer spec) {
 			super(opData);

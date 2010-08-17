@@ -39,8 +39,8 @@ import stencil.module.util.*;
 import stencil.util.collections.ConstantList;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
+import static stencil.module.util.Utilities.noFunctions;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
-
 
 public class LongMath extends BasicModule {
 
@@ -197,15 +197,15 @@ public class LongMath extends BasicModule {
 			} else if (name.equals("Sum") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
-				target = new FullSum(operatorData);
+				target = new FullSum(noFunctions(operatorData));
 			} else if (name.equals("Max") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Max")) {
-				target = new FullMax(operatorData);
+				target = new FullMax(noFunctions(operatorData));
 			} else if (name.equals("Min") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
-				target = new FullMin(operatorData);
+				target = new FullMin(noFunctions(operatorData));
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
 
 		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}

@@ -114,7 +114,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		addToUpdate(ID, update);
 	}
 	
-	private void addToUpdate(String ID, Glyph2D glyph) {
+	private synchronized void addToUpdate(String ID, Glyph2D glyph) {
 		stateID++;
 		Integer idx = updateIndex.get(ID);
 		if (idx != null) {
@@ -139,17 +139,15 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 * 			Updates requires a full iteration iff it was on the edge AND it did not move the edge it was on to make things larger
 	 * 
 	 */
-	public StoreView changeGenerations() {
+	public synchronized StoreView changeGenerations() {
 		// merge generations across
 		for (String id: updateIndex.keySet()) {
 			int updateIDX = updateIndex.get(id);
 			Glyph2D value = update.get(updateIDX);
 			directUpdate(id, value);
 		}
-		
-		for (String id: updateSources.keySet()) {
-			sourceData.put(id, updateSources.get(id));
-		}
+	
+		sourceData.putAll(updateSources);
 
 		if (update.size() >0) {storeStateID=stateID;}
 		
@@ -157,7 +155,6 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		updateSources.clear();
 		updateIndex.clear();
 		update.clear();
-
 		
 		return getView();
 	}

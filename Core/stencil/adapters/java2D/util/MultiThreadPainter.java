@@ -39,6 +39,9 @@ import static stencil.parser.string.StencilParser.DYNAMIC_RULE;
  * TODO: Make a paint task to render whole space always.  This simplifies simple zoom/pan updates, esp for slow-moving layers.  This makes adds a principle "full image" buffer to the main painter.  Painter tasks only need new buffers when image bounds change; Painter tasks no longer need the view transform; Response to view zoom/pan is independent of data updates. Switch to this special task if the layer hasn't change for a while. 
  * */
 public final class MultiThreadPainter {
+	/**Synchronize on this object when rendering can't co-occur.**/
+	private Object renderLock = new Object();
+	
 	/**Root class for paint related tasks.*/
 	private static abstract class PaintTask implements Callable<BufferedImage> {
 		protected BufferedImage buffer;
@@ -217,9 +220,11 @@ public final class MultiThreadPainter {
 
 			g.addRenderingHints(renderQuality);			
 			try {
+				List<Future<BufferedImage>> results;
+				
 				for (PaintTask painter: painters) {painter.createBuffer(buffer, trans);}
-
-				List<Future<BufferedImage>> results =  renderPool.invokeAll(painters);
+				synchronized(renderLock) {results =  renderPool.invokeAll(painters);}
+				
 				//Composite images as the return
 				for (Future<BufferedImage> f: results) {
 					g.drawImage(f.get(), 0,0, null);						
@@ -244,16 +249,16 @@ public final class MultiThreadPainter {
 	 * */
 	public void doUpdates() {
 		try {
-			synchronized(program) {
-				Program viewPoint;
+			Program viewPoint;
 
+			synchronized(renderLock) {					//Prevent rendering
 				synchronized(visLock) { 				//Suspend analysis until the viewpoint is ready
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
 					viewPoint = MakeViewPoint.viewPoint(program);	
-				} 
-
+				}
+	
 				for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
 				for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
 					

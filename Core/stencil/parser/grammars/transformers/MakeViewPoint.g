@@ -52,6 +52,7 @@ instantiate: ^(opDef=OPERATOR .*)
 
 //Replace AST instances with pointers to new viewpoints
 //Uses the new synthetic instances when necessary
+//TODO: Why does it actually make three copies of the operator???
 change:  i=AST_INVOKEABLE 
 {
    AstInvokeable inv = (AstInvokeable) i;

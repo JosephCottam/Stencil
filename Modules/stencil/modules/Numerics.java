@@ -39,6 +39,7 @@ import stencil.module.util.*;
 import stencil.util.collections.ConstantList;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
+import static stencil.module.util.Utilities.noFunctions;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
 
 
@@ -144,10 +145,6 @@ public class Numerics extends BasicModule {
 		
 		/**Arguments are ignored.*/
 		public double query(Object... args) {
-			if (Thread.currentThread().getName().startsWith("updat")) {
-				System.out.println("Max/ID: " + max + "/" + stateID + ": " + this.toString());
-			}
-			
 			return max;
 		}
 		
@@ -157,13 +154,6 @@ public class Numerics extends BasicModule {
 		
 		public String getName() {return NAME;}
 		public FullMax duplicate() {return new FullMax(operatorData);}
-
-		public StencilOperator viewPoint() {
-			StencilOperator op = super.viewPoint();
-			System.out.println("ViewPoint: " + op.toString());
-			return  op;
-		}
-		
 	}
 
 	public static double abs(double d) {return Math.abs(d);}//Included here to ensure that the floating point version is grabbed...
@@ -196,13 +186,6 @@ public class Numerics extends BasicModule {
  	
  	public Numerics(ModuleData md) {super(md);}
  	
- 	private OperatorData deFunction(OperatorData od) {
- 		OperatorData nod = new OperatorData(od);
- 		for (FacetData fd: nod.getFacets()) {fd.setFunction(false);}
- 		return nod;
- 	}
- 	
- 	
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 		Range range = new Range(specializer.get(Specializer.RANGE));
@@ -218,15 +201,15 @@ public class Numerics extends BasicModule {
 			} else if (name.equals("Sum") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
-				target = new FullSum(deFunction(operatorData));
+				target = new FullSum(noFunctions(operatorData));
 			} else if (name.equals("Max") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Max")) {
-				target = new FullMax(deFunction(operatorData));
+				target = new FullMax(noFunctions(operatorData));
 			} else if (name.equals("Min") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
-				target = new FullMin(deFunction(operatorData));
+				target = new FullMin(noFunctions(operatorData));
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
 
 		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}

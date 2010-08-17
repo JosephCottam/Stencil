@@ -4,11 +4,11 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.util.Split;
-import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
+import static stencil.module.util.Utilities.noFunctions;
 
 import java.util.List;
 import java.util.Map;
@@ -108,12 +108,8 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
-		this.operator = operator;
-		OperatorData opData = new OperatorData(operator.getOperatorData()); 
-		this.operatorData = opData;
-		for (FacetData facet: opData.getFacets()) {
-			facet.setFunction(false);
-		}
+		this.operator = operator;		
+		this.operatorData = noFunctions(operator.getOperatorData());
 	}
 	
 	public Invokeable getFacet(String facet) {
