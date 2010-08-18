@@ -13,13 +13,20 @@ import static com.sun.btrace.BTraceUtils.*;
 
 @BTrace
 public class Tracer {
-    @OnMethod(clazz="stencil.adapters.java2D.util.MultiThreadPainter", method="doUpdates", location=@Location(Kind.ENTRY))
+	//Shared hook for data loading
+	@OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.ENTRY))
+    public static void loadEnter() {println(strcat("Load: Entry: ", str(timeMillis())));}
+
+    @OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.RETURN))
+    public static void LoadExit() {println(strcat("Load: Return: ", str(timeMillis())));}
+
+	
+    //Hooks for ViewPoint version
+	@OnMethod(clazz="stencil.adapters.java2D.util.MultiThreadPainter", method="doUpdates", location=@Location(Kind.ENTRY))
     public static void onUpdatesEnter() {println(strcat("Updates: Entry: ", str(timeMillis())));}
 
 	@OnMethod(clazz="stencil.adapters.java2D.util.MultiThreadPainter", method="doUpdates", location=@Location(Kind.RETURN))
     public static void onUpdatesLeave() {println(strcat("Updates: Return: ", str(timeMillis())));}
-
-	
 	
 	
     @OnMethod(clazz="stencil.adapters.java2D.util.MultiThreadPainter", method="render", location=@Location(Kind.ENTRY))
@@ -28,14 +35,19 @@ public class Tracer {
     @OnMethod(clazz="stencil.adapters.java2D.util.MultiThreadPainter", method="render", location=@Location(Kind.RETURN))
     public static void paintExit() {println(strcat("Render: Return: ", str(timeMillis())));}
 
-
     
     
-    @OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.ENTRY))
-    public static void loadEnter() {println(strcat("Load: Entry: ", str(timeMillis())));}
+    //Hooks for BufferedLayer version
+	@OnMethod(clazz="stencil.adapters.java2D.util.Painter", method="doUpdates", location=@Location(Kind.ENTRY))
+    public static void onUpdatesEnter2() {println(strcat("Updates: Entry: ", str(timeMillis())));}
 
-    @OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.RETURN))
-    public static void LoadExit() {println(strcat("Load: Return: ", str(timeMillis())));}
+	@OnMethod(clazz="stencil.adapters.java2D.util.Painter", method="doUpdates", location=@Location(Kind.RETURN))
+    public static void onUpdatesLeave2() {println(strcat("Updates: Return: ", str(timeMillis())));}
+	
+	
+    @OnMethod(clazz="stencil.adapters.java2D.util.Painter", method="doDrawing", location=@Location(Kind.ENTRY))
+    public static void paintEnter2() {println(strcat("Render: Entry: ", str(timeMillis())));}
 
-    
+    @OnMethod(clazz="stencil.adapters.java2D.util.Painter", method="doDrawing", location=@Location(Kind.RETURN))
+    public static void paintExit2() {println(strcat("Render: Return: ", str(timeMillis())));}
 }
