@@ -142,14 +142,11 @@ public class StencilUtil extends BasicModule {
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
 			OperatorData od = new OperatorData(base);
 			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
+			fd = new FacetData(fd.getName(), fd.getType(), true, new String[0]);
 			od.addFacet(fd);
 			
 			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), false, new String[0]);
-			od.addFacet(fd);
-			
-			fd = od.getFacet(StencilOperator.STATE_ID_FACET);
+			fd = new FacetData(fd.getName(), fd.getType(), true, new String[0]);
 			od.addFacet(fd);
 			
 			return od;
