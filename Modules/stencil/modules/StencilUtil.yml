@@ -5,10 +5,15 @@ description: Utilities to manipulate the tuple data representation.
 defaults:
   defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets:
-    - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
-    - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
-
+    - {name: map, function: false, type: OPAQUE, prototype: !proto "VALUE"}
+    - {name: query, function: false, type: OPAQUE, prototype: !proto "VALUE"}
+    - {name: stateID, function: false, type: OPAQUE, prototype: !proto "VALUE"}
+    
 operators:
   - name: EchoCategorize
   - name: EchoContinuous
-  - name: Rename  
+  - name: Rename
+    facets:
+      - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
+      - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    

@@ -28,11 +28,11 @@
  */
 package stencil.modules;
 
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.lang.String.format;
 
@@ -114,9 +114,6 @@ public class StencilUtil extends BasicModule {
 		final OperatorData operatorData;
 		final TuplePrototype samplePrototype;
 		
-		protected final Object STATE_LOCK = new Object();
-		protected int stateID=Integer.MIN_VALUE; 
-		
 		protected EchoBase(OperatorData opData, TuplePrototype p) {
 			operatorData = opData;
 			samplePrototype = p;
@@ -151,9 +148,7 @@ public class StencilUtil extends BasicModule {
 			
 			return od;
 		}
-		
-		public int stateID() {return stateID;}
-		
+				
 		public StencilOperator viewPoint() {
 			try {return (StencilOperator) this.clone();}
 			catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
@@ -177,7 +172,9 @@ public class StencilUtil extends BasicModule {
 		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
 		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
 		private final boolean rangeLock;
-		
+
+		protected int stateID=Integer.MIN_VALUE; 		
+
 		public EchoContinuous(OperatorData opData, TuplePrototype p, boolean lock) {super(opData, p); this.rangeLock=lock;}
 		public EchoContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
 			super(opData, spec);
@@ -191,12 +188,13 @@ public class StencilUtil extends BasicModule {
 		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype, rangeLock);}
 		
 		public String getName() {return NAME;}
-
-		public SampleSeed getSeed() {
+		public int stateID() {return stateID;}
+		
+		public synchronized SampleSeed getSeed() {
 			return new SampleSeed(true, min, max);
 		}
 
-		public Tuple map(Object... args) {
+		public synchronized Tuple map(Object... args) {
 			assert args.length == 1;
 			double value = Converter.toNumber(args[0]).doubleValue();
 
@@ -209,7 +207,7 @@ public class StencilUtil extends BasicModule {
 					max = Math.max(value, max);
 					min = Math.min(value, min);
 				}
-				if ((max != oldMax) || (min != oldMin)) {synchronized (STATE_LOCK) {stateID++;}}
+				if ((max != oldMax) || (min != oldMin)) {stateID++;}
 			}
 			
 			
@@ -225,7 +223,7 @@ public class StencilUtil extends BasicModule {
 	public static final class EchoCategorize extends EchoBase {
 		public static final String NAME = EchoCategorize.class.getSimpleName();
 		
-		private final List<Object[]> seen = Collections.synchronizedList(new ArrayList());
+		private final List<Object[]> seen = new CopyOnWriteArrayList();
 				
 		public EchoCategorize(OperatorData opData, TuplePrototype p) {super(opData, p);}
 		public EchoCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData, s);}
@@ -233,12 +231,12 @@ public class StencilUtil extends BasicModule {
 
 		public final String getName() {return "Echo";}
 
-		public synchronized SampleSeed getSeed() {
+		public SampleSeed getSeed() {
 			return new SampleSeed(false, new ArrayList(seen));
 		}
 
 		public Tuple map(Object... args) {
-			if (!deepContains(seen, args)) {seen.add(args); stateID = seen.size();}
+			if (!deepContains(seen, args)) {seen.add(args);}
 			return new ArrayTuple(args);
 		}
 		
@@ -250,6 +248,8 @@ public class StencilUtil extends BasicModule {
 		public Tuple query(Object... args) {
 			return new ArrayTuple(args);
 		}
+		
+		public int stateID() {return seen.size();}
 	}
 	
 	public StencilUtil(ModuleData md) {super(md);}

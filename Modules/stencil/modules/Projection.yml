@@ -7,7 +7,7 @@ defaults:
   facets:
     - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
     - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
-    - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
+    - {name: stateID, type: OTHER, function: false, prototype: !proto "int VALUE"}
 
 operators:
     - name: Count

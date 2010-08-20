@@ -42,7 +42,8 @@ options {
  
 }
 
-//instantiate new synthetic operators that point to the new tree (Instatiated operators are later used to thread values through).
+//instantiate new synthetic operators that point to the new tree (Instantiated operators are later used to thread values through).
+//Also creates viewpoints of all user-declared  operators
 instantiate 
     : proxy=OPERATOR_PROXY 
       {
@@ -73,7 +74,13 @@ change:  i=AST_INVOKEABLE
    }
    
    StencilOperator viewPoint = instances.get(op.getName());
-   if (viewPoint == null) {throw new RuntimeException("Could not find viewpoint for operator " + op.getName());}
+   if (viewPoint == null) {
+      //TODO: Make stencil inserted operators (like Echo is for guides) appear as OPERATOR_PROXY nodes
+      //This case is required because stencil inserted operators don't appear as PROXY entities anywhere
+      //    This is wasteful because it makes a viewpoint for each apperance of the operator (which may be many, esp. in the guide system)
+      //    This is very dangerous if the viewPoint operation takes a lot of time (doesn't for any operator automatically inserted YET).
+      viewPoint = op.viewPoint();
+   }
    
    inv.setOperator(viewPoint);
    

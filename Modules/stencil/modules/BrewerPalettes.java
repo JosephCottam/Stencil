@@ -1,8 +1,9 @@
 package stencil.modules;
 
-import java.util.*;
+
 import java.awt.Color;
 import java.lang.reflect.*;
+import java.util.*;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
@@ -31,9 +32,9 @@ public class BrewerPalettes  extends BasicModule {
 		private static String PALETTE = "palette";
 		private static String RESERVE = "reserve";
 		
-		final List seen = new ArrayList();
-		final String rootPallet;
-		final Tuple reserve;
+		private ArrayList seen = new ArrayList();
+		private final String rootPallet;
+		private final Tuple reserve;
 
 		public BrewerColors(OperatorData od, Specializer spec) {
 			super(od);
@@ -43,15 +44,17 @@ public class BrewerPalettes  extends BasicModule {
 
 		public Tuple map(Object value) {
 			int idx = Collections.binarySearch(seen, value);
-			if (idx <0) {
+			if (idx<0) {
+		    	seen = new ArrayList(seen);  //Yeah, copy on write!
 				seen.add(value);
-				Collections.sort(seen);
+		    	Collections.sort(seen);
 				idx = Collections.binarySearch(seen, value);
 			} 
-
 			Color[] colors = getSet();
 			return stencil.types.color.ColorCache.get(colors[idx]);  
 		}
+		
+		public int StateID() {return seen.size();}
 
 		public Tuple query(Object value) {
 			int idx = Collections.binarySearch(seen, value);
@@ -61,8 +64,7 @@ public class BrewerPalettes  extends BasicModule {
 			} else {
 				return stencil.types.color.ColorCache.get(getSet()[idx]);
 			}
-		}
-
+		}		
 
 		private Color[] getSet() {
 			Field pallet;
