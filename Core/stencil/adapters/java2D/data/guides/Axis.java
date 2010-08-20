@@ -41,7 +41,7 @@ public class Axis extends Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, tickCount: 10, axisOffset: 0, connect: \"FALSE\"]";
+	private static final String defaultArguments = "[sample: \"CATEGORICAL\", position: NULL, label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, connect: \"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
@@ -50,10 +50,7 @@ public class Axis extends Guide2D {
 
 	public static final String IMPLANTATION_NAME  = "AXIS";
 	public static enum AXIS {X,Y}
-	
-	/**How far from the axis specified should the actual axis line be placed.*/
-	public double axisOffset;
-	
+
 	/**How far from the axis should text be placed?*/
 	public float textOffset;
 	
@@ -64,16 +61,13 @@ public class Axis extends Guide2D {
 	 * False - Only display for the range of values provided.*/
 	public boolean connect;
 	
-	/**Indicates how many ticks are desired on the axis.
-	 * This property is not used by the axis itself, but is 
-	 * rather used by continuous guide ops to influence the sample points.
-	 * 
-	 * This value is only a suggestion.  It will be approximately the number
-	 * of tick marks used, but the exact number is determined by the sampler
-	 * and may take into account the strategy and the range.
-	 * 
-	 * */
-	public float tickCount;
+	/**Where should the axis be rendered?*/
+	private Double baseline = null;
+	
+	/**What is the specified position (influence the baseline).
+	 * null means auto position
+	 * Any other value is the literal location of the axis line.*/
+	public Double position = null;
 	
 	protected final AXIS axis;
 	
@@ -127,33 +121,42 @@ public class Axis extends Guide2D {
 			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
 			
 			axisLabel = axisLabel.update(update);
-		}		
+		}
+
+		if (position != null) {baseline = position;}
 	}
 	
 	public void setConnect(boolean connect) {this.connect = connect;}
 
 	public AXIS getAxis() {return axis;} 
 	
-	public synchronized void setElements(List<Tuple> elements) {
+	public synchronized void setElements(List<Tuple> elements, Rectangle2D targetBounds) {
 		marks.clear();
+		
+		if (position == null) {
+			if (axis == AXIS.X) {baseline = targetBounds.getMaxY();}
+			if (axis == AXIS.Y) {baseline = targetBounds.getMinX();}
+		} 
 		
 		if (elements.size() > 0) {
 			createLabeledTics(elements);
 			Glyph2D line = createLine(elements);
 			if (line !=null) {marks.add(line);}	
 		}
+		
 		bounds = GuideUtils.fullBounds(marks);
 		
 		Tuple update;
+		double x,y;
 		if (axis == AXIS.X) {
-			double x = bounds.getCenterX();
-			double y = bounds.getMaxY() + 2;
-			update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
+			x = bounds.getCenterX();
+			y = bounds.getMaxY() + 2;
 		} else {
-			double x = bounds.getMinX() - 2;
-			double y = bounds.getCenterY();
-			update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
+			x = bounds.getMinX() - 2;
+			y = bounds.getCenterY();
 		}
+
+		update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
 		axisLabel = axisLabel.update(update);
 		marks.add(axisLabel);
 		bounds = GuideUtils.fullBounds(marks);		
@@ -179,13 +182,13 @@ public class Axis extends Guide2D {
 		
 		if (axis == AXIS.X) {
 			values[0]  = min;
-			values[1] = axisOffset;
+			values[1] = baseline;
 			values[2] = max;
-			values[3] = axisOffset;
+			values[3] = baseline;
 		} else {
-			values[0] = axisOffset;
+			values[0] = baseline;
 			values[1] = min;
-			values[2] = axisOffset;
+			values[2] = baseline;
 			values[3] = max;
 		}
 		return prototypeLine.update(new PrototypedTuple(LINE_FIELDS, values));
@@ -217,10 +220,10 @@ public class Axis extends Guide2D {
 		
 		if (axis == AXIS.X) {
 			values[1] = value;
-			values[2] = axisOffset + textOffset;
+			values[2] = baseline + textOffset;
 			values[3] =	90;
 		} else {
-			values[1] = axisOffset - textOffset;
+			values[1] = baseline - textOffset;
 			values[2] = value;
 			values[3] =0;
 		}
@@ -239,13 +242,13 @@ public class Axis extends Guide2D {
 		
 		if (axis == AXIS.X) {
 			values[0] = offset;
-			values[1] = axisOffset - tickSize;
+			values[1] = baseline - tickSize;
 			values[2] = offset;
-			values[3] = axisOffset+tickSize;
+			values[3] = baseline + tickSize;
 		} else {
-			values[0] = axisOffset - tickSize;
+			values[0] = baseline - tickSize;
 			values[1] = offset;
-			values[2] = axisOffset+tickSize;
+			values[2] = baseline + tickSize;
 			values[3] = offset;
 		}
 

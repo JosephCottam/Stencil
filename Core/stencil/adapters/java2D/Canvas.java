@@ -100,14 +100,18 @@ public final class Canvas extends DisplayCanvas {
 	 * 
 	 * @return
 	 */
-	public Rectangle getContentBounds() {
+	public Rectangle getContentBounds(boolean includeGuides) {
 		final Rectangle2D bounds = new Rectangle(layers[0].getView().getBoundsReference());
 		for (DisplayLayer<? extends Glyph2D> l: layers) {
 			bounds.add(l.getView().getBoundsReference());
 		}
 		
-		for (Guide2D g: guides.values()) {
-			bounds.add(g.getBoundsReference());
+		if (includeGuides) {
+			System.out.println("------");
+			for (Guide2D g: guides.values()) {
+				bounds.add(g.getBoundsReference());
+				System.out.println(g.getBoundsReference());
+			}
 		}
 		
 		if (bounds.isEmpty()) {return new Rectangle(0,0,0,0);}

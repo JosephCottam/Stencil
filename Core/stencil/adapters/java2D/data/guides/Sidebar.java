@@ -51,8 +51,8 @@ public class Sidebar extends Guide2D {
 	
 	protected Rectangle2D bounds = new Rectangle2D.Double();
 	
-	public double X;
-	public double Y;
+	public Double X;
+	public Double Y;
 	
 	private boolean autoPlace = true;
 	
@@ -100,7 +100,7 @@ public class Sidebar extends Guide2D {
 		sorter = new TupleSorter(label_idx);
 	}
 
-	public synchronized void setElements(List<Tuple> elements) {
+	public synchronized void setElements(List<Tuple> elements, Rectangle2D parentBounds) {
 		marks.clear();
 		
 		Collections.sort(elements, sorter);
@@ -109,8 +109,8 @@ public class Sidebar extends Guide2D {
 		bounds = GuideUtils.fullBounds(marks);
 		if (!bounds.isEmpty()) {
 			if (autoPlace) {
-				X = -1d * bounds.getWidth();
-				Y = -1d * bounds.getHeight();
+				X = parentBounds.getMaxX() + bounds.getWidth();
+				Y = parentBounds.getMinY() + bounds.getHeight();
 			}
 			this.bounds = new Rectangle2D.Double(bounds.getX()+X,bounds.getY()+Y, bounds.getWidth(), bounds.getHeight());
 		}

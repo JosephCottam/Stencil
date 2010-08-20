@@ -128,7 +128,7 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
 	public void mouseClicked(MouseEvent e) { 
 		if (e.getClickCount() == 2) {
 			Canvas canvas = (Canvas)e.getComponent();
-			Rectangle2D content = canvas.getContentBounds();
+			Rectangle2D content = canvas.getContentBounds(true);
 			Rectangle2D space = canvas.getBounds();
 
 			if (!content.isEmpty()) {

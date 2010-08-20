@@ -53,7 +53,7 @@ public class TrendLine  extends Guide2D {
 		}
 	}
 	
-	public synchronized void setElements(List<Tuple> elements) {
+	public synchronized void setElements(List<Tuple> elements, Rectangle2D parentBounds) {
 		marks.clear();
 		if (elements.size() == 0) {return;}
 		

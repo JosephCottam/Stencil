@@ -1,7 +1,5 @@
 package stencil.interpreter.guide.samplers;
 
-import static stencil.parser.ParserConstants.FALSE_STRING;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -14,8 +12,18 @@ import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
 public class NumericSampler implements SampleOperator {
+	/**Should values be rounded in sampling?*/
 	public static final String SAMPLE_INTEGERS = "round";
+	
+	/**How many samples should be produced?
+	 * This is mutally exclusive with indicating the sample stride.
+	 */
 	public static final String SAMPLE_COUNT = "count";
+	
+	/**What should the spacing between samples be.
+	 * For example, stride of 10 means that all values will be 10 units apart.
+	 */
+	public static final String SAMPLE_STRIDE = "stride";
 
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Iterable source;
@@ -27,12 +35,18 @@ public class NumericSampler implements SampleOperator {
 		} else {
 			double min = ((Number) seed.get(0)).doubleValue();
 			double max = ((Number) seed.get(1)).doubleValue();
-			int tickCount = 
-				spec.getMap().containsKey(SAMPLE_COUNT) ?
-				Converter.toInteger(spec.getMap().get(SAMPLE_COUNT)) : 10;
-			boolean useIntegers = 
-				spec.getMap().containsKey(SAMPLE_INTEGERS) &&
-				!spec.getMap().get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING);
+			
+			int tickCount = 10;
+			boolean useIntegers = spec.containsKey(SAMPLE_INTEGERS) &&
+									(Boolean) Converter.convert(spec.get(SAMPLE_INTEGERS), Boolean.class);
+
+			if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
+				double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));
+				tickCount = (int) Math.ceil((max-min)/stride);
+			} else if (spec.containsKey(SAMPLE_COUNT)) {
+				tickCount =  Converter.toInteger(spec.get(SAMPLE_COUNT));
+			}
+			
 			source = buildRange(max, min, tickCount, useIntegers);
 			sourceSize = ((List) source).size();
 		}

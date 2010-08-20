@@ -41,7 +41,6 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
-import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
@@ -224,9 +223,6 @@ public class Projection extends BasicModule {
 	public static class Rank extends AbstractOperator {
 		public static final String NAME = "Rank";
 		
-		/**Indicate an rank offset.*/
-		public static final String START_KEY = "start";
-		
 		/**Compare groups of object, often pair-wise.
 		 * The first non-zero comparison wins.
 		 * If all elements match, the longest array is 'after' the shorter one (so an array is always less than a non-array).
@@ -276,16 +272,8 @@ public class Projection extends BasicModule {
 		private static final CompoundCompare COMPARE = new CompoundCompare();
 		
 		private SortedSet set = new TreeSet(COMPARE);
-		private final int start; 
 	
-		public Rank(OperatorData opData, Specializer spec) {
-			super(opData);
-			start = Converter.toInteger(spec.get(START_KEY));
-		}
-		private Rank(int start, OperatorData opData) {
-			super(opData);
-			this.start = start;
-		}
+		public Rank(OperatorData opData, Specializer spec) {super(opData);}
 	
 		public int map(Object... values) {return rank(true, values);} 
 		public int query(Object... values) {return rank(false, values);}
@@ -311,11 +299,10 @@ public class Projection extends BasicModule {
 				rank =-1;
 			}
 	
-			return rank + start;
+			return rank;
 		}
 		
 		public int stateID() {return set.size();}
-		public Rank duplicate() {return new Rank(start, operatorData);}
 	}
 
 	public Projection(ModuleData md) {super(md);}

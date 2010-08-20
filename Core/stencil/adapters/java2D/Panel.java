@@ -131,21 +131,22 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		
 	}
 	private void exportEPS(String filename) throws Exception {
-		exportEPS(filename, canvas.getContentBounds());
+		exportEPS(filename, canvas.getContentBounds(true));
 	}
 
 	private void exportPNG(String filename, Integer width, Integer height) throws Exception {
 		if (width <1 && height <1) {exportPNG(filename, StencilPanel.ABSTRACT_SCREEN_RESOLUTION); return;}
-
+		Rectangle contentBounds = canvas.getContentBounds(true);
+		
 		AffineTransform viewTransform = canvas.getViewTransformRef(); 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);		
 		
 		float contentWidth = canvas.getWidth();		//Using float to force floating point arithmetic later
 		float contentHeight = canvas.getHeight();
 		if (contentWidth == 0 || contentHeight == 0) { //If nothing will display, then just show everything (happens in batch mode)
-			contentWidth = (int) Math.ceil(canvas.getContentBounds().getWidth());
-			contentHeight = (int) Math.ceil(canvas.getContentBounds().getHeight());
-			topLeft = canvas.getContentBounds().getLocation();
+			contentWidth = (int) Math.ceil(contentBounds.getWidth());
+			contentHeight = (int) Math.ceil(contentBounds.getHeight());
+			topLeft = contentBounds.getLocation();
 			topLeft = new Point2D.Double(-topLeft.getX(), -topLeft.getY());
 		}
 
@@ -183,10 +184,10 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);
 		
 		if (width == 0 || height == 0) { //If nothing will display, then just show everything (usually batch mode)
-			Rectangle viewBounds = canvas.getContentBounds();
-			width = (int) Math.round(Math.ceil(scale * viewBounds.width));
-			height = (int) Math.round(Math.ceil(scale * viewBounds.height));
-			topLeft = canvas.getContentBounds().getLocation();
+			Rectangle contentBounds = canvas.getContentBounds(true);
+			width = (int) Math.round(Math.ceil(scale * contentBounds.width));
+			height = (int) Math.round(Math.ceil(scale * contentBounds.height));
+			topLeft = contentBounds.getLocation();
 			topLeft = new Point2D.Double(-topLeft.getX(), -topLeft.getY());
 		}
 		

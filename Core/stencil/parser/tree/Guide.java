@@ -109,7 +109,11 @@ public class Guide extends StencilTree {
 		try {results = processAll(projection, getRules());}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 
-		guide.setElements(results);
+		//TODO: Make this get something other than canvas...when guides can be declared on layers or views
+		//TODO: Fix the object creation order so the canvas exists before the updater is started
+		if (Canvas.global != null) {
+			guide.setElements(results, Canvas.global.getComponent().getContentBounds(false));
+		}
 	}
 	
 	private List<Tuple> processAll(List<Tuple> sources, Rule rule) throws Exception {

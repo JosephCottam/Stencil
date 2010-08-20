@@ -23,7 +23,8 @@ public class PointLabel extends Guide2D {
 	
 	public PointLabel(Guide guideDef) {super(guideDef);}
 		
-	public synchronized void setElements(List<Tuple> elements) {
+	/**@param bounds Argument is ignored.*/
+	public synchronized void setElements(List<Tuple> elements, Rectangle2D bounds) {
 		marks.clear();
 		
 		for (Tuple t: elements) {

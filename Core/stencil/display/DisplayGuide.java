@@ -1,5 +1,6 @@
 package stencil.display;
 
+import java.awt.geom.Rectangle2D;
 import java.util.List;
 
 import stencil.tuple.Tuple;
@@ -10,7 +11,9 @@ import stencil.tuple.Tuple;
  * should be defined (otherwise, a zero-argument list will be used).
  */
 public interface DisplayGuide {
-	/**Given a set of autoguide pairs, set the appropriate fields in the guide itself.*/
-	
-	public void setElements(List<Tuple> elements);
+	/**Prepare a guide for rendering.
+	 * @param elements The list of input/result pairs
+	 * @param parentBounds The bounds of the entity this guide is associated  with (bounds should not guides) 
+	 */
+	public void setElements(List<Tuple> elements, Rectangle2D parentBounds);
 }
