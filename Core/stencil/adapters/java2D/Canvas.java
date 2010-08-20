@@ -107,10 +107,8 @@ public final class Canvas extends DisplayCanvas {
 		}
 		
 		if (includeGuides) {
-			System.out.println("------");
 			for (Guide2D g: guides.values()) {
 				bounds.add(g.getBoundsReference());
-				System.out.println(g.getBoundsReference());
 			}
 		}
 		
