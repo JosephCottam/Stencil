@@ -41,6 +41,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
+import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
@@ -217,6 +218,106 @@ public class Projection extends BasicModule {
 		public int stateID() {return (int) count % Integer.MAX_VALUE;}
 	}
 	
+	/**Keeps sorted lists of elements, reporting back
+	 * the position in the list on lookup.
+	 */
+	public static class Rank extends AbstractOperator {
+		public static final String NAME = "Rank";
+		
+		/**Indicate an rank offset.*/
+		public static final String START_KEY = "start";
+		
+		/**Compare groups of object, often pair-wise.
+		 * The first non-zero comparison wins.
+		 * If all elements match, the longest array is 'after' the shorter one (so an array is always less than a non-array).
+		 * If all elements match and the arrays are of the same length, the second object is after the first.
+		 * 
+		 */
+		private static class CompoundCompare implements Comparator {
+			protected CompoundCompare() {super();}
+	
+			private int compareOne(Comparable first, Comparable second) {
+				return first.compareTo(second);
+			}
+	
+			private int compareArrays(Object[] firstArray, Object[] secondArray) {
+				for (int i =0; i< firstArray.length && i < secondArray.length; i++) {
+					Object first = firstArray[i];
+					Object second = secondArray[i];
+	
+					if (first == second) {continue;}
+	
+					if (first instanceof Comparable && first.getClass().isInstance(second)) {
+						int d = compareOne((Comparable) first, (Comparable)second);
+						if (d != 0) {return d;}
+					}
+				}
+	
+				return firstArray.length-secondArray.length;
+			}
+	
+			public int compare(Object f, Object s) {
+				if (f instanceof Object[] && s instanceof Object[]) {return compareArrays((Object[]) f, (Object[]) s);}
+				else if (f instanceof Object[]) {return -1;}
+				else if (s instanceof Object[]) {return 1;}
+				else if (f instanceof Comparable && s instanceof Comparable && f.getClass().equals(s.getClass())) {
+					return compareOne((Comparable) f, (Comparable) s);
+				} else if (f instanceof Number && s instanceof  Number){
+					return (int) Math.signum(((Number) f).doubleValue() - ((Number) s ).doubleValue());
+				} else if (f instanceof Number) {
+					return 1;
+				} else if (s instanceof Number) {
+					return -1;
+				} else {
+					return f.toString().compareTo(s.toString());
+				}
+			}
+		}
+		private static final CompoundCompare COMPARE = new CompoundCompare();
+		
+		private SortedSet set = new TreeSet(COMPARE);
+		private final int start; 
+	
+		public Rank(OperatorData opData, Specializer spec) {
+			super(opData);
+			start = Converter.toInteger(spec.get(START_KEY));
+		}
+		private Rank(int start, OperatorData opData) {
+			super(opData);
+			this.start = start;
+		}
+	
+		public int map(Object... values) {return rank(true, values);} 
+		public int query(Object... values) {return rank(false, values);}
+	
+		public String getName() {return NAME;}
+	
+		/**What is the rank of the values passed.
+		 * -1 indicates no rank (not seen before and not added)
+		 * @param add Should this set of values be added to the set if it is not already there?
+		 * @param values What set of values needs ranking?
+		 */
+		private synchronized int rank(boolean add, Object... values) {
+			int rank;
+			if (add && !set.contains(values)) {
+				SortedSet newSet = new TreeSet(COMPARE);
+				newSet.addAll(set);
+				newSet.add(values);
+				set = newSet;
+				rank = set.headSet(values).size();
+			}else if (set.contains(values)) {
+				rank = set.headSet(values).size();
+			}else {
+				rank =-1;
+			}
+	
+			return rank + start;
+		}
+		
+		public int stateID() {return set.size();}
+		public Rank duplicate() {return new Rank(start, operatorData);}
+	}
+
 	public Projection(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
@@ -245,7 +346,10 @@ public class Projection extends BasicModule {
 			return new Count(operatorData);
 		} else if (name.equals("Counter")) {
 			return new Counter(operatorData);
+		} else if (name.equals("Rank")) {
+			return new Rank(operatorData, specializer);
 		}
+		
 		throw new IllegalArgumentException("Name not known : " + name);
 	}
 }

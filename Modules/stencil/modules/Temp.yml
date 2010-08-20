@@ -9,8 +9,6 @@ defaults:
     - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"} 
 
 operators: 
-   - name: Rank
-     keys: "min, max, n"
    - name: Scale
    - name: LinearInterp
      facets:

@@ -35,7 +35,6 @@ operators:
   - name: Sub1
   - name: Sum
     defaultSpecializer: !spec "[range: ALL, split:0]"
-    keys: range, split
     target: Add
     facets:
       - {name: map, type: PROJECT, function: false, prototype: !proto "long VALUE"}

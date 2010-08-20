@@ -20,4 +20,6 @@ operators:
       - {name: map, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
       - {name: query, type: PROJECT, function: false, prototype: !proto "Color VALUE"}
       - {name: stateID, type: OTHER, function: false, prototype: !proto "Color VALUE"}
-      
+    - name: Rank
+      defaultSpecializer: !spec "[range:ALL, split:0, start: 0]"
+    
