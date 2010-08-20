@@ -11,6 +11,8 @@ import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
+import static stencil.parser.ParserConstants.FALSE_STRING;
+
 public class NumericSampler implements SampleOperator {
 	/**Should values be rounded in sampling?*/
 	public static final String SAMPLE_INTEGERS = "round";
@@ -37,8 +39,7 @@ public class NumericSampler implements SampleOperator {
 			double max = ((Number) seed.get(1)).doubleValue();
 			
 			int tickCount = 10;
-			boolean useIntegers = spec.containsKey(SAMPLE_INTEGERS) &&
-									(Boolean) Converter.convert(spec.get(SAMPLE_INTEGERS), Boolean.class);
+			boolean useIntegers = !(spec.containsKey(SAMPLE_INTEGERS) && spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
 
 			if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
 				double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));

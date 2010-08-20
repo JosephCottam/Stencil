@@ -110,7 +110,7 @@ public class Sidebar extends Guide2D {
 		if (!bounds.isEmpty()) {
 			if (autoPlace) {
 				X = parentBounds.getMaxX() + bounds.getWidth();
-				Y = parentBounds.getMinY() + bounds.getHeight();
+				Y = parentBounds.getMinY();
 			}
 			this.bounds = new Rectangle2D.Double(bounds.getX()+X,bounds.getY()+Y, bounds.getWidth(), bounds.getHeight());
 		}

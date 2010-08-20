@@ -73,7 +73,7 @@ public class Temp extends BasicModule {
 		final double outMin, outMax, span;
 		double inMin = Double.MAX_VALUE;
 		double inMax = Double.MIN_VALUE;
-
+		
 		public Scale(OperatorData od, Specializer spec) {
 			super(od);
 			outMin = Converter.toDouble(spec.get(OUT_MIN));

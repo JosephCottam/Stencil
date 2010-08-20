@@ -67,7 +67,7 @@ public class Axis extends Guide2D {
 	/**What is the specified position (influence the baseline).
 	 * null means auto position
 	 * Any other value is the literal location of the axis line.*/
-	public Double position = null;
+	private Double position = null;
 	
 	protected final AXIS axis;
 	
@@ -97,6 +97,10 @@ public class Axis extends Guide2D {
 		Tuple update = new PrototypedTuple(new String[]{"REGISTRATION"}, new Object[]{registration});
 		prototypeText = prototypeText.update(update);
 		
+		
+		//Get position info based on axis orientation
+		if (axis == AXIS.X) {position = (guideDef.getSpecializer().containsKey("Y") ? Converter.toDouble(guideDef.getSpecializer().get("Y")) : null);}
+		if (axis == AXIS.Y) {position = (guideDef.getSpecializer().containsKey("X") ? Converter.toDouble(guideDef.getSpecializer().get("X")) : null);}
 		
 		prototypeText = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LABEL_PROPERTY_TAG, prototypeText);
 		prototypeText = GuideUtils.applyDefaults(guideDef.getSpecializer(), LABEL_PROPERTY_TAG, prototypeText);
@@ -174,12 +178,7 @@ public class Axis extends Guide2D {
 				
 		double min = Converter.toDouble(elements.get(0).get(offset_idx));
 		double max = Converter.toDouble(elements.get(elements.size()-1).get(offset_idx)); 
-		
-		if (max >0 && min <0) {/*do nothing, doesn't matter what connect is set to if the origin is bridged.*/}
-		
-		if (connect && (min >0)) {min =0;}
-		else if (connect && (max <0)) {max =0;}
-		
+				
 		if (axis == AXIS.X) {
 			values[0]  = min;
 			values[1] = baseline;
