@@ -62,32 +62,28 @@ instantiate
 //TODO: Why does it actually make three copies of the operator???
 change:  i=AST_INVOKEABLE 
 {
-   AstInvokeable inv = (AstInvokeable) i;
-   StencilOperator op = inv.getOperator();
-   if (op == null) {return;}
-   
-   MultiPartName name = new MultiPartName(inv.getParent().getText());
-   if (!name.getFacet().equals("")) {//If this is a true facet operator AND it is a function, nothing more needs to be done.
-     OperatorData od = op.getOperatorData();   
-     FacetData fd = od.getFacet(name.getFacet());
-     if (fd.isFunction()) {return;}
-   }
+    AstInvokeable inv = (AstInvokeable) i;
+    StencilOperator op = inv.getOperator();
+    if (op == null) {return;}
+       
+    MultiPartName name = new MultiPartName(inv.getParent().getText());
+    if (!name.getFacet().equals("")) {//If this is a true facet operator AND it is a function, nothing more needs to be done.
+       OperatorData od = op.getOperatorData();   
+       FacetData fd = od.getFacet(name.getFacet());
+       if (fd.isFunction()) {return;}
+     } else if (name.prefixedName().equals("STATE_QUERY")) {return;}    //State queries are all handled on the original tree
+       
+     StencilOperator viewPoint = instances.get(name.prefixedName());
+     if (viewPoint == null) {
+        //TODO: Make stencil inserted operators (like Echo is for guides) appear as OPERATOR_PROXY nodes
+        //This case is required because stencil inserted operators don't appear as PROXY entities anywhere
+        //    This is wasteful because it makes a viewpoint for each apperance of the operator (which may be many, esp. in the guide system)
+        //    This is very dangerous if the viewPoint operation takes a lot of time (doesn't for any operator automatically inserted YET).
+        viewPoint = op.viewPoint();
+     }
      
-   StencilOperator viewPoint = instances.get(name.prefixedName());
-   if (viewPoint == null) {
-      //TODO: Make stencil inserted operators (like Echo is for guides) appear as OPERATOR_PROXY nodes
-      //This case is required because stencil inserted operators don't appear as PROXY entities anywhere
-      //    This is wasteful because it makes a viewpoint for each apperance of the operator (which may be many, esp. in the guide system)
-      //    This is very dangerous if the viewPoint operation takes a lot of time (doesn't for any operator automatically inserted YET).
-      viewPoint = op.viewPoint();
-   }
-   
-   inv.setOperator(viewPoint);
-   
-   //Probably correct where it matters...but maybe not always
-   if (inv.getAncestor(STATE_QUERY) != null) {
-       inv.changeFacet(STATE_ID_FACET);
-   } else {
-       inv.changeFacet(QUERY_FACET); 
-   }
+     inv.setOperator(viewPoint);
+     
+     //Probably correct where it matters...but maybe not always
+     inv.changeFacet(QUERY_FACET); 
 };
