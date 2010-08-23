@@ -48,7 +48,7 @@ instantiate
     : proxy=OPERATOR_PROXY 
       {
          StencilOperator op =  ((OperatorProxy) proxy).getOperator();
-         instances.put(op.getName(), op.viewPoint());
+         instances.put(proxy.getText(), op.viewPoint());
       }
     | ^(opDef=OPERATOR .*) 
       {
@@ -72,8 +72,8 @@ change:  i=AST_INVOKEABLE
      FacetData fd = od.getFacet(name.getFacet());
      if (fd.isFunction()) {return;}
    }
-   
-   StencilOperator viewPoint = instances.get(op.getName());
+     
+   StencilOperator viewPoint = instances.get(name.prefixedName());
    if (viewPoint == null) {
       //TODO: Make stencil inserted operators (like Echo is for guides) appear as OPERATOR_PROXY nodes
       //This case is required because stencil inserted operators don't appear as PROXY entities anywhere
