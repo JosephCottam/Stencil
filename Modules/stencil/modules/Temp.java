@@ -71,8 +71,9 @@ public class Temp extends BasicModule {
 		private static final String OUT_MAX = "max";
 		private static final String OUT_MIN = "min";
 		final double outMin, outMax, span;
+
 		double inMin = Double.MAX_VALUE;
-		double inMax = Double.MIN_VALUE;
+		double inMax = Double.MIN_VALUE;		
 		
 		public Scale(OperatorData od, Specializer spec) {
 			super(od);
@@ -88,6 +89,7 @@ public class Temp extends BasicModule {
 			}
 			
 			span = outMax-outMin;
+			stateID =0;
 		}
 
 		public double map(double dv) {
@@ -109,6 +111,7 @@ public class Temp extends BasicModule {
 		public double query(double v) {
 			double percent = (v-inMin)/inMax;
 			double value = span*percent + outMin;
+			
 			return value;
 		}
 	}
