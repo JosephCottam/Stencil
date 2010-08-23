@@ -1,9 +1,9 @@
 tree grammar SeparateRules;
 options {
-	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
-	output = AST;
-	filter = true;
+    tokenVocab = Stencil;
+    ASTLabelType = CommonTree;	
+    output = AST;
+    filter = true;
 }
 
 @header {
@@ -17,6 +17,7 @@ options {
 }
 
 @members {
+
    private StencilTree siftRules(List<Rule> rules, int type) {return siftRules(adaptor, rules, type, -1, null);}
  
    //This binding check will be a problem when animated bindings come into play
@@ -25,7 +26,7 @@ options {
       StencilTree list = (StencilTree) adaptor.create(LIST, label);
       
       for(Rule r: rules) {
-         if(r.getTarget().getType() == type) {
+         if(r.getGenericTarget().getType() == type) {
             if (binding < 0 || r.getBinding().getType() == binding) {
               adaptor.addChild(list, adaptor.dupTree(r));
             }
@@ -41,6 +42,7 @@ options {
    protected StencilTree result(CommonTree source)        {return siftRules((List<Rule>) source, RESULT);}
 }
 
+//Put things in blocks based on their type
 topdown: ^(CONSUMES filters=. rules=.) 
 		-> ^(CONSUMES 
               $filters 
@@ -49,7 +51,3 @@ topdown: ^(CONSUMES filters=. rules=.)
               {result(rules)} 
               {view(rules)} 
               {canvas(rules)});
-	 
-	 
-	 
-	 

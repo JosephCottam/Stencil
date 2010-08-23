@@ -33,7 +33,7 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-import stencil.parser.tree.View;
+import stencil.display.Display;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
@@ -82,7 +82,7 @@ public class MouseStream implements TupleStream {
 				Point offset = event.getComponent().getLocationOnScreen();		//MouseInfo is in screen coords, so figure out where the window physically is.
 				currentCanvas = new Point2D.Double(current.getX()-offset.x, current.getY() - offset.y);
 			} else {currentCanvas = event.getPoint();}
-			currentCanvas = View.global.viewToCanvas(currentCanvas); //correct for view transform
+			currentCanvas = Display.view.viewToCanvas(currentCanvas); //correct for view transform
 
 			storedEvent = event;
 			sequence++;

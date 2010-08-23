@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
  * All rights reserved.
  *
@@ -37,8 +38,7 @@ import stencil.display.CanvasTuple;
 
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
-import stencil.parser.tree.Canvas;
-import stencil.parser.tree.View;
+import stencil.display.Display;
 import stencil.util.DoubleDimension;
 
 public class ViewCanvas extends BasicModule {
@@ -53,23 +53,23 @@ public class ViewCanvas extends BasicModule {
 	
 	
 	public static double[] screenToCanvasPoint(double x, double y) {
-		Point2D p = View.global.viewToCanvas(new Point2D.Double(x, y));
+		Point2D p = Display.view.viewToCanvas(new Point2D.Double(x, y));
 		return new double[]{p.getX(), p.getY()};
 	}
 
 	public static double[] screenToCanvasDimension(double width, double height) {
-		Dimension2D p = View.global.viewToCanvas(new DoubleDimension( width, height));
+		Dimension2D p = Display.view.viewToCanvas(new DoubleDimension( width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
 	}
 
 
 	public static double[] canvasToScreenPoint(double x, double y) {
-		Point2D p = View.global.canvasToView(new Point2D.Double(x, y));
+		Point2D p = Display.view.canvasToView(new Point2D.Double(x, y));
 		return new double[]{p.getX(), p.getY()};
 	}
 
 	public static double[] canvasToScreenDimension(double width, double height) {
-		Dimension2D p = View.global.canvasToView(new DoubleDimension(width, height));
+		Dimension2D p = Display.view.canvasToView(new DoubleDimension(width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
 	}
 
@@ -91,7 +91,7 @@ public class ViewCanvas extends BasicModule {
 	 * 
 	 */
 	public static double[] zoomPadded(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
-		CanvasTuple global = Canvas.global;
+		CanvasTuple global = Display.canvas;
 		
 		double x = global.getX() - pad;
 		double y = global.getY() - pad;

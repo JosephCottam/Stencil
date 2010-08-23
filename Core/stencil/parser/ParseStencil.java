@@ -370,6 +370,10 @@ public abstract class ParseStencil {
 		predicate_compact.setTreeAdaptor(TREE_ADAPTOR);
 		p = (Program) predicate_compact.downup(p);
 		
+		UnifyTargetTypes unify = new UnifyTargetTypes(treeTokens);
+		unify.setTreeAdaptor(TREE_ADAPTOR);
+		p = (Program) unify.downup(p);
+		
 		//Since some transformations change chain lengths, this must be re-run.
 		p = (Program) envSize.downup(p);
 

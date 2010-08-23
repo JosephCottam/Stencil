@@ -27,8 +27,8 @@ options {
 
   public Pack fromDefault(Pack pack) {
       Rule rule = pack.getRule();
-      Target target = rule.getTarget();
-      TuplePrototype targetPrototype = target.getPrototype();
+      StencilTree target = rule.getGenericTarget();
+      TuplePrototype targetPrototype = (TuplePrototype) target.findChild(TUPLE_PROTOTYPE);
       
       Pack newPack = (Pack) adaptor.dupNode(pack);
         

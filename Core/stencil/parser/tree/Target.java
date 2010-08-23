@@ -43,8 +43,8 @@ import stencil.types.Converter;
  * @author jcottam
  *
  */
-public abstract class Target extends StencilTree {
-	protected Target(Token source) {super(source);}
+public final class Target extends StencilTree {
+	public Target(Token source) {super(source);}
 
 	/**What is the name of this target (Glyph or Return, etc).*/
 	public String getName() {return token.getText();}

@@ -7,6 +7,7 @@ import java.util.List;
 
 import static java.lang.String.format;
 
+import stencil.display.Display;
 import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.parser.ParserConstants;
@@ -32,7 +33,7 @@ public class Interpreter {
 	
 	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws Exception {return processSequential(streamTuple, Arrays.asList(rule));}
 	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
-		Environment env = Environment.getDefault(Canvas.global, View.global, streamTuple);
+		Environment env = Environment.getDefault(Display.canvas, Display.view, streamTuple);
 		return process(env, rules);
 	}
 
@@ -78,7 +79,7 @@ public class Interpreter {
 		boolean matches;
 		Tuple prefilter, local;
 		Tuple result = null;
-		Environment env = Environment.getDefault(Canvas.global, View.global, source.getValues());
+		Environment env = Environment.getDefault(Display.canvas, Display.view, source.getValues());
 		
 		try {prefilter = process(env, group.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", target.getName()),e);}
@@ -110,13 +111,13 @@ public class Interpreter {
 			
 			try {
 				Tuple viewUpdate = process(env, group.getViewRules());
-				if (viewUpdate != null) {Tuples.transfer(viewUpdate, View.global);}
+				if (viewUpdate != null) {Tuples.transfer(viewUpdate, Display.view);}
 			}
 			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try{
 				Tuple canvasUpdate = process(env, group.getCanvasRules());
-				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Canvas.global);}
+				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Display.canvas);}
 			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}
 		return result;

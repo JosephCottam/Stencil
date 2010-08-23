@@ -48,6 +48,7 @@ public class Rule extends StencilTree {
 
 	/**What is being modified by this rule?*/
 	public Target getTarget() {return (Target) getChild(0);}
+	public StencilTree getGenericTarget() {return (StencilTree) getChild(0);}
 	
 	/**What actions are being taken in this rule*/
 	public CallChain getAction() {return (CallChain) getChild(1);}
@@ -57,7 +58,6 @@ public class Rule extends StencilTree {
 	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
 		Tree t = this.getAncestor(StencilParser.CONSUMES);
-		if (t == null) {throw new RuntimeException("Rules not part of a layer do not belong to a group.");}
 		return (Consumes) t;
 	}
 	

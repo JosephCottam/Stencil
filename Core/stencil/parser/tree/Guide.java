@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.antlr.runtime.Token;
 
+import stencil.display.Display;
 import stencil.display.DisplayGuide;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.guide.*;
@@ -111,8 +112,8 @@ public class Guide extends StencilTree {
 
 		//TODO: Make this get something other than canvas...when guides can be declared on layers or views
 		//TODO: Fix the object creation order so the canvas exists before the updater is started
-		if (Canvas.global != null) {
-			guide.setElements(results, Canvas.global.getComponent().getContentBounds(false));
+		if (Display.canvas != null) {
+			guide.setElements(results, Display.canvas.getComponent().getContentBounds(false));
 		}
 	}
 	

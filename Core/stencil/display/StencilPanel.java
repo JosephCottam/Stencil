@@ -37,11 +37,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.TreeSet;
 
+import stencil.display.Display;
 import stencil.interpreter.Interpreter;
-import stencil.parser.tree.Canvas;
 import stencil.parser.tree.Layer;
 import stencil.parser.tree.Program;
-import stencil.parser.tree.View;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 
@@ -193,8 +192,8 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	/**Actions that must be taken before the run will be valid.*/
 	public void preRun() {
 		//TODO: Modify when view and canvas can have multiple instances
-		View.global = getView();
-		Canvas.global = getCanvas();
+		Display.canvas = getCanvas();
+		Display.view = getView();
 	}
 	
 	//------------------------------------------------------------------------------------------

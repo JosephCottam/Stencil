@@ -1,4 +1,4 @@
-tree grammar GuideInsertSeedOp;
+  tree grammar GuideInsertSeedOp;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
@@ -101,7 +101,7 @@ options {
     /**Given a tree, how should it be looked up in the guides map?*/
     private String key(Rule rule) {
       Tree layer = rule.getAncestor(LAYER);
-      Tree attRef = rule.getTarget().getPrototype().get(0);
+      Tree attRef = ((TuplePrototype) rule.getGenericTarget().findChild(TUPLE_PROTOTYPE)).get(0);
       if (attRef == null) {return null;} //rule has no target, happens when the rule is for side effects only
       Tree att = attRef.getChild(0);
       if (layer == null || att==null) {return null;}
@@ -199,7 +199,7 @@ options {
     private String selectOperator(Tree t) {
       Layer layer = (Layer) t.getAncestor(StencilParser.LAYER);
       Rule r = (Rule) t.getAncestor(StencilParser.RULE);
-      String field = r.getTarget().getPrototype().get(0).getFieldName();
+      String field = ((TuplePrototype) r.getGenericTarget().findChild(TUPLE_PROTOTYPE)).get(0).getFieldName();
       
       Specializer strat = requestedGuides.get(key(layer.getName(), field));
       return operatorName(strat);

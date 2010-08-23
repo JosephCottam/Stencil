@@ -1,5 +1,7 @@
 package stencil.parser.string.util;
 
+
+import stencil.tuple.prototype.TupleFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.interpreter.guide.samplers.LayerSampler;
@@ -104,7 +106,10 @@ public final class EnvironmentProxy {
 	public static TuplePrototype calcPrototype(List<Rule> rules) {
 		List<TupleFieldDef> defs = new ArrayList();
 		for (Rule r: rules) {
-			for (TupleFieldDef def: r.getTarget().getPrototype()) {
+		    StencilTree target = r.getGenericTarget();
+		    TuplePrototype<TupleFieldDef> targetPrototype = (TuplePrototype) target.findChild(StencilParser.TUPLE_PROTOTYPE);
+
+			for (TupleFieldDef def: targetPrototype) {
 				defs.add(def);
 			}
 		}
@@ -119,7 +124,7 @@ public final class EnvironmentProxy {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
 				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();
 			} else if (anc.inRuleList) {
-				return anc.g.getGenerator().getTarget().getPrototype();
+				return (TuplePrototype) anc.g.getGenerator().getGenericTarget().findChild(StencilParser.TUPLE_PROTOTYPE);
 			} else {return anc.g.getSeedOperator().getSamplePrototype();}
 		}
 

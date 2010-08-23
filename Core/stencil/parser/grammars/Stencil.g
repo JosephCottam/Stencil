@@ -42,6 +42,7 @@ tokens {
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
   STREAM_DEF;		//Root of a stream definition
+  TARGET;
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
   TUPLE_REF;

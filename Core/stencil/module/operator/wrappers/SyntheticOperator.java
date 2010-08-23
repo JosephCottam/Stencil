@@ -40,10 +40,9 @@ import stencil.module.util.OperatorData;
 import static stencil.module.util.OperatorData.TYPE_PROJECT;
 import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
 import stencil.parser.ParserConstants;
-import stencil.parser.tree.Canvas;
+import stencil.display.Display;
 import stencil.parser.tree.OperatorFacet;
 import stencil.parser.tree.OperatorRule;
-import stencil.parser.tree.View;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -110,7 +109,7 @@ public class SyntheticOperator implements StencilOperator {
 		}
 		Tuple prefilter;
 		Tuple tuple = new ArrayTuple(values);
-		Environment env = Environment.getDefault(Canvas.global, View.global, tuple);
+		Environment env = Environment.getDefault(Display.canvas, Display.view, tuple);
 		
 		try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}
