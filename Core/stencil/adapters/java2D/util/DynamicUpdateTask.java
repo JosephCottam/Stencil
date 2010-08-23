@@ -15,12 +15,10 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	private final DisplayLayer table;
 	
 	public DynamicUpdateTask(DisplayLayer table, DynamicRule rule) {
-		super(rule);
+		super(rule, rule.getStateQuery(), rule.getAction().getTarget().getPrototype().toStringTree());
 		this.table = table;
 	}
 		
-	public boolean needsUpdate() {return originalFragment.requiresUpdate();}
-
 	public Finisher update() {
 		final List<Tuple> result = viewPointFragment.apply(table);
 		
@@ -30,6 +28,4 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 			}
 		};
 	}
-	
-	public String toString() {return "Dynamic update for " + table.getName() + ": " + originalFragment.getAction().getTarget().getPrototype().toStringTree();}
 }

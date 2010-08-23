@@ -2,7 +2,6 @@ package stencil.interpreter.guide.samplers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 

@@ -55,8 +55,5 @@ public class DynamicRule extends StencilTree {
 		return results;
 	}	
 		
-	/**Should this dynamic rule be run now??*/
-	public boolean requiresUpdate() {
-		return ((StateQuery) getChild(1)).requiresUpdate();
-	}
+	public StateQuery getStateQuery() {return ((StateQuery) getChild(1));}
 }

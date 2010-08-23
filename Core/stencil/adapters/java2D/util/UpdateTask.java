@@ -2,6 +2,7 @@ package stencil.adapters.java2D.util;
 
 import java.util.concurrent.Callable;
 
+import stencil.parser.tree.StateQuery;
 import stencil.parser.tree.StencilTree;
 import stencil.parser.tree.util.Path;
 
@@ -13,22 +14,31 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 	protected final Path path;
 	
 	/**The base fragment to be updated.*/
-	protected final T originalFragment;
+	protected final StateQuery stateQuery;
 
+	/**How should this task be identified in string form?*/
+	protected final String identifier;
+
+	
+	/**Should this updater be run next time the run schedule is made?*/
+	protected boolean needsUpdate;
+	
 	/**The transient viewpoint fragment. 
 	 * This should correspond to the original fragment in some meaningful way
 	 * (they usually have the same path in their respective trees).
 	 */
 	protected T viewPointFragment;
 	
-	public UpdateTask(T original) {
-		this.originalFragment = original;
+	
+	protected UpdateTask(T original, StateQuery stateQuery, String identifier) {
 		this.path = new Path(original);
+		this.stateQuery = stateQuery;
+		this.identifier = this.getClass().getName() + ":" + identifier;
 	}
 	
 	
 	/**Does this updater need to run?*/
-	public abstract boolean needsUpdate();
+	public boolean needsUpdate() {return needsUpdate;}
 	
 	/**Run this updater, regardless of it needs to be run or not.*/
 	public abstract Finisher update();
@@ -37,6 +47,7 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 	 * For example, in a dynamic update, this is a derivative of the dynamically bound rule.*/
 	public void setStencilFragment(StencilTree root) {
 		viewPointFragment = (T) path.apply(root);
+		needsUpdate = stateQuery.requiresUpdate();
 	}
 	
 	public Path getPath() {return path;}
@@ -46,8 +57,11 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 	 * */
 	public Finisher call() {
 		if (needsUpdate()) {
+			needsUpdate = false;
 			return update(); 
 		}
 		return NO_WORK;
 	}
+	
+	public String toString() {return identifier;}
 }

@@ -13,12 +13,10 @@ public class GuideTask extends UpdateTask<Guide> {
 	private final Selector selector;
 	
 	public GuideTask(Guide guideDef, DisplayCanvas canvas) {
-		super(guideDef);
+		super(guideDef, guideDef.getStateQuery(), guideDef.getSelector().toString());
 		this.canvas = canvas;
 		this.selector = guideDef.getSelector();
 	}
-
-	public boolean needsUpdate() {return originalFragment.getStateQuery().requiresUpdate();}
 
 	public Finisher update() {
 		DisplayGuide guide = canvas.getGuide(selector);
@@ -26,5 +24,4 @@ public class GuideTask extends UpdateTask<Guide> {
 		return UpdateTask.NO_WORK;
 	}
 	
-	public String toString() {return "Guide update for " + originalFragment.getSelector().toString();}
 }
