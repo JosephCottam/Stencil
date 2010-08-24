@@ -81,7 +81,7 @@ public class Guide extends StencilTree {
 		List<String> names = new ArrayList();
 		
 		for (Rule r: rules) {
-			String[] targets = TuplePrototypes.getNames(r.getTarget().getPrototype());
+			String[] targets = TuplePrototypes.getNames((TuplePrototype) r.getGenericTarget().findChild(StencilParser.TUPLE_PROTOTYPE));
 			for (String target: targets) {names.add(target);}
 		}
 		
