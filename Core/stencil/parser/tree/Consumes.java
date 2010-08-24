@@ -17,6 +17,9 @@ public class Consumes extends StencilTree {
 	public Consumes(Token source) {super(source);}
 
 	public String getStream() {return token.getText();}
+
+	/**Uniquely identify this group within the layer.*/
+	public int groupID() {return this.getChildIndex();}
 	
 	public ContextNode getContext() {
 		ContextNode result = (ContextNode) this.getAncestor(StencilParser.LAYER);

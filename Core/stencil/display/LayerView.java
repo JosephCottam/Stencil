@@ -4,6 +4,7 @@ import java.awt.Rectangle;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
 import stencil.tuple.Tuple;
 
 
@@ -16,6 +17,20 @@ import stencil.tuple.Tuple;
  * @param <T> Type of the things being stored in the backing layer.
  */
 public interface LayerView<T extends Glyph> extends Iterable<T>{
+	/**Entry into a dynamic binding.
+	 * TODO: Factor this out somehow, it is an ugly implementation leak...A good idea would be to parameterize getSourceData by teh groupID and return a filtering collection of some sort... 
+	 */
+	public static final class DynamicEntry {
+		public int groupID;
+		public Tuple t;
+		public DynamicEntry(int groupID, Tuple t) {
+			this.groupID = groupID;
+			this.t = t;
+		}
+ 	}
+	
+	
+	
 	/**Return an iterator of the tuples of this layer*/
 	public Iterator<T> iterator();
 
@@ -42,5 +57,5 @@ public interface LayerView<T extends Glyph> extends Iterable<T>{
 	public T find(String id);
 	
 	/**Get the source data for dynamic bindings related to this layer.*/
-	public Map<String, Tuple> getSourceData();
+	public Map<String, DynamicEntry> getSourceData();
 }

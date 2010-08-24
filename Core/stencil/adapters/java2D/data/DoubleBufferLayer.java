@@ -27,6 +27,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
+import static stencil.display.LayerView.DynamicEntry;
 
 /**Layer with two related stores (Permanent and Update) to 
  * allow concurrent editing and iteration.  
@@ -38,11 +39,11 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private static final String PROTOTYPE_ID = "PROTOTYPE ID -- IF YOU EVER READ THIS IN OUTPUT, ITS PROBABLY AN ERROR.";
 	
 	private Map<Object, Integer> index = new HashMap(); //TODO: Look at tree-map for large layers...
-	private Map<String, Tuple> sourceData = new HashMap();
+	private Map<String, DynamicEntry> sourceData = new HashMap();
 	private List<Glyph2D> store = new ArrayList();
 
 	private Map<String, Integer> updateIndex = new HashMap();
-	private Map<String, Tuple> updateSources = new HashMap();	
+	private Map<String, DynamicEntry> updateSources = new HashMap();	
 	private List<Glyph2D> update = new ArrayList();
 	
 	
@@ -194,7 +195,9 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		}		
 	}
 
-	public void addDynamic(T target, Tuple sourceData) {updateSources.put(target.getID(), sourceData);}
+	public void addDynamic(int groupID, T target, Tuple sourceData) {
+		updateSources.put(target.getID(), new DynamicEntry(groupID, sourceData));
+	}
 	
 	public StoreView getView() {
 		return new StoreView(storeStateID);
@@ -273,7 +276,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			return g;
 		}
 		
-		public Map<String, Tuple> getSourceData() {return sourceData;}
+		public Map<String, DynamicEntry> getSourceData() {return sourceData;}
 		public int getStateID() {return creationGeneration;}
 		public String getLayerName() {return name;}
 		public int size() {return index.size();}

@@ -24,7 +24,7 @@ public class DynamicRule extends StencilTree {
 	/**What group does this rule belong to?*/
 	public Consumes getGroup() {
 		Tree t = this.getAncestor(StencilParser.CONSUMES);
-		if (t == null) {throw new RuntimeException("Rules not part of a layer do not belong to a group.");}
+		if (t == null) {throw new RuntimeException("Rules not part of a consumes block do not belong to a group.");}
 		return (Consumes) t;
 	}
 
@@ -32,12 +32,13 @@ public class DynamicRule extends StencilTree {
 		LayerView<Glyph> view = table.getView();
 		
 		java.util.List<Tuple> results = new ArrayList(view.size());
-		Map<String, Tuple> sourceData = view.getSourceData();
+		Map<String, LayerView.DynamicEntry> sourceData = view.getSourceData();
+		int groupID = getGroup().groupID();
 		
 		for (Glyph glyph: view) {
-			Tuple source = sourceData.get(glyph.getID());		//Get associated source data
-			
-			//TODO: Resolve how to ensure dynamic bindings are only run when needed...Do single-consumes layers make sense again???
+			LayerView.DynamicEntry entry = sourceData.get(glyph.getID());		//Get associated source data
+			if (entry.groupID != groupID) {continue;}
+			Tuple source = entry.t;
 			
 			try {
 				Tuple result = Interpreter.processSequential(source, getAction());

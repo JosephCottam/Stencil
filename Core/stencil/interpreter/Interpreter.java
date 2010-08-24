@@ -173,7 +173,7 @@ public class Interpreter {
 			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			
-			layer.getDisplayLayer().addDynamic(glyph, source.getValues());
+			layer.getDisplayLayer().addDynamic(group.groupID(), glyph, source.getValues());
 
 			return true;
 		} catch (Exception e) {

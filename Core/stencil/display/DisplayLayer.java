@@ -96,5 +96,5 @@ public interface DisplayLayer<T extends Glyph>  {
 	public void updatePrototype(Tuple defaults);
 	
 	/**Register the input values with the given glyph.*/
-	public void addDynamic(T g, Tuple t);
+	public void addDynamic(int groupID, T g, Tuple t);
 }
