@@ -45,7 +45,6 @@ public class Profile {
 		ImageTest test = getTest(profileProperties);
 		TestRecord r = test.getTestRecord();
 		
-		stencil.explore.ui.Batch.preRun(null);
 		stencil.explore.ui.Batch.batchInvoke(r.getProfileCommand());
 	}
 
@@ -57,7 +56,6 @@ public class Profile {
 		TestRecord r = test.getTestRecord();
 		
 		long start = System.currentTimeMillis();
-		stencil.explore.ui.Batch.preRun(null);
 		stencil.explore.ui.Batch.batchInvoke(r.getImageCommand());
 		long end = System.currentTimeMillis();
 		long elapse = end-start;
