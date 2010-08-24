@@ -45,12 +45,12 @@ import stencil.WorkingDirectory;
 public class File extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
 
-	private final JTextField header = new JTextField();;
-	private final JTextField skip = new JTextField();;
-	private final JCheckBox strict = new JCheckBox();;
-	private final JTextField separator = new JTextField();;
-	private final JButton fileList = new JButton("\u2026");;
-	protected final JTextField filename = new JTextField();;
+	private final JTextField header = new JTextField();
+	private final JTextField skip = new JTextField();
+	private final JCheckBox strict = new JCheckBox();
+	private final JTextField separator = new JTextField();
+	private final JButton fileList = new JButton("\u2026");
+	protected final JTextField filename = new JTextField();
 	protected final JFileChooser fileChooser;
 
 	public File(FileSource source) {

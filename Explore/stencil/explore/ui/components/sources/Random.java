@@ -38,8 +38,8 @@ import stencil.explore.model.sources.RandomSource;
 public class Random extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
 
-	private final JTextField size = new JTextField();;
-	private final JTextField length = new JTextField();;
+	private final JTextField size = new JTextField();
+	private final JTextField length = new JTextField();
 
 	public Random(RandomSource source) {
 		this();

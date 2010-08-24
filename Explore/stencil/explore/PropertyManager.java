@@ -179,9 +179,6 @@ public class PropertyManager {
 		return props;
 	}
 
-	/**Save a configuration file name.*/
-	public static void setExploreConfig(String filename) {exploreConfig = filename;}
-
 	/**Save explore-based configuration information to the indicated file.
 	 * This does not save information that is stencil-wide.  That must be added
 	 * to the stencil configuration file manually.

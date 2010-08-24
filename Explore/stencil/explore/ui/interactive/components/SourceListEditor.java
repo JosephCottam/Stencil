@@ -50,7 +50,7 @@ import stencil.explore.coordination.StencilMutable;
 import stencil.explore.model.sources.*;
 import stencil.explore.ui.components.sources.*;
 import stencil.explore.util.ListModel;
-import stencil.explore.util.StencilIO;;
+import stencil.explore.util.StencilIO;
 
 public class SourceListEditor extends JPanel implements ChangeListener, StencilMutable.Sources<StreamSource> {
 	protected JList streamSources = new JList();

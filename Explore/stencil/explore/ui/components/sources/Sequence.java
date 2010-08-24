@@ -38,9 +38,9 @@ import stencil.explore.model.sources.SequenceSource;
 public class Sequence extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
 
-	private final JTextField start = new JTextField();;
-	private final JTextField increment = new JTextField();;
-	private final JTextField length = new JTextField();;
+	private final JTextField start = new JTextField();
+	private final JTextField increment = new JTextField();
+	private final JTextField length = new JTextField();
 
 	public Sequence(SequenceSource source) {
 		this();

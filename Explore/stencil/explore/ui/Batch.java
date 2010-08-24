@@ -50,7 +50,6 @@ public class Batch {
 	 */
 	public static void main(String[] args) throws Exception {
 		int inputFile = 2;
-		preRun(args);
 
 		if (Application.SETTINGS_FLAG.equals(args[0])) {inputFile = 3;}
 
@@ -61,20 +60,6 @@ public class Batch {
 			batchInvoke(line);
 			line=input.readLine();
 		}
-	}
-
-	/**Utility for test tools that directly call batchInvoke.
-	 * Need to initialize the batch system, but will not be using main.
-	 * This method must be called before the first call to batchInvoke,
-	 * and may be called more often (but is not required).
-	 * The 'args' section is identical to the command line args, but
-	 * most are ignored.
-	 *
-	 * @param args
-	 */
-	public static void preRun(String[] args) {
-		String[] configs = PropertyManager.getConfigFiles(args);
-		PropertyManager.loadProperties(configs, PropertyManager.exploreConfig, PropertyManager.stencilConfig);
 	}
 
 	//Parse an individual line of arguments in a batch invocation.
