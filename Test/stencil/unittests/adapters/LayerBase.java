@@ -11,7 +11,7 @@ import stencil.parser.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.PrototypedTuple;
 
-public abstract class TestLayer extends junit.framework.TestCase {
+public abstract class LayerBase extends junit.framework.TestCase {
 	private static final int TUPLE_COUNT = 100;
 	
 	private String ruleSources ="stream Stream1(Source, A,B,C) layer Layer1 from Stream1 X: A";

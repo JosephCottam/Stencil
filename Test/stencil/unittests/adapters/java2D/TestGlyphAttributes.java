@@ -1,7 +1,5 @@
 package stencil.unittests.adapters.java2D;
 
-import junit.framework.TestCase;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -9,9 +7,10 @@ import java.util.List;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.unittests.StencilTestCase;
 
 //TODO: Add tests for failure cases
-public class TestGlyphAttributes extends TestCase{
+public class TestGlyphAttributes extends StencilTestCase {
 	private void testAttributes(Glyph2D node, String...ignores) throws Exception {
 		List<String> ignore = new ArrayList(Arrays.asList(ignores));
 		ignore.add("ID");

@@ -8,11 +8,11 @@ import stencil.module.operator.wrappers.JythonOperator;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Program;
 import stencil.testUtilities.StringUtils;
+import stencil.unittests.StencilTestCase;
 import stencil.unittests.module.TestModuleCache;
 import stencil.adapters.java2D.Adapter;
 import static stencil.parser.ParserConstants.INIT_FACET;
 import static stencil.parser.ParserConstants.MAP_FACET;
-import junit.framework.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +27,7 @@ import stencil.parser.tree.Python;
 import stencil.parser.tree.PythonFacet;
 
 
-public class TestEncapsulationGenerator extends TestCase {
+public class TestEncapsulationGenerator extends StencilTestCase {
 	
 	public static Python getPython(String env, String facet, List<String> arguments, List<String> results, String body) throws Exception {
 		final String mainFormat = "python %1$s facet %2$s %3$s {%4$s}"; 

@@ -1,5 +1,5 @@
 
-<!--Should be run from the command line with "-lib ../Library/" /-->
+<!--Should be run from the command line with "-lib ../Library/:../Library/JUNG/" /-->
     
  <project name="Stencil" default="Stencil" basedir="..">
  	<taskdef resource="net/sf/antcontrib/antlib.xml"/>
@@ -115,8 +115,7 @@
         <ant antfile="./build/Deploy.xml" inheritRefs="true"/>
     </target> 
  	
-	<!--GUnit tests--> 	
- 	<target name="RunTests" depends="StencilGrammar"> 
+ 	<target name="Test" depends="StencilGrammar"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
  </project>

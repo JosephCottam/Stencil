@@ -8,12 +8,12 @@ import stencil.tuple.Tuples;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
+import stencil.unittests.StencilTestCase;
 import stencil.unittests.util.TestBasicTuple;
 import junit.framework.Assert;
-import junit.framework.TestCase;
 
 
-public class TestTuples extends TestCase {
+public class TestTuples extends StencilTestCase {
 	public void testTransfer() throws Exception {
 		Tuple reference = new PrototypedTuple(TestBasicTuple.names, TestBasicTuple.types, TestBasicTuple.values);
 		HashMap map = new HashMap();

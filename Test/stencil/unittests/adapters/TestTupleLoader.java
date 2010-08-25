@@ -6,12 +6,11 @@ import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
+import stencil.unittests.StencilTestCase;
 import stencil.util.streams.txt.DelimitedParser;
 
-import junit.framework.TestCase;
 
-
-public class TestTupleLoader extends TestCase {
+public class TestTupleLoader extends StencilTestCase {
 	public static final String STENCIL = "./TestData/RegressionImages/Sourceforge/Sourceforge.stencil";
 	public static final String COORDS = "./TestData/RegressionImages/Sourceforge/suppliments/clusterCoords_fragment.coord";
 	public static final String OVERLAY_SHORT = "./TestData/RegressionImages/Sourceforge/suppliments/project_troves_fragment.txt";

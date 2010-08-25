@@ -3,7 +3,7 @@ package stencil.unittests.adapters.java2D;
 import stencil.adapters.java2D.Adapter;
 import stencil.adapters.java2D.Panel;
 
-public class TestGenerate extends stencil.unittests.adapters.TestGenerator {
+public class TestGenerate extends stencil.unittests.adapters.GeneratorBase {
 	private Panel panel;
 	
 	public void tearDown() {

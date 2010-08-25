@@ -9,7 +9,7 @@ import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import stencil.util.streams.txt.DelimitedParser;
 
-public abstract class TestGenerator extends junit.framework.TestCase {
+public abstract class GeneratorBase extends junit.framework.TestCase {
 	private static final String sourceFile = "./TestData/RegressionImages/SeeTest/SeeTest.stencil"; 
 	private StencilPanel panel;
 	

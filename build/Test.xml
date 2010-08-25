@@ -1,15 +1,73 @@
-<!--If ANTLR3 task is not already installed, this script should be run with
-    "-lib ./Library/antlr3-ant.jar" /-->
-    
  <project name="TestStencil" default="RunTests">
+    <target name="RunTests" depends="JUnit"/>
+    
+    <target name="CleanUpTests">
+        <delete><fileset dir="." includes="**/TEST_*"/></delete>
+    </target>
+    
+    <target name="MakeJar">
+       <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
+    </target>
+    
+    
+    <target name="JUnit" depends="CleanUpTests,MakeJar">
+        <property name="results" location="./testResults/" />
+
+        <move file="Stencil.jar" toDir="TestData"/>
+        <delete dir="${results}"/>
+        <mkdir dir="${results}"/>
+
+        
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
+            <formatter type="brief"/>
+
+            <classpath>
+                <pathelement location="./TestData/Stencil.jar"/>
+                <pathelement path="${java.class.path}"/>
+                <pathelement path="."/>
+                <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+            </classpath>
+            
+            
+            <batchtest todir="${results}">
+                <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
+                    <include name="**/*Test*.class"/>
+                    <exclude name="**/*$*"/>
+                    <exclude name="**/testUtilities/**"/>
+                    <exclude name="**/examples/**"/>
+                    <exclude name="**/StencilTestCase.*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        
+        <delete file="TestData/Stencil.jar"/>
+    </target>
+
+
+    <target name="JUnit-Singles" depends="CleanUpTests,MakeJar">
+        <move file="Stencil.jar" toDir="TestData"/>
+        
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
+            <classpath>
+                <pathelement location="./TestData/Stencil.jar"/>
+                <pathelement path="${testsLocation}"/>
+                <pathelement path="${java.class.path}"/>
+                <pathelement path="."/>
+                <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+            </classpath>
+            <test name="stencil.unittests.TestConfigure"/>
+            <formatter type="plain"/>
+        </junit>
+    </target>
+
+
 	<!--GUnit tests--> 	
- 	<target name="RunTests"> 
+ 	<target name="GUnit"> 
 	 	<property name="testsLocation" location="bin/stencil/unittests/parser/string/grammars/" />
 
 		<jar jarfile="${runtimeLibrary}/Stencil.jar" includes="*.class" basedir=".">
 			<fileset dir="bin"/>
 		</jar>
-		<antcall target="EclipseRefresh"/>
 
 		<java classname="org.antlr.gunit.Interp" fork="yes" dir="${target}">
 			<classpath>
@@ -29,8 +87,6 @@
 			</classpath>
 			<arg value="${testsLocation}/SigilArgs.gunit"/>
 		</java>
- 		
-
  		
  		<delete file="${runtimeLibrary}/Stencil.jar"/>
 	</target>

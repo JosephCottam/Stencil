@@ -5,9 +5,9 @@ import java.awt.Color;
 
 import stencil.tuple.instances.*;
 import stencil.types.Converter;
-import junit.framework.TestCase;
+import stencil.unittests.StencilTestCase;
 
-public class TestConverter extends TestCase {
+public class TestConverter extends StencilTestCase {
 
 	public void testColor() {
 		stencil.types.color.ColorCache c = new stencil.types.color.ColorCache();

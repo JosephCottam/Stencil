@@ -19,7 +19,7 @@ import stencil.testUtilities.TestModule;
 import stencil.tuple.Tuple;
 import stencil.util.streams.txt.DelimitedParser;
 
-public abstract class TestInterpreter extends junit.framework.TestCase{
+public abstract class InterpreterBase extends junit.framework.TestCase{
 	public static String registerFailRule = "import TestModule " +
 											"stream NodeAttributes(ID, ATT, Source)"+
 											"layer Overlay from NodeAttributes" +
