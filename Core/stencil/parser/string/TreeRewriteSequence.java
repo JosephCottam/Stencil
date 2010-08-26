@@ -1,14 +1,19 @@
 package stencil.parser.string;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeAdaptor;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.runtime.tree.TreeRewriter;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
+
+import stencil.parser.ParseStencil;
 
 public abstract class TreeRewriteSequence extends TreeRewriter {
 	private static final String DEFAULT_UP_OPERATION = "bottomup";
@@ -62,4 +67,31 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
     }
 
 
+    protected static Tree apply(Tree p, Object... args) {
+    	Class implementing;
+    	try {
+    		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    		implementing = Class.forName(stack[0].getClassName());
+    	} catch (Exception e) {
+    		throw new Error("Inspection failure trying to determine implementing class.");
+    	}
+    	return apply(p, implementing, args);
+    }
+    
+    
+    protected static Tree apply(Tree p, Class implementing, Object... args) {
+    	TreeRewriteSequence fs;
+    	try {
+	    	Constructor<? extends TreeRewriteSequence> c = implementing.getConstructor(TreeNodeStream.class);
+	    	fs = c.newInstance(ParseStencil.TOKEN_STREAM);
+	    	fs.setTreeAdaptor(ParseStencil.TREE_ADAPTOR);
+    	} catch (Exception e){
+    		throw new Error("Tree sequence does not provide required constructor.", e);
+    	}
+    	fs.setup(args);
+    	return (Tree) fs.downup(p);    	
+    }
+    
+    protected void setup(Object... args) {}
+    public abstract void setTreeAdaptor(TreeAdaptor adaptor);
 }

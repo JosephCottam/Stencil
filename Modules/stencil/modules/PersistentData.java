@@ -2,7 +2,6 @@ package stencil.modules;
 
 import static stencil.module.util.OperatorData.TYPE_PROJECT;
 import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
@@ -21,7 +20,7 @@ public class PersistentData extends BasicModule {
 		private final boolean caseSensitive;
 
 
-		protected Dict(OperatorData opData, Specializer spec) {
+		public Dict(OperatorData opData, Specializer spec) {
 			this(opData, spec.containsKey("CaseInsensitive"), getNames(spec));
 		}
 
@@ -86,21 +85,10 @@ public class PersistentData extends BasicModule {
 	
 	public OperatorData getOperatorData(String name, Specializer specializer)
 	throws SpecializationException {
-
 		if(name.equals(Dict.NAME)) {
 			return Dict.getOperatorData(getModuleData().getOperator(name), specializer);
 		}
 
 		return super.getOperatorData(name, specializer);
-	}
-
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		
-		try {
-			if (name.equals(Dict.NAME)) {
-				return new Dict(getOperatorData(name, specializer), specializer);
-			}
-			return super.instance(name, specializer);
-		} catch (Exception e) {throw new Error("Error retriving " + name + " method.",e);}
 	}
 }

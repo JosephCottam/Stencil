@@ -1,7 +1,5 @@
 package stencil.modules;
 
-import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
@@ -15,7 +13,7 @@ public class Geometry extends BasicModule {
 		
 		final double scale;
 		
-		protected Scale(OperatorData opData, Specializer spec) {
+		public Scale(OperatorData opData, Specializer spec) {
 			super(opData);
 			scale = Converter.toDouble(spec.get(SCALE_KEY));
 		}
@@ -34,7 +32,7 @@ public class Geometry extends BasicModule {
 		final double shift;
 		final double scale;
 		
-		protected ScaleRect(OperatorData opData, Specializer spec) {
+		public ScaleRect(OperatorData opData, Specializer spec) {
 			super(opData);
 			scale = Converter.toDouble(spec.get(SCALE_KEY));
 			shift = scale/2;
@@ -52,13 +50,4 @@ public class Geometry extends BasicModule {
 	}
 
 	public Geometry(ModuleData md) {super(md);}
-	
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		validate(name, specializer);
-		OperatorData opData = super.getOperatorData(name, specializer);
-		if (name.equals("ScaleRect")) {return new ScaleRect(opData, specializer);}
-		else if (name.equals("Scale")) {return new Scale(opData, specializer);}
-		
-		throw new RuntimeException("Could not instantiate (but passed validation: " + name);
-	}
 }

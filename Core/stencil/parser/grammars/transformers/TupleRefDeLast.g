@@ -4,6 +4,7 @@ options {
   ASTLabelType = CommonTree;  
   output = AST;
   filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -17,13 +18,20 @@ options {
    **/
    
   package stencil.parser.string;
+  
+  import stencil.parser.tree.Program;
 }
 
+@members {
+   public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+   }
+}
 
 topdown
    : ^(f=FUNCTION spec=. ^(LIST preArgs+=.* ^(TUPLE_REF LAST) postArgs+=.*) pass=. call=.)
-       -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD 
+       -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
        		^(FUNCTION[$f.text] $spec ^(LIST $preArgs* ^(TUPLE_REF NUMBER["0"]) $postArgs*) $pass $call))
    | ^(PACK preArgs+=.* ^(TUPLE_REF LAST) postArgs+=.*)
-   	   -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD
+   	   -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
    	   		^(PACK $preArgs* ^(TUPLE_REF NUMBER["0"]) $postArgs*));

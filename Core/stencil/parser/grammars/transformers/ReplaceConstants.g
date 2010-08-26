@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -14,17 +15,18 @@ options {
 	import stencil.parser.tree.*;
 	import stencil.parser.string.util.*;
 	import stencil.tuple.Tuple;
-    import static stencil.parser.ParserConstants.GLOBALS_FRAME;
+  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
 }
 
-@members {
-  private GlobalsTuple globals;
-  
-  public ReplaceConstants(TreeNodeStream input, Program p) {
-     super(input, new RecognizerSharedState());
-     assert p != null : "Must supply a valid program object.";
-     globals = new GlobalsTuple(p.getGlobals());
+@members {  
+  public static Program apply (Tree t) {
+     GlobalsTuple globals = new GlobalsTuple(((Program) t).getGlobals());
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), globals);
   }
+  
+  protected void setup(Object... args) {globals = (GlobalsTuple) args[0];}
+  
+  private GlobalsTuple globals;
 }
 
 topdown: 

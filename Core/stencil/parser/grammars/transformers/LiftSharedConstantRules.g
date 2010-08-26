@@ -32,12 +32,17 @@ options {
 }
 
 @members {	
-	public Object transform(Object t) throws Exception {
-		t = (Program) downup(t, this, "liftShared");
-		t = (Program) downup(t, this, "updateLayers");
-		return t;
-	}	
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+  
+  public Object downup(Object t) {
+    downup(t, this, "liftShared");
+    downup(t, this, "updateLayers");  
+    return t;
+  }
 
+	
 	private List<Rule> sharedConstants(stencil.parser.tree.List<Consumes> consumes) {
 		List<List<Rule>> ruleSet = allConstants(consumes);
 		Set<Rule> sharedRules = new HashSet();
@@ -80,7 +85,8 @@ options {
 
 	/**Is this the selector rule (e.g. it sets ID)?  The selector rule cannot be lifted.*/	
 	private boolean selectorRule(Rule candidate) {
-   		for (String name: TuplePrototypes.getNames(candidate.getTarget().getPrototype())) {
+	    TuplePrototype prototype = (TuplePrototype) candidate.getGenericTarget().findChild(TUPLE_PROTOTYPE);
+   		for (String name: TuplePrototypes.getNames(prototype)) {
    			if (name.equals(ParserConstants.GLYPH_ID_FIELD)) {return true;}
    		}
    		return false;

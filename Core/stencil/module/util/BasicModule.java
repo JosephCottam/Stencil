@@ -23,7 +23,7 @@ public abstract class BasicModule implements Module {
 			this.operatorData = operatorData;
 		}
 		
-		public OperatorData getLegendData() {return operatorData;} 
+		public OperatorData getOperatorData() {return operatorData;} 
 	}
 	
 	protected ModuleData moduleData;
@@ -34,7 +34,7 @@ public abstract class BasicModule implements Module {
 
 	public String getName() {return moduleData.getName();}
 	
-	/**Return legend data for the operator of the given name with the
+	/**Return meta-data for the operator of the given name with the
 	 * given specializer.
 	 * 
 	 * Will only accept what instance will accept (calls instance itself).
@@ -62,8 +62,8 @@ public abstract class BasicModule implements Module {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
-		OperatorData operatorData = getModuleData().getOperator(name);		
-		StencilOperator operator = Modules.instance(this.getClass(), operatorData);
+		OperatorData operatorData = getOperatorData(name, specializer);		
+		StencilOperator operator = Modules.instance(this.getClass(), operatorData, specializer);
 		
 		return operator;
 		
@@ -73,7 +73,7 @@ public abstract class BasicModule implements Module {
 	 * if they are not valid.
 	 *   
 	 * Defaults to only accepting specializers that match the default specializer.
-	 * Override this method to change validation behavior in both instance and getLegendData.
+	 * Override this method to change validation behavior in both instance and getOperatorData.
 	 *  
 	 * @param name
 	 * @param specializer

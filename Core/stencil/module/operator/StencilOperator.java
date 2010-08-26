@@ -84,7 +84,7 @@ public interface StencilOperator {
 	/**Retrieve the operator data for the current operator.*/ 
 	public OperatorData getOperatorData();
 	
-	/**How is this legend identified?  Legends are registered in their modules under their name.*/
+	/**How is this operator identified?  Operators are registered in their modules under their name.*/
 	public String getName();
 	
 	/**Return a new operator that is functionally identical, but with Stencil-runtime state

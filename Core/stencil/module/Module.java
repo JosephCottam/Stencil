@@ -33,7 +33,7 @@ import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 
-/**A module is a collection of related legends.
+/**A module is a collection of related operators.
  * The module interface describes the elements required
  * for a collection to managed.  The implementing class
  * is responsible for coordinating the package members
@@ -49,7 +49,7 @@ import stencil.parser.tree.Specializer;
  * mechanisms.
  */
 public interface Module {
-	/**Get an instance of the legend of the given name, instantiated
+	/**Get an instance of the operator of the given name, instantiated
 	 * with the given specializer.  Name may should not have a prefix.
 	 *
 	 * @throws IllegalArgumentException Name passed is not known by this module.
@@ -61,7 +61,7 @@ public interface Module {
 	 */
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException, IllegalArgumentException;
 
-	/**Get the meta-data about a specific legend, given the specializer.
+	/**Get the meta-data about a specific operator, given the specializer.
 	 * @throws IllegalArgumentException Name passed is not known by this module.
 	 * @throws SpecializationException Specializer passed not permitted with the given operator.
 	 * */

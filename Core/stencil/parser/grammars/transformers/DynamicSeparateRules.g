@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -16,7 +17,11 @@ options {
 }
 
 @members {
-   protected StencilTree dynamicResults(CommonTree source) {return siftRules(adaptor, (List<Rule>) source, RESULT, DYNAMIC, "Dynamic");}
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+
+  protected StencilTree dynamicResults(CommonTree source) {return siftRules(adaptor, (List<Rule>) source, RESULT, DYNAMIC, "Dynamic");}
 }
 
 topdown: ^(CONSUMES filter=. prefilter=. local=. results=. view=. canvas=.)

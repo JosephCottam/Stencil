@@ -25,30 +25,26 @@ options {
 }
 
 @members {
+  public static Program apply (Tree t, ModuleCache modules, Adapter adapter) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules, adapter);
+  }
+  
+  protected void setup(Object... args) {
+     modules = (ModuleCache) args[0];
+     adapter = (Adapter) args[1];
+     adHoc = modules.getAdHoc();
+  }
+  
 	protected MutableModule adHoc;
 	protected Adapter adapter;
 	protected ModuleCache modules;
 	protected final EncapsulationGenerator encGenerator = new EncapsulationGenerator();
 	
-	public AdHocOperators(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
-		super(input, new RecognizerSharedState());
-		assert modules != null : "Module cache must not be null.";
-		assert adapter != null : "Adapter must not be null.";
-		
-		this.modules = modules;
-		this.adHoc = modules.getAdHoc();
-		this.adapter = adapter;				
-	}
-	
-	public Program transform(Program p) {
-	   p = simpleOps(p);
-	   p = proxyOperators(p);
+	public Object downup(Object p) {	
+	   downup(p, this, "simple");
+	   proxyOperators((Program) p);
 	   return p;
 	}
-
-  private Program simpleOps(Program p) {
-    return (Program) downup(p, this, "simple");
-  }
 	
 	
 
@@ -72,7 +68,7 @@ options {
 	
 	//--------------- Proxy operator fixed-point ---------------------
 	boolean changed = true;
-	public Program proxyOperators(Program p) {
+	public Tree proxyOperators(Tree p) {
 	   while (changed) {
 	      changed = false;
 	      p = runOnce(p);
@@ -80,7 +76,7 @@ options {
 	   return p;
 	}
 	
-	private Program runOnce(Program p) {
+	private Program runOnce(Tree p) {
 	  return (Program) downup(p, this, "proxies");
 	}
 	

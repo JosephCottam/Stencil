@@ -3,6 +3,7 @@ options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
 	filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header{
@@ -21,20 +22,20 @@ options {
 	
 }
 
-@members{
-	protected ModuleCache modules;
-    
+@members{ 
+  public static ModuleCache apply (Tree t) {
+     modules = new ModuleCache();
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+     return modules;
+  }
+  
+  protected static ModuleCache modules;
+	
 	public void doImport(String name, String prefix, CommonTree spec) {
 		//TODO: handle arg list on import (currently just ignored)
 		try {modules.importModule(name, prefix);}
 		catch (Exception e) {throw new RuntimeException(String.format("Error importing \%1\$s (with prefix '\%2\$s').", name, prefix), e);} 
-	}
-	
-	public ModuleCache processImports(Object t) {
-		modules = new ModuleCache(); 
-		super.downup(t);
-		return modules;
-	}
+	}	
 }
 
 /**Build up imports (used to decide the operation type)*/

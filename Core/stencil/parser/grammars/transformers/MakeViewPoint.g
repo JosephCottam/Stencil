@@ -26,20 +26,22 @@ options {
 }
 
 @members {
- private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
- private static final MakeViewPoint INSTANCE = new MakeViewPoint(new CommonTreeNodeStream(null));
+  private static final TreeAdaptor DUPLICATOR = new StencilTreeAdapter();
+  private static Program copy;
+
+  public static Program apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+     return copy;
+  }
 
  private static final Map<String, StencilOperator> instances = new HashMap();
 
- public synchronized static Program viewPoint(Program p) {
-    //this.viewPointer = new MakeViewPoint(new CommonTreeNodeStream(program));
+  public void downup(Object p) {
      instances.clear();
-     Program copy = (Program) DUPLICATOR.dupTree(p);
-     INSTANCE.downup(copy, INSTANCE, "instantiate");
-     INSTANCE.downup(copy, INSTANCE, "change");
-     return copy;
- }
- 
+     copy = (Program) DUPLICATOR.dupTree(p);
+     downup(copy, this, "instantiate");
+     downup(copy, this, "change");
+  }
 }
 
 //instantiate new synthetic operators that point to the new tree (Instantiated operators are later used to thread values through).

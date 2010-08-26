@@ -20,6 +20,12 @@ options {
   import stencil.interpreter.guide.samplers.LayerSampler;
 }
 
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+}
+
 topdown 
   @after{
     Guide g = (Guide) retval.tree.getChild(0);

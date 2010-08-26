@@ -5,7 +5,6 @@ options {
   output = AST;
   filter = true;
   superClass = TreeRewriteSequence;
-  
 }
 
 @header{
@@ -20,34 +19,45 @@ options {
   import stencil.parser.tree.util.*;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.parser.string.util.EnvironmentProxy;
+  import stencil.parser.ParseStencil;
   import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
   import static stencil.parser.string.util.EnvironmentProxy.extend;
 }
 
 @members {
-  private ModuleCache modules;
-  
-  public NumeralizeTupleRefs(TreeNodeStream input, ModuleCache modules) {
-    super(input, new RecognizerSharedState());
-    assert modules != null : "ModuleCache must not be null.";
-    this.modules = modules;
+  public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
   }
+  
+  protected void setup(Object... args) {modules = (ModuleCache) args[0];}
+
+  private static ModuleCache modules;  
 }
+
+
+//In a more ideal world (where environment-proxy-like entity construction coud be efficienlty implemented as a few methods)
+//Maybe if we tucked reutnr prototypes into the invokeables or something.  That would take care of all chains, then only predicates and special frames would need extra work
+//topdown
+//  : ^(TARGET .*) -> ^(TARGET .*)  //Skip all tuple refs in targets
+//  | ^(r=TUPLE_REF id=ID topdown?) -> ^(TUPLE_REF numeralize($id) topdown?)
+//  | ^(TUPLE_REF r=NUMBER topdown) //No change needed
+//  | ^(TUPLE_REF NUMBER);  //No change needed
 
 topdown
 	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
-    | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)]);
+  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .?); 
 
 callTarget[EnvironmentProxy env] 
   : ^(f=FUNCTION . . ^(LIST valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(PACK valueE[env]+);    
       
 valueE[EnvironmentProxy env]
-  : ^(t=TUPLE_REF r=ID v=valueP[env.get(env.getFrameIndex($r.text))]) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] $v)
-  | (TUPLE_REF ID) => ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))])
-  | ^(t=TUPLE_REF r=NUMBER v=valueP[env.get(((StencilNumber) $r).getValue().intValue())])
-  | (TUPLE_REF NUMBER) => ^(t=TUPLE_REF r=NUMBER)
-  | .;
+  options{backtrack=true;}
+  : ^(t=TUPLE_REF r=ID v=valueP[env.get(env.getFrameIndex($r.text))]) 
+      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] $v)
+  | ^(t=TUPLE_REF r=ID)
+      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))])
+  | .; //Literals don't have tuple refs, just match and continue
     catch[Exception e] {throw new RuntimeException(String.format("Error numeralizing \%1\$s.\n\%2\$s.", $t.toStringTree(), e.toString()));}
   
       
@@ -55,8 +65,8 @@ valueE[EnvironmentProxy env]
 valueP[TuplePrototype p]
   : ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))])
   | ^(t=TUPLE_REF r=ID valueNP) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))] valueNP)
-  | ^(t=TUPLE_REF r=NUMBER valueNP) 
-  | ^(t=TUPLE_REF r=NUMBER);
+  | ^(t=TUPLE_REF r=NUMBER)
+  | ^(t=TUPLE_REF r=NUMBER valueNP); 
     catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
 
 valueNP

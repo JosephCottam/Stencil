@@ -51,6 +51,7 @@ public class TestEncapsulationGenerator extends StencilTestCase {
 	}
 	
 	public void setUp() throws Exception {
+		super.setUp();
 		TestModuleCache.initCache();
 	}
 	
@@ -68,28 +69,32 @@ public class TestEncapsulationGenerator extends StencilTestCase {
 			
 			Program program;
 			try {program  = ParseStencil.parse(source, stencil.adapters.java2D.Adapter.ADAPTER);}
-			catch (Exception e) {errors.add(name); continue;}
+			catch (Throwable e) {
+				e.printStackTrace();
+				errors.add(name); 
+				continue;
+			}
 			
 			ModuleCache modules = new ModuleCache();
 			
-			Set<StencilOperator> legends = new HashSet<StencilOperator>();
+			Set<StencilOperator> operators = new HashSet<StencilOperator>();
 			for (Python p: program.getPythons()) {
 				StencilOperator l = g.generate(p, modules.getAdHoc());
-				legends.add(l);
+				operators.add(l);
 			}				
-			assertEquals("Incorrect number of encapsulations generated.", program.getPythons().size(),legends.size());
+			assertEquals("Incorrect number of encapsulations generated.", program.getPythons().size(),operators.size());
 			
 			for (Python p: program.getPythons()) {
 				assertNotNull("Defined environment not found: " + p.getEnvironment(), g.getEnvironment(p.getEnvironment()));
-				assertNotNull("Defined python group not found: " + p.getName(), findOperator(p.getName(), legends));
+				assertNotNull("Defined python group not found: " + p.getName(), findOperator(p.getName(), operators));
 			}
 			
 			for (Python p: program.getPythons()) {
-				JythonOperator legend = findOperator(p.getName(), legends);
+				JythonOperator operator = findOperator(p.getName(), operators);
 				
 				for (PythonFacet b: p.getFacets()) {
 					if (b.getName().equals(INIT_FACET)) {continue;}//Init blocks are not transfered, just executed.
-					assertNotNull("Could not find declared python block", legend.getFacet(b.getName()));
+					assertNotNull("Could not find declared python block", operator.getFacet(b.getName()));
 				}
 			}
 		}

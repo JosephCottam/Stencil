@@ -34,6 +34,7 @@ import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
+import org.antlr.runtime.tree.TreeNodeStream;
 
 import stencil.module.ModuleCache;
 import stencil.adapters.Adapter;
@@ -86,7 +87,8 @@ public abstract class ParseStencil {
 
 	
 	
-	public static final StencilTreeAdapter TREE_ADAPTOR = new StencilTreeAdapter(); 
+	public static final StencilTreeAdapter TREE_ADAPTOR = new StencilTreeAdapter();
+	public static final TreeNodeStream TOKEN_STREAM = new CommonTreeNodeStream(TREE_ADAPTOR, null);
 	
 	public static TuplePrototype parsePrototype(String source, boolean allowEmpty) throws ProgramParseException {
 		try {
@@ -123,9 +125,7 @@ public abstract class ParseStencil {
 			parser.setTreeAdaptor(TREE_ADAPTOR);
 			StencilParser.specializer_return parserRV = parser.specializer();
 			if (parser.getNumberOfSyntaxErrors() >0) {throw new SyntaxException(parser.getNumberOfSyntaxErrors(), source);}
-			
-			validate((StencilTree) parserRV.getTree());
-			
+						
 			return (Specializer) parserRV.getTree();
 		} catch (Exception e) {
 			throw new ProgramParseException(String.format("Error parsing specializer: '%1$s'.", source), e);
@@ -168,224 +168,78 @@ public abstract class ParseStencil {
 	 */
 	public static Program parse(String source, Adapter adapter) throws ProgramParseException, Exception {
 		Program p = checkParse(source);
-		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
-		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
 
-		//Create prototype definitions for internally defined streams
-		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
-		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) liftStreams.downup(p);
+		p = LiftStreamPrototypes.apply(p);		//Create prototype definitions for internally defined streams
+		p = SeparateRules.apply(p);				//Group the operator chains
+		p = EnsureOrders.apply(p);				//Ensure the proper order blocks
 
-		//Group the operator chains
-		SeparateRules separate = new SeparateRules(treeTokens);
-		separate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) separate.downup(p);
-
-		//Ensure the proper order blocks
-		EnsureOrders orders = new EnsureOrders(treeTokens);
-		orders.setTreeAdaptor(TREE_ADAPTOR);
-		p = orders.ensureOrder(p);
-
-		//Do module imports
-		Imports imports = new Imports(treeTokens);
-		ModuleCache modules = imports.processImports(p);
+		ModuleCache modules = Imports.apply(p);	//Do module imports
 		
-		//Verify that Python operators are syntactically correct and appropriately indented
-		PreparsePython pyParse = new PreparsePython(treeTokens);
-		pyParse.downup(p);
+		PreparsePython.apply(p);				//Verify that Python operators are syntactically correct and appropriately indented
+		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
+		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
+		p = TupleRefDeLast.apply(p);			//Remove all uses of the LAST tuple reference
+		p = SpecializerDeconstant.apply(p);	//Remove references to constants in specializers
+		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
 
-		//Parse custom argument blocks
-		PrepareCustomArgs customArgs = new PrepareCustomArgs(treeTokens);
-		customArgs.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) customArgs.downup(p);
+		p = DefaultPack.apply(p);				//Add default packs where required
+		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
+		p = OperatorInstantiateTemplates.apply(p, modules);		//Remove all operator references
+		p = OperatorExplicit.apply(p);		
+		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
+		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
 
-		//Convert filters to standard rule chains
-		Predicate_Expand predicate_expand = new Predicate_Expand(treeTokens);
-		predicate_expand.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) predicate_expand.downup(p);
-		
-		//Ensure that all tuple references have a frame reference
-		TupleRefDeLast deLast = new TupleRefDeLast(treeTokens);
-		deLast.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) deLast.downup(p);
-		
-		//Add default specializers where required
-		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
-		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) defaultSpecializers.downup(p);
 
-		//Add default packs where required
-		DefaultPack defaultPack = new DefaultPack(treeTokens);
-		defaultPack.setTreeAdaptor(TREE_ADAPTOR);
-		defaultPack.downup(p);
-
+		p = AnnotateEnvironmentSize.apply(p);			//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
+		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
+		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 
+		NoOperatorReferences.apply(p);					//Validate the ad-hocs are all created
 		
-		//Converting all operator defs to template/ref pairs
-		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
-		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opToTemplate.downup(p);		
-		treeTokens = new CommonTreeNodeStream(p);	//Must be re-done because we make a new "Program" node in OperatorToOpTemplate
-		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
-		
-		//Remove all operator references
-		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
-		opInstTemplates.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opInstTemplates.downup(p);
-
-		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
-		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExplicit.downup(p);		
-
-		OperatorInlineSimple inlineSimpleOp = new OperatorInlineSimple(treeTokens);
-		inlineSimpleOp.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) inlineSimpleOp.transform(p);		
-		
-		//Expand operatorDefs to include query and stateID
-		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
-		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExtendFacets.transform(p);
-
-		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
-		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
-		envSize.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) envSize.downup(p);
-		
-		//Create ad-hoc operators
-		ElementToLayer deElement = new ElementToLayer(treeTokens);
-		deElement.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) deElement.downup(p);
-		
-		
-		//Create ad-hoc operators
-		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-		adHoc.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) adHoc.transform(p);
-		
-		//Validate the ad-hocs are all created
-		NoOperatorReferences noRefs = new NoOperatorReferences(treeTokens);
-		noRefs.downup(p);
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-		GuideDefaultSelector guideSelector = new GuideDefaultSelector(treeTokens);
-		guideSelector.setTreeAdaptor(TREE_ADAPTOR);
-		guideSelector.downup(p);
-		
-		//Distinguish between guide types
-		GuideDistinguish guideDistinguish  = new GuideDistinguish(treeTokens, TREE_ADAPTOR);
-		guideDistinguish.downup(p);
-		
-		//Ensure that auto-guide requirements are met
-		GuideInsertSeedOp ensure = new GuideInsertSeedOp(treeTokens,modules); 
-		ensure.setTreeAdaptor(TREE_ADAPTOR);		
-		p = (Program) ensure.transform(p);
+		p = GuideDefaultSelector.apply(p); 
+		p = GuideDistinguish.apply(p);		//Distinguish between guide types		
+		p = GuideInsertSeedOp.apply(p, modules);		//Ensure that auto-guide requirements are met
+
 
 		//Add default specializers to all function nodes (cover things recently added)
-		defaultSpecializers.BLEND = false;
-		defaultSpecializers.downup(p);
+		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
+		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
+
 		
-		//Prime tree nodes with operators from the modules cache
-		SetOperators set = new SetOperators(treeTokens, modules);
-		set.setTreeAdaptor(TREE_ADAPTOR);
-		set.downup(p);
-		
-		GuideTransfer ag = new GuideTransfer(treeTokens, modules);
-		ag.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) ag.transform(p);
-		
-		GuideLiftGenerator gLiftGenerator = new GuideLiftGenerator(treeTokens);
-		gLiftGenerator.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) gLiftGenerator.downup(p);
+		p = GuideTransfer.apply(p, modules);		
+		p = GuideLiftGenerator.apply(p);
+		p = GuideDefaultRules.apply(p);
 
-		GuideDefaultRules gDefaultRules = new GuideDefaultRules(treeTokens);
-		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) gDefaultRules.downup(p);
+		p = DefaultSpecializers.apply(p, modules, adapter, false); 
+		p = SetOperators.apply(p, modules);
 
-		defaultSpecializers.BLEND = false;
-		defaultSpecializers.downup(p);
-
-		SetOperators set2 = new SetOperators(treeTokens, modules);
-		set2.setTreeAdaptor(TREE_ADAPTOR);
-		set2.downup(p);
-
-		GuideSampleOp gSampleOp = new GuideSampleOp(treeTokens);
-		gDefaultRules.setTreeAdaptor(TREE_ADAPTOR);
-		gSampleOp.downup(p);
-
-		GuideExtendQuery guideExtend = new GuideExtendQuery(treeTokens);
-		guideExtend.setTreeAdaptor(TREE_ADAPTOR);
-		guideExtend.downup(p);
-
-		GuideClean guideClean = new GuideClean(treeTokens);
-		guideClean.setTreeAdaptor(TREE_ADAPTOR);
-		guideClean.downup(p);
+		GuideSampleOp.apply(p);
+		p = GuideExtendQuery.apply(p);
+		p = GuideClean.apply(p);
 
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 		
-		OperatorStateQuery osq = new OperatorStateQuery(treeTokens);
-		osq.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) osq.downup(p);
+		p = OperatorStateQuery.apply(p);
 		
 		//BEGIN DYNAMIC BINDING ----------------------------------------------------------------------------------
 
-		DynamicSeparateRules dynamicSeparate = new DynamicSeparateRules(treeTokens);
-		dynamicSeparate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) dynamicSeparate.downup(p);
-		
-		DynamicToSimple dynamicToSimple = new DynamicToSimple(treeTokens);
-	    dynamicToSimple.setTreeAdaptor(TREE_ADAPTOR);
-	    p = (Program) dynamicToSimple.downup(p);
- 
-	    DynamicCompleteRules completeDynamics = new DynamicCompleteRules(treeTokens);
-	    completeDynamics.setTreeAdaptor(TREE_ADAPTOR);
-	    p = (Program) completeDynamics.transform(p);
-	    
+		p = DynamicSeparateRules.apply(p);
+		p = DynamicToSimple.apply(p);
+	    p = DynamicCompleteRules.apply(p);
 	    
 		//END DYNAMIC BINDING ----------------------------------------------------------------------------------
 	    
-		TupleRefChain trc = new TupleRefChain(treeTokens);
-		trc.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) trc.downup(p);
-
-		RemoveOpTemplates removeTemplates = new RemoveOpTemplates(treeTokens);
-		removeTemplates.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) removeTemplates.downup(p);
-		
-		//Ensure that all tuple references have a frame reference
-		FrameTupleRefs frameRefs = new FrameTupleRefs(treeTokens, modules, p);
-		frameRefs.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) frameRefs.downup(p);
-
-		//Move all constant rules up to the defaults section so they are only evaluated once.
-		ReplaceConstants consts = new ReplaceConstants(treeTokens, p);
-		consts.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) consts.downup(p);
-		
-		//Numeralize all tuple references
-		NumeralizeTupleRefs numeralize = new NumeralizeTupleRefs(treeTokens, modules);
-		numeralize.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) numeralize.downup(p);		
-
-		//Improve performance of filter rules by removing all the scaffolding
-		Predicate_Compact predicate_compact = new Predicate_Compact(treeTokens);
-		predicate_compact.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) predicate_compact.downup(p);
-		
-		UnifyTargetTypes unify = new UnifyTargetTypes(treeTokens);
-		unify.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) unify.downup(p);
-		
-		//Since some transformations change chain lengths, this must be re-run.
-		p = (Program) envSize.downup(p);
-
-		//Move all constant rules up to the defaults section so they are only evaluated once.
-		ReplaceConstantOps constOps = new ReplaceConstantOps(treeTokens, modules);
-		constOps.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) constOps.transform(p);
-		
-		//Move all constant rules up to the defaults section so they are only evaluated once.
-		LiftSharedConstantRules sharedLifter = new LiftSharedConstantRules(treeTokens);
-		sharedLifter.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) sharedLifter.transform(p);
+		p = TupleRefChain.apply(p);
+		p = RemoveOpTemplates.apply(p);
+		p = FrameTupleRefs.apply(p, modules);				//Ensure that all tuple references have a frame reference
+		p = ReplaceConstants.apply(p);  					//Replace all references to CONST values with the actual value
+		p = NumeralizeTupleRefs.apply(p, modules); 			//Numeralize all tuple references
+		p = Predicate_Compact.apply(p);						//Improve performance of filter rules by removing all the scaffolding		
+		p = UnifyTargetTypes.apply(p);
+		p = AnnotateEnvironmentSize.apply(p);				//Since some transformations change chain lengths, this must be re-run.
+		p = ReplaceConstantOps.apply(p, modules);			//Evaluate constant rules, propagate results out		
+		p = LiftSharedConstantRules.apply(p);				//Move all constant rules up to the defaults section so they are only evaluated once.
 
 		validate(p);
 		
@@ -394,31 +248,15 @@ public abstract class ParseStencil {
 	
 	
 	//Run common validators.
-	private static void validate(StencilTree t) {
+	private static void validate(Tree p) {
 		try {
-			CommonTreeNodeStream treeTokens =new CommonTreeNodeStream(t);
-	
-			SpecializerValidator specializer = new SpecializerValidator(treeTokens);
-			specializer.downup(t);
-	
-			FullNumeralize numeralize = new FullNumeralize(treeTokens);
-			numeralize.downup(t);
-			
-			StreamDeclarationValidator stream = new StreamDeclarationValidator(treeTokens);
-			stream.downup(t);
-			
-			AllInvokeables invokeables = new AllInvokeables(treeTokens);
-			invokeables.downup(t);
-	
-			
-			TargetMatchesPack targetPack = new TargetMatchesPack(treeTokens);
-			targetPack.downup(t);
-
-			OperatorPrefilter opPrefilter = new OperatorPrefilter(treeTokens);
-			opPrefilter.downup(t);
-			
-			MapFoldBalance mapFold = new MapFoldBalance(treeTokens);
-			mapFold.downup(t);
+			SpecializerValidator.apply(p);
+			FullNumeralize.apply(p);
+			StreamDeclarationValidator.apply(p);			
+			AllInvokeables.apply(p);
+			TargetMatchesPack.apply(p);
+			OperatorPrefilter.apply(p);
+			MapFoldBalance.apply(p);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {e.printStackTrace();}

@@ -4,6 +4,7 @@ options {
   ASTLabelType = CommonTree;  
   output = AST;
   filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -15,6 +16,11 @@ options {
   import stencil.parser.tree.*;
 }
 
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+}
 
 topdown: ^(c=CALL_CHAIN ct=callTarget[0] .?) //Will accept a call chain with or without existing size annotation
 			-> ^(CALL_CHAIN callTarget ^(NUMBER[Integer.toString($ct.depth)]));

@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -25,19 +26,20 @@ options {
 }
 
 @members{
-  protected ModuleCache modules;
-  protected Adapter adapter;
-  
-  public boolean BLEND = true;
-    
-  public DefaultSpecializers(TreeNodeStream input, ModuleCache modules, Adapter adapter) {
-    super(input, new RecognizerSharedState());
-    assert modules != null : "ModuleCache must not be null.";
-    assert adapter != null : "Adaptor must not be null.";
-    this.modules = modules;
-    this.adapter = adapter;    
+  public static Program apply (Tree t, ModuleCache modules, Adapter adapter, boolean blend) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules, adapter, blend);
   }
 
+  protected void setup(Object... args) {
+     modules = (ModuleCache) args[0];
+     adapter = (Adapter) args[1];
+     blend = (Boolean) args[2];
+  }
+  
+  protected ModuleCache modules;
+  protected Adapter adapter;  
+  protected boolean blend;
+  
 
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private Specializer getDefault(Specializer spec) {
@@ -108,4 +110,4 @@ options {
 topdown
   options{backtrack=true;}
   : ^(s=SPECIALIZER DEFAULT) -> {getDefault((Specializer) s)}
-  |{BLEND}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};
+  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};

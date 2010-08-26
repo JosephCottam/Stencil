@@ -8,7 +8,6 @@ import static stencil.parser.ParserConstants.*;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototypes;
-import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
@@ -32,13 +31,7 @@ public class JythonOperator implements StencilOperator {
 		
 	public String getName() {return operatorName;}
 
-	/**What is the legend data object for this encapsulation? 
-	 * This is not stored internally, so updates must be acquired by invoking
-	 * this method again.
-	 *
-	 * @return LegendData object reflecting the current state of the Jython Legend
-	 * @throws SpecializationException
-	 */
+	/**What is the meta data for this encapsulation?*/
 	public OperatorData getOperatorData() {
 		return operatorData;		
 	}
@@ -54,7 +47,7 @@ public class JythonOperator implements StencilOperator {
 	public Invokeable<Tuple> getFacet(String name) throws IllegalArgumentException {
 		if (invokeables.containsKey(name)) {return invokeables.get(name);}
 		if (name.equals("query")) {return invokeables.get("map");}	//HACK: Default to 'map' if 'query' wasn't found.
-		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in legend %2$s", name, operatorName));
+		throw new IllegalArgumentException(String.format("Method named '%1$s' not know in operator %2$s", name, operatorName));
 	}
 	
 	//TODO: Can we do something with all of the encapsulations to duplicate them and support duplicate?

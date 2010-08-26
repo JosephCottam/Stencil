@@ -34,33 +34,35 @@ options {
   import stencil.module.util.*;
   import stencil.module.operator.util.Invokeable;
   import stencil.module.operator.StencilOperator;
+  import stencil.interpreter.guide.SeedOperator;
   
   import static stencil.module.util.OperatorData.TYPE_CATEGORIZE;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.STATE_ID_FACET;
-  import static stencil.parser.string.Utilities.*;
+  import static stencil.parser.string.util.Utilities.*;
 }
 
 @members{
+  public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
+
+  public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
+  }
+  
 	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();
 	protected ModuleCache modules;
- 
-	public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
-    
-	public GuideTransfer(TreeNodeStream input, ModuleCache modules) {
-		super(input, new RecognizerSharedState());
-		this.modules = modules;
-	}
-		
-	public Program transform(Program p) {
-		p = (Program) downup(p, this, "buildMappings");
-		p = (Program) downup(p, this, "transferMappings");
-		p = (Program) downup(p, this, "copyQuery");
-		p = (Program) downup(p, this, "trimGuide");
-		p = (Program) downup(p, this, "renameMappingsDown");
-		return p;
-	}	
-    
+
+  protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
+  
+  public Object downup(Object p) {
+    downup(p, this, "buildMappings");
+    downup(p, this, "transferMappings");
+    downup(p, this, "copyQuery");
+    downup(p, this, "trimGuide");
+    downup(p, this, "renameMappingsDown");
+    return p;
+  }
+
     private String key(Tree selector) {
       Selector sel=(Selector) selector;
       List<Id> path = sel.getPath();
@@ -81,8 +83,7 @@ options {
       if (tree instanceof Pack) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
       Function f = (Function) tree;
 
-      //TODO: This is a crapy test for the sample operator...really needs to be fixed to something that can't be confused with user input
-      if (f.getText().startsWith("Echo")) {return (Tree) adaptor.dupTree(f);}
+      if (f.getTarget().getOperator() instanceof SeedOperator) {return (Tree) adaptor.dupTree(f);}
       else {return trimCall(f.getCall());}
    }
     	

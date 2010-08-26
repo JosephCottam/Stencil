@@ -17,18 +17,21 @@ options {
   import stencil.module.operator.util.Invokeable;
   import stencil.module.util.FacetData;
   import stencil.module.util.OperatorData;
-  import static stencil.parser.string.Utilities.stateQueryList;
+  import static stencil.parser.string.util.Utilities.stateQueryList;
   import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
 @members {
-  public Object transform(Object t) {
-    t = downup(t, this, "changeType");
-    t = downup(t, this, "convert");
-    t = downup(t, this, "toQuery");
-    return t;
-  } 
-
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+  
+  public Program downup(Object t) {
+    downup(t, this, "changeType");
+    downup(t, this, "convert");
+    downup(t, this, "toQuery");
+    return (Program) t;
+  }  
    private String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}       
 }
 

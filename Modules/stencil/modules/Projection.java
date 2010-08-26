@@ -308,35 +308,12 @@ public class Projection extends BasicModule {
 	public Projection(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (name.equals("Count")) {
-			return;
-		} else {
-			super.validate(name, specializer);
-		}
-	}
-	
-	public StencilOperator instance(String name, Specializer specializer)
-			throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperator(name);
 		Range r = new Range(specializer.get(Specializer.RANGE));
 		Split s = new Split(specializer.get(Specializer.SPLIT));
-		
 		if (!r.isFullRange() || !s.isVoid())  {
 			throw new SpecializationException(MODULE_NAME, name, specializer);
 		}
-		
-		if (name.equals("Index")) {
-			return new Index(operatorData);
-		} else if (name.equals("HeatScale")) {
-			 return new HeatScale(operatorData, specializer);
-		} else if (name.equals("Count")) {
-			return new Count(operatorData);
-		} else if (name.equals("Counter")) {
-			return new Counter(operatorData);
-		} else if (name.equals("Rank")) {
-			return new Rank(operatorData, specializer);
-		}
-		
-		throw new IllegalArgumentException("Name not known : " + name);
+
+		super.validate(name, specializer);
 	}
 }

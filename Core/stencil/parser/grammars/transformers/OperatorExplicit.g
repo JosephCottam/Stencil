@@ -24,12 +24,16 @@ options {
   import stencil.module.operator.util.Invokeable;
   import stencil.module.util.FacetData;
   import stencil.module.util.OperatorData;
-  import static stencil.parser.string.Utilities.*;
+  import static stencil.parser.string.util.Utilities.*;
   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 }
 
 @members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+
    /**Does the name appear as an operator def/proxy/ref?*/
    private boolean covered(CommonTree function) {
 	      Program program = (Program) function.getAncestor(PROGRAM);

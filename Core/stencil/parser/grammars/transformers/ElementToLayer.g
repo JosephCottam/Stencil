@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -11,9 +12,14 @@ options {
   * TODO: When elements get special treatment in operator creation, retain the element label a little longer.
   **/
   package stencil.parser.string;
+  
+  import stencil.parser.tree.Program;
 }
 
 @members{
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
 
 topdown

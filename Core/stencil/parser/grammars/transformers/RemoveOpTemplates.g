@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -15,9 +16,14 @@ options {
  */
 
   package stencil.parser.string;
-	
-  import stencil.parser.tree.*;
-  import static stencil.parser.string.Utilities.genSym;
+  
+  import stencil.parser.tree.Program;
+}
+
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
                 
 bottomup:

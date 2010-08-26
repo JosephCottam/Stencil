@@ -1,4 +1,4 @@
-  tree grammar GuideInsertSeedOp;
+tree grammar GuideInsertSeedOp;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = CommonTree;	
@@ -33,11 +33,27 @@ options {
    import static stencil.interpreter.guide.Samplers.CATEGORICAL;
    import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
+   
+   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
+   import static stencil.parser.string.util.Utilities.genSym;
 	
    //TODO: Extend so we can handle more than the first field in a mapping definition
 }
 
 @members {
+  public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
+  }
+    
+  protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
+  
+  public Object downup(Object t) {
+    downup(t, this, "listRequirements");
+    downup(t, this, "replaceCompactForm");    /**Replace the auto-categorize operator.**/
+    downup(t, this, "ensure");  /**Make sure that things which need guides have minimum necessary operators.*/    
+    return t;
+  }
+
   private static final String SEED_PREFIX = "seed.";
 
   private static final boolean isCategorical(Specializer spec) {
@@ -49,47 +65,6 @@ options {
 
   //Mapping from requested guides to descriptor construction strategy.  This is populated by the 'build' pass
   protected HashMap<String, Specializer> requestedGuides = new HashMap();
-
-    
-	public GuideInsertSeedOp(TreeNodeStream input, ModuleCache modules) {
-		super(input, new RecognizerSharedState());
-		assert modules != null : "Module cache must not be null.";
-		this.modules = modules;
-	}
-
-  public Object transform(Object t) throws Exception {
-		build(t);
-		t = replace(t);
-		t = ensure(t);
-		return t;
-	}	
-
-	/**Build a list of things that need guides.**/
-	private void build(Object t) {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return listRequirements(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    downup(t, down, up);
-    }
-    
-    /**Replace the auto-categorize operator.**/
-  private Object replace(Object t) throws Exception {
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return replaceCompactForm(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    Object r = downup(t, down, up);
-		return r;
-  }
-    
-    /**Make sure that things which need guides have minimum necessary operators.
-     *
-     *@throws Exception Not all requested guides are found for ensuring
-     */
-    private Object ensure(Object t) throws Exception {
-		    fptr down =	new fptr() {public Object rule() throws RecognitionException { return ensure(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    Object r = downup(t, down, up);
-   	    return r;
-    }
-    
     
     private String key(Selector s) {
       List<Id> path = s.getPath();
@@ -109,8 +84,6 @@ options {
     }
     
     
-    private String key(Tree layer, Tree att) {return key(layer.getText(), att.getText());}
-    private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
 	  private String key(String layer, String attribute) {
      	MultiPartName att = new MultiPartName(attribute);
     	String key= layer + BIND_OPERATOR + att.getName();	//Trim to just the attribute name
@@ -136,9 +109,9 @@ options {
            String operatorName;
       
       if (spec == null || isCategorical(spec)) {
-        operatorName = "EchoCategorize";
+        operatorName = "SeedCategorize";
       } else {
-        operatorName = "EchoContinuous";
+        operatorName = "SeedContinuous";
       }
       
       return String.format("\%1\$s.\%2\$s", operatorName, MAP_FACET);
@@ -212,8 +185,8 @@ listRequirements: ^(GUIDE_DIRECT ^(GUIDE type=. spec=. sel=. actions=.))
 
 //Replace the #-> with an echo operator...
 replaceCompactForm:
- ^(f=FUNCTION s=. a=. GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a DIRECT_YIELD ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD $t));  
+ ^(f=FUNCTION s=. a=. gy=GUIDE_YIELD t=.) ->
+		^(FUNCTION $s $a DIRECT_YIELD[$gy.text] ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] $t));  
 		
 ensure:
   ^(c=CALL_CHAIN t=. d=.)
@@ -222,6 +195,6 @@ ensure:
 		         ^(FUNCTION[selectOperator($t)] 
                 {spec($t)} 
                 {echoArgs($t)} 
-                DIRECT_YIELD 
+                DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
                 $t)
             $d);

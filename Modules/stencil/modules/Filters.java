@@ -76,6 +76,7 @@ public class Filters extends BasicModule {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 		
+		//TODO: Wrap negated into the specializer to eliminate this INSTANCE method...
 		if(name.equals("RE")) {
 			return new RegExp(operatorData, specializer, false);
 		} else if (name.equals("NRE")) {

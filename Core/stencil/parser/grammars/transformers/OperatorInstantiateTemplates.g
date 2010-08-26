@@ -1,5 +1,4 @@
 tree grammar OperatorInstantiateTemplates;
-
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;
@@ -19,18 +18,13 @@ options {
 }
 
 @members{
-  private Program program;
-  private ModuleCache modules;
-  
-  public OperatorInstantiateTemplates(TreeNodeStream input, ModuleCache modules) {
-    super(input, new RecognizerSharedState());
-    this.modules = modules;
-    Object p = input.getTreeSource();
-    
-    assert p instanceof Program : "Input source must be a Program tree.";
-    this.program = (Program) p;
+  public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
   }
+  
+  protected void setup(Object... args) {modules = (ModuleCache) args[0];}
 
+  private ModuleCache modules;
 
   private StencilTree instantiate(OperatorReference opRef) {
     OperatorTemplate t = findTemplate(opRef);
@@ -41,6 +35,7 @@ options {
   
   private OperatorTemplate findTemplate(CommonTree opRef) {
     OperatorBase base = (OperatorBase) opRef.getFirstChildWithType(OPERATOR_BASE);
+    Program program = (Program) opRef.getAncestor(PROGRAM);
     String name = base.getName();  
 
     for (OperatorTemplate t:program.getOperatorTemplates()) {

@@ -16,12 +16,7 @@ import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 public class TreeView {
 	public static String HEADER_FLAG = "-header";
 	
-	public static String test = "LEGEND Justify(max, current) -> (just)\n" +
-//								"(current = 0) => just : CENTER\n" +
-//								"(current = divide(max, 2) -> (div)) => just : CENTER\n" +
-//								"(current < divide(max, 2) -> (div)) => just : LEFT\n" +
-								"(current > divide(max, 2) -> (div)) => just : RIGHT\n" +
-								"ALL => just: CENTER";
+	public static String test = "";
 
 	//Arguments: <StencilProperties> [-header] <SourceFile>
 	//	If header is indicated, will treat source file as if it has a stencil explore header
@@ -56,6 +51,7 @@ public class TreeView {
 		stencil.Configure.loadProperties(props);
 		tree = stencil.parser.ParseStencil.parse(text, Adapter.ADAPTER);
 		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
+		f.setSize(500, 800);
 		f.setVisible(true);
 		
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

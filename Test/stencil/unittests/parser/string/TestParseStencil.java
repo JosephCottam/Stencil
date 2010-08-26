@@ -16,15 +16,15 @@ public class TestParseStencil extends StencilTestCase {
 		Program p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);
 
-		assertEquals(2, p.getLayers().size());
+		assertEquals("Incorrect number of layers found.", 2, p.getLayers().size());
 		
 		
 		p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);
 		assertNotNull(p);
 		
-		assertEquals(2, p.getLayers().size());
-		assertEquals(3, p.getLayers().get(1).getGroups().size());
-		assertEquals(4, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
+		assertEquals("Incorrect number of layers found.", 2, p.getLayers().size());
+		assertEquals("Incorrect number of layers groups found.", 3, p.getLayers().get(1).getGroups().size());
+		assertEquals("Incorrect number or rules found, defaults likely not properly identified.", 4, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
 	}
 
 	public void testParseNull() throws Exception {

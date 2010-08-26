@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	filter = true;
   output = AST;	
+  superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -15,7 +16,9 @@ options {
 }
 
 @members {
-
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
 
 topdown: 

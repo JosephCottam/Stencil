@@ -4,6 +4,7 @@ options {
     ASTLabelType = CommonTree;	
     output = AST;
     filter = true;
+    superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -15,7 +16,12 @@ options {
 	import static stencil.parser.string.StencilParser.*;
 }
 
-	 	 
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+}
+
 //Remove individual types
 topdown
     : ^(LOCAL s+=.*)     -> ^(TARGET["Local"] $s*)

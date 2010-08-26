@@ -10,8 +10,8 @@ defaults:
     - {name: stateID, function: false, type: OPAQUE, prototype: !proto "VALUE"}
     
 operators:
-  - name: EchoCategorize
-  - name: EchoContinuous
+  - name: SeedCategorize
+  - name: SeedContinuous
   - name: Rename
     facets:
       - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}

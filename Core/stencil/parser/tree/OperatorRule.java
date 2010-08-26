@@ -37,9 +37,9 @@ import stencil.tuple.Tuple;
 import stencil.tuple.TupleAppender;
 
 
-/**A legend action is a filter plus a rule.
+/**Filter + rule = operatorRule.
  *
- * If you think of a simple legend as a switch statement,
+ * If you think of an operator as a switch statement,
  * this is a single case in that switch: Test + body == filter + callBlock
  *
  * */
@@ -51,10 +51,10 @@ public class OperatorRule extends StencilTree {
 	public List<Predicate> getFilters() {return (List<Predicate>) getChild(0);}
 	public List<Rule> getRules() {return (List<Rule>) getChild(1);}
 
-	/**Legend actions 'match' when all of their predicates do.*/
+	/**Rules 'match' when all of their predicates do.*/
 	public boolean matches(Environment env) {return Predicate.matches(getFilters(), env);}
 
-	/**Apply the rules of this legend action to the passed tuple.
+	/**Apply the simple rule of this operator rule to the passed tuple.
 	 * This is independent of 'matches', but should only be invoked
 	 * if matches passes.
 	 *

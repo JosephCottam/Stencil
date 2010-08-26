@@ -32,7 +32,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
 public interface DisplayLayer<T extends Glyph>  {
-	/**Name of the method that should be invoked by clients wanting to use this legend*/
+	/**Name of the method that should be invoked by clients wanting to use this operator*/
 	public static final String FIND_METHOD  = "find";
 	public static final String MAKE_METHOD = "make";
 	public static final String MAKE_OR_FIND_METHOD ="makeOrFind";

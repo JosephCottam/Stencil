@@ -4,12 +4,21 @@ options {
   ASTLabelType = CommonTree;	
   filter = true;
   output = AST;	
+  superClass = TreeRewriteSequence;
 }
 
 @header {
   /**Remove compiler annotations that are of no significance for runtime.*/
   
-  package stencil.parser.string; 
+  package stencil.parser.string;
+  
+  import stencil.parser.tree.Program; 
+}
+
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
 
 bottomup

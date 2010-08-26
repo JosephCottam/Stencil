@@ -13,32 +13,24 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
-
 }
 
 @members{
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+    
+  public Program downup(Object t) {
+    newOrder = (Order) adaptor.create(ORDER, "Order");
+    adaptor.addChild(newOrder, adaptor.create(LIST, "Streams"));
+    downup(t, this, "gatherStreams");
+    return (Program) downup(t, this, "fixOrder");     
+  }
+
 	private Order newOrder;
 	private void addName(String name) {
 		adaptor.addChild(newOrder.getChild(0), adaptor.create(ID, name));
 	}
-	
-	public Program ensureOrder(Program p) {
-		//Prep new-order node
-		newOrder = (Order) adaptor.create(ORDER, "Order");
-		adaptor.addChild(newOrder, adaptor.create(LIST, "Streams"));
-		
-		//Gather Streams
-		fptr down =	new fptr() {public Object rule() throws RecognitionException { return gatherStreams(); }};
-   	    fptr up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-   	    downup(p, down, up);
-
-		//Ensure Orders
-		down =	new fptr() {public Object rule() throws RecognitionException { return fixOrder(); }};
-   	    up = new fptr() {public Object rule() throws RecognitionException { return bottomup(); }};
-		return (Program) downup(p, down, up);
-	}
-		
-
 }
 
 gatherStreams

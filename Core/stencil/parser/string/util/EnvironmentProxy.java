@@ -141,7 +141,9 @@ public final class EnvironmentProxy {
 		String label = pass.getText();
 		Function call = (Function) callTree;
 		TuplePrototype prototype = getPrototype(call, modules);
-		return env.push(label, prototype);
+		EnvironmentProxy p = env.push(label, prototype);
+//		System.out.println(p + "\n\n");
+		return p;
 	}
 
 	/**Create a new Proxy environment from a default environment.
@@ -199,19 +201,19 @@ public final class EnvironmentProxy {
 
 	final EnvironmentProxy parent;    
 
-	final TuplePrototype prototype;
+	private final TuplePrototype prototype;
 
-
-	final String label;
+	private final String label;
 
 	public EnvironmentProxy (String label, TuplePrototype prototype) {this(label, prototype, null);}
 
+	public String getLabel() {return label;}
+	
 	EnvironmentProxy (String label, TuplePrototype prototype, EnvironmentProxy parent) {
 		this.label = label;
 		this.prototype = prototype;
 		this.parent = parent;
 	}
-
 	
 	public int currentIndex() {
 		int index =0;
@@ -229,6 +231,18 @@ public final class EnvironmentProxy {
 			return true;
 		}
 		catch (FrameException e) {return false;}
+	}
+	
+	public static final String IS_LABEL = "***IS A LABEL*** (Just though you should know).";
+	
+	public String frameNameFor(String name) {
+		if (prototype.contains(name)) {return label;}
+		if (label != null && label.equals(name)) {return IS_LABEL;}
+		if (parent == null) {throw new FrameException(name, label, prototype);}
+		try {return parent.frameNameFor(name);}
+		catch (FrameException e) {
+			throw new FrameException(name, label, prototype, e);
+		}
 	}
 	
 	public int frameRefFor(String name) {

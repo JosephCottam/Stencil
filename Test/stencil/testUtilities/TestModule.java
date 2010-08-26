@@ -52,7 +52,7 @@ public class TestModule implements Module {
 				return new InvokeableOperator(name,  od, inv);
 			}
 		} catch (Exception e) {throw new RuntimeException(e);}
-		throw new RuntimeException("No such legend " + name);
+		throw new RuntimeException("No such operator " + name);
 	}
 
 	public String getName() {return MODULE_DATA.getName();}
@@ -60,7 +60,7 @@ public class TestModule implements Module {
 	public OperatorData getOperatorData(String name, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
 		if (name.equals("FilterFail")) {return MODULE_DATA.getOperator("FilterFail");}
-		throw new IllegalArgumentException("No legend of name " + name);
+		throw new IllegalArgumentException("No operator of name " + name);
 	}
 
 }

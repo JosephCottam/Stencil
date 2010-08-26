@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -11,7 +12,8 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.parser.string.ValidationException;
-  
+  import stencil.parser.ParseStencil;
+  import stencil.parser.string.TreeFilterSequence;
 }
 
 @members {
@@ -19,10 +21,12 @@ options {
   	public ReferenceNotRemovedException(String name, String base) {
   		super(String.format("Operator \%1\$s not instantiated (base \%2\$s).", name, base));
   	}
-  }  
+  }
+
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
-
-
 
 topdown
  : ^(r=OPERATOR_REFERENCE base=. spec=.) {throw new ReferenceNotRemovedException($r.getText(), $base.getText());};

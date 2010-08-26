@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -21,6 +22,10 @@ options {
 }
 
 @members {
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+  
   private static final class PythonValidationException extends ValidationException {
   	public PythonValidationException(PythonFacet facet, String message) {
   		super("Error parsing \%1\$s.\%2\$s. \%3\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName(), message);

@@ -64,14 +64,10 @@ import stencil.parser.tree.Specializer;
  * and may include further details in nested exceptions.
  */
 public class SpecializationException extends Exception {
-	public SpecializationException(ModuleData module, String legend, Specializer specializer) {this(module.getName(), legend, specializer, "", null);}
+	public SpecializationException(ModuleData module, String operator, Specializer specializer) {this(module.getName(), operator, specializer, "", null);}
 
-	/**
-	 * @param legendName Name of method trying to specialize
-	 * @param specializer Specializer employed
-	 */
-	public SpecializationException(String module, String legend, Specializer specializer) {this(module, legend, specializer, "", null);}
-	public SpecializationException(String module, String legend, Specializer specializer, String message) {this(module, legend, specializer, message, null);}
+	public SpecializationException(String module, String operator, Specializer specializer) {this(module, operator, specializer, "", null);}
+	public SpecializationException(String module, String operator, Specializer specializer, String message) {this(module, operator, specializer, message, null);}
 
 	/**
 	 * @param name Name of method trying to specialize

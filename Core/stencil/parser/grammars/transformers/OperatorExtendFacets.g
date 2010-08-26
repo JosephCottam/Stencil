@@ -20,27 +20,22 @@ options {
   import stencil.module.operator.util.Invokeable;
   import stencil.module.util.FacetData;
   import stencil.module.util.OperatorData;
-  import static stencil.parser.string.Utilities.*;
+  import static stencil.parser.string.util.Utilities.*;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.MAP_FACET;
   import static stencil.parser.ParserConstants.STATE_ID_FACET;
 }
 
 @members {
-	public Object transform(Object t) {
-		t = replicate(t);
-		t = toQuery(t);
-		return t;
-	}	
-
-	 //Build a mapping from the layer/attribute names to mapping trees
-	 private Object replicate(Object t) {
-	   return downup(t, this, "replicate");
-	 }
-	 
-	 private Object toQuery(Object t) {
-	   return downup(t, this, "toQuery");
-	 }
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+    
+  public Object downup(Object t) {
+    downup(t, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees
+    downup(t, this, "toQuery");
+    return t;
+  }
 }
 
 //Extend the operator definition to include the required facets 

@@ -196,9 +196,9 @@ public class Temp extends BasicModule {
 		private final STYLE style;
 		
 		private int idx=0;
-		private boolean goingUp;
+		private boolean goingUp = true;
 		
-		protected Oscillate(OperatorData opData, Specializer spec) {
+		public Oscillate(OperatorData opData, Specializer spec) {
 			super(opData);
 			style = STYLE.valueOf(Converter.toString(spec.get(STYLE_KEY)).toUpperCase());
 		
@@ -280,16 +280,7 @@ public class Temp extends BasicModule {
 
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		try {
-			StencilOperator op;
-			if (name.equals("Scale")) {
-				op = new Scale(getOperatorData(name, specializer), specializer);
-			} else if (name.equals("Partition")) {
-				op = new Partition(getOperatorData(name, specializer), specializer);
-			} else if (name.equals("Oscillate")) {
-				op = new Oscillate(getOperatorData(name, specializer), specializer);
-			} else {
-				op = super.instance(name, specializer);
-			}
+			StencilOperator op = super.instance(name, specializer);
 			
 			Split split = new Split(specializer.get(SPLIT));
 			return SplitHelper.makeOperator(split, op);

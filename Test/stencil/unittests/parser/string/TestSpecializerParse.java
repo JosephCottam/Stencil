@@ -61,6 +61,19 @@ public class TestSpecializerParse extends TestCase {
 		
 		testPasses(specializers);
 	}
+	
+	//ID arguments can refer to constants.  Right now, just see if they can be parsed.
+	public void testIDArgs() throws Exception {
+		String[] specializers = new String[] {
+				"[]",
+				"[one: ONE]",			
+				"[one: 1, two: TWO]",
+				"[one: \"one\", two: 2, three: THREE]",
+				"[one: \"one\", two: TWO, three: 3]"};
+
+		
+		testPasses(specializers);		
+	}
 
 	
 	private void testPasses(String[] tests) throws Exception {

@@ -41,6 +41,7 @@ import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.parser.ParserConstants;
+import stencil.parser.tree.Specializer;
 
 import static stencil.module.util.OperatorData.TYPE_PROJECT;
 
@@ -108,20 +109,29 @@ public final class Modules {
 			if (!Modifier.isStatic(c.getModifiers())) {continue;}
 			if (!StencilOperator.class.isAssignableFrom(c)) {continue;}
 			if (!Modifier.isPublic(c.getModifiers())) {continue;}
+			if (!target.equals(c.getSimpleName().toUpperCase())) {continue;}
 
+			//Try #1: All arguments
 			try {
-				if (target.equals(c.getSimpleName().toUpperCase())) {
-					Object[] fullArgs = new Object[args.length+1];
-					fullArgs[0] = operatorData;
-					System.arraycopy(args, 0, fullArgs, 1, args.length);
-					Class[] argTypes = new Class[fullArgs.length];
-					for (int i=0; i< fullArgs.length; i++) {argTypes[i] = fullArgs[i].getClass();}
-					Constructor constr = c.getConstructor(argTypes);
-					return (StencilOperator) constr.newInstance(fullArgs);
+				Object[] fullArgs = new Object[args.length+1];
+				System.arraycopy(args, 0, fullArgs, 1, args.length);
+				fullArgs[0] = operatorData;
+				return tryConstruct(c, fullArgs);
+			}
+			catch (Exception e) {
+				//Try #2: Remove specializer (if provided)
+				if (args[0] instanceof Specializer) {
+					try {
+						Object[] fullArgs = new Object[args.length];
+						System.arraycopy(args, 1, fullArgs, 1, args.length-1);
+						fullArgs[0] = operatorData;
+						return tryConstruct(c, fullArgs);
+					} catch (Exception e2) {/*Ignore, must not be the right thing if it can't be instantiated!*/}
 				}
 			}
-			catch (Exception e) {/*Ignore, must not be the right thing if it can't be instantiated!*/}
 		}
+		
+		
 		
 		for (Method m: source.getMethods()) {
 			if (!Modifier.isPublic(m.getModifiers())) {continue;}
@@ -138,7 +148,14 @@ public final class Modules {
 		
 	}
 	
-	/**Return a mutableLegendData object with the default facets and specializer.
+	private static final StencilOperator tryConstruct(Class c, Object[] args) throws Exception {
+		Class[] argTypes = new Class[args.length];
+		for (int i=0; i< args.length; i++) {argTypes[i] = args[i].getClass();}
+		Constructor constr = c.getConstructor(argTypes);
+		return (StencilOperator) constr.newInstance(args);
+	}
+	
+	/**Return a meta-data object with the default facets and specializer.
 	 * 
 	 * Default type for facets is Categorize.
 	 * Default return prototype is singleton VALUE.

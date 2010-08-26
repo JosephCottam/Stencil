@@ -256,7 +256,7 @@ public final class MultiThreadPainter {
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
-					viewPoint = MakeViewPoint.viewPoint(program);	
+					viewPoint = MakeViewPoint.apply(program);	
 				}
 	
 				for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}

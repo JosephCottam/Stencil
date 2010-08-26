@@ -4,6 +4,7 @@ options {
   ASTLabelType = CommonTree;	
   filter = true;
   output = AST;	
+  superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -16,6 +17,12 @@ options {
   import stencil.module.operator.util.ReflectiveInvokeable;
   import stencil.parser.tree.*;
   import static stencil.module.operator.StencilOperator.STATE_ID_FACET;
+}
+
+@members {
+   public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+   }
 }
 
 topdown:

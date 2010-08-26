@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -17,9 +18,15 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.parser.string.ValidationException;
-  
+  import stencil.parser.ParseStencil;
+  import stencil.parser.string.TreeFilterSequence;
 }
 
+@members {
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+}
 
 topdown: (layerDefault | prefilter | view | canvas | local);
 

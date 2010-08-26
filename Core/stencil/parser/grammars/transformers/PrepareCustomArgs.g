@@ -4,6 +4,7 @@ options {
   ASTLabelType = CommonTree;  
   output = AST;
   filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -18,9 +19,14 @@ options {
 
 	import java.util.regex.Pattern;
 	import stencil.parser.tree.StencilString;
+	import stencil.parser.tree.Program;
 }
 
 @members{
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+
 	public static final String PRINTF_OP = "Format.map";
 	public static final String VALIDATE_PATTERN = "([^\\{\\}]*(\\{.+\\})?)*";
 	public static final String SPLIT_PATTERN = "\\{|\\}";

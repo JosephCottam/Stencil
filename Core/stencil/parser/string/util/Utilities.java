@@ -1,4 +1,4 @@
-package stencil.parser.string;
+package stencil.parser.string.util;
 
 
 
@@ -19,6 +19,9 @@ import static stencil.parser.ParserConstants.STATE_ID_FACET;
 
 
 public class Utilities {
+	/**Name that should be used with genSym whenever creating an auotmatic label for a yield/map/fold operator.**/
+	public static final String FRAME_SYM_PREFIX = "Frame";
+	
 	private static int gsCounter = 0;
 	public static String genSym(String name) {
 		if (gsCounter <0) {throw new Error("Exceed gensym guranteed namespace capacity.");}

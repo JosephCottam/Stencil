@@ -12,7 +12,7 @@ public class TestStencilUtils extends TestCase {
 		String[] fields = fieldDef.split("\\s*,\\s*");
 		Specializer spec = ParseStencil.parseSpecializer("[range: ALL, split: 0, fields: \"" + fieldDef + "\"]");
 		
-		StencilUtil.EchoCategorize ec = new StencilUtil.EchoCategorize(null, spec);
+		StencilUtil.SeedCategorize ec = new StencilUtil.SeedCategorize(null, spec);
 		TuplePrototype proto = ec.getSamplePrototype();
 		
 		assertEquals(fields.length, proto.size());

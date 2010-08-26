@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -15,6 +16,10 @@ options {
 }
 
 @members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+
    private Tree makePrototype(StreamDef t) {
       Stream s = (Stream) adaptor.create(STREAM, t.getName());
       adaptor.addChild(s, adaptor.dupTree(t.getPrototype()));

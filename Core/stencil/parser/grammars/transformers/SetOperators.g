@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	filter = true;
 	output = AST;
+	superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -19,22 +20,22 @@ options {
     import stencil.module.util.*;
     import stencil.module.operator.StencilOperator;
     import stencil.module.operator.util.*;
-    import stencil.parser.tree.Function;
-    import stencil.parser.tree.Specializer;
-    import stencil.parser.tree.StencilTree;
-    import stencil.parser.tree.AstInvokeable;
-	import stencil.parser.tree.util.*;
+    import stencil.parser.tree.*;
+	  import stencil.parser.tree.util.*;
     import stencil.util.*;
 
 }
 
 @members { 
-	protected ModuleCache modules;
+  public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
+  }
+  
+  protected void setup(Object... args) {
+     modules = (ModuleCache) args[0];
+  }
 
-	public SetOperators(TreeNodeStream input, ModuleCache modules) {
-		super(input, new RecognizerSharedState());
-		this.modules = modules;
-	}
+	protected ModuleCache modules;
 	
     public AstInvokeable makeInvokeable(Tree t) {
     	Function func = (Function) t;

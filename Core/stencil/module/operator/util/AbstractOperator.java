@@ -36,7 +36,7 @@ public abstract class AbstractOperator implements StencilOperator, Cloneable {
 	public OperatorData getOperatorData() {return operatorData;}	
 	public String getName() {return operatorData.getName();}
 
-	public int StateID() {return stateID;}
+	public int stateID() {return stateID;}
 	
 	/**Unsupported operation in BasicProject, must be supplied by the 
 	 * actual implementation.

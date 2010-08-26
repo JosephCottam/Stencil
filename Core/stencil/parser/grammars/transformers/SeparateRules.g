@@ -4,6 +4,7 @@ options {
     ASTLabelType = CommonTree;	
     output = AST;
     filter = true;
+    superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -17,7 +18,10 @@ options {
 }
 
 @members {
-
+   public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+   }
+  
    private StencilTree siftRules(List<Rule> rules, int type) {return siftRules(adaptor, rules, type, -1, null);}
  
    //This binding check will be a problem when animated bindings come into play

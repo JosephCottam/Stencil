@@ -17,20 +17,25 @@ options {
 
 	import stencil.parser.ParseStencil;
 	import stencil.parser.tree.*;
-    import stencil.tuple.prototype.TuplePrototypes;
+  import stencil.tuple.prototype.TuplePrototypes;
+  import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
+  import static stencil.parser.string.util.Utilities.genSym;
 }
 
-
 @members {	
-   private final Map<String, StencilTree> simple = new HashMap();
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+    
+  public Object downup(Object t) {
+     simple.clear();
+     downup(t, this, "search");
+     downup(t, this, "replace");
+     return t;
+  }  
+  
+   protected final Map<String, StencilTree> simple = new HashMap();
 
-  public Object transform(Object t) {
-    t = downup(t, this, "search");
-    t = downup(t, this, "replace");
-    return t;
-  }   
-  
-  
    private Tree replaceRef(String refName, StencilTree simpleOpRef) {
       StencilTree op = simple.get(refName);
       StencilTree core = (StencilTree) adaptor.dupTree(getCoreCall(op));
@@ -62,7 +67,7 @@ options {
          Tree preSpec = ParseStencil.parseSpecializer("[names: \"" + input + "\"]");
          adaptor.addChild(preRename, preSpec);
          adaptor.addChild(preRename, adaptor.dupTree(inArgs));
-         adaptor.addChild(preRename, adaptor.create(DIRECT_YIELD,""));
+         adaptor.addChild(preRename, adaptor.create(DIRECT_YIELD,genSym(FRAME_SYM_PREFIX)));
          adaptor.addChild(preRename, workingCore);
 	  
          Tree postRename = (Tree) adaptor.create(FUNCTION, "Rename.map");

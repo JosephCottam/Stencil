@@ -26,6 +26,10 @@ options {
 }
 
 @members {
+   public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+   }
+    
    private static final Rule OUTPUT_RULE;
    private static final Rule INPUT_RULE;
    private static final String OUTPUT_FIELD = "Output";

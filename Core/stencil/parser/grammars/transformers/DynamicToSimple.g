@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -20,6 +21,13 @@ options {
   import stencil.parser.tree.Rule;
   import stencil.tuple.prototype.TuplePrototypes;
   import java.util.Arrays;
+  import stencil.parser.tree.Program;
+}
+
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
 
 topdown: ^(CONSUMES . . . ^(LIST rule*) .*);

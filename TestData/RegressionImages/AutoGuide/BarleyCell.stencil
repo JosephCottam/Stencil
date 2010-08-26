@@ -2,7 +2,7 @@ STREAM: File
 NAME: Barley
 HEADER: year, site, yield, variety
 SEPARATOR: \s*,\s+
-SOURCE: /Volumes/OSL.image/home/jcottam/scratch/Stencil/Stencil/TestData/RegressionImages/AutoGuide/BeckersBarley.csv
+SOURCE: ./BeckersBarley.csv
 SKIP: 1
 STRICT: true
 
@@ -10,11 +10,14 @@ import BrewerPalettes
 
 stream Barley(year, site, yield, variety)
 
+const MAX: 100
+const MIN: 10
+
 canvas Main
   guide axis[axisLabel: "Variety", X:0] from BarleySite Y
   guide 
     axis[axisLabel: "Yield", 
-         sample: "LINEAR", seed.min: 10, seed.max: 100]
+         sample: "LINEAR", seed.min: MIN, seed.max: MAX]
     from BarleySite X
   guide 
     sidebar[X: 75, Y: -60] 
@@ -27,6 +30,6 @@ layer BarleySite
     ID: Concatenate(variety,year)
     PEN_COLOR: BrewerColors[palette: "PuRd"](year)
     FILL_COLOR: @Color{CLEAR}
-    X:* Scale[min: 0, max:100, inMin: 10, inMax: 100](yield)
+    X:* Scale[min: 0, max:100, inMin: MIN, inMax: MAX](yield)
     Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)
     REGISTRATION: "CENTER"

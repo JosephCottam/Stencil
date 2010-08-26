@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -14,14 +15,19 @@ options {
   import stencil.parser.tree.*;
   import stencil.parser.string.ValidationException;
   import stencil.parser.string.StencilParser;
+  import stencil.parser.ParseStencil;
+  import stencil.parser.string.TreeFilterSequence;
 }
 
 @members {
   private static final class TargetPackMismatchException extends ValidationException {
-      public TargetPackMismatchException() {
-        super("");
-      }
+      public TargetPackMismatchException() {super("");}
   }  
+  
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+  
 }
 
 topdown: ^(OPERATOR . ^(LIST prefilter) .*);

@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -11,7 +12,8 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.parser.string.ValidationException;
-  
+  import stencil.parser.ParseStencil;
+  import stencil.parser.string.TreeFilterSequence;
 }
 
 @members {
@@ -21,11 +23,10 @@ options {
   	}
   }  
 
-  private void validate(AstInvokeable i) {
-      if (i.getInvokeable() == null) {throw new OperatorMissingException("AST Invokeable.");}
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
   }
 }
 
-topdown: i = AST_INVOKEABLE {validate((AstInvokeable) i);};
-  
-  
+topdown: i = AST_INVOKEABLE 
+      {if (((AstInvokeable) i).getInvokeable() == null) {throw new OperatorMissingException("AST Invokeable.");}};  

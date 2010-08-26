@@ -125,7 +125,8 @@ tokens {
   import java.util.ArrayList;
   import java.util.List;
   import stencil.parser.ParserConstants;
-    
+  import static stencil.parser.string.util.Utilities.genSym;
+  import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
 }
 
 @lexer::header{
@@ -279,12 +280,12 @@ functionCallTarget
   		l=frameLabel f1=functionCall passOp[$l.label] f2=callChainMember
   		-> ^($f1 passOp $f2)
   | (functionCall passOp["a"]) => 
-  		f1=functionCall passOp[(String) null] f2=callChainMember    
+  		f1=functionCall passOp[genSym(FRAME_SYM_PREFIX)] f2=callChainMember    
   		-> ^($f1 passOp $f2)
   | l=frameLabel f1=functionCall 
     -> ^($f1 DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
   | f1=functionCall 
-    -> ^($f1 DIRECT_YIELD[(String) null] ^(PACK DEFAULT));
+    -> ^($f1 DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] ^(PACK DEFAULT));
    
 frameLabel returns [String label]: ARG ID CLOSE_ARG {$label=$ID.text;} -> ID;
 
@@ -355,7 +356,8 @@ mapList
   : mapEntry (SEPARATOR mapEntry)* -> ^(LIST["Map Arguments"] mapEntry*);
   
 mapEntry 
-  : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v);
+  : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v)
+  | k=ID DEFINE t=ID   -> ^(MAP_ENTRY[$k.text] $t);
 
 tuple[boolean allowEmpty] //TODO: Add optionally permitted types
   : emptySet {allowEmpty}?

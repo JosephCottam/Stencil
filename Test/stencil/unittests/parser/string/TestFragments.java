@@ -3,7 +3,6 @@ package stencil.unittests.parser.string;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.java2D.Adapter;
@@ -12,23 +11,26 @@ import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.AdHocOperators;
 import stencil.parser.string.AnnotateEnvironmentSize;
+import stencil.parser.string.DefaultPack;
 import stencil.parser.string.DefaultSpecializers;
+import stencil.parser.string.ElementToLayer;
 import stencil.parser.string.EnsureOrders;
 import stencil.parser.string.Imports;
 import stencil.parser.string.LiftStreamPrototypes;
 import stencil.parser.string.OperatorExplicit;
 import stencil.parser.string.OperatorExtendFacets;
+import stencil.parser.string.OperatorInlineSimple;
 import stencil.parser.string.OperatorInstantiateTemplates;
 import stencil.parser.string.OperatorToOpTemplate;
+import stencil.parser.string.Predicate_Expand;
 import stencil.parser.string.PrepareCustomArgs;
 import stencil.parser.string.SeparateRules;
 import stencil.parser.string.StencilParser;
 import stencil.parser.string.PreparsePython;
+import stencil.parser.string.TupleRefDeLast;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
-
-import static stencil.parser.ParseStencil.TREE_ADAPTOR;
 
 public class TestFragments extends TestCase {
 	private interface Test {
@@ -45,12 +47,9 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testImport() throws Exception {
-		CommonTreeNodeStream treeTokens;
 		Tree t = init("import JUNG");
 
-		treeTokens = new CommonTreeNodeStream(t);
-		Imports imports = new Imports(treeTokens);
-		ModuleCache modules = imports.processImports(t);
+		ModuleCache modules = Imports.apply(t);
 		
 		assertNotNull("Import unsuccessful; could not find module by name.", modules.getModule("JUNG"));
 		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("BalloonLayout"));		
@@ -58,9 +57,7 @@ public class TestFragments extends TestCase {
 		
 		t = init("import JUNG as JG");
 
-		treeTokens = new CommonTreeNodeStream(t);
-		imports = new Imports(treeTokens);
-		modules = imports.processImports(t);
+		modules = Imports.apply(t);
 		
 		assertNotNull("Proxy name import unsuccessful; could not find  module by prefix.", modules.getModule("JG"));
 		
@@ -71,76 +68,35 @@ public class TestFragments extends TestCase {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
 		Program p = init(source);
 		Adapter adapter = Adapter.ADAPTER;
-		CommonTreeNodeStream treeTokens = new CommonTreeNodeStream(p);
 
-
-		//Create prototype definitions for internally defined streams
-		LiftStreamPrototypes liftStreams = new LiftStreamPrototypes(treeTokens);
-		liftStreams.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) liftStreams.downup(p);
-
-		//Group the operator chains
-		SeparateRules separate = new SeparateRules(treeTokens);
-		separate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) separate.downup(p);
-
-		//Ensure the proper order blocks
-		EnsureOrders orders = new EnsureOrders(treeTokens);
-		orders.setTreeAdaptor(TREE_ADAPTOR);
-		p = orders.ensureOrder(p);
+		p = LiftStreamPrototypes.apply(p);		//Create prototype definitions for internally defined streams
+		p = SeparateRules.apply(p);	//Group the operator chains
+		p = EnsureOrders.apply(p);		//Ensure the proper order blocks
 
 		//Do module imports
-		Imports imports = new Imports(treeTokens);
-		ModuleCache modules = imports.processImports(p);
+		ModuleCache modules = Imports.apply(p);
 		
-		//Verify that Python operators are syntactically correct and appropriately indented
-		PreparsePython pyParse = new PreparsePython(treeTokens);
-		pyParse.downup(p);
-
-		//Parse custom argument blocks
-		PrepareCustomArgs customArgs = new PrepareCustomArgs(treeTokens);
-		customArgs.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) customArgs.downup(p);
-
-		//Add default specializers where required
-		DefaultSpecializers defaultSpecializers = new DefaultSpecializers(treeTokens, modules, adapter);
-		defaultSpecializers.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) defaultSpecializers.downup(p);
-
-		//Converting all operator defs to template/ref pairs
-		OperatorToOpTemplate opToTemplate = new OperatorToOpTemplate(treeTokens);
-		opToTemplate.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opToTemplate.downup(p);		
-
-		//Remove all operator references
-		treeTokens = new CommonTreeNodeStream(p);
-		treeTokens.setTreeAdaptor(TREE_ADAPTOR);
-		OperatorInstantiateTemplates opInstTemplates = new OperatorInstantiateTemplates(treeTokens, modules);
-		opInstTemplates.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opInstTemplates.downup(p);
-
-		OperatorExplicit opExplicit = new OperatorExplicit(treeTokens);
-		opExplicit.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExplicit.downup(p);		
 		
-		//Expand operatorDefs to include query and stateID
-		OperatorExtendFacets opExtendFacets = new OperatorExtendFacets(treeTokens);
-		opExtendFacets.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) opExtendFacets.transform(p);
+		PreparsePython.apply(p);		//Verify that Python operators are syntactically correct and appropriately indented
+		p = PrepareCustomArgs.apply(p);		//Parse custom argument blocks
+		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
+		p = TupleRefDeLast.apply(p);							//Remove all uses of the LAST tuple reference
+		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
 
-		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
-		AnnotateEnvironmentSize envSize = new AnnotateEnvironmentSize(treeTokens);
-		envSize.setTreeAdaptor(TREE_ADAPTOR);
-		p = (Program) envSize.downup(p);
-		
-		treeTokens = new CommonTreeNodeStream(p);
-		AdHocOperators adHoc = new AdHocOperators(treeTokens, modules, adapter);
-		adHoc.setTreeAdaptor(TREE_ADAPTOR);
-		adHoc.transform(p);
-		
+		p = DefaultPack.apply(p);			//Add default packs where required
+		p = OperatorToOpTemplate.apply(p);							//Converting all operator defs to template/ref pairs
+		p = OperatorInstantiateTemplates.apply(p, modules);		//Remove all operator references
+		p = OperatorExplicit.apply(p);		
+		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
+		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
+
+
+		AnnotateEnvironmentSize.apply(p);		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
+		p = ElementToLayer.apply(p);		//Convert "element" statements into layers
+		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
 		Module m = modules.getAdHoc();
 		int expected = p.getOperators().size() + p.getPythons().size() + p.getLayers().size();
-		assertEquals("Ad-hoc legends size incorrect.", expected, m.getModuleData().getOperators().size());
+		assertEquals("Ad-hoc operators size incorrect.", expected, m.getModuleData().getOperators().size());
 	}
 	
 	public void testOpCreate() throws Exception {

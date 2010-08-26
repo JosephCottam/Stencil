@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -14,7 +15,9 @@ options {
   package stencil.parser.string.validators;
   
   import stencil.parser.tree.*;
+  import stencil.parser.ParseStencil;
   import stencil.parser.string.ValidationException;
+  import stencil.parser.string.TreeFilterSequence;
 }
 
 @members {
@@ -22,7 +25,11 @@ options {
       public TargetPackMismatchException() {
         super("");
       }
-  }  
+  }
+
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
 
 topdown: ^(RULE target=. chain[((Target) target).getPrototype().size()] .*);

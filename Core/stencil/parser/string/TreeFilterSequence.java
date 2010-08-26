@@ -1,14 +1,18 @@
 package stencil.parser.string;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.RecognizerSharedState;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
+import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeFilter;
 import org.antlr.runtime.tree.TreeNodeStream;
 import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
+
+import stencil.parser.ParseStencil;
 
 public abstract class TreeFilterSequence extends TreeFilter {
 	private static final String DEFAULT_UP_OPERATION = "bottomup";
@@ -60,5 +64,25 @@ public abstract class TreeFilterSequence extends TreeFilter {
         return t;    
     }
 
+    /**This is a convenience method for executing filter sequences.
+     * It is suggested that each filter include an apply method that calls this method
+     * with the appropriate class and addition arguments.
+     */
+    protected static void apply(Tree p, Class implementing, Object... args) {
+    	TreeFilterSequence fs;
+    	try {
+	    	Constructor<? extends TreeFilterSequence> c = implementing.getConstructor(TreeNodeStream.class);
+	    	fs = c.newInstance(ParseStencil.TOKEN_STREAM);
+    	} catch (Exception e){
+    		throw new Error("Tree sequence does not provide required constructor.", e);
+    	}
+    	fs.setup(args);
+    	fs.downup(p);    	
+    }    
 
+    /**This method is invoked by the static apply method.
+     * The args passed to the static apply will be passed here.
+     * @param objects
+     */
+    protected void setup(Object...objects) {}
 }

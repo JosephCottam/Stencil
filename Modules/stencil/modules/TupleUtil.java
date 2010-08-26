@@ -1,7 +1,6 @@
 package stencil.modules;
 
 import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.parser.tree.Specializer;
@@ -104,13 +103,5 @@ public class TupleUtil extends BasicModule {
 
 		if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
-	}
-
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		validate(name, specializer);
-		OperatorData opData = getOperatorData(name, specializer);
-
-		if (name.equals("Select")) {return new Select(opData, specializer);}
-		else {return super.instance(name, specializer);}
 	}
 }

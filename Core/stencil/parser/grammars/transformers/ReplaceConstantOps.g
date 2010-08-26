@@ -21,27 +21,26 @@ options {
 }
 
 @members {
-  protected ModuleCache modules;
-
-  public ReplaceConstantOps(TreeNodeStream input, ModuleCache modules) {
-    super(input, new RecognizerSharedState());
-    assert modules != null : "ModuleCache must not be null.";
-    this.modules = modules;
-  }
+   public static Program apply (Tree t, ModuleCache modules) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
+   }
   
+   protected void setup(Object... args) {modules = (ModuleCache) args[0];}
+   
+   protected ModuleCache modules;
   
   //Fixed point for updating constants
   private boolean changed; 
-  public Program transform(Program p) {
+  public Object downup(Object p) {
      
      changed = true;
      while(changed) {
        changed = false;
-       p=(Program) downup(p, this, "replaceOps");
-       p=(Program) downup(p, this, "propogateValues");
+       downup(p, this, "replaceOps");
+       downup(p, this, "propogateValues");
      }
      
-     changed= true;
+     changed= true;   //Doing this as a fixed point makes the grammar easier
      while (changed) {
        changed = false;     
        p=(Program) downup(p, this, "removeConsts");

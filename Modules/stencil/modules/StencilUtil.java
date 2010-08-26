@@ -34,15 +34,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static java.lang.String.format;
-
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.SeedOperator;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.module.operator.util.Invokeable;
-import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
 import stencil.module.util.ModuleData;
@@ -50,6 +46,7 @@ import stencil.module.util.OperatorData;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
@@ -108,34 +105,24 @@ public class StencilUtil extends BasicModule {
 	}
 
 	
-	public static abstract class EchoBase implements StencilOperator, SeedOperator, Cloneable {
+	public static abstract class SeedBase extends AbstractOperator implements  SeedOperator, Cloneable {
 		private final String FIELDS = "fields";
 		
-		final OperatorData operatorData;
 		final TuplePrototype samplePrototype;
 		
-		protected EchoBase(OperatorData opData, TuplePrototype p) {
-			operatorData = opData;
+		protected SeedBase(OperatorData opData, TuplePrototype p) {
+			super(opData);
 			samplePrototype = p;
 		}
 		
-		protected EchoBase(OperatorData opData, Specializer s) throws SpecializationException {
-			this.operatorData = opData;
+		protected SeedBase(OperatorData opData, Specializer s) throws SpecializationException {
+			super(opData);
 			samplePrototype  = new SimplePrototype(s.get(FIELDS).getText().split("\\s*,\\s*"));
 		}
 		
 		public TuplePrototype getSamplePrototype() {return samplePrototype;}
-
-		public Invokeable getFacet(String facet) {
-			try {return new ReflectiveInvokeable(facet, this);}
-			catch (Exception e) {
-				throw new IllegalArgumentException(format("Facet %1$s not known.", facet),e);
-			}
-		}
-
-		public OperatorData getOperatorData() {return operatorData;}
 				
-		/**Complete the legend data, given the specializer.*/
+		/**Complete the operator data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
 			OperatorData od = new OperatorData(base);
 			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
@@ -148,23 +135,20 @@ public class StencilUtil extends BasicModule {
 			
 			return od;
 		}
-				
-		public StencilOperator viewPoint() {
-			try {return (StencilOperator) this.clone();}
-			catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
-		}
+		
+		public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 	}
 
 	
 	/**Returns what was passed in, but records the range of elements
-	 * seen.  Used for continuous legends and should probably never
+	 * seen.  Used for continuous operators and should probably never
 	 * be used directly.
 	 * 
 	 * TODO: Lift rangeLock out so locked ranges are a separate class...its a much simpler class!
 	 * 
 	 */
-	public static final class EchoContinuous extends EchoBase {
-		public static final String NAME = EchoContinuous.class.getSimpleName();
+	public static final class SeedContinuous extends SeedBase {
+		public static final String NAME = SeedContinuous.class.getSimpleName();
 		public static final String MAX_KEY = "max";
 		public static final String MIN_KEY = "min";
 		public static final String LOCK_KEY = "lock";
@@ -175,8 +159,8 @@ public class StencilUtil extends BasicModule {
 
 		protected int stateID=Integer.MIN_VALUE; 		
 
-		public EchoContinuous(OperatorData opData, TuplePrototype p, boolean lock) {super(opData, p); this.rangeLock=lock;}
-		public EchoContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
+		public SeedContinuous(OperatorData opData, TuplePrototype p, boolean lock) {super(opData, p); this.rangeLock=lock;}
+		public SeedContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
 			super(opData, spec);
 			
 			Map<String, Atom> map = spec.getMap();
@@ -185,14 +169,9 @@ public class StencilUtil extends BasicModule {
 			rangeLock = map.containsKey(LOCK_KEY) && map.get(LOCK_KEY).getValue().equals(FALSE_STRING);
 		}
 		
-		public StencilOperator duplicate() {return new EchoContinuous(operatorData, samplePrototype, rangeLock);}
-		
-		public String getName() {return NAME;}
-		public int stateID() {return stateID;}
-		
-		public synchronized SampleSeed getSeed() {
-			return new SampleSeed(true, min, max);
-		}
+		public StencilOperator duplicate() {return new SeedContinuous(operatorData, samplePrototype, rangeLock);}
+
+		public SampleSeed getSeed() {return new SampleSeed(true, min, max);}
 
 		public synchronized Tuple map(Object... args) {
 			assert args.length == 1;
@@ -211,42 +190,31 @@ public class StencilUtil extends BasicModule {
 			}
 			
 			
-			return new ArrayTuple(args);
+			return Tuples.EMPTY_TUPLE;
 		}
-
-		public Tuple query(Object... args) {return new ArrayTuple(args);}
 	}
 	
 	/**Returns exactly what it was passed, but
 	 * records elements seen (for categorization).
 	 */
-	public static final class EchoCategorize extends EchoBase {
-		public static final String NAME = EchoCategorize.class.getSimpleName();
+	public static final class SeedCategorize extends SeedBase {
+		public static final String NAME = SeedCategorize.class.getSimpleName();
 		
 		private final List<Object[]> seen = new CopyOnWriteArrayList();
 				
-		public EchoCategorize(OperatorData opData, TuplePrototype p) {super(opData, p);}
-		public EchoCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData, s);}
-		public StencilOperator duplicate() throws UnsupportedOperationException {return new EchoCategorize(operatorData, samplePrototype);}
-
-		public final String getName() {return "Echo";}
-
-		public SampleSeed getSeed() {
-			return new SampleSeed(false, new ArrayList(seen));
-		}
+		public SeedCategorize(OperatorData opData, TuplePrototype p) {super(opData, p);}
+		public SeedCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData, s);}
+		public StencilOperator duplicate() throws UnsupportedOperationException {return new SeedCategorize(operatorData, samplePrototype);}
+		public synchronized SampleSeed getSeed() {return new SampleSeed(false, new ArrayList(seen));}
 
 		public Tuple map(Object... args) {
 			if (!deepContains(seen, args)) {seen.add(args);}
-			return new ArrayTuple(args);
+			return Tuples.EMPTY_TUPLE;
 		}
 		
 		private static final boolean deepContains(List<Object[]> list, Object[] candidate) {
 			for (Object[] e: list) {if (Arrays.deepEquals(e, candidate)) {return true;}}
 			return false;
-		}
-
-		public Tuple query(Object... args) {
-			return new ArrayTuple(args);
 		}
 		
 		public int stateID() {return seen.size();}
@@ -263,21 +231,9 @@ public class StencilUtil extends BasicModule {
 		OperatorData od = moduleData.getOperator(name);
 
 		if (name.equals("Rename")) {return Rename.complete(od, specializer);}
-		od = EchoBase.complete(od, specializer);
+		od = SeedBase.complete(od, specializer);
 
 		if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
-	}
-
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		validate(name, specializer);
-		OperatorData opData = getOperatorData(name, specializer);
-		if (name.equals("EchoCategorize")) {return new EchoCategorize(opData, specializer);}
-		else if (name.equals("EchoContinuous")) {return new EchoContinuous(opData, specializer);}
-		else if (name.equals("Rename")) {
-			return new Rename(opData, specializer);
-		}
-		
-		throw new RuntimeException(String.format("Legend name not known: %1$s.", name));
 	}
 }

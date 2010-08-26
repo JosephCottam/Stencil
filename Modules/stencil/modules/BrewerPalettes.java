@@ -5,12 +5,9 @@ import java.awt.Color;
 import java.lang.reflect.*;
 import java.util.*;
 
-import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
-import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -18,15 +15,6 @@ import stencil.tuple.Tuple;
 public class BrewerPalettes  extends BasicModule {
 
 	public BrewerPalettes(ModuleData md) {super(md);}
-
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperator(name);
-		if (name.equals("BrewerColors")) {
-			return Modules.instance(this.getClass(), operatorData, specializer);
-		}else {
-			throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toString()));
-		}
-	}
 	
 	public static final class BrewerColors extends AbstractOperator {
 		private static String PALETTE = "palette";

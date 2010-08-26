@@ -11,7 +11,7 @@
 	<classpathentry kind="lib" path="Library/JUNG/jung-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-graph-impl-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/ant-contrib-1.0b3.jar"/>
-	<classpathentry kind="lib" path="Library/antlr-3.2.jar"/>
+	<classpathentry kind="lib" path="Library/antlr-3.2.jar" sourcepath="/Users/jcottam/Library/Java/antlr-3.2/runtime/Java/src/main/java/"/>
 	<classpathentry kind="lib" path="Library/antlr3-ant.jar"/>
 	<classpathentry kind="lib" path="Library/jdom.jar"/>
 	<classpathentry kind="lib" path="Library/jython.jar"/>

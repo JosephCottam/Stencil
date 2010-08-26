@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;
 	filter = true;
 	output = AST;
+  superClass = TreeRewriteSequence;
 }
 
 @header {
@@ -12,12 +13,15 @@ options {
   */
 
   package stencil.parser.string;
+  
+  import stencil.parser.tree.Program;
 }
 
-@members {	 
-
+@members {
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
 }
-
 
 topdown: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. spec=. args=. .+) size=.))) -> ^(PREDICATE[$f.text] $inv $args); 
   		

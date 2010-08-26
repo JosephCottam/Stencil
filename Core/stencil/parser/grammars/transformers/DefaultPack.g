@@ -4,6 +4,7 @@ options {
 	ASTLabelType = CommonTree;	
 	output = AST;
 	filter = true;
+  superClass = TreeRewriteSequence;
 }
 
 @header{
@@ -23,6 +24,10 @@ options {
 @members{
   public static final class DefaultPackExpansionException extends RuntimeException {
     public DefaultPackExpansionException(String msg) {super(msg);}
+  }
+  
+  public static Program apply (Tree t) {
+    return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
   }
 
   public Pack fromDefault(Pack pack) {

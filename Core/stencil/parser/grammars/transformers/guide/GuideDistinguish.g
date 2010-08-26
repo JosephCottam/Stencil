@@ -15,19 +15,17 @@ options {
   package stencil.parser.string;
 
   import java.util.Arrays;
+  import stencil.parser.tree.Program;
 }
 
 @members {
   //TODO: Get the list of direct types from the adaptor
   private static List<String> DIRECT_TYPES = Arrays.asList("AXIS", "SIDEBAR");
 
-
-  public GuideDistinguish(TreeNodeStream input, TreeAdaptor adaptor) {
-    super(input, new RecognizerSharedState());
-    this.adaptor = adaptor;
+  public static Program apply (Tree t) {
+     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
   }
-
-
+    
   private boolean isDirect(Tree t) {
     String type = t.getText().toUpperCase();
     return DIRECT_TYPES.contains(type);

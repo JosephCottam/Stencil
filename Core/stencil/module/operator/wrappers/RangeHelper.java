@@ -41,9 +41,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-/**Wraps a StencilLegend with range support.
+/**Wraps an operator with range support.
  * Keeps a copy of every argument set seen within the range
- * and re-invokes the legend with an argument list equal to concatenating
+ * and re-invokes the operator with an argument list equal to concatenating
  * all in-range arguments.  
  * 
  * Warnings:  
@@ -174,7 +174,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	protected List values;	 			//One list, used by both Query and Map.  Invoking a single instance in both may end up arguments appended multiple times. 
 	protected final Range range;
 	protected final OperatorData operatorData;
-	private final StencilOperator baseOperator; //Backing StencilLegend instance
+	private final StencilOperator baseOperator; 
 	protected final Invokeable baseFacet;		//Actual facet invokable for doing computations
 	private final String facetName;				//Facet on the operator to be used in ranged operations.  MUST be a function.
 	
@@ -258,7 +258,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	public String getName() {return baseOperator.getName() + "(Ranged)";}
 	
 	/**Updates the list storage according to the specified range.
-	 * @return List of arguments to actually invoke the underlying legend with.
+	 * @return List of arguments to actually invoke the underlying operator with.
 	 */
 	protected abstract Object[] updateCache(Object... args);
 	

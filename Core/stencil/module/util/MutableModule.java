@@ -8,7 +8,7 @@ import stencil.parser.tree.Specializer;
 import java.util.Map;
 import java.util.HashMap;
 
-/**Simple MutableModule.  Does not allow specialization of the Legends.*/
+/**Simple MutableModule.  Does not allow specialization of the operators.*/
 public class MutableModule implements Module {
 	protected Map<String, StencilOperator> operators;
 	protected ModuleData moduleData;
@@ -32,7 +32,7 @@ public class MutableModule implements Module {
 		try {
 			addOperator(target, target.getOperatorData());
 		} catch (Exception e) {
-			throw new RuntimeException(String.format("Error adding jython legend %1$s to module %2$s", target.getName(), getModuleData().getName()), e);
+			throw new RuntimeException(String.format("Error adding operator %1$s to module %2$s", target.getName(), getModuleData().getName()), e);
 		}
 	}
 	

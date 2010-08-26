@@ -3,6 +3,7 @@ options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
   filter = true;
+  superClass = TreeFilterSequence;
 }
 
 @header {
@@ -19,6 +20,8 @@ options {
   import stencil.parser.string.StencilParser;
   import stencil.parser.tree.TuplePrototype;
   import stencil.parser.tree.TupleFieldDef;
+  import stencil.parser.ParseStencil;
+  import stencil.parser.string.TreeFilterSequence;
 
   import java.util.HashSet;
   import java.util.Set;
@@ -29,6 +32,10 @@ options {
 }
 
 @members {
+  public static void apply (Tree t) {
+     apply(t, new Object(){}.getClass().getEnclosingClass());
+  }
+
   public void uniqueFieldNames(Stream e, TuplePrototype prototype) {
     String field = null;
     Set<String> fields = new HashSet<String>();
