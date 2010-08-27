@@ -21,7 +21,7 @@ options {
 
 @members {
   public static Program apply (Tree t, Map<TupleRef, TupleRef> subst) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), subst);
+     return (Program) TreeRewriteSequence.apply(t, subst);
   }
   
   protected void setup(Object... args) {

@@ -26,7 +26,7 @@ options {
 
 @members {
   public static Program apply (Tree t, ModuleCache modules, Adapter adapter) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules, adapter);
+     return (Program) TreeRewriteSequence.apply(t, modules, adapter);
   }
   
   protected void setup(Object... args) {

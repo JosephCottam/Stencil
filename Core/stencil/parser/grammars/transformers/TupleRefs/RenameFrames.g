@@ -25,9 +25,10 @@ options {
 @members {  
   /**Old name to new name mapping.*/
   private static Map<String, String> subst = new HashMap();
+
   public static Program apply (Tree t) {
      subst.clear();
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
+     return (Program) TreeRewriteSequence.apply(t);
   }
 }
 

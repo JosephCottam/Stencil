@@ -64,11 +64,31 @@ public abstract class TreeFilterSequence extends TreeFilter {
         return t;    
     }
 
-    /**This is a convenience method for executing filter sequences.
-     * It is suggested that each filter include an apply method that calls this method
-     * with the appropriate class and addition arguments.
-     */
-    protected static void apply(Tree p, Class implementing, Object... args) {
+    /**Preferred method for executing ALL stencil filter sequences.
+     * 
+     * All classes that sub-class should include their own apply method.
+     * The default implementation of which should be:
+     * 
+     * public static void apply(Tree tree) { 
+     *  TreeFilterSequence.apply(tree);
+     * }
+     * 
+     * The static reference is suggested since method uses stack trace inspection
+     * to detect the declaring class of the calling method (a horrible, horrible hack...but it makes calling parsers so much easier).
+     * That class  will then be instantiated with the additional arguments passed (if any).
+     */    
+    protected static void apply(Tree p, Object... args) {
+    	Class implementing;
+    	try {
+    		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
+    		implementing = Class.forName(stack[2].getClassName());	//Prior frame should contain the name of the actual implementing class...
+    	} catch (Exception e) {
+    		throw new Error("Inspection failure trying to determine implementing class.");
+    	}
+    	apply(p, implementing, args);
+    }
+    
+    private static void apply(Tree p, Class implementing, Object... args) {
     	TreeFilterSequence fs;
     	try {
 	    	Constructor<? extends TreeFilterSequence> c = implementing.getConstructor(TreeNodeStream.class);

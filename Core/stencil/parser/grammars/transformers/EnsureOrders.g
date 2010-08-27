@@ -16,9 +16,7 @@ options {
 }
 
 @members{
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
     
   public Program downup(Object t) {
     newOrder = (Order) adaptor.create(ORDER, "Order");

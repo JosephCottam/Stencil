@@ -107,7 +107,12 @@
         <ant antfile="./build/Deploy.xml" inheritRefs="true"/>
     </target> 
  	
- 	<target name="Test" depends="StencilGrammar"> 
+ 	<!-- Just test with whatever is already built-->
+ 	<target name="FastTest" depends=""> 
+        <ant antfile="./build/Test.xml" inheritRefs="true"/>
+    </target>
+ 	
+ 	<target name="Test" depends="Stencil"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
  </project>

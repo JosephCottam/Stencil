@@ -46,7 +46,7 @@ options {
   public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
 
   public static Program apply (Tree t, ModuleCache modules) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), modules);
+     return (Program) TreeRewriteSequence.apply(t, modules);
   }
   
 	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();

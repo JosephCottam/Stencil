@@ -22,9 +22,7 @@ options {
 }
 
 @members {
-  public static void apply (Tree t) {
-     apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
 topdown

@@ -17,9 +17,7 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 
   protected StencilTree dynamicResults(CommonTree source) {return siftRules(adaptor, (List<Rule>) source, RESULT, DYNAMIC, "Dynamic");}
 }

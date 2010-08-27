@@ -26,9 +26,7 @@ options {
     public DefaultPackExpansionException(String msg) {super(msg);}
   }
   
-  public static Program apply (Tree t) {
-    return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 
   public Pack fromDefault(Pack pack) {
       Rule rule = pack.getRule();

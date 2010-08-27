@@ -30,9 +30,7 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 
    /**Does the name appear as an operator def/proxy/ref?*/
    private boolean covered(CommonTree function) {

@@ -21,7 +21,7 @@ options {
 @members {  
   public static Program apply (Tree t) {
      GlobalsTuple globals = new GlobalsTuple(((Program) t).getGlobals());
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass(), globals);
+     return (Program) TreeRewriteSequence.apply(t, globals);
   }
   
   protected void setup(Object... args) {globals = (GlobalsTuple) args[0];}

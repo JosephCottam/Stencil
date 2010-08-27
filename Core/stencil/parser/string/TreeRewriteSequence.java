@@ -67,11 +67,24 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
     }
 
 
+    /**Preferred method for executing ALL stencil rewrite sequences.
+     * 
+     * All classes that sub-class should include their own apply method.
+     * The default implementation of which should be:
+     * 
+     * public static Tree apply(Tree tree) { 
+     *  return (Tree) TreeFilterSequence.apply(tree);
+     * }
+     * 
+     * The static reference is suggested since method uses stack trace inspection
+     * to detect the declaring class of the calling method (a horrible, horrible hack...but it makes calling parsers so much easier).
+     * That class  will then be instantiated with the additional arguments passed (if any).
+     */
     protected static Tree apply(Tree p, Object... args) {
     	Class implementing;
     	try {
     		StackTraceElement[] stack = Thread.currentThread().getStackTrace();
-    		implementing = Class.forName(stack[0].getClassName());
+    		implementing = Class.forName(stack[2].getClassName());	//Prior frame should contain the name of the actual implementing class...
     	} catch (Exception e) {
     		throw new Error("Inspection failure trying to determine implementing class.");
     	}
@@ -79,7 +92,7 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
     }
     
     
-    protected static Tree apply(Tree p, Class implementing, Object... args) {
+    private static Tree apply(Tree p, Class implementing, Object... args) {
     	TreeRewriteSequence fs;
     	try {
 	    	Constructor<? extends TreeRewriteSequence> c = implementing.getConstructor(TreeNodeStream.class);

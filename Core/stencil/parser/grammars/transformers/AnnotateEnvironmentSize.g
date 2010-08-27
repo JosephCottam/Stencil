@@ -17,9 +17,7 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 }
 
 topdown: ^(c=CALL_CHAIN ct=callTarget[0] .?) //Will accept a call chain with or without existing size annotation

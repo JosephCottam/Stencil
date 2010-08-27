@@ -18,9 +18,7 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 }
 
 topdown: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. spec=. args=. .+) size=.))) -> ^(PREDICATE[$f.text] $inv $args); 

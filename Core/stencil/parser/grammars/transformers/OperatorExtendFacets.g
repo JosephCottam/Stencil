@@ -27,9 +27,7 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
     
   public Object downup(Object t) {
     downup(t, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees

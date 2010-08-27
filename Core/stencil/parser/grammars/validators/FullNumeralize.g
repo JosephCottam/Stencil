@@ -34,9 +34,7 @@ options {
     }
   }
 
-  public static void apply (Tree t) {
-     apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
 //TODO: Remove if statement when numeralize is done in return values as well

@@ -23,9 +23,7 @@ options {
   	}
   }  
 
-  public static void apply (Tree t) {
-     apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+  public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
 topdown: i = AST_INVOKEABLE 

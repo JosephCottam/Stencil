@@ -22,10 +22,8 @@ options {
   import static stencil.parser.string.util.Utilities.genSym;
 }
 
-@members {	
-  public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-  }
+@members {
+  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
     
   public Object downup(Object t) {
      simple.clear();

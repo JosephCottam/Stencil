@@ -21,9 +21,7 @@ options {
 }
 
 @members {
-   public static void apply (Tree t) {
-     apply(t, new Object(){}.getClass().getEnclosingClass());
-   }
+  public static void apply (Tree t) {TreeFilterSequence.apply(t);}
      
    public void setSummarySample(Guide g) {
 	   Program p = (Program) g.getAncestor(PROGRAM);

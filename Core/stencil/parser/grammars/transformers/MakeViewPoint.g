@@ -30,7 +30,7 @@ options {
   private static Program copy;
 
   public static Program apply (Tree t) {
-     apply(t, new Object(){}.getClass().getEnclosingClass());
+     TreeFilterSequence.apply(t);
      return copy;
   }
 

@@ -26,9 +26,7 @@ options {
 }
 
 @members {
-   public static Program apply (Tree t) {
-     return (Program) apply(t, new Object(){}.getClass().getEnclosingClass());
-   }
+   public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
     
    private static final Rule OUTPUT_RULE;
    private static final Rule INPUT_RULE;

@@ -25,7 +25,7 @@ options {
 @members{ 
   public static ModuleCache apply (Tree t) {
      modules = new ModuleCache();
-     apply(t, new Object(){}.getClass().getEnclosingClass());
+     TreeFilterSequence.apply(t);
      return modules;
   }
   
