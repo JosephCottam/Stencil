@@ -23,7 +23,7 @@
     </target>
  		
  		
- 	<target name="Stencil" depends="GuideSystem, Transformers, TreeAdapter, Validators, Interpreter">
+ 	<target name="Stencil" depends="Transformers, TreeAdapter, Validators, Interpreter">
 		<javac srcdir="${src}" destdir="${target}">
 			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
 			<!-- compilerarg value="-Xlint"/ -->
@@ -46,14 +46,6 @@
             <param name="antlrTarget" value="${parser}"/>
         </foreach>
     </target>
-
-    <target name="GuideSystem" depends="StencilGrammar">
-        <foreach target="antlrBuild" param="file" inheritall="true">
-            <fileset dir="${grammars}/guide"/>
-        	<param name="antlrTarget" value="${parser}"/>
-        </foreach>
-    </target>
-    	    
  	
     <target name="Validators" depends="StencilGrammar">
     	<foreach target="antlrBuild" param="file" inheritall="true">
