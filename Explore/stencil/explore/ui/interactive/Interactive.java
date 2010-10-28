@@ -284,7 +284,7 @@ public class Interactive implements Runnable {
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
 
-						try {model.export(filename, "RASTER", Application.EXPORT_RESOLUTION);}
+						try {model.export(filename, "RASTER", new Object[]{Application.EXPORT_RESOLUTION});}
 						catch(Exception e) {throw new RuntimeException("Error exporting image.", e);}
 					} else if (stat == JFileChooser.ERROR_OPTION) {
 						java.awt.Toolkit.getDefaultToolkit().beep();

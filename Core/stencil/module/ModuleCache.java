@@ -28,6 +28,7 @@
  */
 package stencil.module;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.*;
 
@@ -193,7 +194,17 @@ public class ModuleCache {
 			Module m;
 			ModuleData md;
 			
-			InputStream stream = ModuleCache.class.getResourceAsStream(filename);
+			
+			InputStream stream;
+			try {
+				if (filename.startsWith("file://")) {
+					stream = new FileInputStream(filename.substring("file://".length()));
+				} else {
+					stream = ModuleCache.class.getResourceAsStream(filename);
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(String.format("Error accessing module resource " + filename), e);
+			}
 
 			try {md = ModuleDataParser.load(stream);} 
 			catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}

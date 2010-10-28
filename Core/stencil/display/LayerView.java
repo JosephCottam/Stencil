@@ -18,7 +18,7 @@ import stencil.tuple.Tuple;
  */
 public interface LayerView<T extends Glyph> extends Iterable<T>{
 	/**Entry into a dynamic binding.
-	 * TODO: Factor this out somehow, it is an ugly implementation leak...A good idea would be to parameterize getSourceData by teh groupID and return a filtering collection of some sort... 
+	 * TODO: Factor this out somehow, it is an ugly implementation leak...A good idea would be to parameterize getSourceData by the groupID and return a filtering collection of some sort... 
 	 */
 	public static final class DynamicEntry {
 		public int groupID;
