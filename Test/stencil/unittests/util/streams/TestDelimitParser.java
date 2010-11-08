@@ -9,6 +9,7 @@ import junit.framework.Assert;
 
 public class TestDelimitParser extends TestCase {
 	public static String coordFile = "./TestData/RegressionImages/Sourceforge/suppliments/clusterCoords_fragment.coord";
+	public static String troveFile = "./TestData/RegressionImages/Sourceforge/project_troves.txt";
 	public static String header_coordFile = "./TestData/RegressionImages/Sourceforge/suppliments/header_coord.txt";
 
 	public void testOpen() throws Exception{
@@ -60,6 +61,26 @@ public class TestDelimitParser extends TestCase {
 			p.next();
 			Assert.fail("Next succeeded when object was closed.");
 		} catch (java.util.NoSuchElementException e) {/*Exception expected.*/}
+	}
+	
+	/**Check the amount of time the loading of a given amount of tuples takes.*/
+	public void testTime() throws Exception {
+		final long max = 1000; //1 second
+		
+		DelimitedParser p = new DelimitedParser("Troves", "ID|ATT", troveFile, "\\|", true,1);		
+		final long start = System.currentTimeMillis();
+		
+		long fields=0;
+		while (p.hasNext()) {
+			Tuple t = p.next();
+			fields = t.size() + fields;
+		}
+		final long end = System.currentTimeMillis();		
+		final long elapse = end-start;
+		
+		System.out.printf("Took %1$d ms\n", elapse);
 
+		Assert.assertTrue("Insufficient fields read.", fields > 1250000);//Diagnostic
+		Assert.assertTrue("Load time exceed permitted max of (in milliseconds)" + max, max > elapse);
 	}
 }
