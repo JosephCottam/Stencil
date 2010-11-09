@@ -9,6 +9,33 @@
        <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
     </target>
     
+    <target name="OneTest" depends="CleanUpTests,MakeJar">
+        <property name="results" location="./testResults/" />
+
+        <move file="Stencil.jar" toDir="TestData"/>
+        <delete dir="${results}"/>
+        <mkdir dir="${results}"/>
+
+        
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
+            <formatter type="plain"/>
+
+            <classpath>
+                <pathelement location="./TestData/Stencil.jar"/>
+                <pathelement path="${java.class.path}"/>
+                <pathelement path="."/>
+                <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+            </classpath>
+            
+            <batchtest todir="${results}">
+                <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
+                    <include name="**/*TestDelimitParser.class"/>
+                </fileset>
+            </batchtest>
+        </junit>
+        
+        <delete file="TestData/Stencil.jar"/>
+    </target>
     
     <target name="JUnit" depends="CleanUpTests,MakeJar">
         <property name="results" location="./testResults/" />
