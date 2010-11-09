@@ -9,6 +9,10 @@ defaults:
     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
 
 operators:
+  - name: Accumulate
+    facets:
+      - {name: map, type: PROJECT, function: FALSE, prototype: !proto "double VALUE"}
+      - {name: query, type: PROJECT, function: FALSE, prototype: !proto "double VALUE"}
   - name: Abs
   - name: Add
   - name: Add1
@@ -31,6 +35,7 @@ operators:
   - name: Mult
   - name: Negate
   - name: Nearest
+  - name: ParseInt
   - name: Sine
   - name: Cosine
   - name: Tangent

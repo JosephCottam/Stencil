@@ -32,6 +32,8 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 
 public class StringUtil extends BasicModule {
+	
+	
 	/**Print the passed tuple. Replaces names with new names.*/
 	public static Object[] print(Object... os) {
 		for (int i=0;i<os.length;i++) {

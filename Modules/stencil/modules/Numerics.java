@@ -34,7 +34,9 @@ import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Range;
+import stencil.module.operator.util.Split;
 import stencil.module.operator.wrappers.RangeHelper;
+import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.util.collections.ConstantList;
 import stencil.parser.tree.Specializer;
@@ -45,6 +47,30 @@ import static stencil.module.operator.StencilOperator.QUERY_FACET;
 
 public class Numerics extends BasicModule {
 
+	/**Parse an integer from a string.*/
+	public static Integer parseInt(String hexString, int radix) {
+		return Integer.valueOf(hexString, radix);
+	}	
+
+	
+	public static final class Accumulate extends AbstractOperator {
+		private int acc;
+		private Object storedKey;
+		
+		public Accumulate(OperatorData opData) {super(opData);}
+		
+		public double map(Object key, int value) {
+			if (storedKey ==null || !storedKey.equals(key)) {acc =0;}
+			acc += value;
+			storedKey = key;
+			return acc;
+		}
+		public double query(Object key, int value) {
+			if (storedKey ==null || !storedKey.equals(key)) {return 0;}
+			return acc+value;
+		}
+	}
+	
 	/**Sum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 **/
@@ -213,6 +239,8 @@ public class Numerics extends BasicModule {
 				target = new FullMin(noFunctions(operatorData));
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
 
+			
+			target = SplitHelper.makeOperator(new Split(specializer.get(Specializer.SPLIT)), target);
 		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}
 
 		return target;
