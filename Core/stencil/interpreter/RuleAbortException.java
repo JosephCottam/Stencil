@@ -37,7 +37,7 @@ public class RuleAbortException extends Exception {
 	}
 
 	public RuleAbortException(Rule r, Exception e) {
-		super(String.format("Rule %1$s in layer or operator %2$s aborted.", r.getChildIndex()+1, r.getPath()), e);
+		super(String.format("Rule %1$s in %2$s aborted.", r.getChildIndex()+1, r.getPath()), e);
 	}
 
 }

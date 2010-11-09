@@ -53,7 +53,7 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 	public Path getPath() {return path;}
 	
 	/**Run this updater if required.
-	 * Returns true if the update ran; false otherwise.
+	 * Return an appropriate finisher to complete work (if required).
 	 * */
 	public Finisher call() {
 		if (needsUpdate()) {

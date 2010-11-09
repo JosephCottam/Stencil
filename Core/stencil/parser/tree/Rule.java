@@ -32,6 +32,7 @@ import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.tuple.Tuple;
+import stencil.interpreter.RuleAbortException;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.util.Environment;
 
@@ -88,7 +89,7 @@ public class Rule extends StencilTree {
 		Environment ruleEnv = env.ensureCapacity(env.size() + getAction().getDepth());
 
 		Tuple t = getAction().apply(ruleEnv);
-		if (t == null) {return t;}
+		if (t == null) {throw new RuleAbortException(this);}
 		return getTarget().finalize(t);
 	}
 }

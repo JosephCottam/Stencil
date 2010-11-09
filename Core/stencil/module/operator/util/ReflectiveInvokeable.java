@@ -4,6 +4,7 @@ import java.lang.reflect.*;
 import static java.util.Arrays.deepToString;
 import static java.lang.String.format;
 
+import stencil.interpreter.NoOutputSignal;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -60,11 +61,19 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	
 	
 	public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {
-		R result = invoke(arguments);
-		Tuple t=null;
-		if (returnsTuple) {t=(Tuple) result;}
-		else if (result != null) {t=Converter.toTuple(result);}
-		return t;
+		try {
+			R result = invoke(arguments);
+			Tuple t=null;
+			if (returnsTuple) {t=(Tuple) result;}
+			else if (result != null) {t=Converter.toTuple(result);}
+			return t;
+		} 
+		catch (NoOutputSignal no) {throw no;}
+		catch (MethodInvokeFailedException ex) {
+			if (ex.getCause() instanceof NoOutputSignal) {
+				throw (NoOutputSignal) ex.getCause();
+			} else {throw ex;}
+		}
 	}
 	
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
@@ -114,8 +123,13 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			
 		try {
 			return (R) method.invoke(target, args);	//99% of method time spent on this one line...
-		} catch (Exception e) {
-		 	throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, e);
+		} 
+		catch (Exception ex) {
+			if (ex.getCause() instanceof NoOutputSignal) {
+				throw (NoOutputSignal) ex.getCause();
+			} else {
+				throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, ex);
+			}
 		}
 	}
 	

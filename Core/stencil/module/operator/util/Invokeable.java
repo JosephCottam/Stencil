@@ -1,5 +1,6 @@
 package stencil.module.operator.util;
 
+import stencil.interpreter.NoOutputSignal;
 import stencil.tuple.Tuple;
 
 public interface Invokeable<R> {
@@ -11,10 +12,10 @@ public interface Invokeable<R> {
 	 * value MUST NOT be null.
      **/
 	public abstract Tuple tupleInvoke(Object[] arguments) 
-		throws MethodInvokeFailedException;
+		throws NoOutputSignal, MethodInvokeFailedException;
 
 	/**Invoke some entity with the passed arguments.*/
 	public abstract R invoke(Object[] arguments)
-		throws MethodInvokeFailedException;
+		throws NoOutputSignal, MethodInvokeFailedException;
 
 }

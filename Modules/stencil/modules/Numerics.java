@@ -30,6 +30,7 @@ package stencil.modules;
 
 import java.util.List;
 
+import stencil.interpreter.NoOutputSignal;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
@@ -59,14 +60,20 @@ public class Numerics extends BasicModule {
 		
 		public Accumulate(OperatorData opData) {super(opData);}
 		
-		public double map(Object key, int value) {
-			if (storedKey ==null || !storedKey.equals(key)) {acc =0;}
+		public int map(Object key, int value) throws NoOutputSignal {
+			Integer rv = null;
+			if (storedKey ==null || !storedKey.equals(key)) {
+				rv = acc;
+				acc =0;
+			}
 			acc += value;
 			storedKey = key;
-			return acc;
+			if (rv ==null) {throw new NoOutputSignal();}
+			return rv;
 		}
-		public double query(Object key, int value) {
-			if (storedKey ==null || !storedKey.equals(key)) {return 0;}
+		
+		public int query(Object key, int value) {
+			if (storedKey ==null || !storedKey.equals(key)) {return value;}
 			return acc+value;
 		}
 	}

@@ -47,8 +47,8 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private List<Glyph2D> update = new ArrayList();
 	
 	
-	private int storeStateID = Integer.MIN_VALUE;
-	protected int stateID = Integer.MIN_VALUE; 
+	private int storeStateID = 0;
+	protected int stateID = 0; 
 	
 	private final String name;
 	private final boolean sortZ;

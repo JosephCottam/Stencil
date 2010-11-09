@@ -32,6 +32,7 @@ import java.util.List;
 import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
+import stencil.interpreter.NoOutputSignal;
 import stencil.parser.string.StencilParser;
 
 public class Function extends CallTarget {
@@ -89,6 +90,8 @@ public class Function extends CallTarget {
 			Object[] formals = TupleRef.resolveAll(getArguments(), valueSource);
 			Tuple results = getTarget().invoke(formals);
 			return results;
- 		} catch (Exception e) {throw new FunctionApplicationException(this, valueSource, e);} 		
+		} 
+		catch (NoOutputSignal no) {throw no;}
+ 		catch (Exception e) {throw new FunctionApplicationException(this, valueSource, e);} 		
 	}
 }

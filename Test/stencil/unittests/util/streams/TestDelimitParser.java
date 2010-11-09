@@ -77,8 +77,6 @@ public class TestDelimitParser extends TestCase {
 		}
 		final long end = System.currentTimeMillis();		
 		final long elapse = end-start;
-		
-		System.out.printf("Took %1$d ms\n", elapse);
 
 		Assert.assertTrue("Insufficient fields read.", fields > 1250000);//Diagnostic
 		Assert.assertTrue("Load time exceed permitted max of (in milliseconds)" + max, max > elapse);

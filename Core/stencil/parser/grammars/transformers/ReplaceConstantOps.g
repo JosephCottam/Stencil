@@ -77,10 +77,11 @@ options {
    	  }
 		}
 
-	private Tuple evaluate(Function f) {
-	    assert isConstant(f) : "Reached evaluate for non-const operator application.";
-	    return f.getTarget().invoke(f.getArguments().toArray()); 
-  }
+    private Tuple evaluate(Function f) {
+        assert isConstant(f) : "Reached evaluate for non-const operator application.";
+        try {return f.getTarget().invoke(f.getArguments().toArray());}
+        catch (Exception e) {throw new RuntimeException("Error evaluating constant oeprator durring constant propagation; " + f.toStringTree());}
+    }
   
   private static final Environment defaultEnvironment(Object chain) {
      int depth = ((CallChain) chain).getDepth();

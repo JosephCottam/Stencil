@@ -31,15 +31,15 @@ public class Interpreter {
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws Exception {return processSequential(streamTuple, Arrays.asList(rule));}
-	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws Exception {
+	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws NoOutputSignal, RuleAbortException {return processSequential(streamTuple, Arrays.asList(rule));}
+	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws NoOutputSignal, RuleAbortException {
 		Environment env = Environment.getDefault(Display.canvas, Display.view, streamTuple);
 		return process(env, rules);
 	}
 
 			
-	public static Tuple process(Environment env, Rule... rules) throws Exception {return process(env, Arrays.asList(rules));}	
-	public static Tuple process(Environment env, Iterable<Rule> rules) throws Exception {
+	public static Tuple process(Environment env, Rule... rules) throws NoOutputSignal, RuleAbortException {return process(env, Arrays.asList(rules));}	
+	public static Tuple process(Environment env, Iterable<Rule> rules) throws NoOutputSignal, RuleAbortException {
 		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
 
 		List<Tuple> resultBuffer = new ArrayList();
@@ -49,14 +49,12 @@ public class Interpreter {
 			for (Rule rule: rules) {
 				Tuple result;				
 				try {result = rule.apply(env);}
-				catch (Exception e) {throw new RuntimeException(String.format("Error invoking rule %1$d.", rule.getChildIndex()+1), e);}
-				
-				//TODO: Have rules throw exception (instead of return null)
-				//TODO: Fix the creation issue.  Right now errors in dynamic rules are ignored (they will be retried later in the dynamic system)
-				if (result == null) {
+				catch (RuleAbortException ra) {
 					if (abortOnError) {throw new RuleAbortException(rule);}
-					else {return null;}
+					else {throw new NoOutputSignal("No output due to rule abort.", ra);}
 				}
+				catch (NoOutputSignal no) {throw no;}
+				catch (Exception e) {throw new RuleAbortException(rule, e);}
 				
 				resultBuffer.add(result);
 			}
@@ -74,15 +72,14 @@ public class Interpreter {
 	}
 	
 	//Parallelize here???  Checks all groups in parallel...
-	public Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws Exception {
+	public Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws NoOutputSignal, RuleAbortException {
 		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
 		Tuple prefilter, local;
 		Tuple result = null;
 		Environment env = Environment.getDefault(Display.canvas, Display.view, source.getValues());
 		
-		try {prefilter = process(env, group.getPrefilterRules());}
-		catch (Exception e) {throw new RuntimeException(format("Error processing prefilter rules in layer %1$s", target.getName()),e);}
+		prefilter = process(env, group.getPrefilterRules());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 		
 		try {matches = group.matches(env);}
@@ -90,8 +87,7 @@ public class Interpreter {
 		
 		if (matches) {
 			
-			try {local = process(env, group.getLocalRules());}
-			catch (Exception e) {throw new RuntimeException(format("Error processing locals in layer %1$s", target.getName()), e);}	
+			local = process(env, group.getLocalRules());				
 			env.setFrame(Environment.LOCAL_FRAME, local);
 			try {
 				result = process(env, group.getResultRules());				
@@ -105,7 +101,7 @@ public class Interpreter {
 				}
 
 			}
-			
+			catch (NoOutputSignal no) {throw no;}
 			catch (IDException IDex) {throw IDex;}
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
@@ -137,16 +133,24 @@ public class Interpreter {
 			stream.offer(StreamDef.DIVIDER);
 			for (Consumes group: stream.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
-				process(source, stream, group);
-				actionsTaken = true;
+				try {
+					process(source, stream, group);
+					actionsTaken = true;
+				} catch (NoOutputSignal no) {
+					actionsTaken = true;
+				}
 			}
 		}
 		
 		for (Layer layer:program.getLayers()) {			
 			for(Consumes group:layer.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
-				Tuple result = process(source, layer, group);
-				actionsTaken = registerDynamics(layer, group, source, result) && actionsTaken;
+				try {
+					Tuple result = process(source, layer, group);
+					actionsTaken = registerDynamics(layer, group, source, result) && actionsTaken;
+				} catch (NoOutputSignal no) {
+					actionsTaken = true;
+				}
 			}
 		}
 		return actionsTaken;

@@ -262,8 +262,7 @@ public final class MultiThreadPainter {
 				for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
 				for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
 					
-				executeAll(dynamicUpdaters.values());//PROBLEM: Assumes dynamic updates do not depend on the state of the layer.  Does that make sense???  Otherwise, sequence of updates will matter.
-													 //SOLUTION: Introduce rounds of dynamic binding.  Syntax is ":[n]*.  Round is automatically determined EXCEPT when a circularity exists.  Then round must be explicit.
+				executeAll(dynamicUpdaters.values());
 				executeAll(guideUpdaters);
 			}
 		} catch (Exception e) {
