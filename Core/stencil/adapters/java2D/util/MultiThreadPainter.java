@@ -190,7 +190,7 @@ public final class MultiThreadPainter {
 		
 	}
 
-	public void signalShutdown() {
+	public synchronized void signalShutdown() {
 		if (!renderPool.isShutdown()) {renderPool.shutdown();}
 		if (!updatePool.isShutdown()) {updatePool.shutdown();}
 	}

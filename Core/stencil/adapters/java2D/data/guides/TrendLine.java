@@ -11,6 +11,7 @@ import java.util.List;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.Line;
+import stencil.parser.string.util.EnvironmentProxy;
 import stencil.parser.tree.Guide;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
@@ -39,7 +40,7 @@ public class TrendLine  extends Guide2D {
 	
 	public TrendLine(Guide guideDef) {
 		super(guideDef);
-		TuplePrototype p = guideDef.getPrototype();		//Get input prototype
+		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
 		x_idx = ArrayUtil.indexOf("X", TuplePrototypes.getNames(p));
 		y_idx = ArrayUtil.indexOf("Y", TuplePrototypes.getNames(p));
 

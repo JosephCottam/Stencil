@@ -43,33 +43,29 @@ options {
 //  | ^(TUPLE_REF r=NUMBER topdown) //No change needed
 //  | ^(TUPLE_REF NUMBER);  //No change needed
 
+
 topdown
 	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
-  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .?); 
+  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .); 
 
-callTarget[EnvironmentProxy env] 
+callTarget[EnvironmentProxy env]
   : ^(f=FUNCTION . . ^(LIST valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
-  | ^(PACK valueE[env]+);    
+  | ^(PACK valueE[env]*);    
+      
       
 valueE[EnvironmentProxy env]
-  options{backtrack=true;}
-  : ^(t=TUPLE_REF r=ID v=valueP[env.get(env.getFrameIndex($r.text))]) 
-      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] $v)
-  | ^(t=TUPLE_REF r=ID)
-      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))])
-  | .; //Literals don't have tuple refs, just match and continue
+  : ^(t=TUPLE_REF r=ID valueP[env.get(env.getFrameIndex($r.text))]?)
+      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] valueP?)
+  | (STRING | NUMBER); //Literals don't have tuple refs, just match and continue
     catch[Exception e] {throw new RuntimeException(String.format("Error numeralizing \%1\$s.\n\%2\$s.", $t.toStringTree(), e.toString()));}
   
       
 //TODO:Unify envProxy and TuplePrototype (will eliminated the valueE and valueNP variants, requires a way to get a prototype from a prototype...)
 valueP[TuplePrototype p]
-  : ^(t=TUPLE_REF r=ID) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))])
-  | ^(t=TUPLE_REF r=ID valueNP) -> ^(TUPLE_REF NUMBER[Integer.toString(p.indexOf($r.text))] valueNP)
-  | ^(t=TUPLE_REF r=NUMBER)
-  | ^(t=TUPLE_REF r=NUMBER valueNP); 
-    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $t.toStringTree());}
+  : r=ID value? -> NUMBER[Integer.toString(p.indexOf($r.text))] value?
+  | r=NUMBER value?;
+    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $r.getAncestor(TUPLE_REF).toStringTree());}
 
-valueNP
-  : ^(TUPLE_REF ID) {throw new RuntimeException("Numeralize can only handle one level names in nesting");}
-  | ^(TUPLE_REF NUMBER valueNP)
-  | ^(TUPLE_REF NUMBER);
+value
+  : ID {throw new RuntimeException("Numeralize can only handle one level names in nesting");}
+  | NUMBER value?;

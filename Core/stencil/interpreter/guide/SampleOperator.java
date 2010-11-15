@@ -29,15 +29,23 @@
 package stencil.interpreter.guide;
 
 import java.util.List;
+
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 
 
 public interface SampleOperator {
+	/**Tuple prototype for all sample results.  
+	 * This always includes exactly one field: #Sample.
+	 */
+	public TuplePrototype PROTOTYPE = new SimplePrototype("#Sample");
+	
 	/**Generate a sample based on the seed values and the details.
 	 * The values of details that are actually paid attention to 
 	 * depends on the sample operator itself. 
 	 * 
 	 */
-	public List<Tuple> sample(SampleSeed seed, Specializer details);
+	public List<Tuple> sample(SampleSeed seed, Specializer details);	
 }

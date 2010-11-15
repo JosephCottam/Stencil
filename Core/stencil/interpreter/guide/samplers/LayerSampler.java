@@ -12,6 +12,7 @@ import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
+/**Iterates the tuples of a layer as the sample.*/
 public final class LayerSampler implements SampleOperator {
 	/**Special seed operator to accompany this sampler type.*/
 	public static final class SeedOperator implements stencil.interpreter.guide.SeedOperator {

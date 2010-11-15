@@ -11,9 +11,10 @@ options {
   /** Ensures that a sample operator exists in the call chain.
    *  Sample operators are inserted where a #-> appears,
    *  after the last project operator in a chain or 
-   *  at the start of the chain.
+   *  at the start of the chain (in that order of precedence).
    *
    *  TODO: Needs to be fixed so that constants don't mess this up...ARG!!!!
+   *  TODO: Extend so to can handle more than the first field in a mapping definition
    **/
 	 
    package stencil.parser.string;
@@ -36,8 +37,6 @@ options {
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
-	
-   //TODO: Extend so we can handle more than the first field in a mapping definition
 }
 
 @members {
@@ -118,8 +117,6 @@ options {
     }
  
     /**Construct the arguments section of an echo call block.
-     *
-     * TODO: Remove by having guide happen AFTER numeralize occurs
      * 
      * @param t Call target that will follow the new echo operator.
      */
@@ -137,15 +134,7 @@ options {
     private Specializer spec(CommonTree t) {
       CallTarget target = (CallTarget) t;
       List<Value> args = echoArgs(target);
-      StringBuilder b = new StringBuilder("[range" + BIND_OPERATOR + " ALL, fields: \"");
-      for (Value v: args) {
-        if (v instanceof TupleRef) {
-	        b.append(((TupleRef) v).getValue());
-	        b.append(",");
-	      }
-      }
-      b.replace(b.length()-1, b.length(), "\",");
-      
+      StringBuilder b = new StringBuilder("[range" + BIND_OPERATOR + " ALL,");      
       
       //Get additional map arguments from the guide declaration
       Specializer spec = requestedGuides.get(key(target));

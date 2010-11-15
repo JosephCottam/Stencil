@@ -125,8 +125,12 @@ public abstract class ParseStencil {
 			parser.setTreeAdaptor(TREE_ADAPTOR);
 			StencilParser.specializer_return parserRV = parser.specializer();
 			if (parser.getNumberOfSyntaxErrors() >0) {throw new SyntaxException(parser.getNumberOfSyntaxErrors(), source);}
-						
-			return (Specializer) parserRV.getTree();
+			
+			Specializer  spec = (Specializer) parserRV.getTree();
+
+			//SpecializerValidator.apply(spec);  //Is not used here because it makes testing some important cases hard...
+			
+			return spec;
 		} catch (Exception e) {
 			throw new ProgramParseException(String.format("Error parsing specializer: '%1$s'.", source), e);
 		}
@@ -178,34 +182,33 @@ public abstract class ParseStencil {
 		PreparsePython.apply(p);				//Verify that Python operators are syntactically correct and appropriately indented
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
-		p = TupleRefDeLast.apply(p);			//Remove all uses of the LAST tuple reference
-		p = SpecializerDeconstant.apply(p);	//Remove references to constants in specializers
+		p = LastToAll.apply(p);					//Remove all uses of the LAST tuple reference
+		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
 		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
-
 		p = DefaultPack.apply(p);				//Add default packs where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
 		p = OperatorInstantiateTemplates.apply(p, modules);		//Remove all operator references
-		p = OperatorExplicit.apply(p);		
-		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
+		p = RemoveOpTemplates.apply(p);							//Remove the templates references point at (simplifies later analysis)
+		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
-
 
 		p = AnnotateEnvironmentSize.apply(p);			//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
 		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 
 		NoOperatorReferences.apply(p);					//Validate the ad-hocs are all created
+
 		
+		p = FrameTupleRefs.apply(p, modules, true);//Ensure that all tuple references have a frame reference
+		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
 		
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		p = GuideDefaultSelector.apply(p); 
-		p = GuideDistinguish.apply(p);		//Distinguish between guide types		
+		p = GuideDistinguish.apply(p);					//Distinguish between guide types		
 		p = GuideInsertSeedOp.apply(p, modules);		//Ensure that auto-guide requirements are met
-
-
-		//Add default specializers to all function nodes (cover things recently added)
+		p = FrameTupleRefs.apply(p, modules, true);		
 		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
 		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
-
+													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
 		
 		p = GuideTransfer.apply(p, modules);		
 		p = GuideLiftGenerator.apply(p);
@@ -217,22 +220,18 @@ public abstract class ParseStencil {
 		GuideSampleOp.apply(p);
 		p = GuideExtendQuery.apply(p);
 		p = GuideClean.apply(p);
-
+		p = FrameTupleRefs.apply(p, modules, false);		//Ensure that all tuple references have a frame reference
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
-		
-		p = OperatorStateQuery.apply(p);
-		
-		//BEGIN DYNAMIC BINDING ----------------------------------------------------------------------------------
 
+		//DYNAMIC BINDING ----------------------------------------------------------------------------------
 		p = DynamicSeparateRules.apply(p);
 		p = DynamicToSimple.apply(p);
 	    p = DynamicCompleteRules.apply(p);
 	    
-		//END DYNAMIC BINDING ----------------------------------------------------------------------------------
+		p = OperatorStateQuery.apply(p);
+
 	    
-		p = TupleRefChain.apply(p);
-		p = RemoveOpTemplates.apply(p);
-		p = FrameTupleRefs.apply(p, modules);				//Ensure that all tuple references have a frame reference
+	   // SIMPlIFICATIONS AND OPTIMIZATIONS
 		p = ReplaceConstants.apply(p);  					//Replace all references to CONST values with the actual value
 		p = NumeralizeTupleRefs.apply(p, modules); 			//Numeralize all tuple references
 		p = Predicate_Compact.apply(p);						//Improve performance of filter rules by removing all the scaffolding		
@@ -240,7 +239,7 @@ public abstract class ParseStencil {
 		p = AnnotateEnvironmentSize.apply(p);				//Since some transformations change chain lengths, this must be re-run.
 		p = ReplaceConstantOps.apply(p, modules);			//Evaluate constant rules, propagate results out		
 		p = LiftSharedConstantRules.apply(p);				//Move all constant rules up to the defaults section so they are only evaluated once.
-
+		//TODO: Remove all RENAME operators, just re-arrange the tuple references
 		validate(p);
 		
 		return p;

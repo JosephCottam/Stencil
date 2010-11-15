@@ -28,9 +28,6 @@
  */
 package stencil.interpreter.guide;
 
-import stencil.tuple.prototype.TuplePrototype;
-
-
 public interface SeedOperator {
 	/**Get information about the values that have been seen.
 	 * This need not be a comprehensive sample (thought it may be,
@@ -39,16 +36,6 @@ public interface SeedOperator {
 	 * sample, based on the seed.
 	 */
 	public SampleSeed getSeed();
-
-	/**The seed operator is inserted into the call chain to gather
-	 * information for the seed; as such, it carries information about
-	 * the tuple prototype that needs to be fed into the 
-	 * guide process.  This will become the input stream prototype for the 
-	 * guide system.
-	 * 
-	 * TODO: This should be pushed into the AST, not held here!
-	 */
-	public TuplePrototype getSamplePrototype();
 	
 	/**State identifier for the seed operator.**/
 	public int stateID();

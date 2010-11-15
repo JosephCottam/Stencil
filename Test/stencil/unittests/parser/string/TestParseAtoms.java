@@ -2,6 +2,7 @@ package stencil.unittests.parser.string;
 
 import junit.framework.TestCase;
 import stencil.parser.string.StencilParser;
+import stencil.testUtilities.SuppressOutput;
 
 public class TestParseAtoms extends TestCase {
 	
@@ -31,8 +32,10 @@ public class TestParseAtoms extends TestCase {
 			boolean failed = false;
 			StencilParser parser =  ParserUtils.MakeParser(nn);
 
+			SuppressOutput.suppress();
 			try {parser.atom();}
 			catch (Exception e) {failed = true;}
+			finally {SuppressOutput.restore();}
 			
 			assertFalse("Parser did not fail on atom parse with input " + nn, failed);
 		}

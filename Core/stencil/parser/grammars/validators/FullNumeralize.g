@@ -16,21 +16,14 @@ options {
   import stencil.parser.string.ValidationException;
   import stencil.parser.ParseStencil;
   import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.tree.util.Path;
+  import stencil.parser.tree.StencilTree;
 }
 
 @members{
   private static final class NumeralizationException extends ValidationException {
     public NumeralizationException(Tree t) {
-      super(message(t));
-    }
-    
-    private static String message(Tree t) {
-        Tree ancestor = t.getAncestor(FUNCTION);
-        if (ancestor != null) {
-          return "Non-numeralized tuple ref outside of target: " + t.toStringTree() + " in " + ancestor.toStringTree();
-        } else {
-          return "Non-numeralized tuple ref outside of target: " + t.toStringTree();
-        }
+      super("Non-numeralized tuple ref outside of target: " + Path.toString((StencilTree) t));
     }
   }
 
@@ -39,10 +32,12 @@ options {
 
 //TODO: Remove if statement when numeralize is done in return values as well
 topdown
- : ^(t=TUPLE_REF ID .*) 
-    {if (t.getAncestor(StencilParser.FUNCTION) != null
-          || t.getAncestor(StencilParser.PACK) != null
-          || t.getAncestor(StencilParser.PREDICATE) != null) {
+ : ^(t=TUPLE_REF .*) 
+    {if (t.getAncestor(StencilParser.TARGET) == null
+         &&
+          (t.getFirstChildWithType(ID) != null
+          || t.getFirstChildWithType(ALL) != null
+          || t.getFirstChildWithType(LAST) != null)) {
         throw new NumeralizationException(t);
       }};
   

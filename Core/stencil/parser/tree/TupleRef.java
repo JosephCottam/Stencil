@@ -5,67 +5,36 @@ import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
 
-/**Unpack a tuple reference.*/
+/**Reference to a value in a tuple (represented as a list of reference steps)
+ * 
+ * TODO: Would an optimized version of this help?  
+ * 		 All tuple refs have two steps: Field and Frame
+ * 	     Special compiler pass initializes the instances so that field and frame are pre-computed
+ * 		 ALL is represented as -1
+ * */
 public final class TupleRef extends Value {
-	private static final TupleRef NO_SUB_REF = new TupleRef(null);
-	
-	private Integer value = null;
-	private TupleRef subRef;
-	
 	public TupleRef(Token source) {
 		super(source);
 	}
 
-	/**Get the simple value portion of this reference (what will be used to de-reference the tuple)*/
-	public final Atom getValue() {return ((Atom) getChild(0));}
+	/**Unsupported operation*/
+	public final Atom getValue() {throw new UnsupportedOperationException("Cannot get simple value from a TupleRef");}
 
-	/**After numeralization, the value should always be numeric.  This method
-	 * gets the value, based on the assumption that a number will be returned.
-	 * This method is memoized.
-	 */
-	public final Integer getRefValue() {
-		assert (getValue()).isNumber() : "Non number: " + this.getParent().toStringTree();
-		if (value == null) {value = ((StencilNumber) getValue()).intValue();}
-		return value;
-	}
 
 	/**Get the value this reference holds with respect to the tuple.*/
 	public Object getValue(Tuple source) {
-		if (source == null) {return null;}
-
-		int val = getRefValue();
-		Object value = source.get(val);
-		
-		if (hasSubRef()) {return getSubRef().getValue((Tuple) value);}
-		else {return value;}
-	}
-
-	/**Get the sub-reference (if any).
-	 * This method is memoized.
-	 * 
-	 * @throws RuntimeException When there is no sub-ref, but this method is called then this exception is thrown.
-	 */
-	public TupleRef getSubRef() {
-		if (!hasSubRef()) {throw new RuntimeException("Attempt to get subref where none is present.");}
-		return (TupleRef) subRef;
+		Object value = source;
+		for (int i=0; i< getChildCount(); i++) {
+			if (value == null) {return null;}
+			StencilNumber num = (StencilNumber) getChild(i);
+			int idx = num.intValue();
+			value = ((Tuple) value).get(idx);
+		}
+		return value;
 	}
 	
 	public boolean isTupleRef() {return true;}	
-	
-	/**Does this tuple-ref include a sub-ref?
-	 * This method is memoized. 
-	 */
-	public boolean hasSubRef() {
-		if (subRef == null) {
-			if (this.getChildCount() >= 2) {
-				subRef = (TupleRef) getChild(1);
-			} else {
-				subRef = NO_SUB_REF;
-			}
-		}
-		return subRef != NO_SUB_REF;
-	}
-	
+		
 	/**Given a potential reference and source, gets a Java value.
 	 * Values are resolved in the following order of precedence:
 	 * 	1) Literals

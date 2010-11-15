@@ -13,6 +13,7 @@ import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
 import stencil.parser.ParseStencil;
+import stencil.parser.string.util.EnvironmentProxy;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -108,7 +109,7 @@ public class Axis extends Guide2D {
 		prototypeLine = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LINE_PROPERTY_TAG, prototypeLine);
 		prototypeLine = GuideUtils.applyDefaults(guideDef.getSpecializer(), LINE_PROPERTY_TAG, prototypeLine);
 		
-		TuplePrototype p = guideDef.getPrototype();		//Get input prototype
+		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
 		offset_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
 		

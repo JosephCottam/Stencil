@@ -1,9 +1,7 @@
 package stencil.module.util;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.Collection;
 
 import org.yaml.snakeyaml.Loader;
 import org.yaml.snakeyaml.TypeDescription;
@@ -15,10 +13,7 @@ import org.yaml.snakeyaml.nodes.ScalarNode;
 
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
-import stencil.testUtilities.StringUtils;
 import stencil.tuple.prototype.TuplePrototype;
-
-
 
 public class ModuleDataParser {
 	/**Constructor class to handle loading the stencil-specific constructs.*/
@@ -68,23 +63,4 @@ public class ModuleDataParser {
 	public static ModuleData load(String fileName) throws Exception {
 		return load(new FileInputStream(fileName));
 	}
-	
-	public static void main(String[] args) throws Exception {
-		Collection<String> files= StringUtils.allFiles("./configs/", ".yml");
-		if (files.size() ==0) {System.err.println("No files found.");}
-		
-		for (String file: files) {
-			String name = new File(file).getName();
-			try {
-				load(new FileInputStream(file));
-				System.out.println("Loaded: " + name);
-			}
-			catch (Throwable e) {
-				System.err.println("Error parsing: " + name);
-				e.printStackTrace();
-			}			
-		}
-	}
-
-	
 }

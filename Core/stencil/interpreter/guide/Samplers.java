@@ -2,8 +2,6 @@ package stencil.interpreter.guide;
 
 import stencil.display.DisplayLayer;
 import stencil.interpreter.guide.samplers.*;
-import stencil.module.operator.util.Invokeable;
-import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.parser.tree.Layer;
 
 import java.util.HashMap;
@@ -45,11 +43,6 @@ public final class Samplers {
 
 		try {return opClass.getConstructor(argTypes).newInstance(args);}
 		catch (Exception e) {throw new RuntimeException("Error creating sample operator for class: " + clazz.getName());}
-	}
-	
-	public static Invokeable getInvokeable(Class clazz, Object... args) {
-		SampleOperator o = get(clazz, args);
-		return new ReflectiveInvokeable("sample", o);
 	}
 	
 	public static void add(Class clazz, Class<? extends SampleOperator> op) {

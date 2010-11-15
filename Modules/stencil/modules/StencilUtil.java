@@ -48,8 +48,6 @@ import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
-import stencil.tuple.prototype.SimplePrototype;
-import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
@@ -106,22 +104,8 @@ public class StencilUtil extends BasicModule {
 
 	
 	public static abstract class SeedBase extends AbstractOperator implements  SeedOperator, Cloneable {
-		private final String FIELDS = "fields";
-		
-		final TuplePrototype samplePrototype;
-		
-		protected SeedBase(OperatorData opData, TuplePrototype p) {
-			super(opData);
-			samplePrototype = p;
-		}
-		
-		protected SeedBase(OperatorData opData, Specializer s) throws SpecializationException {
-			super(opData);
-			samplePrototype  = new SimplePrototype(s.get(FIELDS).getText().split("\\s*,\\s*"));
-		}
-		
-		public TuplePrototype getSamplePrototype() {return samplePrototype;}
-				
+		protected SeedBase(OperatorData opData) {super(opData);}
+						
 		/**Complete the operator data, given the specializer.*/
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
 			OperatorData od = new OperatorData(base);
@@ -159,9 +143,9 @@ public class StencilUtil extends BasicModule {
 
 		protected int stateID=Integer.MIN_VALUE; 		
 
-		public SeedContinuous(OperatorData opData, TuplePrototype p, boolean lock) {super(opData, p); this.rangeLock=lock;}
+		public SeedContinuous(OperatorData opData, boolean lock) {super(opData); this.rangeLock=lock;}
 		public SeedContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
-			super(opData, spec);
+			super(opData);
 			
 			Map<String, Atom> map = spec.getMap();
 			if (map.containsKey(MAX_KEY)) {max = Converter.toDouble(map.get(MAX_KEY));}
@@ -169,7 +153,7 @@ public class StencilUtil extends BasicModule {
 			rangeLock = map.containsKey(LOCK_KEY) && map.get(LOCK_KEY).getValue().equals(FALSE_STRING);
 		}
 		
-		public StencilOperator duplicate() {return new SeedContinuous(operatorData, samplePrototype, rangeLock);}
+		public StencilOperator duplicate() {return new SeedContinuous(operatorData, rangeLock);}
 
 		public SampleSeed getSeed() {return new SampleSeed(true, min, max);}
 
@@ -202,9 +186,10 @@ public class StencilUtil extends BasicModule {
 		
 		private final List<Object[]> seen = new CopyOnWriteArrayList();
 				
-		public SeedCategorize(OperatorData opData, TuplePrototype p) {super(opData, p);}
-		public SeedCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData, s);}
-		public StencilOperator duplicate() throws UnsupportedOperationException {return new SeedCategorize(operatorData, samplePrototype);}
+		public SeedCategorize(OperatorData opData) {super(opData);}
+		public SeedCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData);}
+		public StencilOperator duplicate() throws UnsupportedOperationException {return new SeedCategorize(operatorData);}
+		
 		public synchronized SampleSeed getSeed() {return new SampleSeed(false, new ArrayList(seen));}
 
 		public Tuple map(Object... args) {

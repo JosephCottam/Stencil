@@ -9,7 +9,13 @@ import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 public class Selector extends StencilTree {
 	public Selector(Token token) {super(token);}
 
-	/**What is this selector associated with?*/
+	/**What attribute will the results of the selector be applied to?
+	 * This makes the guides slightly more flexible by allowing things like
+	 * FILL_COLOR : Chart.PEN_COLOR;  The paint color from chart will be used to 
+	 * determine the fill color in the guide.
+	 * 
+	 * TODO: Should this be moved to some other part of the tree?  Selector sort of does two things right now: What from and Where to...
+	 * */
 	public String getAttribute() {return getChild(0).getText();}
 
 	/**What is being selected?  This is a path statement.*/

@@ -1,4 +1,4 @@
-tree grammar TupleRefDeLast;
+tree grammar LastToAll;
 options {
   tokenVocab = Stencil;
   ASTLabelType = CommonTree;  
@@ -13,8 +13,11 @@ options {
    *  with the values.  This is one step towards making all tuple
    *  references numeric at runtime.
    *
+   *  Semanticall ALL retrieves a tuple from the runtime as a tuple.  
+   *  Whereas LAST refers to just the values in the tuple.  
+   *  Therefore, LAST can be replaced with a call to ToArray(ALL).
+   *
    *  TODO: Will currently only work for immediate prior tuple, not for arbitrary nesting...
-   *  TODO: Will currently mess up numeric references into the prior frame.  Need to name all frames, frame tuple refs by name THEN do this transform.  Later, numeralize the tuple refs.  Would also make it so that echo operators no longer need to echo, they can just sample (and be named samplers!)
    **/
    
   package stencil.parser.string;

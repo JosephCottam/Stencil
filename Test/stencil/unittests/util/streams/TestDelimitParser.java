@@ -65,7 +65,7 @@ public class TestDelimitParser extends TestCase {
 	
 	/**Check the amount of time the loading of a given amount of tuples takes.*/
 	public void testTime() throws Exception {
-		final long max = 1000; //1 second
+		final long max = 2500; //2.5 second
 		
 		DelimitedParser p = new DelimitedParser("Troves", "ID|ATT", troveFile, "\\|", true,1);		
 		final long start = System.currentTimeMillis();
@@ -79,6 +79,6 @@ public class TestDelimitParser extends TestCase {
 		final long elapse = end-start;
 
 		Assert.assertTrue("Insufficient fields read.", fields > 1250000);//Diagnostic
-		Assert.assertTrue("Load time exceed permitted max of (in milliseconds)" + max, max > elapse);
+		Assert.assertTrue(String.format("Load time of %1$s ms exceed permitted max of %2$s ms", elapse, max), max > elapse);
 	}
 }

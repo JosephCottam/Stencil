@@ -56,12 +56,7 @@ options {
     }
     
     private boolean constArgs(List<Value> args) {
-       for (Value v: args) {
-          if (v instanceof TupleRef
-              || v instanceof All
-              || v instanceof Last) {return false;}  
-       }
-       return true;
+       return ((stencil.parser.tree.List) args).findChild(TUPLE_REF) == null;
     }
 
     //Is the passed Function using a facet that is a mathematical function?

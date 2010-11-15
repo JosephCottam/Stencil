@@ -9,25 +9,7 @@ import stencil.adapters.java2D.Adapter;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
-import stencil.parser.string.AdHocOperators;
-import stencil.parser.string.AnnotateEnvironmentSize;
-import stencil.parser.string.DefaultPack;
-import stencil.parser.string.DefaultSpecializers;
-import stencil.parser.string.ElementToLayer;
-import stencil.parser.string.EnsureOrders;
-import stencil.parser.string.Imports;
-import stencil.parser.string.LiftStreamPrototypes;
-import stencil.parser.string.OperatorExplicit;
-import stencil.parser.string.OperatorExtendFacets;
-import stencil.parser.string.OperatorInlineSimple;
-import stencil.parser.string.OperatorInstantiateTemplates;
-import stencil.parser.string.OperatorToOpTemplate;
-import stencil.parser.string.Predicate_Expand;
-import stencil.parser.string.PrepareCustomArgs;
-import stencil.parser.string.SeparateRules;
-import stencil.parser.string.StencilParser;
-import stencil.parser.string.PreparsePython;
-import stencil.parser.string.TupleRefDeLast;
+import stencil.parser.string.*;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
@@ -76,23 +58,21 @@ public class TestFragments extends TestCase {
 		//Do module imports
 		ModuleCache modules = Imports.apply(p);
 		
-		
-		PreparsePython.apply(p);		//Verify that Python operators are syntactically correct and appropriately indented
-		p = PrepareCustomArgs.apply(p);		//Parse custom argument blocks
+		PreparsePython.apply(p);				//Verify that Python operators are syntactically correct and appropriately indented
+		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
-		p = TupleRefDeLast.apply(p);							//Remove all uses of the LAST tuple reference
+		p = LastToAll.apply(p);					//Remove all uses of the LAST tuple reference
+		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
 		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
-
-		p = DefaultPack.apply(p);			//Add default packs where required
-		p = OperatorToOpTemplate.apply(p);							//Converting all operator defs to template/ref pairs
+		p = DefaultPack.apply(p);				//Add default packs where required
+		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
 		p = OperatorInstantiateTemplates.apply(p, modules);		//Remove all operator references
-		p = OperatorExplicit.apply(p);		
-		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
+		p = RemoveOpTemplates.apply(p);							//Remove the templates references point at (simplifies later analysis)
+		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
 
-
-		AnnotateEnvironmentSize.apply(p);		//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
-		p = ElementToLayer.apply(p);		//Convert "element" statements into layers
+		p = AnnotateEnvironmentSize.apply(p);			//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
+		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
 		Module m = modules.getAdHoc();
 		int expected = p.getOperators().size() + p.getPythons().size() + p.getLayers().size();

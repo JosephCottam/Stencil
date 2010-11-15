@@ -165,10 +165,14 @@ public final class Tuples {
 	 * alphabetical order when using this method.
 	 *
 	 * **/
-	public static String toString(Tuple t) {return toString(t, TuplePrototypes.getNames(t));}
-	
+	public static String toString(Tuple t) {
+		try {return toString(t, TuplePrototypes.getNames(t));}
+		catch (UnsupportedOperationException e) {return toStringByIndex(t);}
+	}
+
 	/**String tuple representation with a prefix.  
 	 * This mimics the sigil operator style: @<prefix>{<values>}.
+	 * The tuple passed must support prototypes for this to work.
 	 * 
 	 * @param prefix Type prefix
 	 * @param t
@@ -184,6 +188,22 @@ public final class Tuples {
 		return SIGIL + prefix + "{" + base + "}";
 	}
 	
+	
+	private static String toStringByIndex(Tuple t) {
+		StringBuilder rv = new StringBuilder("(");
+		for (int i=0; i<t.size(); i++) {
+			String value = formatValue(t, t.get(i));
+			rv.append(String.format("**%1$s:%2$s; ", i, value));
+		}
+
+		rv.deleteCharAt(rv.length()-1);
+		if (rv.length() == 0) {rv.append("()");}
+		else {rv.append(")");}
+		return rv.toString();
+	}
+	
+
+	
 	/**Provide a string representation of the tuple, 
 	 * but only include the fields in the passed list.
 	 */
@@ -193,22 +213,11 @@ public final class Tuples {
 		for (String name: fields){
 			Object value =t.get(name);
 			if (value instanceof Number && ((Number) value).doubleValue() ==-0) {value =0.0d;}//Prevent negative zeros
-			
+
 			//Skip values currently set to the default
 			if (t.isDefault(name, value)) {continue;}
-			
-			if (value == null) {
-				value = "[null]";
-			} else if (value instanceof java.awt.TexturePaint) {
-				value = Fills.fillString((java.awt.TexturePaint) value);
-			}else if (value.getClass().isArray()) {
-				value = Arrays.deepToString((Object[]) value);
-			} else if (value == t) {
-				value = "<self>";
-			} else {
-				value = Converter.toString(value);
-			}
-			
+
+			value = formatValue(t, value);
 			rv.append(String.format("%1$s:%2$s; ", name, value));
 		}
 
@@ -218,6 +227,21 @@ public final class Tuples {
 		return rv.toString();
 	}
 
+	private static final String formatValue(Tuple source, Object value) {
+		
+		if (value == null) {
+			return "[null]";
+		} else if (value instanceof java.awt.TexturePaint) {
+			return Fills.fillString((java.awt.TexturePaint) value);
+		}else if (value.getClass().isArray()) {
+			return Arrays.deepToString((Object[]) value);
+		} else if (value == source) {
+			return "<self>";
+		} else {
+			return Converter.toString(value);
+		}
+	}
+	
 	/**Create a new tuple with fields representing a union of the
 	 * fields of the two source tuples.  Values will be taken from
 	 * source1 first, then source2 (so last-write wins on shared fields).

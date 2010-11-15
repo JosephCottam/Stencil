@@ -3,6 +3,7 @@ package stencil.unittests.parser.string;
 import junit.framework.TestCase;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
+import stencil.testUtilities.SuppressOutput;
 import stencil.tuple.prototype.TuplePrototype;
 
 
@@ -52,8 +53,12 @@ public class TestPrototypeParse extends TestCase {
 	private void testFails(String[] tests) {
 		for (String test: tests) {
 			boolean failed = false;
+			
+			SuppressOutput.suppress();
 			try {ParseStencil.parsePrototype(test, false);}
 			catch (ProgramParseException e) {failed = true;}
+			finally{SuppressOutput.restore();}
+			
 			assertTrue(String.format("Expected failure parsing '%1$s' did not occur.", test), failed);
 		}
 	}

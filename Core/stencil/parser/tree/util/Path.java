@@ -49,4 +49,21 @@ public final class Path {
 		}
 		return code;
 	}
+	
+	public String toString() {		
+		if (turns.size() >0){
+			StringBuilder b= new StringBuilder();
+			for (int i: turns) {
+				b.append(i);
+				b.append(":");
+			}
+			b.deleteCharAt(b.length()-1);
+			return b.toString();
+		} else {
+			return "Root element";
+		}
+ 	}
+
+	/**Given a tree, what is its path string.*/
+	public static String toString(StencilTree tree) {return new Path(tree).toString();}
 }

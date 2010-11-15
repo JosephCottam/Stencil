@@ -16,6 +16,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.parser.ParseStencil;
+import stencil.parser.string.util.EnvironmentProxy;
 import stencil.parser.tree.Guide;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -90,7 +91,7 @@ public class Sidebar extends Guide2D {
 		if (specializer.getMap().containsKey(StandardAttribute.X.name()) || specializer.getMap().containsKey(StandardAttribute.Y.name())) {autoPlace = false;}
 		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.getSelector().getAttribute();}
 		
-		TuplePrototype p = guideDef.getPrototype();		//Get input prototype
+		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
 		value_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
 		

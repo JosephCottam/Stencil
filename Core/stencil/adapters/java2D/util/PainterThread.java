@@ -21,7 +21,7 @@ public final class PainterThread implements Runnable {
 	
 	private final BufferedImage[] buffers = new BufferedImage[2];
 	private int nextBuffer =0; 
-	protected boolean keepRunning = true;
+	protected volatile boolean keepRunning = true;
 	
 	public PainterThread(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
 		this.target = target;

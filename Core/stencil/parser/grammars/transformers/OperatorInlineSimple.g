@@ -20,6 +20,8 @@ options {
   import stencil.tuple.prototype.TuplePrototypes;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
   import static stencil.parser.string.util.Utilities.genSym;
+  
+  import java.util.HashMap;
 }
 
 @members {
@@ -60,14 +62,16 @@ options {
          StencilTree pack = findTail(workingCore);
          String input = prototypeNames(op.findChild(YIELDS).getChild(0));
          String output =prototypeNames(op.findChild(YIELDS).getChild(1));
+         String inputFrameName = genSym(FRAME_SYM_PREFIX);
+         Map<TupleRef, TupleRef> subst = buildSubst(inputFrameName, pass, (List) inArgs);
 
          StencilTree preRename = (StencilTree) adaptor.create(FUNCTION, "Rename.map");
          Tree preSpec = ParseStencil.parseSpecializer("[names: \"" + input + "\"]");
          adaptor.addChild(preRename, preSpec);
          adaptor.addChild(preRename, adaptor.dupTree(inArgs));
-         adaptor.addChild(preRename, adaptor.create(DIRECT_YIELD,genSym(FRAME_SYM_PREFIX)));
-         adaptor.addChild(preRename, workingCore);
-	  
+         adaptor.addChild(preRename, adaptor.create(DIRECT_YIELD,inputFrameName));
+         adaptor.addChild(preRename, ReplaceTupleRefs.apply(workingCore, subst));
+         
          Tree postRename = (Tree) adaptor.create(FUNCTION, "Rename.map");
          Tree postSpec = ParseStencil.parseSpecializer("[names: \"" + output + "\"]");
          adaptor.addChild(postRename, postSpec);
@@ -83,6 +87,18 @@ options {
       }    
    }
    
+   private Map<TupleRef, TupleRef> buildSubst(String newFrame, Tree pass, List<TupleRef> inArgs) {
+      Map<TupleRef, TupleRef> result = new HashMap();
+      
+      for (TupleRef ref: inArgs) {
+         TupleRef newRef = (TupleRef) adaptor.create(TUPLE_REF, newFrame);
+//         adaptor.addChild(newRef, adaptor.dupTree(ref.findChild(TUPLE_REF)));  //TODO: Pop off the frame name level when framerefs are added earlier
+         adaptor.addChild(newRef, adaptor.dupTree(ref));  
+
+         result.put(ref, newRef);
+      }
+      return result;
+   }
    
    private List toList(Tree source) {
        List list = (List) adaptor.create(LIST, "args");
@@ -123,7 +139,7 @@ options {
 
 //Identify operators that only have one branch
 search: ^(OPERATOR . LIST opRules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
-opRules: ^(LIST ^(OPERATOR_RULE ^(LIST pred=predicate) ^(LIST .)))   //This step ensures there is only one rule (part of being in-line-able)  TODO: Inline multiple rules
+opRules: ^(LIST ^(OPERATOR_RULE ^(LIST pred=predicate) ^(LIST .)))   //This step ensures there is only one rule (part of being in-line-able)  TODO: Inline multiple rules after explicit framing is universal
   {if ($pred.pred.getText().startsWith("#TrivialTrue")) {
      Tree op = pred.tree.getAncestor(OPERATOR);
      simple.put(op.getText(), (StencilTree) op);

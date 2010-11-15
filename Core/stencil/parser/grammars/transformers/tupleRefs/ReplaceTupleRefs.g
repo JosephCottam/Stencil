@@ -8,8 +8,7 @@ options {
 }
 
 @header{
-  /** Replace references according to the mapping passed.
-   **/
+  /** Replace references according to the mapping passed.**/
    
   package stencil.parser.string;
 
@@ -20,18 +19,18 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t, Map<TupleRef, TupleRef> subst) {
-     return (Program) TreeRewriteSequence.apply(t, subst);
+  public static Tree apply (Tree t, Map<TupleRef, TupleRef> subst) {
+     return TreeRewriteSequence.apply(t, subst);
   }
   
   protected void setup(Object... args) {
      subst = (Map<TupleRef, TupleRef>) args[0];
   }
   
-  private Map<TupleRef, TupleRef> subst;  //TODO: Can this be moved to an argument to topdown???
+  private Map<TupleRef, TupleRef> subst;
 }
 
 topdown
   : t=TUPLE_REF -> {subst.containsKey($t)}? {adaptor.dupTree(subst.get($t))}
-                -> TUPLE_REF
+                -> {adaptor.dupTree($t)}
   ;

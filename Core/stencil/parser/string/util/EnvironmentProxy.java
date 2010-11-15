@@ -4,6 +4,7 @@ package stencil.parser.string.util;
 import stencil.tuple.prototype.TupleFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
@@ -12,6 +13,7 @@ import stencil.parser.string.StencilParser;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.parser.tree.util.MultiPartName;
+import stencil.parser.tree.util.Path;
 import stencil.tuple.prototype.SimplePrototype;
 
 import java.util.Arrays;
@@ -67,22 +69,24 @@ public final class EnvironmentProxy {
 	 */
 	private static final class AncestryPackage {
 		final Consumes c;
-		final OperatorFacet o;
+		final OperatorFacet of;
 		final Guide g;
 		final Layer l;
 		final Program program;
 		final CommonTree focus;
 		final boolean inRuleList;
+		final boolean inGuideGenerator;
 		
 		public AncestryPackage(CommonTree t) {
 			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
-			o = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
+			of = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
 			g = (Guide) t.getAncestor(StencilParser.GUIDE);
 			l = (Layer) t.getAncestor(StencilParser.LAYER);
 
 			StencilTree r= (StencilTree) t.getAncestor(StencilParser.RULE);
 			inRuleList = (r==null) ? false : r.getParent().getType() == StencilParser.LIST;
 			
+			inGuideGenerator = t.getAncestor(StencilParser.GUIDE_GENERATOR) != null;
 			
 			
 			
@@ -97,7 +101,7 @@ public final class EnvironmentProxy {
 	}
 	private static TuplePrototype calcPrefilterProxy(AncestryPackage anc) {
 		if (anc.c != null) {return calcPrototype(anc.c.getPrefilterRules());}
-		if (anc.o != null) {return calcPrototype(anc.o.getPrefilterRules());}
+		if (anc.of != null) {return calcPrototype(anc.of.getPrefilterRules());}
 
 		return new SimplePrototype();
 	}
@@ -118,17 +122,19 @@ public final class EnvironmentProxy {
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
 		if (anc.c != null) {return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();}
-		if (anc.o != null) {return anc.o.getArguments();}
+		if (anc.of != null) {return anc.of.getArguments();}
 		
 		if (anc.g != null) {
 			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
+				//In a rule list but not part of the seed operator indicates that 
 				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();
+			} else if (anc.inGuideGenerator) {
+				return SampleOperator.PROTOTYPE;
 			} else if (anc.inRuleList) {
 				return (TuplePrototype) anc.g.getGenerator().getGenericTarget().findChild(StencilParser.TUPLE_PROTOTYPE);
-			} else {return anc.g.getSeedOperator().getSamplePrototype();}
+			}
 		}
-
-		throw new RuntimeException("Could not calculate stream proxy for tree: " + anc.focus.toStringTree());
+		throw new RuntimeException(String.format("Could not calculate stream proxy for %1$s at %2$s", anc.focus.toString(), Path.toString((StencilTree) anc.focus)));
 	}
 	
 	
@@ -142,7 +148,6 @@ public final class EnvironmentProxy {
 		Function call = (Function) callTree;
 		TuplePrototype prototype = getPrototype(call, modules);
 		EnvironmentProxy p = env.push(label, prototype);
-//		System.out.println(p + "\n\n");
 		return p;
 	}
 
@@ -233,11 +238,20 @@ public final class EnvironmentProxy {
 		catch (FrameException e) {return false;}
 	}
 	
+	/**Value returned for frame labels (not value names)*/
 	public static final String IS_LABEL = "***IS A LABEL*** (Just though you should know).";
 	
+	/**Returns the name of the frame that the value appears in OR 
+	 * IS_LABEL if the name passed is for a frame and not a value.
+	 * 
+	 * @param name
+	 * @return
+	 */
 	public String frameNameFor(String name) {
 		if (prototype.contains(name)) {return label;}
-		if (label != null && label.equals(name)) {return IS_LABEL;}
+		if (label != null && label.equals(name)) {
+			return IS_LABEL;
+		}
 		if (parent == null) {throw new FrameException(name, label, prototype);}
 		try {return parent.frameNameFor(name);}
 		catch (FrameException e) {

@@ -50,7 +50,9 @@ import stencil.parser.tree.Specializer;
  */
 public interface Module {
 	/**Get an instance of the operator of the given name, instantiated
-	 * with the given specializer.  Name may should not have a prefix.
+	 * with the given specializer.  Name may should NOT have a prefix.
+	 * 
+	 * TODO: Replace "specializer" with "context" object
 	 *
 	 * @throws IllegalArgumentException Name passed is not known by this module.
 	 * @throws SpecializationException Specializer passed not permitted with the given operator.
@@ -62,6 +64,9 @@ public interface Module {
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException, IllegalArgumentException;
 
 	/**Get the meta-data about a specific operator, given the specializer.
+	 * 
+	 * TODO: Replace "specializer" with "context" object
+	 * 
 	 * @throws IllegalArgumentException Name passed is not known by this module.
 	 * @throws SpecializationException Specializer passed not permitted with the given operator.
 	 * */

@@ -395,9 +395,9 @@ private simpleRef
   | v=VIEW -> ^(TUPLE_REF ID[$v.text]);
 
 private qualifiedRef 
-  : ARG i=ID CLOSE_ARG -> ^(TUPLE_REF $i)
-  | ARG n=number CLOSE_ARG -> ^(TUPLE_REF $n)
-  | ARG DEFAULT_VALUE CLOSE_ARG -> ^(TUPLE_REF NUMBER["0"]);
+  : ARG i=ID CLOSE_ARG -> $i
+  | ARG n=number CLOSE_ARG -> $n
+  | ARG DEFAULT_VALUE CLOSE_ARG -> NUMBER["0"];
 
 booleanOp : GT |  GTE | LT | LTE | EQ | NEQ | RE | NRE;
 

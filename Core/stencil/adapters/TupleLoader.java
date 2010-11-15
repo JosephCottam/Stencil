@@ -46,7 +46,7 @@ public class TupleLoader implements Runnable {
 	protected Exception exception;
 	protected long recordsLoaded;
 	protected long updateFrequency;
-	protected boolean keepRunning = true;
+	protected volatile boolean keepRunning = true;
 
 	public TupleLoader(StencilPanel panel, TupleStream input) {
 		this.panel = panel;

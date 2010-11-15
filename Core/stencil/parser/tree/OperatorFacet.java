@@ -6,9 +6,7 @@ import org.antlr.runtime.Token;
 
 import stencil.parser.string.StencilParser;
 
-/**In a Python group, there may be more than one block of executable
- * code.  Each of these is a Facet...captured here!
- */
+/**Single facet to a synthetic operator.*/
 public final class OperatorFacet extends StencilTree {
 	public OperatorFacet(Token token) {super(token);}
 

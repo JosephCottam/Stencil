@@ -25,10 +25,10 @@ options {
   public static void apply (Tree t) {TreeFilterSequence.apply(t);}
   
   private static final class PythonValidationException extends ValidationException {
-  	public PythonValidationException(PythonFacet facet, String message) {
-  		super("Error parsing \%1\$s.\%2\$s. \%3\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName(), message);
-  	}
-  	
+    public PythonValidationException(PythonFacet facet, String message) {
+      super("Error parsing \%1\$s.\%2\$s. \%3\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName(), message);
+    }
+    
     public PythonValidationException(PythonFacet facet, Exception e) {
       super(e, "Error parsing \%1\$s.\%2\$s.", ((Python) facet.getParent()).getEnvironment(), facet.getName());
     }
@@ -52,7 +52,7 @@ options {
     for (String line: lines) {
       if (line.trim().equals("")) {continue;}
       if (!pastFirst) {
-      	pastFirst = true;
+        pastFirst = true;
         while(Character.isWhitespace(line.charAt(whiteCount))) {whiteCount++;}
       }
       newBody.append(line.substring(whiteCount));
@@ -66,7 +66,7 @@ options {
     stripIndent(facet);
     
     if (facet.getName().equals(INIT_FACET)) {
-    	if (facet.getArguments().size() != 0) {throw new PythonValidationException(facet, INIT_FACET + " facet with arguments not permitted.");}
+      if (facet.getArguments().size() != 0) {throw new PythonValidationException(facet, INIT_FACET + " facet with arguments not permitted.");}
     }
     
     if (facet.getBody().equals("")) {return;}   

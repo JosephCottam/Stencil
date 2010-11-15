@@ -8,17 +8,14 @@ options {
 }
 
 @header{
-/** Performs the bulk of automatic guide mark generation:
- *   1) Transfers call chain from layer def to guide def
+/** Performs the bulk of automatic guide guide generation:
+ *   1) Transfers call chain from layer def to guide def for generator
  *   2) Trims guide generator chain to minimal length
  *   3) Acquires guide or query facets in guide generator chain
  *
  * Precondition: To operate properly, this pass must be run after ensuring 
  * guide operators exist and after annotating function calls with their
  * associated call targets.
- *  
- *
- * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality    
  **/
 
   package stencil.parser.string;
@@ -139,5 +136,6 @@ renameMappingsDown
    @after{
      Function func = ((Function) $renameMappingsDown.tree);
      func.getTarget().changeFacet(QUERY_FACET);
+     //TODO: Remove when no longer relying on copy propagation to keep shared state correct
    }
    : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);

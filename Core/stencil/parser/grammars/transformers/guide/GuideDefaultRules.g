@@ -21,6 +21,7 @@ options {
    import stencil.parser.tree.*;
    import stencil.tuple.prototype.*;
    import stencil.tuple.prototype.TuplePrototype;
+   import stencil.parser.string.util.EnvironmentProxy;
 
    import static stencil.parser.ParserConstants.BIND_OPERATOR;	
 }
@@ -58,7 +59,7 @@ options {
     
    
    public StencilTree reform(Guide g) {
-     TuplePrototype p = g.getPrototype();
+     TuplePrototype p = EnvironmentProxy.calcPrototype(g.getRules());
      List<String> names = Arrays.asList(TuplePrototypes.getNames(p));
      List<Rule> rules = g.getRules();
      String layer = g.getSelector().getPath().get(0).getID();

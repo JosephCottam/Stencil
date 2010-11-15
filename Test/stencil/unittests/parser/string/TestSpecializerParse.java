@@ -3,6 +3,10 @@ package stencil.unittests.parser.string;
 import junit.framework.TestCase;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
+import stencil.parser.string.ValidationException;
+import stencil.parser.string.validators.SpecializerValidator;
+import stencil.parser.tree.Specializer;
+import stencil.testUtilities.SuppressOutput;
 
 
 public class TestSpecializerParse extends TestCase {
@@ -15,7 +19,7 @@ public class TestSpecializerParse extends TestCase {
 				"[range: \"1 .. -10\"]",
 				"[range: \"-10 .. -1\"]"
 		};
-		testPasses(specializers);
+		testPasses(specializers, true);
 	}
 	
 	public void testRangeFail() throws Exception {
@@ -46,7 +50,7 @@ public class TestSpecializerParse extends TestCase {
 				"[range: ALL]",
 				"[range: LAST]"
 				};
-		testPasses(specializers);
+		testPasses(specializers,true);
 	}
 	
 	
@@ -59,7 +63,7 @@ public class TestSpecializerParse extends TestCase {
 				"[one: \"one\", two: 2, three: \"three\"]"};
 
 		
-		testPasses(specializers);
+		testPasses(specializers, true);
 	}
 	
 	//ID arguments can refer to constants.  Right now, just see if they can be parsed.
@@ -72,21 +76,32 @@ public class TestSpecializerParse extends TestCase {
 				"[one: \"one\", two: TWO, three: 3]"};
 
 		
-		testPasses(specializers);		
+		testPasses(specializers, false);	//Cannot validate because of constant refs can't be resolved out
 	}
 
 	
-	private void testPasses(String[] tests) throws Exception {
+	private void testPasses(String[] tests, boolean validate) throws Exception {
 		for (String test: tests) {
-			ParseStencil.parseSpecializer(test);
+			Specializer spec = ParseStencil.parseSpecializer(test);
+			if (validate) {SpecializerValidator.apply(spec);}
 		}
 	}
 	
-	private void testFails(String[] tests) {
+	private void testFails(String[] tests) { 
+				
 		for (String test: tests) {
+			
+			SuppressOutput.suppress();
+
 			boolean failed = false;
-			try {ParseStencil.parseSpecializer(test);}
+			try {
+				Specializer spec = ParseStencil.parseSpecializer(test);
+				SpecializerValidator.apply(spec);
+			}
 			catch (ProgramParseException e) {failed = true;}
+			catch (ValidationException e) {failed =true;}
+			finally {SuppressOutput.restore();}
+			
 			assertTrue(String.format("Expected failure parsing %1$s did not occur.", test), failed);
 		}
 	}
