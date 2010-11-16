@@ -76,6 +76,7 @@ public abstract class ParserConstants {
 	public static final String CANVAS_FRAME = "canvas";
 	public static final String LOCAL_FRAME = "local";
 	public static final String PREFILTER_FRAME = "prefilter";
+	public static final String STREAM_FRAME = "stream";
 	
 	public static final String SOURCE_FIELD = "Source";
 	public static final String VALUES_FIELD = "Values";

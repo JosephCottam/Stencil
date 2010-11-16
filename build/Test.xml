@@ -2,7 +2,7 @@
     <target name="RunTests" depends="JUnit"/>
     
     <target name="CleanUpTests">
-        <delete><fileset dir="." includes="**/TEST_*"/></delete>
+        <delete><fileset dir="testResults" includes="**/TEST_*"/></delete>
     </target>
     
     <target name="MakeJar">

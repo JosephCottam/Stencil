@@ -62,20 +62,23 @@ public class Rule extends StencilTree {
 		return (Consumes) t;
 	}
 	
-	/**What is the string of named entities (layers, operators, consumes blocks, etc.) to get to this rule.*/
+	/**What is the string of named entities (layers, operators, consumes blocks, etc.) to get to this rule.
+	 * TODO: Extend regular path to identify nameded things and print a perttier path, then replace this call with that.
+	 * */
 	public String getPath() {
 		StringBuilder path = new StringBuilder();
 		
 		try { 
 			//Layer
 			Consumes c = getGroup();
-			path.append(c.getStream());
-			path.append(".");
 			path.append(c.getContext().getName());
+			path.append(".");
+			path.append(c.getStream());
 		} catch (RuntimeException e) {
 			//Operator....
 			path.append(this.getParent().getParent().getText());
 		}
+		
 		return path.toString();
 	}
 	

@@ -39,7 +39,7 @@ public class NumericSampler implements SampleOperator {
 			double max = ((Number) seed.get(1)).doubleValue();
 			
 			int tickCount = 10;
-			boolean useIntegers = !(spec.containsKey(SAMPLE_INTEGERS) && spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
+			boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
 
 			if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
 				double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));
@@ -59,14 +59,14 @@ public class NumericSampler implements SampleOperator {
 	}
 
 	private static List<Number> buildRange(double max, double min, int tickCount, boolean useIntegers) {
-		double range = niceNum(max-min, false);							//'Nice' range
-		double spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
+		float range = niceNum(max-min, false);							//'Nice' range
+		float spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
 		if (spacing < Double.MIN_NORMAL) {spacing =1;}					//Ensure some spacing occurs
-		double graphMin = Math.floor(min/spacing) * spacing;			//Smallest value on the graph
-		double graphMax = Math.ceil(max/spacing) * spacing;				//Largest value on the graph
+		float graphMin = (float) Math.floor(min/spacing) * spacing;			//Smallest value on the graph
+		float graphMax = (float) Math.ceil(max/spacing) * spacing;				//Largest value on the graph
 		SortedSet<Number> nums = new TreeSet();
 		
-		for (double v=graphMin; nums.size() == 0 || nums.last().doubleValue() < graphMax; v+=spacing) {
+		for (float v=graphMin; nums.size() == 0 || nums.last().doubleValue() < graphMax; v+=spacing) {
 			if (useIntegers) {nums.add((int) v);}
 			else {nums.add(v);}
 		}
@@ -79,7 +79,7 @@ public class NumericSampler implements SampleOperator {
 	/**Finds a multiple of 1,2 or 5 or a power of 10 near the passed number.
 	 * 
 	 * From: Graphic Gems, "Nice Numbers for Graph Labels," by Paul Heckbert*/
-	private static double niceNum(double num, boolean round) {
+	private static float niceNum(double num, boolean round) {
 		int exp;
 		double f;
 		double nf;

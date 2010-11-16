@@ -35,7 +35,9 @@ import java.awt.geom.Rectangle2D;
 import java.lang.ref.SoftReference;
 
 import stencil.adapters.general.Registrations;
+import stencil.adapters.general.ScaleWith;
 import stencil.adapters.general.Shapes;
+import stencil.adapters.general.ScaleWith.ScaleBy;
 import stencil.adapters.general.Shapes.StandardShape;
 import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
@@ -55,8 +57,10 @@ public class Shape extends Filled {
 	private static final Attribute<Double> HEIGHT = new Attribute("HEIGHT", 5.0d);
 	private static final Attribute<Double> X = new Attribute("X", 0d);
 	private static final Attribute<Double> Y = new Attribute("Y", 0d);
-	
+	private static final Attribute<ScaleBy> SCALE = new Attribute("SCALE", ScaleBy.ALL);
+
 	static {
+		ATTRIBUTES.add(SCALE);
 		ATTRIBUTES.add(SHAPE);
 		ATTRIBUTES.add(SIZE);
 		ATTRIBUTES.add(WIDTH);
@@ -67,7 +71,7 @@ public class Shape extends Filled {
 	}
 	
 	private final SoftReference<java.awt.Shape> glyphRef;
-
+	private final AffineTransform trans;
 	private final StandardShape shape;
 	private final double width;
 	private final double height;
@@ -75,6 +79,7 @@ public class Shape extends Filled {
 	private final double rotation;
 	private final double regX;
 	private final double regY;
+	private final ScaleBy scale;
 	
 	public Shape(DisplayLayer layer, String id) {
 		super(layer, id);
@@ -84,7 +89,9 @@ public class Shape extends Filled {
 		height= HEIGHT.defaultValue;
 		regX = X.defaultValue;
 		regY = Y.defaultValue;
-		rotation = ROTATION.defaultValue;	
+		rotation = ROTATION.defaultValue;
+		scale = SCALE.defaultValue;
+		trans = AffineTransform.getTranslateInstance(regX, regY);
 		
 		java.awt.Shape glyph = createShape();
 		glyphRef  = new SoftReference(glyph);
@@ -103,6 +110,8 @@ public class Shape extends Filled {
 		this.rotation = source.rotation;
 		this.regX = source.regX;
 		this.regY = source.regY;
+		this.scale = source.scale;
+		this.trans =  source.trans;
 	}
 
 
@@ -124,11 +133,13 @@ public class Shape extends Filled {
 		
 		
 		regX = switchCopy(source.regX, safeGet(option, X));
-		regY = switchCopy(source.regY, safeGet(option, Y));		
+		regY = switchCopy(source.regY, safeGet(option, Y));
+		scale = switchCopy(source.scale, safeGet(option, SCALE));
 
+		trans = AffineTransform.getTranslateInstance(regX, regY);
 		java.awt.Shape glyph = createShape();
 		glyphRef = new SoftReference(glyph);
-		super.updateBoundsRef(glyph.getBounds2D());
+		super.updateBoundsRef(trans.createTransformedShape(glyph).getBounds2D());
 	}
 
 	private final java.awt.Shape createShape() {
@@ -137,8 +148,7 @@ public class Shape extends Filled {
 		
 		java.awt.Shape s = Shapes.getShape(shape, bounds.getX()-regX, bounds.getY()-regY, width, height);
 		s = AffineTransform.getRotateInstance(Math.toRadians(rotation)).createTransformedShape(s);
-		s = AffineTransform.getTranslateInstance(regX, regY).createTransformedShape(s);
-		
+
 		return s;
 	}
 	
@@ -150,6 +160,7 @@ public class Shape extends Filled {
 		else if (ROTATION.is(name)) {return rotation;}
 		else if (WIDTH.is(name)) {return width;}
 		else if (HEIGHT.is(name)) {return height;}
+		else if (SCALE.is(name)) {return scale;} 
 		else {return super.get(name);}
 	}
 	
@@ -162,8 +173,10 @@ public class Shape extends Filled {
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
 		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
-		java.awt.Shape glyph = glyphRef.get();
+		java.awt.Shape glyph = glyphRef.get();  
 		if (glyph == null) {glyph = createShape();}
+		glyph = ScaleWith.scale(glyph, scale, base);
+		glyph = trans.createTransformedShape(glyph);
 		
 		super.render(g, glyph);
 		super.postRender(g, null);

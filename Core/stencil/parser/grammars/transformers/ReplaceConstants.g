@@ -9,13 +9,15 @@ options {
 
 @header {
   /**Identifies constants in operator arguments and specializers, replacing them with the literal value.
+   *
+   * TODO: Make more delicate when runtime constants are added.  Only replace/remove constants if they are compile-time
    **/
-	package stencil.parser.string;
+   package stencil.parser.string;
 	
-	import stencil.parser.tree.*;
-	import stencil.parser.string.util.*;
-	import stencil.tuple.Tuple;
-  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
+   import stencil.parser.tree.*;
+   import stencil.parser.string.util.*;
+   import stencil.tuple.Tuple;
+   import static stencil.parser.ParserConstants.GLOBALS_FRAME;
 }
 
 @members {  
@@ -30,8 +32,8 @@ options {
 }
 
 topdown: 
-	^(TUPLE_REF frame=ID ^(TUPLE_REF field=ID)) 
+	^(TUPLE_REF frame=ID field=ID) 
 		{$frame.text.equals(GLOBALS_FRAME) &&
   		  globals.getPrototype().contains($field.text)}? ->  {adaptor.dupTree(globals.get($field.text))};
-  		  
+  		    		  
 bottomup: ^(LIST ^(CONST .*)) -> ^(LIST);  		  

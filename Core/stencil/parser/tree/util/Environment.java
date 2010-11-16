@@ -8,11 +8,12 @@ public abstract class Environment implements Tuple {
 	/**The default frame names.  
 	 * The element "**stream**" is logically replaced by the name 
 	 * of the stream in any frame instance.*/
-	public static final String[] DEFAULT_FRAME_NAMES = {ParserConstants.CANVAS_FRAME, ParserConstants.VIEW_FRAME, "stream", ParserConstants.PREFILTER_FRAME, ParserConstants.LOCAL_FRAME};
+	public static final String[] DEFAULT_FRAME_NAMES = {ParserConstants.CANVAS_FRAME, ParserConstants.VIEW_FRAME, ParserConstants.GLOBALS_FRAME, ParserConstants.STREAM_FRAME, ParserConstants.PREFILTER_FRAME, ParserConstants.LOCAL_FRAME};
 	public static final int DEFAULT_SIZE = DEFAULT_FRAME_NAMES.length;
 	public static final int CANVAS_FRAME = ArrayUtil.indexOf(ParserConstants.CANVAS_FRAME, DEFAULT_FRAME_NAMES);
 	public static final int VIEW_FRAME = ArrayUtil.indexOf(ParserConstants.VIEW_FRAME, DEFAULT_FRAME_NAMES);
-	public static final int STREAM_FRAME = 2;
+	public static final int GLOBAL_FRAME = ArrayUtil.indexOf(ParserConstants.GLOBALS_FRAME, DEFAULT_FRAME_NAMES);
+	public static final int STREAM_FRAME = ArrayUtil.indexOf(ParserConstants.STREAM_FRAME, DEFAULT_FRAME_NAMES);
 	public static final int PREFILTER_FRAME = ArrayUtil.indexOf(ParserConstants.PREFILTER_FRAME, DEFAULT_FRAME_NAMES);
 	public static final int LOCAL_FRAME = ArrayUtil.indexOf(ParserConstants.LOCAL_FRAME, DEFAULT_FRAME_NAMES);
 

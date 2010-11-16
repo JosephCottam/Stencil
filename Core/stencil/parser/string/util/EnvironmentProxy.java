@@ -192,6 +192,7 @@ public final class EnvironmentProxy {
 		TuplePrototype[] prototypes = new TuplePrototype[Environment.DEFAULT_SIZE];
 		prototypes[Environment.CANVAS_FRAME] = stencil.display.CanvasTuple.PROTOTYPE;
 		prototypes[Environment.VIEW_FRAME] = stencil.display.ViewTuple.PROTOTYPE;
+		prototypes[Environment.GLOBAL_FRAME] = new GlobalsTuple(ancestry.program.getGlobals()).getPrototype();
 		prototypes[Environment.STREAM_FRAME] = calcStreamProxy(ancestry, modules);
 		prototypes[Environment.PREFILTER_FRAME] = calcPrefilterProxy(ancestry);
 		prototypes[Environment.LOCAL_FRAME] = calcLocalProxy(ancestry);

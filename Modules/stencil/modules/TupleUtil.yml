@@ -11,9 +11,11 @@ defaults:
 operators:
   - name: Enfold
   - name: ExtendTuple
+  - name: Filter
   - name: Get
   - name: Rename
   - name: Size
   - name: Select
+  - name: Subset
   - name: ToArray
   - name: ToTuple

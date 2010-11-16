@@ -109,7 +109,7 @@ public class SyntheticOperator implements StencilOperator {
 		}
 		Tuple prefilter;
 		Tuple tuple = new ArrayTuple(values);
-		Environment env = Environment.getDefault(Display.canvas, Display.view, tuple);
+		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, tuple);
 		
 		try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}

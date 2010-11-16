@@ -52,6 +52,10 @@ public class Numerics extends BasicModule {
 	public static Integer parseInt(String hexString, int radix) {
 		return Integer.valueOf(hexString, radix);
 	}	
+	
+	public static Double Logarithm(double base, double value) {
+		return Math.log10(value)/Math.log10(base);
+	}
 
 	
 	public static final class Accumulate extends AbstractOperator {

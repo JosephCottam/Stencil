@@ -231,6 +231,7 @@ public final class Text extends Basic {
 
 	
 	//TODO: Convert this to a more general POINT scaling method, look at line/polyline for inspiration
+	//TODO: Merge this (and the line/polyline version) into the general.ScaleWith version
 	protected void fixScale(Graphics2D g) {
 		AffineTransform trans = g.getTransform();
 		

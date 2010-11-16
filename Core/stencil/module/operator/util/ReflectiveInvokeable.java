@@ -24,9 +24,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 	//Cache objects common allocated/referenced while invoking but never materially changing
 	private final Class[] paramTypes;
-	
-	//TODO: Try a thread-local array to handle an argument cache (removes a short-lived object but adds state here).
-	
+		
 	public ReflectiveInvokeable(Method method) {this(method, null);}
 	public ReflectiveInvokeable(String method, Class target) {this(findMethod(method, target), null);}
 	public ReflectiveInvokeable(String method, T target) {this(findMethod(method, target.getClass()), target);}
@@ -122,7 +120,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		}
 			
 		try {
-			return (R) method.invoke(target, args);	//99% of method time spent on this one line...
+			return (R) method.invoke(target, args);	//99% of method time spent on this one line; 34% of analysis time
 		} 
 		catch (Exception ex) {
 			if (ex.getCause() instanceof NoOutputSignal) {

@@ -158,7 +158,7 @@ public final class Applet extends JApplet implements StencilListener.StencilChan
 		this.add(tabs);
 	}
 
-	private void loadProperties() {
+	public void loadProperties() {
 		Properties props = PropertyManager.loadProperties(new String[]{APPLET_CONFIG});
 		DefaultComboBoxModel model = (DefaultComboBoxModel) stencils.getModel();
 

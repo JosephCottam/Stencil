@@ -1,5 +1,7 @@
 package stencil.modules;
 
+import java.util.ArrayList;
+
 import stencil.module.SpecializationException;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
@@ -94,6 +96,33 @@ public class TupleUtil extends BasicModule {
 
 	/**Takes a tuple, returns a singleton tuple whose value is an array of the original tuples values.*/
 	public static final Tuple toArray(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
+
+
+	/**Given a tuple, select part of that tuple.
+	 * If end <0, it will select the remainder of the tuple.*/
+	public static final Tuple subset(Tuple t, int start, int end) {
+		Object[] values = Tuples.toArray(t);
+		if (end <0) {end = values.length;}
+		Object[] newValues = new Object[end-start];
+		System.arraycopy(values, start, newValues, 0, newValues.length);
+		return new ArrayTuple(values);
+	}
+	
+	/**Filters the passed tuple according to the regular expression passed as a pattern.
+	 * Only elements whose toString matches the pattern will be part of the output.
+	 * TODO: Generalize the pattern matcher to something...probably need some higher-order stuff to do that nicely though...
+	 */
+	public static final Tuple filter(Tuple input, String pattern) {
+		ArrayList l = new ArrayList(input.size());
+		
+		for (int i=0; i<input.size(); i++) {
+			Object o = input.get(i);
+			if (o.toString().matches(pattern)) {l.add(o);}
+		}
+		
+		return new ArrayTuple(l.toArray());
+	}
+	
 	
 	public TupleUtil(ModuleData md) {super(md);}
 		

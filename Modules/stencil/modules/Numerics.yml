@@ -19,6 +19,7 @@ operators:
   - name: AsNumber
   - name: Div
   - name: Divide
+  - name: Logarithm
   - name: Max
     facets:
      - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}

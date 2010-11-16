@@ -33,7 +33,7 @@ public class Interpreter {
 	
 	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws NoOutputSignal, RuleAbortException {return processSequential(streamTuple, Arrays.asList(rule));}
 	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws NoOutputSignal, RuleAbortException {
-		Environment env = Environment.getDefault(Display.canvas, Display.view, streamTuple);
+		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, streamTuple);
 		return process(env, rules);
 	}
 
@@ -77,7 +77,9 @@ public class Interpreter {
 		boolean matches;
 		Tuple prefilter, local;
 		Tuple result = null;
-		Environment env = Environment.getDefault(Display.canvas, Display.view, source.getValues());
+		
+		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
+		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues());
 		
 		prefilter = process(env, group.getPrefilterRules());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);

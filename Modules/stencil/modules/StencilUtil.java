@@ -126,11 +126,7 @@ public class StencilUtil extends BasicModule {
 	
 	/**Returns what was passed in, but records the range of elements
 	 * seen.  Used for continuous operators and should probably never
-	 * be used directly.
-	 * 
-	 * TODO: Lift rangeLock out so locked ranges are a separate class...its a much simpler class!
-	 * 
-	 */
+	 * be used directly.	 */
 	public static final class SeedContinuous extends SeedBase {
 		public static final String NAME = SeedContinuous.class.getSimpleName();
 		public static final String MAX_KEY = "max";
@@ -140,8 +136,6 @@ public class StencilUtil extends BasicModule {
 		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
 		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
 		private final boolean rangeLock;
-
-		protected int stateID=Integer.MIN_VALUE; 		
 
 		public SeedContinuous(OperatorData opData, boolean lock) {super(opData); this.rangeLock=lock;}
 		public SeedContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
@@ -155,12 +149,14 @@ public class StencilUtil extends BasicModule {
 		
 		public StencilOperator duplicate() {return new SeedContinuous(operatorData, rangeLock);}
 
-		public SampleSeed getSeed() {return new SampleSeed(true, min, max);}
+		public SampleSeed getSeed() {
+			synchronized(this) {return new SampleSeed(true, min, max);}
+		}
 
-		public synchronized Tuple map(Object... args) {
+		public Tuple map(Object... args) {
 			assert args.length == 1;
 			double value = Converter.toNumber(args[0]).doubleValue();
-
+			
 			if (!rangeLock) {
 			
 				double oldMax = max;
@@ -170,9 +166,10 @@ public class StencilUtil extends BasicModule {
 					max = Math.max(value, max);
 					min = Math.min(value, min);
 				}
-				if ((max != oldMax) || (min != oldMin)) {stateID++;}
+				if ((max != oldMax) || (min != oldMin)) {
+					stateID++;
+				}
 			}
-			
 			
 			return Tuples.EMPTY_TUPLE;
 		}

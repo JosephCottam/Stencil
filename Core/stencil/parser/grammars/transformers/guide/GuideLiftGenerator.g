@@ -38,13 +38,15 @@ options {
    *  TODO: Have the replacement strategy throw an exception if it is replacing from more than one frame.
    *  TODO: When runtime constants are added, do not replace elements in the runtime global frame  
   */
-  public boolean retain(CommonTree ref, String frame) {
-     if (frame.equals(ParserConstants.VIEW_FRAME) || frame.equals(ParserConstants.CANVAS_FRAME)) {return true;}
+  public boolean replace(CommonTree ref, String frame) {
+     if (frame.equals(ParserConstants.GLOBALS_FRAME) 
+         || frame.equals(ParserConstants.VIEW_FRAME) 
+         || frame.equals(ParserConstants.CANVAS_FRAME)) {return false;}
      
      Function f = (Function) ref.getAncestor(FUNCTION);
-     if (f == null) {return false;}
-     if (f.getPass().getText().equals(frame)) {return true;}
-     return retain(f, frame);
+     if (f == null) {return true;}
+     if (f.getPass().getText().equals(frame)) {return false;}
+     return replace(f, frame);
   }
 }
 
@@ -79,9 +81,9 @@ retarget
 //Add sample output to the result prototpye      
 repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)
-  | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID["stream"] ID["#Sample"]));
+  | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"]));
 
 rename: ^(TUPLE_REF fr=ID fi=ID r=.*)
-  {($fr.getAncestor(GUIDE_GENERATOR) != null) && !retain($fr, $fr.getText())}? 
-      -> ^(TUPLE_REF ID["stream"] ID["#Sample"] $r*);
+  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
+      -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*);
         

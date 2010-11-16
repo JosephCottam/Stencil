@@ -69,7 +69,7 @@ value[EnvironmentProxy env]
   | ^(TUPLE_REF ALL) -> ^(TUPLE_REF ID[env.getLabel()])
   | ^(TUPLE_REF n=ID) 
       -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n)
-  		-> {env.canFrame($n.text)}? ^(TUPLE_REF ID[env.frameNameFor($n.text)] $n)
+      -> {env.canFrame($n.text)}? ^(TUPLE_REF ID[env.frameNameFor($n.text)] $n)
   	  -> {globals.getPrototype().contains($n.text)}? ^(TUPLE_REF ID[GLOBALS_FRAME] $n)
   	  -> {env.frameNameFor($n.text)} //invoked to get a good exception out of it...
   | (STRING | NUMBER);
