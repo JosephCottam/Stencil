@@ -8,7 +8,6 @@ import edu.uci.ics.jung.algorithms.util.IterativeContext;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
@@ -18,14 +17,14 @@ import stencil.types.Converter;
 /**Utility class for building JUNG graph operators.  This covers 
  * graph creation/storage, layout storage and position queries.
  */
-public abstract class GraphOperator extends AbstractOperator implements StencilOperator {
+public abstract class GraphOperator extends AbstractOperator {
 	protected final DirectedGraph graph = new DirectedSparseGraph();
 	protected Layout<Object, Object> layout;	
 	
 	protected GraphOperator(OperatorData opData) {super(opData);}
 
 	/**Recalculate the layout.
-	 * This method should call 'setLayout'.
+	 * This method must call 'setLayout'.
 	 */
 	protected abstract void resetLayout();
 	
@@ -36,7 +35,7 @@ public abstract class GraphOperator extends AbstractOperator implements StencilO
 		extendGraph(values);
 		return true;	
 	}
-	
+
 	public Point2D map(Object... values) {
 		extendGraph(values);
 		return query(values);
@@ -93,6 +92,8 @@ public abstract class GraphOperator extends AbstractOperator implements StencilO
 	/**Utility class for layout operators that use step-wise refinement.
 	 * Supports retrieval of max-iterations, but may ignore it (depending on the layout's definition of 'done')
 	 * 
+	 * TODO: something about iterating until no "real" changes are made.
+	 * 
 	 * @author jcottam
 	 *
 	 */
@@ -107,18 +108,27 @@ public abstract class GraphOperator extends AbstractOperator implements StencilO
 		}
 		
 		public void setLayout(Layout layout) {
-			this.layout = (IterativeContext) layout;
-			
+			this.layout = (IterativeContext) layout;	
 			super.setLayout((Layout) layout);
 		}
 		
 		public Point2D query(String id) {
 			if (super.layout == null) {resetLayout();}
+			return super.query(id);
+		}
+		
+		public int stateID() {
+			if (layout == null) {resetLayout();}
 			if (!layout.done()) {
 				layout.step();
 				stateID++;
 			}
-			return super.query(id);
+			return stateID;
+		}
+		
+		public StepOperator viewPoint() {
+			if (layout == null) {resetLayout();}
+			return (StepOperator) super.viewPoint();
 		}
 	}
 

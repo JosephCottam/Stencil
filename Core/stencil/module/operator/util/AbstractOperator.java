@@ -38,9 +38,7 @@ public abstract class AbstractOperator implements StencilOperator, Cloneable {
 
 	public int stateID() {return stateID;}
 	
-	/**Unsupported operation in BasicProject, must be supplied by the 
-	 * actual implementation.
-	 */
+	/**Unsupported operation in simplest form, must be supplied by the actual implementation.*/
 	public StencilOperator duplicate() {throw new UnsupportedOperationException();}
 
 	/**Default viewpoint creation is to just clone the underlying operator.

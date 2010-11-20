@@ -18,20 +18,21 @@ stream BFS(ID)
 
 order BFS > VertexList
 
-layer VSM
-default
-    FILL_COLOR: @Color{RED}
-    (SIZE, SHAPE) : (1, "RECTANGLE")
+stream VertexPair(ID1, ID2)
 from VertexList
+   (ID1, ID2): (ID1, ID2)
+from VertexList
+   (ID1, ID2): (ID2, ID1)
+
+layer VSM
+from VertexPair
    ID : Concatenate(ID1, ID2) 
    X : Ordering(ID1)
    Y : Ordering(ID2) -> Mult(_, -1)
-from VertexList
-   ID : Concatenate(ID2, ID1) 
-   X : Ordering(ID2) 
-   Y : Ordering(ID1) -> Mult(_, -1)
+   FILL_COLOR: @Color{RED}
+   (SIZE, SHAPE) : (1, "RECTANGLE")
  
-layer Prime
+stream Prime()
 from BFS
 	() : Ordering(ID) -> ()
 

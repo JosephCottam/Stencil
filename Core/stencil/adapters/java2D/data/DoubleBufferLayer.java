@@ -38,7 +38,7 @@ import static stencil.display.LayerView.DynamicEntry;
 public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private static final String PROTOTYPE_ID = "PROTOTYPE ID -- IF YOU EVER READ THIS IN OUTPUT, ITS PROBABLY AN ERROR.";
 	
-	private Map<Object, Integer> index = new HashMap(); //TODO: Look at tree-map for large layers...
+	private Map<Object, Integer> index = new HashMap();
 	private Map<String, DynamicEntry> sourceData = new HashMap();
 	private List<Glyph2D> store = new ArrayList();
 
@@ -192,7 +192,9 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			T newGlyph = (T) glyph.update(update);
 			String id = glyph.getID();
 			if (glyph != newGlyph) {directUpdate(id, newGlyph);}
-		}		
+		}
+		storeStateID++;
+		stateID++;
 	}
 
 	public void addDynamic(int groupID, T target, Tuple sourceData) {

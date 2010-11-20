@@ -24,7 +24,7 @@
  		<mkdir dir="${lib.app.dir}"/>
  		<copy todir="${lib.app.dir}">
  			<fileset dir="${runtimeLibrary}">
- 				<include name="*.jar"/>
+ 				<include name="**/*.jar"/>
                 <exclude name="junit*"/>
  				<exclude name="antlr3-ant.jar"/>
 				<exclude name="antlr-3.2.jar"/>
@@ -74,6 +74,7 @@
             <path id="library.Classpath">
                 <fileset dir="${runtimeLibrary}">
                     <include name="*.jar"/>
+                    <include name="JUNG/*.jar"/>
                     <exclude name="antlr-3.2.jar"/>
                     <exclude name="antlr3-ant.jar"/>
                     <exclude name="stringtemplate-3.2.jar"/>

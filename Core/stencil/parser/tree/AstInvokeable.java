@@ -38,10 +38,10 @@ public final class AstInvokeable<R> extends StencilTree {
 	}
 	
 	public String toString() {
-		String rv = super.toString();
-		if (inv == null) {return rv + " -NoInvokeable";}
-		if (op == null) {return rv + " -NoOperator";}
-		return rv;
+		String rv = super.toString() + "(AST";
+		if (inv == null) {return rv + " -NoInvokeable)";}
+		if (op == null) {return rv + " -NoOperator)";}
+		return rv + ")";
 	}
 	
 	/**If the invokeable being carried contains a

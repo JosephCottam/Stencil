@@ -89,9 +89,15 @@ public class Temp extends BasicModule {
 			}
 			
 			span = outMax-outMin;
-			stateID =0;
 		}
 
+		public Scale(OperatorData od, double outMin, double outMax) {
+			super(od);
+			this.outMin = outMin;
+			this.outMax = outMax;
+			span = outMax-outMin;
+		}
+		
 		public double map(double dv) {
 			double newInMin = Math.min(dv, inMin);
 			double newInMax = Math.max(dv, inMax);
@@ -114,6 +120,8 @@ public class Temp extends BasicModule {
 			
 			return value;
 		}
+		
+		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
 	}
 	
 	

@@ -46,7 +46,6 @@ public class TreeMap extends Layout {
 			}
 			return node;
 		}
-		
 	}	
 	
 	public TreeMap(OperatorData opData, Specializer spec) {
@@ -98,8 +97,6 @@ public class TreeMap extends Layout {
 	private void layout() {
 		layout = root.getLayoutTree();
 		layout.layout(algorithm,new Rect(origin.getX(), origin.getY(), width, height));
-		
-		System.out.println(layoutString(layout, ""));
 	}
 	
 	/**What is the layout info for the given id?
@@ -115,18 +112,7 @@ public class TreeMap extends Layout {
 		return candidate.getMapItem();
 	}
 	
-	private static String layoutString(TreeModel root, String pad) {
-		if (root == null) {return "";}
-		StringBuilder b = new StringBuilder();
-		
-		b.append(pad);
-		b.append(root.getMapItem().getBounds().toString());
-		b.append("\n");
-		
-		for (int i=0; i<root.childCount(); i++) {
-			b.append(layoutString(root.getChild(i), pad + "   "));
-		}
-		
-		return b.toString();
+	public TreeMap viewPoint() {
+		return (TreeMap) super.viewPoint();
 	}
 }

@@ -201,6 +201,8 @@ public final class MultiThreadPainter {
 		for (int i=0; i< layers.length; i++) {
 			if (layers[i].getStateID() != painters.get(i).stateID()) {return true;}
 		}
+		for (UpdateTask task: guideUpdaters) {if (task.needsUpdate()) {return true;}}
+		for (UpdateTask task: dynamicUpdaters.values()) {if (task.needsUpdate()) {return true;}}
 		
 		return (bounds.getHeight() != renderedSize.getHeight()) 
 				|| (bounds.getWidth() != renderedSize.getWidth())

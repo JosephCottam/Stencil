@@ -1,0 +1,23 @@
+name: Dates
+targetClass: stencil.modules.Dates
+description: Simple date support
+defaults: 
+  defaultSpecializer: !spec "[]"
+  facets: 
+    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+    
+operators:
+  - name: MonthNum
+    facets: 
+      - {name: map, type: PROJECT, function: TRUE, prototype: !proto "int monthNum"}
+      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "int monthNum"}
+  - name: Num2Month
+    facets: 
+      - {name: map, type: PROJECT, function: TRUE, prototype: !proto "String month"}
+      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "String month"}
+  - name: MonthFull
+    facets: 
+      - {name: map, type: PROJECT, function: TRUE, prototype: !proto "String month"}
+      - {name: query, type: PROJECT, function: TRUE, prototype: !proto "String month"}
+  

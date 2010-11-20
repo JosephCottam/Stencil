@@ -4,9 +4,10 @@ description: Module to provide access to JUNG operators in Stencil
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split: 0, width: 500, height: 500, steps: 50]"
   facets: 
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "X,Y"}
-    - {name: add, type: PROJECT, function: TRUE, prototype: !proto "modified"}
+    - {name: map, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+    - {name: query, type: PROJECT, function: FALSE, prototype: !proto "X,Y"}
+    - {name: add, type: PROJECT, function: FALSE, prototype: !proto "modified"}
+    - {name: stateID, type: OTHER, function: false, prototype: !proto "int VALUE"}
     
 operators:
     - name: BalloonLayout
