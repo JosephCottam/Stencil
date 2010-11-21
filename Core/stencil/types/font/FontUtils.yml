@@ -5,8 +5,8 @@ description: Create and modify fonts (a font is family+size+style).
 defaults:
   defaultSpecializer: !spec "[range: ALL, split:0]"
   facets:
-    - {name: map, function: true, type: PROJECT, prototype: !proto "Font font"}
-    - {name: query, function: true, type: PROJECT, prototype: !proto "Font font"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "Font font"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "Font font"}
 
 operators:
   - name: Bold
@@ -17,6 +17,6 @@ operators:
   - name: SetFamily
   - name: Font
     facets:
-      - {name: argumentParser, function: true, target: query, type: PROJECT, prototype: !proto "Font font"}
-      - {name: query, function: true, type: PROJECT, prototype: !proto "Font font"}
+      - {name: argumentParser, memUse: FUNCTION, target: query, prototype: !proto "Font font"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "Font font"}
       

@@ -5,8 +5,8 @@ description: Create and modify strokes.  Strokes control non-color aspects of dr
 defaults:
   defaultSpecializer: !spec "[range: LAST, split:0]"
   facets:
-    - {name: map, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
-    - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "BasicStroke stroke"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "BasicStroke stroke"}
 
 operators:
   - name: Width
@@ -17,6 +17,6 @@ operators:
   - name: Pattern
   - name: Stroke
     facets:
-      - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
-      - {name: query, function: true, type: PROJECT, prototype: !proto "BasicStroke stroke"}
+      - {name: argumentParser, memUse: FUNCTION, prototype: !proto "BasicStroke stroke"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "BasicStroke stroke"}
       

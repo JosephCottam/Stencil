@@ -37,7 +37,7 @@ import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
-import static stencil.module.util.OperatorData.TYPE_PROJECT;
+import stencil.module.util.FacetData.MemoryUse;
 import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
 import stencil.parser.ParserConstants;
 import stencil.display.Display;
@@ -74,9 +74,9 @@ public class SyntheticOperator implements StencilOperator {
 
 		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER);
 		
-		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, TYPE_PROJECT, false, opDef.getMap().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, TYPE_PROJECT, false, opDef.getQuery().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, TYPE_PROJECT, false, "VALUE"));
+		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, opDef.getMap().getResults()));	
+		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.WRITER, opDef.getQuery().getResults()));	
+		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 	}
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {

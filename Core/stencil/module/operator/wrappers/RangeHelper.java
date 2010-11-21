@@ -176,12 +176,12 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	protected final OperatorData operatorData;
 	private final StencilOperator baseOperator; 
 	protected final Invokeable baseFacet;		//Actual facet invokable for doing computations
-	private final String facetName;				//Facet on the operator to be used in ranged operations.  MUST be a function.
+	private final String baseFacetName;				//Facet on the operator to be used in ranged operations.  MUST be a function.
 	
 	protected RangeHelper(Range range, StencilOperator operator, String facetName) {
 		this.baseOperator = operator;
 		this.range = range;
-		this.facetName = facetName;
+		this.baseFacetName = facetName;
 		this.baseFacet = operator.getFacet(facetName);
 		this.operatorData =  noFunctions(operator.getOperatorData());		
 	}
@@ -195,7 +195,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	public Invokeable getFacet(String facetName) {
 		try {
 			if (QUERY_FACET.equals(facetName)) {
-				if (!baseOperator.getOperatorData().getFacet(facetName).isFunction()) {
+				if (baseOperator.getOperatorData().getFacet(this.baseFacetName).mutative()) {
 					throw new IllegalArgumentException("Cannot construct a ranged query facet if base facet is not a function.");
 				} else{
 					return new QueryRangeTarget(this, baseFacet);
@@ -270,7 +270,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	
 	public StencilOperator duplicate() {
 		StencilOperator op = baseOperator.duplicate();
-		return makeOperator(range, op, facetName);
+		return makeOperator(range, op, baseFacetName);
 	}
 	
 	public StencilOperator viewPoint() {
@@ -287,7 +287,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 	 * 
 	 * @param range  Range to operator over
 	 * @param operator The base operator instance (also the default return value, if the range is simple) 
-	 * @param baseFacet The name of the facet to be used in non-simple ranged operations
+	 * @param baseFacet The name of the facet to be invoked by the range helper (must be a function)
 	 * @return
 	 */
 	public static StencilOperator makeOperator(Range range, StencilOperator operator, String facetName) {

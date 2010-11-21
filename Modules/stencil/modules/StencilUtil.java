@@ -43,6 +43,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -91,11 +92,11 @@ public class StencilUtil extends BasicModule {
 			OperatorData od = new OperatorData(base);
 			String[] keys  = getNames(spec);
 			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), true, keys);
+			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
 			od.addFacet(fd);
 			
 			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), true, keys);
+			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
 			od.addFacet(fd);
 			return od;
 		}
@@ -110,11 +111,11 @@ public class StencilUtil extends BasicModule {
 		protected static OperatorData complete(OperatorData base, Specializer spec) {
 			OperatorData od = new OperatorData(base);
 			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), true, new String[0]);
+			fd = new FacetData(fd.getName(), MemoryUse.WRITER, new String[0]);
 			od.addFacet(fd);
 			
 			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), fd.getType(), true, new String[0]);
+			fd = new FacetData(fd.getName(), MemoryUse.WRITER, new String[0]);
 			od.addFacet(fd);
 			
 			return od;

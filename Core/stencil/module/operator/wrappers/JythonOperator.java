@@ -12,6 +12,7 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.*;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.PythonFacet;
 
 
@@ -38,9 +39,8 @@ public class JythonOperator implements StencilOperator {
 	
 	public void add(JythonEncapsulation enc, PythonFacet f) {
 		invokeables.put(enc.getName(), new ReflectiveInvokeable<JythonEncapsulation, Tuple>(enc.getInvokeMethod(), enc));
-		String opType = f.getAnnotations().get("TYPE").getText();
 		String[] fields = TuplePrototypes.getNames(enc.getReturns());
-		FacetData data = new FacetData(f.getName(), opType, false, fields);
+		FacetData data = new FacetData(f.getName(), MemoryUse.WRITER, fields);
 		operatorData.addFacet(data);		
 	}
 

@@ -66,7 +66,7 @@ options {
     		Module m = modules.findModuleForOperator(name.prefixedName());
     		OperatorData od = m.getOperatorData(name.getName(), f.getSpecializer());
     		FacetData fd=od.getFacet(name.getFacet());
-    		return fd.isFunction();
+    		return fd.getMemUse() == FacetData.MemoryUse.FUNCTION;
    		} catch (Exception e) {
    			throw new RuntimeException("Error getting module information for operator " + name, e);
    	  }
@@ -75,7 +75,7 @@ options {
     private Tuple evaluate(Function f) {
         assert isConstant(f) : "Reached evaluate for non-const operator application.";
         try {return f.getTarget().invoke(f.getArguments().toArray());}
-        catch (Exception e) {throw new RuntimeException("Error evaluating constant oeprator durring constant propagation; " + f.toStringTree());}
+        catch (Exception e) {throw new RuntimeException("Error evaluating constant oeprator durring constant propagation; " + f.toStringTree(), e);}
     }
   
   private static final Environment defaultEnvironment(Object chain) {

@@ -17,7 +17,7 @@ canvas Main
   guide axis[axisLabel: "Variety", X:0] from BarleySite Y
   guide 
     axis[axisLabel: "Yield", 
-         sample: "LINEAR", seed.min: MIN, seed.max: MAX]
+         sample: "LINEAR", round: "T", seed.min: MIN, seed.max: MAX]
     from BarleySite X
   guide 
     sidebar[X: 75, Y: -60] 

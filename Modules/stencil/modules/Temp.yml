@@ -4,27 +4,27 @@ targetClass: stencil.modules.Temp
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split:0]"
   facets: 
-    - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
-    - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
-    - {name: stateID, type: OTHER, function: false, prototype: !proto "VALUE"} 
+    - {name: map, memUse: WRITER, prototype: !proto "VALUE"}
+    - {name: query, memUse: READER, prototype: !proto "VALUE"}
+    - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
 
 operators: 
    - name: Scale
    - name: LinearInterp
      facets:
-      - {name: map, type: PROJECT, function: true, prototype: !proto "VALUE"}
-      - {name: query, type: PROJECT, function: true, prototype: !proto "VALUE"}
+      - {name: map, memUse: READER, prototype: !proto "VALUE"}
+      - {name: query, memUse: READER, prototype: !proto "VALUE"}
    - name: Partition
      facets:
-      - {name: map, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
-      - {name: query, type: PROJECT, function: true, prototype: !proto "double Start, double End, double Bucket"}
+      - {name: map, memUse: READER, prototype: !proto "double Start, double End, double Bucket"}
+      - {name: query, memUse: READER, prototype: !proto "double Start, double End, double Bucket"}
    - name: StopWords
      facets:
-      - {name: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
-      - {name: map, target: query, type: PROJECT, function: true, prototype: !proto "boolean stopWord"}
+      - {name: map, memUse: READER, prototype: !proto "boolean stopWord", target: query}
+      - {name: query, memUse: READER, prototype: !proto "boolean stopWord"}
    - name: Oscillate
      defaultSpecializer: !spec  "[range: ALL, split:0, style: \"CIRCLE\", states: 2]"
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "VALUE"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "VALUE"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
      

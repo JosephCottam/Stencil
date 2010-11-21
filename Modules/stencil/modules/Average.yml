@@ -4,9 +4,9 @@ description: Module for handling the average, in various manners
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets: 
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-    - {name: range, type: PROJECT, function: FALSE, prototype: !proto "double VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
+    - {name: range, memUse: FUNCTION, prototype: !proto "double VALUE"}
     
 operators:
   - name: Mean

@@ -8,10 +8,8 @@ STRICT: true
 
 stream Values(Category)
 
-/*Left-hand side defines the legend type.  Right-hand side says what to create it for.*/
-/*Specializers (things in square brackets) define the graphic design*/
 canvas Main
-    guide axis[sample: "LINEAR", tickCount: 10, tickSize: 5, textOffset: 6] from Chart Y
+    guide axis[sample: "LINEAR", count: 5, round: "T", tickSize: 5, textOffset: 6] from Chart Y
         label.FONT: @Font{10}
         line.PEN: @Stroke{1}
         label.REGISTRATION: "RIGHT"
@@ -20,6 +18,7 @@ canvas Main
         label.REGISTRATION: "LEFT"
         label.FONT: @Font{10}
         line.PEN: @Stroke{1} 
+
         
 layer Chart
 from Values

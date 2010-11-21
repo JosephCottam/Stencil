@@ -5,8 +5,8 @@ description: Math functions taken from java.lang.Math directly.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
 
 operators:
    - name: Abs
@@ -31,8 +31,8 @@ operators:
    - name: Round
    - name: Random
      facets:
-       - {name: map, type: OPAQUE, function: FALSE, prototype: !proto "VALUE"}
-       - {name: query, type: OPAQUE, function: FALSE, prototype: !proto "VALUE"}
+       - {name: map, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
+       - {name: query, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
    - name: Signum
    - name: Sin
    - name: Sinh

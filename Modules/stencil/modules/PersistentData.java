@@ -1,16 +1,17 @@
 package stencil.modules;
 
-import static stencil.module.util.OperatorData.TYPE_PROJECT;
 import stencil.module.SpecializationException;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.Specializer;
 import org.pcollections.*;
 
 public class PersistentData extends BasicModule {
+	/**TODO: Remove 'put' and change it to just map.*/
 	public static class Dict extends AbstractOperator {		
 		public static final String NAMES = "fields";
 		public static final String NAME = "Dict";
@@ -72,8 +73,8 @@ public class PersistentData extends BasicModule {
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
 			OperatorData od = new OperatorData(basic);
-			od.addFacet(new FacetData(MAP_FACET, TYPE_PROJECT, false, fields));
-			od.addFacet(new FacetData(QUERY_FACET, TYPE_PROJECT, false, fields));
+			od.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, fields));
+			od.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, fields));
 			return od;
 		}
 

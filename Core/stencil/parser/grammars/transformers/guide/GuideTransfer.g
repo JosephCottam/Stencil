@@ -33,7 +33,6 @@ options {
   import stencil.module.operator.StencilOperator;
   import stencil.interpreter.guide.SeedOperator;
   
-  import static stencil.module.util.OperatorData.TYPE_CATEGORIZE;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.STATE_ID_FACET;
   import static stencil.parser.string.util.Utilities.*;
@@ -83,16 +82,6 @@ options {
       if (f.getTarget().getOperator() instanceof SeedOperator) {return (Tree) adaptor.dupTree(f);}
       else {return trimCall(f.getCall());}
    }
-    	
-	
-	private boolean isCategorize(Function f) {
-   		MultiPartName name = new MultiPartName(f.getName());
-   		Module m = modules.findModuleForOperator(name.prefixedName());
-   		try {
-   			String opType =  m.getOperatorData(name.getName(), f.getSpecializer()).getFacet(name.getFacet()).getType();;
-   			return TYPE_CATEGORIZE.equals(opType);
-   		} catch (SpecializationException e) {throw new Error("Specialization error after ensuring specialization supposedly performed.",e);}
-	}
 }
 
 //Move mappings from the declarations in the consumes block up to the guides section

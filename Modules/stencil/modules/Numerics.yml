@@ -5,14 +5,14 @@ description: Math functions to supplement the standard ones from JavaMath.
 defaults:
   defaultSpecializer: !spec "[range: LAST, split: 0]"
   facets:
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
 
 operators:
   - name: Accumulate
     facets:
-      - {name: map, type: PROJECT, function: FALSE, prototype: !proto "double VALUE"}
-      - {name: query, type: PROJECT, function: FALSE, prototype: !proto "double VALUE"}
+      - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
   - name: Abs
   - name: Add
   - name: Add1
@@ -22,16 +22,14 @@ operators:
   - name: Logarithm
   - name: Max
     facets:
-     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-     - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}
-     - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
+     - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
+     - {name: range, memUse: FUNCTION, prototype: !proto "double VALUE"}  
   - name: Min
     facets:
-     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "double VALUE"}
-     - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
-     - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+     - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
+     - {name: range,  memUse: FUNCTION, prototype: !proto "double VALUE"}
   - name: Mod
   - name: Mult
   - name: Negate
@@ -46,8 +44,7 @@ operators:
     defaultSpecializer: !spec "[range: ALL, split:0]"
     target: Add
     facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
-      - {name: stateID, type: OTHER, function: false, prototype: !proto "double VALUE"}  
-      - {name: range, type: PROJECT, function: false, prototype: !proto "double VALUE"}  
+      - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
+      - {name: range, memUse: FUNCTION, prototype: !proto "double VALUE"}  
       

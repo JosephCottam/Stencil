@@ -5,7 +5,7 @@ description: Module for doing boolean comparisons.  These are the operators used
 defaults: 
   defaultSpecializer: !spec "[range: LAST, split: 0]"
   facets: 
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "boolean V"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "boolean V"}
 
 
 operators:
@@ -24,10 +24,10 @@ operators:
    - name: RE
      defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"
      facets:
-       - {name: query, type: PROJECT, function: TRUE, prototype: !proto "V"}
-       - {name: match, type: PROJECT, function: TRUE, prototype: !proto "V"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "V"}
+       - {name: match, memUse: FUNCTION, prototype: !proto "V"}
    - name: NRE
      defaultSpecializer: !spec "[range: LAST, split: 0, pattern: NULL]"
      facets:
-       - {name: query, type: PROJECT, function: TRUE, prototype: !proto "V"}
-       - {name: match, type: PROJECT, function: TRUE, prototype: !proto "V"}     
+       - {name: query, memUse: FUNCTION, prototype: !proto "V"}
+       - {name: match, memUse: FUNCTION, prototype: !proto "V"}     

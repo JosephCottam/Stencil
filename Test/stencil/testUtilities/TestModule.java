@@ -7,11 +7,11 @@ import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.module.util.*;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.PrototypedTuple;
-import static stencil.module.util.OperatorData.*;
 
 import java.lang.reflect.*;
  
@@ -24,8 +24,8 @@ public class TestModule implements Module {
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
 		OperatorData od = MODULE_DATA.getOperator("FilterFail");
-		od.addFacet(new FacetData("map", TYPE_PROJECT, true, "VALUE"));
-		od.addFacet(new FacetData("query", TYPE_PROJECT, true, "VALUE"));
+		od.addFacet(new FacetData("map", MemoryUse.FUNCTION, "VALUE"));
+		od.addFacet(new FacetData("query", MemoryUse.FUNCTION, "VALUE"));
 	}
 	
 	public static TestModule instance() {return instance;}

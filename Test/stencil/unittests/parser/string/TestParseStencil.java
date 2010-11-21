@@ -16,7 +16,7 @@ public class TestParseStencil extends StencilTestCase {
 		Program p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);
 
-		assertEquals("Incorrect number of layers found.", 2, p.getLayers().size());
+		assertEquals("Incorrect number of layers found.", 1, p.getLayers().size());
 		
 		
 		p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);

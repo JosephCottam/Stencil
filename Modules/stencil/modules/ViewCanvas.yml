@@ -5,41 +5,41 @@ description: Screen/Canvas conversion transformations.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-     - {name: map, type: PROJECT, function: false, prototype: !proto "double VALUE"}
-     - {name: query, type: PROJECT, function: false, prototype: !proto "double VALUE"}
+     - {name: map, memUse: UNSPECIFIED, prototype: !proto "double VALUE"}
+     - {name: query, memUse: UNSPECIFIED, prototype: !proto "double VALUE"}
 
 operators:
    - name: TranslateRegistration
      facets: 
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
 
    - name: ScreenToCanvasPoint
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
 
    - name: ScreenToCanvasDimension
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double Width, double Height"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double Width, double Height"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double Width, double Height"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double Width, double Height"}
 
    - name: CanvasToScreenPoint
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double X, double Y"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double X, double Y"}
 
    - name: CanvasToScreenDimension
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double Width, double Height"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double Width, double Height"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double Width, double Height"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double Width, double Height"}
 
    - name: Zoom
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double Zoom, double X, double Y, double Width"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double Zoom, double X, double Y, double Width"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double Zoom, double X, double Y, double Width"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double Zoom, double X, double Y, double Width"}
 
    - name: ZoomPadded
      facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "double Zoom, double X, double Y, double Width"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "double Zoom, double X, double Y, double Width"}
+      - {name: map, memUse: UNSPECIFIED, prototype: !proto "double Zoom, double X, double Y, double Width"}
+      - {name: query, memUse: UNSPECIFIED, prototype: !proto "double Zoom, double X, double Y, double Width"}

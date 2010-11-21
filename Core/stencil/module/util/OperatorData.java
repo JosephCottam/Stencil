@@ -8,11 +8,6 @@ import java.util.Map;
 import stencil.parser.tree.Specializer;
 
 public final class OperatorData {
-	public static final String TYPE_PROJECT = "PROJECT";
-	public static final String TYPE_CATEGORIZE = "CATEGORIZE";
-	public static final String TYPE_NA = "NA";
-	
-	
 	private Specializer spec;		 /**Default Specializer*/
 	private String name;			 /**Operator Name*/
 	private String target;			 /**Method or class to use for the given operator (containing class is determined by the module).*/

@@ -12,7 +12,7 @@ import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
-import static stencil.module.util.OperatorData.TYPE_NA;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.tuple.prototype.TuplePrototype;
 
 /**Wraps a layer as an operator. 
@@ -43,12 +43,12 @@ public final class LayerOperator implements StencilOperator {
 
 		TuplePrototype prototype = layer.getPrototype();
 		operatorData = Modules.basicOperatorData(module, getName());
-		operatorData.addFacet(new FacetData(FIND_FACET, TYPE_NA, false, prototype));
-		operatorData.addFacet(new FacetData(MAP_FACET, TYPE_NA, false, prototype));
-		operatorData.addFacet(new FacetData(QUERY_FACET, TYPE_NA, false, prototype));
-		operatorData.addFacet(new FacetData(REMOVE_FACET, TYPE_NA, false, prototype));
-		operatorData.addFacet(new FacetData(CONTAINS_FACET, TYPE_NA, false, prototype));
-		operatorData.addFacet(new FacetData(STATE_ID_FACET, TYPE_NA, false, "VALUE"));
+		operatorData.addFacet(new FacetData(FIND_FACET, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, prototype));
+		operatorData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(REMOVE_FACET, MemoryUse.WRITER, prototype));
+		operatorData.addFacet(new FacetData(CONTAINS_FACET, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 	}
 	
 	public String getName() {return layer.getName();}

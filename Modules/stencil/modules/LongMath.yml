@@ -5,8 +5,8 @@ description: Math functions that are defined in terms of longs instead of double
 defaults:
   defaultSpecializer: !spec "[range: LAST, split: 0]"
   facets:
-    - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
-    - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
 
 operators:
   - name: Abs
@@ -17,16 +17,14 @@ operators:
   - name: Divide
   - name: Max
     facets:
-     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
-     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
-     - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}
-     - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}  
+     - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
+     - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}  
   - name: Min
     facets:
-     - {name: map, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
-     - {name: query, type: PROJECT, function: TRUE, prototype: !proto "long VALUE"}
-     - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}  
-     - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}
+     - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
+     - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}
   - name: Mod
   - name: Mult
   - name: Negate
@@ -37,8 +35,7 @@ operators:
     defaultSpecializer: !spec "[range: ALL, split:0]"
     target: Add
     facets:
-      - {name: map, type: PROJECT, function: false, prototype: !proto "long VALUE"}
-      - {name: query, type: PROJECT, function: false, prototype: !proto "long VALUE"}
-      - {name: stateID, type: OTHER, function: false, prototype: !proto "long VALUE"}  
-      - {name: range, type: PROJECT, function: false, prototype: !proto "long VALUE"}  
+      - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
+      - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}  
       

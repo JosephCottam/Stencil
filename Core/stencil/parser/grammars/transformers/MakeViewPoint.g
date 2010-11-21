@@ -72,7 +72,7 @@ change:  i=AST_INVOKEABLE
     if (!name.getFacet().equals("")) {//If this is a true facet operator AND it is a function, nothing more needs to be done.
        OperatorData od = op.getOperatorData();   
        FacetData fd = od.getFacet(name.getFacet());
-       if (fd.isFunction()) {return;}
+       if (!fd.mutative()) {return;}
      } else if (name.prefixedName().equals("STATE_QUERY")) {return;}    //State queries are all handled on the original tree
        
      StencilOperator viewPoint = instances.get(name.prefixedName());

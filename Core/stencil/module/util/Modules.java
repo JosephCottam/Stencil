@@ -40,10 +40,9 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.ParserConstants;
 import stencil.parser.tree.Specializer;
-
-import static stencil.module.util.OperatorData.TYPE_PROJECT;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
@@ -163,7 +162,7 @@ public final class Modules {
 	 * 
 	 **/
 	public static OperatorData basicOperatorData(String module, String name) {
-		return basicOperatorData(module, name, TYPE_PROJECT, "VALUE");
+		return basicOperatorData(module, name, "VALUE");
 	}
 	
 	/**Produce a mutable operator meta-data object with the names, op-type and operator fields
@@ -175,14 +174,14 @@ public final class Modules {
 	 * @param fields
 	 * @return
 	 */
-	public static OperatorData basicOperatorData(String module, String name, String type, String...fields) {
-		return basicOperatorData(module, name, type, Arrays.asList(fields));
+	public static OperatorData basicOperatorData(String module, String name, String...fields) {
+		return basicOperatorData(module, name, Arrays.asList(fields));
 	}
 	
-	public static OperatorData basicOperatorData(String module, String name, String type, List<String> fields) {
+	public static OperatorData basicOperatorData(String module, String name, List<String> fields) {
 		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER);
-		od.addFacet(new FacetData(ParserConstants.MAP_FACET, type, false, fields));
-		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, type, false, fields));
+		od.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, fields));
+		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
 		return od;
 	}
 }

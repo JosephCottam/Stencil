@@ -7,42 +7,38 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
+	public static enum MemoryUse {FUNCTION, READER, WRITER, UNSPECIFIED}; 
+	
 	private String name;
-	private String type;
-	private boolean function;
+	private MemoryUse memory;
 	private TuplePrototype prototype;
 	private String target;
 	private String roles;
 
 	public FacetData() {}
 	
-	public FacetData(String name, String type, boolean function, String... fields) {
-		this(name, type, function, Arrays.asList(fields));
+	public FacetData(String name, MemoryUse memory, String... fields) {
+		this(name, memory, Arrays.asList(fields));
 	}
 	
-	public FacetData(String name, String type, boolean function, List<String> fields) {
-		this(name, type, function, new SimplePrototype(fields));
+	public FacetData(String name, MemoryUse memory, List<String> fields) {
+		this(name, memory, new SimplePrototype(fields));
 	}
 	
-	public FacetData(String name, String type, boolean function, TuplePrototype prototype) {
+	public FacetData(String name, MemoryUse memory, TuplePrototype prototype) {
 		this.name = name;
-		this.function = function;
+		this.memory = memory;
 		this.prototype = prototype;
-		setType(type);
 	}
 	
 	public FacetData(FacetData source) {
 		this.name = source.name;
-		this.function = source.function;
+		this.memory = source.memory;
 		this.prototype = source.prototype;
-		setType(source.type);
 	}
 	
 	public void setName(String name) {this.name = name;}
 	public String getName() {return name;}
-
-	public void setType(String type) {this.type = type.toUpperCase();}
-	public String getType() {return type;}
 	
 	public void setTarget(String target) {this.target = target;}
 	public String getTarget() {return target!=null?target:name;}
@@ -51,8 +47,14 @@ public final class FacetData {
 	public void setRoles(String roles) {this.roles = roles;}
 	public boolean hasRole(String role) {return roles.indexOf(role) >=0;}
 	
-	public boolean isFunction() {return function;}
-	public void setFunction(boolean fun) {function = fun;}
+	public void setMemory(String memUse) {memory = MemoryUse.valueOf(memUse);}
+	public MemoryUse getMemUse() {return memory;}
+	public void setMemUse(MemoryUse memUse) {memory = memUse;}
+	
 	public void setPrototype(TuplePrototype prototype) {this.prototype = prototype;}
 	public TuplePrototype getPrototype() {return prototype;}
+	
+	public boolean mutative() {
+		return memory == MemoryUse.WRITER && memory == MemoryUse.UNSPECIFIED;
+	}
 }

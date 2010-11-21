@@ -72,8 +72,8 @@
         <pathconvert property="jarClasspath" pathsep=" " dirsep="/">
             <map from="${runtimeLibrary}" to="./lib"/>
             <path id="library.Classpath">
-                <fileset dir="${runtimeLibrary}">
-                    <include name="*.jar"/>
+                <fileset dir="${runtimeLibrary}/">
+                    <include name="**/*.jar"/>
                     <include name="JUNG/*.jar"/>
                     <exclude name="antlr-3.2.jar"/>
                     <exclude name="antlr3-ant.jar"/>

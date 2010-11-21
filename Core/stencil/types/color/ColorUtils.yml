@@ -5,8 +5,8 @@ description: Create and modify colors.
 defaults:
   defaultSpecializer: !spec "[range: ALL, split:0]"
   facets:
-    - {name: map, function: true, type: PROJECT, prototype: !proto "VALUE"}
-    - {name: query, function: true, type: PROJECT, prototype: !proto "VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "VALUE"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "VALUE"}
 
 operators:
   - name: Brighter  
@@ -33,6 +33,6 @@ operators:
   
   - name: Color
     facets:
-      - {name: argumentParser, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
-      - {name: query, function: true, type: PROJECT, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      - {name: argumentParser, memUse: FUNCTION, prototype: !proto "self,Red,Green,Blue,Alpha"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "self,Red,Green,Blue,Alpha"}
       
