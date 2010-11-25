@@ -382,7 +382,6 @@ public class Projection extends BasicModule {
 		if (!r.isFullRange() || !s.isVoid())  {
 			throw new SpecializationException(MODULE_NAME, name, specializer);
 		}
-
 		super.validate(name, specializer);
 	}
 }
