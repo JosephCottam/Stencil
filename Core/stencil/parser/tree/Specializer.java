@@ -30,11 +30,11 @@ package stencil.parser.tree;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.antlr.runtime.Token; 
+import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
-
 import stencil.parser.string.StencilParser;
+import static stencil.parser.ParserConstants.POSITIONAL_ARG;
 
 public class Specializer extends StencilTree {
 	/**Customary key used to store range descriptor.*/
@@ -119,9 +119,21 @@ public class Specializer extends StencilTree {
 		StencilTree mapList = (StencilTree) adaptor.create(StencilParser.LIST, "<map args>");
 		adaptor.addChild(result, mapList);
 		
-		Map<String, Atom> entries = new HashMap();
+
+		Map<String, Tree> entries = new HashMap();
 		entries.putAll(defaults.getMap());
-		entries.putAll(update.getMap());
+
+		Tree newEntries = update.getFirstChildWithType(StencilParser.LIST);
+		Tree defaultEntries = defaults.getFirstChildWithType(StencilParser.LIST);
+		
+		for (int i=0; i<newEntries .getChildCount(); i++) {
+			Tree entry = newEntries.getChild(i);
+			if (entry.getText().equals(POSITIONAL_ARG)) {
+				entries.put(defaultEntries.getChild(i).getText(), entry.getChild(0));
+			} else {
+				entries.put(entry.getText(), entry.getChild(0));
+			}
+		}
 
 		for (String key: entries.keySet()) {
 			Object entry = adaptor.create(StencilParser.MAP_ENTRY, key);

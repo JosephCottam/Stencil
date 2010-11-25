@@ -41,6 +41,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
+import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
@@ -305,6 +306,74 @@ public class Projection extends BasicModule {
 		public int stateID() {return set.size();}
 	}
 
+	/**Projects one range of values into another.
+	 * The target range is statically specified by the specializer.
+	 * The source range is constructed based upon input.
+	 * 
+	 * This operator only works with numbers, but using Rank to convert
+	 * arbitrary values to numbers can be used to scale arbitrary items. 
+	 * @author jcottam
+	 *
+	 */
+	public static final class Scale extends AbstractOperator {
+		private static final String IN_MAX = "inMax";
+		private static final String IN_MIN = "inMin";
+		private static final String OUT_MAX = "max";
+		private static final String OUT_MIN = "min";
+		final double outMin, outMax, span;
+
+		double inMin = Double.MAX_VALUE;
+		double inMax = Double.MIN_VALUE;		
+		
+		public Scale(OperatorData od, Specializer spec) {
+			super(od);
+			outMin = Converter.toDouble(spec.get(OUT_MIN));
+			outMax = Converter.toDouble(spec.get(OUT_MAX));
+			
+			if (spec.containsKey(IN_MAX) && spec.get(IN_MAX).getValue() != null) {
+				inMax = Converter.toDouble(spec.get(IN_MAX));
+			} 
+			
+			if (spec.containsKey(IN_MIN) && spec.get(IN_MIN).getValue() != null) {
+				inMin = Converter.toDouble(spec.get(IN_MIN));
+			}
+			
+			span = outMax-outMin;
+		}
+
+		public Scale(OperatorData od, double outMin, double outMax) {
+			super(od);
+			this.outMin = outMin;
+			this.outMax = outMax;
+			span = outMax-outMin;
+		}
+		
+		public double map(double dv) {
+			double newInMin = Math.min(dv, inMin);
+			double newInMax = Math.max(dv, inMax);
+			if (newInMin != inMin) {
+				inMin = newInMin;
+				stateID++;
+			}
+			
+			if (newInMax != inMax) {
+				inMax = newInMax;
+				stateID++;
+			}
+			
+			return query(dv);   
+		}
+
+		public double query(double v) {
+			double percent = (v-inMin)/inMax;
+			double value = span*percent + outMin;
+			
+			return value;
+		}
+		
+		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
+	}
+	
 	public Projection(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {

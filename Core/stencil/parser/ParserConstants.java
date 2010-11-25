@@ -40,15 +40,13 @@ public abstract class ParserConstants {
 	public static final String DEFAULT_RESTRICTION = "ANY";
 	public static final String DEFAULT_FIELD_TYPE_LABEL="NOMINAL";
 
+	public static final String POSITIONAL_ARG = "#POSITIONAL";
 	public static final String SEPARATOR = ",";
 	public static final String INITIATOR = "(";
 	public static final String TERMINATOR = ")";
 	public static final String SIGIL = "@";
 
 	public static final String GLYPH_ID_FIELD  = "ID";
-
-	public static final String OPAQUE_DOUBLE = "1.0";
-	public static final String OPAQUE_INT	= "255";
 
 	//Block tags (for Python and corresponding to operator items)
 	public static final String MAP_FACET = StencilOperator.MAP_FACET;

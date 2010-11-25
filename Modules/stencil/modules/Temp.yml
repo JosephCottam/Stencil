@@ -9,7 +9,6 @@ defaults:
     - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
 
 operators: 
-   - name: Scale
    - name: LinearInterp
      facets:
       - {name: map, memUse: READER, prototype: !proto "VALUE"}

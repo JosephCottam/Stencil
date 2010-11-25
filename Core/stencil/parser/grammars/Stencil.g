@@ -118,8 +118,6 @@ tokens {
 @header{
   package stencil.parser.string;
 
-  //TODO: Remove/delete glyph operation
-
   import static stencil.parser.ParserConstants.*;
   import java.util.ArrayList;
   import java.util.List;
@@ -346,17 +344,23 @@ predicate
     -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
 
 specializer
-  : ARG mapList CLOSE_ARG -> ^(SPECIALIZER mapList)
+  : ARG argList CLOSE_ARG -> ^(SPECIALIZER ^(LIST argList))
+  | ARG mapList CLOSE_ARG -> ^(SPECIALIZER ^(LIST mapList))
+  | ARG argList SEPARATOR mapList CLOSE_ARG -> ^(SPECIALIZER ^(LIST argList mapList))
   | ARG CLOSE_ARG -> ^(SPECIALIZER LIST["Map Arguments"])
   | -> ^(SPECIALIZER DEFAULT);
 
+argList : argEntry  (SEPARATOR! argEntry)*;
+private argEntry
+    : ID -> ^(MAP_ENTRY[POSITIONAL_ARG] ID)
+    | atom -> ^(MAP_ENTRY[POSITIONAL_ARG] atom);
 
 mapList
-  : mapEntry (SEPARATOR mapEntry)* -> ^(LIST["Map Arguments"] mapEntry*);
+  : mapEntry (SEPARATOR! mapEntry)*;
   
-mapEntry 
+private mapEntry 
   : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v)
-  | k=ID DEFINE t=ID   -> ^(MAP_ENTRY[$k.text] $t);
+  | k=ID DEFINE r=ID   -> ^(MAP_ENTRY[$k.text] $r);
 
 tuple[boolean allowEmpty] //TODO: Add optionally permitted types
   : emptySet {allowEmpty}?

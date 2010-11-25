@@ -22,4 +22,9 @@ operators:
       - {name: stateID, memUse: READER, prototype: !proto "Color VALUE"}
     - name: Rank
       defaultSpecializer: !spec "[range:ALL, split:0, start: 0]"
-    
+    - name: Scale
+      defaultSpecializer: !spec "[max: 0, min: 1, inMin: NULL, inMax: NULL, range: ALL, split:0]"
+      facets: 
+       - {name: map, memUse: WRITER, prototype: !proto "VALUE"}
+       - {name: query, memUse: READER, prototype: !proto "VALUE"}
+       - {name: stateID, memUse: READER, prototype: !proto "VALUE"}

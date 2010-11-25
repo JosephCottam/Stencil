@@ -29,7 +29,7 @@
             
             <batchtest todir="${results}">
                 <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
-                    <include name="**/*TestDelimitParser.class"/>
+                    <include name="**/*TestMetadataDefs.class"/>
                 </fileset>
             </batchtest>
         </junit>

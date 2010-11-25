@@ -53,6 +53,15 @@ public class TestSpecializerParse extends TestCase {
 		testPasses(specializers,true);
 	}
 	
+	public void testPositionArgs() throws Exception {
+		String[] specializers = new String[] {
+				"[]",
+				"[1.0]",			
+				"[1]",			
+				"[\"one\", \"two\"]",
+				"[\"one\", 2, \"three\"]"};
+		testPasses(specializers, true);
+	}
 	
 	public void testNamedArgs() throws Exception {
 		String[] specializers = new String[] {
@@ -66,6 +75,18 @@ public class TestSpecializerParse extends TestCase {
 		testPasses(specializers, true);
 	}
 	
+	public void testMixedArgs() throws Exception {
+		String[] specializers = new String[] {
+				"[]",
+				"[1, one: 1.0]",			
+				"[1.0, one: 1]",			
+				"[\"one\", two: \"two\"]",
+				"[\"one\", 2, three: \"three\", four: 4]"};
+		testPasses(specializers, true);
+	}
+	
+
+
 	//ID arguments can refer to constants.  Right now, just see if they can be parsed.
 	public void testIDArgs() throws Exception {
 		String[] specializers = new String[] {
@@ -105,6 +126,4 @@ public class TestSpecializerParse extends TestCase {
 			assertTrue(String.format("Expected failure parsing %1$s did not occur.", test), failed);
 		}
 	}
-	
-	
 }
