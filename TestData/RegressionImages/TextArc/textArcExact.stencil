@@ -15,7 +15,7 @@ canvas main [BACKGROUND_COLOR: "BLACK"]
 
 stream Lines (line, text)
 from RawLines
-   line: Counter()
+   line: Count()
    words: text
 
 stream RawWords (line, word)

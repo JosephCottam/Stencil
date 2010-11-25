@@ -90,7 +90,7 @@ from overheads
 
 layer coms[LINE]
 from trans
-    ID: Counter()
+    ID: Count()
 	Y.1: Layout(source)
 	Y.2: Layout(dest)
 	X.1: Timescale(skewedStart)

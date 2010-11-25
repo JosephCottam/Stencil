@@ -13,7 +13,7 @@ stream RawLines(text)
 
 stream Lines (line, text)
 from RawLines
-   line: Counter()
+   line: Count()
    words: text
 
 stream RawWords (line, word)

@@ -1,3 +1,4 @@
+
 tree grammar AdHocOperators;
 options {
 	tokenVocab = Stencil;

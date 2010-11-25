@@ -21,13 +21,14 @@
     <!-- Just the core stencil grammar, not the additional processing.-->
     <target name="WorkingGrammar">
         <antlr3
-            target="${grammars}/transformers/TupleRefs/FrameTupleRefs.g"
-            outputdirectory="${parser}"
+            target="${grammars}/info/UseContext.g"
+            outputdirectory="${parser}/info/"
+            libdirectory="${parser}"
         />
     </target>
  		
  		
- 	<target name="Stencil" depends="Transformers, TreeAdapter, Validators, Interpreter, Compile"/>
+ 	<target name="Stencil" depends="Transformers, Infos, TreeAdapter, Validators, Interpreter, Compile"/>
  	
     <target name="Compile">
             <javac srcdir="${core}" destdir="${target}">
@@ -72,6 +73,14 @@
             <param name="antlrTarget" value="${parser}"/>
         </foreach>
     </target>
+
+    <target name="Infos" depends="StencilGrammar">
+        <foreach target="antlrBuild" param="file" inheritall="true">
+           <fileset dir="${grammars}/info" />
+           <param name="antlrTarget" value="${parser}/info"/>
+        </foreach>
+    </target>
+
  	
     <target name="Validators" depends="StencilGrammar">
     	<foreach target="antlrBuild" param="file" inheritall="true">

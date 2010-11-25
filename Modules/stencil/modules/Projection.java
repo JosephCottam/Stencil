@@ -39,7 +39,12 @@ import stencil.module.operator.util.Range;
 import stencil.module.operator.util.Split;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
+import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
+import stencil.parser.string.StencilParser;
+import stencil.parser.string.info.UseContext;
+import stencil.parser.string.util.Context;
+import stencil.parser.tree.Program;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import stencil.types.color.ColorCache;
@@ -383,5 +388,24 @@ public class Projection extends BasicModule {
 			throw new SpecializationException(MODULE_NAME, name, specializer);
 		}
 		super.validate(name, specializer);
+	}
+	
+	public StencilOperator instance(String name, Specializer spec) throws SpecializationException {
+		//HACK: Should the use name be passed in?
+		String useName = spec.getParent().getText();
+		Program p = (Program) spec.getAncestor(StencilParser.PROGRAM);
+		Context context = null;
+		if (p != null) {context = UseContext.apply(spec.getAncestor(StencilParser.PROGRAM),useName);}
+		
+		if (context != null && name.equals("Count")) {
+			if (context.maxCount() == 0) {
+				OperatorData od = super.getOperatorData(name, spec);
+				od = new OperatorData(od);
+				od.setTarget("Counter");
+				return Modules.instance(this.getClass(), od, spec);
+			}
+		}
+		
+		return super.instance(name, spec);
 	}
 }

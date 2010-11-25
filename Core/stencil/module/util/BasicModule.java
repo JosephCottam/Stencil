@@ -58,6 +58,7 @@ public abstract class BasicModule implements Module {
 	/**Retrieve an instance based on the name and specializer presented. 
 	 * This uses the Modules.instance method exclusively.  
 	 * Validates arguments before attempting specialization.
+	 * Context is ignored by default.
 	 */
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);

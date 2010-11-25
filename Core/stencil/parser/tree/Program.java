@@ -104,6 +104,12 @@ public class Program extends StencilTree {
 		return (List<Operator>) getChild(OPERATORS);
 	}
 	
+	/**Same as operators, but later in time.*/
+	public List<OperatorProxy> getProxies() {
+		assert verifyType(getChild(OPERATORS), StencilParser.LIST);
+		return (List<OperatorProxy>) getChild(OPERATORS);
+	}
+	
 	public List<Python> getPythons() {
 		assert verifyType(getChild(PYTHONS), StencilParser.LIST);
 		return (List<Python>) getChild(PYTHONS);

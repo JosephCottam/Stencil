@@ -18,8 +18,8 @@ stream Entities(ID)
 layer Nodes
 from Entities
 	SIZE: 1
-	ID: Counter()
-	(X,Y) : Counter() -> [v] Sub(_,1) -> Layout(_) 
+	ID: Count()
+	(X,Y) : Count() -> [v] Sub(_,1) -> Layout(_) 
 
 operator Layout (i) -> (X,Y) 
 	ALL => (X,Y): Sqrt(i) -> 

@@ -22,7 +22,7 @@ canvas Main
         
 layer Chart
 from Values
-  ID : Counter()
+  ID : Count()
   X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
   Y : Count(Category) -#> Mult(VALUE, -11) -> VALUE
   FILL_COLOR: @Color{BLUE}
