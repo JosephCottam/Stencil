@@ -30,4 +30,4 @@ from Attributes
 	ID : Counter()
 	(X,Y) : Counter() -> (_,_)
 
-operator Counter base Count
+operator Counter : Count

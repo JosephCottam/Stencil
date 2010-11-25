@@ -52,9 +52,9 @@ from Words
 		[color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) ->
 				Scale[min: 50, max:1000](freq[_]) -> @Font{{_}} -> (color[_],_)
 
-operator WordCount base Count
+operator WordCount : Count
 
-operator LineIndex base Dict[fields: "lines"]
+operator LineIndex : Dict[fields: "lines"]
 
 /*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)
@@ -65,5 +65,5 @@ operator Centroid (word) -> (X,Y)
             Select[field: 1](*) -> Average[range: LAST](LAST)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
-operator Layout base CircularLayout[start: 0, size: 10, ratio: .75]
-operator Contract base Geo::Scale[by: .94]
+operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]
+operator Contract : Geo::Scale[by: .94]

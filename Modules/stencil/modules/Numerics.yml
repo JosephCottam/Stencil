@@ -19,7 +19,8 @@ operators:
   - name: AsNumber
   - name: Div
   - name: Divide
-  - name: Logarithm
+  - name: Log
+    defaultSpecializer:  !spec "[base: NULL, range: LAST, split: 0]"
   - name: Max
     facets:
      - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}

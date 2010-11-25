@@ -40,6 +40,7 @@ import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.util.collections.ConstantList;
+import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import static stencil.module.util.Utilities.noFunctions;
@@ -53,10 +54,44 @@ public class Numerics extends BasicModule {
 		return Integer.valueOf(hexString, radix);
 	}	
 	
-	public static Double Logarithm(double base, double value) {
-		return Math.log10(value)/Math.log10(base);
+	
+	public static final class Log {
+		public static final class LogFixed extends AbstractOperator {
+			private final double base;
+			public LogFixed(OperatorData od, double base) {
+				super(od);
+				this.base = base;
+			}
+			
+			public Double map(double value) {return query(value);}
+			public Double query(double value) {
+				return Math.log(value)/Math.log(base);
+			}		
+		}
+		
+		public static Double LogParam(double base, double value) {return Math.log(value)/Math.log(base);}
+		
+		public static StencilOperator instance(OperatorData od, Specializer spec) {
+			Atom base = spec.get("base");
+			if (base.isString() && base.getText().toLowerCase().equals("e")) {
+				return Modules.instance(java.lang.Math.class, od);
+			} else if (base.isNumber()){
+				double bs = Converter.toDouble(spec.get("base"));
+				if (bs == 10) {
+					od = new OperatorData(od);
+					od.setTarget("Log10");
+					return Modules.instance(java.lang.Math.class, od);					
+				} else {
+					return new LogFixed(od, bs);
+				}
+			} else {
+				od = new OperatorData(od);
+				od.setTarget("LogParam");
+				return Modules.instance(Log.class, od);
+			}
+		}
 	}
-
+	
 	
 	public static final class Accumulate extends AbstractOperator {
 		private int acc;
@@ -232,7 +267,8 @@ public class Numerics extends BasicModule {
 		StencilOperator target = null;
 		
 		try {
-			
+			if (name.equals("Log")) {return Log.instance(operatorData, specializer);}
+
 			target = Modules.instance(this.getClass(), operatorData);
 			if (specializer.isLowMem()) {
 				return target;

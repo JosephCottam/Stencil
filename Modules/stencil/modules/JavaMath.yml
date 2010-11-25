@@ -23,8 +23,6 @@ operators:
    - name: Floor
    - name: Hypot
    - name: IEEERemainder
-   - name: Log
-   - name: Log10
    - name: Log1p
    - name: Negate
    - name: Pow

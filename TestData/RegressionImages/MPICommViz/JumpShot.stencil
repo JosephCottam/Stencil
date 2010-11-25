@@ -52,7 +52,7 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
 
-operator Spacer base Max[range: ALL]
+operator Spacer : Max[range: ALL]
 
 layer baseline[LINE]
 from overheads

@@ -86,4 +86,4 @@ from Degrees
 	Y.1 : Add(270, Deg) -> Sine(_) -> Mult(_,50) 
 	PEN_COLOR: @Color{MediumPurple}
 
-operator IDS base Count
+operator IDS : Count

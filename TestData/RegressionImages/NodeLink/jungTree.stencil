@@ -38,4 +38,4 @@ from VertexList
 	COLOR: @Color{GRAY60}
 
 
-operator Layout base BalloonLayout
+operator Layout : BalloonLayout

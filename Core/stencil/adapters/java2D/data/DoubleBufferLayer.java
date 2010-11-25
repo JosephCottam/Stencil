@@ -1,3 +1,4 @@
+
 package stencil.adapters.java2D.data;
 
 import java.awt.Graphics2D;

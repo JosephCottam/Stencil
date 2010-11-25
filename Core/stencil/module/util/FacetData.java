@@ -7,7 +7,7 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
-	public static enum MemoryUse {FUNCTION, READER, WRITER, UNSPECIFIED}; 
+	public static enum MemoryUse {FUNCTION, READER, WRITER, UNSPECIFIED} 
 	
 	private String name;
 	private MemoryUse memory;

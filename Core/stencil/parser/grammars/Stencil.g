@@ -51,7 +51,6 @@ tokens {
   //General Keywords
   ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n
   AS  = 'as';         //used in imports
-  BASE  = 'base';     //Refer to the base entity
   CANVAS  = 'canvas';
   CONST = 'const';
   DEFAULT = 'default';
@@ -250,7 +249,7 @@ operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text])
 operatorDef
   : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Prefilters"] $pf*) ^(LIST["Rules"] operatorRule+))
-  | OPERATOR name=ID BASE base=opName specializer
+  | OPERATOR name=ID DEFINE base=opName specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
 //Apply defaultCall to functions that have no explicit call
