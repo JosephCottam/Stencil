@@ -8,9 +8,35 @@ import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.Specializer;
+
 import org.pcollections.*;
 
 public class PersistentData extends BasicModule {
+	
+	/**Given a static list of values, returns the value based on the input.*/ 
+	public static class StaticList extends AbstractOperator {
+		private static final String VALUES_KEY = "vals";
+		private final Object[] out;
+		
+		public StaticList(OperatorData opData, Specializer spec) {
+			super(opData);
+									
+			String literalMask = spec.get(VALUES_KEY).getText();
+			String[] parts = literalMask.split("\\s*,\\s*");
+
+			out = new Object[parts.length];
+			for (int i =0; i< out.length; i++) {
+				out[i] = parts[i];
+			}
+		}
+		
+		public Object map(int inIndex) {return query(inIndex);}
+		public Object query(int inIndex) {return out[inIndex];}
+	}
+	
+
+
+	
 	/**TODO: Remove 'put' and change it to just map.*/
 	public static class Dict extends AbstractOperator {		
 		public static final String NAMES = "fields";
@@ -84,12 +110,10 @@ public class PersistentData extends BasicModule {
 	
 	public PersistentData(ModuleData md) {super(md);}
 	
-	public OperatorData getOperatorData(String name, Specializer specializer)
-	throws SpecializationException {
+	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
 		if(name.equals(Dict.NAME)) {
 			return Dict.getOperatorData(getModuleData().getOperator(name), specializer);
 		}
-
 		return super.getOperatorData(name, specializer);
 	}
 }

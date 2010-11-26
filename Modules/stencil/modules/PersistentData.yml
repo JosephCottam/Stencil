@@ -10,4 +10,9 @@ defaults:
     - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
 
 operators: 
-   - name: Dict      
+   - name: Dict
+   - name: StaticList
+     facets:
+       - {name: map,     memUse: FUNCTION, prototype: !proto "VALUE"}
+       - {name: query,   memUse: FUNCTION, prototype: !proto "VALUE"}
+   
