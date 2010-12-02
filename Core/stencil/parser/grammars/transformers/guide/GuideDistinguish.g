@@ -20,7 +20,7 @@ options {
 
 @members {
   //TODO: Get the list of direct types from the adaptor
-  private static List<String> DIRECT_TYPES = Arrays.asList("AXIS", "SIDEBAR");
+  private static List<String> DIRECT_TYPES = Arrays.asList("AXIS", "LEGEND");
 
   public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
     

@@ -28,15 +28,15 @@
  */
 package stencil.unittests.adapters.examples;
 
-public class AutoGuide_Sidebar extends ImageTest {
+public class AutoGuide_Legend extends ImageTest {
 
-	public AutoGuide_Sidebar(String[] configs) {
+	public AutoGuide_Legend(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/AutoGuide/",
-				  "Sidebar.stencil",
+				  "Legend.stencil",
 				  null,
 				  null,
-				  "sidebar.txt",
-				  "sidebar.png", configs));
+				  "legend.txt",
+				  "legend.png", configs));
 	}
 
 }

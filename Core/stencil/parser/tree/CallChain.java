@@ -43,20 +43,11 @@ import stencil.types.Converter;
  *
  */
 public class CallChain extends StencilTree {
-	private CallTarget chainStart;
 	private int depth = Integer.MIN_VALUE;
 	
 	public CallChain(Token source) {super(source);}
 
-	public CallTarget getStart() {
-		if (chainStart == null) {
-			chainStart = (Function) getFirstChildWithType(StencilParser.FUNCTION);
-			if (chainStart == null) {
-				chainStart = (Pack) getFirstChildWithType(StencilParser.PACK);
-			}
-		}
-		return chainStart;
-	}
+	public CallTarget getStart() {return (CallTarget) getChild(0);}
 	
 	/**How long is this call chain?*/
 	public int getDepth() {

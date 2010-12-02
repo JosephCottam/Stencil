@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.data.guides;
 
 import  static stencil.parser.ParserConstants.SIMPLE_DEFAULT;
+import  static stencil.parser.ParserConstants.GUIDE_LABEL;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -28,7 +29,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.collections.ArrayUtil;
 
-public class Sidebar extends Guide2D {
+public class Legend extends Guide2D {
 	
 	public static final String IMPLANTATION_NAME = "SIDE_BAR";
 	public static final String LABEL_PROPERTY_TAG = "label";
@@ -68,8 +69,10 @@ public class Sidebar extends Guide2D {
 	private final TupleSorter sorter;
 	private final int label_idx;
 	private final int value_idx;
+	private final String guideLabel;
 	
-	public Sidebar(Guide guideDef, int idx) {
+	
+	public Legend(Guide guideDef, int idx) {
 		super(guideDef);
 		Specializer specializer = guideDef.getSpecializer();
 		
@@ -81,6 +84,8 @@ public class Sidebar extends Guide2D {
 
 		prototypeExample = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		prototypeExample = GuideUtils.applyDefaults(specializer, EXAMPLE_PROPERTY_TAG, prototypeExample);
+		
+		guideLabel = specializer.get(GUIDE_LABEL).getText();
 		
 		exampleHeight = Math.max(Converter.toFloat(prototypeLabel.get(StandardAttribute.HEIGHT.name())), Converter.toFloat(prototypeExample.get("SIZE")));
 		exampleWidth = Converter.toFloat(prototypeExample.get("SIZE"));
@@ -104,6 +109,8 @@ public class Sidebar extends Guide2D {
 	public synchronized void setElements(List<Tuple> elements, Rectangle2D parentBounds) {
 		marks.clear();
 		
+		marks.addAll(createGuideLabel());
+		
 		Collections.sort(elements, sorter);
 		marks.addAll(createLabeledBoxes(elements));
 		
@@ -118,12 +125,29 @@ public class Sidebar extends Guide2D {
 	}
 	
 	public Rectangle2D getBoundsReference() {return bounds;}
+
+	private Collection<Glyph2D> createGuideLabel() {
+		List<Glyph2D> parts = new ArrayList(2);
+		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
+		Object[] labelValues = new Object[]{0, 0, guideLabel, "LEFT"};
+		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
+		parts.add(label);
+
+//		double offset = label.getBoundsReference().getHeight() + vSpacing/2.0;
+//		String[] lineFields = new String[]{"X.1","Y.1","X.2", "Y.2"};
+//		Object[] lineValues = new Object[]{0, offset ,label.getBoundsReference().getWidth(), offset};
+//		Line line = new Line(null, "guide line").update(new PrototypedTuple(lineFields, lineValues));
+//		parts.add(line);
+		
+		return parts;
+	}
+
 	
 	private Collection<Glyph2D> createLabeledBoxes(List<Tuple> elements) {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);
 		for (int i=0; i< elements.size(); i++) {
 			Tuple t = elements.get(i);
-			marks.addAll(createLabeledBox(t, i));
+			marks.addAll(createLabeledBox(t, i+1));	//Plus 1 because of the guide label
 		}
 		return marks;
 	}

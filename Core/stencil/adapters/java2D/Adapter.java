@@ -63,7 +63,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 
 	public Class getGuideClass(String name) {
 		if (name.equals("axis")) {return Axis.class;}
-		else if (name.equals("sidebar")) {return Sidebar.class;}
+		else if (name.equals("legend")) {return Legend.class;}
 		else if (name.equals("trend")) {return Trend.class;}
 		else if (name.equals("pointLabels")) {return PointLabel.class;}
 		
@@ -95,7 +95,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	
 	//TODO: Lift out into a grammar pass...
 	private void constructGuides(Canvas canvas, Program program) {
-		int sidebarCount = 0;//How many side-bars have been created?
+		int legendCount = 0;//How many side-bars have been created?
 		
 		for (Guide guideDef : program.getCanvasDef().getGuides()) {
 			stencil.parser.tree.Selector sel = guideDef.getSelector();
@@ -104,8 +104,8 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			if (guideType.equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
 				canvas.addGuide(sel, guide);
-			} else if (guideType.equals("sidebar")) {
-				Guide2D guide = new Sidebar(guideDef, sidebarCount++);
+			} else if (guideType.equals("legend")) {
+				Guide2D guide = new Legend(guideDef, legendCount++);
 				canvas.addGuide(sel, guide);
 			} else if (guideType.equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);

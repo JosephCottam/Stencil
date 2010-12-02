@@ -42,8 +42,8 @@ public abstract class Examples extends TestCase {
 	public void testAutoGuide_AxisImage() throws Throwable {new AutoGuide_Axis(configs).testPNG();}
 	public void testAutoGuide_AxisText() throws Throwable {new AutoGuide_Axis(configs).testTXT();}
 
-	public void testAutoGuide_SidebarText() throws Throwable {new AutoGuide_Sidebar(configs).testTXT();}
-	public void testAutoGuide_SidebarImage() throws Throwable {new AutoGuide_Sidebar(configs).testPNG();}
+	public void testAutoGuide_SidebarText() throws Throwable {new AutoGuide_Legend(configs).testTXT();}
+	public void testAutoGuide_SidebarImage() throws Throwable {new AutoGuide_Legend(configs).testPNG();}
 
 	public void testNodeLinkText() throws Throwable {new NodeLink(configs).testTXT();}
 	public void testNodeLinkImage() throws Throwable {new NodeLink(configs).testPNG();}

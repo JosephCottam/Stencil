@@ -18,9 +18,9 @@ options {
 
   package stencil.parser.string;
   
-  import stencil.parser.tree.Program;
-  import stencil.parser.tree.Specializer;
-  import stencil.parser.tree.Selector; 
+  import stencil.parser.tree.*;
+  import stencil.interpreter.guide.SeedOperator;
+  
   import static stencil.parser.ParserConstants.GUIDE_LABEL;  
 }
 
@@ -29,10 +29,35 @@ options {
      return (Program) TreeRewriteSequence.apply(t);
   }
   
+  private static String getSources(Selector sel) {
+    Program p = (Program) sel.getAncestor(PROGRAM);
+    List<Id> path = sel.getPath();
+
+    Layer l = p.getLayer(path.get(0).getID());
+    Consumes c = l.getGroups().get(0);
+               
+    Rule r= null;
+    for (Rule r2: c.getResultRules()) {
+       if (((TuplePrototype) r2.getGenericTarget().getChild(0)).contains(path.get(1).getID())) {r=r2; break;}
+    }
+    assert r != null : "Guide path did not match any rule.";
+           
+    CallTarget t = r.getAction().getStart();
+    while (t instanceof Function) {
+      Function f = (Function) t;
+      AstInvokeable target = f.getTarget();
+      if (target != null && target.getOperator() instanceof SeedOperator) {
+        return f.getArguments().get(0).getChild(1).getText(); //get child 1 because this is a tuple ref and it has been framed
+      }
+      t = f.getCall();
+   }
+   throw new Error("Guide path did not lead to location with seed operator");
+  }
+  
   private Specializer autoLabel(Specializer spec, Selector sel) {
     Specializer newSpec = (Specializer) adaptor.dupTree(spec);
     
-    String fields = "HA HA HA HA!!!";   //Change to the argument names 
+    String fields = getSources(sel); 
     
     Tree entry = (Tree) adaptor.create(MAP_ENTRY, GUIDE_LABEL);
     Tree value = (Tree) adaptor.create(STRING, fields);

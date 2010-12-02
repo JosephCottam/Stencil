@@ -9,7 +9,7 @@ STRICT: true
 stream Deaths(date, type, count)
 
 canvas Main
-  guide sidebar[X: -75, Y: -50] from Rose FILL_COLOR
+  guide legend[X: -75, Y: -50] from Rose FILL_COLOR
 
   guide pointLabels from Rose ID
     TEXT: MakeLabel(ID)

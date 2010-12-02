@@ -14,7 +14,7 @@ canvas Main
 		line.PEN: @Stroke{1}
 		label.REGISTRATION: "LEFT"
 
-	guide sidebar[sample: "LINEAR", round: "TRUE", spacing: 1] from Chart FILL_COLOR
+	guide legend[sample: "LINEAR", round: "TRUE", spacing: 1] from Chart FILL_COLOR
 		label.FONT : @Font{10}
 		example.SIZE: 9
 

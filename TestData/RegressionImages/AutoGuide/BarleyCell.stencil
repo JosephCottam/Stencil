@@ -20,7 +20,7 @@ canvas Main
          sample: "LINEAR", round: "T", seed.min: MIN, seed.max: MAX]
     from BarleySite X
   guide 
-    sidebar[X: 75, Y: -60] 
+    legend[X: 75, Y: -60] 
     from BarleySite PEN_COLOR
       example.FILL_COLOR: @Color{GRAY90}
 

@@ -28,7 +28,7 @@ public class Guide extends StencilTree {
 	 */
 	public Selector getSelector() {return (Selector) getFirstChildWithType(StencilParser.SELECTOR);}
 	
-	/**What type of guide needs to be created (axis, sidebar, etc)?*/
+	/**What type of guide needs to be created (axis, legend, etc)?*/
 	public String getGuideType() {return getFirstChildWithType(StencilParser.ID).getText();}
 	
 	/**What are the specializer arguments?*/
