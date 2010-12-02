@@ -45,7 +45,7 @@
         <mkdir dir="${results}"/>
 
         
-        <junit fork="yes" dir="/Users/jcottam/Documents/workspace/Stencil/Stencil/">
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
             <formatter type="brief"/>
 
             <classpath>
@@ -57,7 +57,7 @@
             
             
             <batchtest todir="${results}">
-                <fileset dir="/Users/jcottam/Documents/workspace/Stencil/Stencil/bin/">
+                <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
                     <include name="**/*Test*.class"/>
                     <exclude name="**/*$*"/>
                     <exclude name="**/testUtilities/**"/>
@@ -74,7 +74,7 @@
     <target name="JUnit-Singles" depends="CleanUpTests,MakeJar">
         <move file="Stencil.jar" toDir="TestData"/>
         
-        <junit fork="yes" dir="/Users/jcottam/Documents/workspace/Stencil/Stencil/">
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
             <classpath>
                 <pathelement location="./TestData/Stencil.jar"/>
                 <pathelement path="${testsLocation}"/>
