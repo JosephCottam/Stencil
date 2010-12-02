@@ -14,9 +14,9 @@ stream flowers(sepalL, petalW, sepalW,
 canvas Main
   guide trend[sample: "SIMPLE"] from FlowerPlot ID 
   guide sidebar[X: 15, Y: -90] from FlowerPlot FILL_COLOR
-  guide axis[sample: "Linear", axisLabel: "Petal Length"] 
+  guide axis[sample: "Linear", guideLabel: "Petal Length"] 
     from FlowerPlot Y
-  guide axis[sample: "Linear", axisLabel: "Petal Width"] 
+  guide axis[sample: "Linear", guideLabel: "Petal Width"] 
      from FlowerPlot X
 
 layer FlowerPlot

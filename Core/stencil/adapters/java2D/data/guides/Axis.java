@@ -25,12 +25,14 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 
+import static stencil.parser.ParserConstants.GUIDE_LABEL;
+
 public class Axis extends Guide2D {
 	/**Fields used in creating marks.*/
 	private final String[] LABEL_FIELDS =  new String[]{"TEXT", "X","Y", "ROTATION"};
 	private final String[] LINE_FIELDS = new String[]{"X.1", "Y.1","X.2","Y.2"};
 
-	public static final String AXIS_LABEL_PROPERTY="axisLabel";
+	public static final String AXIS_LABEL_PROPERTY= GUIDE_LABEL;
 	
 	/**In the axial specializer, map values that start with
 	 * this tag will be applied to the labels.
@@ -83,7 +85,7 @@ public class Axis extends Guide2D {
 	protected final int offset_idx;
 	protected final TupleSorter sorter;
 	
-	protected Text axisLabel;
+	protected Text guideLabel;
 	
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {
@@ -118,14 +120,14 @@ public class Axis extends Guide2D {
 		
 		sorter = new TupleSorter(offset_idx);
 
-		axisLabel = new Text(null, "label");
+		guideLabel = new Text(null, "label");
 		if (guideDef.getSpecializer().getMap().containsKey(AXIS_LABEL_PROPERTY)) {
 			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
 			int rotation = axis==AXIS.X ? 0 : 270;
 			registration = axis==AXIS.X ? "TOP" : "BOTTOM";
 			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
 			
-			axisLabel = axisLabel.update(update);
+			guideLabel = guideLabel.update(update);
 		}
 
 		if (position != null) {baseline = position;}
@@ -162,8 +164,8 @@ public class Axis extends Guide2D {
 		}
 
 		update = new PrototypedTuple(new String[]{"X", "Y"},  new Object[]{x,y});
-		axisLabel = axisLabel.update(update);
-		marks.add(axisLabel);
+		guideLabel = guideLabel.update(update);
+		marks.add(guideLabel);
 		bounds = GuideUtils.fullBounds(marks);		
 	}
 

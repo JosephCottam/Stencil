@@ -213,6 +213,7 @@ public abstract class ParseStencil {
 		p = GuideTransfer.apply(p, modules);		
 		p = GuideLiftGenerator.apply(p);
 		p = GuideDefaultRules.apply(p);
+		p = GuideAutoLabel.apply(p);
 
 		p = DefaultSpecializers.apply(p, modules, adapter, false); 
 		p = SetOperators.apply(p, modules);

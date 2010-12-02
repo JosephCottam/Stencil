@@ -14,9 +14,9 @@ const MAX: 100
 const MIN: 10
 
 canvas Main
-  guide axis[axisLabel: "Variety", X:0] from BarleySite Y
+  guide axis[guideLabel: "Variety", X:0] from BarleySite Y
   guide 
-    axis[axisLabel: "Yield", 
+    axis[guideLabel: "Yield", 
          sample: "LINEAR", round: "T", seed.min: MIN, seed.max: MAX]
     from BarleySite X
   guide 

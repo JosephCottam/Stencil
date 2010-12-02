@@ -40,6 +40,7 @@ public abstract class ParserConstants {
 	public static final String DEFAULT_RESTRICTION = "ANY";
 	public static final String DEFAULT_FIELD_TYPE_LABEL="NOMINAL";
 
+	public static final String GUIDE_LABEL = "guideLabel";
 	public static final String POSITIONAL_ARG = "#POSITIONAL";
 	public static final String SEPARATOR = ",";
 	public static final String INITIATOR = "(";
