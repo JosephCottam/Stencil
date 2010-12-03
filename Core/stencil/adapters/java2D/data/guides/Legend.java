@@ -3,6 +3,7 @@ package stencil.adapters.java2D.data.guides;
 import  static stencil.parser.ParserConstants.SIMPLE_DEFAULT;
 import  static stencil.parser.ParserConstants.GUIDE_LABEL;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -128,8 +129,11 @@ public class Legend extends Guide2D {
 
 	private Collection<Glyph2D> createGuideLabel() {
 		List<Glyph2D> parts = new ArrayList(2);
-		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
-		Object[] labelValues = new Object[]{0, 0, guideLabel, "LEFT"};
+		Font font = (Font) prototypeLabel.get("FONT");
+//		font = font.deriveFont(Font.ITALIC);
+		
+		String[] labelFields = new String[]{"FONT", "X","Y","TEXT", "REGISTRATION"};
+		Object[] labelValues = new Object[]{font, 0, 0, guideLabel, "LEFT"};
 		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
 		parts.add(label);
 

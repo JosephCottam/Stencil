@@ -1,5 +1,6 @@
 package stencil.adapters.java2D.data.guides;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -120,12 +121,15 @@ public class Axis extends Guide2D {
 		
 		sorter = new TupleSorter(offset_idx);
 
-		guideLabel = new Text(null, "label");
+		guideLabel = (Text) prototypeText.updateID("label");
 		if (guideDef.getSpecializer().getMap().containsKey(AXIS_LABEL_PROPERTY)) {
 			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
 			int rotation = axis==AXIS.X ? 0 : 270;
 			registration = axis==AXIS.X ? "TOP" : "BOTTOM";
-			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT", "ROTATION"}, new Object[]{label, registration, 5, rotation}); 
+			Font font = (Font) guideLabel.get("FONT");
+			font = font.deriveFont(font.getSize2D()*1.2f);
+
+			update = new PrototypedTuple(new String[]{"TEXT", "REGISTRATION", "FONT", "ROTATION"}, new Object[]{label, registration, font, rotation}); 
 			
 			guideLabel = guideLabel.update(update);
 		}
