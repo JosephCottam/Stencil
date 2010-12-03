@@ -365,11 +365,14 @@ public class Projection extends BasicModule {
 				inMax = newInMax;
 				stateID++;
 			}
+			System.out.printf("Map   --  v:%1$s, in:(%2$f, %3$f), out:(%4$f, %5$f)\n", dv, inMin, inMax, outMin, outMax);
 			
 			return query(dv);   
 		}
 
 		public double query(double v) {
+			System.out.printf("Query --  v:%1$s, in:(%2$f, %3$f), out:(%4$f, %5$f)\n", v, inMin, inMax, outMin, outMax);
+
 			double percent = (v-inMin)/inMax;
 			double value = span*percent + outMin;
 			
