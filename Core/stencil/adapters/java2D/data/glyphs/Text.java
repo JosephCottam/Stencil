@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -291,8 +292,9 @@ public final class Text extends Basic {
 			double x = horizontalOffset(dim.width, ld.fullWidth, justify);
 			double y = dim.height * i + fm.getAscent();
 			
-			java.awt.Shape s = font.createGlyphVector(context, line).getOutline((float) x, (float) y);
-			compound.append(s, false);
+			int flags = Font.LAYOUT_LEFT_TO_RIGHT + Font.LAYOUT_NO_LIMIT_CONTEXT + Font.LAYOUT_NO_START_CONTEXT;
+			GlyphVector v = font.layoutGlyphVector(context, line.toCharArray(), 0, line.length(), flags);
+			compound.append(v.getOutline((float) x, (float) y), false);
 		}
 
 		return compound;
