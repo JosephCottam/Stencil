@@ -249,7 +249,7 @@ public final class EnvironmentProxy {
 	 * @return
 	 */
 	public String frameNameFor(String name) {
-		if (prototype.contains(name)) {return label;}
+		if (prototype != null && prototype.contains(name)) {return label;}
 		if (label != null && label.equals(name)) {
 			return IS_LABEL;
 		}
@@ -261,7 +261,7 @@ public final class EnvironmentProxy {
 	}
 	
 	public int frameRefFor(String name) {
-		if (prototype.contains(name)) {return currentIndex();}
+		if (prototype != null && prototype.contains(name)) {return currentIndex();}
 		if (label != null && label.equals(name)) {return currentIndex();}
 		if (parent == null) {
 			throw new FrameException(name, label, prototype);

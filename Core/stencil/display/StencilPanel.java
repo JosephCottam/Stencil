@@ -123,6 +123,8 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * that are needed by the actual export.
 	 *
 	 * By default, no export is implemented and an UnsupportedOperationException is thrown instead.
+	 * 
+	 * Export should make an attempt at relevant updates.
 	 *
 	 * @param filename File to save in
 	 * @param type Flag indicating type (may be literal or logical, consult implementing class documentation)
@@ -148,11 +150,11 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * the graphic, a tuple to represent the canvas and view are also need to be exported.
 	 * These special tuples should have no layer.
 	 *
+	 * Export should make an attempt at relevant updates.
+	 *
 	 * @param filename File to tuples items in
 	 * @throws Exception This method is not expected to resolve file issues.
 	 */
-
-	/**Export a list of tuples describing all glyphs (even those out of the view), plus the view and canvas.*/
 	protected void exportTuples(String filename) throws Exception {
 		java.io.FileWriter writer = new java.io.FileWriter(filename);
 		IDOrdered comp = new IDOrdered();
@@ -195,13 +197,4 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		Display.canvas = getCanvas();
 		Display.view = getView();
 	}
-	
-	//------------------------------------------------------------------------------------------
-	//Runtime support operations.  These are methods called by the interpreter.
-	
-	/**Force updates to run now.  Updates method should take precautions
-	 * to maintain a consistent visualization.  As such, this method should
-	 * NEVER be invoked as part of data analysis.
-	 */
-	public abstract void doUpdates();
 }

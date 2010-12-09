@@ -3,13 +3,13 @@ package stencil.module.util;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-import org.yaml.snakeyaml.Loader;
 import org.yaml.snakeyaml.TypeDescription;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.AbstractConstruct;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
@@ -20,13 +20,15 @@ public class ModuleDataParser {
 	private static class StencilYAMLConstructor extends Constructor {
 	    public StencilYAMLConstructor(Class root) {
 	    	super(root);
-	        this.yamlConstructors.put("!spec", new ConstructSpecializer());
-	        this.yamlConstructors.put("!proto", new ConstructPrototype());
+	        this.yamlConstructors.put(new Tag("!spec"), new ConstructSpecializer());
+	        this.yamlConstructors.put(new Tag("!proto"), new ConstructPrototype());
 	    }
 
 	    private class ConstructPrototype extends AbstractConstruct {
 	        public TuplePrototype construct(Node node) {
 	            String source = (String) constructScalar((ScalarNode) node);
+	            if (source.equals("NULL")) {source = "";}
+	            
 	            source = String.format("(%1$s)", source);
 	            try {
 	            	return ParseStencil.parsePrototype(source,false);
@@ -53,8 +55,7 @@ public class ModuleDataParser {
 		mdDesc .putListPropertyType("operators", OperatorData.class);
 		constructor.addTypeDescription(mdDesc);
 
-		Loader loader = new Loader(constructor);
-		Yaml yaml = new Yaml(loader);
+		Yaml yaml = new Yaml(constructor);
 
 		ModuleData md = (ModuleData) yaml.load(source);
 		return md;

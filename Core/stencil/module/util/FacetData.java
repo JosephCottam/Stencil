@@ -7,7 +7,7 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
-	public static enum MemoryUse {FUNCTION, READER, WRITER, UNSPECIFIED} 
+	public static enum MemoryUse {FUNCTION, READER, WRITER, OPAQUE} 
 	
 	private String name;
 	private MemoryUse memory;
@@ -55,6 +55,6 @@ public final class FacetData {
 	public TuplePrototype getPrototype() {return prototype;}
 	
 	public boolean mutative() {
-		return memory == MemoryUse.WRITER && memory == MemoryUse.UNSPECIFIED;
+		return memory == MemoryUse.WRITER && memory == MemoryUse.OPAQUE;
 	}
 }

@@ -183,7 +183,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 		this.range = range;
 		this.baseFacetName = facetName;
 		this.baseFacet = operator.getFacet(facetName);
-		this.operatorData =  noFunctions(operator.getOperatorData());		
+		this.operatorData =  noFunctions(operator.getOperatorData(), true);		
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}

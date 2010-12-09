@@ -19,7 +19,7 @@ options {
   public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
 }
 
-//Extend the operator definition to include the required facets 
+//Extend the operator definition to include the state query facet
 topdown
   : ^(sq=STATE_QUERY .*) 
       {sq.getAncestor(OPERATOR) != null}? -> {stateQueryList(adaptor, $sq.getAncestor(OPERATOR))}; 

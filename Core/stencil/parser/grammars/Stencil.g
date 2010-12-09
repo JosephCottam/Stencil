@@ -250,7 +250,6 @@ operatorDef
   | OPERATOR name=ID DEFINE base=opName specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
-//Apply defaultCall to functions that have no explicit call
 opName
   : pre=ID NAMESPACE post=ID -> ID[$pre + "::" + $post] 
   | ID;

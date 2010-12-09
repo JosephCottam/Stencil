@@ -46,5 +46,7 @@ replicate: ^(r=OPERATOR proto=. prefilter=. rules=.)
 
 //Properly construct the query facet
 toQuery: ^(f=FUNCTION rest+=.*) 
-          {$f.getAncestor(PREDICATE)  == null && $f.getAncestor(OPERATOR_FACET) != null && $f.getAncestor(OPERATOR_FACET).getText().equals("query")}? ->
+          {$f.getAncestor(PREDICATE)  == null                                   //No predicate specified 
+            && $f.getAncestor(OPERATOR_FACET) != null                           //Face is specified
+            && $f.getAncestor(OPERATOR_FACET).getText().equals("query")}? ->    //And the facet group being transformed is a query THEN...
           ^(FUNCTION[queryName($f.getText())]  $rest*);

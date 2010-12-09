@@ -109,7 +109,7 @@ public abstract class SplitHelper implements StencilOperator {
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
 		this.operator = operator;		
-		this.operatorData = noFunctions(operator.getOperatorData());
+		this.operatorData = noFunctions(operator.getOperatorData(), true);
 	}
 	
 	public Invokeable getFacet(String facet) {

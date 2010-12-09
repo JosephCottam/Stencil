@@ -29,6 +29,11 @@ options {
 }
 
 @members {
+  private static final class FramingException extends RuntimeException {
+      public FramingException(Tree at, EnvironmentProxy.FrameException fe) {
+        super("Error Framing" + at.toStringTree() + "\n" + fe.getMessage(), fe.getCause());}
+  }
+
   private static boolean ignoreErrors;
   public static Program apply (Tree t, ModuleCache modules, boolean ignoreErrors) {
      FrameTupleRefs.ignoreErrors= ignoreErrors;
@@ -48,8 +53,8 @@ topdown
   : ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)])
   | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .?);
 	catch [EnvironmentProxy.FrameException fe] {
-	 if (c != null) {throw new RuntimeException("Error framing: " + c.toStringTree(), fe);}
-	 else if (p != null) {throw new RuntimeException("Error framing: " + p.toStringTree(), fe);}
+	 if (c != null) {throw new FramingException(c, fe);}
+     else if (p != null) {throw new FramingException(p, fe);}
 	 else {throw new Error("Error in framing: No root.");}
   }
   catch [RuntimeException ex] {

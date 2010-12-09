@@ -92,21 +92,18 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
 	public void export(String filename, String type, Object info) throws Exception {
-		synchronized(program) {
-			synchronized(visLock) {
-				painter.doUpdates();
-	
-				
-				if (type.equals("PNG") || type.equals("RASTER")) {
-					exportPNG(filename, Converter.toInteger(Array.get(info,0)));
-				} else if (type.equals("PNG2")) {
-					exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
-				} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
-					exportEPS(filename);
-				} else if (type.equals("EPS2") || type.equals("VECTOR")) {
-					exportEPS(filename, (Rectangle) info);
-				} else {super.export(filename, type, info);}
-			}
+		synchronized(visLock) {
+			painter.doUpdates();
+			
+			if (type.equals("PNG") || type.equals("RASTER")) {
+				exportPNG(filename, Converter.toInteger(Array.get(info,0)));
+			} else if (type.equals("PNG2")) {
+				exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
+			} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
+				exportEPS(filename);
+			} else if (type.equals("EPS2") || type.equals("VECTOR")) {
+				exportEPS(filename, (Rectangle) info);
+			} else {super.export(filename, type, info);}
 		}
 	}
 	
@@ -228,6 +225,4 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 							bounds.width-(insets.left+insets.right),
 							bounds.height-(insets.top+insets.bottom));
 	}
-	
-	public void doUpdates() {painter.doUpdates();}
 }

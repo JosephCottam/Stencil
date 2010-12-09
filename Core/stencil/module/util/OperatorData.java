@@ -12,6 +12,7 @@ public final class OperatorData {
 	private String name;			 /**Operator Name*/
 	private String target;			 /**Method or class to use for the given operator (containing class is determined by the module).*/
 	private String module;		     /**Module this operator belongs to.*/
+	private String description;   	 /**Text description of the operator.*/
 	private Map<String, FacetData> facets = new HashMap();
 	
 	
@@ -28,6 +29,7 @@ public final class OperatorData {
 		name = source.name;
 		target = source.target;
 		module = source.module;
+		description = source.description;
 		for (FacetData facet: source.facets.values()) {
 			addFacet(new FacetData(facet));
 		}
@@ -59,6 +61,9 @@ public final class OperatorData {
 
 	public String getTarget() {return target;}
 	public void setTarget(String target) {this.target = target;}
+
+	public String getDescription() {return description;}
+	public void setDescription(String description) {this.description = description;}
 	
 	public boolean isComplete() {
 		return target != null
