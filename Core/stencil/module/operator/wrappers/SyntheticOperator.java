@@ -39,7 +39,6 @@ import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
-import stencil.parser.ParserConstants;
 import stencil.display.Display;
 import stencil.parser.tree.OperatorFacet;
 import stencil.parser.tree.OperatorRule;
@@ -74,9 +73,9 @@ public class SyntheticOperator implements StencilOperator {
 
 		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER);
 		
-		operatorData.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, opDef.getMap().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.WRITER, opDef.getQuery().getResults()));	
-		operatorData.addFacet(new FacetData(ParserConstants.STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, opDef.getFacet(MAP_FACET).getResults()));	
+		operatorData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, opDef.getFacet(QUERY_FACET).getResults()));	
+		operatorData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 	}
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {
@@ -92,8 +91,8 @@ public class SyntheticOperator implements StencilOperator {
 
 	public String getName() {return operatorData.getName();}
 	public OperatorData getOperatorData() {return operatorData;}
-	public Tuple query(Object... values) {return process(opDef.getQuery(), values);}
-	public Tuple map(Object... values) {return process(opDef.getMap(), values);}
+	public Tuple query(Object... values) {return process(opDef.getFacet(QUERY_FACET), values);}
+	public Tuple map(Object... values) {return process(opDef.getFacet(MAP_FACET), values);}
 	public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?

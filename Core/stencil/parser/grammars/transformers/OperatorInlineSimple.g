@@ -15,8 +15,9 @@ options {
 
 	package stencil.parser.string;
 
-	import stencil.parser.ParseStencil;
-	import stencil.parser.tree.*;
+  import stencil.parser.ParseStencil;
+  import stencil.parser.tree.*;
+  import stencil.parser.tree.util.MultiPartName;
   import stencil.tuple.prototype.TuplePrototypes;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
   import static stencil.parser.string.util.Utilities.genSym;
@@ -36,14 +37,19 @@ options {
   
    protected final Map<String, StencilTree> simple = new HashMap();
 
-   private Tree replaceRef(String refName, StencilTree simpleOpRef) {
-      StencilTree op = simple.get(refName);
-      StencilTree core = (StencilTree) adaptor.dupTree(getCoreCall(op));
+   private Tree replaceRef(Function simpleOpRef) {
+      String refName = getName(simpleOpRef);
+      String facetName = getFacet(simpleOpRef);
+      
+      Operator op = (Operator) simple.get(refName);
+      OperatorFacet facet =  op.getFacet(facetName);
+      Function core = (Function) adaptor.dupTree(getCoreCall(facet));
+      
       StencilTree target = simpleOpRef.findChild(FUNCTION);
       if (target == null) {target =simpleOpRef.findChild(PACK);}
       Tree pass = simpleOpRef.getChild(2);
       
-      StencilTree splice = makeSplice(simpleOpRef.findChild(LIST), pass, op, core);
+      StencilTree splice = makeSplice(simpleOpRef.findChild(LIST), pass, facet, core);
       StencilTree tail = findTail(splice);
       
       adaptor.setChild(tail.getParent(), tail.getChildIndex(), adaptor.dupTree(target));
@@ -77,7 +83,7 @@ options {
          adaptor.addChild(postRename, postSpec);
          adaptor.addChild(postRename, adaptor.dupTree(toList(pack)));
          adaptor.addChild(postRename, adaptor.dupNode(pass));
-         adaptor.addChild(postRename, adaptor.create(PACK, ""));
+         adaptor.addChild(postRename, adaptor.create(PACK, "PACK"));
 	  
          adaptor.setChild(pack.getParent(), pack.getChildIndex(), postRename);
 	  
@@ -129,28 +135,42 @@ options {
    }
       
    private String getName(Object t) {
-      return ((Tree) t).getText().substring(0, ((Tree) t).getText().indexOf("."));
+      MultiPartName name = new MultiPartName(((Tree) t).getText());
+      return name.getName();
    }
    
-   private StencilTree getCoreCall(StencilTree operator) {
-      return (StencilTree) operator.getChild(2).getChild(0).getChild(1).getChild(0).getChild(1).getChild(0);
+   private String getFacet(Object t) {
+      MultiPartName name = new MultiPartName(((Tree) t).getText());
+      return name.getFacet();
+   }
+   
+   /**What is actually going to be inlined?
+    * Having established that the call is inlineable, only the call chain not including the predicate needs to be inlined.
+    * This is the "core" of the defined operator.
+    *
+    * @param operator A tree node representing an operator
+    * @param facet The facet from that operator that is desired
+    **/   
+   private Function getCoreCall(OperatorFacet facet) {
+      assert facet.getRules().size() == 1 : "Can only inline facets with exactly one rule";
+      return (Function) ((CommonTree) facet.getRules().get(0).getRules().get(0).getFirstChildWithType(CALL_CHAIN)).getFirstChildWithType(FUNCTION);
    }
 }
 
 //Identify operators that only have one branch
-search: ^(OPERATOR . LIST opRules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
+search: ^(OPERATOR_FACET . LIST opRules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
 opRules: ^(LIST ^(OPERATOR_RULE ^(LIST pred=predicate) ^(LIST .)))   //This step ensures there is only one rule (part of being in-line-able)  TODO: Inline multiple rules after explicit framing is universal
   {if ($pred.pred.getText().startsWith("#TrivialTrue")) {
      Tree op = pred.tree.getAncestor(OPERATOR);
      simple.put(op.getText(), (StencilTree) op);
   }};
 
-predicate returns [Tree pred]: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=.))) {$pred = $f;};
+predicate returns [Tree pred]: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=. n=.))) {$pred = $f;};
 
 
 replace: ^(cc=CALL_CHAIN chain[cc]);
 chain[Tree prior]
   : ^(f=FUNCTION spec=. args=. pass=. target=chain[f])
-      -> {simple.containsKey(getName($f))}?  {replaceRef(getName($f), (StencilTree) $f)}
+      -> {simple.containsKey(getName($f))}?  {replaceRef((Function) $f)}
       -> 									^(FUNCTION $spec $args $pass $target)
   | ^(PACK .*);

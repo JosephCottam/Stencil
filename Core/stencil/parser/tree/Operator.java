@@ -35,7 +35,13 @@ public class Operator extends StencilTree {
 
 	public String getName() {return token.getText();}
 
-	public OperatorFacet getMap() {return (OperatorFacet) getChild(0);}
-	public OperatorFacet getQuery() {return (OperatorFacet) getChild(1);}
+	public OperatorFacet getFacet(String name) {
+		for (Object t: this.getChildren()) {
+			OperatorFacet facet = (OperatorFacet) t;
+			if (facet.getName().equals(name)) {return facet;}
+		}
+		throw new RuntimeException("Facet not known: " + name);
+	}
+	
 	public StateQuery getStateQuery() {return (StateQuery) getChild(2);}
 }
