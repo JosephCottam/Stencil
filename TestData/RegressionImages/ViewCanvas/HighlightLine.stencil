@@ -24,7 +24,7 @@ layer Markers[POLY_LINE]
 from Stocks
 	ID : "Google"
 	X.new : TimeStep(Date) -> Date.put(VALUE, VALUE, Date) -#> VALUE
-	Y.new : Add(Open, 0) -#> Price(VALUE) -> Price
+	Y.new : Add(Open, 0) -#> Price(sum) -> Price
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
 
@@ -35,8 +35,8 @@ from Stocks
 	
 layer Lookup[SHAPE]
 from Stocks
-	ID : TimeStep(Date)
-   X : TimeStep(Date) -> VALUE
+   ID : TimeStep(Date)
+   X : TimeStep(Date)
    Y : Price(Open)
    VISIBLE : "False"
 
@@ -64,5 +64,5 @@ operator Price (Open) -> (Price)
 	ALL => (Price) : Mult(-1, Open)
 
 operator TimeStep (T) -> (VALUE, Date)
-	ALL => VALUE : Index(T) -> Mult(VALUE, 3) -> VALUE
+	ALL => VALUE : Index(T) -> Mult(index, 3)
 			Date : T

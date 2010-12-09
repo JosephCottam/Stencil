@@ -5,18 +5,23 @@ description: String manipulation.
 defaults:
   defaultSpecializer: !spec "[]"
   facets:
-    - {name: map, memUse: FUNCTION, prototype: !proto "String VALUE"}
-    - {name: query, memUse: FUNCTION, prototype: !proto "String VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "String value"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "String value"}
 
 operators:
   - name: Concatenate
   - name: Delimit
   - name: Format
   - name: IndexOf
+    facets:
+    - {name: map, memUse: FUNCTION, prototype: !proto "int index"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "int index"}
+
   - name: Length
     facets:
-    - {name: map, memUse: FUNCTION, prototype: !proto "int VALUE"}
-    - {name: query, memUse: FUNCTION, prototype: !proto "int VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "int length"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "int length"}
+
   - name: Print
   - name: Replace
   - name: Substring

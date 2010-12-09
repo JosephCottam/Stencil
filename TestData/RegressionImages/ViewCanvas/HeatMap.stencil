@@ -10,7 +10,7 @@ canvas main[BACKGROUND_COLOR: "BLACK"]
 
 layer Heat
 from Mouse
-	ID : Count(" ") -> VALUE
+	ID : Count()
 	(X,Y) : (X,Y)
 	FILL_COLOR: Colorize(META) -> C
 	SIZE: 10
@@ -21,13 +21,13 @@ from Mouse
 	filter(BUTTON=1) 
 	filter(TYPE=~"DRAG")
 	filter(SHIFT!~"TRUE")
-	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width) -> VALUE
-	view(Y) : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view[Y], Height) -> VALUE
+	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
+	view(Y) : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view[Y], Height)
 from Mouse
 	filter(BUTTON=1)
 	filter(SHIFT=~"true")
 	filter(TYPE=~"DRAG") 
-	view(ZOOM) : Mult(DELTA_Y, .01) -> Add(VALUE, view[ZOOM]) -> VALUE
+	view(ZOOM) : Mult(DELTA_Y, .01) -> Add(product, view[ZOOM])
 from Mouse
 	filter(BUTTON=1)
 	filter(CLICK_COUNT=3)

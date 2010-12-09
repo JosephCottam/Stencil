@@ -60,9 +60,9 @@ operator LineIndex : Dict[fields: "lines"]
 operator Centroid (word) -> (X,Y)
   (ALL) =>
     (X): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
-            Select[field: 0](*) -> Average[range: LAST](LAST)
+            Select[field: 0](*) -> Mean[range: LAST](LAST)
     (Y): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
-            Select[field: 1](*) -> Average[range: LAST](LAST)
+            Select[field: 1](*) -> Mean[range: LAST](LAST)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]

@@ -8,37 +8,37 @@ STRICT: TRUE
 
 stream Stocks(Date, Open)
 
-layer Ticker[POLY_LINE]					/*Poly-line is a set of line segments treated as a group.*/
+layer Ticker[POLY_LINE]				/*Poly-line is a set of line segments treated as a group.*/
 from Stocks
 	ID: "Google"
-	X.new: TimeStep(Date) -> (VALUE) /*Indicates that a new segment of a poly-line is to be crated.*/
-	Y.new: Price(Open) -> (Price)		/*All news in a block indicate the same extension until a new input is started.*/
+	X.new: TimeStep(Date)           /*Indicates that a new segment of a poly-line is to be crated.*/
+	Y.new: Price(Open)         		/*All news in a block indicate the same extension until a new input is started.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
 
 layer Averages[POLY_LINE]
 from Stocks
 	ID: "Google_30"
-	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[range: "-30..n"](Price) -> (VALUE)	/*Average the most recent 30 values.*/
+	X.new: TimeStep(Date)
+	Y.new: Price(Open) -> Mean[range: "-30..n"](Price)	    /*Average the most recent 30 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{LIME,150}
 from Stocks
 	ID: "Google_ALL"
-	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[range: ALL](Price) -> (VALUE)		/*Average all values.*/
+	X.new: TimeStep(Date)
+	Y.new: Price(Open) -> Mean[range: ALL](Price)		    /*Average all values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{CRIMSON,150}
 from Stocks
 	ID: "Google_20"
-	X.new: TimeStep(Date) -> (VALUE)
-	Y.new: Price(Open) -> Mean[range: "-30 .. -10"](Price) -> (VALUE) /*Average that lags by 10 and includes 20 values.*/
+	X.new: TimeStep(Date)
+	Y.new: Price(Open) -> Mean[range: "-30 .. -10"](Price) /*Average that lags by 10 and includes 20 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{ORANGE,150}
 	
 
 operator Price (Open) -> (Price)
-	ALL => (Price) : Mult(-1, Open) -> (VALUE)
+	ALL => (Price) : Mult(-1, Open)
 
 operator TimeStep (T) -> (VALUE)
-	ALL => (VALUE) :  Index(T) -> Mult(VALUE, 3) -> VALUE
+	ALL => (VALUE) :  Index(T) -> Mult(_, 3)

@@ -10,9 +10,9 @@ stream LineSource(axis1A, axis1B)
 
 layer Vertical[ARC]
 from LineSource
-	ID: Concatenate(axis1A, axis1B) -> (VALUE)
-	X.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
-	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	ID: Concatenate(axis1A, axis1B) 
+	X.1: Concatenate(axis1A, axis1B) -> Spacing(value) 
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(value) 
 	Y.1: -5
 	Y.2: 10
 	ARC_HEIGHT: 20
@@ -21,9 +21,9 @@ from LineSource
 
 layer Horizontal[ARC]
 from LineSource
-	ID: Concatenate(axis1A, axis1B) -> (VALUE)
-	Y.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
-	Y.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (V)
+	ID: Concatenate(axis1A, axis1B)
+	Y.1: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (V)
+	Y.2: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (V)
 	X.1: -5
 	X.2: 10
 	ARC_HEIGHT: 50
@@ -33,13 +33,13 @@ from LineSource
 
 layer Diagonal[ARC]
 from LineSource
-	ID: Concatenate(axis1A, axis1B) -> (VALUE)
+	ID: Concatenate(axis1A, axis1B)
 	X.1: 40
-	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> Mult(V, 2) -> VALUE
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(value)  -> Mult(V, 2)
 	Y.1: 40
 	Y.2: 50
 	PEN_COLOR: @Color{GRAY80}
 	PEN: @Stroke{3}
 
 operator Spacing (ID) -> (V) 
-	ALL => V : Index(ID) -> Mult(VALUE, 100) -> (VALUE)
+	ALL => V : Index(ID) -> Mult(index, 100)

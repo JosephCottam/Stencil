@@ -11,19 +11,37 @@ defaults:
 
 operators:
     - name: Count
+      description: Count the number of times the argument combination has been seen (including the current one)
+      facets:
+       - {name: map, memUse: WRITER, prototype: !proto "long count"}
+       - {name: query, memUse: READER, prototype: !proto "long count"}
+       - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
+
     - name: Index
-    - name: Justify
+      description: Record the original presentation order of the combination of arguments
+      facets:
+         - {name: map, memUse: WRITER, prototype: !proto "long index"}
+         - {name: query, memUse: READER, prototype: !proto "long index"}
+         - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
+
     - name: HeatScale
+      description: Project between two color spaces.  Satefully keeps the max/min seen.
       defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\"]"
       facets:
-      - {name: map, memUse: WRITER, prototype: !proto "Color VALUE"}
-      - {name: query, memUse: READER, prototype: !proto "Color VALUE"}
-      - {name: stateID, memUse: READER, prototype: !proto "Color VALUE"}
+        - {name: map, memUse: WRITER, prototype: !proto "Color VALUE"}
+        - {name: query, memUse: READER, prototype: !proto "Color VALUE"}
+        - {name: stateID, memUse: READER, prototype: !proto "Color VALUE"}
+      
     - name: Rank
       defaultSpecializer: !spec "[range:ALL, split:0, start: 0]"
+      facets:
+         - {name: map, memUse: WRITER, prototype: !proto "long rank"}
+         - {name: query, memUse: READER, prototype: !proto "long rank"}
+         - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
+               
     - name: Scale
       defaultSpecializer: !spec "[min: 0, max: 1, inMin: NULL, inMax: NULL, range: ALL, split:0]"
       facets: 
-       - {name: map, memUse: WRITER, prototype: !proto "VALUE"}
-       - {name: query, memUse: READER, prototype: !proto "VALUE"}
-       - {name: stateID, memUse: READER, prototype: !proto "VALUE"}
+       - {name: map, memUse: WRITER, prototype: !proto "double value"}
+       - {name: query, memUse: READER, prototype: !proto "double value"}
+       - {name: stateID, memUse: READER, prototype: !proto "double value"}

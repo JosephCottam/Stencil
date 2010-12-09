@@ -23,8 +23,8 @@ canvas Main
 layer Chart
 from Values
   ID : Count()
-  X : Index(Category) -> Add(VALUE, 1) -> Mult(VALUE, 11) -> VALUE
-  Y : Count(Category) -#> Mult(VALUE, -11) -> VALUE
+  X : Index(Category) -> Add(index, 1) -> Mult(sum, 11)
+  Y : Count(Category) -#> Mult(count, -11)
   FILL_COLOR: @Color{BLUE}
   SIZE: 10
   REGISTRATION: "CENTER"

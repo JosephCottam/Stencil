@@ -21,7 +21,7 @@ order MTTSource > MTTNotApplicable
 layer Trivial
 from MTTSource
 	filter (suite_name =~ "trivial")
-	ID : Concatenate(axis1A, axis1B, axis2A, axis2B) ->  VALUE
+	ID : Concatenate(axis1A, axis1B, axis2A, axis2B)
 	(X,Y): Layout(axis1A, axis1B, axis2A, axis2B) ->(X,Y)
  	FILL_COLOR : BasicFails(fail) -> (C)
 	SIZE: 50
@@ -31,7 +31,7 @@ from MTTSource
 layer Others[PIE]
 from MTTSource
 	filter(suite_name !~"trivial")
-	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name) -> VALUE
+	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
 	(X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
 	SIZE: 13
 	PEN: @Stroke{3}
@@ -67,20 +67,20 @@ from MTTSource
 
 layer Labels[TEXT]
 from MTTSource
-	ID: Concatenate(axis1A, axis1B) -> VALUE
-	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12) -> VALUE
-	TEXT: Concatenate(axis1A, "\n", axis1B) -> VALUE
+	ID: Concatenate(axis1A, axis1B)
+	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12)
+	TEXT: Concatenate(axis1A, "\n", axis1B)
 	(Y, WIDTH): (-5, 50)
 	(ROTATION, JUSTIFY): ("VERTICAL", "LEFT")
 from MTTSource
-	ID: Concatenate(axis2A, axis2B) -> VALUE
-	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12) -> VALUE
-	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(VALUE) -> Label
+	ID: Concatenate(axis2A, axis2B)
+	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12)
+	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(value) -> Label
 	X : -5
 	(JUSTIFY, REGISTRATION): ("RIGHT", "TOP_RIGHT")
 from MTTSource
 	ID: graphLabel
-	Y: NamesIndex(graphLabel) -> VALUE
+	Y: NamesIndex(graphLabel)
 	TEXT: graphLabel
 	X: -375
 
@@ -94,27 +94,27 @@ from MTTSource
 
 layer GridLines[LINE]
 from MTTSource
-	ID : Concatenate(axis1A, axis1B) -> VALUE
+	ID : Concatenate(axis1A, axis1B)
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
 	Y.1 :-5
 	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
 	PEN_COLOR : Palet("GRID")
 from MTTSource
-	ID : Concatenate(axis2A, axis2B) -> VALUE
+	ID : Concatenate(axis2A, axis2B)
 	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
 	X.1 : -5
 	X.2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
 	PEN_COLOR: Palet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[range: ALL](VALUE)
+	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[range: ALL](sum)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[range: ALL](VALUE)
+	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[range: ALL](sum)
 
 
 operator NamesIndex(ID) -> (VALUE)
-	ALL => VALUE: Index(ID) -> (VALUE)
+	ALL => VALUE: Index(ID)
 
 operator BasicFails(fails) -> (C)
 	(fails = 0) => C: Palet("PASS") -> SetAlpha(51, C)

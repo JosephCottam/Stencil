@@ -24,7 +24,7 @@ from VertexList
 	 
 layer Edges[LINE]
 from VertexList 
-	ID: Concatenate(parent, child) -> (VALUE)
+	ID: Concatenate(parent, child)
 	(X.1, Y.1):* Nodes.find(parent) -> (X,Y)
 	(X.2, Y.2):* Nodes.find(child) ->  (X,Y)
 	PEN_COLOR: @Color{GRAY30,80}

@@ -147,8 +147,6 @@ public class Projection extends BasicModule {
 	 * presentation rank is returned.  (So the first item
 	 * presented always returns index one).  Ordering
 	 * is independent for each IndexScale created.
-	 *
-	 * TODO: Update so it can use a comparator for arbitrary sorting orders, then have it default to 'natural' order
 	 */
 	public static final class Index extends AbstractOperator {
 		public static final String NAME = "Index";

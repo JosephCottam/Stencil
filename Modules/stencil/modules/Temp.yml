@@ -11,19 +11,19 @@ defaults:
 operators: 
    - name: LinearInterp
      facets:
-      - {name: map, memUse: READER, prototype: !proto "VALUE"}
-      - {name: query, memUse: READER, prototype: !proto "VALUE"}
+      - {name: map, memUse: FUNCTION, prototype: !proto "value"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "value"}
+
    - name: Partition
      facets:
-      - {name: map, memUse: READER, prototype: !proto "double Start, double End, double Bucket"}
-      - {name: query, memUse: READER, prototype: !proto "double Start, double End, double Bucket"}
-   - name: StopWords
-     facets:
-      - {name: map, memUse: READER, prototype: !proto "boolean stopWord", target: query}
-      - {name: query, memUse: READER, prototype: !proto "boolean stopWord"}
+      - {name: map, memUse: WRITER, prototype: !proto "double start, double end, double bucket"}
+      - {name: query, memUse: READER, prototype: !proto "double start, double end, double bucket"}
+      - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
+
    - name: Oscillate
      defaultSpecializer: !spec  "[range: ALL, split:0, style: \"CIRCLE\", states: 2]"
      facets:
-      - {name: map, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
-      - {name: query, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
+       - {name: map, memUse: WRITER, prototype: !proto "value"}
+       - {name: query, memUse: READER, prototype: !proto "value"}
+       - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
      

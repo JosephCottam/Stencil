@@ -43,6 +43,8 @@ public class TupleUtil extends BasicModule {
 	/**Take a tuple of tuples.  Retrieve the n-th field from
 	 * each of those tuples to form a new tuple.
 	 * 
+	 * TODO: Investigate using map and get instead of Select
+	 * 
 	 * @author jcottam
 	 *
 	 */
@@ -89,12 +91,12 @@ public class TupleUtil extends BasicModule {
 		public Tuple query(Tuple t, int i) {return Converter.toTuple(t.get(i));}
 	}
 	
-	public static final class ToTuple extends AbstractOperator {
-		public ToTuple(OperatorData opData) {super(opData);}
-		public Tuple query(Object o) {return Converter.toTuple(o);}
-	}
-
-	/**Takes a tuple, returns a singleton tuple whose value is an array of the original tuples values.*/
+	/**TODO: Move this to a general converter module.*/
+	public static final Tuple toTuple(Object o) {return Converter.toTuple(o);}
+	
+	/**Takes a tuple, returns a singleton tuple whose value is an array of the original tuples values.
+	 * TODO: Move this to a general converter module.
+	 * */
 	public static final Tuple toArray(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
 
 

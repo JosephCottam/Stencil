@@ -12,13 +12,13 @@ stream LineSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, 
  
 layer GridLines[LINE]
 from LineSource
-	ID: Concatenate(axis1A, axis1B) -> VALUE
-	X.1: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (X)
-	X.2: Concatenate(axis1A, axis1B) -> Spacing(VALUE)  -> (X)
+	ID: Concatenate(axis1A, axis1B)
+	X.1: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (X)
+	X.2: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (X)
 	Y.1: -5
 	Y.2: 10
 	PEN_COLOR: @Color{GRAY80}
 	PEN: @Stroke{3}
 
 operator Spacing (ID) -> (X) 
-	ALL => X : Index(ID) -> Mult(VALUE, 5) -> (VALUE)
+	ALL => X : Index(ID) -> Mult(index, 5) -> (product)

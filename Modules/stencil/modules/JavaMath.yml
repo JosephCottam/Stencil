@@ -9,34 +9,134 @@ defaults:
     - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
 
 operators:
-   - name: Abs
    - name: ACos
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double acos"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double acos"}
+
    - name: ASin
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double asin"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double asin"}
+
    - name: ATan
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double atan"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double atan"}
    - name: ATan2
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double atan2"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double atan2"}
+
    - name: Cbrt
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double cbrt"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double cbrt"}   
+
    - name: Ceil
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double ceil"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double ceil"}
+
    - name: Cos
-   - name: Cosh 
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double cos"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double cos"}   
+   
+   - name: Cosh
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double cosh"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double cosh"}
+          
    - name: Exp
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double exp"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double exp"}   
+   
    - name: Expm1
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double expm1"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double expm1"}   
+   
    - name: Floor
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double floor"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double floor"}   
+   
    - name: Hypot
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double hypot"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double hypot"}   
+   
+   
    - name: IEEERemainder
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double ieee"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double ieee"}   
+   
+   
    - name: Log1p
-   - name: Negate
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double log"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double log"}   
+
    - name: Pow
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double product"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double product"}   
+
    - name: Round
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double val"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double val"}
+
    - name: Random
      facets:
-       - {name: map, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
-       - {name: query, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
+       - {name: map,   memUse: OPAQUE, prototype: !proto "double val"}
+       - {name: query, memUse: OPAQUE, prototype: !proto "double val"}
+       
    - name: Signum
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double signum"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double signum"}
+
    - name: Sin
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double sin"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double sin"}
+   
    - name: Sinh
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double sinh"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double sinh"}
+
    - name: Sqrt
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double sqrt"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double sqrt"}
+
    - name: Tan
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double tan"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double tan"}
+   
    - name: Tanh
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double tanh"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double tanh"}
+
    - name: ToRadians
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double radians"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double radians"}
+
    - name: ToDegrees
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double degrees"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double degrees"}
+   
    - name: Ulp
+     facets:
+       - {name: map, memUse: FUNCTION, prototype: !proto "double ulp"}
+       - {name: query, memUse: FUNCTION, prototype: !proto "double ulp"}
+   

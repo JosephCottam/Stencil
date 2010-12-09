@@ -17,7 +17,7 @@
         <mkdir dir="${results}"/>
 
         
-        <junit fork="yes" dir="/Users/jcottam/Documents/workspace/Stencil/Stencil/">
+        <junit fork="yes" dir="/home/jcottam/scratch/Stencil/Stencil/">
             <formatter type="plain"/>
 
             <classpath>
@@ -28,8 +28,8 @@
             </classpath>
             
             <batchtest todir="${results}">
-                <fileset dir="/Users/jcottam/Documents/workspace/Stencil/Stencil/bin/">
-                    <include name="**/*TestMetadataDefs.class"/>
+                <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
+                    <include name="**/*TestExamples.class"/>
                 </fileset>
             </batchtest>
         </junit>

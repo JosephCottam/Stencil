@@ -5,15 +5,15 @@ description: Utilities to manipulate the tuple data representation.
 defaults:
   defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets:
-    - {name: map, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
-    - {name: query, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
-    - {name: stateID, memUse: UNSPECIFIED, prototype: !proto "VALUE"}
+    - {name: map,     memUse: OPAQUE, prototype: !proto "VALUE"}
+    - {name: query,   memUse: OPAQUE, prototype: !proto "VALUE"}
+    - {name: stateID, memUse: OPAQUE, prototype: !proto "VALUE"}
     
 operators:
   - name: SeedCategorize
   - name: SeedContinuous
   - name: Rename
     facets:
+      - {name: query,   memUse: OPAQUE, prototype: !proto "VALUE"}
       - {name: map, memUse: FUNCTION, prototype: !proto "VALUE"}
-      - {name: query, memUse: FUNCTION, prototype: !proto "VALUE"}
     

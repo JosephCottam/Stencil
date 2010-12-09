@@ -4,15 +4,12 @@ description: Module for handling the average, in various manners
 defaults: 
   defaultSpecializer: !spec "[range: ALL, split: 0]"
   facets: 
-    - {name: map, memUse: FUNCTION, prototype: !proto "double VALUE"}
-    - {name: query, memUse: FUNCTION, prototype: !proto "double VALUE"}
-    - {name: range, memUse: FUNCTION, prototype: !proto "double VALUE"}
+    - {name: map, memUse: FUNCTION, prototype: !proto "double avg"}
+    - {name: query, memUse: FUNCTION, prototype: !proto "double avg"}
+    - {name: range, memUse: FUNCTION, prototype: !proto "double avg"}
     
 operators:
   - name: Mean
   - name: Median
-  - name: Mode
-  - {name: Average, target: Mean}
-  - {name: Avg, target: Mean}
-    
+  - name: Mode    
   

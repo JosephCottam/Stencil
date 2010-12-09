@@ -1,21 +1,45 @@
 name: TupleUtil
 targetClass: stencil.modules.TupleUtil
-description: Utilities to manipulate the tuple data representation.
+description: Utilities to manipulate the tuple data representation; tuples so manipulated can generally only be de-referenced numerically.
 
-defaults:
+defaults: 
   defaultSpecializer: !spec "[]"
-  facets:
-    - {name: map, target: query, memUse: FUNCTION, prototype: !proto "VALUE"}
-    - {name: query, memUse: FUNCTION, prototype: !proto "VALUE"}
+  facets: 
+    - {name: query, memUse: FUNCTION, prototype: NULL}
+    - {name: map,   memUse: FUNCTION, prototype: NULL, target: "query"}
 
-operators:
+operators:  
   - name: Enfold
+    description: Tuple -> Tuple where the original tuple values are wrapped in tuples.
+  
   - name: ExtendTuple
+    description: Tuple X [value] -> New tuple extended by value list
+  
   - name: Filter
+    description: Tuple X Regular Expression -> Tuple where only values that match the regular expression are retained.
+  
   - name: Get
-  - name: Rename
+    description: Tuple X int -> Value at position indicated by the int
+    facets:
+      - {name: query, memUse: FUNCTION, prototype: !proto "VALUE", roles: "map, query"}
+    
   - name: Size
+    description: How many fields in this tuple?
+    defaultSpecializer: !spec "[]"
+    facets:
+      - {name: query, memUse: FUNCTION, prototype: !proto "Size", roles: "map, query"}
+  
   - name: Select
+    description: Given a tuple of tuples, takes the n-th field from each sub-tuple.
+  
   - name: Subset
+    description: Get a contiguous subset of the passed tuple (includes first index, does not include second; -1 as second index indicates all remaining values).  
+  
   - name: ToArray
+    description: Convert a tuple to a singleton tuple containing an array of the original values  
+    facets:
+      - {name: query, memUse: FUNCTION, prototype: !proto "VALUES", roles: "map, query"}
+  
   - name: ToTuple
+    description: Convert a value into a tuple per the Converter utility.
+  

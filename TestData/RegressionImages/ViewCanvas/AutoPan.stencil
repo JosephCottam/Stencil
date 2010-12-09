@@ -30,7 +30,7 @@ from Stocks
     filter(TimeStep < RIGHT)
     prefilter(TimeStep, Margin, RIGHT) : 
         [Right] TranslateRegistration("TOP_LEFT", view[X], view[Y], view[WIDTH], view[HEIGHT], "RIGHT") ->
-        [Time] TimeStep(Date) -> Sub(Right[X], _) -> (Time[VALUE], VALUE, Right[X]) 
+        [Time] TimeStep(Date) -> Sub(Right[X], _) -> (Time[VALUE], diff, Right[X]) 
     
     view(X): Add(3, view[X])
 
@@ -49,4 +49,4 @@ from Mouse
     view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
 
 operator TimeStep (Date) -> (VALUE)
-    ALL => VALUE : Index(Date) -> Mult(3, VALUE)
+    ALL => VALUE : Index(Date) -> Mult(3, index)

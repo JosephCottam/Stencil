@@ -29,7 +29,7 @@ from ranks
 	REGISTRATION: "RIGHT"
 from overheads
 	filter (start > margin)
-	prefilter(start, margin): Spacer.query() -> Add(5000,_) -> (start, VALUE)
+	prefilter(start, margin): Spacer.query() -> Add(5000,_) -> (start, sum)
 	
 	ID: start
 	TEXT: start
@@ -41,7 +41,7 @@ from overheads
 	() : Spacer.map(start)
 from overheads
 	filter (end > margin)
-	prefilter(end, margin): Spacer.query() -> Add(5000,_) -> (end, VALUE)
+	prefilter(end, margin): Spacer.query() -> Add(5000,_) -> (end, sum)
 	
 	ID: end
 	TEXT: end
@@ -53,6 +53,7 @@ from overheads
 	() : Spacer.map(end)
 
 operator Spacer : Max[range: ALL]
+    
 
 layer baseline[LINE]
 from overheads

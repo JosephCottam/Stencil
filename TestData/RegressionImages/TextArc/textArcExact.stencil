@@ -70,5 +70,5 @@ operator Freq (word) -> (freq)
 operator Centroid (word) -> (X,Y)
   prefilter(positions) :LineIndex(word) -> ToTuple(_) >> Layout.query(_) >- ALL
   (ALL) =>
-    (X): Select[field: 0](positions) -> Average[range: LAST](LAST)
-    (Y): Select[field: 1](positions) -> Average[range: LAST](LAST)
+    (X): Select[field: 0](positions) -> Mean[range: LAST](LAST)
+    (Y): Select[field: 1](positions) -> Mean[range: LAST](LAST)

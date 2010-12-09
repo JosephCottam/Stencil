@@ -197,15 +197,15 @@ public class LongMath extends BasicModule {
 			} else if (name.equals("Sum") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
-				target = new FullSum(noFunctions(operatorData));
+				target = new FullSum(noFunctions(operatorData, true));
 			} else if (name.equals("Max") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Max")) {
-				target = new FullMax(noFunctions(operatorData));
+				target = new FullMax(noFunctions(operatorData, true));
 			} else if (name.equals("Min") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
-				target = new FullMin(noFunctions(operatorData));
+				target = new FullMin(noFunctions(operatorData, true));
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
 
 		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}

@@ -13,15 +13,15 @@ layer Text[TEXT]
 from Elements
 	ID : Name
 	TEXT: Name
-	ROTATION: Count(Name) -> Mult(12.5, VALUE) -> (VALUE)
-	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
+	ROTATION: Count(Name) -> Mult(12.5, VALUE)
+	X : Count(Name) -> Mult(40, VALUE)
 
 layer Shape
 from Elements
 	ID: Concatenate(Name, "TL")
 	SHAPE: "CROSS"
-	ROTATION: Count(Name) -> Mult(12.5, VALUE) -> (VALUE)
-	X : Count(Name) -> Mult(40, VALUE)-> (VALUE)
+	ROTATION: Count(Name) -> Mult(12.5, VALUE)
+	X : Count(Name) -> Mult(40, VALUE)
 	Y : 40
 	SIZE: 30
  	FILL_COLOR: @Color{RED}
@@ -39,4 +39,4 @@ from Elements
 
 
 operator Count(Name) -> (VALUE) 
-	(ALL) => VALUE : Index(Name) -> VALUE
+	(ALL) => VALUE : Index(Name)

@@ -37,14 +37,14 @@ from BFS
 
 layer Edges[LINE]
 from VertexList 
-	ID: Concatenate(ID1,ID2) -> (VALUE)
+	ID: Concatenate(ID1,ID2)
 	(X.1, Y.1): Nodes.find(ID1) -> (X,Y)
 	(X.2, Y.2): Nodes.find(ID2) ->  (X,Y)
 	PEN_COLOR: @Color{GRAY30,80}
 
 
 operator Ordering (ID)->(VALUE)  
-	(ALL) => VALUE : Index(ID) -> (VALUE)
+	(ALL) => VALUE : Index(ID)
 
 python Triangular
 facet init {

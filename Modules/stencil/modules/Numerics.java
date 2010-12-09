@@ -232,7 +232,7 @@ public class Numerics extends BasicModule {
 	public static double abs(double d) {return Math.abs(d);}//Included here to ensure that the floating point version is grabbed...
 	public static double add1(double d) {return d+1;}
 	public static double add(double d, double d2) {return d+d2;}
-	public static double div(double d1, double d2) {return Math.round(d1)/Math.round(d2);}
+	public static long div(double d1, double d2) {return Math.round(d1)/Math.round(d2);}
 	public static double divide(double d1, double d2) {return d1/d2;}
 	public static double mult(double d1, double d2) {return d1*d2;}
 	public static double negate(double d) {return -1 * d;}
@@ -275,15 +275,15 @@ public class Numerics extends BasicModule {
 			} else if (name.equals("Sum") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Sum")) {
-				target = new FullSum(noFunctions(operatorData));
+				target = new FullSum(noFunctions(operatorData, true));
 			} else if (name.equals("Max") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);
 			} else if (name.equals("Max")) {
-				target = new FullMax(noFunctions(operatorData));
+				target = new FullMax(noFunctions(operatorData, true));
 			} else if (name.equals("Min") && !range.isFullRange()) {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
-				target = new FullMin(noFunctions(operatorData));
+				target = new FullMin(noFunctions(operatorData, true));
 			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
 
 			

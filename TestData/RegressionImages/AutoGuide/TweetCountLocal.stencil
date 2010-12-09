@@ -20,8 +20,8 @@ canvas Main
 layer Counts
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
-	X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11,VALUE)
-	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, VALUE)
+	X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11, rank)
+	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, count)
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
 	
@@ -32,4 +32,4 @@ from Tweets
 	
 
 operator firstLetter(Phrase) -> (Letter)
-	(ALL) => Letter: Trim(Phrase) -> Substring(VALUE, 0,1)-> VALUE
+	(ALL) => Letter: Trim(Phrase) -> Substring(value, 0,1)

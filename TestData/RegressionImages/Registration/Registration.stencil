@@ -23,13 +23,13 @@ layer Points
 from Reg
 	ID: Name
 	SIZE: 4
-	X: Count(Name) -> (VALUE)
+	X: Count(Name) 
 	REGISTRATION: Name
 
 layer Points2
 from Reg
    ID : Name
-   X: Count(Name) -> (VALUE)
+   X: Count(Name) 
    Y: 10
    FILL_COLOR: @Color{RED}
    REGISTRATION:  Name
@@ -49,7 +49,7 @@ from Reg
    ID : Name
    TEXT: Name
    X: 5
-   Y: Count(Name) -> Mult(VALUE, 2) -> Add(20, VALUE) -> (VALUE)
+   Y: Count(Name) -> Mult(VALUE, 2) -> Add(20, product)
    REGISTRATION:  Name
 
 layer VerticalText[TEXT]
@@ -57,11 +57,11 @@ from Reg
    ID : Name
    TEXT: Name
    Y: 150
-   X: Count(Name) -> Mult(VALUE, 2) -> Add(200, VALUE) -> (VALUE)
+   X: Count(Name) -> Mult(VALUE, 2) -> Add(200, product)
    REGISTRATION:  Name
 	ROTATION: "VERTICAL"
 
 
 
 operator Count(C) -> (VALUE)
-   ALL => VALUE: Index(C) -> Mult(10, VALUE) -> (VALUE)
+   ALL => VALUE: Index(C) -> Mult(10, index)

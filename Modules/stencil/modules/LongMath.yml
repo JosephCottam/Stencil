@@ -10,32 +10,80 @@ defaults:
 
 operators:
   - name: Abs
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long abs"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long abs"}
+  
   - name: Add
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long sum"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long sum"}
+
   - name: Add1
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long sum"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long sum"}
+
   - name: AsNumber
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long value"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long value"}
+
   - name: Div
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long quotient"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long quotient"}
+
   - name: Divide
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long quotient"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long quotient"}
+
+
   - name: Max
     facets:
-     - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
-     - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
-     - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}  
+     - {name: map, memUse: FUNCTION, prototype: !proto "long max"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "long max"}
+       
   - name: Min
     facets:
-     - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
-     - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
-     - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}
+     - {name: map, memUse: FUNCTION, prototype: !proto "long min"}
+     - {name: query, memUse: FUNCTION, prototype: !proto "long min"}
+     
   - name: Mod
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long mod"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long mod"}
+
   - name: Mult
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long product"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long product"}
+  
   - name: Negate
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long value"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long value"}
+
   - name: Nearest
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long value"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long value"}
+
   - name: Sub
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long diff"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long diff"}
+
   - name: Sub1
+    facets:
+      - {name: map,   memUse: FUNCTION, prototype: !proto "long diff"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long diff"}
+
   - name: Sum
     defaultSpecializer: !spec "[range: ALL, split:0]"
     target: Add
     facets:
-      - {name: map, memUse: FUNCTION, prototype: !proto "long VALUE"}
-      - {name: query, memUse: FUNCTION, prototype: !proto "long VALUE"}
-      - {name: range, memUse: FUNCTION, prototype: !proto "long VALUE"}  
-      
+      - {name: map, memUse: FUNCTION, prototype: !proto "long sum"}
+      - {name: query, memUse: FUNCTION, prototype: !proto "long sum"}
+   
