@@ -14,20 +14,22 @@ options {
 
   import java.util.Map;
   import stencil.parser.tree.TupleRef;
+  import stencil.parser.tree.Value;
   import stencil.parser.tree.Program;
   import stencil.parser.ParseStencil;
 }
 
 @members {
-  public static Tree apply (Tree t, Map<TupleRef, TupleRef> subst) {
+  private static Map<TupleRef, Value> subst;
+
+  public synchronzied static Tree apply (Tree t, Map<TupleRef, Value> subst) {
      return TreeRewriteSequence.apply(t, subst);
   }
   
   protected void setup(Object... args) {
-     subst = (Map<TupleRef, TupleRef>) args[0];
+     subst = (Map<TupleRef, Value>) args[0];
   }
   
-  private Map<TupleRef, TupleRef> subst;
 }
 
 topdown

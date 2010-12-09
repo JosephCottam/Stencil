@@ -11,9 +11,4 @@ defaults:
     
 operators:
   - name: SeedCategorize
-  - name: SeedContinuous
-  - name: Rename
-    facets:
-      - {name: query,   memUse: OPAQUE, prototype: !proto "VALUE"}
-      - {name: map, memUse: FUNCTION, prototype: !proto "VALUE"}
-    
+  - name: SeedContinuous    

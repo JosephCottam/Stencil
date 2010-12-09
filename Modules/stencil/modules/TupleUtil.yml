@@ -23,6 +23,13 @@ operators:
     facets:
       - {name: query, memUse: FUNCTION, prototype: !proto "VALUE", roles: "map, query"}
     
+  - name: Rename
+    description: Construct a tuple with a prototype from the names (passed in the specializer under the `names' key) and the values (passed as arguments). 
+    facets:
+      - {name: query, memUse: FUNCTION, prototype: NULL}
+      - {name: map,   memUse: FUNCTION, prototype: NULL}
+
+
   - name: Size
     description: How many fields in this tuple?
     defaultSpecializer: !spec "[]"

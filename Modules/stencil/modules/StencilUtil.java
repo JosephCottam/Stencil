@@ -48,61 +48,12 @@ import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
 
 /**Operators used in various stencil transformations.*/
 public class StencilUtil extends BasicModule {
-
-	/**Rename the components of a tuple with new names; 
-	 * like an echo but with variable names updated in the prototype.
-	 */
-	public static final class Rename extends AbstractOperator {
-		private static String NAMES = "names";
-
-		private final String[] keys;
-
-		public Rename(OperatorData opData, Specializer specializer) {
-			super(opData);
-			keys = getNames(specializer);
-		}
-
-		public Rename(OperatorData opData, String...keys) {
-			super(opData);
-			this.keys = keys;
-		}
-
-		
-		public Tuple map(Object... values) {return query(values);}
-		public Tuple query(Object... values) {
-			assert keys.length == values.length : "Keys and values lengths do not match.";
-			
-			return new ArrayTuple(values);
-		}
-		
-		public Rename duplicate() {return new Rename(operatorData, keys);}
-		
-		private static String[] getNames(Specializer spec) {
-			return spec.get(NAMES).getText().split("\\s+,\\s+");
-		}
-		
-		public static OperatorData complete(OperatorData base, Specializer spec) {
-			OperatorData od = new OperatorData(base);
-			String[] keys  = getNames(spec);
-			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
-			od.addFacet(fd);
-			
-			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
-			od.addFacet(fd);
-			return od;
-		}
-		
-	}
-
 	
 	public static abstract class SeedBase extends AbstractOperator implements  SeedOperator, Cloneable {
 		protected SeedBase(OperatorData opData) {super(opData);}
@@ -213,7 +164,6 @@ public class StencilUtil extends BasicModule {
 		validate(name, specializer);
 		OperatorData od = moduleData.getOperator(name);
 
-		if (name.equals("Rename")) {return Rename.complete(od, specializer);}
 		od = SeedBase.complete(od, specializer);
 
 		if (od.isComplete()) {return od;}

@@ -3,8 +3,10 @@ package stencil.modules;
 import java.util.ArrayList;
 
 import stencil.module.SpecializationException;
+import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -67,6 +69,53 @@ public class TupleUtil extends BasicModule {
 		}
 	}
 	
+	
+	/**Rename the components of a tuple with new names; 
+	 * like an echo but with variable names updated in the prototype.
+	 */
+	public static final class Rename extends AbstractOperator {
+		private static String NAMES = "names";
+
+		private final String[] keys;
+
+		public Rename(OperatorData opData, Specializer specializer) {
+			super(opData);
+			keys = getNames(specializer);
+		}
+
+		public Rename(OperatorData opData, String...keys) {
+			super(opData);
+			this.keys = keys;
+		}
+
+		
+		public Tuple map(Object... values) {return query(values);}
+		public Tuple query(Object... values) {
+			assert keys.length == values.length : "Keys and values lengths do not match.";
+			
+			return new ArrayTuple(values);
+		}
+		
+		public Rename duplicate() {return new Rename(operatorData, keys);}
+		
+		private static String[] getNames(Specializer spec) {
+			return spec.get(NAMES).getText().split("\\s+,\\s+");
+		}
+		
+		public static OperatorData complete(OperatorData base, Specializer spec) {
+			OperatorData od = new OperatorData(base);
+			String[] keys  = getNames(spec);
+			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
+			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
+			od.addFacet(fd);
+			
+			fd = od.getFacet(StencilOperator.QUERY_FACET);
+			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
+			od.addFacet(fd);
+			return od;
+		}
+		
+	}
 	
 	/**Takes a tuple and extends it by the passed values.
 	 * Resulting tuple can only safely be numerically dereferenced.
@@ -132,7 +181,8 @@ public class TupleUtil extends BasicModule {
 		validate(name, specializer);
 		OperatorData od = moduleData.getOperator(name);
 
-		if (od.isComplete()) {return od;}
+		if (name.equals("Rename")) {return Rename.complete(od, specializer);}
+		else if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
 	}
 }
