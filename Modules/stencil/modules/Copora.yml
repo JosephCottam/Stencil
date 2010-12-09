@@ -1,0 +1,12 @@
+name: Copora
+targetClass: stencil.modules.Copora
+
+defaults: 
+  defaultSpecializer: !spec "[]"
+  facets: 
+      - {name: map,   memUse: FUNCTION, prototype: !proto "boolean stopWord", target: query}
+      - {name: query, memUse: FUNCTION, prototype: !proto "boolean stopWord"}
+
+operators: 
+   - name: StopWords
+     
