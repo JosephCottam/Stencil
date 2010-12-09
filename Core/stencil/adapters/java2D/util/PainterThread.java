@@ -59,29 +59,31 @@ public final class PainterThread implements Runnable {
 
 	
 	private BufferedImage selfBuffer() {
-		painter.doUpdates();
-		
-		BufferedImage buffer = buffers[nextBuffer];
-		Rectangle size = target.getBounds();
-		
-		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
-		
-		//Ensure that the buffer is the 'right' size
-		if (buffer == null ||
-			buffer.getWidth() != size.width ||
-			buffer.getHeight() != size.height) 
-		{
-			buffers[nextBuffer] = newBuffer(target, size.width, size.height);
-			buffer= buffers[nextBuffer];
+		synchronized(target) {
+			painter.doUpdates();
+			
+			BufferedImage buffer = buffers[nextBuffer];
+			Rectangle size = target.getBounds();
+			
+			if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
+			
+			//Ensure that the buffer is the 'right' size
+			if (buffer == null ||
+				buffer.getWidth() != size.width ||
+				buffer.getHeight() != size.height) 
+			{
+				buffers[nextBuffer] = newBuffer(target, size.width, size.height);
+				buffer= buffers[nextBuffer];
+			}
+	
+			try {
+				painter.render(target.getBackground(), buffer, target.getViewTransform());
+			} catch (Exception e) {
+				e.printStackTrace();
+			} 
+			
+			return buffer;
 		}
-
-		try {
-			painter.render(target.getBackground(), buffer, target.getViewTransform());
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-		
-		return buffer;
 	}
 
 	/**Create a new buffer if required.
