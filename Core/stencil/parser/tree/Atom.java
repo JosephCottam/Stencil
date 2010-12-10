@@ -36,53 +36,14 @@ import stencil.tuple.Tuple;
 import static stencil.parser.string.StencilParser.*;
 
 public abstract class Atom extends Value {
-	public static final class Literal extends Atom {
-		private enum Type {String, Number, Other}
-		Object value;
-		Type type;
-		
-		public static Literal instance(Object o) {
-			if (o ==null) {return null;}
-			return new Literal(o);
-		}
-
-		private Literal(Object o) {
-			value = o;
-			if (o instanceof Number) {type = Type.Number;}
-			else if (o instanceof String) {type = Type.String;}
-			else {type = Type.Other;}
-		}
-
-		public boolean isLiteral() {return true;}
-		public Object getValue() {return value;}
-		public String getName() {throw new IllegalArgumentException("Literal atom cannot be a name.");}
-
-		public java.lang.Number getNumber() {
-			if (isNumber()) {return (java.lang.Number) value;}
-			throw new IllegalArgumentException(String.format("Literal tuple is of type %1$s, cannot retrieve as number.", type));
-
-		}
-
-		public String getString() {
-			if (isString()) {return (String) value;}
-			throw new IllegalArgumentException(String.format("Literal tuple is of type %1$s, cannot retrieve as string.", type));
-		}
-
-		public boolean isNil() {return false;}
-		public boolean isName() {return false;}
-		public boolean isNumber() {return type == Type.Number;}
-		public boolean isString() {return type == Type.String;}
-
-		public String toString() {return value.toString();}
-		
-		public Literal dupNode() {return Literal.instance(value);}
-	}
-
 	public static final List<Integer> BASE_TYPES;
 	static {
 		BASE_TYPES =  Arrays.asList(new Integer[]{ID, STRING, NUMBER, ALL});
 	}
 
+	private static final StencilTreeAdapter adaptor = new StencilTreeAdapter();
+
+	
 	protected Atom() {super(null);}
 	protected Atom(Token token) {super(token);}
 	protected Atom(Token token, int type) {super(token, type);}
@@ -96,12 +57,22 @@ public abstract class Atom extends Value {
 	public boolean isAll() {return getType() == ALL;}
 	public boolean isLast() {return getType() == LAST;}
 	public boolean isNull() {return getType() == NULL;}
+	public boolean isConst() {return getType() == CONST;}
 	
 	/**Atoms ignore the getValue Tuple context.
 	 * Calling the single-argument getValue is identical to
 	 * calling the zero-argument getValue.*/
 	public Object getValue(Tuple source) {return getValue();}
 
+	public int hashCode() {return getValue().hashCode();}
+	public boolean equals(Object other) {
+		if (this == other) {return true;}
+		if (this.getClass() != other.getClass()) {return false;}
+		
+		Atom a = (Atom) other;
+		return getValue().equals(a.getValue());
+	}
+	
 	public static boolean isAtom(Token token) {return BASE_TYPES.contains(token);}
 
 	public static Atom instance(Token token) {
@@ -112,5 +83,20 @@ public abstract class Atom extends Value {
 		case ID : return new Id(token);
 		}
 		throw new IllegalArgumentException("Cannot make atom from tree of type " + StencilTree.typeName(token.getType()));
+	}
+		
+	public static Atom instance(Object value) {return instance(value, false);}
+	public static Atom instance(Object value, boolean idBiased) {
+		if (value instanceof Number) {
+			return (Atom) adaptor.create(NUMBER, ((Number) value).toString());
+		} else if (value instanceof String && idBiased) {
+			return (Id) adaptor.create(ID, value.toString());
+		} else if (value instanceof String) {
+			return (Atom) adaptor.create(STRING, value.toString());
+		} else {
+			Const constant = (Const) adaptor.create(CONST,"CONST");
+			constant.setValue(value);
+			return constant;
+		}
 	}
 }

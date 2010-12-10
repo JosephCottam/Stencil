@@ -200,48 +200,48 @@ public abstract class ParseStencil {
 		
 		p = FrameTupleRefs.apply(p, modules, true);//Ensure that all tuple references have a frame reference
 		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
-//		
-//		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-//		p = GuideDefaultSelector.apply(p); 
-//		p = GuideDistinguish.apply(p);					//Distinguish between guide types		
-//		p = GuideInsertSeedOp.apply(p, modules);		//Ensure that auto-guide requirements are met
-//		p = FrameTupleRefs.apply(p, modules, true);		
-//		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
-//		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
-//													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
-//		
-//		p = GuideTransfer.apply(p, modules);		
-//		p = GuideLiftGenerator.apply(p);
-//		p = GuideDefaultRules.apply(p);
-//		p = GuideAutoLabel.apply(p);
-//
-//		p = DefaultSpecializers.apply(p, modules, adapter, false); 
-//		p = SetOperators.apply(p, modules);
-//
-//		GuideSampleOp.apply(p);
-//		p = GuideExtendQuery.apply(p);
-//		p = GuideClean.apply(p);
-//		p = FrameTupleRefs.apply(p, modules, false);		//Ensure that all tuple references have a frame reference
-//		//END GUIDE SYSTEM----------------------------------------------------------------------------------
-//
-//		//DYNAMIC BINDING ----------------------------------------------------------------------------------
-//		p = DynamicSeparateRules.apply(p);
-//		p = DynamicToSimple.apply(p);
-//	    p = DynamicCompleteRules.apply(p);
-//	    
-//		p = OperatorStateQuery.apply(p);
-//
-//	    
-//	   // SIMPlIFICATIONS AND OPTIMIZATIONS
-//		p = ReplaceConstants.apply(p);  					//Replace all references to CONST values with the actual value
-//		p = NumeralizeTupleRefs.apply(p, modules); 			//Numeralize all tuple references
-//		p = Predicate_Compact.apply(p);						//Improve performance of filter rules by removing all the scaffolding		
-//		p = UnifyTargetTypes.apply(p);
-//		p = AnnotateEnvironmentSize.apply(p);				//Since some transformations change chain lengths, this must be re-run.
-//		p = ReplaceConstantOps.apply(p, modules);			//Evaluate constant rules, propagate results out		
-//		p = LiftSharedConstantRules.apply(p);				//Move all constant rules up to the defaults section so they are only evaluated once.
+		
+		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
+		p = GuideDefaultSelector.apply(p); 
+		p = GuideDistinguish.apply(p);					//Distinguish between guide types		
+		p = GuideInsertSeedOp.apply(p, modules);		//Ensure that auto-guide requirements are met
+		p = FrameTupleRefs.apply(p, modules, true);		
+		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
+		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
+													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
+		
+		p = GuideTransfer.apply(p, modules);		
+		p = GuideLiftGenerator.apply(p);
+		p = GuideDefaultRules.apply(p);
+		p = GuideAutoLabel.apply(p);
 
-//		validate(p);
+		p = DefaultSpecializers.apply(p, modules, adapter, false); 
+		p = SetOperators.apply(p, modules);
+
+		GuideSampleOp.apply(p);
+		p = GuideExtendQuery.apply(p);
+		p = GuideClean.apply(p);
+		p = FrameTupleRefs.apply(p, modules, false);		//Ensure that all tuple references have a frame reference
+		//END GUIDE SYSTEM----------------------------------------------------------------------------------
+
+		//DYNAMIC BINDING ----------------------------------------------------------------------------------
+		p = DynamicSeparateRules.apply(p);
+		p = DynamicToSimple.apply(p);
+	    p = DynamicCompleteRules.apply(p);
+	    
+		p = OperatorStateQuery.apply(p);
+
+	    
+	   // SIMPlIFICATIONS AND OPTIMIZATIONS
+		p = ReplaceConstants.apply(p);  					//Replace all references to CONST values with the actual value
+		p = NumeralizeTupleRefs.apply(p, modules); 			//Numeralize all tuple references
+		p = Predicate_Compact.apply(p);						//Improve performance of filter rules by removing all the scaffolding		
+		p = UnifyTargetTypes.apply(p);
+		p = AnnotateEnvironmentSize.apply(p);				//Since some transformations change chain lengths, this must be re-run.
+		p = ReplaceConstantOps.apply(p, modules);			//Evaluate constant rules, propagate results out		
+		p = LiftSharedConstantRules.apply(p);				//Move all constant rules up to the defaults section so they are only evaluated once.
+
+		validate(p);
 		
 		return p;
 	}

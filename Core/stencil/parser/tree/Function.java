@@ -33,9 +33,12 @@ import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
 import stencil.interpreter.NoOutputSignal;
-import static stencil.parser.string.StencilParser.*;
+import stencil.parser.string.StencilParser;
 
 public class Function extends CallTarget {
+	private List<Value> args;
+	private AstInvokeable target;
+	private CallTarget call;
 	
 	private static final class FunctionApplicationException extends RuntimeException {
 		public FunctionApplicationException(Function f, Tuple t, Exception e) {
@@ -48,26 +51,27 @@ public class Function extends CallTarget {
 	public String getName() {return token.getText();}
 	
 	public Specializer getSpecializer() {
-		return (Specializer) this.getFirstChildWithType(SPECIALIZER);
+		return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);
 	}
 	
-	public List<Value> getArguments() {return (List<Value>) getFirstChildWithType(LIST);}
-	
-	public AstInvokeable getTarget() {return (AstInvokeable) getFirstChildWithType(AST_INVOKEABLE);}
-	
-	private static final int[] PASS_TYPES = new int[]{DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD};
-	public StencilTree getPass() {
-		for (int type: PASS_TYPES) {
-			Object pass = getFirstChildWithType(type);
-			if (pass != null) {return (StencilTree) pass;}
-		}
-		throw new RuntimeException("Function node with no pass: " + getName());
+	public List<Value> getArguments() {
+		if (args == null) {args = (List<Value>) getFirstChildWithType(StencilParser.LIST);}
+		return args;
 	}
+	
+	public AstInvokeable getTarget() {
+		if (target == null) {target = (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
+		return target;
+	}
+	
+	public StencilTree getPass() {return (StencilTree) getChild(3);}
 	
 	public CallTarget getCall() {
-		CallTarget call = (Function) getFirstChildWithType(FUNCTION);
 		if (call == null) {
-			call = (Pack) getFirstChildWithType(PACK);
+			call = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+			if (call == null) {
+				call = (Pack) getFirstChildWithType(StencilParser.PACK);
+			}
 		}
 		return call;
 	}

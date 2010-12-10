@@ -45,14 +45,15 @@ options {
           Operator op = (Operator) simple.get(refName);
           OperatorFacet facet =  op.getFacet(facetName);
           Function core = getCoreCall(facet);
+          String parentFrame = simpleOpRef.getPass().getText();
                     
           StencilTree splice = makeSplice((List) simpleOpRef.findChild(LIST), facet, core); //Start of the thing being inserted
           Pack spliceTail = findTail(splice);                                               //End of the thing being inserted
 
-
           CallTarget target = (CallTarget) adaptor.dupTree(simpleOpRef.getCall()); //Target of the thing being replaced (parent pointing to splice is handled by the ANTLR transformer)
           TuplePrototype resultsPrototype = (TuplePrototype) facet.findChild(YIELDS).getChild(1);
-          Map<TupleRef, Value> subst = buildSubst(resultsPrototype, spliceTail.getArguments());
+          Map<TupleRef, Value> subst = buildSubst(parentFrame, resultsPrototype, spliceTail.getArguments());          
+          
           target = (CallTarget) ReplaceTupleRefs.apply(target, subst);
           adaptor.setChild(spliceTail.getParent(), spliceTail.getChildIndex(), target);
           
@@ -67,7 +68,7 @@ options {
        private StencilTree makeSplice(List inArgs, StencilTree facet, StencilTree core) {
           try {             
              TuplePrototype inputPrototype  = (TuplePrototype) facet.findChild(YIELDS).getChild(0);
-             Map<TupleRef, Value> subst = buildSubst(inputPrototype, inArgs);
+             Map<TupleRef, Value> subst = buildSubst(ParserConstants.STREAM_FRAME, inputPrototype, inArgs);
              
              StencilTree workingCore = (StencilTree) adaptor.dupTree(core);
              workingCore = (StencilTree) ReplaceTupleRefs.apply(workingCore, subst);             
@@ -77,26 +78,28 @@ options {
           }    
        }
        
-       /**Construct a substitution that matches values to names pair-wise.*/
-       private Map<TupleRef, Value> buildSubst(final TuplePrototype names, final List<Value> values) {
-          assert values.size() == names.size() : "Must have same number of values as names";
-          
-          Map<TupleRef, Value> result = new HashMap();
-          
-          for (int i=0; i<values.size(); i++) {
-              TupleFieldDef def = names.get(i);
-              String name = def.getFieldName();
-              TupleRef key = makeRef(ParserConstants.STREAM_FRAME, name);
-              Value value = (Value) adaptor.dupTree(values.get(i));
-              result.put(key, value);
-          }
-          return result;
+     /**Construct a substitution that matches values to names pair-wise
+      * and includes a numeric reference substitution as well.
+      */ 
+     private Map<TupleRef, Value> buildSubst(String frame, final TuplePrototype names, final List<Value> values) {
+       assert values.size() == names.size() : "Must have same number of values as names";
+              
+       Map<TupleRef, Value> subst = new HashMap();
+              
+       for (int i=0; i<values.size(); i++) {
+          Value value = (Value) adaptor.dupTree(values.get(i));
+          TupleFieldDef def = names.get(i);
+          String name = def.getFieldName();
+          subst.put(makeRef(frame, name), value);
+          subst.put(makeRef(frame, i), value);
        }
+       return subst;
+    }
 
-    private TupleRef makeRef(String... path) {
+    private TupleRef makeRef(Object... path) {
        TupleRef rootRef = (TupleRef) adaptor.create(TUPLE_REF, "TUPLE_REF");
-       for (String part: path) {
-           Id newRef = (Id) adaptor.create(ID, part); 
+       for (Object part: path) {
+           Atom newRef = Atom.instance(part, true); 
            adaptor.addChild(rootRef, newRef);
        }
        return rootRef;

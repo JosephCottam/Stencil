@@ -1,7 +1,5 @@
 package stencil.parser.tree;
 
-import static stencil.parser.string.StencilParser.TUPLE_REF;
-
 import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
@@ -36,12 +34,5 @@ public abstract class Value extends StencilTree {
 	public boolean isAll() {return false;}
 	public boolean isLast() {return false;}
 	public boolean isNull() {return false;}
-
-
-	public static Value instance(Token source) {
-		if (source.getType() == TUPLE_REF) {return new TupleRef(source);}
-
-		try {return Atom.instance(source);}
-		catch (Exception e) {throw new IllegalArgumentException("Cannot make value from tree of type " + StencilTree.typeName(source.getType()), e);}
-	}
+	public boolean isConst() {return false;}
 }

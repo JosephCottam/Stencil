@@ -110,7 +110,7 @@ options {
         if (value == NO_RESOLUTION || value == EMPTY_TUPLE) {
            adaptor.addChild(newArgs, adaptor.dupTree(arg));
         } else{
-          adaptor.addChild(newArgs, Atom.Literal.instance(value));
+          adaptor.addChild(newArgs, Atom.instance(value));
         }
      }
      

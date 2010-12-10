@@ -1,6 +1,7 @@
 package stencil.parser.tree;
 
 import java.util.List;
+
 import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
@@ -13,13 +14,10 @@ import stencil.tuple.Tuple;
  * 		 ALL is represented as -1
  * */
 public final class TupleRef extends Value {
-	public TupleRef(Token source) {
-		super(source);
-	}
+	public TupleRef(Token source) {super(source);}
 
 	/**Unsupported operation*/
 	public final Atom getValue() {throw new UnsupportedOperationException("Cannot get simple value from a TupleRef");}
-
 
 	/**Get the value this reference holds with respect to the tuple.*/
 	public Object getValue(Tuple source) {
@@ -48,8 +46,7 @@ public final class TupleRef extends Value {
 	 *
 	 */
 	public static final Object resolve(Value potentialRef, Tuple valueSource) {
-		if (potentialRef instanceof Atom.Literal
-			|| potentialRef instanceof Atom) {return potentialRef.getValue();}
+		if (potentialRef instanceof Atom) {return potentialRef.getValue();}
 		
 		if (!potentialRef.isTupleRef()) {throw new IllegalArgumentException("Can only handle literals and tuple references.");}
 		TupleRef ref = (TupleRef) potentialRef;
@@ -67,5 +64,23 @@ public final class TupleRef extends Value {
 		}
 
 		return formals;
+	}
+	
+	public int hashCode() {
+		int code = 1;
+		for (int i=0; i<getChildCount(); i++) {
+			code = code * Math.abs(getChild(i).hashCode())+1;
+		}
+		return code;
+	}
+	
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof TupleRef)) {return false;}
+		TupleRef other = (TupleRef) o;
+		
+		for (int i=0; i<getChildCount();i++) {
+			if (!other.getChild(i).equals(getChild(i))) {return false;}
+		}
+		return true;
 	}
 }

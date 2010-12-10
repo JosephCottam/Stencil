@@ -12,12 +12,12 @@ import stencil.tuple.prototype.SimplePrototype;
 
 /**Tuple that encapsulates the globals of a program.*/
 public class GlobalsTuple implements Tuple {
-	private final Atom[] values;
+	private final Object[] values;
 	private final TuplePrototype prototype;
 	
 	public GlobalsTuple(List<Const> defs) {
 		String[] names = new String[defs.size()];
-		values = new Atom[defs.size()];
+		values = new Object[defs.size()];
 		for (int i =0; i<values.length; i++) {
 			values[i] = defs.get(i).getValue();
 			names[i] = defs.get(i).getName();
