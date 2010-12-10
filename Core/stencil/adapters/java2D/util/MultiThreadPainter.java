@@ -171,7 +171,7 @@ public final class MultiThreadPainter {
 		
 		
 		for (Guide g: program.getCanvasDef().getGuides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
-		for (Object r : program.allDescendants(DYNAMIC_RULE)) {
+		for (Object r : program.findDescendants(DYNAMIC_RULE)) {
 			DynamicRule rule = (DynamicRule) r;
 			DisplayLayer layer= null;
 			String ruleLayerName=rule.getGroup().getContext().getName();

@@ -33,7 +33,7 @@ import org.antlr.runtime.Token;
 
 import stencil.tuple.Tuple;
 import stencil.interpreter.NoOutputSignal;
-import stencil.parser.string.StencilParser;
+import static stencil.parser.string.StencilParser.*;
 
 public class Function extends CallTarget {
 	private List<Value> args;
@@ -51,26 +51,36 @@ public class Function extends CallTarget {
 	public String getName() {return token.getText();}
 	
 	public Specializer getSpecializer() {
-		return (Specializer) this.getFirstChildWithType(StencilParser.SPECIALIZER);
+		return (Specializer) findChild(SPECIALIZER);
 	}
 	
 	public List<Value> getArguments() {
-		if (args == null) {args = (List<Value>) getFirstChildWithType(StencilParser.LIST);}
+		if (args == null) {args = (List<Value>) findChild(LIST);}
 		return args;
 	}
 	
 	public AstInvokeable getTarget() {
-		if (target == null) {target = (AstInvokeable) getFirstChildWithType(StencilParser.AST_INVOKEABLE);}
+		if (target == null) {target = (AstInvokeable) findChild(AST_INVOKEABLE);}
 		return target;
 	}
 	
-	public StencilTree getPass() {return (StencilTree) getChild(3);}
+	public StencilTree getPass() {
+		StencilTree t = (StencilTree) getChild(3);
+		int type = t.getType();
+		if (type != DIRECT_YIELD
+			&& type != GUIDE_YIELD
+			&& type != MAP
+			&& type != FOLD) {
+			t = (StencilTree) getChild(2);
+		}
+		return t;
+	}
 	
 	public CallTarget getCall() {
 		if (call == null) {
-			call = (Function) getFirstChildWithType(StencilParser.FUNCTION);
+			call = (Function) getFirstChildWithType(FUNCTION);
 			if (call == null) {
-				call = (Pack) getFirstChildWithType(StencilParser.PACK);
+				call = (Pack) getFirstChildWithType(PACK);
 			}
 		}
 		return call;

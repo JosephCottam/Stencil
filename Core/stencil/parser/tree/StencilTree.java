@@ -76,7 +76,7 @@ public class StencilTree extends CommonTree {
 	 * Will search in children that match the given type, so the list
 	 * may contain nodes with internal ancestor/descendant relationships. 
 	 */
-	public java.util.List<CommonTree> allDescendants(int type) {
+	public java.util.List<CommonTree> findDescendants(int type) {
 		java.util.List<CommonTree> results = new ArrayList();
 		if (this.getChildren() == null) {return results;}
 		
@@ -85,7 +85,7 @@ public class StencilTree extends CommonTree {
 				results.add((CommonTree) child);
 			}
 			if (child instanceof StencilTree) {
-				results.addAll(((StencilTree) child).allDescendants(type));
+				results.addAll(((StencilTree) child).findDescendants(type));
 			}
 		}
 		return results;
