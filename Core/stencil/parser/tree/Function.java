@@ -65,24 +65,11 @@ public class Function extends CallTarget {
 	}
 	
 	public StencilTree getPass() {
-		StencilTree t = (StencilTree) getChild(3);
-		int type = t.getType();
-		if (type != DIRECT_YIELD
-			&& type != GUIDE_YIELD
-			&& type != MAP
-			&& type != FOLD) {
-			t = (StencilTree) getChild(2);
-		}
-		return t;
+		return (StencilTree) findChildren(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD).get(0);
 	}
 	
 	public CallTarget getCall() {
-		if (call == null) {
-			call = (Function) getFirstChildWithType(FUNCTION);
-			if (call == null) {
-				call = (Pack) getFirstChildWithType(PACK);
-			}
-		}
+		if (call == null) {call = (CallTarget) findChildren(FUNCTION, PACK).get(0);}
 		return call;
 	}
 

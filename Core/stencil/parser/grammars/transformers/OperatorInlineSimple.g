@@ -15,7 +15,6 @@ options {
 
 	package stencil.parser.string;
 
-  import stencil.parser.ParseStencil;
   import stencil.parser.tree.*;
   import stencil.parser.tree.util.MultiPartName;
   import stencil.tuple.prototype.TuplePrototypes;
@@ -38,46 +37,83 @@ options {
   
    protected final Map<String, StencilTree> simple = new HashMap();
 
-       private Tree replaceRef(Function simpleOpRef) {
-          String refName = getName(simpleOpRef);
-          String facetName = getFacet(simpleOpRef);
+   private Tree replaceRef(Function simpleOpRef) {
+      String refName = getName(simpleOpRef);
+      String facetName = getFacet(simpleOpRef);
           
-          Operator op = (Operator) simple.get(refName);
-          OperatorFacet facet =  op.getFacet(facetName);
-          Function core = getCoreCall(facet);
-          String parentFrame = simpleOpRef.getPass().getText();
+      Operator op = (Operator) simple.get(refName);
+      OperatorFacet facet =  op.getFacet(facetName);
+      Function core = (Function) facet.getRules().get(0).getRules().get(0).findDescendants(FUNCTION).get(0);    //All of those zeros BECAUSE there is only one rule in the facet
+      String frameName = simpleOpRef.getPass().getText();
                     
-          StencilTree splice = makeSplice((List) simpleOpRef.findChild(LIST), facet, core); //Start of the thing being inserted
-          Pack spliceTail = findTail(splice);                                               //End of the thing being inserted
+      StencilTree splice = makeSplice((List) simpleOpRef.findChild(LIST), facet, core); //Start of the thing being inserted
+      if (requiresTuple(simpleOpRef, frameName)) {splice = extendSplice(splice);}//Add a ToTuple operation ONLY if the whole tuple is referenced                  
+      Pack spliceTail = (Pack) splice.findDescendants(PACK).get(0);                     //End of the thing being inserted
 
-          CallTarget target = (CallTarget) adaptor.dupTree(simpleOpRef.getCall()); //Target of the thing being replaced (parent pointing to splice is handled by the ANTLR transformer)
-          TuplePrototype resultsPrototype = (TuplePrototype) facet.findChild(YIELDS).getChild(1);
-          Map<TupleRef, Value> subst = buildSubst(parentFrame, resultsPrototype, spliceTail.getArguments());          
+      CallTarget target = (CallTarget) adaptor.dupTree(simpleOpRef.getCall()); //Target of the thing being replaced (parent pointing to splice is handled by the ANTLR transformer)
+      TuplePrototype resultsPrototype = (TuplePrototype) facet.findChild(YIELDS).getChild(1);
+      Map<TupleRef, Value> subst = buildSubst(frameName, resultsPrototype, spliceTail.getArguments());          
+
           
-          target = (CallTarget) ReplaceTupleRefs.apply(target, subst);
-          adaptor.setChild(spliceTail.getParent(), spliceTail.getChildIndex(), target);
+      target = (CallTarget) ReplaceTupleRefs.apply(target, subst);
+      adaptor.setChild(spliceTail.getParent(), spliceTail.getChildIndex(), target);
           
-          return splice;
+      return splice;
+  }
+  
+   private boolean requiresTuple(Function function, String frameName) {
+       List<TupleRef> refs = (List<TupleRef>) function.findDescendants(TUPLE_REF);
+       for (TupleRef ref: refs) {
+         if (ref.getChildCount() == 1 && ref.getChild(0).getText().equals(frameName)) {return true;}
        }
+       return false;
+   }
+   
+   private StencilTree extendSplice(StencilTree splice) {
+       Pack pack  = (Pack) splice.findDescendants(PACK).get(0);  //The tail of the chain
+       StencilTree lastCall = (StencilTree) pack.getParent();    //That which calls the tail
+       adaptor.deleteChild(lastCall, pack.getChildIndex());
+       
+       //Add a ToTuple
+       String frameName = genSym(FRAME_SYM_PREFIX);
+       Object newCall = adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
+       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER));
+       adaptor.addChild(newCall, adaptor.dupTree(pack.getArguments()));
+       adaptor.addChild(newCall, adaptor.create(DIRECT_YIELD, frameName));
        
        
-       /**Creates a rename before and after the core.  
-        *  The rename before is built as: take the inArgs and pass them as formals to the rename.  The specializer is the input prototype of the operator.
-        *  The rename after  is built as: take the pack from the core and use its args as the formals to the rename.  The specializer is the output prototype of the operator.  
-        */   
-       private StencilTree makeSplice(List inArgs, StencilTree facet, StencilTree core) {
-          try {             
-             TuplePrototype inputPrototype  = (TuplePrototype) facet.findChild(YIELDS).getChild(0);
-             Map<TupleRef, Value> subst = buildSubst(ParserConstants.STREAM_FRAME, inputPrototype, inArgs);
-             
-             StencilTree workingCore = (StencilTree) adaptor.dupTree(core);
-             workingCore = (StencilTree) ReplaceTupleRefs.apply(workingCore, subst);             
-             return workingCore;
-          } catch (Exception e) {
-             throw new RuntimeException("Exception in-lining simple operator.", e);
-          }    
-       }
+       //Add the tuple to the pack
+       Pack newPack = (Pack) adaptor.dupTree(pack);
+       List args = newPack.getArguments();
+       Object ref = adaptor.create(TUPLE_REF, "");
+       adaptor.addChild(ref, frameName);
+       adaptor.addChild(args, ref);
+
+       //Attach the new end
+       adaptor.addChild(lastCall, newCall);
+       adaptor.addChild(newCall, newPack);
+
+       return splice;
+   }
        
+       
+   /**Creates a rename before and after the core.  
+    *  The rename before is built as: take the inArgs and pass them as formals to the rename.  The specializer is the input prototype of the operator.
+    *  The rename after  is built as: take the pack from the core and use its args as the formals to the rename.  The specializer is the output prototype of the operator.  
+    */   
+   private StencilTree makeSplice(List inArgs, StencilTree facet, StencilTree core) {
+      try {             
+         TuplePrototype inputPrototype  = (TuplePrototype) facet.findChild(YIELDS).getChild(0);
+         Map<TupleRef, Value> subst = buildSubst(ParserConstants.STREAM_FRAME, inputPrototype, inArgs);
+         
+         StencilTree workingCore = (StencilTree) adaptor.dupTree(core);
+         workingCore = (StencilTree) ReplaceTupleRefs.apply(workingCore, subst);             
+         return workingCore;
+      } catch (Exception e) {
+         throw new RuntimeException("Exception in-lining simple operator.", e);
+      }    
+   }
+   
      /**Construct a substitution that matches values to names pair-wise
       * and includes a numeric reference substitution as well.
       */ 
@@ -104,16 +140,7 @@ options {
        }
        return rootRef;
    }
-   
-   private Pack findTail(StencilTree head) {
-     while (head != null) {
-        StencilTree tail = head.findChild(PACK);
-        if (tail == null) {head = head.findChild(FUNCTION);}
-        else {return (Pack) tail;}
-     }
-     throw new Error("Could not find splice tail when required...");
-   }
-      
+         
    private String getName(Object t) {
       MultiPartName name = new MultiPartName(((Tree) t).getText());
       return name.getName();
@@ -122,18 +149,6 @@ options {
    private String getFacet(Object t) {
       MultiPartName name = new MultiPartName(((Tree) t).getText());
       return name.getFacet();
-   }
-   
-   /**What is actually going to be inlined?
-    * Having established that the call is inlineable, only the call chain not including the predicate needs to be inlined.
-    * This is the "core" of the defined operator.
-    *
-    * @param operator A tree node representing an operator
-    * @param facet The facet from that operator that is desired
-    **/   
-   private Function getCoreCall(OperatorFacet facet) {
-      assert facet.getRules().size() == 1 : "Can only inline facets with exactly one rule";
-      return (Function) ((CommonTree) facet.getRules().get(0).getRules().get(0).getFirstChildWithType(CALL_CHAIN)).getFirstChildWithType(FUNCTION);
    }
 }
 

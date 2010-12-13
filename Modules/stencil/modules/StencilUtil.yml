@@ -11,4 +11,9 @@ defaults:
     
 operators:
   - name: SeedCategorize
-  - name: SeedContinuous    
+  - name: SeedContinuous
+  - name: ToTuple
+    facets: 
+      - {name: map,     memUse: FUNCTION, prototype: NULL}
+      - {name: query,   memUse: FUNCTION, prototype: NULL}
+    

@@ -30,6 +30,8 @@ package stencil.parser.tree;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.antlr.runtime.Token;
 import org.antlr.runtime.tree.Tree;
@@ -71,20 +73,30 @@ public class StencilTree extends CommonTree {
 		return null;
 	}
 
+	/**Find all direct descendants of the given type.*/
+	public java.util.List<? extends CommonTree> findChildren(Integer... types) {
+		return searchDescendants(false, types);
+	}
 	
+	
+	public java.util.List<? extends CommonTree> findDescendants(Integer... types) {
+		return searchDescendants(true, types);
+	}
 	/**Find all descendants of the given type.
 	 * Will search in children that match the given type, so the list
 	 * may contain nodes with internal ancestor/descendant relationships. 
 	 */
-	public java.util.List<CommonTree> findDescendants(int type) {
+	private java.util.List<? extends CommonTree> searchDescendants(boolean recursive, Integer... type) {
 		java.util.List<CommonTree> results = new ArrayList();
 		if (this.getChildren() == null) {return results;}
+		ArrayList types = new ArrayList(Arrays.asList(type));
+		Collections.sort(types);
 		
-		for (Object child: this.getChildren()) {
-			if (child instanceof CommonTree && ((Tree) child).getType() == type) {
+		for (Object child: getChildren()) {
+			if (child instanceof CommonTree && types.contains(((Tree) child).getType())) {
 				results.add((CommonTree) child);
 			}
-			if (child instanceof StencilTree) {
+			if (recursive && child instanceof StencilTree) {
 				results.addAll(((StencilTree) child).findDescendants(type));
 			}
 		}

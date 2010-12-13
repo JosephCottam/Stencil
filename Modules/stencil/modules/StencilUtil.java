@@ -48,12 +48,14 @@ import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
 
 /**Operators used in various stencil transformations.*/
 public class StencilUtil extends BasicModule {
+	public static final Tuple toTuple(Object... values) {return new ArrayTuple(values);} 
 	
 	public static abstract class SeedBase extends AbstractOperator implements  SeedOperator, Cloneable {
 		protected SeedBase(OperatorData opData) {super(opData);}
