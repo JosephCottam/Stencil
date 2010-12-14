@@ -21,7 +21,8 @@ operators:
   - name: Get
     description: Tuple X int -> Value at position indicated by the int
     facets:
-      - {name: query, memUse: FUNCTION, prototype: !proto "VALUE", roles: "map, query"}
+      - {name: map,   memUse: FUNCTION, prototype: !proto "VALUE", target: query}
+      - {name: query, memUse: FUNCTION, prototype: !proto "VALUE"}
     
   - name: Rename
     description: Construct a tuple with a prototype from the names (passed in the specializer under the `names' key) and the values (passed as arguments). 

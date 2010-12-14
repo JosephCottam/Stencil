@@ -8,12 +8,12 @@ options {
 }
 
 @header {
-	/**Moves synthetic operators that only have one branch (the ALL branch)
-	 * up to their call site.  Requires that the OperatorExplicit has already
-	 * been run to ensure that state sharing is still correct.
-	 **/
+ /**Moves synthetic operators that only have one branch (the ALL branch)
+  * up to their call site.  Requires that the OperatorExplicit has already
+  * been run to ensure that state sharing is still correct.
+  **/
 
-	package stencil.parser.string;
+  package stencil.parser.string;
 
   import stencil.parser.tree.*;
   import stencil.parser.tree.util.MultiPartName;
@@ -47,16 +47,31 @@ options {
       String frameName = simpleOpRef.getPass().getText();
                     
       StencilTree splice = makeSplice((List) simpleOpRef.findChild(LIST), facet, core); //Start of the thing being inserted
-      if (requiresTuple(simpleOpRef, frameName)) {splice = extendSplice(splice);}//Add a ToTuple operation ONLY if the whole tuple is referenced                  
       Pack spliceTail = (Pack) splice.findDescendants(PACK).get(0);                     //End of the thing being inserted
-
+      StencilTree lastCall = (StencilTree) spliceTail.getParent();    //That which calls the tail
+      
       CallTarget target = (CallTarget) adaptor.dupTree(simpleOpRef.getCall()); //Target of the thing being replaced (parent pointing to splice is handled by the ANTLR transformer)
       TuplePrototype resultsPrototype = (TuplePrototype) facet.findChild(YIELDS).getChild(1);
       Map<TupleRef, Value> subst = buildSubst(frameName, resultsPrototype, spliceTail.getArguments());          
-
-          
       target = (CallTarget) ReplaceTupleRefs.apply(target, subst);
-      adaptor.setChild(spliceTail.getParent(), spliceTail.getChildIndex(), target);
+
+
+      if (requiresTuple(simpleOpRef, frameName)) {//Add a ToTuple operation ONLY if the whole tuple is referenced
+            Function extension = createExtension(splice);
+            
+            //Attach the new end of the splice
+            adaptor.deleteChild(lastCall,  spliceTail.getChildIndex());    //Remove the old pack
+            adaptor.addChild(lastCall, extension);                         //Add the new call
+            
+            subst = buildSubst(frameName, extension.getPass().getText());  //Pass holds the frame name
+            target = (CallTarget) ReplaceTupleRefs.apply(target, subst);   //Apply the tuple-reference name substitution
+            
+            lastCall = extension;                                          //Point splicy parts at the new parts
+            spliceTail = (Pack) extension.getCall();                       
+            
+      }                         
+
+      adaptor.setChild(lastCall, spliceTail.getChildIndex(), target);
           
       return splice;
   }
@@ -69,31 +84,23 @@ options {
        return false;
    }
    
-   private StencilTree extendSplice(StencilTree splice) {
-       Pack pack  = (Pack) splice.findDescendants(PACK).get(0);  //The tail of the chain
-       StencilTree lastCall = (StencilTree) pack.getParent();    //That which calls the tail
-       adaptor.deleteChild(lastCall, pack.getChildIndex());
-       
-       //Add a ToTuple
+   /**Creates the appropriate call for constructing a tuple.
+    *  TODO: ToTuple is currently used, but without a prototype-creating-specializer; should a prototype be created for it? 
+    */
+   private Function createExtension(StencilTree splice) {
+       Pack pack = (Pack) splice.findDescendants(PACK).get(0);
        String frameName = genSym(FRAME_SYM_PREFIX);
-       Object newCall = adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
-       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER));
-       adaptor.addChild(newCall, adaptor.dupTree(pack.getArguments()));
+       Function newCall = (Function) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
+       Object newArgs = adaptor.create(LIST, "arguments");
+       for (Object arg: pack.getChildren()) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
+       adaptor.addChild(newCall, ParserConstants.EMPTY_SPECIALIZER);
+       adaptor.addChild(newCall, newArgs);
        adaptor.addChild(newCall, adaptor.create(DIRECT_YIELD, frameName));
-       
-       
-       //Add the tuple to the pack
-       Pack newPack = (Pack) adaptor.dupTree(pack);
-       List args = newPack.getArguments();
-       Object ref = adaptor.create(TUPLE_REF, "");
-       adaptor.addChild(ref, frameName);
-       adaptor.addChild(args, ref);
 
-       //Attach the new end
-       adaptor.addChild(lastCall, newCall);
-       adaptor.addChild(newCall, newPack);
-
-       return splice;
+       //Add a dummy pack
+       adaptor.addChild(newCall, adaptor.create(PACK, "DUMMY PACK--Probably an error if you ever see this"));
+       
+       return newCall;       
    }
        
        
@@ -119,7 +126,7 @@ options {
       */ 
      private Map<TupleRef, Value> buildSubst(String frame, final TuplePrototype names, final List<Value> values) {
        assert values.size() == names.size() : "Must have same number of values as names";
-              
+  
        Map<TupleRef, Value> subst = new HashMap();
               
        for (int i=0; i<values.size(); i++) {
@@ -130,6 +137,15 @@ options {
           subst.put(makeRef(frame, i), value);
        }
        return subst;
+    }
+    
+    private Map<TupleRef, Value> buildSubst(String oldFrame, String newFrame) {
+       assert oldFrame != null : "Must supply an old frame name";
+       assert newFrame != null : "Must supply a new frame name";
+       Map<TupleRef, Value> subst = new HashMap();
+       
+       subst.put(makeRef(oldFrame), makeRef(newFrame));
+       return subst;  
     }
 
     private TupleRef makeRef(Object... path) {
