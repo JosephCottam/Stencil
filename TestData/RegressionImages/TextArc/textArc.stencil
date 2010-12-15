@@ -30,7 +30,7 @@ from RawWords
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex.put(word, *)
+ () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex(word, *)
  () : WordCount(word)
 
 layer Border[TEXT]
@@ -59,9 +59,9 @@ operator LineIndex : Dict[fields: "lines"]
 /*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)
   (ALL) =>
-    (X): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
+    (X): LineIndex.query(word) -> Get(*,0) >> Layout.query(_) >-
             Select[field: 0](*) -> Mean[range: LAST](LAST)
-    (Y): LineIndex(word) -> ToTuple(_) >> Layout.query(_) >-
+    (Y): LineIndex.query(word) -> Get(*,0) >> Layout.query(_) >-
             Select[field: 1](*) -> Mean[range: LAST](LAST)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            

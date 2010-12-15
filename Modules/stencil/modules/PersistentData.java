@@ -34,10 +34,6 @@ public class PersistentData extends BasicModule {
 		public Object query(int inIndex) {return out[inIndex];}
 	}
 	
-
-
-	
-	/**TODO: Remove 'put' and change it to just map.*/
 	public static class Dict extends AbstractOperator {		
 		public static final String NAMES = "fields";
 		public static final String NAME = "Dict";
@@ -62,8 +58,7 @@ public class PersistentData extends BasicModule {
 			this.names = names;
 		}
 		
-		
-		public Object[] put(Object key, Object... values) {
+		public Object[] map(Object key, Object... values) {
 			Object[] objects = new Object[values.length];
 			System.arraycopy(values, 0, objects, 0, values.length); //Copy is required for storage.
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
@@ -77,14 +72,12 @@ public class PersistentData extends BasicModule {
 			return objects;
 		}
 		
-		
-		public Object[] map(Object key, Object... args) {return query(key, args);}
-		public Object[] query(Object key, Object... args) {
+		public Object[] query(Object key, Object... values) {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
 			Object result = dict.get(key);
 			if (result == null) {return null;}
-			else {return (Object[]) result;}	//TODO: Store the tuple itself, will always end up wrapped anyway...
+			else {return (Object[]) result;}
 		}
 
 		public Dict duplicate() {return new Dict(operatorData, caseSensitive, names);}

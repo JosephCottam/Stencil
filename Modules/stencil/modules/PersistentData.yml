@@ -6,7 +6,6 @@ defaults:
   facets: 
     - {name: map,     memUse: READER, prototype: !proto "VALUE"}
     - {name: query,   memUse: READER, prototype: !proto "VALUE"}
-    - {name: put,     memUse: WRITER, prototype: !proto "VALUE"}
     - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
 
 operators: 
