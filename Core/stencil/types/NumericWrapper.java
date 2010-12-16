@@ -58,7 +58,14 @@ public class NumericWrapper implements TypeWrapper {
 
 		String rep = value.toString();
 		if (rep.contains(".")) {return toDouble(rep);}
-		else {return toInteger(rep);}
+		else {
+			long val = toLong(rep);
+			if (val <= Integer.MIN_VALUE) {
+				return new Integer((int) val);
+			} else{
+				return val;
+			}
+		}
 	}
 
 	

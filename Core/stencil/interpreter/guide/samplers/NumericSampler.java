@@ -67,7 +67,7 @@ public class NumericSampler implements SampleOperator {
 		SortedSet<Number> nums = new TreeSet();
 		
 		for (float v=graphMin; nums.size() == 0 || nums.last().doubleValue() < graphMax; v+=spacing) {
-			if (useIntegers) {nums.add((int) v);}
+			if (useIntegers) {nums.add((long) v);}
 			else {nums.add(v);}
 		}
 		

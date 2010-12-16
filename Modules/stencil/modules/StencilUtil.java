@@ -86,8 +86,8 @@ public class StencilUtil extends BasicModule {
 		public static final String MIN_KEY = "min";
 		public static final String LOCK_KEY = "lock";
 
-		private double max = Double.MIN_VALUE;	//Largest value in last reporting cycle
-		private double min = Double.MAX_VALUE;	//Smallest value in last reporting cycle
+		private double max = Double.MIN_VALUE;	/**Largest value in last reporting cycle*/
+		private double min = Double.MAX_VALUE;	/**Smallest value in last reporting cycle*/
 		private final boolean rangeLock;
 
 		public SeedContinuous(OperatorData opData, boolean lock) {super(opData); this.rangeLock=lock;}
