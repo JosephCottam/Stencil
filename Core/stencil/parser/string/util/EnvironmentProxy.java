@@ -76,19 +76,18 @@ public final class EnvironmentProxy {
 		final CommonTree focus;
 		final boolean inRuleList;
 		final boolean inGuideGenerator;
+		final boolean inDynamicRule;
 		
 		public AncestryPackage(CommonTree t) {
 			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
 			of = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
 			g = (Guide) t.getAncestor(StencilParser.GUIDE);
 			l = (Layer) t.getAncestor(StencilParser.LAYER);
-
+			
 			StencilTree r= (StencilTree) t.getAncestor(StencilParser.RULE);
 			inRuleList = (r==null) ? false : r.getParent().getType() == StencilParser.LIST;
-			
+			inDynamicRule = (r == null || c == null) ? false : r.getAncestor(StencilParser.DYNAMIC_RULE) != null;
 			inGuideGenerator = t.getAncestor(StencilParser.GUIDE_GENERATOR) != null;
-			
-			
 			
 			program = (Program) t.getAncestor(StencilParser.PROGRAM);
 			focus = t;
@@ -121,7 +120,13 @@ public final class EnvironmentProxy {
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
 		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
-		if (anc.c != null) {return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();}
+		if (anc.c != null) {
+			if (!anc.inDynamicRule) {
+				return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();
+			} else {
+				return new SimplePrototype();	//Any sub-ref will be different if in a dynamic rule, but direct refs are numeralized in reducer creation
+			}
+		}
 		if (anc.of != null) {return anc.of.getArguments();}
 		
 		if (anc.g != null) {

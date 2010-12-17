@@ -34,7 +34,6 @@ options {
   private static ModuleCache modules;  
 }
 
-
 //In a more ideal world (where environment-proxy-like entity construction coud be efficienlty implemented as a few methods)
 //Maybe if we tucked reutnr prototypes into the invokeables or something.  That would take care of all chains, then only predicates and special frames would need extra work
 //topdown
@@ -46,7 +45,8 @@ options {
 
 topdown
 	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
-  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .); 
+  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .)
+  | ^(CONSUMES (options {greedy=false;} :.)* ^(p=PACK valueE[initialEnv($p, modules)]*)); 
 
 callTarget[EnvironmentProxy env]
   : ^(f=FUNCTION . . ^(LIST valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])

@@ -78,14 +78,11 @@ public class StencilTree extends CommonTree {
 		return searchDescendants(false, types);
 	}
 	
-	
+	/**Recursively look for descendants of the given type.*/
 	public java.util.List<? extends CommonTree> findDescendants(Integer... types) {
 		return searchDescendants(true, types);
 	}
-	/**Find all descendants of the given type.
-	 * Will search in children that match the given type, so the list
-	 * may contain nodes with internal ancestor/descendant relationships. 
-	 */
+
 	private java.util.List<? extends CommonTree> searchDescendants(boolean recursive, Integer... type) {
 		java.util.List<CommonTree> results = new ArrayList();
 		if (this.getChildren() == null) {return results;}

@@ -228,6 +228,7 @@ public abstract class ParseStencil {
 		p = DynamicSeparateRules.apply(p);
 		p = DynamicToSimple.apply(p);
 	    p = DynamicCompleteRules.apply(p);
+	    p = DynamicReducer.apply(p);
 	    
 		p = OperatorStateQuery.apply(p);
 
@@ -242,7 +243,7 @@ public abstract class ParseStencil {
 		p = LiftSharedConstantRules.apply(p);				//Move all constant rules up to the defaults section so they are only evaluated once.
 
 		validate(p);
-		
+
 		return p;
 	}
 	
@@ -259,7 +260,7 @@ public abstract class ParseStencil {
 			MapFoldBalance.apply(p);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
-			else {e.printStackTrace();}
+			else {System.err.println(e.getMessage());}
 		}
 	}
 }

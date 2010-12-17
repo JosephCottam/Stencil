@@ -71,11 +71,18 @@ public class Interpreter {
 		return fullResult;
 	}
 	
+	
+	private static final class ProcessResults {
+		final Tuple local, result;
+		public ProcessResults(Tuple local, Tuple result) {this.local = local;this.result = result;}
+	}
+
 	//Parallelize here???  Checks all groups in parallel...
-	public Tuple process(SourcedTuple source, TupleStore target, Consumes group) throws NoOutputSignal, RuleAbortException {
+	public ProcessResults process(SourcedTuple source, TupleStore target, Consumes group) throws NoOutputSignal, RuleAbortException {
 		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
-		Tuple prefilter, local;
+		Tuple prefilter;
+		Tuple local = null;
 		Tuple result = null;
 		
 		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
@@ -118,7 +125,7 @@ public class Interpreter {
 				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Display.canvas);}
 			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}
-		return result;
+		return new ProcessResults(local, result);
 	}
 	
 	/**Takes a single tuple and works it through all applicable
@@ -148,8 +155,8 @@ public class Interpreter {
 			for(Consumes group:layer.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
 				try {
-					Tuple result = process(source, layer, group);
-					actionsTaken = registerDynamics(layer, group, source, result) && actionsTaken;
+					ProcessResults results = process(source, layer, group);
+					actionsTaken = registerDynamics(layer, group, source, results.local, results.result) && actionsTaken;
 				} catch (NoOutputSignal no) {
 					actionsTaken = true;
 				}
@@ -158,28 +165,31 @@ public class Interpreter {
 		return actionsTaken;
 	}
 
-	//TODO: What about locals in a dynamic binding?
-	private boolean registerDynamics(Layer layer, Consumes group, SourcedTuple source, Tuple result) {
+	private boolean registerDynamics(Layer layer, Consumes group, SourcedTuple source, Tuple local, Tuple result) {
 		boolean actionsTaken = false;
+		
+		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues(), Tuples.EMPTY_TUPLE, local);
+		Tuple merged = group.getDynamicReducer().apply(env);
+		
 		if (result != null && result instanceof MapMergeTuple) {
 			for (int i=0; i<result.size(); i++) {
 				Tuple rslt = (Tuple) result.get(i);
-				singleRegisterDynamic(layer, group, source, rslt);
+				singleRegisterDynamic(layer, group, merged, rslt);
 			}
 		} else if (result != null) {
-			singleRegisterDynamic(layer, group, source, result);
+			singleRegisterDynamic(layer, group, merged, result);
 		}		
 		return actionsTaken;
 	}
 	
-	private boolean singleRegisterDynamic(Layer layer, Consumes group, SourcedTuple source, Tuple result) {
+	private boolean singleRegisterDynamic(Layer layer, Consumes group, Tuple source, Tuple result) {
 		if (!layer.canStore(result)) {return false;}
 		try {
 			String id = Converter.toString(result.get(ParserConstants.GLYPH_ID_FIELD));
 			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			
-			layer.getDisplayLayer().addDynamic(group.groupID(), glyph, source.getValues());
+			layer.getDisplayLayer().addDynamic(group.groupID(), glyph, source);
 
 			return true;
 		} catch (Exception e) {

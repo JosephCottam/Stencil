@@ -7,7 +7,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.ValueEnum;
 
 public class NumericWrapper implements TypeWrapper {
-	private static final Class[] ACCEPTS = {Integer.class, Long.class, Double.class, Float.class, int.class, long.class, double.class, float.class};
+	private static final Class[] ACCEPTS = {Number.class, Integer.class, Long.class, Double.class, Float.class, int.class, long.class, double.class, float.class};
 
 
 	public Tuple toTuple(Object o) {
@@ -20,6 +20,7 @@ public class NumericWrapper implements TypeWrapper {
 	public static Double toDouble(Object value) {
 		if (value instanceof Double) {return (Double) value;}
 		if (value instanceof ValueEnum) {return toDouble(((ValueEnum) value).getValue());}
+		if (value instanceof Number) {return ((Number) value).doubleValue();}
 		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
 		
 		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getValue().doubleValue());}
@@ -31,6 +32,7 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof Float) {return (Float) value;}
 		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getValue().floatValue());}
+		if (value instanceof Number) {return ((Number) value).floatValue();}
 		
 		return Float.parseFloat(value.toString());	
 	}
@@ -40,6 +42,7 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof Long) {return ((Long) value).intValue();}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
 		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getValue().intValue());}
+		if (value instanceof Number) {return ((Number) value).intValue();}
 
 		return toFloat(value).intValue();
 	}
@@ -48,6 +51,7 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof StencilNumber) {return new Long(((StencilNumber) value).getValue().longValue());}
 		if (value instanceof Number) {return ((Number) value).longValue();}
 		if (value instanceof ValueEnum) {return toLong(((ValueEnum)value).getValue());}
+		if (value instanceof Number) {return ((Number) value).longValue();}
 		return new Long(Long.parseLong(value.toString()));
 	}
 	

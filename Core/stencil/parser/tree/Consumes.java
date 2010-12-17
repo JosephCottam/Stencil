@@ -46,4 +46,6 @@ public class Consumes extends StencilTree {
 		}
 		return true;
 	}
+	
+	public Pack getDynamicReducer() {return (Pack) this.findChild(StencilParser.PACK);}
 }
