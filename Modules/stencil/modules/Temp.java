@@ -64,60 +64,6 @@ public class Temp extends BasicModule {
 	
 
 
-	/**Takes a range of values and creates a set of partitions of that range.
-	 * Will report what partition any value falls in.  This is done with modulus
-	 * if a value is outside the original range and with abs if outside in a negative manner.
-	 * 
-	 * @author jcottam
-	 *
-	 */
-	public static final class Partition extends AbstractOperator {
-		private static final String MIN = "min";
-		private static final String MAX = "max";
-		private static final String BUCKETS = "n";
-		
-		private final double buckets;
-		private final boolean autoMin;
-		private final boolean autoMax;
-
-		private double min;
-		private double max;
-		private double bucketSpan;
-		
-		public Partition(OperatorData od, Specializer spec) {
-			super(od);
-
-			buckets = Converter.toDouble(spec.get(BUCKETS));
-
-			autoMin = !spec.containsKey(MAX);
-			autoMax = !spec.containsKey(MIN);
-			max = autoMax ? Converter.toDouble(spec.get(MAX)) : Double.MAX_VALUE;
-			min = autoMin ? Converter.toDouble(spec.get(MIN)) : Double.MAX_VALUE; 
-		}
-
-		private void calcSpan(double value) {
-			if (autoMax && value > max) {max = value;}
-			if (autoMin && value < min) {min = value;}
-			bucketSpan = (max-min)/buckets;
-		}
-		
-		public double[] map(double dv) {return query(dv);}
-		public double[] query(double dv) {
-			calcSpan(dv);
-			
-			dv = dv-min;
-
-			double bucket = (buckets)/((max-min)/dv);
-			bucket = Math.abs(Math.floor(bucket));
-			bucket = bucket%buckets;
-
-			double start = bucket*bucketSpan;
-			double end = (bucket +1)*bucketSpan;
-			
-			return new double[]{start,end,bucket};
-		}
-	}
-
 	public static class Oscillate extends AbstractOperator {
 		public static enum STYLE {CIRCLE, SINE, SINE2}
 		

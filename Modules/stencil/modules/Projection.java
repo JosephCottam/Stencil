@@ -46,10 +46,39 @@ import stencil.parser.string.info.UseContext;
 import stencil.parser.string.util.Context;
 import stencil.parser.tree.Program;
 import stencil.parser.tree.Specializer;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.Tuple;
+import stencil.tuple.TupleBoundsException;
+import stencil.tuple.Tuples;
+import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 
 public class Projection extends BasicModule {
+	
+	/**Given a bin-size, determines what bin a particular value falls into.**/
+	public static class Bin extends AbstractOperator {
+		private static final String SIZE="size";
+		private final Number binSize;
+		
+		public Bin(OperatorData opData, Specializer spec) {
+			super(opData);
+			binSize = Converter.toNumber(spec.get(SIZE));
+		}
+		
+		public long map(Number value, Number min) {return query(value, min);}
+		
+		public long query(Number value, Number min) {
+			if (binSize instanceof Double || value instanceof Double || min instanceof Double) {
+				return (long) Math.ceil((value.doubleValue() - min.doubleValue())/binSize.doubleValue());
+			} else {
+				return (long) Math.ceil((value.longValue() - min.longValue())/binSize.doubleValue());				
+			}
+		}
+
+	}
+
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
@@ -175,15 +204,29 @@ public class Projection extends BasicModule {
 	 * For query, items that have not been seen return 0 and are not added to the map.
 	 */
 	public static final class Count extends AbstractOperator {
-		private Map<Object, Long> counts = new HashMap<Object, Long>();
+		private static final class CompoundKey {
+			final Object[] values;
+			public CompoundKey(Object... values) {this.values = values;}
+			public int hashCode() {return Arrays.hashCode(values);}
+			public boolean equals(Object o) {
+				return o != null 
+					&& o.getClass().isArray() 
+					&& o.getClass().equals(Object.class) 
+					&& Arrays.equals(values, (Object[]) o);
+			}
+		}
+		
+		private Map<CompoundKey, Long> counts = new HashMap();
 		private int stateID = Integer.MIN_VALUE;
 		
 		public Count(OperatorData opData) {super(opData);}
 		
 		public String getName() {return "Count";}
 
-		public long map(Object key) {
+		public long map(Object... keys) {
 			long value;
+			CompoundKey key = new CompoundKey(keys);
+			
 			if (counts.containsKey(key)) {
 				Long l = counts.get(key);
 				value = l.longValue();
@@ -197,8 +240,10 @@ public class Projection extends BasicModule {
 			return value;
 		}
 
-		public long query(Object key) {
+		public long query(Object... keys) {
 			long value =0;
+			CompoundKey key = new CompoundKey(keys);
+			
 			if (counts.containsKey(key)) {
 				value = counts.get(key);
 			}
@@ -377,6 +422,60 @@ public class Projection extends BasicModule {
 		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
 	}
 	
+	/**Perform a linear interpolation between zero and one, returning the Percent, mIn and maX (thus PIX).*/
+	public static final class PIX extends AbstractOperator {
+		private static final class PIXTuple implements Tuple {
+			private static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{"p","min","max"}, new Class[]{Number.class, Number.class, Number.class});
+			private final Number[] values;
+			private PIXTuple(Number percent, Number min, Number max){values=new Number[]{percent, min, max};}			
+			public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
+			public Object get(int idx) throws TupleBoundsException {return values[idx];}
+			public TuplePrototype getPrototype() {return PROTOTYPE;}
+			public boolean isDefault(String name, Object value) {return false;}
+			public int size() {return PROTOTYPE.size();}			
+		}
+		
+		private static final String MIN = "min";
+		private static final String MAX = "max";
+		
+		private Number min = null;
+		private Number max = null;
+		
+		public PIX(OperatorData opData, Specializer spec) {
+			super(opData);
+			
+			min = spec.containsKey(MIN) ? Converter.toNumber(spec.get(MIN)) : null;
+			max = spec.containsKey(MAX) ? Converter.toNumber(spec.get(MAX)) : null;
+
+		}
+		
+		public Tuple map(Number value) {
+			if (min == null) {min = value;}
+			if (max == null) {max = value;}
+			
+			if (min.doubleValue() >= value.doubleValue()) {min = value; stateID++;}
+			if (max.doubleValue() <= value.doubleValue()) {max = value; stateID++;}
+			
+			return query(value);
+		}
+		
+		public Tuple query(Number value) {
+			Number qmin = min == null ? value : min;   //local copies for query, so they are guaranteed to have a value
+			Number qmax = max == null ? value : max;
+
+			if (value instanceof Double || qmin instanceof Double || qmax instanceof Double) {
+				double span = (qmax.doubleValue()-qmin.doubleValue());
+				if (span ==0d) {value = 1;}
+				else {value = (value.doubleValue())/(qmin.doubleValue() + span);}
+			} else {
+				long span = (qmax.longValue()-qmin.longValue());
+				if (span ==0) {value =1;}
+				else {value = value.longValue()/((double) (qmin.longValue() + span));} 				
+			}
+			return new PIXTuple(value, qmin, qmax);
+		}
+	}
+
 	public Projection(ModuleData md) {super(md);}
 
 	protected void validate(String name, Specializer specializer) throws SpecializationException {

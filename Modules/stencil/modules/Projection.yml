@@ -10,6 +10,13 @@ defaults:
     - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
 
 operators:
+    - name: Bin
+      description: Calculates a bin that something falls into.  Bins are fixed size, with a potentially infinite number.  Bin size must be supplied in specializer."
+      defaultSpecializer: !spec "[size: 1, range:ALL, split: 0]"
+      facets:
+         - {name: map, memUse: FUNCTION, prototype: !proto "long bin"}
+         - {name: query, memUse: FUNCTION, prototype: !proto "long bin"}
+      
     - name: Count
       description: Count the number of times the argument combination has been seen (including the current one)
       facets:
@@ -17,20 +24,28 @@ operators:
        - {name: query, memUse: READER, prototype: !proto "long count"}
        - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
 
+    - name: HeatScale
+      description: Project between two color spaces.  Satefully keeps the max/min seen.
+      defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"BLUE\", hot: \"RED\"]"
+      facets:
+        - {name: map, memUse: WRITER, prototype: !proto "Color VALUE"}
+        - {name: query, memUse: READER, prototype: !proto "Color VALUE"}
+        - {name: stateID, memUse: READER, prototype: !proto "Color VALUE"}
+
     - name: Index
       description: Record the original presentation order of the combination of arguments
       facets:
          - {name: map, memUse: WRITER, prototype: !proto "long index"}
          - {name: query, memUse: READER, prototype: !proto "long index"}
          - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
-
-    - name: HeatScale
-      description: Project between two color spaces.  Satefully keeps the max/min seen.
-      defaultSpecializer: !spec "[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\"]"
+      
+    - name: PIX
+      description: Percent/min/max calculator.  Uses sliding (though intializable) min/max.
       facets:
-        - {name: map, memUse: WRITER, prototype: !proto "Color VALUE"}
-        - {name: query, memUse: READER, prototype: !proto "Color VALUE"}
-        - {name: stateID, memUse: READER, prototype: !proto "Color VALUE"}
+         - {name: map, memUse: WRITER, prototype: !proto "Number p, Number min, Number max"}
+         - {name: query, memUse: READER, prototype: !proto "Number p, Number min, Number max"}
+         - {name: stateID, memUse: READER, prototype: !proto "int VALUE"}
+      
       
     - name: Rank
       defaultSpecializer: !spec "[range:ALL, split:0, start: 0]"

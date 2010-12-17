@@ -14,12 +14,6 @@ operators:
       - {name: map, memUse: FUNCTION, prototype: !proto "value"}
       - {name: query, memUse: FUNCTION, prototype: !proto "value"}
 
-   - name: Partition
-     facets:
-      - {name: map, memUse: WRITER, prototype: !proto "double start, double end, double bucket"}
-      - {name: query, memUse: READER, prototype: !proto "double start, double end, double bucket"}
-      - {name: stateID, memUse: READER, prototype: !proto "VALUE"} 
-
    - name: Oscillate
      defaultSpecializer: !spec  "[range: ALL, split:0, style: \"CIRCLE\", states: 2]"
      facets:

@@ -73,10 +73,9 @@ public class StringUtil extends BasicModule {
 	public static String toUpper(String s) {return s.toUpperCase();}
 	public static String toLower(String s) {return s.toLowerCase();}	
 	
-	//TODO: Add range support to concatenate
 	public static String concatenate(Object... os) {
 		StringBuilder b = new StringBuilder();
-		for (Object o:os) {b.append(o.toString());}
+		for (Object o:os) {b.append(o!= null ? o.toString() : o);}
 		return b.toString();
 	}
 

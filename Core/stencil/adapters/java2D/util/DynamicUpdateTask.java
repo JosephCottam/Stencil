@@ -18,7 +18,7 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 		super(rule, rule.getStateQuery(), rule.getAction().getTarget().getPrototype().toStringTree());
 		this.table = table;
 	}
-		
+	
 	public Finisher update() {
 		final List<Tuple> result = viewPointFragment.apply(table);
 		
