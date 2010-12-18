@@ -47,7 +47,9 @@ public abstract class ParserConstants {
 	public static final String TERMINATOR = ")";
 	public static final String SIGIL = "@";
 
-	public static final String GLYPH_ID_FIELD  = "ID";
+	//Seletors
+	public static final String SELECTOR_FIELD  = "ID";
+	public static final String SUB_SELECTOR_FIELD  = "IDX";
 
 	//Block tags (for Python and corresponding to operator items)
 	public static final String MAP_FACET = StencilOperator.MAP_FACET;
@@ -60,7 +62,6 @@ public abstract class ParserConstants {
 	public static final int RANGE_END_INT = 0;
 	public static final String RANGE_START = Integer.toString(RANGE_START_INT);
 	public static final String RANGE_END = Integer.toString(RANGE_END_INT);
-	public static final String NEW_VALUE = "new";
 	public static final String FINAL_VALUE = "n";
 	public static final String ALL = "ALL";
 	public static final String LAST = "LAST";

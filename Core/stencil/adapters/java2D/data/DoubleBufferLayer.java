@@ -82,7 +82,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	}
 	
 	public Glyph makeOrFind(Tuple values) {
-		Object id = values.get(ParserConstants.GLYPH_ID_FIELD);
+		Object id = values.get(ParserConstants.SELECTOR_FIELD);
 		if (id == null) {throw new IDException(name);}		
 		
 		String ID = Converter.toString(id);

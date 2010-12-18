@@ -37,7 +37,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
@@ -207,7 +206,7 @@ public abstract class Basic implements Glyph2D {
 		return Tuples.safeGet(att.name, source, source.getPrototype(), att.type, null);
 	}
 	
-	/**REturn either the candidate value -or- if it is null, the defaultValue.*/
+	/**Return either the candidate value -or- if it is null, the defaultValue.*/
 	protected static final <T> T switchCopy(T defaultValue, T candidate) {
 		return candidate==null ? defaultValue : candidate;
 	}
@@ -256,36 +255,4 @@ public abstract class Basic implements Glyph2D {
 
 		}
 	}
-	
-	/**Convert a full property name to just a base property name.
-	 * Base properties are the first component of a dotted name,
-	 * but to distinguish properties that take arguments from
-	 * properties that do not, base names for properties that
-	 * take arguments have an 'n' appended to the end.
-	 *
-	 *  For example:
-	 *  	FullName	BaseName	Notes
-	 *  	   Y		   Y		  Simple Y that cannot take arguments
-	 *  	   Y.1		   Yn		  Y that takes an argument
-	 **/
-	private static final Pattern NAME_SPLITTER = Pattern.compile("\\."); 
-	public static String baseName(String fullName) {
-		String baseName = NAME_SPLITTER.split(fullName)[0];
-		if (baseName.length() == fullName.length()) {return fullName;} //Return quick if nothing changed
-		baseName = baseName.concat("n");
-		return baseName;
-	}
-	
-	/**What are the implicit arguments in the full name passed?
-	 * This is the converse of the baseName operation.  Anything
-	 * that is not part of the base name is part of the implicit arguments.
-	 *
-	 */
-	public static String nameArgs(String fullName) {
-		String baseName = baseName(fullName);
-		if (baseName.equals(fullName)) {return null;}
-
-		return fullName.substring(baseName(fullName).length());
-	}
-
 }

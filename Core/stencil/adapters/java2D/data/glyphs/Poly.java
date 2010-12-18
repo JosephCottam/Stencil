@@ -29,9 +29,6 @@
  */
 package stencil.adapters.java2D.data.glyphs;
 
-import static stencil.parser.ParserConstants.FINAL_VALUE;
-import static stencil.parser.ParserConstants.NEW_VALUE;
-
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -40,14 +37,12 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.adapters.general.ImplicitArgumentException;
 import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototypes;
-import stencil.types.Converter;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
@@ -90,28 +85,30 @@ public abstract class Poly extends Stroked {
 	
 	
 	public static final Double DEFAULT_COORDINATE_VALUE = 0.0;
-	private static final Double UNITIAILZED_COORDINATE  = Double.NaN;
 	
 	protected static final AttributeList ATTRIBUTES = new AttributeList(Stroked.ATTRIBUTES);
 	protected static final AttributeList UNSETTABLES = new AttributeList();
-	protected static final Attribute<Double> Xn = new Attribute("Xn", 0d, double.class);
-	protected static final Attribute<Double> Yn = new Attribute("Yn", 0d, double.class);
+	protected static final Attribute<Double> XS = new Attribute("XS", DEFAULT_COORDINATE_VALUE, double.class);
+	protected static final Attribute<Double> YS = new Attribute("YS", DEFAULT_COORDINATE_VALUE, double.class);
 	protected static final Attribute<Double> X = new Attribute("X", 0d, double.class);
 	protected static final Attribute<Double> Y = new Attribute("Y", 0d, double.class);
-	protected static final Attribute<String> SCALE_BY = new Attribute("SCALE_BY", "ALL");
-
+	protected static final Attribute<String> SCALE = new Attribute("SCALE", "ALL");
+	protected static final String IDX = "IDX";	//Psudo-property.  Only ever set, never read; identifies WHICH points are being modified by other properties
+	
+	
 	static {
-		ATTRIBUTES.add(Xn);
-		ATTRIBUTES.add(Yn);
+		ATTRIBUTES.add(XS);
+		ATTRIBUTES.add(YS);
 		ATTRIBUTES.add(X);
 		ATTRIBUTES.add(Y);
-		ATTRIBUTES.add(SCALE_BY);
+		ATTRIBUTES.add(SCALE);
 		
 		UNSETTABLES.add(X);
 		UNSETTABLES.add(Y);
 	}
 	
-	private final List<Point2D> points;
+	private final List<Double> xs;
+	private final List<Double> ys;
 	private final GeneralPath path;	
 	private final boolean connect;
 	private final String scaleBy;
@@ -120,9 +117,10 @@ public abstract class Poly extends Stroked {
 		super(layer, id);
 		this.connect = connect;
 		
-		points = new ArrayList();
-		path = buildPath(points, this.connect);
-		scaleBy = SCALE_BY.defaultValue;
+		xs = new ArrayList();
+		ys = new ArrayList();
+		path = buildPath(xs,ys, this.connect);
+		scaleBy = SCALE.defaultValue;
 		super.updateBoundsRef(path.getBounds2D());
 	}
 	
@@ -130,7 +128,8 @@ public abstract class Poly extends Stroked {
 	
 	protected Poly(String id, Poly source) {
 		super(id, source);
-		this.points = source.points;
+		this.xs = source.xs;
+		this.ys = source.ys;
 		this.path = source.path;
 		this.connect = source.connect;
 		this.scaleBy = source.scaleBy;
@@ -142,14 +141,16 @@ public abstract class Poly extends Stroked {
 		super(source, option, UNSETTABLES);
 		this.connect = connect;
 		
-		this.scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE_BY));
+		this.scaleBy = switchCopy(source.scaleBy, safeGet(option, SCALE));
 		
 		if (changesPoints(option)) {
-			points = new ArrayList(source.points);
-			updatePoints(points, option);
-			path = buildPath(points, this.connect);
+			xs = new ArrayList(source.xs);
+			ys = new ArrayList(source.ys);
+			updatePoints(xs, ys, option);
+			path = buildPath(xs,ys, this.connect);
 		} else {
-			points = source.points;
+			this.xs = source.xs;
+			this.ys = source.ys;
 			path = source.path;
 		}
 		
@@ -161,60 +162,34 @@ public abstract class Poly extends Stroked {
 	protected AttributeList getAttributes() {return ATTRIBUTES;}
 	protected AttributeList getUnsettables() {return UNSETTABLES;}
 
-	public Object get(String name) {
-		String base = baseName(name); 
-		
+	public Object get(String name) {		
 		if (X.is(name)) {return bounds.getX();}
 		if (Y.is(name)) {return bounds.getY();}
-		
-		if (Xn.is(base) || Yn.is(base)) {
-			int index = (int) index(points, name, true);
-			if (index == points.size()) {return UNITIAILZED_COORDINATE;}
-			if (index < 0) {
-				if (Xn.is(base)) {return halfPoints(true);}
-				else {return halfPoints(false);}
-			}
-			if (Xn.is(base)) {return points.get(index).getX();}
-			if (Yn.is(base)) {return points.get(index).getY();}
-		} 
-		
-		if (SCALE_BY.is(name)) {return scaleBy;}
+		if (XS.is(name)) {return xs;}
+		if (YS.is(name)) {return ys;}
+		if (SCALE.is(name)) {return scaleBy;}
 		
 		return super.get(name);
 	}	
 
-	/**What are the X or Y half of points in this tuple?
-	 * 
-	 * @param x Return the x portion?  (false implies return the y portion)
-	 * @return
-	 */
-	private final Double[] halfPoints(boolean x) {
-		Double[] pts = new Double[points.size()];
-		for (int i=0; i< pts.length; i++) {
-			Point2D p = points.get(i);
-			pts[i] = x ? p.getX() : p.getY(); 
-		}
-		return pts;
-	}
-	
 	/**Does the given tuple have up point-related updates?*/
 	private static final boolean changesPoints(Tuple t) {
 		for (String field: TuplePrototypes.getNames(t.getPrototype())) {
-			String base = baseName(field);
-			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {return true;}
+			if (XS.is(field) || YS.is(field)) {return true;}
 		}
 		return false;
 	}
 	
-	private static GeneralPath buildPath(List<Point2D> points, boolean connect) {
-		if (points.size() == 0) {return new GeneralPath();} //Nothing to draw until there are two points...
+	private static GeneralPath buildPath(List<Double> xs, List<Double> ys, boolean connect) {
+		assert xs.size() == ys.size() : "Path components of different sizes";
+		
+		if (xs.size() == 0) {return new GeneralPath();} //Nothing to draw until there are two points...
 		
 		GeneralPath p = new GeneralPath();
-		Point2D prior = points.get(0);
+		Point2D prior = new Point2D.Double(xs.get(0), ys.get(0));
 		Point2D first = prior;
-		for (int i=1; i< points.size(); i++) {
-			Point2D current = points.get(i);
-
+		for (int i=1; i< xs.size(); i++) {
+			Point2D current = new Point2D.Double(xs.get(i), ys.get(i));
 			Line2D l = new Line2D.Double(prior, current);
 			p.append(l, false);
 			prior = current;
@@ -229,14 +204,10 @@ public abstract class Poly extends Stroked {
 		
 		if (scaleBy.equals("NONE")) {
 			AffineTransform vt = g.getTransform();
-			List newPoints = new ArrayList(points.size());
-			
-			for (Point2D oldPoint: points) {
-				Point2D newPoint = vt.transform(oldPoint, null);
-				newPoints.add(newPoint);
-			}
+			GeneralPath newPath = (GeneralPath) path.clone();
+			newPath.transform(vt);
 			g.setTransform(IDENTITY_TRANSFORM);
-			return buildPath(newPoints, connect);
+			return newPath;
 		}
 		throw new IllegalArgumentException("Can only scale polyline by ALL or NONE.");
 		
@@ -250,84 +221,32 @@ public abstract class Poly extends Stroked {
 		super.postRender(g, base);
 	}
 	
-	private static final class IdxValuePair {
-		final double idx;
-		final double value;
-		final boolean x;
-		final boolean isInsertion;
+	private static final void updatePoints(List<Double> xs, List<Double> ys, Tuple option) {
+		Object index = option.get(IDX);
+		int idx;
 		
-		IdxValuePair(double idx, double value, boolean x) {
-			this.idx = idx;
-			this.value = value;
-			this.x = x;
-			isInsertion = (idx == Math.ceil(idx) || idx ==0);//Fractional values and insert at the start of the list
-		}
+		//TODO: Support for multi-point updates
+		if (index instanceof Tuple) {throw new RuntimeException("Support for multi-update not complete.");}
+		if (index.equals("before")) {idx = -1;}
+		else if (index.equals("after")) {idx = xs.size();}
+		else if (index.equals("first")) {idx = 0;}
+		else if (index.equals("last")) {idx = xs.size()-1;}
+		else {idx = Integer.parseInt(index.toString());}
 		
-		int realIndex() {return (int) Math.ceil(idx);}
-		
-		Point2D update(Point2D original) {
-			if (x) {
-				return new Point2D.Double(value, original.getY());
-			} else {
-				return new Point2D.Double(original.getX(), value);
-			}
-		}
-	}
-	
-	private static final void updatePoints(List<Point2D> points, Tuple option) {
-		List<IdxValuePair> updates = new ArrayList(option.getPrototype().size());
-		
-		for (String field: TuplePrototypes.getNames(option.getPrototype())) {
-			final String base = baseName(field);
-			if (Xn.is(base) || Yn.is(base) && !base.equals(field)) {
-				double idx = index(points, field, false);
-				double value = Converter.toDouble(option.get(field));
-				updates.add(new IdxValuePair(idx, value, Xn.is(base)));
-			}
-		}
+		if (idx <0) {idx = xs.size() - idx;}//Wrapp around...
 
-		for (IdxValuePair p: updates) {
-			if (!p.isInsertion) {
-				int index = p.realIndex();
-				Point2D original = points.get(index);
-				points.set(index, p.update(original));
-			}
+		double defaultX = idx < xs.size() ? xs.get(idx) : DEFAULT_COORDINATE_VALUE;
+		double defaultY = idx < ys.size() ? ys.get(idx) : DEFAULT_COORDINATE_VALUE;
+ 		
+		double newX = Tuples.safeGet(XS.name, option, option.getPrototype(), defaultX);
+		double newY = Tuples.safeGet(YS.name, option, option.getPrototype(), defaultY);
+
+		while (idx>=xs.size()) {	//Ensure requested length
+			xs.add(DEFAULT_COORDINATE_VALUE);
+			ys.add(DEFAULT_COORDINATE_VALUE);
 		}
 		
-		List<Point2D> added = new ArrayList(updates.size());
-		for (IdxValuePair p: updates) {
-			if (p.isInsertion) {
-				int index = p.realIndex();
-				Point2D candidate = null;
-				if (index < points.size()) {candidate = points.get(index);}
-				
-				if (!added.contains(candidate)) {
-					candidate = new Point2D.Double();
-					candidate = p.update(candidate);
-					points.add(index, candidate);
-					added.add(candidate);
-				} else {
-					candidate = p.update(candidate);
-					points.set(index, candidate);					
-				}
-			}
-		}
-	}
-
-	/**What is the X/Y implicit argument (as a number)*/
-	private static double index(List<Point2D> points, String att, boolean onlyInt) {
-		if (Xn.is(att) || Yn.is(att)) {return -1;}
-		
-		try {
-			double val;
-			String arg = nameArgs(att);
-
-			if (arg.equals(NEW_VALUE)) {val = points.size();}
-			else if (arg.equals(FINAL_VALUE)) {val = points.size()-1;}
-			else {val = Double.parseDouble(arg);}
-
-			if (onlyInt && Math.floor(val) != val) {throw new ImplicitArgumentException(Line.class, att, "Can only reference integers in current call context.", null);}
-			return val;
-		} catch (Exception e) {throw new ImplicitArgumentException(Poly.class, att, e);}
+		xs.set(idx, newX);
+		ys.set(idx, newY);
 	}
 }

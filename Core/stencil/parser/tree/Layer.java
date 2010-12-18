@@ -64,7 +64,7 @@ public class Layer extends StencilTree implements TupleStore, ContextNode {
 	
 	public boolean canStore(Tuple t) {
 		return t instanceof PrototypedTuple &&
-				((PrototypedTuple) t).getPrototype().contains(ParserConstants.GLYPH_ID_FIELD);
+				((PrototypedTuple) t).getPrototype().contains(ParserConstants.SELECTOR_FIELD);
 	}
 		
 	public DisplayLayer getDisplayLayer() {return displayLayer;}

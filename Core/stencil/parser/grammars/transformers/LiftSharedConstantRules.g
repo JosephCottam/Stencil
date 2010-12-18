@@ -81,11 +81,11 @@ options {
 		return constants;
 	}
 
-	/**Is this the selector rule (e.g. it sets ID)?  The selector rule cannot be lifted.*/	
+	/**Is this a selector rule (e.g. it sets ID)?  Selector rules cannot be lifted.*/	
 	private boolean selectorRule(Rule candidate) {
 	    TuplePrototype prototype = (TuplePrototype) candidate.getGenericTarget().findChild(TUPLE_PROTOTYPE);
    		for (String name: TuplePrototypes.getNames(prototype)) {
-   			if (name.equals(ParserConstants.GLYPH_ID_FIELD)) {return true;}
+   			if (name.equals(ParserConstants.SELECTOR_FIELD) || name.equals(ParserConstants.SUB_SELECTOR_FIELD)) {return true;}
    		}
    		return false;
    	}
