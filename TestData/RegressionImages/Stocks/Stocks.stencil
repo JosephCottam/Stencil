@@ -2,37 +2,45 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /u/jcottam/scratch/Stencil/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
 SKIP: 1
-STRICT: TRUE
+STRICT: true
 
 stream Stocks(Date, Open)
+
+canvas Main
+  guide axis from Ticker XS
+  guide axis[sample:"linear"] from Ticker YS
 
 layer Ticker[POLY_LINE]				/*Poly-line is a set of line segments treated as a group.*/
 from Stocks
 	ID: "Google"
-	X.new: TimeStep(Date)           /*Indicates that a new segment of a poly-line is to be crated.*/
-	Y.new: Price(Open)         		/*All news in a block indicate the same extension until a new input is started.*/
+   IDX: "after"
+	XS: TimeStep(Date)           /*Indicates that a new segment of a poly-line is to be crated.*/
+	YS: Price(Open)         		/*All news in a block indicate the same extension until a new input is started.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
 
 layer Averages[POLY_LINE]
 from Stocks
 	ID: "Google_30"
-	X.new: TimeStep(Date)
-	Y.new: Price(Open) -> Mean[range: "-30..n"](Price)	    /*Average the most recent 30 values.*/
+   IDX: "after"
+	XS: TimeStep(Date)
+	YS: Price(Open) -> Mean[range: "-30..n"](Price)	    /*Average the most recent 30 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{LIME,150}
 from Stocks
 	ID: "Google_ALL"
-	X.new: TimeStep(Date)
-	Y.new: Price(Open) -> Mean[range: ALL](Price)		    /*Average all values.*/
+   IDX: "after"
+	XS: TimeStep(Date)
+	YS: Price(Open) -> Mean[range: ALL](Price)		    /*Average all values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{CRIMSON,150}
 from Stocks
 	ID: "Google_20"
-	X.new: TimeStep(Date)
-	Y.new: Price(Open) -> Mean[range: "-30 .. -10"](Price) /*Average that lags by 10 and includes 20 values.*/
+   IDX: "after"
+	XS: TimeStep(Date)
+	YS: Price(Open) -> Mean[range: "-30 .. -10"](Price) /*Average that lags by 10 and includes 20 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{ORANGE,150}
 	

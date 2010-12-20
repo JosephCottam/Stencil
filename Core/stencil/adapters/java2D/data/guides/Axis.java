@@ -91,7 +91,7 @@ public class Axis extends Guide2D {
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {
 		super(guideDef);
-		axis = AXIS.valueOf(guideDef.getSelector().getAttribute());
+		axis = AXIS.valueOf(guideDef.getSelector().getAttribute().substring(0,1));//Only the first character matters because of XS,YS, etc
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
 		GuideUtils.setValues(guideDef.getSpecializer(), this);
