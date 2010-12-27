@@ -93,7 +93,7 @@ options {
        Function newCall = (Function) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
        Object newArgs = adaptor.create(LIST, "arguments");
        for (Object arg: pack.getChildren()) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
-       adaptor.addChild(newCall, ParserConstants.EMPTY_SPECIALIZER);
+       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER));
        adaptor.addChild(newCall, newArgs);
        adaptor.addChild(newCall, adaptor.create(DIRECT_YIELD, frameName));
 

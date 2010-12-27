@@ -35,7 +35,7 @@ import stencil.module.util.OperatorData;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import static stencil.module.util.Utilities.noFunctions;
+import static stencil.module.operator.wrappers.Utilities.noFunctions;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

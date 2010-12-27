@@ -28,8 +28,6 @@
  */
 package stencil.module;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.*;
 
 import stencil.module.operator.StencilOperator;
@@ -189,32 +187,30 @@ public class ModuleCache {
 	 */
 	public static void registerModules(Properties props) {
 		for (String key: PropertyUtils.filter(props, MODULE_KEY)) {
-			String filename = props.getProperty(key);
+			String className = props.getProperty(key);
 			
 			Module m;
 			ModuleData md;
 			
 			
-			InputStream stream;
+			Class moduleClass;
 			try {
-				if (filename.startsWith("file://")) {
-					stream = new FileInputStream(filename.substring("file://".length()));
+				if (className.startsWith("file://")) {
+					moduleClass = ClassLoader.getSystemClassLoader().loadClass(className);
 				} else {
-					stream = ModuleCache.class.getResourceAsStream(filename);
+					moduleClass = Class.forName(className);
 				}
+				m = (Module) moduleClass.getConstructor().newInstance();
 			} catch (Exception e) {
-				throw new RuntimeException(String.format("Error accessing module resource " + filename), e);
+				throw new RuntimeException(String.format("Error accessing module class: " + className), e);
 			}
-
-			try {md = ModuleDataParser.load(stream);} 
-			catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", filename), e);}
+			
+			try {md = m.getModuleData();} 
+			catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", className), e);}
 			
 			if (!key.endsWith(md.getName())) {
 				throw new RuntimeException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), md.getName()));
 			}
-			
-			try {m = md.getModule();}
-			catch (Exception e) {throw new RuntimeException(String.format("Error instantiating module %1$s.", md.getName()), e);}
 			
 			register(m);
 		}
@@ -224,7 +220,6 @@ public class ModuleCache {
 			defaultModules = defaults.trim().split("\\s*,\\s*");
 		}
 	}
-
 	
 	/**Ensures that module is no longer known by the static module
 	 * cache.  Removes the module if needed, but throws

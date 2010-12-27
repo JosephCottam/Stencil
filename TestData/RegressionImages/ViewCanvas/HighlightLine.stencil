@@ -15,16 +15,17 @@ stream Stocks(Date, Open)
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
 canvas Main
-	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] from Markers X
+	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] from Markers XS
 		label.TEXT: Date.query(_) -> Print(Date)
-	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] from Markers Y
+	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] from Markers YS
 
 
 layer Markers[POLY_LINE]
 from Stocks
 	ID : "Google"
-	X.new : TimeStep(Date) -> Date(VALUE, VALUE, Date) -#> VALUE
-	Y.new : Add(Open, 0) -#> Price(sum) -> Price
+	IDX: "after"
+	XS : TimeStep(Date) -> Date(VALUE, VALUE, Date) -#> VALUE
+	YS : Add(Open, 0) -#> Price(sum) -> Price
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
 

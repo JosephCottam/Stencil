@@ -6,7 +6,7 @@ public final class Context {
           
      public Context(String target) {this.target = target;}
      
-     public int maxCount() {return maxArgCount;}
+     public int maxArgCount() {return maxArgCount;}
      public void update(int argCount) {
     	 maxArgCount = (int) Math.max(argCount, maxArgCount);
      }

@@ -38,33 +38,98 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Split;
 import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
-import stencil.parser.tree.*;
+import stencil.module.util.ann.*;
+import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
 /**
  * A module of misc utilities that I haven't figured out where they really belong yet.
  */
+@Module
 public class Temp extends BasicModule {
-
-
-	
 	
 	/**Perform a linear interpolation.*/
+	@Operator(spec="[range: ALL, split:0]")
 	public static final class LinearInterp extends AbstractOperator {
 		public LinearInterp(OperatorData opData) {super(opData);}
 		
-		public double map(double step, double steps, double min, double max) {
-			return query(step, steps, min, max);
-		}
-		
+		@Facet(memUse="FUNCTION", prototype="(double value)", alias={"map","query"})
 		public double query(double step, double steps, double min, double max) {
 			return ((step/steps) * (min-max)) + min; 
 		}
 	}
 	
 
+	/**Takes a range of values and creates a set of partitions of that range.
+	 * Will report what partition any value falls in.  This is done with modulus
+	 * if a value is outside the original range and with abs if outside in a negative manner.
+	 */
+	@Operator(spec="[range: ALL, split:0, n:10]")
+	public static final class Partition extends AbstractOperator.Statefull {
+		private static final String MIN = "min";
+		private static final String MAX = "max";
+		private static final String BUCKETS = "n";
+		
+		private final double buckets;
+		private final boolean autoMin;
+		private final boolean autoMax;
 
-	public static class Oscillate extends AbstractOperator {
+		private double min;
+		private double max;
+		
+		public Partition(OperatorData od, Specializer spec) {
+			super(od);
+
+			buckets = Converter.toDouble(spec.get(BUCKETS));
+
+			autoMin = !spec.containsKey(MAX);
+			autoMax = !spec.containsKey(MIN);
+			max = autoMax ? Converter.toDouble(spec.get(MAX)) : Double.MAX_VALUE;
+			min = autoMin ? Converter.toDouble(spec.get(MIN)) : Double.MAX_VALUE; 
+		}
+		private Partition(OperatorData od, double buckets, boolean autoMin, boolean autoMax, double min, double max) {
+			super(od);
+			this.buckets=buckets;
+			this.autoMax = autoMax;
+			this.autoMin = autoMin;
+			
+			if (!autoMax) {this.max = max;}
+			if (!autoMin) {this.min = min;}
+		}
+
+		private void updateSpan(double value) {
+			if (autoMax && value > max) {max = value; stateID++;}
+			if (autoMin && value < min) {min = value; stateID++;}
+		}
+		
+		@Facet(memUse="READER", prototype="(double start, double end, int bucket)")
+		public double[] query(double dv) {
+			double bucketSpan = (max-min)/buckets;
+			dv = dv-min;
+
+			double bucket = (buckets)/((max-min)/dv);
+			bucket = Math.abs(Math.floor(bucket));
+			bucket = bucket%buckets;
+
+			double start = bucket*bucketSpan;
+			double end = (bucket +1)*bucketSpan;
+			
+			return new double[]{start,end,bucket};
+		}
+		
+		@Facet(memUse="WRITER", prototype="(double start, double end, int bucket)")
+		public double[] map(double dv) {
+			updateSpan(dv);
+			return query(dv);
+		}
+		
+		public Partition duplicate() {
+			return new Partition(operatorData, buckets, autoMin, autoMax, min, max);
+		}
+	}
+
+	@Operator(spec="[range: ALL, split:0, style: \"CIRCLE\", states: 2]")
+	public static class Oscillate extends AbstractOperator.Statefull {
 		public static enum STYLE {CIRCLE, SINE, SINE2}
 		
 		public static final String STATES_KEY = "states";	//How many states should it oscillate through (may either be an int or a coma-separated list)
@@ -101,14 +166,15 @@ public class Temp extends BasicModule {
 		}
 			
 			
+		@Facet(memUse="READER", prototype="(value)")
 		public synchronized Object query() {
-			stateID--;
-			return map();
+			return states[idx];
 		}
 		
+		@Facet(memUse="WRITER", prototype="(value)")
 		public synchronized Object map(){
-			Object rv = states[idx];
 			stateID++;
+			Object rv = query();
 			
 			switch (style) {
 			case CIRCLE : idx = (idx+1)%states.length; break;
@@ -154,8 +220,6 @@ public class Temp extends BasicModule {
 		
 	}
 	
-	public Temp(ModuleData md) {super(md);}
-
 	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		try {
 			StencilOperator op = super.instance(name, specializer);

@@ -3,6 +3,7 @@ package stencil.modules.layouts;
 import java.awt.geom.Point2D;
 
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import stencil.util.collections.Tree;
@@ -10,6 +11,7 @@ import stencil.util.collections.Tree;
 
 //TODO: add a fit-to-specific-width option
 /**Based on the prefuse radial layout routines.*/
+@Operator(name="RadialLayout", spec="[range: ALL, split: 0, gap: 50, fallOff: 0, rule: \"simple\", X:0, Y: 0]")
 public class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	
@@ -199,9 +201,8 @@ public class RadialTree extends Layout{
     
     /**What is the point-representation of the allocation for the given node?
      * This returns the center-point of the allocation, on the radius line.
-     * 
-     * TODO: Make a point2D tuple and return a Point2D from here.
      * */
+    @Facet(memUse="READER", prototype="(X,Y)")
     public Point2D query(Object id) {
     	if (layoutStale) {layout();}
     	
@@ -214,6 +215,7 @@ public class RadialTree extends Layout{
     }
 
     /**Add a node and report where it was placed.*/
+    @Facet(memUse="WRITER", prototype="(X,Y)")
     public Point2D map(Object id, Object parentID) {
     	add(id, parentID);
     	return query(id);
@@ -225,6 +227,7 @@ public class RadialTree extends Layout{
      * @param parentID Identity of parent
      * @return         Did adding this node change anything?
      */
+    @Facet(memUse="WRITER", prototype="(boolean newRoot)")
     public boolean add(Object id, Object parentID) {
     	LayoutTree node = Tree.findNode(root, id);
     	LayoutTree parent = Tree.findNode(root, parentID);
@@ -263,6 +266,7 @@ public class RadialTree extends Layout{
     /**What is the slice-representation of the allocation for a given node?
      * This returns the radius line and the start/end angles (in radians).
      */
+    @Facet(memUse="READER", prototype="(r, t1, t2)")
     public double[] slice(Object id) {
     	if (layoutStale) {layout();}
     	

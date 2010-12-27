@@ -4,9 +4,11 @@ import java.util.Comparator;
 
 import edu.uci.ics.jung.graph.DelegateForest;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.Operator;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
+@Operator(spec="[range: ALL, split: 0, width: 500, height: 500, radius: 100, sort: \"SEQ\"]")
 public final class CircleLayout extends GraphOperator.SizedOperator {
 	private static final String RADIUS = "radius";
 	private static final String SORTER_KEY ="sort";

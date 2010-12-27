@@ -27,7 +27,7 @@ public class TestModuleCache extends StencilTestCase {
 		BufferedReader r = new BufferedReader(new FileReader(DEFAULT_PROPERTIES_FILE));
 		int expected=0;
 		while (r.ready()) {
-			if (r.readLine().contains(".yml")) {expected++;}
+			if (r.readLine().contains("key=\"module:")) {expected++;}
 		}
 		
 		assertFalse("Module cache empty when not expected.", 0==ModuleCache.registeredModules().size());

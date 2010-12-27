@@ -31,8 +31,6 @@ package stencil.unittests.module.operator;
 import stencil.adapters.java2D.Adapter;
 import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
-import stencil.module.util.ModuleData;
-import stencil.module.util.ModuleDataParser;
 import stencil.modules.Projection;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.OperatorProxy;
@@ -43,8 +41,7 @@ public class TestProjection extends StencilTestCase {
 	final Module project;
 	
 	public TestProjection() throws Exception {
-		ModuleData md = ModuleDataParser.load("./modules/stencil/modules/Projection.yml");
-		project = new Projection(md);
+		project = new Projection();
 	}
 
 	public void testCount() throws Exception {

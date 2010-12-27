@@ -32,8 +32,6 @@ import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
-import stencil.module.util.ModuleData;
-import stencil.module.util.ModuleDataParser;
 import stencil.modules.Numerics;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
@@ -43,8 +41,7 @@ public class TestNumerics extends StencilTestCase {
 	final Module numerics;
 	
 	public TestNumerics() throws Exception {
-		ModuleData MD = ModuleDataParser.load("./modules/stencil/modules/Numerics.yml");
-		numerics = new Numerics(MD);
+		numerics = new Numerics();
 	}
 
 	public void testLog() throws Exception {
@@ -60,7 +57,7 @@ public class TestNumerics extends StencilTestCase {
 		
 		assertEquals(InvokeableOperator.class, log10.getClass());
 		assertEquals(InvokeableOperator.class, logE.getClass());
-		assertEquals(stencil.modules.Numerics.Log.LogFixed.class, log2.getClass());
+		assertEquals(stencil.modules.Numerics.LogFixed.class, log2.getClass());
 		assertEquals(InvokeableOperator.class, logNone.getClass());
 		
 		testInvokes(log10, new Object[]{10, 100, 200, 5}, new Object[]{1.0d, 2.0d, 2.3010299956639813, 0.6989700043360189}); 

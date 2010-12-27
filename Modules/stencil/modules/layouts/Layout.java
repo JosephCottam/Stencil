@@ -7,7 +7,7 @@ import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
-public abstract class Layout extends AbstractOperator {
+public abstract class Layout extends AbstractOperator.Statefull {
 	protected static final String X = "X";
 	protected static final String Y = "Y";
 	

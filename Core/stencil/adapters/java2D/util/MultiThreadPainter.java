@@ -225,13 +225,13 @@ public final class MultiThreadPainter {
 				List<Future<BufferedImage>> results;
 				
 				for (PaintTask painter: painters) {painter.createBuffer(buffer, trans);}
-				synchronized(renderLock) {results =  renderPool.invokeAll(painters);}
+				synchronized(renderLock) {results = renderPool.invokeAll(painters);}
 				
 				//Composite images as the return
 				for (Future<BufferedImage> f: results) {
 					g.drawImage(f.get(), 0,0, null);						
 				}
-			} catch (Exception e) {throw new RuntimeException("Error in mulit-thread painting.", e);}
+			} catch (Exception e) {throw new RuntimeException("Error in multi-thread painting.", e);}
 
 			renderedSize = new Dimension(buffer.getWidth(), buffer.getHeight());
 			renderedViewTransform = trans;

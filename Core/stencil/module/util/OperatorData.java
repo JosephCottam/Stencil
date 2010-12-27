@@ -18,10 +18,11 @@ public final class OperatorData {
 	
 	public OperatorData() {}
 	
-	public OperatorData(String module, String name, Specializer specializer) {
+	public OperatorData(String module, String name, Specializer specializer, String target) {
 		this.module = module;
 		this.name = name;
 		this.spec = specializer;
+		this.target = target;
 	}
 	
 	public OperatorData(OperatorData source) {
@@ -38,10 +39,11 @@ public final class OperatorData {
 	public void setDefaultSpecializer(Specializer spec) {this.spec = spec;}
 	public Specializer getDefaultSpecializer() {return spec;}
 
+	//TODO: Change addFacet to taken an array of FacetData objects
 	public void addFacet(FacetData facet) {facets.put(facet.getName(), facet);}
 	public FacetData getFacet(String name) {
 		if (facets.containsKey(name)) {return facets.get(name);}
-		throw new IllegalArgumentException(String.format("Could not find find facet '%1$s' in operator %2$s.", name, this.name));
+		throw new IllegalArgumentException(String.format("Could not find facet '%1$s' in operator %2$s.", name, this.name));
 	}
 	
 	public boolean hasFacet(String name) {return getFacetNames().contains(name);}

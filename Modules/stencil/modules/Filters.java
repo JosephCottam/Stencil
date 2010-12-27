@@ -2,37 +2,33 @@ package stencil.modules;
 
 import java.util.regex.Pattern;
 
-import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
+@Module
+@Description("Module for doing boolean comparisons.  These are the operators used in the Filter operations.")
 public class Filters extends BasicModule {
 
-	public static final boolean gte(double n1, double n2) {return n1 >= n2;}
-	public static final boolean gteI(int n1, int n2) {return n1 >= n2;}
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean GTE(double n1, double n2) {return n1 >= n2;}
 
-	public static final boolean gt(double n1, double n2) {return n1 > n2;}
-	public static final boolean gtI(int n1, int n2) {return n1 > n2;}
-
-	public static final boolean lt(double n1, double n2) {return n1 < n2;}
-	public static final boolean ltI(int n1, int n2) {return n1 < n2;}
-
-	public static final boolean lteq(double n1, double n2) {return n1 <= n2;}
-	public static final boolean lteqI(int n1, int n2) {return n1 <= n2;}
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean GT(double n1, double n2) {return n1 > n2;}
 	
-	public static final boolean eqD(double n1, double n2) {return n1 == n2;}
-	public static final boolean eqI(int n1, int n2) {return n1 == n2;}
-	public static final boolean neqD(double n1, double n2) {return n1 != n2;}
-	public static final boolean neqI(int n1, int n2) {return n1 != n2;}
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean LT(double n1, double n2) {return n1 < n2;}
 
-	
-	public static final boolean eqs(Object lhs, Object rhs) {
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean LTE(double n1, double n2) {return n1 <= n2;}
+
+		
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean EQ(Object lhs, Object rhs) {
 		if (rhs == null || lhs == null) {return lhs == rhs;}
 		if (rhs instanceof Number || lhs instanceof Number) {
 			double l = Converter.toDouble(lhs).doubleValue();
@@ -42,50 +38,53 @@ public class Filters extends BasicModule {
 			return lhs.equals(rhs);
 		}
 	}
-	public static final boolean neqs(Object lhs, Object rhs) {return !eqs(lhs, rhs);}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+	public static final boolean NEQ(Object lhs, Object rhs) {return !EQ(lhs, rhs);}
 
 
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 	public static final boolean trivialTrue(Object... args) {return true;}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 	public static final boolean trivialFalse(Object... args) {return false;}
 		
+	
+	@Operator(name="NRE")
+	public static class NRegExp extends RegExp {
+		public NRegExp(OperatorData opData, Specializer specializer) {super(opData, specializer, true);}
+	}
+	
+	
+	@Operator(name="RE")
 	public static class RegExp extends AbstractOperator {
 		private static final String PATTERN_KEY = "pattern";
 		private final Pattern patternCache; 
 		private final boolean negated;
 
-		public RegExp(OperatorData opData, Specializer specializer, boolean negated) {
+		public RegExp(OperatorData opData, Specializer specializer) {
+			this(opData, specializer, false);
+		}
+		
+		protected RegExp(OperatorData opData, Specializer specializer, boolean negated) {
 			super(opData);
 			Atom pattern = specializer.get(PATTERN_KEY);
 			patternCache = (pattern == null || pattern.isNull()) ? null : Pattern.compile(pattern.getText());
 			this.negated = negated;
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean query(String value, String pattern) {			
 			Pattern matcher = patternCache != null ? patternCache : Pattern.compile(pattern);
 			return !negated == matcher.matcher(value).matches();
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="(boolean V)")
 		public boolean match(String value) {
 			assert patternCache != null;
 			return !negated == patternCache.matcher(value).matches();
 		}
 	}
-	
-	public Filters(ModuleData md) {super(md);}
-	
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperator(name);
-		
-		//TODO: Wrap negated into the specializer to eliminate this INSTANCE method...
-		if(name.equals("RE")) {
-			return new RegExp(operatorData, specializer, false);
-		} else if (name.equals("NRE")) {
-			return new RegExp(operatorData, specializer, true);
-		} else {
-			return super.instance(name, specializer);
-		}
-	}
 
-	
 	
 }

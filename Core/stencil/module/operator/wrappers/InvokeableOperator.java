@@ -19,25 +19,22 @@ import stencil.util.collections.KeysetConstantMap;
  * Duplicate is NOT supported if the method indicate is not a function.
  */
 public final class InvokeableOperator extends AbstractOperator {
-	private final String name;
 	private final Map<String, ReflectiveInvokeable> facets;
 	
 	/**All facets are directed towards the same target (a common case for functional operators).*/
-	public InvokeableOperator(String name, OperatorData opData, Invokeable target) {
-		this(name, opData, new KeysetConstantMap(opData.getFacetNames(), target));
+	public InvokeableOperator(OperatorData opData, Invokeable target) {
+		this(opData, new KeysetConstantMap(opData.getFacetNames(), target));
 	}
 
 	
-	public InvokeableOperator(String name, OperatorData opData, Map<String, ReflectiveInvokeable> facets) {
+	public InvokeableOperator(OperatorData opData, Map<String, ReflectiveInvokeable> facets) {
 		super(opData);
-		this.name= name;
 		this.facets = facets;
 		verify();
 	}
 	
-	public InvokeableOperator(String name, OperatorData opData, List<ReflectiveInvokeable> targets) {
+	public InvokeableOperator(OperatorData opData, List<ReflectiveInvokeable> targets) {
 		super(opData);
-		this.name = name;
 		this.facets = new HashMap();
 
 		List<String> facetNames = opData.getFacetNames();
@@ -67,7 +64,7 @@ public final class InvokeableOperator extends AbstractOperator {
 		}
 	}
 		
-	public String getName() {return name;}
+	public String getName() {return operatorData.getName();}
 	
 	//TODO: Would it be better to see if all facets were functions as a quick-check?
 	//TODO: implement a more general duplicate
@@ -82,7 +79,7 @@ public final class InvokeableOperator extends AbstractOperator {
 
 	public Invokeable getFacet(String facet) {
 		Invokeable result = facets.get(facet);
-		if (result == null) {throw new UnknownFacetException(name, facet, facets.keySet());}
+		if (result == null) {throw new UnknownFacetException(getName(), facet, facets.keySet());}
 		return result;
 	}
 

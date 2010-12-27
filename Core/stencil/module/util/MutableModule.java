@@ -15,7 +15,7 @@ public class MutableModule implements Module {
 
 	public MutableModule(String name) {
 		operators = new HashMap<String, StencilOperator>();
-		moduleData = new ModuleData(this, name);
+		moduleData = new ModuleData(name);
 	}
 
 	public ModuleData getModuleData() {return moduleData;}

@@ -5,8 +5,6 @@ import java.util.Arrays;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.unittests.StencilTestCase;
-import stencil.module.util.ModuleData;
-import stencil.module.util.ModuleDataParser;
 import stencil.modules.Temp;
 import static stencil.modules.Temp.Oscillate;
 
@@ -14,8 +12,7 @@ public class TestOscillate extends StencilTestCase {
 	Temp temp;
 
 	public void setUp() throws Exception {
-		ModuleData MD = ModuleDataParser.load("./modules/stencil/modules/Temp.yml");
-		temp = new Temp(MD);
+		temp = new Temp();
 	}
 	
 	public void testCycle() throws Exception {

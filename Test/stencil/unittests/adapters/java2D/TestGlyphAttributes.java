@@ -44,11 +44,11 @@ public class TestGlyphAttributes extends StencilTestCase {
 	}
 	
 	public void testPolyLine() throws Exception {
-		testAttributes(new Poly.PolyLine(null, "MyID"), "X", "Y", "Xn", "Yn");
+		testAttributes(new Poly.PolyLine(null, "MyID"), "X", "Y", "XS", "YS");
 	}
 	
 	public void testPoly() throws Exception {
-		testAttributes(new Poly.Polygon(null, "MyID"), "X", "Y", "Xn", "Yn");
+		testAttributes(new Poly.Polygon(null, "MyID"), "X", "Y", "XS", "YS");
 	}
 	
 	public void testPie() throws Exception {

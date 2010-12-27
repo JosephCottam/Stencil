@@ -132,63 +132,56 @@ operator Palet(Name) -> (C)
 	(Name =~"N/A")     => C: @Color{GRAY90}
 	(Name =~"GRID")    => C: @Color{GRAY80}
 
-python Break
-facet map (Orig) -> (Label)
+java Break
 {
-	Label=Orig.replace("Absoft: Absoft ", "")
-	Label=Label.replace("Absoft: ", "")
-	Label=Label.replace(",", "\n")
+   @Facet(memUse="FUNCTION", prototype="(Label)", alias={"map","query"})
+   public String query(String original) {
+      return original
+                .replace("Absoft: Absoft ", "")
+                .replace("Absoft: ", "")
+                .replace(",", "\n");
+   }
 }
 
-
-
-python Layout
-facet init {
-	XIndex= []
-	YIndex = []
-	majorOffset = 50
-	suites = ["ibm", "imb", "intel", "mpicxx"]
-	border = 10
-	minorOffset = 18
-
-	def queryLayout(X1,X2,Y1,Y2):
-		XBase = X1+X2
-		YBase = Y1+Y2
-		if (XBase not in XIndex): return (-375,300)
-		if (YBase not in YIndex): return (-375,300)
-		X = XIndex.index(XBase) * majorOffset
-		Y = YIndex.index(YBase) * majorOffset
-		return (X,Y)
-	
-	def baseLayout(X1, X2,Y1,Y2):
-		XBase = X1+X2
-		YBase = Y1+Y2
-		if (XBase not in XIndex): XIndex.append(XBase)
-		if (YBase not in YIndex): YIndex.append(YBase)
-		X = XIndex.index(XBase) * majorOffset
-		Y = YIndex.index(YBase) * majorOffset
-		return (X,Y)
-		
-	def suiteLayout(baseX, baseY, suite):
-		if (suite not in suites): suites.append(suite)
-		offset = suites.index(suite)
-		X = baseX + border + (offset%2 * minorOffset)
-		Y = baseY + border+ (offset/2 * minorOffset)
-		return (X,Y)
-	
-	def suiteLayout(baseX, baseY, suite):
-		if (suite not in suites): suites.append(suite)
-		offset = suites.index(suite)
-		X = baseX + border + (offset%2 * minorOffset)
-		Y = baseY + border+ (offset/2 * minorOffset)
-		return (X,Y)	
-}
-
-facet suite(X1,X2,Y1,Y2, suite) -> (X,Y)
+java Layout 
+{import java.util.*;}
 {
-	(X,Y) = baseLayout(X1,X2,Y1,Y2)
-	(X,Y) = suiteLayout(X,Y, suite)
-}
-facet map   (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = baseLayout(X1,X2,Y1,Y2)}
-facet query (X1,X2,Y1,Y2) -> (X,Y) {(X,Y) = queryLayout(X1,X2,Y1,Y2)}
+   static final List<String> suites = Arrays.asList("ibm", "imb", "intel", "mpicxx");
+   static final double majorOffset = 50;
+   static final int border = 10;
+   static final int minorOffset = 18;
+   static final List<String> XIndex = new ArrayList();
+   static final List<String> YIndex = new ArrayList();
+   
+   @Facet(memUse="WRITER", prototype="(double X, double Y)")
+   public double[] suite(String X1, String X2, String Y1, String Y2, String suite) {
+      double[] base = map(X1,X2,Y1,Y2);
+      if (suites.indexOf(suite) <0) {throw new IllegalArgumentException("Unknown suite: " + suite);}
+      int offset = suites.indexOf(suite);
+      double x = base[0] + border + (offset%2 * minorOffset);
+      double y = base[1] + border+ (offset/2 * minorOffset);
+      return new double[]{x,y};
+   }
+   
+   @Facet(memUse="WRITER", prototype="(double X, double Y)")
+   public double[] map(String X1, String X2, String Y1, String Y2) {
+        String XBase = X1+X2;
+        String YBase = Y1+Y2;
+        if (!XIndex.contains(XBase)) {XIndex.add(XBase);}
+        if (!YIndex.contains(YBase)) {YIndex.add(YBase);}
+        double X = XIndex.indexOf(XBase) * majorOffset;
+        double Y = YIndex.indexOf(YBase) * majorOffset;
+        return new double[]{X,Y};
+   }
 
+   @Facet(memUse="READER", prototype="(double X, double Y)")
+   public double[] query(String X1, String X2, String Y1, String Y2) {
+        String XBase = X1+X2;
+        String YBase = Y1+Y2;
+        if (!XIndex.contains(XBase)) {return new double[]{-375,300};}
+        if (!YIndex.contains(YBase)) {return new double[]{-375,300};}
+        double X = XIndex.indexOf(XBase) * majorOffset;
+        double Y = YIndex.indexOf(YBase) * majorOffset;
+        return new double[]{X,Y};
+   }
+}

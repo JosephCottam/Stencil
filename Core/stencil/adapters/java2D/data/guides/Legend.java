@@ -54,8 +54,8 @@ public class Legend extends Guide2D {
 	
 	protected Rectangle2D bounds = new Rectangle2D.Double();
 	
-	public Double X;
-	public Double Y;
+	public double X=0d;
+	public double Y=0d;
 	
 	private boolean autoPlace = true;
 	

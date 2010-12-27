@@ -33,8 +33,6 @@ import static stencil.parser.ParserConstants.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.List;
 
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
@@ -119,7 +117,7 @@ public final class Modules {
 			}
 			catch (Exception e) {
 				//Try #2: Remove specializer (if provided)
-				if (args[0] instanceof Specializer) {
+				if (args.length >0 && args[0] instanceof Specializer) {
 					try {
 						Object[] fullArgs = new Object[args.length];
 						System.arraycopy(args, 1, fullArgs, 1, args.length-1);
@@ -138,7 +136,7 @@ public final class Modules {
 
 			if (target.equals(m.getName().toUpperCase())) {
 				Invokeable inv = new ReflectiveInvokeable(m);
-				return new InvokeableOperator(name, operatorData, inv);
+				return new InvokeableOperator(operatorData, inv);
 			}
 		}
 	
@@ -175,11 +173,7 @@ public final class Modules {
 	 * @return
 	 */
 	public static OperatorData basicOperatorData(String module, String name, String...fields) {
-		return basicOperatorData(module, name, Arrays.asList(fields));
-	}
-	
-	public static OperatorData basicOperatorData(String module, String name, List<String> fields) {
-		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER);
+		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER, null);
 		od.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, fields));
 		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
 		return od;

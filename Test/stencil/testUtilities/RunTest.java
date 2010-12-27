@@ -5,7 +5,7 @@ import org.junit.runner.JUnitCore;
 public class RunTest {
 	
 	public static void main(String[] args) {
-		JUnitCore.main("stencil.unittests.parser.tree.TestValue");
+		JUnitCore.main("stencil.unittests.module.TestMetadataDefs");
 	}
 
 }

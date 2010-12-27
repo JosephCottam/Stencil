@@ -43,8 +43,9 @@ public class Program extends StencilTree {
 	private static final int STREAM_DEFS = 5;
 	private static final int LAYERS = 6;
 	private static final int OPERATORS = 7;
-	private static final int PYTHONS = 8;
+	private static final int JAVAS = 8;
 	private static final int TEMPLATES = 9;
+
 		
 	public Program(Token source) {super(source);}
 
@@ -110,9 +111,9 @@ public class Program extends StencilTree {
 		return (List<OperatorProxy>) getChild(OPERATORS);
 	}
 	
-	public List<Python> getPythons() {
-		assert verifyType(getChild(PYTHONS), StencilParser.LIST);
-		return (List<Python>) getChild(PYTHONS);
+	public List<Java> getJavas() {
+		assert verifyType(getChild(JAVAS), StencilParser.LIST);
+		return (List<Java>) getChild(JAVAS);
 	}
 	
 	public List<OperatorTemplate> getOperatorTemplates() {

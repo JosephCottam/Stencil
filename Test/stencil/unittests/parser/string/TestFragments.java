@@ -58,7 +58,6 @@ public class TestFragments extends TestCase {
 		//Do module imports
 		ModuleCache modules = Imports.apply(p);
 		
-		PreparsePython.apply(p);				//Verify that Python operators are syntactically correct and appropriately indented
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = LastToAll.apply(p);					//Remove all uses of the LAST tuple reference
@@ -75,7 +74,7 @@ public class TestFragments extends TestCase {
 		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
 		Module m = modules.getAdHoc();
-		int expected = p.getOperators().size() + p.getPythons().size() + p.getLayers().size();
+		int expected = p.getOperators().size() + p.getJavas().size() + p.getLayers().size();
 		assertEquals("Ad-hoc operators size incorrect.", expected, m.getModuleData().getOperators().size());
 	}
 	

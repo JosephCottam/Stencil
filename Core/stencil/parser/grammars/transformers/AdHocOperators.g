@@ -9,14 +9,13 @@ options {
 }
 
 @header {
-/** Ensures that stencil native and python operators are defined in the ad-hoc module.  
+/** Ensures that stencil native and java operators are defined in the ad-hoc module.  
  **/
 
   package stencil.parser.string;
 
   import stencil.adapters.Adapter;
   import stencil.display.DisplayLayer;
-  import stencil.module.operator.wrappers.EncapsulationGenerator;
   import stencil.module.operator.*;
   import stencil.module.*;
   import stencil.module.util.*;    
@@ -39,7 +38,6 @@ options {
 	protected MutableModule adHoc;
 	protected Adapter adapter;
 	protected ModuleCache modules;
-	protected final EncapsulationGenerator encGenerator = new EncapsulationGenerator();
 	
 	public Object downup(Object p) {	
 	   downup(p, this, "simple");
@@ -52,10 +50,6 @@ options {
 	protected void makeOperator(Operator op) {
 		StencilOperator operator = new SyntheticOperator(adHoc.getModuleData().getName(), op);		
 		adHoc.addOperator(operator);
-	}
-	
-	protected void makePython(Python p) {
-		encGenerator.generate(p, adHoc);
 	}
 	
 	protected void makeLayer(Layer l) {
@@ -118,13 +112,15 @@ options {
       return op;  
   }
   
-	 
+	private void makeJava(Java java) {
+	    adHoc.addOperator(java.name(), java.operator(), java.operatorData());
+	}
 }
  
 simple
 	: ^(r=OPERATOR .*) {makeOperator((Operator) $r);}
-	| ^(r=PYTHON .*) {makePython((Python) $r);}
 	| ^(r=LAYER .*) {makeLayer((Layer) $r);}
+	| ^(r=JAVA .*) {makeJava((Java) $r);}
   ;
   
 proxies

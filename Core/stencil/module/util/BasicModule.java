@@ -3,6 +3,7 @@ package stencil.module.util;
 import stencil.module.Module;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
+import stencil.module.util.ModuleDataParser.MetaDataParseException;
 import stencil.parser.tree.Specializer;
 
 /**Basic implementation for modules where meta-data is determined largely
@@ -28,7 +29,16 @@ public abstract class BasicModule implements Module {
 	
 	protected ModuleData moduleData;
 
-	protected BasicModule(ModuleData md) {this.moduleData = md;}
+	protected BasicModule() throws MetaDataParseException {this.moduleData = loadOperatorData();}
+	
+	/**Actually load the operator data into the module.
+	 * This method is called by the constructor and should be over-ridden 
+	 * if the default loading mechanism (scanning the module for operator definitions) should not be used.
+	 * @throws MetaDataParseException 
+	 */
+	protected ModuleData loadOperatorData() throws MetaDataParseException {
+		return ModuleDataParser.moduleData(this.getClass());
+	}
 	
 	public ModuleData getModuleData() {return moduleData;}
 

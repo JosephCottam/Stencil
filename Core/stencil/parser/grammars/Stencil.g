@@ -34,7 +34,6 @@ tokens {
   PREDICATE;
   PROGRAM;
   PACK;
-  PYTHON_FACET;
   RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
   RULE;
   SIGIL_ARGS;
@@ -67,7 +66,7 @@ tokens {
   OPERATOR= 'operator';
   ORDER = 'order';
   PREFILTER = 'prefilter'; //Target to indicate actions that occure before filters
-  PYTHON  = 'python';
+  JAVA  = 'java';
   TEMPLATE= 'template';
   STREAM  = 'stream';
   VIEW  = 'view';
@@ -155,7 +154,7 @@ tokens {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
 }
 
-program : imports* (globalValue | externalStream)* order canvasLayer (elementDef | layerDef | operatorDef | operatorTemplate | streamDef | pythonDef)*
+program : imports* (globalValue | externalStream)* order canvasLayer (elementDef | layerDef | operatorDef | operatorTemplate | streamDef | javaDef)*
     -> ^(PROGRAM  
           ^(LIST["Imports"] imports*) 
           ^(LIST["Global Values"] globalValue*)
@@ -165,7 +164,7 @@ program : imports* (globalValue | externalStream)* order canvasLayer (elementDef
           ^(LIST["Streams"] streamDef*) 
           ^(LIST["Layers"] layerDef* elementDef*) 
           ^(LIST["Operators"] operatorDef* operatorTemplate*) 
-          ^(LIST["Pythons"] pythonDef*));
+          ^(LIST["Javas"] javaDef*));
 
 
 
@@ -314,26 +313,11 @@ target[String def]
     -> {def.equals("result")}? ^(RESULT tuple)
     -> ^(DEFAULT tuple); //TODO: Can this case be removed???
 
-//////////////////////////////////////////// PYTHON ///////////////////////////
+//////////////////////////////////////////// JAVA ///////////////////////////
 
-pythonDef
-  : (PYTHON ARG) => PYTHON ARG env=ID CLOSE_ARG name=ID pythonBlock+
-    -> ^(PYTHON[$name.text] ID ^(LIST pythonBlock+))
-  | PYTHON name=ID pythonBlock+
-    -> ^(PYTHON[$name.text] ID[buryID($name.text)] ^(LIST pythonBlock+));
-  
-pythonBlock
-	: FACET 'init' ISLAND_BLOCK
-		-> ^(PYTHON_FACET["init"] ^(YIELDS TUPLE_PROTOTYPE TUPLE_PROTOTYPE) ^(LIST["Annotations"] ^(ANNOTATION["Type"] STRING["NA"])) ISLAND_BLOCK)
-	| annotations FACET name=ID tuple[true] YIELDS tuple[false] ISLAND_BLOCK
-		-> ^(PYTHON_FACET[name] ^(YIELDS tuple tuple) annotations ISLAND_BLOCK);
-
-annotations
-  : annotation+ -> ^(LIST["Annotations"] annotation+)
-  | -> ^(LIST["Annotations"] ^(MAP_ENTRY["TYPE"] STRING["CATEGORIZE"]));
-
-//Upper case and remove tag-character
-annotation: t=TAGGED_ID GROUP atom CLOSE_GROUP -> ^(MAP_ENTRY[$t.text.toUpperCase().substring(1)] atom); 
+javaDef 
+  : JAVA ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$ID.text] $i $b)
+  | JAVA ID b=ISLAND_BLOCK -> ^(JAVA[$ID.text] ISLAND_BLOCK["{}"] $b);
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 predicate
@@ -361,7 +345,7 @@ private mapEntry
   : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v)
   | k=ID DEFINE r=ID   -> ^(MAP_ENTRY[$k.text] $r);
 
-tuple[boolean allowEmpty] //TODO: Add optionally permitted types
+tuple[boolean allowEmpty]
   : emptySet {allowEmpty}?
     -> ^(TUPLE_PROTOTYPE)
   | ID

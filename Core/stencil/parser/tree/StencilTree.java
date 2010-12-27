@@ -54,7 +54,7 @@ public class StencilTree extends CommonTree {
 	
 	
 	/**Find child of this given type.  
-	 * This is a proxy for getfirstchildWithType, provided for symetry with other findChild variants.
+	 * This is a proxy for getfirstchildWithType, provided for symmetry with other findChild variants.
 	 **/
 	public StencilTree findChild(int type) {return (StencilTree) this.getFirstChildWithType(type);}
 	

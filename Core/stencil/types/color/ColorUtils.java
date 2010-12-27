@@ -33,9 +33,12 @@ import stencil.tuple.instances.PrototypedTuple;
 import stencil.types.Converter;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 
+//TODO: Reword due to ColorTuple (no more 'get' operators required)
+@Description("Create and modify colors.")
+@Module
 public final class ColorUtils extends BasicModule {
 	private enum DIR {up, down, full, none}
 
@@ -78,36 +81,63 @@ public final class ColorUtils extends BasicModule {
 		return mod(source, comp, value, name);
 	}
 
+	
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple darker(Object o) {return PrototypedTuple.singleton(validate(o).darker());}
+
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple brighter(Object o) {return PrototypedTuple.singleton(validate(o).brighter());}
 	
-	public static Tuple getBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
-	public static Tuple getIntBlue(Object v) {return PrototypedTuple.singleton(validate(v).getBlue());}
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(int blue)", alias={"map","query"})
+	public static int getBlue(Object v) {return validate(v).getBlue();}
+
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setBlue(Object v, Object o) {return mod(o, ColorTuple.BLUE, v, "SetBlue");}
 
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(int red)", alias={"map","query"})
 	public static Tuple getRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
-	public static Tuple getIntRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
+	
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setRed(Object v, Object o) {return mod(o, ColorTuple.RED, v, "SetRed");}
 
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(int green)", alias={"map","query"})
 	public static Tuple getGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
-	public static Tuple getIntGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
+
+
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setGreen(Object v, Object o) {return mod(o, ColorTuple.GREEN, v, "setGreen");}
 
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(int alpha)", alias={"map","query"})
 	public static Tuple getAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
-	public static Tuple getIntAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
+	
+
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setAlpha(Object v, Object o) {return mod(o, ColorTuple.ALPHA, v, "setAlpha");}
+	
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple opaque(Object o) {return mod(o, ColorTuple.ALPHA, DIR.full, "Opque");}
 
+	@Operator(spec="[range: ALL, split:0]")
 	public static class Color extends AbstractOperator {
 		public Color(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="FUNCTION", prototype="(Color color)")
 		public Tuple argumentParser(String arg) {
 			return ColorCache.get(arg);
 		}
-		public Tuple query(String arg) {
-			return ColorCache.get(arg);
-		}
 
+		@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
+		public Tuple query(String arg) {return ColorCache.get(arg);}
 	}
-	
-	public ColorUtils(ModuleData md) {super(md);}
 }

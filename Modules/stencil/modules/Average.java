@@ -38,8 +38,9 @@ import stencil.module.operator.util.Split;
 import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
+import stencil.module.util.ModuleDataParser;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 
 import static stencil.parser.tree.Specializer.RANGE;
@@ -47,27 +48,28 @@ import static stencil.parser.tree.Specializer.SPLIT;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
+
+@Module
+@Description("Module for handling the average, in various manners.")
 public class Average extends BasicModule {
+
 	/**Facet name for use in ranged operations using Stencils range helpers.*/
 	private static final String RANGE_FACET ="range";
-
-	public static final String MODULE_NAME = "Average";
 	
-
-
 	/**Returns a mean over a range.
 	 * An empty range is considered to have a mean of 0.
 	 * Can be used with zero-length range (n..n) to indicate 'mean of current arguments'
-	 * */
+	 **/
+	@Suppress @Operator(name="Mean", spec="[]")
 	public static class RangeMean extends AbstractOperator {
-		protected RangeMean(OperatorData opData) {super(opData);}
+		protected RangeMean() {super(ModuleDataParser.operatorData(RangeMean.class, Average.class.getSimpleName()));}
 
-		private static final String NAME = "Mean";
-		
+		@Facet(memUse="FUNCTION", prototype="(double avg)")
 		public double range(Object... args) {
 			return map((double[]) RangeHelper.flatten(args, double.class));
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="(double avg)")
 		public double map(double... args) {
 			double mean=0;
 
@@ -78,11 +80,9 @@ public class Average extends BasicModule {
 			}
 			return mean;
 		}
-		public String getName() {return NAME;}
-		public double query(double... args) {return map(args);}
-		public double invoke(double... args) {return map(args);}
 		
-		public RangeMean duplicate() {return new RangeMean(operatorData);}
+		@Facet(memUse="FUNCTION", prototype="(double avg)")
+		public double query(double... args) {return map(args);}
 	}
 
 	/**Keeps a mean over a range from a fixed start point until the current point
@@ -92,8 +92,8 @@ public class Average extends BasicModule {
 	 * TODO: Implement the 'calculate but do not render' message to handle case where minimum range has not bee reached
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
-	public static class FullMean extends AbstractOperator {
-		private static final String NAME = "Mean";
+	@Suppress @Operator(name="Mean", spec="[range: ALL, split:0]")
+	public static class FullMean extends AbstractOperator.Statefull {
 		int start;
 		double total =0;
 		long count=0;
@@ -113,26 +113,29 @@ public class Average extends BasicModule {
 			this.start = start;
 		}
 
-
+		@Facet(memUse="WRITER", prototype="(double avg)")
 		public double map(double... values) {
 			if (start >0) {start--;}
 			if (start >0) {return 0;}
 
-			Double sum=0d;
+			double sum=0;
 			for (int i=0;i < values.length; i++) {sum += values[i];}
 
 			count += values.length;
 			total += sum;
+			stateID++;
 			return total/count;
 		}
 		
-		public String getName() {return NAME;}
-
-		public double query(Object... args) {
-			if (args.length >0) {throw new IllegalArgumentException("Cannot invoke fixd-start-range mean in query context with arguments.");}
-			double value =0;
-			if (count > 0) {value = total/count;}
-			return value;
+		@Facet(memUse="READER", prototype="(double avg)")
+		public double query(double... args) {
+//			if (args.length ==0) {
+				return count==0 ? 0 : total/count;
+//			} else {
+//				double sum=0;
+//				for (int i=0;i < args.length; i++) {sum += args[i];}
+//				return (total+sum)/(count+args.length);
+//			}
 		}
 		
 		public FullMean duplicate() {return new FullMean(operatorData, start);}
@@ -140,20 +143,25 @@ public class Average extends BasicModule {
 
 
 	/**Takes a mean over exactly what is passed, keeps no memory*/
+	@Operator(name = "Mean", spec="[range: \"n..n\", split:0]")
 	public static class SimpleMean extends AbstractOperator {
-		public SimpleMean(OperatorData opData) {super(opData);}
+		public static final String NAME = "Mean";
+		
+		public SimpleMean(OperatorData opData) {super(opData);}		
+		
+		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 		public double query(double...values) {
 			double sum =0;
 			for (double value: values) {sum += value;}
 			return sum/values.length;
 		}
-		
-		public double map(double... values) {return query(values);}
-		public SimpleMean duplicate() {return this;}
 	}
 	
+	@Suppress @Operator(name = "Mode", spec="[range: \"n..n\", split:0]")
 	public static class SimpleMode extends AbstractOperator {
 		public SimpleMode(OperatorData opData) {super(opData);}
+		
+		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 		public Object query(Object... values) {
 			HashMap<Object, Integer> m = new HashMap();
 			for (Object value: values) {
@@ -172,14 +180,13 @@ public class Average extends BasicModule {
 			
 			return result; 
 		}
-		
-		public Object map(Object... values) {return query(values);}
-		public SimpleMode duplicate() {return this;}
 	}
 	
-	
+	@Suppress @Operator(name = "Median", spec="[range: \"n..n\", split:0]")
 	public static class SimpleMedian extends AbstractOperator {
 		public SimpleMedian(OperatorData opData) {super(opData);}
+		
+		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 		public Object query(Object... values) {
 			java.util.Arrays.sort(values);
 			int idx = (int) Math.floor(values.length/2);
@@ -192,26 +199,22 @@ public class Average extends BasicModule {
 			
 			return values[idx];
 		}
-		
-		public Object map(Object... values) {return query(values);}
-		public SimpleMedian duplicate() {return this;}
 	}
 	
 	/**Returns the median value of a range.  The median is defined
 	 * as either the middle-most value (when there are an odd number of elements
-	 * in the range) or he mean of the two middle-most values.  Median is computed
+	 * in the range) or the mean of the two middle-most values.  Median is computed
 	 * the same for full range as sub-range.
 	 */
+	@Operator(spec="[range: ALL, split:0]")
 	public static class Median extends AbstractOperator {
 		private static final String NAME = "Median";
 
 		protected Median(OperatorData opData) {super(opData);}
 		
-		public double range(Object... args) {
-			return map((double[]) RangeHelper.flatten(args, double.class));
-		}
-		
-		public double map(double... args) {
+		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
+		public double query(double... args) {
+			args = (double[]) RangeHelper.flatten(args, double.class);
 			if (args.length == 0) {throw new RuntimeException("Cannot compute median on empty list");}
 
 			java.util.Arrays.sort(args);
@@ -222,26 +225,21 @@ public class Average extends BasicModule {
 			}
 			return args[idx];
 		}
-		public String getName() {return NAME;}
-
-		public double query(double... args) {return map(args);}
-				
-		public Median duplicate() {return new Median(operatorData);}
 	}
 
 	/**Returns the mode value of  range.  The Mode is the most commonly
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
+	@Operator(spec="[range: ALL, split:0]")
 	public static class Mode extends AbstractOperator {
 		private static final String NAME = "Mode";
 
 		public Mode(OperatorData opData) {super(opData);}
 		
-		public double range(Object... args) {
-			return map((Double[]) RangeHelper.flatten(args, Double.class));
-		}
-		public double map(Double... args) {
+		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
+		public double query(Double... args) {
+			args = (Double[]) RangeHelper.flatten(args, Double.class);
 			HashMap<Double, Integer> counts = new HashMap<Double, Integer>();
 
 			//count values into a hash
@@ -265,15 +263,8 @@ public class Average extends BasicModule {
 			//return max value as a tuple
 			return value;
 		}
-		public String getName() {return NAME;}
-
-		public double query(Double... args) {return map(args);}
-		public Mode duplicate() {return new Mode(operatorData);}
 	}
 
-	
-	public Average(ModuleData md) {super(md);}
-	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 		specializer.isBasic();
@@ -290,13 +281,13 @@ public class Average extends BasicModule {
 		
 		try {
 			OperatorData opData = this.getOperatorData(name, specializer);
-			if (name.equals("Average") || name.equals("Mean")) {
-				if (range.isFullRange()) {
-					target =  new FullMean(opData, specializer);
+			if (name.equals(SimpleMean.NAME)) {
+				if (range.isFullRange()) {					
+					target =  new FullMean(ModuleDataParser.operatorData(FullMean.class, "Average"), specializer);
 				} else if (range.isSimple()) {
 					target = new SimpleMean(opData);
 				} else {
-					target = RangeHelper.makeOperator(range, new RangeMean(opData), RANGE_FACET);
+					target = RangeHelper.makeOperator(range, new RangeMean(), RANGE_FACET);
 				}
 			} else if (name.equals(Median.NAME)) {
 				if (range.isSimple()) {target = new SimpleMedian(opData);}

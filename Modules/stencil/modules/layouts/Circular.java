@@ -3,6 +3,7 @@ package stencil.modules.layouts;
 import java.awt.geom.Point2D;
 
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
@@ -18,6 +19,7 @@ import stencil.types.Converter;
  * @author jcottam
  *
  */
+@Operator(name="CircularLayout", spec="[range: ALL, split: 0, pad: 1, start: 0, r: -1, count: -1, size: 10, ratio: 1, X: 0, Y: 0]")
 public class Circular extends Layout {
 	public static final String NAME = "CircularLayout";
 	
@@ -44,6 +46,7 @@ public class Circular extends Layout {
 		elementCount = Converter.toInteger(spec.get(ELEMENT_COUNT));
 	}
 	
+	@Facet(memUse="WRITER", prototype="(angle, count, pad, r, ratio)")
 	public Tuple configure(Double angle, Integer count, Double pad, Double radius, Double ratio, Double cx, Double cy) {
 		this.startAngle   = angle != null  ? angle  : startAngle;
 		this.radius       = radius != null ? radius : this.radius;
@@ -56,6 +59,7 @@ public class Circular extends Layout {
 		return new ArrayTuple(startAngle, elementCount, pad, radius, ratio, origin);
 	}
 	
+	@Facet(memUse="READER", prototype="(X,Y)")
 	public Point2D query(final int idx) {
 		int index = idx +1;
 
@@ -77,6 +81,7 @@ public class Circular extends Layout {
 		return new Point2D.Double(x,y);
 	}
 	
+	@Facet(memUse="WRITER", prototype="(X,Y)")
 	public Point2D map(int idx) {
 		int max = Math.max(elementCount, idx);
 		

@@ -5,15 +5,26 @@ import java.util.Arrays;
 
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.types.Converter;
 
+@Description("Create and modify fonts (a font is family+size+style).")
+@Module
 public final class FontUtils extends BasicModule {
+	@Operator @Facet(memUse="FUNCTION", prototype="(Font font)")
 	public static final java.awt.Font Bold(java.awt.Font f) {return f.deriveFont(java.awt.Font.BOLD);}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(Font font)")
 	public static final java.awt.Font Italic(java.awt.Font f) {return f.deriveFont(java.awt.Font.ITALIC);}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(Font font)")
 	public static final java.awt.Font Family(java.awt.Font f, String family) {return new java.awt.Font(family, f.getStyle(), f.getSize()).deriveFont(f.getSize2D());}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(Font font)")
 	public static final java.awt.Font Plain(java.awt.Font f) {return f.deriveFont(java.awt.Font.PLAIN);}
+
+	@Operator @Facet(memUse="FUNCTION", prototype="(Font font)")	
 	public static final java.awt.Font Size(java.awt.Font f, double size) {return f.deriveFont((float) size);}
 	 
 	
@@ -27,9 +38,11 @@ public final class FontUtils extends BasicModule {
 	 * @author jcottam
 	 *
 	 */
+	@Operator
 	public static class Font extends AbstractOperator {
 		public Font(OperatorData opData) {super(opData);}
 		
+	    @Facet(memUse="FUNCTION", prototype="(Font font)", alias={"map","query","argumentParser"})
 		public FontTuple query(String arg) {return toTuple(arg);}
 		public static FontTuple toTuple(String arg) {
 			final ArrayList<String> parts = new ArrayList(Arrays.asList(arg.trim().toLowerCase().split(",\\s+")));
@@ -52,6 +65,4 @@ public final class FontUtils extends BasicModule {
 			return new FontTuple(family, size, bold, italic);
 		}
 	}
-	
-	public FontUtils(ModuleData md) {super(md);}
 }

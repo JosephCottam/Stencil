@@ -7,6 +7,7 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.FacetData.MemoryUse;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -14,42 +15,39 @@ import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 
 
+@Description("Utilities to manipulate the tuple data representation; tuples so manipulated can generally only be de-referenced numerically.")
+@Module
 public class TupleUtil extends BasicModule {
 	/**How many elements does the given tuple have?
 	 * This does a single-level descent into all tuples passed
 	 * as arguments. If no tuple is passed, the result is 
 	 * equal to the number of arguments.
 	 * */
-	public static final class Size extends AbstractOperator {
-		protected Size(OperatorData opData) {super(opData);}
-		public int query(Tuple t) {return t.size();}
-		public Size duplicate() {return this;}
-	}
+    @Description("How many fields in this tuple?")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="(Size)", alias={"map", "query"})
+	public static final int Size(Tuple t) {return t.size();}
 	
 	
-	/**Takes a tuple and returns a new tuple where every element
-	 * of the original tuple is now a tuple in the new tuple.
-	 */
-	public static final class EnfoldValues extends AbstractOperator {
-		protected EnfoldValues(OperatorData opData) {super(opData);}
-		public Tuple[] query(Tuple t) {
-			Tuple[] ts = new Tuple[t.size()];
-			for (int i=0; i< t.size(); i++) {
-				ts[i] = Converter.toTuple(t.get(i));
-			}
-			return ts;
+    @Description("Tuple -> Tuple where the original tuple values are wrapped in tuples.")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="()", alias={"map", "query"})
+	public static final Tuple[] EnfoldValues(Tuple t) {
+		Tuple[] ts = new Tuple[t.size()];
+		for (int i=0; i< t.size(); i++) {
+			ts[i] = Converter.toTuple(t.get(i));
 		}
-		public EnfoldValues duplicate() {return this;}
+		return ts;
 	}
-	
+
 	/**Take a tuple of tuples.  Retrieve the n-th field from
 	 * each of those tuples to form a new tuple.
 	 * 
 	 * TODO: Investigate using map and get instead of Select
-	 * 
-	 * @author jcottam
-	 *
+	 * TODO: Convert to just a simple operator (no memory) when conversions are cheaper
 	 */
+    @Description("Given a tuple of tuples, takes the n-th field from each sub-tuple.")
+    @Operator()
 	public static final class Select extends AbstractOperator {
 		private final int field;
 		
@@ -58,6 +56,7 @@ public class TupleUtil extends BasicModule {
 			field = Converter.toInteger(spec.get("field"));
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 		public Object[] query(Tuple t) {
 			Object[] values = new Object[t.size()];
 			for (int i=0; i< t.size() ;i++) {
@@ -73,6 +72,8 @@ public class TupleUtil extends BasicModule {
 	/**Rename the components of a tuple with new names; 
 	 * like an echo but with variable names updated in the prototype.
 	 */
+    @Description("Construct a tuple with a prototype from the names (passed in the specializer under the `names' key) and the values (passed as arguments).")
+    @Operator
 	public static final class Rename extends AbstractOperator {
 		private static String NAMES = "names";
 
@@ -88,15 +89,13 @@ public class TupleUtil extends BasicModule {
 			this.keys = keys;
 		}
 
-		
-		public Tuple map(Object... values) {return query(values);}
+
+		@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 		public Tuple query(Object... values) {
 			assert keys.length == values.length : "Keys and values lengths do not match.";
 			
 			return new ArrayTuple(values);
 		}
-		
-		public Rename duplicate() {return new Rename(operatorData, keys);}
 		
 		private static String[] getNames(Specializer spec) {
 			return spec.get(NAMES).getText().split("\\s+,\\s+");
@@ -120,9 +119,12 @@ public class TupleUtil extends BasicModule {
 	/**Takes a tuple and extends it by the passed values.
 	 * Resulting tuple can only safely be numerically dereferenced.
 	 * */
+    @Description("Tuple X [value] -> New tuple extended by value list")
+    @Operator
 	public static final class ExtendTuple extends AbstractOperator {
 		public ExtendTuple(OperatorData opData) {super(opData);}
 		
+		@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 		public Tuple query(Tuple t, Object... more) {
 			if (t == null) {t = Tuples.EMPTY_TUPLE;}
 			Object[] values = Tuples.toArray(t);
@@ -135,22 +137,25 @@ public class TupleUtil extends BasicModule {
 		}
 	}
 	
-	public static final class Get extends AbstractOperator {
-		public Get(OperatorData opData) {super(opData);}
-		public Tuple query(Tuple t, int i) {return Converter.toTuple(t.get(i));}
-	}
-	
-	/**TODO: Move this to a general converter module.*/
-	public static final Tuple toTuple(Object o) {return Converter.toTuple(o);}
-	
+    @Description("Tuple X int -> Value at position indicated by the int")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="(value)", alias={"map","query"})
+	public static final Tuple get(Tuple t, int i) {return Converter.toTuple(t.get(i));}
+		
 	/**Takes a tuple, returns a singleton tuple whose value is an array of the original tuples values.
 	 * TODO: Move this to a general converter module.
 	 * */
+    @Description("Convert a tuple to a singleton tuple containing an array of the original values")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="(value)", alias={"map","query"})
 	public static final Tuple toArray(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
 
 
 	/**Given a tuple, select part of that tuple.
 	 * If end <0, it will select the remainder of the tuple.*/
+    @Description("Get a contiguous subset of the passed tuple (includes first index, does not include second; -1 as second index indicates all remaining values).")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	public static final Tuple subset(Tuple t, int start, int end) {
 		Object[] values = Tuples.toArray(t);
 		if (end <0) {end = values.length;}
@@ -161,8 +166,11 @@ public class TupleUtil extends BasicModule {
 	
 	/**Filters the passed tuple according to the regular expression passed as a pattern.
 	 * Only elements whose toString matches the pattern will be part of the output.
-	 * TODO: Generalize the pattern matcher to something...probably need some higher-order stuff to do that nicely though...
+	 * TODO: Generalize the pattern matcher to something...probably need to take functions as arguments to do that nicely though...
 	 */
+    @Description("Tuple X Regular Expression -> Tuple where only values that match the regular expression are retained.")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	public static final Tuple filter(Tuple input, String pattern) {
 		ArrayList l = new ArrayList(input.size());
 		
@@ -173,10 +181,7 @@ public class TupleUtil extends BasicModule {
 		
 		return new ArrayTuple(l.toArray());
 	}
-	
-	
-	public TupleUtil(ModuleData md) {super(md);}
-		
+			
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
 		OperatorData od = moduleData.getOperator(name);

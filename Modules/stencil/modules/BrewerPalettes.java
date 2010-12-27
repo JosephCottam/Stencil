@@ -7,15 +7,16 @@ import java.util.*;
 
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
 
+@Module
+@Description("Encoding of the color palette found at ColorBrewer.org (by Cynthia A. Brewer, Penn State).")
 public class BrewerPalettes  extends BasicModule {
 
-	public BrewerPalettes(ModuleData md) {super(md);}
-	
+	@Operator(spec="[palette: \"Set1\", reserve: \"BLACK\"]")
 	public static final class BrewerColors extends AbstractOperator {
 		private static String PALETTE = "palette";
 		private static String RESERVE = "reserve";
@@ -30,6 +31,7 @@ public class BrewerPalettes  extends BasicModule {
 			reserve = stencil.types.color.ColorCache.get(spec.get(RESERVE).getText());
 		}
 
+		@Facet(memUse="WRITER", prototype="(Color color)")
 		public Tuple map(Object value) {
 			int idx = Collections.binarySearch(seen, value);
 			if (idx<0) {
@@ -42,8 +44,10 @@ public class BrewerPalettes  extends BasicModule {
 			return stencil.types.color.ColorCache.get(colors[idx]);  
 		}
 		
+		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int StateID() {return seen.size();}
 
+		@Facet(memUse="READER", prototype="(Color color)")
 		public Tuple query(Object value) {
 			int idx = Collections.binarySearch(seen, value);
 

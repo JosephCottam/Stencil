@@ -38,9 +38,10 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Range;
 import stencil.module.operator.util.Split;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
+import stencil.module.util.ModuleDataParser;
 import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.string.StencilParser;
 import stencil.parser.string.info.UseContext;
 import stencil.parser.string.util.Context;
@@ -55,6 +56,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 
+@Module
 public class Projection extends BasicModule {
 	
 	/**Given a bin-size, determines what bin a particular value falls into.**/
@@ -82,28 +84,28 @@ public class Projection extends BasicModule {
 	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
-	//TODO: Lift the throws-exception out to a wrapping class.  If throws Exception is requested, use the wrapper; otherwise use this class directly.  Change argument types to float.
-	public static final class HeatScale extends AbstractOperator {
-		public static final String NAME = "HeatScale";
-		public static final boolean DEFAULT_THROW_EXCEPTIONS = true;
-
+	@Description("Project between two colors; records the max/min seen.")
+	@Operator(spec="[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\", throw: \"TRUE\"]")
+	public static final class HeatScale extends AbstractOperator.Statefull {
 		private float min = Float.NaN;
 		private float max = Float.NaN;
-		private boolean throwExceptions = DEFAULT_THROW_EXCEPTIONS;
-
+		
+		private final boolean throwExceptions;
 		private final Color cold;
 		private final Color hot;
 		
 		public HeatScale(OperatorData opData, Specializer spec) {
 			super(opData);
-			cold = ColorCache.get(spec.getMap().get("cold").getValue().toString());
-			hot = ColorCache.get(spec.getMap().get("hot").getValue().toString());
+			cold = ColorCache.get(spec.get("cold").getValue().toString());
+			hot = ColorCache.get(spec.get("hot").getValue().toString());
+			throwExceptions = (Boolean) Converter.convert(spec.get("throw"), Boolean.class);
 		}
 		
-		private HeatScale(OperatorData opData, Color cold, Color hot) {
+		private HeatScale(OperatorData opData, Color cold, Color hot, boolean throwException) {
 			super(opData);
 			this.cold = cold;
 			this.hot = hot;
+			this.throwExceptions = throwException;
 		}
 		
 		/**Returns a value between Red (low) and White (high) that represents
@@ -113,12 +115,13 @@ public class Projection extends BasicModule {
 		 * If the key passed cannot be parsed as number and 'throwExceptions' is set to false, black is returned.
 		 * If the key passed cannot be parsed and 'throwExceptions' is set to true, an exception is thrown.
 		 */
+		@Facet(memUse="WRITER", prototype="(Color VALUE)")
 		public Color map(float d) {
 			float p =-1;			
 				
 			try {
-				if (d>max || Double.isNaN(max)) {max = d; stateID++;}
-				if (d<min || Double.isNaN(min)) {min = d; stateID++;}
+				if (d>max || Float.isNaN(max)) {max = d; stateID++;}
+				if (d<min || Float.isNaN(min)) {min = d; stateID++;}
 				if (max == min) {p = 1;}
 				else {p = 1-((max-d)/(max-min));}
 				return averageColors(p);
@@ -156,17 +159,15 @@ public class Projection extends BasicModule {
 		/**Returns a color value if the first key object is between the current max and min.
 		 * Otherwise it returns null.
 		 */
+		@Facet(memUse="READER", prototype="(Color VALUE)")
 		public Color query(float d) {
-		         if (d < min) {return cold;}
+			if (Float.isNaN(min) && Float.isNaN(max)) {return averageColors(.5f);}
+			else if (d < min) {return cold;}
 			else if (d > max) {return hot;}
-			else              {return map(d);} //value is in the range of requested values 
+			else              {return map(d);} //value is in the range of requested values, no risk of mutation
 		}
 
-		public String getName() {return NAME;}
-		public boolean getThrowExceptions() {return throwExceptions;}
-		public void setThrowExceptions(boolean v) {throwExceptions = v;}
-		
-		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot);} 
+		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot, throwExceptions);} 
 	}
 	
 	/**Projects a set of values onto their presentation order.
@@ -177,23 +178,26 @@ public class Projection extends BasicModule {
 	 * presented always returns index one).  Ordering
 	 * is independent for each IndexScale created.
 	 */
+	@Operator(spec="[range: ALL, split: 0]")
+	@Description("Record the original presentation order of the combination of arguments")
 	public static final class Index extends AbstractOperator {
-		public static final String NAME = "Index";
 		private List<String> labels = new ArrayList<String>();
 
 		public Index(OperatorData opData) {super(opData);}
-		
+
+		@Facet(memUse="READER", prototype="(double index)")
 		public int query(Object key) {
 			if (labels.contains(key)) {return labels.indexOf(key);}
 			return 0;
 		}
 
+		@Facet(memUse="WRITER", prototype="(double index)")
 		public int map(Object key) {
 			if (!labels.contains(key)) {labels.add(key.toString());}
 			return labels.indexOf(key);
 		}
 
-		public String getName() {return NAME;}
+		@Facet(memUse="READER", prototype="(int VALUE)") 
 		public int stateID() {return labels.size();}
 		public Index duplicate() {return new Index(operatorData);}
 	}
@@ -203,26 +207,26 @@ public class Projection extends BasicModule {
 	 * For mapping, items that have not been seen before return 1 the first time, incremented there-after.
 	 * For query, items that have not been seen return 0 and are not added to the map.
 	 */
-	public static final class Count extends AbstractOperator {
+
+	@Description("Count the number of times the argument combination has been seen (including the current one)")
+	@Operator(spec="[range: ALL, split: 0]")
+	public static final class Count extends AbstractOperator.Statefull {
 		private static final class CompoundKey {
 			final Object[] values;
-			public CompoundKey(Object... values) {this.values = values;}
+			public CompoundKey(Object... values) {this.values = Arrays.copyOf(values, values.length);}
 			public int hashCode() {return Arrays.hashCode(values);}
 			public boolean equals(Object o) {
 				return o != null 
-					&& o.getClass().isArray() 
-					&& o.getClass().equals(Object.class) 
-					&& Arrays.equals(values, (Object[]) o);
+					&& o instanceof CompoundKey  
+					&& Arrays.equals(values, ((CompoundKey) o).values);
 			}
 		}
 		
 		private Map<CompoundKey, Long> counts = new HashMap();
-		private int stateID = Integer.MIN_VALUE;
 		
 		public Count(OperatorData opData) {super(opData);}
 		
-		public String getName() {return "Count";}
-
+		@Facet(memUse="WRITER", prototype="(long count)")
 		public long map(Object... keys) {
 			long value;
 			CompoundKey key = new CompoundKey(keys);
@@ -240,6 +244,7 @@ public class Projection extends BasicModule {
 			return value;
 		}
 
+		@Facet(memUse="READER", prototype="(long count)")
 		public long query(Object... keys) {
 			long value =0;
 			CompoundKey key = new CompoundKey(keys);
@@ -250,28 +255,32 @@ public class Projection extends BasicModule {
 			return value;
 		}
 
-		public int stateID() {return stateID;}
-		
 		public Count duplicate() {return new Count(operatorData);}
 	}
 
 	/**Counting when there are no keys to worry about.**/
+	@Suppress @Operator(spec="[range: ALL, split: 0]")
 	public static final class Counter extends AbstractOperator {
 		private long count =1;
 		public Counter(OperatorData opData) {super(opData);}
 		public StencilOperator duplicate() {return new Counter(operatorData);}
 		public String getName() {return "Count";}
+
+		@Facet(memUse="WRITER", prototype="(long count)")
 		public long map() {return count++;}
+		
+		@Facet(memUse="READER", prototype="(long count)")
 		public long query() {return count;}		
+		
+		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {return (int) count % Integer.MAX_VALUE;}
 	}
 	
 	/**Keeps sorted lists of elements, reporting back
 	 * the position in the list on lookup.
 	 */
+	@Operator(spec="[range:ALL, split:0, start: 0]")
 	public static class Rank extends AbstractOperator {
-		public static final String NAME = "Rank";
-		
 		/**Compare groups of object, often pair-wise.
 		 * The first non-zero comparison wins.
 		 * If all elements match, the longest array is 'after' the shorter one (so an array is always less than a non-array).
@@ -324,10 +333,11 @@ public class Projection extends BasicModule {
 	
 		public Rank(OperatorData opData, Specializer spec) {super(opData);}
 	
+		@Facet(memUse="WRITER", prototype="(int rank)")
 		public int map(Object... values) {return rank(true, values);} 
+		
+		@Facet(memUse="READER", prototype="(int rank)")
 		public int query(Object... values) {return rank(false, values);}
-	
-		public String getName() {return NAME;}
 	
 		/**What is the rank of the values passed.
 		 * -1 indicates no rank (not seen before and not added)
@@ -361,9 +371,9 @@ public class Projection extends BasicModule {
 	 * This operator only works with numbers, but using Rank to convert
 	 * arbitrary values to numbers can be used to scale arbitrary items. 
 	 * @author jcottam
-	 *
 	 */
-	public static final class Scale extends AbstractOperator {
+	@Operator(spec="[min: 0, max: 1, inMin: NULL, inMax: NULL, range: ALL, split:0]")
+	public static final class Scale extends AbstractOperator.Statefull {
 		private static final String IN_MAX = "inMax";
 		private static final String IN_MIN = "inMin";
 		private static final String OUT_MAX = "max";
@@ -396,6 +406,7 @@ public class Projection extends BasicModule {
 			span = outMax-outMin;
 		}
 		
+		@Facet(memUse="WRITER", prototype="(double value)")
 		public double map(double dv) {
 			double newInMin = Math.min(dv, inMin);
 			double newInMax = Math.max(dv, inMax);
@@ -412,6 +423,7 @@ public class Projection extends BasicModule {
 			return query(dv);   
 		}
 
+		@Facet(memUse="READER", prototype="(double value)")
 		public double query(double v) {
 			double percent = (v-inMin)/inMax;
 			double value = span*percent + outMin;
@@ -422,8 +434,10 @@ public class Projection extends BasicModule {
 		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
 	}
 	
+
 	/**Perform a linear interpolation between zero and one, returning the Percent, mIn and maX (thus PIX).*/
-	public static final class PIX extends AbstractOperator {
+	@Operator
+	public static final class PIX extends AbstractOperator.Statefull {
 		private static final class PIXTuple implements Tuple {
 			private static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{"p","min","max"}, new Class[]{Number.class, Number.class, Number.class});
 			private final Number[] values;
@@ -449,6 +463,7 @@ public class Projection extends BasicModule {
 
 		}
 		
+		@Facet(memUse="WRITER", prototype="(Number p, Number min, Number max)")
 		public Tuple map(Number value) {
 			if (min == null) {min = value;}
 			if (max == null) {max = value;}
@@ -459,6 +474,7 @@ public class Projection extends BasicModule {
 			return query(value);
 		}
 		
+		@Facet(memUse="READER", prototype="(Number p, Number min, Number max)")
 		public Tuple query(Number value) {
 			Number qmin = min == null ? value : min;   //local copies for query, so they are guaranteed to have a value
 			Number qmax = max == null ? value : max;
@@ -475,9 +491,6 @@ public class Projection extends BasicModule {
 			return new PIXTuple(value, qmin, qmax);
 		}
 	}
-
-	public Projection(ModuleData md) {super(md);}
-
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		Range r = new Range(specializer.get(Specializer.RANGE));
 		Split s = new Split(specializer.get(Specializer.SPLIT));
@@ -488,17 +501,14 @@ public class Projection extends BasicModule {
 	}
 	
 	public StencilOperator instance(String name, Specializer spec) throws SpecializationException {
-		//HACK: Should the use name be passed in?
 		String useName = spec.getParent().getText();
 		Program p = (Program) spec.getAncestor(StencilParser.PROGRAM);
 		Context context = null;
 		if (p != null) {context = UseContext.apply(spec.getAncestor(StencilParser.PROGRAM),useName);}
 		
 		if (context != null && name.equals("Count")) {
-			if (context.maxCount() == 0) {
-				OperatorData od = super.getOperatorData(name, spec);
-				od = new OperatorData(od);
-				od.setTarget("Counter");
+			if (context.maxArgCount() == 0) {
+				OperatorData od = ModuleDataParser.operatorData(Counter.class, Projection.class.getSimpleName());
 				return Modules.instance(this.getClass(), od, spec);
 			}
 		}

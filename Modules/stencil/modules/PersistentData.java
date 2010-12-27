@@ -4,16 +4,19 @@ import stencil.module.SpecializationException;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
-import stencil.module.util.ModuleData;
+import stencil.module.util.ann.*;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.tree.Specializer;
 
 import org.pcollections.*;
 
+@Module
 public class PersistentData extends BasicModule {
 	
-	/**Given a static list of values, returns the value based on the input.*/ 
+	/**Given a static list of values, returns the value based on the input.*/
+	@Operator(spec="[range: ALL, split:0]")
+	@Description("A list that can be de-referenced by the index in the list.  The list is given in the specializer under the key `vals'.")
 	public static class StaticList extends AbstractOperator {
 		private static final String VALUES_KEY = "vals";
 		private final Object[] out;
@@ -30,11 +33,13 @@ public class PersistentData extends BasicModule {
 			}
 		}
 		
-		public Object map(int inIndex) {return query(inIndex);}
+		@Facet(memUse="FUNCTION", prototype="(VALUE)")
 		public Object query(int inIndex) {return out[inIndex];}
 	}
 	
-	public static class Dict extends AbstractOperator {		
+	@Operator(spec="[range: ALL, split:0]")
+	@Description("Dictionary for key/value pairs.  The specializer determines how many of the passed values are the key and how many are the values. Retrieval by key yields a tuple with just the values.")
+	public static class Dict extends AbstractOperator.Statefull {		
 		public static final String NAMES = "fields";
 		public static final String NAME = "Dict";
 
@@ -57,7 +62,8 @@ public class PersistentData extends BasicModule {
 			this.caseSensitive = caseSensitive;
 			this.names = names;
 		}
-		
+
+		@Facet(memUse="WRITER", prototype="()")
 		public Object[] map(Object key, Object... values) {
 			Object[] objects = new Object[values.length];
 			System.arraycopy(values, 0, objects, 0, values.length); //Copy is required for storage.
@@ -72,6 +78,7 @@ public class PersistentData extends BasicModule {
 			return objects;
 		}
 		
+		@Facet(memUse="READER", prototype="()")
 		public Object[] query(Object key, Object... values) {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
@@ -100,8 +107,6 @@ public class PersistentData extends BasicModule {
 		private static String[] getNames(Specializer spec) {return spec.get(NAMES).getText().split("\\s*,\\s*");}
 		
 	}
-	
-	public PersistentData(ModuleData md) {super(md);}
 	
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
 		if(name.equals(Dict.NAME)) {

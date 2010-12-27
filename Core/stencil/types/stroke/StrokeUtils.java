@@ -4,20 +4,39 @@ import java.awt.BasicStroke;
 
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.StencilNumber;
 import stencil.types.Converter;
 import stencil.types.stroke.StrokeTuple.Cap;
 import stencil.types.stroke.StrokeTuple.Join;
 import static stencil.types.stroke.StrokeTuple.*;
 
+@Module
 public final class StrokeUtils extends BasicModule {
+	
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Width(BasicStroke s, float w) {return new BasicStroke(w, s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Join(BasicStroke s, Join join) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), join.v, s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Cap(BasicStroke s, Cap cap) {return new BasicStroke(s.getLineWidth(), cap.v, s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), s.getDashPhase());}
+	
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Phase(BasicStroke s, float phase) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), s.getDashArray(), phase);}
+
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Limit(BasicStroke s, float limit) {return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), limit, s.getDashArray(), s.getDashPhase());}
+
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Pattern(BasicStroke s, Object... input) {
 		float[] pattern = Pattern.SOLD.mask;
 		
@@ -27,19 +46,21 @@ public final class StrokeUtils extends BasicModule {
 			
 		}
 		
-		
 		return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), pattern, s.getDashPhase());
 	}
 	
 	/**The  format for strokes is "weight:pattern:cap";
 	 * all other properties must be set with other methods.
 	 */
+	@Operator
 	public static class Stroke extends AbstractOperator {
 		public Stroke(OperatorData opData) {super(opData);}
-		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
 		
+		@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)")
 		public BasicStroke argumentParser(String arg) {return parse(arg);}
-		
+
+		@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
+		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
 		
 		public static BasicStroke parse(String arg) { 
 			String[] parts = arg.split(":");
@@ -73,6 +94,4 @@ public final class StrokeUtils extends BasicModule {
 			return new BasicStroke(weight, cap.v, DEFAULT_JOIN.v, DEFAULT_LIMIT, pattern, 0f);
 		}
 	}
-	
-	public StrokeUtils(ModuleData md) {super(md);}
 }

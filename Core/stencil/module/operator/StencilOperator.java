@@ -34,32 +34,15 @@ import stencil.module.util.OperatorData;
 
 
 /**An operator is an object that can 
- * hand out method objects to be appropriately invoked.
- * Method objects are requested by role (role matching is case
- * insensitive).  
+ * hand out method objects to be appropriately invoked as facets.
+ * Facets are requested by name.  
  * 
- * Required roles: map and query
- * Canonical, optional roles:
- * 		guide -- Used in guide generation, may modify future results of map
- *  			as guide requests may represent advice of potential inputs;
- *  			when guide is not available query is used instead.
- * 		updateRequired -- Used to determine if a dynamic binding or guide needs to be updated.
- * 				Should return true if a call to map/query/guide may return 
- * 				a different value than it did previously.  If not available,
- * 				this will be assumed false on functions and true on non-functions.
- * 
- * 
- * The method objects returned by a role request must return a Tuple, 
- * but may take any of a number of arguments over any types
- * (and thus don't conform to a standard java Interface).  
- * The Stencil runtime will take care of properly constructing
- * an argument array to invoke the given method.
+ * Each operator should provide a map and query facet.
+ * A stateID facet is required for stateful operators.
  * 
  * Operators instances may be specialized, and the specialization will
  * be reflected in all roles.  Operators instances of the same base type
- * are completely independent. 
- * 
- * TODO: Evaluate eliminating the getFacet and return to a more regular interface (requires call type data in the meta-data definition)
+ * must not share writeable memory or must be labeled as Opaque. 
  *  
  * @author jcottam
  *

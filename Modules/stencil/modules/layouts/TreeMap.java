@@ -3,11 +3,13 @@ package stencil.modules.layouts;
 import java.awt.geom.Rectangle2D;
 
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 import stencil.util.collections.Tree;
 import edu.umd.cs.treemap.*;
 
+@Operator(spec="[range: ALL, split: 0, style: \"square\", X:0, Y: 0, W:100, H:100]")
 public class TreeMap extends Layout {
 	public static final String NAME = "TreeMap";
 
@@ -63,7 +65,7 @@ public class TreeMap extends Layout {
 		height = Converter.toDouble(spec.get(HEIGHT_KEY));
 	}
 	
-	
+	@Facet(memUse="READER", prototype="(X,Y,W,H)")
 	public Rectangle2D query(final Object id) {
 		Mappable layoutNode = layoutFor(id); 
 		Rect r = layoutNode.getBounds();
@@ -71,11 +73,13 @@ public class TreeMap extends Layout {
 		return result;
 	}
 	
+	@Facet(memUse="WRITER", prototype="(X,Y,W,H)")
 	public Rectangle2D map(final Object id, final Object parent, double value) {
 		add(id, parent, value);
 		return query(id);
 	}
 
+	@Facet(memUse="WRITER", prototype="(X,Y,W,H)")
 	public boolean add(final Object id, final Object parentID, double value) {
 		LayoutTree parent = Tree.findNode(root, parentID);
 		stateID++;

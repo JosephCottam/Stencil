@@ -1,8 +1,11 @@
 package stencil.modules;
 
+import stencil.module.util.BasicModule;
+import stencil.module.util.ann.*;
 import stencil.util.collections.ArrayUtil;
 
-public class Dates {
+@Module
+public class Dates extends BasicModule {
 	private static final String[] months = new String[12];
 	static {
 		months[0] = "January";
@@ -19,6 +22,8 @@ public class Dates {
 		months[11] = "December";
 	}
 	
+	@Operator()
+	@Facet(memUse="FUNCTION", prototype="(int monthNum)", alias={"map","query"})
 	public static int monthNum(String month) {
 		month = nice(month);
 		int idx =ArrayUtil.indexOf(month, months); 
@@ -29,7 +34,13 @@ public class Dates {
 		return  idx + 1;
 	}
 	
+	@Operator()
+	@Facet(memUse="FUNCTION", prototype="(String month)", alias={"map","query"})
 	public static String num2Month(int month) {return months[month-1];}
+
+	
+	@Operator()
+	@Facet(memUse="FUNCTION", prototype="(String month)", alias={"map","query"})
 	public static String fullMonth(String abr) {
 		abr = nice(abr);
 		for (String month: months) {

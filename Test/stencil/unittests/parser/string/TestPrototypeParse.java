@@ -24,7 +24,11 @@ public class TestPrototypeParse extends TestCase {
 				"(1)",
 				"(One, 2)",
 				"(2Them)",
-				""
+				"noParens",
+				"(oneParen",
+				"endParen)",
+				"noParens, again",
+				"type1 noParens, type2 again"
 		};
 		testFails(prototypes);		
 	}

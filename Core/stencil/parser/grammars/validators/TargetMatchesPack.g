@@ -7,10 +7,7 @@ options {
 }
 
 @header {
-  /** Verifies that python blocks contain valid python code.
-   * Corrects python block indentation for blocks that have are
-   * indented on their first non-blank line. 
-   */
+  /** Verifies that all packs have the same number of outputs as the target definition.*/
 
   package stencil.parser.string.validators;
   

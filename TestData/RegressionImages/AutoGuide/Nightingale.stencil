@@ -34,21 +34,6 @@ operator ColorBy (t) -> (C)
    (t=~"other") => C:@Color{DarkGray}
    (t=~"disease") => C:@Color{LightBlue}
 
-python MinRadius 
-facet init {from math import *}
-facet query(Min, X1,Y1,X,Y) -> (X,Y) {
-   rise = Y-Y1
-   run = X-X1
-   radius = sqrt(rise**2 + run**2)
-   if (radius >0): ratio = Min/radius
-   else: ratio=1
-
-   #Only needs to change if its not far enough already
-   if (ratio > 1):
-      Y = Y1 + (ratio * rise)
-      X = X1 + (ratio * run)
-}
-
 operator ParseDate (d) -> (m,y)
    (ALL) => (m,y): [s] IndexOf(d, "/") -> 
                    [m] Substring(d, 0, s[0]) ->
@@ -78,3 +63,22 @@ operator MonthAbr (n) -> (month)
    (n=11) => month: "Nov"
    (n=12) => month: "Dec"
    (ALL) => month: "ERROR"
+
+
+java MinRadius {
+   public MinRadius(OperatorData od) {super(od);}
+
+   @Facet(memUse="FUNCTION", prototype="(double X, double Y)")
+   public double[] query(double Min, double X1, double Y1, double X, double Y) {
+       double rise = Y-Y1;
+       double run = X-X1;
+       double radius = Math.sqrt(Math.pow(rise,2) + Math.pow(run,2));
+       double ratio = radius >0 ? Min/radius : 1;
+       if (ratio > 1) {
+          Y = Y1 + (ratio * rise);
+          X = X1 + (ratio * run);
+       }
+       return new double[]{X,Y};
+   }
+}
+

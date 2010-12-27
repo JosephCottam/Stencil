@@ -12,12 +12,13 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
+import stencil.module.util.ann.*;
 
 
 /**Utility class for building JUNG graph operators.  This covers 
  * graph creation/storage, layout storage and position queries.
  */
-public abstract class GraphOperator extends AbstractOperator {
+public abstract class GraphOperator extends AbstractOperator.Statefull {
 	protected final DirectedGraph graph = new DirectedSparseGraph();
 	protected Layout<Object, Object> layout;	
 	
@@ -31,11 +32,13 @@ public abstract class GraphOperator extends AbstractOperator {
 	protected void setLayout(Layout layout) {this.layout = layout;}
 	
 	
+	@Facet(memUse="WRITER", prototype="(boolean modified)")
 	public boolean add(Object... values) {
 		extendGraph(values);
 		return true;	
 	}
 
+	@Facet(memUse="WRITER", prototype="(double X, double Y)")
 	public Point2D map(Object... values) {
 		extendGraph(values);
 		return query(values);
@@ -64,6 +67,7 @@ public abstract class GraphOperator extends AbstractOperator {
 		layout = null;
 	}
 	
+	@Facet(memUse="READER", prototype="(double X, double Y)")
 	public Point2D query(Object id) {
 		if (layout == null) {resetLayout();}
 		return layout.transform(id);

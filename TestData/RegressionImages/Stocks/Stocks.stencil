@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 HEADER: Date,Open,High,Low,Close,Volume
 SEPARATOR: ,
-SOURCE: /u/jcottam/scratch/Stencil/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
+SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: true
 

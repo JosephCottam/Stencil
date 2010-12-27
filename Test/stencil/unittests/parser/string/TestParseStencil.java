@@ -25,8 +25,8 @@ public class TestParseStencil extends StencilTestCase {
 		
 		assertEquals("Incorrect number of layers found.", 2, p.getLayers().size());
 		assertEquals("Incorrect number of layers groups found.", 3, p.getLayers().get(1).getGroups().size());
-		assertEquals("Incorrect number or rules found, defaults likely not properly identified.", 3, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
-		assertEquals("Root operator found; inline did not identify oportunity.", "Index", ((Function) p.getLayers().get(1).getGroups().get(1).getResultRules().get(1).getAction().getStart()).getTarget().getOperator().getOperatorData().getName());
+		assertEquals("Incorrect number or rules found, defaults likely not properly identified.", 5, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
+		assertEquals("Root operator found; inline did not identify oportunity.", "Index", ((Function) p.getLayers().get(1).getGroups().get(1).getResultRules().get(2).getAction().getStart()).getTarget().getOperator().getOperatorData().getName());
 	}
 
 	public void testParseNull() throws Exception {

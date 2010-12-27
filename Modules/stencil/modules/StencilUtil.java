@@ -41,9 +41,9 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.FacetData;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Atom;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.Tuple;
@@ -51,12 +51,16 @@ import stencil.tuple.Tuples;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
-
 /**Operators used in various stencil transformations.*/
+@Module
+@Description("Utilities to manipulate the tuple data representation.")
 public class StencilUtil extends BasicModule {
+	
+	@Operator(spec="[range: ALL, split: 0]")
+	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	public static final Tuple toTuple(Object... values) {return Converter.toTuple(values);} 
 	
-	public static abstract class SeedBase extends AbstractOperator implements  SeedOperator, Cloneable {
+	public static abstract class SeedBase extends AbstractOperator.Statefull implements  SeedOperator, Cloneable {
 		protected SeedBase(OperatorData opData) {super(opData);}
 						
 		/**Complete the operator data, given the specializer.*/
@@ -72,14 +76,21 @@ public class StencilUtil extends BasicModule {
 			
 			return od;
 		}
+
+		public abstract Tuple map(Object...args);
 		
+		@Facet(memUse="OPAQUE", prototype="(VALUE)")
 		public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
+
+		@Override
+		public SampleSeed getSeed() {throw new RuntimeException("No implemented.");}
 	}
 
 	
 	/**Returns what was passed in, but records the range of elements
 	 * seen.  Used for continuous operators and should probably never
-	 * be used directly.	 */
+	 * be used directly.*/
+	@Operator(spec="[range: ALL, split: 0]")
 	public static final class SeedContinuous extends SeedBase {
 		public static final String NAME = SeedContinuous.class.getSimpleName();
 		public static final String MAX_KEY = "max";
@@ -106,6 +117,7 @@ public class StencilUtil extends BasicModule {
 			synchronized(this) {return new SampleSeed(true, min, max);}
 		}
 
+		@Facet(memUse="OPAQUE", prototype="(VALUE)")
 		public Tuple map(Object... args) {
 			assert args.length == 1;
 			double value = Converter.toNumber(args[0]).doubleValue();
@@ -129,8 +141,8 @@ public class StencilUtil extends BasicModule {
 	}
 	
 	/**Returns exactly what it was passed, but
-	 * records elements seen (for categorization).
-	 */
+	 * records elements seen (for categorization).*/
+	@Operator(spec="[range: ALL, split: 0]")	
 	public static final class SeedCategorize extends SeedBase {
 		public static final String NAME = SeedCategorize.class.getSimpleName();
 		
@@ -142,6 +154,7 @@ public class StencilUtil extends BasicModule {
 		
 		public synchronized SampleSeed getSeed() {return new SampleSeed(false, new ArrayList(seen));}
 
+		@Facet(memUse="OPAQUE", prototype="(VALUE)")
 		public Tuple map(Object... args) {
 			if (!deepContains(seen, args)) {seen.add(args);}
 			return Tuples.EMPTY_TUPLE;
@@ -152,11 +165,10 @@ public class StencilUtil extends BasicModule {
 			return false;
 		}
 		
+		@Facet(memUse="READER", prototype="(int VALUE)")		
 		public int stateID() {return seen.size();}
 	}
 	
-	public StencilUtil(ModuleData md) {super(md);}
-
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 	}

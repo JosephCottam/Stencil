@@ -46,15 +46,15 @@ from VertexList
 operator Ordering (ID)->(VALUE)  
 	(ALL) => VALUE : Index(ID)
 
-python Triangular
-facet init {
-	from math import sqrt
-	from math import ceil
-}
-
-facet map (Seq) -> (X,Y) {
-	seq = int(Seq)+1
-	base = int(ceil(sqrt(seq)))
-	X = (seq/base) * 10 *base
-	Y = (seq%base) * 10 *base
+java Triangular {
+    public Triangular(OperatorData od) {super(od);}
+    
+    @Facet(memUse="FUNCTION", prototype="(X,Y)", alias={"map","query"})
+    public double[] query(int seq) {
+        seq = seq+1;
+        int base = (int) Math.ceil(Math.sqrt(seq));
+        int X = (seq/base) * 10 *base;
+        int Y = (seq%base) * 10 *base;
+        return new double[]{X,Y};
+    }    
 }

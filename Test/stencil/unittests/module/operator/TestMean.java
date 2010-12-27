@@ -31,8 +31,6 @@ package stencil.unittests.module.operator;
 import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
-import stencil.module.util.ModuleData;
-import stencil.module.util.ModuleDataParser;
 import stencil.modules.Average;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
@@ -42,8 +40,7 @@ public class TestMean extends StencilTestCase {
 	final Module average;
 	
 	public TestMean() throws Exception {
-		ModuleData MD = ModuleDataParser.load("./modules/stencil/modules/Average.yml");
-		average = new Average(MD);
+		average = new Average();
 	}
 	
 	public void testFullRange() throws Exception {

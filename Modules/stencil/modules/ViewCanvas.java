@@ -37,13 +37,17 @@ import stencil.adapters.general.Registrations.Registration;
 import stencil.display.CanvasTuple;
 
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
+import stencil.module.util.ann.*;
 import stencil.display.Display;
 import stencil.util.DoubleDimension;
 
+@Description("Screen/Canvas conversion transformations.")
+@Module
 public class ViewCanvas extends BasicModule {
 	
 	//Given an original registration and position, what would the X/Y be in the target registration
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
 	public static double[] translateRegistration(Registration original, double x, double y, double width, double height, Registration target) {
 		Point2D topLeft = Registrations.registrationToTopLeft(original, x, y, width, height);
 		Point2D targetValue = Registrations.topLeftToRegistration(target, topLeft.getX(), topLeft.getY(), width, height);
@@ -52,22 +56,30 @@ public class ViewCanvas extends BasicModule {
 	}
 	
 	
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
 	public static double[] screenToCanvasPoint(double x, double y) {
 		Point2D p = Display.view.viewToCanvas(new Point2D.Double(x, y));
 		return new double[]{p.getX(), p.getY()};
 	}
 
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double Width, double Height)", alias={"map","query"})
 	public static double[] screenToCanvasDimension(double width, double height) {
 		Dimension2D p = Display.view.viewToCanvas(new DoubleDimension( width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
 	}
 
 
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
 	public static double[] canvasToScreenPoint(double x, double y) {
 		Point2D p = Display.view.canvasToView(new Point2D.Double(x, y));
 		return new double[]{p.getX(), p.getY()};
 	}
 
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double Width, double Height)", alias={"map","query"})
 	public static double[] canvasToScreenDimension(double width, double height) {
 		Dimension2D p = Display.view.canvasToView(new DoubleDimension(width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
@@ -82,6 +94,8 @@ public class ViewCanvas extends BasicModule {
 	 * @param canvasHeight
 	 * @return
 	 */
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double Width)", alias={"map","query"})
 	public static double[] zoom(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
 		return zoomPadded(portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
 	}
@@ -90,6 +104,8 @@ public class ViewCanvas extends BasicModule {
 	 * Padding is specified in canvas pixels. 
 	 * 
 	 */
+	@Operator
+	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double Width)", alias={"map","query"})
 	public static double[] zoomPadded(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
 		CanvasTuple global = Display.canvas;
 		
@@ -113,6 +129,4 @@ public class ViewCanvas extends BasicModule {
 		
 		return new double[]{min, x, y, canvasWidth};
 	}
-	
-	public ViewCanvas(ModuleData md) {super(md);}
 }

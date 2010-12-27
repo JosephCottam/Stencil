@@ -5,15 +5,18 @@ import java.util.regex.Pattern;
 
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.types.Converter;
 
+@Module
 public class GradientUtils extends BasicModule {
 
+	@Operator
 	public static class Gradient extends AbstractOperator {
-
 		public Gradient(OperatorData opData) {super(opData);}
+		
+		@Facet(memUse="FUNCTION", prototype="(self, start, end, length, absolute, cyclic)", alias={"map","query"})
 		public GradientTuple query(Color one, Color two, double len, boolean abs, boolean cyclic) {
 			return new GradientTuple(one, two, len, abs, cyclic);
 		}
@@ -28,6 +31,9 @@ public class GradientUtils extends BasicModule {
 		 * @return
 		 */
 		private static final Pattern SPLIT_PATTERN = Pattern.compile("(\\s*->\\s*)|(\\s*:\\s*)");
+		
+		
+		@Facet(memUse="FUNCTION", prototype="(self, start, end, length, absolute, cyclic)")
 		public GradientTuple argumentParser(String arg) {
 			String[] args = SPLIT_PATTERN.split(arg);
 			Color one = (Color) Converter.convert(args[0], Color.class);
@@ -44,6 +50,4 @@ public class GradientUtils extends BasicModule {
 			return query(one, two, len, abs, cyclic);
 		}
 	}
-	
-	public GradientUtils(ModuleData md) {super(md);}
 }

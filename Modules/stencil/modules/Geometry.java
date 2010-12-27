@@ -2,12 +2,16 @@ package stencil.modules;
 
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
-import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.parser.tree.Specializer;
 import stencil.types.Converter;
 
+@Module
+@Description("Geometric operations")
 public class Geometry extends BasicModule {
+	
+	@Operator
 	public static class Scale extends AbstractOperator {
 		private static final String SCALE_KEY = "by";
 		
@@ -18,6 +22,7 @@ public class Geometry extends BasicModule {
 			scale = Converter.toDouble(spec.get(SCALE_KEY));
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="(double X, double Y)", alias={"map","query"})
 		public double[] query(double x, double y) {
 			double[] results = new double[2];
 			results[0] = scale * x; 
@@ -26,6 +31,7 @@ public class Geometry extends BasicModule {
 		}
 	}
 
+	@Operator
 	public static class ScaleRect extends AbstractOperator {
 		private static final String SCALE_KEY = "by";
 		
@@ -38,6 +44,7 @@ public class Geometry extends BasicModule {
 			shift = scale/2;
 		}
 		
+		@Facet(memUse="FUNCTION", prototype="(double X, double Y, double Width, double Height)", alias={"map","query"})
 		public double[] query(double x, double y, double width, double height) {
 			double[] results = new double[4];
 			results[0] = shift * x; 
@@ -48,6 +55,4 @@ public class Geometry extends BasicModule {
 			
 		}
 	}
-
-	public Geometry(ModuleData md) {super(md);}
 }

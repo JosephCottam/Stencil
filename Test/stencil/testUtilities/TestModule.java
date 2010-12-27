@@ -16,11 +16,11 @@ import stencil.tuple.instances.PrototypedTuple;
 import java.lang.reflect.*;
  
 public class TestModule implements Module {
-	private static final ModuleData MODULE_DATA = new ModuleData(instance(), "TestModule");
+	private static final ModuleData MODULE_DATA = new ModuleData("TestModule");
 	private static final TestModule instance = new TestModule();
 	
 	static {
-		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[range: ALL]")));}
+		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[range: ALL]"), null));}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
 		OperatorData od = MODULE_DATA.getOperator("FilterFail");
@@ -49,7 +49,7 @@ public class TestModule implements Module {
 				Method m = Filter.class.getMethod("doFilter", String.class);
 				Invokeable inv = new ReflectiveInvokeable(m, null);
 				OperatorData od = getOperatorData(name, specializer);
-				return new InvokeableOperator(name,  od, inv);
+				return new InvokeableOperator(od, inv);
 			}
 		} catch (Exception e) {throw new RuntimeException(e);}
 		throw new RuntimeException("No such operator " + name);

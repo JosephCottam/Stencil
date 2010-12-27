@@ -44,9 +44,8 @@ import stencil.parser.tree.Specializer;
  * will have to be explicitly included in the Stencil).
  *
  * In addition to the method specified, a module must have
- * a single-argument constructor that takes a ModuleData object
- * if it is to be loaded by the ModuleCache through the startup
- * mechanisms.
+ * a zero-argument constructor if it is to be loaded into the 
+ * ModuleCache through the startup mechanisms.
  */
 public interface Module {
 	/**Get an instance of the operator of the given name, instantiated

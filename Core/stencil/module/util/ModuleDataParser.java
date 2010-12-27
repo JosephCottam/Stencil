@@ -1,67 +1,132 @@
 package stencil.module.util;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
+import java.lang.reflect.*;
 
-import org.yaml.snakeyaml.TypeDescription;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.AbstractConstruct;
-import org.yaml.snakeyaml.constructor.Constructor;
-import org.yaml.snakeyaml.nodes.Node;
-import org.yaml.snakeyaml.nodes.ScalarNode;
-import org.yaml.snakeyaml.nodes.Tag;
-
+import stencil.module.util.FacetData.MemoryUse;
+import stencil.module.util.ann.*;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.Specializer;
 import stencil.tuple.prototype.TuplePrototype;
 
 public class ModuleDataParser {
-	/**Constructor class to handle loading the stencil-specific constructs.*/
-	private static class StencilYAMLConstructor extends Constructor {
-	    public StencilYAMLConstructor(Class root) {
-	    	super(root);
-	        this.yamlConstructors.put(new Tag("!spec"), new ConstructSpecializer());
-	        this.yamlConstructors.put(new Tag("!proto"), new ConstructPrototype());
-	    }
+	public static final class MetaDataParseException extends RuntimeException {
+		private final String message;
 
-	    private class ConstructPrototype extends AbstractConstruct {
-	        public TuplePrototype construct(Node node) {
-	            String source = (String) constructScalar((ScalarNode) node);
-	            if (source.equals("NULL")) {source = "";}
-	            
-	            source = String.format("(%1$s)", source);
-	            try {
-	            	return ParseStencil.parsePrototype(source,false);
-	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined prototype: " + source, e);}
-	        }
-	    }
+		public MetaDataParseException(String message) {
+			super();
+			this.message = message;
+		}
+		
+		public MetaDataParseException(Class source, Exception cause) {
+			super(cause);
+			message = String.format("%1$s\n(For class %2$s).", super.getMessage(), source.getCanonicalName());
+		}
+		
+		public MetaDataParseException(Method source, Exception cause) {
+			super(cause);
+			message = String.format("%1$s\n(For static method %2$s in %3$s).", super.getMessage(), source.getName(), source.getDeclaringClass().getCanonicalName());
+		}
+		
+		public String getMessage() {return message;}
+	}
+	
+	private static final String EMPTY = "";
+	
+	private static OperatorData operatorData(Method m, String moduleName) throws Exception {
+		Operator o = m.getAnnotation(Operator.class);
+		Facet f = m.getAnnotation(Facet.class);
+		if (o == null || f == null) {return null;}
 
-	    private class ConstructSpecializer extends AbstractConstruct {
-	        public Specializer construct(Node node) {
-	            String source = (String) constructScalar((ScalarNode) node);
-	            try {
-	            	return ParseStencil.parseSpecializer(source);
-	            } catch (Exception e) {throw new RuntimeException("Error parsing configuration defined specializer: " + source, e);}
-	        }
-	    }
+		String defaultName = m.getName().substring(0,1).toUpperCase() + m.getName().substring(1);
+		final String opName = EMPTY.equals(o.name().trim()) ? defaultName : o.name();
+		
+		final Specializer spec = ParseStencil.parseSpecializer(o.spec());
+		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName());
+
+		
+		FacetData[] fds = makeFacetData(f, m.getName());
+		for (FacetData fd:fds) {od.addFacet(fd);}
+		return od;
+	}
+
+
+
+	/**Make the FacetData object from a facet annotation and information about its context.*/
+	private static final FacetData[] makeFacetData(Facet f, String target) throws Exception {
+		final String[] aliases = f.alias().length ==0 ? new String[]{target} : f.alias();
+
+		final MemoryUse memUse = MemoryUse.valueOf(f.memUse().trim().toUpperCase());
+		
+		final TuplePrototype proto = ParseStencil.parsePrototype(f.prototype(), true);
+
+		FacetData[] results=new FacetData[aliases.length];
+		for (int i=0;i<aliases.length; i++) {
+			FacetData fd = new FacetData(aliases[i], target, memUse, proto);
+			results[i] = fd;
+		}
+		return results;
+	}
+	
+	/**
+	 * @param c  Class supplying the operator candidate
+	 * @param moduleName Name of the surrounding module
+	 * @param suppress Should the suppress flag be adhered to?
+	 * @return
+	 * @throws MetaDataParseException
+	 */
+	private static OperatorData operatorData(Class c, String moduleName, boolean suppress) throws Exception {
+		if (suppress && c.getAnnotation(Suppress.class) != null) {return null;}
+		
+		Operator o = (Operator) c.getAnnotation(Operator.class);
+		if (o == null) {return null;}
+		
+		final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
+		final Specializer spec = ParseStencil.parseSpecializer(o.spec());
+		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName());
+
+		for (Method m: c.getMethods()) {
+			Facet f = (Facet) m.getAnnotation(Facet.class);
+			if (f== null) {continue;}
+			FacetData[] fds = makeFacetData(f, m.getName());
+			for (FacetData fd:fds) {od.addFacet(fd);}
+		}
+		return od;
 	}
 	
 	/**Given an input stream, will parse the contents 
 	 * and return a ModuleData object.
+	 * @throws MetaDataParseException 
 	 */
-	public static ModuleData load(InputStream source) {
-		Constructor constructor = new StencilYAMLConstructor(ModuleData.class);
-		TypeDescription mdDesc = new TypeDescription(ModuleData.class);
-		mdDesc .putListPropertyType("operators", OperatorData.class);
-		constructor.addTypeDescription(mdDesc);
+	public static ModuleData moduleData(Class source) throws MetaDataParseException {
+		Module ma = (Module) source.getAnnotation(Module.class);
+		if (ma == null) {throw new MetaDataParseException("No module annotation found in " + source.getCanonicalName());}
 
-		Yaml yaml = new Yaml(constructor);
+		final String moduleName = EMPTY.equals(ma.name().trim()) ? source.getSimpleName():ma.name();			
+		ModuleData md = new ModuleData(moduleName);
+		
+			for (Class c: source.getClasses()) {
+				try {
+					final OperatorData od = operatorData(c, moduleName, true);
+					if (od == null) {continue;}
+					md.addOperator(od);
+				} catch (Exception e) {throw new MetaDataParseException(c,e);}
+			}
+			
+			for (Method m: source.getMethods()) {
+				try {md.addOperator(operatorData(m, moduleName));}
+				catch (Exception e) {throw new MetaDataParseException(m,e);}
+			}
 
-		ModuleData md = (ModuleData) yaml.load(source);
 		return md;
 	}
 	
-	public static ModuleData load(String fileName) throws Exception {
-		return load(new FileInputStream(fileName));
+	public static ModuleData moduleData(String className) throws ClassNotFoundException, MetaDataParseException {
+		return moduleData(Class.forName(className));
+	}
+	
+	/**Load operator data (ignores suppress flag)*/
+	public static OperatorData operatorData(Class c, String moduleName) throws MetaDataParseException {
+		try {return operatorData(c, moduleName, false);}
+		catch (Exception e) {throw new MetaDataParseException(c, e);}
 	}
 }

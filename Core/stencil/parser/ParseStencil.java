@@ -92,6 +92,7 @@ public abstract class ParseStencil {
 	
 	public static TuplePrototype parsePrototype(String source, boolean allowEmpty) throws ProgramParseException {
 		try {
+			if (!(source.startsWith("(") && source.endsWith(")"))) {throw new SyntaxException(2, source);}
 			ANTLRStringStream input = new ANTLRStringStream(source);
 	
 			StencilLexer lexer = new StencilLexer(input);
@@ -179,7 +180,6 @@ public abstract class ParseStencil {
 
 		ModuleCache modules = Imports.apply(p);	//Do module imports
 		
-		PreparsePython.apply(p);				//Verify that Python operators are syntactically correct and appropriately indented
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = LastToAll.apply(p);					//Remove all uses of the LAST tuple reference
