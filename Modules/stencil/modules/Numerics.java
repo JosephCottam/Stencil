@@ -43,6 +43,7 @@ import stencil.types.Converter;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
 import static stencil.module.util.ModuleDataParser.operatorData;
 
+@Description("Math functions; includes many simple re-directions to java.lang.Math.")
 @Module()
 public class Numerics extends BasicModule {
 

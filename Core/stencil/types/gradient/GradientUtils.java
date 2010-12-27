@@ -9,6 +9,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.types.Converter;
 
+@Description("Create gradients")
 @Module
 public class GradientUtils extends BasicModule {
 

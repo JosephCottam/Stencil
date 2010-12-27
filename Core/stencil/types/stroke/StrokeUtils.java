@@ -12,6 +12,7 @@ import stencil.types.stroke.StrokeTuple.Cap;
 import stencil.types.stroke.StrokeTuple.Join;
 import static stencil.types.stroke.StrokeTuple.*;
 
+@Description("Create and modify strokes.  Strokes control non-color aspects of drawing.")
 @Module
 public final class StrokeUtils extends BasicModule {
 	

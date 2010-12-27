@@ -60,6 +60,8 @@ import stencil.types.color.ColorCache;
 public class Projection extends BasicModule {
 	
 	/**Given a bin-size, determines what bin a particular value falls into.**/
+	@Description("Calculates a bin that something falls into.  Bins are fixed size, with a potentially infinite number.  Bin size must be supplied in specializer.")
+	@Operator(spec="[size: 1, range:ALL, split: 0]")
 	public static class Bin extends AbstractOperator {
 		private static final String SIZE="size";
 		private final Number binSize;
@@ -69,8 +71,7 @@ public class Projection extends BasicModule {
 			binSize = Converter.toNumber(spec.get(SIZE));
 		}
 		
-		public long map(Number value, Number min) {return query(value, min);}
-		
+		@Facet(memUse="FUNCTION", prototype="(long bin)", alias={"map","query"})
 		public long query(Number value, Number min) {
 			if (binSize instanceof Double || value instanceof Double || min instanceof Double) {
 				return (long) Math.ceil((value.doubleValue() - min.doubleValue())/binSize.doubleValue());
@@ -80,8 +81,6 @@ public class Projection extends BasicModule {
 		}
 
 	}
-
-	public static final String MODULE_NAME = "Projection";
 	
 	/**Projects a range of numbers onto a red/white scale.*/
 	@Description("Project between two colors; records the max/min seen.")
@@ -495,7 +494,7 @@ public class Projection extends BasicModule {
 		Range r = new Range(specializer.get(Specializer.RANGE));
 		Split s = new Split(specializer.get(Specializer.SPLIT));
 		if (!r.isFullRange() || !s.isVoid())  {
-			throw new SpecializationException(MODULE_NAME, name, specializer);
+			throw new SpecializationException(getName(), name, specializer);
 		}
 		super.validate(name, specializer);
 	}

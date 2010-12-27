@@ -4,6 +4,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ann.*;
 import stencil.util.collections.ArrayUtil;
 
+@Description("Simple date support")
 @Module
 public class Dates extends BasicModule {
 	private static final String[] months = new String[12];
