@@ -12,10 +12,10 @@ canvas Main
   guide legend[X: -75, Y: -50] from Rose FILL_COLOR
 
   guide pointLabels from Rose ID
-    TEXT: MakeLabel(ID)
+    TEXT: MakeLabel(ID)			/*@\label{rose:postProcessStart}@*/
     (X,Y): MinRadius.query(50, X, Y, OUTERX, OUTERY)
     REGISTRATION: "CENTER"
-    FONT: @Font{4}
+    FONT: @Font{4}			/*@\label{rose:postProcessEnd}@*/
 
 layer Rose[SLICE]
 from Deaths
@@ -65,7 +65,7 @@ operator MonthAbr (n) -> (month)
    (ALL) => month: "ERROR"
 
 
-java MinRadius {
+java MinRadius {	/*@\label{rose:javaStart}@*/
    public MinRadius(OperatorData od) {super(od);}
 
    @Facet(memUse="FUNCTION", prototype="(double X, double Y)")

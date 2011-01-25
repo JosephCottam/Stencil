@@ -1,9 +1,12 @@
 package stencil.module.operator.wrappers;
 
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
+import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.util.Split;
+import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
@@ -15,10 +18,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 public abstract class SplitHelper implements StencilOperator {
-	protected StencilOperator operator;
-	protected Split split;
-	protected OperatorData operatorData;
-
 	/**Handle unordered split cases (default case).*/
 	public static class UnorderedHelper extends SplitHelper {
 		protected Map<Object, StencilOperator> operators = new HashMap();
@@ -30,7 +29,16 @@ public abstract class SplitHelper implements StencilOperator {
 			Object[] newArgs = getArgs(args);
 			StencilOperator op = getOp(key);
 			Invokeable inv = op.getFacet(facet);
-			return inv.invoke(newArgs);
+			
+			//Monitor stateID of the invoked operator
+			Invokeable stateIDFacet = op.getFacet(STATE_ID_FACET);
+			int oldID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
+
+			Object rv = inv.invoke(newArgs);
+			
+			int newID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
+				if (newID != oldID) {stateID++;}
+			return rv;
 		}
 				
 		/**Check if the key has been seen before.
@@ -43,6 +51,7 @@ public abstract class SplitHelper implements StencilOperator {
 		private StencilOperator getOp(Object key) {
 			if (!operators.containsKey(key)) {
 				operators.put(key, operator.duplicate());
+				stateID++;
 			}
 			return operators.get(key);
 		}
@@ -105,16 +114,30 @@ public abstract class SplitHelper implements StencilOperator {
 		}
 		public Object getTarget() {return this;}
 	}
+
+	private static FacetData STATE_ID_FD = new FacetData(STATE_ID_FACET, FacetData.MemoryUse.READER, "state");
+	
+	protected StencilOperator operator;
+	protected final Split split;
+	protected final OperatorData operatorData;
+	protected int stateID;					//State ID of the split operator
 	
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
 		this.operator = operator;		
 		this.operatorData = noFunctions(operator.getOperatorData(), true);
+		this.operatorData.addFacet(STATE_ID_FD);
 	}
 	
+	public int stateID() {return stateID;}
+	
 	public Invokeable getFacet(String facet) {
-		try {operator.getFacet(facet);}	
-		catch (Exception e) {throw new RuntimeException("Facet error intializing split for " + operator.getName() + "." + facet, e);}
+		if (facet.equals(STATE_ID_FD)) {
+			return new ReflectiveInvokeable(STATE_ID_FACET, this);
+		} else {
+			try {operator.getFacet(facet);}	
+			catch (Exception e) {throw new RuntimeException("Facet error intializing split for " + operator.getName() + "." + facet, e);}
+		}
 		
 		SplitTarget target = new SplitTarget(this, facet); 
 		return target;
@@ -150,7 +173,8 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	//final because it is a utility method
 	public static final StencilOperator makeOperator(Split split, StencilOperator operator) {
-		if (split.getFields() ==0) {return operator;}
+		if (AbstractOperator.isFunction(operator)) {throw new RuntimeException("Attempt to wrap pure function in Split.");}
+ 		if (split.getFields() ==0) {return operator;}
 		if (split.isOrdered()) {return new OrderedHelper(split, operator);}
 		return new UnorderedHelper(split, operator);
 	}

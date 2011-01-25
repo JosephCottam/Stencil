@@ -53,8 +53,8 @@ options {
   public Object downup(Object p) {
     downup(p, this, "buildMappings");
     downup(p, this, "transferMappings");
-    downup(p, this, "copyQuery");
     downup(p, this, "trimGuide");
+    downup(p, this, "copyQuery");
     downup(p, this, "renameMappingsDown");
     return p;
   }
@@ -112,9 +112,9 @@ copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAI
 
 //trimMappings  -----------------------------------------------
 trimGuide
-  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=. .*)) query=.)
+  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=. .*)))
     {g.getAncestor(GUIDE_DIRECT) != null}?
-    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall((CallTarget) c)})) $query);
+    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall((CallTarget) c)})));
 
 //^(CALL_CHAIN call=. size=.) {call.getAncestor(GUIDE) != null}? -> ^(CALL_CHAIN {trimCall((CallTarget) call)});
 

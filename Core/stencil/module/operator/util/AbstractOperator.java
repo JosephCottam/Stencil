@@ -7,6 +7,7 @@ import static java.lang.String.format;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.Facet;
 
 public abstract class AbstractOperator implements StencilOperator, Cloneable {
@@ -77,4 +78,13 @@ public abstract class AbstractOperator implements StencilOperator, Cloneable {
 
 	/**Default viewpoint is self.  This is safe ONLY if the operator implements a true function.**/
 	public StencilOperator viewPoint() {return this;}
+	
+	/** Does given operator/meta-data include any stateful facets?  If not, it is a function.**/ 
+	public static boolean isFunction(StencilOperator op) {return isFunction(op.getOperatorData());}
+	public static boolean isFunction(OperatorData op) {
+		for (FacetData fd: op.getFacets()) {
+			if (fd.getMemUse() != MemoryUse.FUNCTION) {return false;}
+		}
+		return true;
+	}
 }
