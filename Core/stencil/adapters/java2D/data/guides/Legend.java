@@ -18,9 +18,8 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 import stencil.parser.ParseStencil;
-import stencil.parser.string.util.EnvironmentProxy;
-import stencil.parser.tree.Guide;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Guide;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
@@ -39,7 +38,7 @@ public class Legend extends Guide2D {
 	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT: 4, label.FCOLOR: \"BLACK\", example.SIZE: 4, spacing: .25, displayOn: \"" + SIMPLE_DEFAULT + "\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
-		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
+		try {DEFAULT_ARGUMENTS = ParseStencil.specializer(defaultArguments);}
 		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
 	}
 	
@@ -75,7 +74,8 @@ public class Legend extends Guide2D {
 	
 	public Legend(Guide guideDef, int idx) {
 		super(guideDef);
-		Specializer specializer = guideDef.getSpecializer();
+		
+		Specializer specializer = guideDef.specializer();
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
 		GuideUtils.setValues(specializer, this);
@@ -86,7 +86,7 @@ public class Legend extends Guide2D {
 		prototypeExample = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		prototypeExample = GuideUtils.applyDefaults(specializer, EXAMPLE_PROPERTY_TAG, prototypeExample);
 		
-		guideLabel = specializer.get(GUIDE_LABEL).getText();
+		guideLabel = (String) specializer.get(GUIDE_LABEL);
 		
 		exampleHeight = Math.max(Converter.toFloat(prototypeLabel.get(StandardAttribute.HEIGHT.name())), Converter.toFloat(prototypeExample.get("SIZE")));
 		exampleWidth = Converter.toFloat(prototypeExample.get("SIZE"));
@@ -94,10 +94,10 @@ public class Legend extends Guide2D {
 		hSpacing = spacing * exampleWidth;
 		
 		
-		if (specializer.getMap().containsKey(StandardAttribute.X.name()) || specializer.getMap().containsKey(StandardAttribute.Y.name())) {autoPlace = false;}
-		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.getSelector().getAttribute();}
+		if (specializer.containsKey(StandardAttribute.X.name()) || specializer.containsKey(StandardAttribute.Y.name())) {autoPlace = false;}
+		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.selector().attribute();}
 		
-		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
+		TuplePrototype p = guideDef.resultsPrototype();
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
 		value_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
 		

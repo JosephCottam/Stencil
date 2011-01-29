@@ -19,10 +19,11 @@ import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.LayerView;
 import stencil.display.DisplayLayer;
+import stencil.interpreter.tree.Freezer;
+import stencil.interpreter.tree.Specializer;
 import stencil.parser.ParserConstants;
-import stencil.parser.string.util.EnvironmentProxy;
-import stencil.parser.tree.Consumes;
-import stencil.parser.tree.Layer;
+import stencil.parser.string.StencilParser;
+import stencil.parser.tree.StencilTree;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
@@ -290,40 +291,41 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	
 	private void setPrototype(T prototype) {this.prototype = prototype;}
 	
-	public static DoubleBufferLayer<?> instance(Layer layerDef) {
-		String name = layerDef.getName();
-		String implantation = layerDef.getImplantation();
+	public static DoubleBufferLayer<?> instance(StencilTree layerDef) {
+		String name = layerDef.getText();
+		Specializer spec = Freezer.specializer(layerDef.find(StencilParser.SPECIALIZER));
+		String layerType = (String) spec.get(TYPE_KEY);
 		
 		boolean sortZ = false;
-		for (Consumes group: layerDef.getGroups()) {
-			TuplePrototype proxy = EnvironmentProxy.calcPrototype(group.getResultRules());
-			if (proxy.contains("Z")) {sortZ = true; break;}
+		for (StencilTree field: layerDef.findAllDescendants(StencilParser.TUPLE_FIELD_DEF)) {
+			String fieldName = field.find(StencilParser.ID).getText();
+			if (fieldName.equals("Z")) {sortZ = true; break;}
 		}
 		
 		DoubleBufferLayer layer = new DoubleBufferLayer(name, sortZ);
 		Glyph2D prototype = null;
 		try {
-			if (implantation.equals(Shape.IMPLANTATION)) {
+			if (layerType.equals(Shape.IMPLANTATION)) {
 				prototype = new Shape(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Line.IMPLANTATION)) {
+			} else if (layerType.equals(Line.IMPLANTATION)) {
 				prototype = new Line(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Text.IMPLANTATION)) {
+			} else if (layerType.equals(Text.IMPLANTATION)) {
 				prototype = new Text(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Pie.IMPLANTATION)) {
+			} else if (layerType.equals(Pie.IMPLANTATION)) {
 				prototype = new Pie(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Image.IMPLANTATION)) {
+			} else if (layerType.equals(Image.IMPLANTATION)) {
 				prototype = new Image(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Poly.PolyLine.IMPLANTATION)) {
+			} else if (layerType.equals(Poly.PolyLine.IMPLANTATION)) {
 				prototype = new Poly.PolyLine(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Poly.Polygon.IMPLANTATION)) {
+			} else if (layerType.equals(Poly.Polygon.IMPLANTATION)) {
 				prototype = new Poly.Polygon(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Arc.IMPLANTATION)) {
+			} else if (layerType.equals(Arc.IMPLANTATION)) {
 				prototype = new Arc(layer, PROTOTYPE_ID);
-			} else if (implantation.equals(Slice.IMPLANTATION)) {
+			} else if (layerType.equals(Slice.IMPLANTATION)) {
 				prototype = new Slice(layer, PROTOTYPE_ID);
 			} 
-		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + implantation, e);}
-		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + implantation);}
+		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + layerType, e);}
+		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + layerType);}
 		
 		layer.setPrototype(prototype);
 

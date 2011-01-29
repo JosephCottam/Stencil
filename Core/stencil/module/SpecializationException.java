@@ -57,7 +57,7 @@
 package stencil.module;
 
 import stencil.module.util.ModuleData;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 
 /**Indicates that trying to specialize a method from a package failed.
  * The error message indicates the method name and the attempted specialization
@@ -76,6 +76,6 @@ public class SpecializationException extends Exception {
 	 */
 	public SpecializationException(String module, String name, Specializer specializer, Exception e) {this(module, name, specializer, "", e);}
 	public SpecializationException(String module, String name, Specializer specializer, String message, Exception e) {
-		super(String.format("Cannot create operator %1$s from %2$s with specializer %3$s: %4$s", name, module, specializer.toStringTree(), message), e);
+		super(String.format("Cannot create operator %1$s from %2$s with specializer %3$s: %4$s", name, module, specializer.toString(), message), e);
 	}
 }

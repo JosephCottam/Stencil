@@ -8,7 +8,8 @@ import stencil.module.util.ModuleIncompleteError;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ModuleDataParser.MetaDataParseException;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.util.ModuleDataParser.moduleData;
 
@@ -37,7 +38,7 @@ public class JUNG extends BasicModule {
 	}
 	
 	@Override
-	public StencilOperator instance(String name, Specializer specializer)
+	public StencilOperator instance(String name, Context context, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
 		validate(name, specializer);
 

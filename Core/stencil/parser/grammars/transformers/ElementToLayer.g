@@ -1,7 +1,7 @@
 tree grammar ElementToLayer;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -13,19 +13,25 @@ options {
   **/
   package stencil.parser.string;
   
-  import stencil.parser.tree.Program;
+  import stencil.parser.tree.StencilTree;
 }
 
 @members{
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 topdown
-  : ^(e=ELEMENT type=. defaults=. rules[$e.text]) -> ^(LAYER[$e.text] $type $defaults rules);
+  : ^(e=ELEMENT type=. defaults=. consumes[$e.text]*) 
+      -> ^(LAYER[$e.text] $type $defaults consumes)
+  ;
 
+consumes[String name]
+  : ^(LIST_CONSUMES filters=. rules[name])
+  ;
   
 rules[String name]
-  : ^(LIST rule+=.*) -> 
-  		^(LIST ^(RULE ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["ID"] DEFAULT)) ^(CALL_CHAIN ^(PACK STRING[$name]) DEFINE)) $rule+);
+  : ^(LIST_RULES rule+=.*) -> 
+  		^(LIST_RULES ^(RULE ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["ID"] DEFAULT)) ^(CALL_CHAIN ^(PACK STRING[$name]) DEFINE)) $rule+)
+  ;
 
   

@@ -36,6 +36,7 @@ public interface DisplayLayer<T extends Glyph>  {
 	public static final String FIND_METHOD  = "find";
 	public static final String MAKE_METHOD = "make";
 	public static final String MAKE_OR_FIND_METHOD ="makeOrFind";
+	public static final String TYPE_KEY = "type";
 
 	
 	/**Get a view of this layer.

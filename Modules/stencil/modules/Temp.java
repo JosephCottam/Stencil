@@ -28,7 +28,7 @@
  */
 package stencil.modules;
 
-import static stencil.parser.tree.Specializer.SPLIT;
+import static stencil.interpreter.tree.Specializer.SPLIT;
 
 import java.util.*;
 
@@ -39,7 +39,8 @@ import stencil.module.operator.util.Split;
 import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
 /**
@@ -220,9 +221,9 @@ public class Temp extends BasicModule {
 		
 	}
 	
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
 		try {
-			StencilOperator op = super.instance(name, specializer);
+			StencilOperator op = super.instance(name, context, specializer);
 			
 			Split split = new Split(specializer.get(SPLIT));
 			return SplitHelper.makeOperator(split, op);

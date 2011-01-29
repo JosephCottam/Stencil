@@ -1,7 +1,7 @@
 tree grammar OperatorStateQuery;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;
+	ASTLabelType = StencilTree;
   output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -11,12 +11,12 @@ options {
 /** Fill in operator state query for synthetic operators.*/
   package stencil.parser.string;
 
-  import stencil.parser.tree.*;
+  import stencil.parser.tree.StencilTree;
   import static stencil.parser.string.util.Utilities.*;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 //Extend the operator definition to include the state query facet

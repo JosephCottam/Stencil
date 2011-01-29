@@ -79,7 +79,7 @@ public final class PrototypedTuple implements Tuple {
 		public PrototypedTuple(String[] names, Class[] types, Object[] values) {
 		assert types != null : "Types may not be null";
 		assert names != null : "Names may not be null.";
-		assert names.length == values.length : "Value and name list not of the same length." + names + " vs. " + values;
+		assert names.length == values.length : "Value and name list not of the same length." + Arrays.deepToString(names) + " vs. " + Arrays.deepToString(values);
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 
 		this.prototype = new SimplePrototype(names, types);

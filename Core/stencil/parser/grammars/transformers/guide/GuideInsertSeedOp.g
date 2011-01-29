@@ -1,7 +1,7 @@
 tree grammar GuideInsertSeedOp;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
 	superClass = TreeRewriteSequence;
@@ -18,30 +18,26 @@ options {
    **/
 	 
    package stencil.parser.string;
-	 
-   import java.util.Set;
-   import java.util.HashSet;
-   
+	    
    import stencil.parser.tree.util.*;
-   import stencil.util.collections.ArrayUtil;
    import stencil.module.*;
-   import stencil.module.operator.StencilOperator;
    import stencil.parser.tree.*;
    import stencil.parser.ParseStencil;
+   import stencil.interpreter.tree.Freezer;
+   import stencil.interpreter.tree.Specializer;
    
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.MAP_FACET;
    import static stencil.interpreter.guide.Samplers.CATEGORICAL;
    import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
-   import static stencil.parser.ParserConstants.BIND_OPERATOR;
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
 }
 
 @members {
-  public static Program apply (Tree t, ModuleCache modules) {
-     return (Program) TreeRewriteSequence.apply(t, modules);
+  public static StencilTree apply (Tree t, ModuleCache modules) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules);
   }
     
   protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
@@ -56,8 +52,8 @@ options {
   private static final String SEED_PREFIX = "seed.";
 
   private static final boolean isCategorical(Specializer spec) {
-    return !spec.getMap().containsKey(SAMPLE_KEY) ||
-           CATEGORICAL.equals(spec.getMap().get(SAMPLE_KEY).getValue());
+    return !spec.containsKey(SAMPLE_KEY) ||
+           CATEGORICAL.equals(spec.get(SAMPLE_KEY));
   }
 
 	protected ModuleCache modules;
@@ -65,21 +61,23 @@ options {
   //Mapping from requested guides to descriptor construction strategy.  This is populated by the 'build' pass
   protected HashMap<String, Specializer> requestedGuides = new HashMap();
     
-    private String key(Selector s) {
-      List<Id> path = s.getPath();
-      return key(path.get(0).getText(), path.get(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
-    }
-    
-    private String key(CallTarget target) {return key((Rule) target.getAncestor(RULE));}
-
     /**Given a tree, how should it be looked up in the guides map?*/
-    private String key(Rule rule) {
-      Tree layer = rule.getAncestor(LAYER);
-      Tree attRef = ((TuplePrototype) rule.getGenericTarget().findChild(TUPLE_PROTOTYPE)).get(0);
-      if (attRef == null) {return null;} //rule has no target, happens when the rule is for side effects only
-      Tree att = attRef.getChild(0);
-      if (layer == null || att==null) {return null;}
-      return key(layer.getText(), att.getText());
+    private String key(StencilTree tree) {
+      if (tree.getType() == SELECTOR) {
+          return key(tree.getChild(0).getText(), tree.getChild(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
+      } else if (tree.getType() == PACK || tree.getType() == FUNCTION) {
+          return key(tree.getAncestor(RULE));
+      } else if (tree.getType() == RULE) {
+		      Tree layer = tree.getAncestor(LAYER);
+		      Tree attRef = tree.find(TARGET, RESULT, LOCAL, PREFILTER, VIEW, CANVAS).find(TUPLE_PROTOTYPE).getChild(0);
+		      if (attRef == null) {return null;} //rule has no target, happens when the rule is for side effects only
+		      Tree att = attRef.getChild(0);
+		      if (layer == null || att==null) {return null;}
+		      return key(layer.getText(), att.getText());
+      }      
+      //Should be unreachable (given call sites)
+      assert false : "Could not construct key for tree of type " + StencilTree.typeName(tree.getType());
+      return null;
     }
     
     
@@ -90,16 +88,15 @@ options {
     }
     
     /**Does the given call group already have the appropriate sampling operator?**/ 
-    private boolean requiresChanges(CallChain chain) {
-      Rule r = (Rule) chain.getAncestor(RULE);
+    private boolean requiresChanges(StencilTree chain) {
+      StencilTree r = chain.getAncestor(RULE);
       if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
       Specializer strat = requestedGuides.get(key(r));
       String operatorName = operatorName(strat);
-      CallTarget call = chain.getStart();
-      while(!(call instanceof Pack)) {
-        Function f  = (Function) call;
-        if (operatorName.equals(f.getName())) {return false;}
-        call = f.getCall();
+      StencilTree call = chain.find(FUNCTION, PACK);
+      while(call.getType() == FUNCTION) {
+        if (operatorName.equals(call.getText())) {return false;}
+        call = call.find(FUNCTION, PACK);
       }
       return true;
     }
@@ -120,27 +117,27 @@ options {
      * 
      * @param t Call target that will follow the new echo operator.
      */
-    private List<Value> echoArgs(Tree target) {return echoArgs((CallTarget) target);}
-    private List<Value> echoArgs(CallTarget target) {
-    	List<Value> args = (List<Value>) adaptor.create(LIST, "Arguments");
-    	
- 		  for (Value v: target.getArguments()) {
- 			  if (v.isAtom()) {continue;}
- 			  adaptor.addChild(args, adaptor.dupTree(v));
- 		  }
- 		  return args;
+    private StencilTree echoArgs(StencilTree target) {
+       StencilTree newArgs = (StencilTree) adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
+          
+       StencilTree args = (target.getType() == PACK) ? target : target.find(LIST_ARGS);
+       for (StencilTree v: args) {
+          if (v.getType() == TUPLE_REF) {
+            adaptor.addChild(newArgs, adaptor.dupTree(v));
+          }
+       }
+       return newArgs;
     }
     
-    private Specializer spec(CommonTree t) {
-      CallTarget target = (CallTarget) t;
-      List<Value> args = echoArgs(target);
+    //HACK: Do this more directly, just build the tree (specializer is simpler than it used to be)
+    private StencilTree spec(StencilTree target) {
       StringBuilder b = new StringBuilder("[range" + BIND_OPERATOR + " ALL,");      
       
       //Get additional map arguments from the guide declaration
       Specializer spec = requestedGuides.get(key(target));
-      for (String k: spec.getMap().keySet()) {
+      for (String k: spec.keySet()) {
           if (k.startsWith(SEED_PREFIX)) {
-             String value = spec.getMap().get(k).toString();
+             String value = spec.get(k).toString();
              String key = k.substring(SEED_PREFIX.length());
              
              b.append(key);
@@ -150,27 +147,23 @@ options {
           }
       }
       b.replace(b.length()-1, b.length(), "]");
-      try {return ParseStencil.parseSpecializer(b.toString());}
+      try {return ParseStencil.specializerTree(b.toString());}
       catch (Exception e) {throw new Error("Error parsing synthesized specializer: " + b.toString());}
     }
-    
-     public CallTarget getStart(Tree c) {
-       return ((CallChain) c).getStart();
-     }
-    
-    private String selectOperator(Tree t) {
-      Layer layer = (Layer) t.getAncestor(StencilParser.LAYER);
-      Rule r = (Rule) t.getAncestor(StencilParser.RULE);
-      String field = ((TuplePrototype) r.getGenericTarget().findChild(TUPLE_PROTOTYPE)).get(0).getFieldName();
+        
+    private String selectOperator(StencilTree t) {
+      StencilTree layer = t.getAncestor(StencilParser.LAYER);
+      StencilTree r = t.getAncestor(StencilParser.RULE);
+      String field = r.findDescendant(TUPLE_PROTOTYPE).getChild(0).getChild(0).getText();
       
-      Specializer strat = requestedGuides.get(key(layer.getName(), field));
+      Specializer strat = requestedGuides.get(key(layer.getText(), field));
       return operatorName(strat);
     }
 }
 
 //Identify requested guides from canvas def
-listRequirements: ^(GUIDE_DIRECT ^(GUIDE type=. spec=. sel=. actions=.)) 
-   {requestedGuides.put(key((Selector) sel), (Specializer) spec);};
+listRequirements: ^(GUIDE_DIRECT ^(guide=GUIDE .*)) 
+   {requestedGuides.put(key(guide.find(SELECTOR)), Freezer.specializer(guide.find(SPECIALIZER)));};
 
 //Replace the #-> with an echo operator...
 replaceCompactForm:
@@ -178,12 +171,11 @@ replaceCompactForm:
 		^(FUNCTION $s $a DIRECT_YIELD[$gy.text] ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] $t));  
 		
 ensure:
-  ^(c=CALL_CHAIN t=. d=.)
-		  {$c.getParent().getChild(0).getType() == RESULT &&  requiresChanges((CallChain) $c)}? ->
+  ^(c=CALL_CHAIN t=.)
+		  {$c.getParent().getChild(0).getType() == RESULT &&  requiresChanges($c)}? ->
 		    ^(CALL_CHAIN    
 		         ^(FUNCTION[selectOperator($t)] 
                 {spec($t)} 
                 {echoArgs($t)} 
                 DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
-                $t)
-            $d);
+                $t));

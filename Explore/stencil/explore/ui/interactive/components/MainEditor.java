@@ -28,6 +28,8 @@
  */
 package stencil.explore.ui.interactive.components;
 
+import static stencil.parser.string.StencilParser.LIST_STREAM_DECLS;
+
 import java.awt.BorderLayout;
 import java.util.TreeSet;
 import java.util.Set;
@@ -42,8 +44,7 @@ import stencil.explore.model.sources.MouseSource;
 import stencil.explore.model.sources.SourceCache;
 import stencil.explore.model.sources.StreamSource;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Program;
-import stencil.parser.tree.Stream;
+import stencil.parser.tree.StencilTree;
 
 
 public class MainEditor extends JPanel implements StencilListener.StencilChanged, TextPositionChangedListener {
@@ -91,7 +92,7 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 
 
 	public void stencilChanged(StencilEvent.StencilChanged stencilUpdate) {
-		Program program;
+		StencilTree program;
 		
 		try {program = ParseStencil.checkParse(stencilEditor.getStencil());}
 		catch (Exception e) {return;}
@@ -99,15 +100,15 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 		//Synch Sources
 		Set<StreamSource> sources = new TreeSet<StreamSource>();
 		try {
-			for (Stream stream: program.getStreams()) {
+			for (StencilTree stream: program.find(LIST_STREAM_DECLS)) {
 				StreamSource source;
-				if (SourceCache.weakContains(stream.getName())) {
-					source = SourceCache.weakGet(stream.getName());
+				if (SourceCache.weakContains(stream.getText())) {
+					source = SourceCache.weakGet(stream.getText());
 				} else {
-					if (stream.getName().equals(MouseSource.NAME)) { //If it was named after the mouse, assume it is the mouse
-						source = new MouseSource(stream.getName());
+					if (stream.getText().equals(MouseSource.NAME)) { //If it was named after the mouse, assume it is the mouse
+						source = new MouseSource(stream.getText());
 					} else {
-						source = new FileSource(stream.getName()); 	//If we've had nothing of this name before, assume its a file
+						source = new FileSource(stream.getText()); 	//If we've had nothing of this name before, assume its a file
 					}
 				}
 				sources.add(source);

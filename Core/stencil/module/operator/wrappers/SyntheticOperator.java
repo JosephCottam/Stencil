@@ -31,6 +31,7 @@ package stencil.module.operator.wrappers;
 import java.util.Arrays;
 
 import stencil.interpreter.Interpreter;
+import stencil.interpreter.tree.Freezer;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.UnknownFacetException;
 import stencil.module.operator.util.Invokeable;
@@ -40,13 +41,18 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
 import stencil.display.Display;
-import stencil.parser.tree.OperatorFacet;
-import stencil.parser.tree.OperatorRule;
+import stencil.interpreter.tree.OperatorFacet;
+import stencil.interpreter.tree.OperatorRule;
+import stencil.interpreter.tree.StateQuery;
+import stencil.parser.tree.StencilTree;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
- 
+import stencil.tuple.prototype.TuplePrototype;
+
+import static stencil.parser.string.StencilParser.*;
+
 /**Operator defined through a stencil definition.
  * 
  * TODO: These aren't always projects...but they are for now!
@@ -57,8 +63,11 @@ public class SyntheticOperator implements StencilOperator {
 		public NoMatchException(String message) {super(message);}
 	}
 	
-	stencil.parser.tree.Operator opDef;
+	protected final StencilTree opDef;
 			
+	protected StateQuery stateQuery;
+	protected OperatorFacet map;
+	protected OperatorFacet query;
 	
 	protected final OperatorData operatorData;
 
@@ -67,15 +76,37 @@ public class SyntheticOperator implements StencilOperator {
 	/**Create a Stencil operator from a specification.
 	 * TODO: Some synthetic operators facets are functions...figure out a way to detect this!
 	 * */
-	public SyntheticOperator(String module, stencil.parser.tree.Operator opDef) {
+	public SyntheticOperator(String module, StencilTree opDef) {
 		this.module = module;
 		this.opDef = opDef;
 
-		this.operatorData = new OperatorData(module, opDef.getName(), BASIC_SPECIALIZER, null);
+		OperatorData opData = new OperatorData(module, opDef.getText(), Freezer.specializer(BASIC_SPECIALIZER), null);
 		
-		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, opDef.getFacet(MAP_FACET).getResults()));	
-		operatorData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, opDef.getFacet(QUERY_FACET).getResults()));	
-		operatorData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+		opData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, findPrototype(MAP_FACET)));	
+		opData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, findPrototype(QUERY_FACET)));	
+		opData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+		
+		this.operatorData = opData;
+	}
+	private SyntheticOperator(String module, OperatorData opData) {
+		this.module = module;
+		this.operatorData = opData;
+		this.opDef = null;
+	}
+	
+	private TuplePrototype findPrototype(String name) {
+		return Freezer.prototype(findFacet(name).find(YIELDS).getChild(1));
+	}
+	private StencilTree findFacet(String name) {
+		for(StencilTree facet: opDef.findAll(OPERATOR_FACET)) {
+			if (facet.getText().equals(name)) {return facet;}
+		}
+		if (operatorData == null) {
+			throw new Error(String.format("Facet %1$s presented without required name: %2$s.", opDef.getText(), name));
+		} else {
+			throw new UnknownFacetException(opDef.getText(), name, operatorData.getFacetNames());
+		}
+		
 	}
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {
@@ -91,14 +122,33 @@ public class SyntheticOperator implements StencilOperator {
 
 	public String getName() {return operatorData.getName();}
 	public OperatorData getOperatorData() {return operatorData;}
-	public Tuple query(Object... values) {return process(opDef.getFacet(QUERY_FACET), values);}
-	public Tuple map(Object... values) {return process(opDef.getFacet(MAP_FACET), values);}
-	public int stateID(Object... values) {return opDef.getStateQuery().compositeStateID();}
+	
+	public Tuple query(Object... values) {return process(getQuery(), values);}
+	private OperatorFacet getQuery() {
+		if (query == null) {query = Freezer.operatorFacet(operatorData.getName(), findFacet(QUERY_FACET));}
+		return query;
+	}
+
+	public Tuple map(Object... values) {return process(getMap(), values);}
+	private OperatorFacet getMap() {
+		if (map == null) {map = Freezer.operatorFacet(operatorData.getName(), findFacet(MAP_FACET));}
+		return map;
+	}
+	
+	public int stateID(Object... values) {return getStateQuery().compositeStateID();}
+	private StateQuery getStateQuery() {
+		if (stateQuery == null) {stateQuery = Freezer.stateQuery(opDef.find(STATE_QUERY));}
+		return stateQuery;
+	}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
 	public SyntheticOperator duplicate() {throw new UnsupportedOperationException();}
-	public StencilOperator viewPoint() {
-		throw new UnsupportedOperationException("Fix this one...will reqiure some work thought!");
+	public SyntheticOperator viewpoint() {
+		SyntheticOperator rv = new SyntheticOperator(module, operatorData);
+		rv.query = getQuery().viewpoint();
+		rv.map = getMap().viewpoint();
+		rv.stateQuery = getStateQuery().viewpoint();
+		return rv;
 	}
 
 	private Tuple process(OperatorFacet facet, Object... values) {
@@ -110,8 +160,8 @@ public class SyntheticOperator implements StencilOperator {
 		Tuple tuple = new ArrayTuple(values);
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, tuple);
 		
-		try {prefilter = Interpreter.process(env, facet.getPrefilterRules());}
-		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", opDef.getName(), facet.getName(), tuple.toString()));}
+		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
+		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.getName(), facet.getName(), tuple.toString()));}
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 		
 		OperatorRule action = matchingAction(facet, env);
@@ -122,7 +172,7 @@ public class SyntheticOperator implements StencilOperator {
 				 result = Tuples.align(result, facet.getResults());
 				 return result;
 			} catch (Exception e) {
-				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", opDef.getName(), facet.getName()),e);
+				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", operatorData.getName(), facet.getName()),e);
 			}
 		}
 		

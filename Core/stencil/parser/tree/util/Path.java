@@ -3,6 +3,8 @@ package stencil.parser.tree.util;
 import stencil.parser.tree.StencilTree;
 import java.util.*;
 
+import org.antlr.runtime.tree.Tree;
+
 /**A path is the way to navigate from the tree root to a specific node.
  * Applying a path to a root will give the original node if it is applied
  * to the tree the path was originally created on OR the corresponding node
@@ -11,7 +13,7 @@ import java.util.*;
 public final class Path {
 	final List<Integer> turns;
 	
-	public Path(StencilTree target) {
+	public Path(Tree target) {
 		List turns = new LinkedList();
 		
 		int idx = target.getChildIndex();
@@ -65,5 +67,5 @@ public final class Path {
  	}
 
 	/**Given a tree, what is its path string.*/
-	public static String toString(StencilTree tree) {return new Path(tree).toString();}
+	public static String toString(Tree tree) {return new Path(tree).toString();}
 }

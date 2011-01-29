@@ -1,7 +1,7 @@
 tree grammar PrepareCustomArgs;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   output = AST;
   filter = true;
   superClass = TreeRewriteSequence;
@@ -18,12 +18,11 @@ options {
 	package stencil.parser.string;
 
 	import java.util.regex.Pattern;
-	import stencil.parser.tree.StencilString;
-	import stencil.parser.tree.Program;
+	import stencil.parser.tree.StencilTree;
 }
 
 @members{
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
 	public static final String PRINTF_OP = "Format.map";
 	public static final String VALIDATE_PATTERN = "([^\\{\\}]*(\\{.+\\})?)*";
@@ -44,11 +43,11 @@ options {
    /**Divide the input up into string and tuple refs.  
     * The input text MUST NOT include the island grammar markers (e.g. the quotes or braces...or whatever they end up being)
     **/
-   public static Tree splitArgs(String input, TreeAdaptor adaptor) {
+   public static StencilTree splitArgs(String input, TreeAdaptor adaptor) {
       boolean inRef = false;//Always starts outside of the ref
       String[] parts = split(input);
  	  
- 	  Tree root = (Tree) adaptor.create(SIGIL_ARGS, "SIGIL_ARGS");
+ 	  StencilTree root = (StencilTree) adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
  	  for (String part: parts) {
  	     if (!part.equals("")) {
 	 	     Tree leaf;
@@ -73,22 +72,22 @@ options {
 
    public Tree printfArgs(Tree args) {return printfArgs(args, adaptor);}
    public static Tree printfArgs(Tree args, TreeAdaptor adaptor) {
-     List<Tree> splitArgs = new stencil.parser.tree.List.WrapperList(splitArgs(stripBraces(args), adaptor));
+     StencilTree splitArgs = splitArgs(stripBraces(args), adaptor);
      StringBuilder format = new StringBuilder();
      List<Tree> refArgs = new ArrayList();
      
      for (Tree t: splitArgs) {
-        if (t instanceof StencilString) {
+        if (t.getType() == STRING) {
            format.append(t.getText());
         } else {
         	refArgs.add(t);
-			format.append("\%");
-			format.append(refArgs.size());
-			format.append("\$s");     
+          format.append("\%");
+          format.append(refArgs.size());
+          format.append("\$s");     
         }
      }
      
-     Tree printfArgs = (Tree) adaptor.create(LIST, "<args>");
+     Tree printfArgs = (Tree) adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
      adaptor.addChild(printfArgs, adaptor.create(STRING, format.toString()));
      for (Tree t: refArgs) {
         adaptor.addChild(printfArgs, adaptor.dupTree(t));
@@ -102,5 +101,5 @@ options {
 }
 
 topdown: ^(FUNCTION s=. b=ISLAND_BLOCK y=. c=.) 
-			 -> {doPrintf($b)}? ^(FUNCTION[PRINTF_OP] ^(SPECIALIZER DEFAULT) {printfArgs($b)} $y ^(FUNCTION $s ^(LIST ^(TUPLE_REF ^(NUMBER["0"]))) $y $c))
-			 -> ^(FUNCTION $s ^(LIST ^(STRING[stripBraces($b)])) $y $c);
+			 -> {doPrintf($b)}? ^(FUNCTION[PRINTF_OP] ^(SPECIALIZER DEFAULT) {printfArgs($b)} DIRECT_YIELD ^(FUNCTION $s ^(LIST_ARGS ^(TUPLE_REF ^(NUMBER["0"]))) $y $c))
+			 -> ^(FUNCTION $s ^(LIST_ARGS ^(STRING[stripBraces($b)])) $y $c);

@@ -31,7 +31,8 @@ package stencil.module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 
 /**A module is a collection of related operators.
  * The module interface describes the elements required
@@ -60,7 +61,7 @@ public interface Module {
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException, IllegalArgumentException;
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException, IllegalArgumentException;
 
 	/**Get the meta-data about a specific operator, given the specializer.
 	 * 

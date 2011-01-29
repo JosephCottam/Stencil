@@ -34,7 +34,7 @@ import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.modules.Numerics;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.unittests.StencilTestCase;
 
 public class TestNumerics extends StencilTestCase {
@@ -45,15 +45,15 @@ public class TestNumerics extends StencilTestCase {
 	}
 
 	public void testLog() throws Exception {
-		Specializer spec10 = ParseStencil.parseSpecializer("[base: 10, range: LAST]");
-		Specializer specE = ParseStencil.parseSpecializer("[base: \"e\", range: LAST]");
-		Specializer spec2 = ParseStencil.parseSpecializer("[base: 2, range: LAST]");
-		Specializer specNone = ParseStencil.parseSpecializer("[base: NULL, range: LAST]");
+		Specializer spec10 = ParseStencil.specializer("[base: 10, range: LAST]");
+		Specializer specE = ParseStencil.specializer("[base: \"e\", range: LAST]");
+		Specializer spec2 = ParseStencil.specializer("[base: 2, range: LAST]");
+		Specializer specNone = ParseStencil.specializer("[base: NULL, range: LAST]");
 		
-		StencilOperator log10 = numerics.instance("Log", spec10);
-		StencilOperator logE = numerics.instance("Log", specE);
-		StencilOperator log2 = numerics.instance("Log", spec2);
-		StencilOperator logNone = numerics.instance("Log", specNone);
+		StencilOperator log10 = numerics.instance("Log", null, spec10);
+		StencilOperator logE = numerics.instance("Log", null, specE);
+		StencilOperator log2 = numerics.instance("Log", null, spec2);
+		StencilOperator logNone = numerics.instance("Log", null, specNone);
 		
 		assertEquals(InvokeableOperator.class, log10.getClass());
 		assertEquals(InvokeableOperator.class, logE.getClass());

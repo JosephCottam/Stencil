@@ -4,7 +4,7 @@ import java.awt.geom.Rectangle2D;
 
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import stencil.util.collections.Tree;
 import edu.umd.cs.treemap.*;
@@ -53,12 +53,12 @@ public class TreeMap extends Layout {
 	public TreeMap(OperatorData opData, Specializer spec) {
 		super(opData, spec);
 		
-		String style = spec.get(STYLE_KEY).getText().toUpperCase();
+		String style = ((String) spec.get(STYLE_KEY)).toUpperCase();
 		if (style.equals("SQUARE")) {algorithm = new SquarifiedLayout();}
 		else if (style.equals("SLICE")) {algorithm = new SliceLayout();}
 		else if (style.equals("BINARY")) {algorithm = new BinaryTreeLayout();}
 		else if (style.equals("STRIP")) {algorithm = new StripTreemap();}
-		else {throw new IllegalArgumentException("Unrecognized style: " + spec.get(STYLE_KEY).getText());}
+		else {throw new IllegalArgumentException("Unrecognized style: " + spec.get(STYLE_KEY));}
 
 	
 		width = Converter.toDouble(spec.get(WIDTH_KEY));

@@ -108,7 +108,7 @@ public final class DelimitedParser implements TupleStream {
 	 * @param filename
 	 */
 	private void open() {
-		assert (filename != null && filename.trim() != "") : "Invalid filename supplied.  May not be null.  May not be empty.";
+		assert (filename != null && !filename.trim().equals("")) : "Invalid filename supplied.  May not be null.  May not be empty.";
 
 		try {
 			source = new BufferedReader(new FileReader(filename));

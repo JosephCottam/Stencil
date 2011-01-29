@@ -8,11 +8,12 @@ import stencil.module.operator.wrappers.SyntheticOperator;
 import stencil.module.operator.wrappers.SyntheticOperator.NoMatchException;
 import stencil.module.util.FacetData;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Program;
+import stencil.parser.tree.StencilTree;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.unittests.module.TestModuleCache;
 import junit.framework.TestCase;
+import static stencil.parser.string.StencilParser.LIST_OPERATORS;
 
 public class TestSyntheticOperator extends TestCase {
 	public static final String fullOperatorSource = "operator full(X,Y,Z) -> (X,Y,Z) (X != NULL) => (X,Y,Z) : (Z,Y,X)";			
@@ -24,21 +25,21 @@ public class TestSyntheticOperator extends TestCase {
 	}
 	
 	public void testGenerate() throws Exception {
-		Program program = ParseStencil.parse(fullOperatorSource, ADAPTER);
-		StencilOperator operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
+		StencilTree program = ParseStencil.programTree(fullOperatorSource, ADAPTER);
+		StencilOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
 		
 		assertEquals("full", operator.getName());
 		assertEquals(SyntheticOperator.class, operator.getClass());
 
-		program = ParseStencil.parse(basicOperatorSource, ADAPTER);
-		operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
+		program = ParseStencil.programTree(basicOperatorSource, ADAPTER);
+		operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
 		assertEquals("basic", operator.getName());
 		assertEquals(SyntheticOperator.class, operator.getClass());
 	}
 
 	public void testMap() throws Exception {
-		Program program = ParseStencil.parse(fullOperatorSource, ADAPTER);
-		SyntheticOperator operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
+		StencilTree program = ParseStencil.programTree(fullOperatorSource, ADAPTER);
+		SyntheticOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
 		FacetData facetData = operator.getOperatorData().getFacet(StencilOperator.MAP_FACET);
 		TuplePrototype prototype = facetData.getPrototype();
 		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
@@ -61,9 +62,9 @@ public class TestSyntheticOperator extends TestCase {
 	}
 
 	public void testMapNulls() throws Exception {
-		Program program = ParseStencil.parse(basicOperatorSource, ADAPTER);
+		StencilTree program = ParseStencil.programTree(basicOperatorSource, ADAPTER);
 
-		SyntheticOperator operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
+		SyntheticOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
 		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
 
 		boolean error = false;
@@ -80,7 +81,7 @@ public class TestSyntheticOperator extends TestCase {
 		String source = "operator bad(X,Y) -> (X,Y,Z) (all) => (Z,Y,X): (X,Y)";
 		boolean failed = false;
 		try {
-			ParseStencil.parse(source, ADAPTER);
+			ParseStencil.program(source, ADAPTER);
 		} catch (Exception e) {failed = true;}
 		finally {assertTrue("Exception not thrown when spec has argument mismatch in return.", failed);}
 
@@ -88,14 +89,14 @@ public class TestSyntheticOperator extends TestCase {
 		source = "operator bad(X,Y,Z) -> (X,Y,Z) (A=~ \".*\") => (X,Y,Z) : (Z,Y,X)";
 		failed = false;
 		try {
-			ParseStencil.parse(source, ADAPTER);
+			ParseStencil.program(source, ADAPTER);
 		} catch (Exception e) {failed = true;}
 		finally {assertTrue("Exception not thrown with unknown argument in filter.", failed);}
 	}
 
 	public void testMapfail() throws Exception {
-		Program program = ParseStencil.parse(fullOperatorSource, ADAPTER);
-		StencilOperator operator = new SyntheticOperator("TestModule", program.getOperators().get(0));
+		StencilTree program = ParseStencil.programTree(fullOperatorSource, ADAPTER);
+		StencilOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
 		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
 		
 		boolean failed = false;

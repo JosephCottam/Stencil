@@ -35,10 +35,11 @@ import stencil.module.operator.util.Range;
 import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
+import stencil.parser.string.util.Context;
 
 @Module
 @Description("Math functions that are defined in terms of longs instead of the default doubles")
@@ -207,7 +208,7 @@ public class LongMath extends BasicModule {
 	//TODO: Remove when converter has its own module/operator
 	public static Number asNumber(Object v) {return Converter.toNumber(v);}
  	 	
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 		Range range = new Range(specializer.get(Specializer.RANGE));
 
@@ -231,7 +232,7 @@ public class LongMath extends BasicModule {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
 				target = new FullSum(operatorData(FullMin.class, getName()));
-			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
+			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer));}
 
 		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}
 

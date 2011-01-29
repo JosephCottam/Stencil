@@ -103,5 +103,8 @@ public class StrokeTuple implements Tuple {
 
 	public int size() {return FIELDS.length;}
 	public String toString() {return Tuples.toString("Stroke", this, 1);}
-
+	public boolean equals(Object other) {
+		return other instanceof StrokeTuple 
+				&& ((StrokeTuple) other).stroke.equals(stroke);
+	}
 }

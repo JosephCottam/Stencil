@@ -33,14 +33,14 @@ from Words
  () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex(word, *)
  () : WordCount(word)
 
-layer Border[TEXT]
+layer Border["TEXT"]
 from Lines
    ID: line
    TEXT: text
    (X,Y):* Layout(line) 
 
 
-layer Center[TEXT]
+layer Center["TEXT"]
 from Words
    ID: word
    TEXT: word

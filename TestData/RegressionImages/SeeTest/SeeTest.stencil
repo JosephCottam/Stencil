@@ -28,7 +28,7 @@ from MTTSource
 	SHAPE: "RECTANGLE"
 	REGISTRATION: "TOP_LEFT"
 
-layer Others[PIE]
+layer Others["PIE"]
 from MTTSource
 	filter(suite_name !~"trivial")
 	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
@@ -52,7 +52,7 @@ from MTTNotApplicable
 	PATTERN: "HATCH"
 	PATTERN_WEIGHT: 1.1
 
-layer SubLabels[TEXT]
+layer SubLabels["TEXT"]
 from MTTSource
 	filter(suite_name !~"trivial")
 	local(ID): Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
@@ -65,7 +65,7 @@ from MTTSource
 	FONT_STYLE: "BOLD"
 	COLOR: @Color{0,0,0,166}
 
-layer Labels[TEXT]
+layer Labels["TEXT"]
 from MTTSource
 	ID: Concatenate(axis1A, axis1B)
 	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12)
@@ -85,14 +85,14 @@ from MTTSource
 	X: -375
 
 
-layer Legend[IMAGE]
+layer Legend["IMAGE"]
 from MTTSource
 	ID: "LegendImage"
 	FILE: "./SeeTest-Key.png"
 	(X,Y,WIDTH,HEIGHT) : (-375,10,200, 200)
 
 
-layer GridLines[LINE]
+layer GridLines["LINE"]
 from MTTSource
 	ID : Concatenate(axis1A, axis1B)
 	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)

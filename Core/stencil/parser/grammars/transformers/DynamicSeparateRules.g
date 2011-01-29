@@ -1,7 +1,7 @@
 tree grammar DynamicSeparateRules;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -17,10 +17,8 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
-
-  protected StencilTree dynamicResults(CommonTree source) {return siftRules(adaptor, (List<Rule>) source, RESULT, DYNAMIC, "Dynamic");}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
-topdown: ^(CONSUMES filter=. prefilter=. local=. results=. view=. canvas=.)
-   -> ^(CONSUMES $filter $prefilter $local $results $view $canvas {dynamicResults($results)});
+topdown: ^(c=CONSUMES rest+=.*)
+   -> ^(CONSUMES $rest* {siftRules(adaptor, $c.find(RULES_RESULT), RESULT, RULES_DYNAMIC, DYNAMIC)});

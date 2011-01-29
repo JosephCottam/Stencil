@@ -1,7 +1,7 @@
 tree grammar GuideTransfer;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
@@ -28,24 +28,21 @@ options {
   import stencil.parser.tree.*;
   import stencil.parser.tree.util.*;
   import stencil.module.*;
-  import stencil.module.util.*;
-  import stencil.module.operator.util.Invokeable;
-  import stencil.module.operator.StencilOperator;
   import stencil.interpreter.guide.SeedOperator;
   
   import static stencil.parser.ParserConstants.QUERY_FACET;
-  import static stencil.parser.ParserConstants.STATE_ID_FACET;
+  import static stencil.parser.ParserConstants.INVOKEABLE;
   import static stencil.parser.string.util.Utilities.*;
 }
 
 @members{
   public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
 
-  public static Program apply (Tree t, ModuleCache modules) {
-     return (Program) TreeRewriteSequence.apply(t, modules);
+  public static StencilTree apply (Tree t, ModuleCache modules) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules);
   }
   
-	protected Map<String, CommonTree> attDefs = new HashMap<String, CommonTree>();
+	protected Map<String, StencilTree> attDefs = new HashMap<String, StencilTree>();
 	protected ModuleCache modules;
 
   protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
@@ -59,10 +56,8 @@ options {
     return p;
   }
 
-    private String key(Tree selector) {
-      Selector sel=(Selector) selector;
-      List<Id> path = sel.getPath();
-      return key(path.get(0).getText(), path.get(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
+    private String key(StencilTree sel) {
+      return key(sel.getChild(0), sel.getChild(1)); //TODO: Extend the range of keys beyond layer/att pairs to full paths
     }
     
     private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
@@ -75,17 +70,16 @@ options {
 
 	//EnsureGuideOp guarantees that a sample operator exists; this
 	//cuts things down so the generator only includes things after that point
-   private Tree trimCall(CallTarget tree) {
-      if (tree instanceof Pack) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
-      Function f = (Function) tree;
+   private Tree trimCall(StencilTree tree) {
+      if (tree.getType() == StencilParser.PACK) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
 
-      if (f.getTarget().getOperator() instanceof SeedOperator) {return (Tree) adaptor.dupTree(f);}
-      else {return trimCall(f.getCall());}
+      if (tree.find(INVOKEABLE).getOperator() instanceof SeedOperator) {return (Tree) adaptor.dupTree(tree);}
+      else {return trimCall(tree.find(FUNCTION, PACK));}
    }
 }
 
 //Move mappings from the declarations in the consumes block up to the guides section
-buildMappings: ^(c=CONSUMES . . . ^(LIST mapping[((Consumes)$c).getContext().getName()]*) . .);
+buildMappings: ^(c=CONSUMES {$c.getAncestor(LAYER) !=null}? . . . ^(RULES_RESULT mapping[$c.getAncestor(LAYER).getText()]*) . .);
 mapping[String layerName] 
   : ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
 		{attDefs.put(key(layerName, field), group);};
@@ -106,25 +100,25 @@ transferMappings
 
 
 //Update query creation -----------------------------------------------
-copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=. .*))) ->
+copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=.))) ->
         ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} {stateQueryList(adaptor, $chain)});
 
 
 //trimMappings  -----------------------------------------------
 trimGuide
-  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=. .*)))
+  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=.)))
     {g.getAncestor(GUIDE_DIRECT) != null}?
-    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall((CallTarget) c)})));
+    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall(c)})));
 
-//^(CALL_CHAIN call=. size=.) {call.getAncestor(GUIDE) != null}? -> ^(CALL_CHAIN {trimCall((CallTarget) call)});
+//^(CALL_CHAIN call=. size=.) {call.getAncestor(GUIDE) != null}? -> ^(CALL_CHAIN {trimCall(call)});
 
 //Rename mappings -----------------------------------------------
 //Pick the 'guide'-related function instead of whatever else
 //was selected for each function
 renameMappingsDown
    @after{
-     Function func = ((Function) $renameMappingsDown.tree);
-     func.getTarget().changeFacet(QUERY_FACET);
+     StencilTree func = $renameMappingsDown.tree;
+     func.find(INVOKEABLE).changeFacet(QUERY_FACET);
      //TODO: Remove when no longer relying on copy propagation to keep shared state correct
    }
    : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);

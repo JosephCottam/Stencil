@@ -14,12 +14,27 @@ tokens {
   CANVAS_DEF;
   DIRECT_YIELD;
   DYNAMIC_RULE;
+  DYNAMIC_REDUCER;
   FUNCTION;
-  GLYPH_TYPE;        	//Indicate layer type
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
   GUIDE_SUMMARIZATION;
-  LIST;
+  LIST_ARGS;
+  LIST_CONSUMES;
+  LIST_FILTERS;
+  LIST_GUIDES;
+  LIST_GLOBALS;
+  LIST_IMPORTS;
+  LIST_JAVAS;
+  LIST_LAYERS;
+  LIST_OPERATORS;
+  LIST_PREDICATES;
+  LIST_RULES;
+  LIST_STREAMS;
+  LIST_STREAM_DECLS;
+  LIST_STREAM_DEFS;
+  LIST_TEMPLATES;
+  
   MAP_ENTRY;
   NUMBER;
   OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
@@ -35,12 +50,28 @@ tokens {
   PROGRAM;
   PACK;
   RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
+
   RULE;
-  SIGIL_ARGS;
+  RULES_CANVAS;
+  RULES_DEFAULTS;
+  RULES_DYNAMIC;
+  RULES_FILTER;
+  RULES_LOCAL;
+  RULES_OPERATOR;   //List of rules in an operator
+  RULES_PREDICATES;
+  RULES_PREFILTER;  
+  RULES_RESULT;
+  RULES_VIEW;
+
+  PROTOTYPE_ARG;
+  PROTOTYPE_RESULT;
+
+  SAMPLE_OPERATOR;//Guide system sample-operator node  
   STATE_QUERY;    //List of entities ot check if state has changed
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
-  STREAM_DEF;		//Root of a stream definition
+  SEED_OPERATOR;  //Guide system seed-operator node
+  STREAM_DEF;		  //Root of a stream definition
   TARGET;
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
@@ -156,28 +187,22 @@ tokens {
 
 program : imports* (globalValue | externalStream)* order canvasLayer (elementDef | layerDef | operatorDef | operatorTemplate | streamDef | javaDef)*
     -> ^(PROGRAM  
-          ^(LIST["Imports"] imports*) 
-          ^(LIST["Global Values"] globalValue*)
-          ^(LIST["Stream Declarations"] externalStream*)
+          ^(LIST_IMPORTS imports*) 
+          ^(LIST_GLOBALS globalValue*)
+          ^(LIST_STREAM_DECLS externalStream*)
           order 
           canvasLayer
-          ^(LIST["Streams"] streamDef*) 
-          ^(LIST["Layers"] layerDef* elementDef*) 
-          ^(LIST["Operators"] operatorDef* operatorTemplate*) 
-          ^(LIST["Javas"] javaDef*));
+          ^(LIST_STREAM_DEFS streamDef*) 
+          ^(LIST_LAYERS layerDef* elementDef*) 
+          ^(LIST_OPERATORS operatorDef* operatorTemplate*) 
+          ^(LIST_JAVAS javaDef*));
 
 
 
 //////////////////////////////////////////// PREAMBLE ///////////////////////////
 imports
-  : (IMPORT ID specializer AS) => IMPORT name=ID args=specializer AS as=ID
-      -> ^(IMPORT[$name.text] $as $args)
-  | (IMPORT ID AS) => IMPORT name=ID AS as=ID
-      -> ^(IMPORT[$name.text] $as LIST["Arguments"])
-  | (IMPORT ID specializer) => IMPORT name=ID args=specializer
-      -> ^(IMPORT[$name.text] ID[""] $args)
-  | IMPORT ID
-      -> ^(IMPORT[$name.text] ID[""] LIST["Arguments"]);
+  : IMPORT name=ID AS as=ID -> ^(IMPORT $name $as)
+  | IMPORT name=ID -> ^(IMPORT $name ID[""]);
 
 order
   : ORDER orderRef ('>' orderRef)*
@@ -185,8 +210,8 @@ order
   | -> ^(ORDER);
 
 orderRef
-  : ID -> ^(LIST["Streams"] ID)
-  | GROUP ID ('|' ID)+ CLOSE_GROUP ->  ^(LIST["Streams"] ID+);
+  : ID -> ^(LIST_STREAMS["Streams"] ID)
+  | GROUP ID ('|' ID)+ CLOSE_GROUP ->  ^(LIST_STREAMS ID+);
 
 globalValue
 //  options{backtrack=true;}
@@ -199,43 +224,38 @@ externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 
 canvasLayer
   : CANVAS name=ID specializer guideDef* 
-    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST["Guides"] guideDef*))
-  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER LIST) ^(LIST["Guides"]));
+    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST_GUIDES["Guides"] guideDef*))
+  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT) ^(LIST_GUIDES["Guides"]));
 
 guideDef: GUIDE ID specializer FROM selector rule["result"]* 
-			-> ^(GUIDE ID specializer selector ^(LIST["Rules"] rule*));
+			-> ^(GUIDE ID specializer selector ^(LIST_RULES rule*));
 
 selector
   options{backtrack=true;}
-  : att=ID DEFINE path+=ID+ -> ^(SELECTOR[$att.text] $att ^(LIST["path"] $path+))
-  |               path+=ID+ -> ^(SELECTOR["DEFAULT"] DEFAULT ^(LIST["path"] $path+));
+  : att=ID DEFINE path+=ID+ -> ^(SELECTOR[$att.text] $path+)
+  |               path+=ID+ -> ^(SELECTOR["DEFAULT"] $path+);
 
 //////////////////////////////////////////// STREAM, LAYER, ELEMENT ///////////////////////////
 
 streamDef
   : STREAM name=ID tuple[true]  consumesBlock+
-    -> ^(STREAM_DEF[$name.text] tuple ^(LIST["Consumes"] consumesBlock+));
+    -> ^(STREAM_DEF[$name.text] tuple ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 layerDef
-  : LAYER name=ID implantationDef defaultsBlock consumesBlock+
-    -> ^(LAYER[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+));
+  : LAYER name=ID specializer defaultsBlock consumesBlock+
+    -> ^(LAYER[$name.text] specializer defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 elementDef
-  : ELEMENT name=ID implantationDef defaultsBlock consumesBlock+
-  	->^(ELEMENT[$name.text] implantationDef defaultsBlock ^(LIST["Consumes"] consumesBlock+)); 
-
-  
-implantationDef
-  : ARG type=ID CLOSE_ARG -> GLYPH_TYPE[$type.text]
-  | -> GLYPH_TYPE[DEFAULT_GLYPH_TYPE];
+  : ELEMENT name=ID specializer defaultsBlock consumesBlock+
+  	->^(ELEMENT[$name.text] specializer defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+)); 
     
 defaultsBlock
-  : DEFAULT rule["result"]+ -> ^(LIST["Defaults"] rule+)
-  | -> ^(LIST["Defaults"]);
+  : DEFAULT rule["result"]+ -> ^(RULES_DEFAULTS rule+)
+  | -> RULES_DEFAULTS;
   
 consumesBlock
   : FROM stream=ID filter* rule["result"]+ 
-    -> ^(CONSUMES[$stream.text] ^(LIST["Filters"] filter*) ^(LIST["Rules"] rule+));
+    -> ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+));
 
 filter: FILTER! predicate;
 
@@ -245,7 +265,7 @@ operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text])
   
 operatorDef
   : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
-    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(LIST["Prefilters"] $pf*) ^(LIST["Rules"] operatorRule+))
+    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER["Prefilters"] $pf*) ^(RULES_OPERATOR["Rules"] operatorRule+))
   | OPERATOR name=ID DEFINE base=opName specializer
     -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
   	  
@@ -255,7 +275,7 @@ opName
 
 operatorRule
   : predicate GATE rule["result"]+
-    -> ^(OPERATOR_RULE predicate ^(LIST["Rules"] rule+));
+    -> ^(OPERATOR_RULE predicate ^(LIST_RULES["Rules"] rule+));
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[String def]
@@ -271,28 +291,27 @@ callChainMember
   
   
 functionCallTarget
-  : (frameLabel functionCall passOp["a"]) => 
-  		l=frameLabel f1=functionCall passOp[$l.label] f2=callChainMember
-  		-> ^($f1 passOp $f2)
-  | (functionCall passOp["a"]) => 
-  		f1=functionCall passOp[genSym(FRAME_SYM_PREFIX)] f2=callChainMember    
-  		-> ^($f1 passOp $f2)
+  :	l=frameLabel f1=functionCall passOp[$l.label] f2=callChainMember
+  		-> ^(FUNCTION[$f1.funcName] $f1 passOp $f2)
+  | f1=functionCall passOp[genSym(FRAME_SYM_PREFIX)] f2=callChainMember    
+  		-> ^(FUNCTION[$f1.funcName] $f1 passOp $f2)
   | l=frameLabel f1=functionCall 
-    -> ^($f1 DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
+      -> ^(FUNCTION[$f1.funcName] $f1 DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
   | f1=functionCall 
-    -> ^($f1 DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] ^(PACK DEFAULT));
+      -> ^(FUNCTION[$f1.funcName] $f1 DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] ^(PACK DEFAULT));
    
 frameLabel returns [String label]: ARG ID CLOSE_ARG {$label=$ID.text;} -> ID;
 
-
-functionCall
-  :(callName[MAP_FACET] specializer valueList) =>
-   name=callName[MAP_FACET] specializer valueList
-    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"] valueList))
+functionCall returns[String funcName]
+  : name=callName[MAP_FACET] s=specializer valueList 
+     {$funcName = ((Tree) name.tree).getText();} 
+     -> specializer ^(LIST_ARGS valueList)
   | name=callName[MAP_FACET] specializer emptySet
-    -> ^(FUNCTION[((Tree)name.tree).getText()] specializer ^(LIST["args"]))
+     {$funcName = ((Tree) name.tree).getText();} 
+     -> specializer ^(LIST_ARGS)
   | t=TAGGED_ID ISLAND_BLOCK
-    -> ^(FUNCTION[customArgsCall($t.text)] ^(SPECIALIZER DEFAULT) ISLAND_BLOCK);  
+     {$funcName = customArgsCall($t.text);} 
+     -> ^(SPECIALIZER DEFAULT) ISLAND_BLOCK;  
 
 //Apply defaultCall to functions that have no explicit call
 callName[String defaultCall]
@@ -316,21 +335,23 @@ target[String def]
 //////////////////////////////////////////// JAVA ///////////////////////////
 
 javaDef 
-  : JAVA ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$ID.text] $i $b)
-  | JAVA ID b=ISLAND_BLOCK -> ^(JAVA[$ID.text] ISLAND_BLOCK["{}"] $b);
+  : JAVA n=ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$ID.text] ID[DEFAULT_JAVA_SUPER] $i $b)
+  | JAVA n=ID b=ISLAND_BLOCK -> ^(JAVA[$ID.text] ID[DEFAULT_JAVA_SUPER] ISLAND_BLOCK["{}"] $b)
+  | JAVA n=ID DEFINE s=ID b=ISLAND_BLOCK -> ^(JAVA[$n.text] $s ISLAND_BLOCK["{}"] $b)
+  | JAVA n=ID DEFINE s=ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$n.text] $s $i $b);
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 predicate
   : GROUP? ALL CLOSE_GROUP?
-    -> ^(LIST["Predicates"] ^(PREDICATE ALL))
+    -> ^(LIST_PREDICATES ^(PREDICATE ALL))
   | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
-    -> ^(LIST["Predicates"] ^(PREDICATE value booleanOp value)+);
+    -> ^(LIST_PREDICATES ^(PREDICATE value booleanOp value)+);
 
 specializer
-  : ARG argList CLOSE_ARG -> ^(SPECIALIZER ^(LIST argList))
-  | ARG mapList CLOSE_ARG -> ^(SPECIALIZER ^(LIST mapList))
-  | ARG argList SEPARATOR mapList CLOSE_ARG -> ^(SPECIALIZER ^(LIST argList mapList))
-  | ARG CLOSE_ARG -> ^(SPECIALIZER LIST["Map Arguments"])
+  : ARG argList CLOSE_ARG -> ^(SPECIALIZER argList)
+  | ARG mapList CLOSE_ARG -> ^(SPECIALIZER mapList)
+  | ARG argList SEPARATOR mapList CLOSE_ARG -> ^(SPECIALIZER argList mapList)
+  | ARG CLOSE_ARG -> ^(SPECIALIZER)
   | -> ^(SPECIALIZER DEFAULT);
 
 argList : argEntry  (SEPARATOR! argEntry)*;
@@ -358,27 +379,27 @@ tuple[boolean allowEmpty]
 
 emptySet: GROUP! CLOSE_GROUP!;
 
-atomList: atom (SEPARATOR atom)* -> ^(LIST["Value Arguments"] atom*);
 valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!; 
 		
 value : tupleRef | atom;
-atom  : number | STRING | DEFAULT | ALL | LAST | NULL;
+atom  : number | STRING | DEFAULT | ALL | LAST | NULL;  //TODO: Can ALL, LAST be removed from this list?
 
 tupleRef
   options{backtrack=true;}
-  : simpleRef
-  | simpleRef qualifiedRef+ -> ^(simpleRef qualifiedRef+);
+  : simpleRef -> ^(TUPLE_REF simpleRef)
+  | simpleRef qualifiedRef+ -> ^(TUPLE_REF simpleRef qualifiedRef+);
 
 private simpleRef
-  : ID  -> ^(TUPLE_REF ID)
-  | DEFAULT_VALUE -> ^(TUPLE_REF NUMBER["0"])
-  | TUPLE_VALUE -> ^(TUPLE_REF ALL)
-  | LAST -> ^(TUPLE_REF LAST)
-  | ALL -> ^(TUPLE_REF ALL)
-  | ARG number CLOSE_ARG -> ^(TUPLE_REF number)
-  | c=CANVAS -> ^(TUPLE_REF ID[$c.text])
-  | l=LOCAL -> ^(TUPLE_REF ID[$l.text])
-  | v=VIEW -> ^(TUPLE_REF ID[$v.text]);
+  : ID 
+  | DEFAULT_VALUE -> NUMBER["0"]
+  | TUPLE_VALUE -> ALL
+  | LAST 
+  | ALL 
+  | ARG! number CLOSE_ARG!
+  | c=CANVAS -> ID[$c.text]
+  | l=LOCAL -> ID[$l.text]
+  | v=VIEW -> ID[$v.text]
+  ;
 
 private qualifiedRef 
   : ARG i=ID CLOSE_ARG -> $i

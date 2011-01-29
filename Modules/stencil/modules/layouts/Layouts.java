@@ -10,7 +10,8 @@ import stencil.module.util.ModuleIncompleteError;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ModuleDataParser.MetaDataParseException;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 
 @Module
 @Description("Layouts groups of nodes")
@@ -30,7 +31,7 @@ public class Layouts extends BasicModule {
 		return md;
 	}
 
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
 		OperatorData operatorData = getModuleData().getOperator(name);

@@ -6,14 +6,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 
 import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.AstInvokeable;
-import stencil.parser.tree.TupleRef;
 import stencil.parser.tree.util.MultiPartName;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
 import static stencil.parser.ParserConstants.QUERY_FACET;
@@ -75,18 +73,5 @@ public class Utilities {
 			adaptor.addChild(rv, target);					
 		}		
 		return rv;
-	}
-	
-	public static String mapTreesToString(Map<TupleRef, Tree> subst) {
-		StringBuilder b = new StringBuilder();
-		for(TupleRef key: subst.keySet()) {
-			b.append(key.toStringTree());
-			b.append(":");
-			b.append(subst.get(key).toStringTree());
-			b.append(" --- ");
-			b.append(key.hashCode());
-			b.append("\n");
-		}
-		return b.toString();
 	}
 }

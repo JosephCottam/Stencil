@@ -25,13 +25,10 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
-import stencil.parser.string.MakeViewPoint;
-import stencil.parser.tree.DynamicRule;
-import stencil.parser.tree.Guide;
-import stencil.parser.tree.Program;
+import stencil.interpreter.tree.DynamicRule;
+import stencil.interpreter.tree.Guide;
+import stencil.interpreter.tree.Program;
 import stencil.util.StencilThreadFactory;
-import static stencil.parser.string.StencilParser.DYNAMIC_RULE;
-
 
 /**Paint visualization.
  * This implementation uses a set of thread pools to perform updates and do the actual painting.
@@ -144,7 +141,6 @@ public final class MultiThreadPainter {
 	private final List<PaintTask> painters;
 	private final ExecutorService renderPool;
 	private final ExecutorService updatePool;
-	private final Program program;
 	
 	private final List<UpdateTask> guideUpdaters = new ArrayList();
 	private final Map<DynamicRule, DynamicUpdateTask> dynamicUpdaters = new HashMap();
@@ -162,7 +158,6 @@ public final class MultiThreadPainter {
 	public MultiThreadPainter(Canvas canvas, DoubleBufferLayer[] layers, Object visLock, Program program) {
 		this.layers = layers;
 		this.visLock = visLock;
-		this.program = program;
 		
 		renderPool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("render"));
 		updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update"));
@@ -170,13 +165,12 @@ public final class MultiThreadPainter {
 		painters = new ArrayList();		
 		
 		
-		for (Guide g: program.getCanvasDef().getGuides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
-		for (Object r : program.findDescendants(DYNAMIC_RULE)) {
-			DynamicRule rule = (DynamicRule) r;
+		for (Guide g: program.canvas().guides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
+		for (DynamicRule rule : program.allDynamics()) {
 			DisplayLayer layer= null;
-			String ruleLayerName=rule.getGroup().getContext().getName();
-			for (DisplayLayer t: layers) {if (t.getName().equals(ruleLayerName)) {layer = t; break;}}
+			for (DisplayLayer t: layers) {if (t.getName().equals(rule.layerName())) {layer = t; break;}}
 			assert layer != null : "Table null after name-based search.";
+			
 			DynamicUpdateTask updateTask = new DynamicUpdateTask(layer, rule);
 			dynamicUpdaters.put(rule, updateTask);
 		}
@@ -251,18 +245,15 @@ public final class MultiThreadPainter {
 	 * */
 	public void doUpdates() {
 		try {
-			Program viewPoint;
-
 			synchronized(renderLock) {					//Prevent rendering
 				synchronized(visLock) { 				//Suspend analysis until the viewpoint is ready
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
-					viewPoint = MakeViewPoint.apply(program);	
 				}
 	
-				for (UpdateTask ut: guideUpdaters) {ut.setStencilFragment(viewPoint);}
-				for (UpdateTask ut: dynamicUpdaters.values()) {ut.setStencilFragment(viewPoint);}
+				for (UpdateTask ut: guideUpdaters) {ut.viewPoint();}
+				for (UpdateTask ut: dynamicUpdaters.values()) {ut.viewPoint();}
 					
 				executeAll(dynamicUpdaters.values());
 				executeAll(guideUpdaters);
@@ -278,8 +269,8 @@ public final class MultiThreadPainter {
 	 * @param targets
 	 * @throws Exception
 	 */
-	private void executeAll(Collection<? extends UpdateTask> targets) throws Exception {
-		List<Future<Finisher>> results = updatePool.invokeAll((Collection<? extends Callable<Finisher>>) targets); //HACK: Why is this cast required???
+	private void executeAll(Collection targets) throws Exception {
+		List<Future<Finisher>> results = updatePool.invokeAll(targets);	
 		for (Future<Finisher> f: results) {//TODO: Finisher could PROBABLY be removed if the layer were a column store...
 			Finisher finalizer = f.get();
 			finalizer.finish();

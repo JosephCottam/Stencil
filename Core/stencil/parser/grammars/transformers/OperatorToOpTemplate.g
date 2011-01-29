@@ -1,7 +1,7 @@
 tree grammar OperatorToOpTemplate;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -17,20 +17,20 @@ options {
 }
 
 @members{
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
    private String newName;
    
    /** @arg ops Operator parts list
     * @arg keep True -- return list of templates; False -- return list of non-templates
     */
-   private StencilTree siftTemplates(List<StencilTree> ops, String label, boolean keepTemplates) {
-      StencilTree list = (StencilTree) adaptor.create(LIST, label); 
+   private StencilTree siftTemplates(StencilTree ops, int type, boolean keepTemplates) {
+      StencilTree list = (StencilTree) adaptor.create(type, StencilTree.typeName(type)); 
       for (StencilTree t: ops) {
          if (keepTemplates && t.getType() == OPERATOR) {
-            adaptor.addChild(list, adaptor.dupTree(t.getFirstChildWithType(OPERATOR_TEMPLATE)));
+            adaptor.addChild(list, adaptor.dupTree(t.find(OPERATOR_TEMPLATE)));
          } else if (!keepTemplates && t.getType() == OPERATOR) {
-            adaptor.addChild(list, adaptor.dupTree(t.getFirstChildWithType(OPERATOR_REFERENCE)));
+            adaptor.addChild(list, adaptor.dupTree(t.find(OPERATOR_REFERENCE)));
          } else if (!keepTemplates && t.getType() != OPERATOR) {
          	  adaptor.addChild(list, adaptor.dupTree(t));
          }
@@ -38,8 +38,8 @@ options {
       return list;   
    }
 
-   protected StencilTree templates(CommonTree source)     {return siftTemplates((List<StencilTree>) source, "Operator Templates", true);}
-   protected StencilTree nonTemplates(CommonTree source)  {return siftTemplates((List<StencilTree>) source, "Operators", false);}
+   protected StencilTree templates(StencilTree source)     {return siftTemplates(source, LIST_TEMPLATES, true);}
+   protected StencilTree nonTemplates(StencilTree source)  {return siftTemplates(source, LIST_OPERATORS, false);}
    
 }
 

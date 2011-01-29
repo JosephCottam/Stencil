@@ -4,7 +4,7 @@ import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
 import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.*;
+import stencil.interpreter.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
 import stencil.util.streams.txt.DelimitedParser;
@@ -25,7 +25,7 @@ public class TestTupleLoader extends StencilTestCase {
 	public void testLoad() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 		
-		Program program = ParseStencil.parse(ruleSource, Adapter.ADAPTER);
+		Program program = ParseStencil.program(ruleSource, Adapter.ADAPTER);
 		panel = Adapter.ADAPTER.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
@@ -42,7 +42,7 @@ public class TestTupleLoader extends StencilTestCase {
 	public void testThread() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 
-		Program program = ParseStencil.parse(ruleSource, Adapter.ADAPTER);
+		Program program = ParseStencil.program(ruleSource, Adapter.ADAPTER);
 		panel = Adapter.ADAPTER.generate(program);
 
 		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);

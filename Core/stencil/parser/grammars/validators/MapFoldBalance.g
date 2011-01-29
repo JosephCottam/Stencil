@@ -1,7 +1,7 @@
 tree grammar MapFoldBalance;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   filter = true;
   superClass = TreeFilterSequence;
 }
@@ -28,18 +28,18 @@ options {
 
 topdown: (layerDefault | prefilter | view | canvas | local);
 
-layerDefault: ^(LAYER . ^(LIST balancedRule*) .*);
+layerDefault: ^(LAYER . ^(LIST_CONSUMES balancedRule*) .*);
 
-prefilter: ^(CONSUMES . ^(LIST balancedRule*) .*);
-local:     ^(CONSUMES . . ^(LIST balancedRule*) .*);
-view:      ^(CONSUMES . . . . ^(LIST balancedRule*) .*);
-canvas:    ^(CONSUMES . . . . . ^(LIST balancedRule*) .*);
+prefilter: ^(RULES_PREFILTER balancedRule*);
+local:     ^(RULES_LOCAL balancedRule*);
+view:      ^(RULES_VIEW balancedRule*);
+canvas:    ^(RULES_CANVS balancedRule*);
 
 
 balancedRule: ^(RULE . callChain .);
 callChain
    @after{if ($r.r != 0) {throw new ValidationException("Unbalanced map/fold in a context that requires balance.");}}
-   : ^(CALL_CHAIN r=chain[0] .);
+   : ^(CALL_CHAIN r=chain[0]);
    
    
 chain[int d] returns [int r]

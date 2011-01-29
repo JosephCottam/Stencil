@@ -1,7 +1,7 @@
 tree grammar GuideDefaultRules;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	filter = true;
   superClass = TreeRewriteSequence;
   output = AST;	
@@ -27,10 +27,10 @@ options {
 }
 
 @members {
-   public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+   public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-   private static final Rule OUTPUT_RULE;
-   private static final Rule INPUT_RULE;
+   private static final StencilTree OUTPUT_RULE;
+   private static final StencilTree INPUT_RULE;
    private static final String OUTPUT_FIELD = "Output";
    private static final String INPUT_FIELD = "Input";
    private static final String X_FIELD = "X";
@@ -43,7 +43,7 @@ options {
        INPUT_RULE = parseRule(INPUT_FIELD + BIND_OPERATOR + INPUT_FIELD);
    }
    
-   private static final Rule parseRule(String input) {
+   private static final StencilTree parseRule(String input) {
       ANTLRStringStream input1 = new ANTLRStringStream(input);
       StencilLexer lexer = new StencilLexer(input1);
       CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -51,40 +51,39 @@ options {
       parser.setTreeAdaptor(ParseStencil.TREE_ADAPTOR);
       
       try {
-         return (Rule) parser.rule("result").getTree();
+         return (StencilTree) parser.rule("result").getTree();
       } catch (Exception e) {
          throw new Error("Error constructing default rule for guides.",e);
       }
    }
     
    
-   public StencilTree reform(Guide g) {
-     TuplePrototype p = EnvironmentProxy.calcPrototype(g.getRules());
+   public StencilTree reform(StencilTree g) {
+     StencilTree rules = g.find(LIST_RULES);
+     TuplePrototype p = EnvironmentProxy.calcPrototype(rules);
      List<String> names = Arrays.asList(TuplePrototypes.getNames(p));
-     List<Rule> rules = g.getRules();
-     String layer = g.getSelector().getPath().get(0).getID();
 
-
-     if (g.getGuideType().equals("pointLabels")) {
+     String guideType = g.find(ID).getText();
+     if (guideType.equals("pointLabels")) {
         if (!names.contains(X_FIELD)) {
-           Rule r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
+           StencilTree r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(Y_FIELD)) {
-           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
+           StencilTree r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(TEXT_FIELD)) {
-           Rule r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
+           StencilTree r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
            adaptor.addChild(rules, r);
         }
-     } else if (g.getGuideType().equals("trend")) {
+     } else if (guideType.equals("trend")) {
         if (!names.contains(X_FIELD)) {
-           Rule r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
+           StencilTree r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
            adaptor.addChild(rules, r);
         }
         if (!names.contains(Y_FIELD)) {
-           Rule r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
+           StencilTree r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
            adaptor.addChild(rules, r);
         }        
      } else {          
@@ -101,4 +100,4 @@ options {
    }
 }
 
-topdown: ^(g=GUIDE .*) -> {reform((Guide) g)};
+topdown: ^(g=GUIDE .*) -> {reform(g)};

@@ -1,7 +1,7 @@
 tree grammar GuideClean;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;	
+  ASTLabelType = StencilTree;	
   filter = true;
   output = AST;	
   superClass = TreeRewriteSequence;
@@ -12,11 +12,11 @@ options {
   
   package stencil.parser.string;
   
-  import stencil.parser.tree.Program; 
+  import stencil.parser.tree.StencilTree; 
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 bottomup

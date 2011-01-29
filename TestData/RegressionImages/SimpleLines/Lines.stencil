@@ -10,7 +10,7 @@ STRICT: false
 
 stream LineSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
  
-layer GridLines[LINE]
+layer GridLines["LINE"]
 from LineSource
 	ID: Concatenate(axis1A, axis1B)
 	X.1: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (X)

@@ -16,7 +16,7 @@ stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CT
 
 order (Stocks | Mouse)
 
-layer Ticker[POLY_LINE]
+layer Ticker["POLY_LINE"]
 from Stocks
     ID : "Google"   
     X.new: TimeStep(Date) 

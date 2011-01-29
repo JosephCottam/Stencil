@@ -3,7 +3,8 @@ package stencil.module.util;
 import stencil.module.Module;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class MutableModule implements Module {
 		return moduleData.getOperator(name);		
 	}
 
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
 		return operators.get(name);
 	}
 

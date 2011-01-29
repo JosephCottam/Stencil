@@ -3,7 +3,7 @@ package stencil.modules.jung;
 import edu.uci.ics.jung.graph.DelegateForest;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
 @Operator(spec="[range: ALL, split: 0, distX: 50, distY: 50]")

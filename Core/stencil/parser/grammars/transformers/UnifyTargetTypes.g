@@ -1,7 +1,7 @@
 tree grammar UnifyTargetTypes;
 options {
     tokenVocab = Stencil;
-    ASTLabelType = CommonTree;	
+    ASTLabelType = StencilTree;	
     output = AST;
     filter = true;
     superClass = TreeRewriteSequence;
@@ -12,12 +12,11 @@ options {
 
 	package stencil.parser.string;
 	
-	import stencil.parser.tree.*;
-	import static stencil.parser.string.StencilParser.*;
+	import stencil.parser.tree.StencilTree;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 //Remove individual types

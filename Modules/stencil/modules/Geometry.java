@@ -4,7 +4,7 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
 @Module

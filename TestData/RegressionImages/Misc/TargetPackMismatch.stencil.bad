@@ -1,0 +1,15 @@
+STREAM: File
+NAME: EntityFeed
+HEADER: ID
+SEPARATOR: $^
+SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
+SKIP: 0
+STRICT: true
+
+stream Stream(V)
+
+layer Layer
+from Stream
+	ID: Count()
+    SIZE: (1,2)
+

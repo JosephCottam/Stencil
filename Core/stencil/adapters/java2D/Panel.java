@@ -35,7 +35,7 @@ import stencil.adapters.java2D.data.ViewTuple;
 import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
-import stencil.parser.tree.Program;
+import stencil.interpreter.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import stencil.util.epsExport.EpsGraphics2D;

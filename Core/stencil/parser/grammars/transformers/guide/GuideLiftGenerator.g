@@ -1,7 +1,7 @@
 tree grammar GuideLiftGenerator;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	filter = true;
   superClass = TreeRewriteSequence;
   output = AST;	
@@ -19,56 +19,60 @@ options {
   import stencil.interpreter.guide.SeedOperator;
   import stencil.module.operator.util.ReflectiveInvokeable;
   import stencil.interpreter.guide.samplers.LayerSampler;
+  import stencil.display.DisplayLayer;
+  import static stencil.parser.ParserConstants.INVOKEABLE;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-  public Program downup(Object t) {
+  public StencilTree downup(Object t) {
     downup(t, this, "lift");
     downup(t, this, "repackRoot");  //Lift up and package as a guide generator
     downup(t, this, "rename");//Rename stream references to sample references
-    return (Program) t;  
+    return (StencilTree) t;  
   }
   
   /**Return true if a frame name should be replaced with a reference to the generated sample.
    *  In the simple world, this will only need to replace the references to the stream.
    *  However, with -#> sampler placement, this is more copmlicated.
    *
-   *  TODO: Have the replacement strategy throw an exception if it is replacing from more than one frame.
    *  TODO: When runtime constants are added, do not replace elements in the runtime global frame  
   */
-  public boolean replace(CommonTree ref, String frame) {
+  public boolean replace(StencilTree ref, String frame) {
      if (frame.equals(ParserConstants.GLOBALS_FRAME) 
          || frame.equals(ParserConstants.VIEW_FRAME) 
          || frame.equals(ParserConstants.CANVAS_FRAME)) {return false;}
      
-     Function f = (Function) ref.getAncestor(FUNCTION);
+     StencilTree f = ref.getAncestor(FUNCTION);
      if (f == null) {return true;}
-     if (f.getPass().getText().equals(frame)) {return false;}
+     if (f.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD).getText().equals(frame)) {return false;}
      return replace(f, frame);
   }
 }
 
 lift
   @after{
-    Guide g = (Guide) retval.tree.getChild(0);
+    StencilTree g = retval.tree.getChild(0);
     if (seed != null) {
-       g.setSeedOperator(((Function) seed).getTarget().getInvokeable());
+       Object op = seed.find(INVOKEABLE).getOperator();
+       ((Const) g.find(SEED_OPERATOR).find(CONST)).setValue(op);
     } else {
-       String layerName = g.getSelector().getPath().get(0).getID();
-       Layer layer = ((Program) g.getAncestor(PROGRAM)).getLayer(layerName);
-       SeedOperator op = new LayerSampler.SeedOperator(layer);
-       g.setSeedOperator(new ReflectiveInvokeable("getSeed", op));
+       String layerName = g.find(SELECTOR).getChild(0).getText();
+       StencilTree layer = g.getAncestor(PROGRAM).find(LIST_LAYERS).find(LAYER, layerName);
+       DisplayLayer dl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();
+       
+       SeedOperator op = new LayerSampler.SeedOperator(dl);
+       ((Const) g.find(SEED_OPERATOR).find(CONST)).setValue(op);
     }
   }
 
   : ^(GUIDE_DIRECT ^(GUIDE type=. spec=. selector=. actions=.
         ^(RULE target=.
            ^(CALL_CHAIN ^(seed=FUNCTION i=. s=. a=. y=. c=. ))) query=.))        
-     -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query))
+     -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query ^(SEED_OPERATOR CONST)))
   | ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. seeder=. query=.))
-     -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $seeder) $query));
+     -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $seeder) $query ^(SEED_OPERATOR CONST)));
      
 repackRoot
   : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
@@ -83,7 +87,7 @@ repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)
   | ^(PACK f=.*) -> ^(PACK $f ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"]));
 
-rename: ^(TUPLE_REF fr=ID fi=ID r=.*)
+rename: ^(TUPLE_REF fr=ID fi=. r+=.*)
   {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
       -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*);
         

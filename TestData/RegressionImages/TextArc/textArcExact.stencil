@@ -35,14 +35,14 @@ from Words
  () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex(word, ALL)
  () : WordCount(word)
 
-layer Border[TEXT]
+layer Border["TEXT"]
 from Lines
    ID: line
    TEXT: text
    (X,Y):* Layout(line) 
    COLOR: @Color{Gray70}
 
-layer Center[TEXT]
+layer Center["TEXT"]
 from Words
    ID: word
    TEXT: word
@@ -50,7 +50,7 @@ from Words
    REGISTRATION: "CENTER"
    (COLOR, FONT):* Freq(word) -> 
         [color] HeatScale[hot: "Gray90", cold: "Gray30"](freq) ->
-   		Scale[min: 50, max:500](freq) -> @Font{_} -> (color[_], _)
+   		Scale[min: 50, max:500](freq) -> @Font{{_}} -> (color[_], _)
   
 operator Contract : Geo::Scale[by: .94]
 operator Outer : CircularLayout[start:0, size: 10, ratio: -.75]

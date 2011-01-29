@@ -10,17 +10,19 @@ import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.*;
+import stencil.parser.string.validators.TargetMatchesPack;
 import stencil.parser.tree.*;
 import stencil.testUtilities.StringUtils;
+import static stencil.parser.string.StencilParser.*;
 import junit.framework.TestCase;
 
 public class TestFragments extends TestCase {
 	private interface Test {
-		public boolean check(Tree t);
+		public boolean check(StencilTree t);
 		public String getMessage();
 	}
 
-	private Program init(String source) throws Exception {
+	private StencilTree init(String source) throws Exception {
 		Properties props = new Properties();
 		props.loadFromXML(new FileInputStream("./TestData/Stencil.properties"));
 		stencil.Configure.loadProperties(props);
@@ -29,12 +31,12 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testImport() throws Exception {
-		Tree t = init("import JUNG");
+		Tree t = init("import JUNG\n");
 
 		ModuleCache modules = Imports.apply(t);
 		
 		assertNotNull("Import unsuccessful; could not find module by name.", modules.getModule("JUNG"));
-		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("BalloonLayout"));		
+		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("", "BalloonLayout"));		
 
 		
 		t = init("import JUNG as JG");
@@ -43,12 +45,12 @@ public class TestFragments extends TestCase {
 		
 		assertNotNull("Proxy name import unsuccessful; could not find  module by prefix.", modules.getModule("JG"));
 		
-		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG::BalloonLayout"));
+		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG", "BalloonLayout"));
 	}
 	
 	public void testAdHocPrime() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
-		Program p = init(source);
+		StencilTree p = init(source);
 		Adapter adapter = Adapter.ADAPTER;
 
 		p = LiftStreamPrototypes.apply(p);		//Create prototype definitions for internally defined streams
@@ -65,16 +67,14 @@ public class TestFragments extends TestCase {
 		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
 		p = DefaultPack.apply(p);				//Add default packs where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
-		p = OperatorInstantiateTemplates.apply(p, modules);		//Remove all operator references
-		p = RemoveOpTemplates.apply(p);							//Remove the templates references point at (simplifies later analysis)
+		p = OperatorInstantiateTemplates.apply(p);		//Remove all operator references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
 
-		p = AnnotateEnvironmentSize.apply(p);			//Annotate call chains with the environment size (must be done before layer creation because defaults can have call chains)
 		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
 		Module m = modules.getAdHoc();
-		int expected = p.getOperators().size() + p.getJavas().size() + p.getLayers().size();
+		int expected = p.find(LIST_OPERATORS).getChildCount() + p.find(LIST_JAVAS).getChildCount() + p.find(LIST_LAYERS).getChildCount();
 		assertEquals("Ad-hoc operators size incorrect.", expected, m.getModuleData().getOperators().size());
 	}
 	
@@ -82,12 +82,12 @@ public class TestFragments extends TestCase {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
 		Adapter adapter = Adapter.ADAPTER;
 
-		Program program = ParseStencil.parse(source, adapter);
+		StencilTree program = ParseStencil.programTree(source, adapter);
 		Test test = new Test() {
 
-			public boolean check(Tree t) {
-				if (t instanceof Function) {
-					return ((Function) t).getTarget().getOperator() != null;
+			public boolean check(StencilTree t) {
+				if (t.getType() == StencilParser.FUNCTION) {
+					return ((AstInvokeable) t.find(StencilParser.AST_INVOKEABLE)).getOperator() != null;
 				}
 				return true;
 			}
@@ -99,7 +99,7 @@ public class TestFragments extends TestCase {
 		traverse(program, test);
 	}
 	
-	private void traverse(Tree t, Test test) {
+	private void traverse(StencilTree t, Test test) {
 		assertTrue(test.getMessage(), test.check(t));
 		for (int i=0; i< t.getChildCount(); i++) {traverse(t.getChild(i), test);}
 	}
@@ -107,13 +107,13 @@ public class TestFragments extends TestCase {
 	public void testSpecializer() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
 		Adapter adapter = Adapter.ADAPTER;
-		Program program = ParseStencil.parse(source, adapter);
+		StencilTree program = ParseStencil.programTree(source, adapter);
 		Test test = new Test() {
 
-			public boolean check(Tree t) {
-				if (t instanceof Function) {
-					return ((Function) t).getSpecializer() != null &&
-						   ((Function) t).getSpecializer().getToken().getType() != StencilParser.DEFAULT;
+			public boolean check(StencilTree t) {
+				if (t.getType() == StencilParser.FUNCTION) {
+					return t.find(SPECIALIZER) != null &&
+						   t.find(SPECIALIZER).getToken().getType() != StencilParser.DEFAULT;
 				}
 				return true;
 			}
@@ -124,12 +124,17 @@ public class TestFragments extends TestCase {
 		traverse(program, test);
 	}
 	
-	public void testLiftConstantRules() throws Exception {
+	public void testLiftLayerConstants() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
-		Adapter adapter = Adapter.ADAPTER;
-		Program program = ParseStencil.parse(source, adapter);
-		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Nodes").getDefaults().size()); 
-		assertEquals("Incorrectly identified defaults count.", 2, program.getLayer("Edges").getDefaults().size()); 
+		StencilTree program = ParseStencil.programTree(source,  Adapter.ADAPTER);
+		assertEquals("Incorrectly identified defaults count.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).getChildCount());
+		assertEquals("Incorrectly identified defaults count.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).getChildCount());
+	}
+
+	public void testTargetPackMismatch() throws Exception {
+		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/TargetPackMismatch.stencil.bad", true);
+		try {ParseStencil.program(source, Adapter.ADAPTER);}
+		catch (TargetMatchesPack.TargetPackMismatchException e) {/**Ignored**/}		
 	}
 	
 }

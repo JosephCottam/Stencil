@@ -2,7 +2,6 @@ package stencil.interpreter;
 
 import java.lang.ref.WeakReference;
 import java.util.*;
-import java.util.List;
 
 
 import static java.lang.String.format;
@@ -10,13 +9,14 @@ import static java.lang.String.format;
 import stencil.display.Display;
 import stencil.display.IDException;
 import stencil.display.StencilPanel;
+import stencil.interpreter.tree.*;
 import stencil.parser.ParserConstants;
-import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleAppender;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MapMergeTuple;
 import stencil.types.Converter;
 
@@ -24,22 +24,20 @@ public class Interpreter {
 	private final WeakReference<StencilPanel> panel;	//
 	private final Program program;
 	
-	public static boolean abortOnError = false;
-	
 	public Interpreter(StencilPanel panel) {
 		this.panel = new WeakReference(panel);
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple processSequential(Tuple streamTuple, Rule rule) throws NoOutputSignal, RuleAbortException {return processSequential(streamTuple, Arrays.asList(rule));}
-	public static Tuple processSequential(Tuple streamTuple, Iterable<Rule> rules) throws NoOutputSignal, RuleAbortException {
+	public static Tuple processTuple(Tuple streamTuple, Rule rule) throws RuleAbortException {return processTuple(streamTuple, new Rule[]{rule});}
+	public static Tuple processTuple(Tuple streamTuple, Rule[] rules) throws RuleAbortException {
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, streamTuple);
-		return process(env, rules);
+		return processEnv(env, rules);
 	}
+	
 
-			
-	public static Tuple process(Environment env, Rule... rules) throws NoOutputSignal, RuleAbortException {return process(env, Arrays.asList(rules));}	
-	public static Tuple process(Environment env, Iterable<Rule> rules) throws NoOutputSignal, RuleAbortException {
+	public static Tuple processEnv(Environment env, Rule rule) throws RuleAbortException {return processEnv(env, new Rule[]{rule});}
+	public static Tuple processEnv(Environment env, Rule[] rules) throws RuleAbortException {
 		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
 
 		List<Tuple> resultBuffer = new ArrayList();
@@ -49,14 +47,11 @@ public class Interpreter {
 			for (Rule rule: rules) {
 				Tuple result;				
 				try {result = rule.apply(env);}
-				catch (RuleAbortException ra) {
-					if (abortOnError) {throw new RuleAbortException(rule);}
-					else {throw new NoOutputSignal("No output due to rule abort.", ra);}
-				}
-				catch (NoOutputSignal no) {throw no;}
+				catch (NoOutput.Signal s) {result=NoOutput.TUPLE;}
+				catch (RuleAbortException ra) {throw ra;}
 				catch (Exception e) {throw new RuleAbortException(rule, e);}
 				
-				resultBuffer.add(result);
+				if (result != NoOutput.TUPLE) {resultBuffer.add(result);}
 			}
 			
 		} catch (RuleAbortException ra) {
@@ -76,9 +71,10 @@ public class Interpreter {
 		final Tuple local, result;
 		public ProcessResults(Tuple local, Tuple result) {this.local = local;this.result = result;}
 	}
+	
 
 	//Parallelize here???  Checks all groups in parallel...
-	public ProcessResults process(SourcedTuple source, TupleStore target, Consumes group) throws NoOutputSignal, RuleAbortException {
+	public ProcessResults process(SourcedTuple source, TupleStore target, Consumes group) throws RuleAbortException {
 		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
 		Tuple prefilter;
@@ -88,7 +84,7 @@ public class Interpreter {
 		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues());
 		
-		prefilter = process(env, group.getPrefilterRules());
+		prefilter = processEnv(env, group.getPrefilterRules());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 		
 		try {matches = group.matches(env);}
@@ -96,10 +92,10 @@ public class Interpreter {
 		
 		if (matches) {
 			
-			local = process(env, group.getLocalRules());				
+			local = processEnv(env, group.getLocalRules());				
 			env.setFrame(Environment.LOCAL_FRAME, local);
 			try {
-				result = process(env, group.getResultRules());				
+				result = processEnv(env, group.getResultRules());				
 				if (result != null && result instanceof MapMergeTuple) {
 					for (int i=0; i< result.size(); i++) {
 						Tuple nt = Converter.toTuple(result.get(i));
@@ -110,18 +106,17 @@ public class Interpreter {
 				}
 
 			}
-			catch (NoOutputSignal no) {throw no;}
 			catch (IDException IDex) {throw IDex;}
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try {
-				Tuple viewUpdate = process(env, group.getViewRules());
+				Tuple viewUpdate = processEnv(env, group.getViewRules());
 				if (viewUpdate != null) {Tuples.transfer(viewUpdate, Display.view);}
 			}
 			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try{
-				Tuple canvasUpdate = process(env, group.getCanvasRules());
+				Tuple canvasUpdate = processEnv(env, group.getCanvasRules());
 				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Display.canvas);}
 			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}
@@ -138,28 +133,21 @@ public class Interpreter {
 	 */
 	private boolean processSingleTuple(SourcedTuple source) throws Exception {
 		boolean actionsTaken = false;
-		for (StreamDef stream: program.getStreamDefs()) {
+		for (StreamDef stream: program.streamDefs()) {
 			stream.offer(StreamDef.DIVIDER);
 			for (Consumes group: stream.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
-				try {
-					process(source, stream, group);
-					actionsTaken = true;
-				} catch (NoOutputSignal no) {
-					actionsTaken = true;
-				}
+				actionsTaken = true;
+				process(source, stream, group);
 			}
 		}
 		
-		for (Layer layer:program.getLayers()) {			
+		for (Layer layer:program.layers()) {			
 			for(Consumes group:layer.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
-				try {
-					ProcessResults results = process(source, layer, group);
-					actionsTaken = registerDynamics(layer, group, source, results.local, results.result) && actionsTaken;
-				} catch (NoOutputSignal no) {
-					actionsTaken = true;
-				}
+				ProcessResults results = process(source, layer, group);
+				actionsTaken = registerDynamics(layer, group, source, results.local, results.result) && actionsTaken;
+				actionsTaken = true;
 			}
 		}
 		return actionsTaken;
@@ -169,7 +157,7 @@ public class Interpreter {
 		boolean actionsTaken = false;
 		
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues(), Tuples.EMPTY_TUPLE, local);
-		Tuple merged = group.getDynamicReducer().apply(env);
+		Tuple merged = new ArrayTuple(TupleRef.resolveAll(group.getDynamicReducer(), env));
 		
 		if (result != null && result instanceof MapMergeTuple) {
 			for (int i=0; i<result.size(); i++) {
@@ -202,7 +190,7 @@ public class Interpreter {
 
 		
 		while (!allEmpty()) {
-			for (StreamDef stream: program.getStreamDefs()) {
+			for (StreamDef stream: program.streamDefs()) {
 				Tuple divider = stream.poll();		//Strip off dividers
 				assert divider==StreamDef.DIVIDER;
 				while (!stream.isEmpty() && !stream.isDivider()) {
@@ -215,7 +203,7 @@ public class Interpreter {
 	
 	/**Are the stencil-defined streams all drained?*/
 	private boolean allEmpty() {
-		for (StreamDef stream: program.getStreamDefs()) {
+		for (StreamDef stream: program.streamDefs()) {
 			if (!stream.isEmpty()) {return false;}
 		}
 		return true;

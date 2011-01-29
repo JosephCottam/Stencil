@@ -13,7 +13,7 @@ import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Program;
+import stencil.interpreter.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.testUtilities.TestModule;
 import stencil.tuple.Tuple;
@@ -39,7 +39,7 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 	}
 
 	public void testRegisterFails(Adapter adapter) throws Exception{
-		Program program = ParseStencil.parse(registerFailRule, adapter);
+		Program program = ParseStencil.program(registerFailRule, adapter);
 		panel = adapter.generate(program);
 		boolean error =false;
 		
@@ -54,7 +54,7 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 	public void testSimpleLines(Adapter adapter) throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SimpleLines/Lines.stencil");
 
-		Program program = ParseStencil.parse(source, adapter);
+		Program program = ParseStencil.program(source, adapter);
 		panel = adapter.generate(program);
 		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt", "\\s+\\|\\s+", false, 0);
 

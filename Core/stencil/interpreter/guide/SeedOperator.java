@@ -28,7 +28,9 @@
  */
 package stencil.interpreter.guide;
 
-public interface SeedOperator {
+import stencil.interpreter.Viewpoint;
+
+public interface SeedOperator extends Viewpoint {
 	/**Get information about the values that have been seen.
 	 * This need not be a comprehensive sample (thought it may be,
 	 * especially for categorical variables of unknown domain).
@@ -39,4 +41,6 @@ public interface SeedOperator {
 	
 	/**State identifier for the seed operator.**/
 	public int stateID();
+	
+	public SeedOperator viewpoint();
 }

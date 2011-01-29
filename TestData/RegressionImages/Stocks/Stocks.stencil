@@ -12,7 +12,7 @@ canvas Main
   guide axis from Ticker XS
   guide axis[sample:"linear"] from Ticker YS
 
-layer Ticker[POLY_LINE]				/*Poly-line is a set of line segments treated as a group.*/
+layer Ticker["POLY_LINE"]		/*Poly-line is a set of line segments treated as a group.*/
 from Stocks
 	ID: "Google"
    IDX: "after"
@@ -21,7 +21,7 @@ from Stocks
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
 
-layer Averages[POLY_LINE]
+layer Averages["POLY_LINE"]
 from Stocks
 	ID: "Google_30"
    IDX: "after"

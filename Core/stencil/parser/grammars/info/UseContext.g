@@ -1,7 +1,7 @@
 tree grammar UseContext;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   filter = true;
   superClass = TreeFilterSequence;
 }
@@ -13,9 +13,9 @@ options {
   package stencil.parser.string.info;
   
   import stencil.parser.string.TreeFilterSequence;
-  import static stencil.parser.string.StencilParser.LIST;
   import stencil.parser.string.util.Context;
   import stencil.parser.tree.util.MultiPartName;
+  import stencil.parser.tree.StencilTree;
 }
 
 @members{
@@ -36,7 +36,7 @@ topdown
  : ^(f=FUNCTION .*)
     { MultiPartName n = new MultiPartName(f.getText());
       if (n.getName().equals(inProgress.target())) {
-        inProgress.update(f.getFirstChildWithType(LIST).getChildCount());
+        inProgress.update(f.find(LIST_ARGS).getChildCount());
         }
     };
   

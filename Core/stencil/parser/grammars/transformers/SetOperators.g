@@ -1,7 +1,7 @@
 tree grammar SetOperators;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	filter = true;
 	output = AST;
 	superClass = TreeRewriteSequence;
@@ -13,21 +13,21 @@ options {
  * of the ANTLR tree; however this does set decorator fields in the AST.
  *
  * Annotate function call tree nodes with Invokeable objects.
+ *
+ * TODO: Remove ad-hoc module, just search the AST operators list (may require synthetic operators to be proxied)
  **/
 	package stencil.parser.string;
 	
-    import stencil.module.*;
-    import stencil.module.util.*;
-    import stencil.module.operator.StencilOperator;
-    import stencil.module.operator.util.*;
-    import stencil.parser.tree.*;
-	  import stencil.parser.tree.util.*;
-    import stencil.util.*;
-
+  import stencil.module.*;
+  import stencil.module.operator.StencilOperator;
+  import stencil.parser.tree.*;
+  import stencil.parser.tree.util.*;
+  import stencil.interpreter.tree.Specializer;
+  import stencil.interpreter.tree.Freezer;
 }
 
 @members { 
-  public static Program apply (Tree t, ModuleCache modules) {return (Program) TreeRewriteSequence.apply(t, modules);}
+  public static StencilTree apply (Tree t, ModuleCache modules) {return (StencilTree) TreeRewriteSequence.apply(t, modules);}
   
   protected void setup(Object... args) {
      modules = (ModuleCache) args[0];
@@ -35,16 +35,15 @@ options {
 
 	protected ModuleCache modules;
 	
-    public AstInvokeable makeInvokeable(Tree t) {
-    	Function func = (Function) t;
+    public AstInvokeable makeInvokeable(StencilTree func) {
   		StencilOperator op;
-   		MultiPartName name = new MultiPartName(func.getName());
+   		MultiPartName name = new MultiPartName(func.getText());
   		
   		try {
-    		Specializer s = func.getSpecializer();
-            op = modules.instance(name.prefixedName(), s);
+         Specializer s = Freezer.specializer(func.find(SPECIALIZER));
+         op = modules.instance(name.getPrefix(), name.getName(), null, s);   //null context is fine BECAUSE all ops should be instantiated in the AST already
     	} catch (Exception e) {
-    		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getName()); //TODO: Add path to the point of error...
+    		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getText()); //TODO: Add path to the point of error...
     		throw new RuntimeException(message, e);
     	}
     	

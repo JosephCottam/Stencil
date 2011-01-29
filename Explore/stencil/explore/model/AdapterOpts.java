@@ -86,7 +86,7 @@ public final class AdapterOpts {
 			Class clss = Class.forName(className);
 			a = (Adapter) clss.getField("ADAPTER").get(null);
 		} catch (Exception e) {
-			throw new IllegalArgumentException(String.format("Could not select proper adapter for %1$s given class name %1$s.", adapterName, className) ,e);
+			throw new IllegalArgumentException(String.format("Could not select proper adapter for %1$s given class name %2$s.", adapterName, className) ,e);
 		}
 		
 		try {a.setDebugColor(debug);}

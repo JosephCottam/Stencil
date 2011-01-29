@@ -1,7 +1,6 @@
 package stencil.module.operator.util;
 
 import stencil.parser.string.ValidationException;
-import stencil.parser.tree.Atom;
 
 /**Class to capture the split sub-concept of specialization.
  * Grammar is: count,pre/post,ord
@@ -20,7 +19,7 @@ public class Split {
 	private final boolean pre;		//Should split occur before range? (default is false)
 	private final int fields;		//How many fields are involved in the split (default is 1)
 	
-	public Split(Atom source) {this(source.getText());}
+	public Split(Object source) {this(source.toString());}
 	public Split(String source) {
 		String[] parts = source.trim().split("\\s*,\\s*");
 		

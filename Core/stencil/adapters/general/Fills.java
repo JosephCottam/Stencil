@@ -220,7 +220,7 @@ public final class Fills {
 	}
 
 	public static Paint modify(Paint b, String key, Object value) {
-		FillProperty att = FillProperty.valueOf(key.toString());
+		FillProperty att = FillProperty.valueOf(key);
 		return modify(b, att, value);
 	}
 	

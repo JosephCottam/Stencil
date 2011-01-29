@@ -11,7 +11,7 @@ import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
-import stencil.parser.tree.Guide;
+import stencil.interpreter.tree.Guide;
 import stencil.tuple.Tuple;
 
 public class PointLabel extends Guide2D {
@@ -32,7 +32,7 @@ public class PointLabel extends Guide2D {
 			marks.add(label);
 		}
 		
-		bounds = GuideUtils.fullBounds(marks);
+		this.bounds = GuideUtils.fullBounds(marks);
 	}
 
 	public Rectangle2D getBoundsReference() {return bounds;}

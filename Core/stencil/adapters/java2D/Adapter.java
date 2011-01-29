@@ -34,14 +34,15 @@ import stencil.adapters.java2D.data.DoubleBufferLayer;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Guide;
-import stencil.parser.tree.Layer;
-import stencil.parser.tree.Program;
+import stencil.parser.tree.StencilTree;
+import stencil.interpreter.tree.Program;
+import stencil.interpreter.tree.Guide;
 import stencil.adapters.java2D.data.glyphs.Basic;
 import stencil.adapters.java2D.data.guides.*;
 import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.ZoomPanHandler;
 import twitter4j.Trend;
+
 
 public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	public static final Adapter ADAPTER = new Adapter();
@@ -49,7 +50,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private boolean defaultMouse;
 	
 	public Panel generate(Program program) {
-		Canvas canvas = new Canvas(program.getCanvasDef(), program.getLayers());
+		Canvas canvas = new Canvas(program.canvas(), program.layers());
 		constructGuides(canvas, program);
 		Panel panel = new Panel(canvas, program);
 		
@@ -70,7 +71,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
 
-	public stencil.display.DisplayLayer makeLayer(Layer l) {
+	public stencil.display.DisplayLayer makeLayer(StencilTree l) {
 		return DoubleBufferLayer.instance(l);
 	}
 
@@ -89,7 +90,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	}
 	
 	public Panel compile(String programSource) throws Exception {
-		return generate(ParseStencil.parse(programSource, this));
+		return generate(ParseStencil.program(programSource, this));
 	}
 	
 	
@@ -97,24 +98,21 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private void constructGuides(Canvas canvas, Program program) {
 		int legendCount = 0;//How many side-bars have been created?
 		
-		for (Guide guideDef : program.getCanvasDef().getGuides()) {
-			stencil.parser.tree.Selector sel = guideDef.getSelector();
-			String guideType = guideDef.getGuideType();
-			
-			if (guideType.equals("axis")) {
+		for (Guide guideDef : program.canvas().guides()) {
+			if (guideDef.type().equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
-				canvas.addGuide(sel, guide);
-			} else if (guideType.equals("legend")) {
+				canvas.addGuide(guideDef.selector(), guide);
+			} else if (guideDef.type().equals("legend")) {
 				Guide2D guide = new Legend(guideDef, legendCount++);
-				canvas.addGuide(sel, guide);
-			} else if (guideType.equals("pointLabels")) {
+				canvas.addGuide(guideDef.selector(), guide);
+			} else if (guideDef.type().equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);
-				canvas.addGuide(sel, guide);
-			} else if (guideType.equals("trend")) {
+				canvas.addGuide(guideDef.selector(), guide);
+			} else if (guideDef.type().equals("trend")) {
 				Guide2D guide = new TrendLine(guideDef);
-				canvas.addGuide(sel, guide);
+				canvas.addGuide(guideDef.selector(), guide);
 			} else {
-				throw new IllegalArgumentException("Unknown guide type requested: " +guideType);
+				throw new IllegalArgumentException("Unknown guide type requested: " + guideDef.type());
 			}
 		}
 	}

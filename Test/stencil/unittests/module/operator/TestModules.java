@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.parser.tree.util.MultiPartName;
 import stencil.unittests.module.TestModuleCache;
 
@@ -27,7 +27,7 @@ public class TestModules extends TestCase {
 		Specializer s = m.getModuleData().getOperator(n.getName()).getDefaultSpecializer();
 		assertNotNull(s);
 		
-		StencilOperator l = m.instance(n.getName(), s);		
+		StencilOperator l = m.instance(n.getName(), null, s);		
 		assertNotNull(l);
 		
 	}

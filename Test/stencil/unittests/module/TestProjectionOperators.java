@@ -2,7 +2,7 @@ package stencil.unittests.module;
 
 import stencil.modules.Projection;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import stencil.types.color.ColorTuple;
 
@@ -17,7 +17,7 @@ public class TestProjectionOperators extends TestCase {
 
 		java.awt.Color c;
 
-		Specializer s = ParseStencil.parseSpecializer("[cold: \"RED\", hot: \"WHITE\", throw: \"FALSE\"]");
+		Specializer s = ParseStencil.specializer("[cold: \"RED\", hot: \"WHITE\", throw: \"FALSE\"]");
 		
 		
 		Projection.HeatScale l = new Projection.HeatScale(null, s);	//OperatorData is not required...

@@ -2,7 +2,6 @@ package stencil.module.operator.util;
 
 import static stencil.parser.ParserConstants.*;
 import stencil.parser.string.ValidationException;
-import stencil.parser.tree.Atom;
 
 /**Class to capture the range sub-concept of specialization.
  * Gramar is:
@@ -21,7 +20,7 @@ public class Range {
 	final int start;
 	final int end;
 	
-	public Range(Atom source) {
+	public Range(Object source) {
 		this(source.toString());
 	}
 	

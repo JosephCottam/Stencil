@@ -1,7 +1,7 @@
 tree grammar LiftStreamPrototypes;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -16,22 +16,24 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
-   private Tree makePrototype(StreamDef t) {
-      Stream s = (Stream) adaptor.create(STREAM, t.getName());
-      adaptor.addChild(s, adaptor.dupTree(t.getPrototype()));
+   private Object makePrototype(StencilTree streamDef) {
+      assert streamDef.getType() == STREAM_DEF : "Did not recieve stream def when expected.";
+     
+      Object s = adaptor.create(STREAM, streamDef.getText());
+      adaptor.addChild(s, adaptor.dupTree(streamDef.find(TUPLE_PROTOTYPE)));
       return s;
    }   
 
-   private Tree addPrototypes(List prototypes, List<StreamDef> defs) {
+   private Tree addPrototypes(StencilTree prototypes, StencilTree defs) {
       Tree listing = (Tree) adaptor.dupTree(prototypes);
       
-      for (StreamDef sd: defs) {adaptor.addChild(listing, makePrototype(sd));}
+      for (StencilTree sd: defs) {adaptor.addChild(listing, makePrototype(sd));}
       return listing;
    }
 }
 
 topdown 
   : ^(PROGRAM i=. gv=. sd=. o=. cd=. s=. r+=.*) 
-      -> ^(PROGRAM $i $gv  {addPrototypes((List) $sd, (List) $s)} $o $cd $s $r*);
+      -> ^(PROGRAM $i $gv {addPrototypes($sd, $s)} $o $cd $s $r*);

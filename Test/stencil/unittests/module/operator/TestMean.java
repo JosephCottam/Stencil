@@ -33,7 +33,7 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.modules.Average;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.unittests.StencilTestCase;
 
 public class TestMean extends StencilTestCase {
@@ -44,8 +44,8 @@ public class TestMean extends StencilTestCase {
 	}
 	
 	public void testFullRange() throws Exception {
-		Specializer spec = ParseStencil.parseSpecializer("[range: ALL, split: 0]");
-		StencilOperator meaner = average.instance("Mean", spec);
+		Specializer spec = ParseStencil.specializer("[range: ALL, split: 0]");
+		StencilOperator meaner = average.instance("Mean", null, spec);
 		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
 		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
 		
@@ -61,8 +61,8 @@ public class TestMean extends StencilTestCase {
 	}
 	
 	public void testSplitFullRange() throws Exception {
-		Specializer spec = ParseStencil.parseSpecializer("[split: \"1,pre\", range: ALL]");
-		StencilOperator meaner = average.instance("Mean", spec);
+		Specializer spec = ParseStencil.specializer("[split: \"1,pre\", range: ALL]");
+		StencilOperator meaner = average.instance("Mean", null, spec);
 		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
 		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
 

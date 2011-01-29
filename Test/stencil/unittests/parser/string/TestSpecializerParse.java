@@ -3,9 +3,10 @@ package stencil.unittests.parser.string;
 import junit.framework.TestCase;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
+import stencil.parser.string.StencilParser;
 import stencil.parser.string.ValidationException;
 import stencil.parser.string.validators.SpecializerValidator;
-import stencil.parser.tree.Specializer;
+import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.SuppressOutput;
 
 
@@ -103,9 +104,15 @@ public class TestSpecializerParse extends TestCase {
 	
 	private void testPasses(String[] tests, boolean validate) throws Exception {
 		for (String test: tests) {
-			Specializer spec = ParseStencil.parseSpecializer(test);
+			StencilTree spec = ParseStencil.specializerTree(test);
 			if (validate) {SpecializerValidator.apply(spec);}
 		}
+	}
+	
+	public void testNullValue() throws Exception {
+		StencilTree spec = ParseStencil.specializerTree("[value: NULL]");
+		StencilTree valueToken = (StencilTree) spec.getChild(0).getChild(0);
+		assertEquals("Unexpected token type: " + StencilTree.typeName(valueToken.getType()), StencilParser.NULL, valueToken.getType());
 	}
 	
 	private void testFails(String[] tests) { 
@@ -116,7 +123,7 @@ public class TestSpecializerParse extends TestCase {
 
 			boolean failed = false;
 			try {
-				Specializer spec = ParseStencil.parseSpecializer(test);
+				StencilTree spec = ParseStencil.specializerTree(test);
 				SpecializerValidator.apply(spec);
 			}
 			catch (ProgramParseException e) {failed = true;}

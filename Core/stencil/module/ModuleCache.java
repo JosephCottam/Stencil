@@ -32,7 +32,9 @@ import java.util.*;
 
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.*;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.parser.tree.util.MultiPartName;
+import stencil.interpreter.tree.Specializer;
 import stencil.util.collections.PropertyUtils;
 
 
@@ -92,32 +94,34 @@ public class ModuleCache {
 	}
 
 
-	/**From the Modules imported into the stencil, find a given method and
-	 * specialize it.
+	/**From the Modules imported into the stencil, find a given operator and specialize it.
 	 *
 	 * @param name
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(String name, Specializer specializer) throws MethodInstanceException {		
+	public StencilOperator instance(String prefix, String name, Context context, Specializer specializer) throws MethodInstanceException {		
 		try {
-			Module module = findModuleForOperator(name);
-			String operatorName = Modules.removePrefix(name);
+			Module module = findModuleForOperator(prefix, name);
+			
+			MultiPartName multiName = new MultiPartName(name);
+			String operatorName = multiName.getName();
 
-			StencilOperator operator = module.instance(operatorName, specializer);
+			StencilOperator operator = module.instance(operatorName, context, specializer);
 			return operator;
 		}
 		catch (Exception e) {throw new MethodInstanceException(name, true, e);}		
 	}
-	
+		
 	/** @param name operator name to find (should not include facet). Must be prefixed if corresponding module was imported prefixed. 
 	 * @return Prefixed Module which contains the operator.
 	 * @throws IllegalArgumentException Name does not indicate any known operator 
 	 */
-	public Module findModuleForOperator(String name) throws IllegalArgumentException {
+	public Module findModuleForOperator(String prefix, String name) throws IllegalArgumentException {
 		for (PrefixedModule pm: importedModules) {
+			if (!prefix.equals(pm.prefix)) {continue;}
 			for (String operatorName: pm.module.getModuleData().getOperatorNames()) {
-				if (name.equals(Modules.prefixName(pm.prefix, operatorName))) {
+				if (name.equals(operatorName)) {
 					return pm.module;
 				}
 			}

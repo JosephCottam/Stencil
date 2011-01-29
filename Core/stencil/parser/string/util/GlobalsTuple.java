@@ -1,7 +1,5 @@
 package stencil.parser.string.util;
 
-import java.util.List;
-
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
@@ -15,14 +13,19 @@ public class GlobalsTuple implements Tuple {
 	private final Object[] values;
 	private final TuplePrototype prototype;
 	
-	public GlobalsTuple(List<Const> defs) {
-		String[] names = new String[defs.size()];
-		values = new Object[defs.size()];
-		for (int i =0; i<values.length; i++) {
-			values[i] = defs.get(i).getValue();
-			names[i] = defs.get(i).getName();
+	public GlobalsTuple(StencilTree defs) {
+		if (defs == null) {
+			prototype = new SimplePrototype();
+			values = new Object[0];
+		} else {
+			String[] names = new String[defs.getChildCount()];
+			values = new Object[defs.getChildCount()];
+			for (int i =0; i<values.length; i++) {
+				values[i] = ((Const) defs.getChild(i)).getValue();
+				names[i] = defs.getChild(i).getText();
+			}
+			prototype = new SimplePrototype(names);
 		}
-		prototype = new SimplePrototype(names);
 	}
 	
 	public Object get(String name) throws InvalidNameException {

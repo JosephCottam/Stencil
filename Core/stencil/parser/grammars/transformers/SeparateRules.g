@@ -1,7 +1,7 @@
 tree grammar SeparateRules;
 options {
     tokenVocab = Stencil;
-    ASTLabelType = CommonTree;	
+    ASTLabelType = StencilTree;	
     output = AST;
     filter = true;
     superClass = TreeRewriteSequence;
@@ -14,34 +14,32 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
-	import static stencil.parser.string.StencilParser.*;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-   private StencilTree siftRules(List<Rule> rules, int type) {return siftRules(adaptor, rules, type, -1, null);}
+   private StencilTree siftRules(StencilTree rules, int type, int listType) {return siftRules(adaptor, rules, type, listType, -1);}
  
    //This binding check will be a problem when animated bindings come into play
-   public static StencilTree siftRules(TreeAdaptor adaptor, List<Rule> rules, int type, int binding, String label) {
-      label = label != null ? label : StencilParser.tokenNames[type] ;
-      StencilTree list = (StencilTree) adaptor.create(LIST, label);
+   public static StencilTree siftRules(TreeAdaptor adaptor, StencilTree rules, int type, int listType, int binding) {
+      StencilTree list = (StencilTree) adaptor.create(listType, StencilTree.typeName(listType));
       
-      for(Rule r: rules) {
-         if(r.getGenericTarget().getType() == type) {
-            if (binding < 0 || r.getBinding().getType() == binding) {
-              adaptor.addChild(list, adaptor.dupTree(r));
+      for(StencilTree rule: rules) {
+         if(rule.find(TARGET, RESULT, VIEW, CANVAS, LOCAL, PREFILTER).getType() == type) {
+            if (binding < 0 || rule.find(DEFINE, DYNAMIC, ANIMATED,ANIMATED_DYNAMIC).getType() == binding) {
+              adaptor.addChild(list, adaptor.dupTree(rule));
             }
          }
       }
       return list;
    }
 
-   protected StencilTree local(CommonTree source)         {return siftRules((List<Rule>) source, LOCAL);}   
-   protected StencilTree canvas(CommonTree source)        {return siftRules((List<Rule>) source, CANVAS);}
-   protected StencilTree view(CommonTree source)          {return siftRules((List<Rule>) source, VIEW);}
-   protected StencilTree prefilter(CommonTree source)     {return siftRules((List<Rule>) source, PREFILTER);}
-   protected StencilTree result(CommonTree source)        {return siftRules((List<Rule>) source, RESULT);}
+   protected StencilTree local(StencilTree source)         {return siftRules(source, LOCAL, RULES_LOCAL);}   
+   protected StencilTree canvas(StencilTree source)        {return siftRules(source, CANVAS, RULES_CANVAS);}
+   protected StencilTree view(StencilTree source)          {return siftRules(source, VIEW, RULES_VIEW);}
+   protected StencilTree prefilter(StencilTree source)     {return siftRules(source, PREFILTER, RULES_PREFILTER);}
+   protected StencilTree result(StencilTree source)        {return siftRules(source, RESULT, RULES_RESULT);}
 }
 
 //Put things in blocks based on their type

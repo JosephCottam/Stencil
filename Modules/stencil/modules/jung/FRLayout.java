@@ -3,7 +3,7 @@ package stencil.modules.jung;
 import edu.uci.ics.jung.graph.DelegateForest;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 
 @Operator(spec="[range: ALL, split: 0, width: 500, height: 500, steps: 50]")
 public final class FRLayout extends GraphOperator.StepOperator {

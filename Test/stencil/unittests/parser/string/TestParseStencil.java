@@ -6,33 +6,49 @@ import java.util.Map;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Function;
-import stencil.parser.tree.Program;
+import stencil.parser.string.StencilParser;
+import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
+import static stencil.parser.string.StencilParser.*;
 
 public class TestParseStencil extends StencilTestCase {
 	public void testParse() throws Exception {
-		Program p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
+		StencilTree p = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);
 
-		assertEquals("Incorrect number of layers found.", 1, p.getLayers().size());
+		assertEquals("Incorrect number of layers found.", 1, p.find(LIST_LAYERS).getChildCount());
 		
 		
-		p = ParseStencil.parse(StringUtils.getContents("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);
+		p = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);
 		assertNotNull(p);
 		
-		assertEquals("Incorrect number of layers found.", 2, p.getLayers().size());
-		assertEquals("Incorrect number of layers groups found.", 3, p.getLayers().get(1).getGroups().size());
-		assertEquals("Incorrect number or rules found, defaults likely not properly identified.", 5, p.getLayers().get(1).getGroups().get(1).getResultRules().size());
-		assertEquals("Root operator found; inline did not identify oportunity.", "Index", ((Function) p.getLayers().get(1).getGroups().get(1).getResultRules().get(2).getAction().getStart()).getTarget().getOperator().getOperatorData().getName());
+		assertEquals("Incorrect number of layers found.", 2, p.find(LIST_LAYERS).getChildCount());
+		assertEquals("Incorrect number of layers groups found.", 3, p.find(LIST_LAYERS).getChild(1).findAllDescendants(CONSUMES).size());
+		assertEquals("Incorrect number or defaults found.", 1, p.find(LIST_LAYERS).getChild(1).find(RULES_DEFAULTS).getChildCount());
+		assertEquals("Incorrect number or rules found, rule combine likely not performed.", 1, p.find(LIST_LAYERS).getChild(1).findAllDescendants(CONSUMES).get(1).find(RULES_RESULT).getChildCount());
+		assertNull("Root synthetic operator found; inline did not identify oportunity", findChild(p.find(LIST_LAYERS).getChild(1).findAllDescendants(CONSUMES).get(1).find(StencilParser.RULES_RESULT), StencilParser.FUNCTION, "Price.map"));
 	}
 
+	/**Find a child with the given type and the given content value.
+	 * Content value is treated as a string literal (not a pattern or prefix).
+	 **/
+	private static StencilTree findChild(StencilTree node, int type, String content) {
+		for (int i=0; i < node.getChildCount(); i++) {
+			StencilTree t = (StencilTree) node.getChild(i);
+			if (t.getType() == type 
+				&& (content == null || content.equals(t.getText()))) {
+				return t;
+			}
+		}
+		return null;
+	}
+	
 	public void testParseNull() throws Exception {
 		boolean failed=false;
 
-		try {ParseStencil.parse(null, ADAPTER);}
+		try {ParseStencil.program(null, ADAPTER);}
 		catch (Exception e) {failed = true;}
 		finally {if (!failed) {fail("Parser accepted null program, should have thrown an exception.");}}
 	}
@@ -45,7 +61,7 @@ public class TestParseStencil extends StencilTestCase {
 
 		for (String name: programs.keySet()) {
 			try {
-				Program p = ParseStencil.parse(programs.get(name), ADAPTER);
+				StencilTree p = ParseStencil.programTree(programs.get(name), ADAPTER);
 				ancestryCheck(p);
 			}
 			catch (Throwable e) {

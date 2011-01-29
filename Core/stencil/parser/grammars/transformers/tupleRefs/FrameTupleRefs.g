@@ -1,7 +1,7 @@
 tree grammar FrameTupleRefs;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   output = AST;
   filter = true;
   superClass = TreeRewriteSequence;
@@ -19,9 +19,7 @@ options {
   import stencil.module.*;
   import stencil.parser.string.util.EnvironmentProxy;  
   import stencil.parser.string.util.GlobalsTuple;
-  import stencil.parser.tree.Program;
-  import stencil.tuple.prototype.TuplePrototype;
-  import stencil.parser.ParseStencil;
+  import stencil.parser.tree.*;
   import static stencil.parser.string.util.EnvironmentProxy.extend;
   import static stencil.parser.ParserConstants.GLOBALS_FRAME;
   import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
@@ -35,9 +33,9 @@ options {
   }
 
   private static boolean ignoreErrors;
-  public static Program apply (Tree t, ModuleCache modules, boolean ignoreErrors) {
+  public static StencilTree apply (StencilTree t, ModuleCache modules, boolean ignoreErrors) {
      FrameTupleRefs.ignoreErrors= ignoreErrors;
-     return (Program) TreeRewriteSequence.apply(t, modules, new GlobalsTuple(((Program) t).getGlobals()));
+     return (StencilTree) TreeRewriteSequence.apply(t, modules, new GlobalsTuple(t.find(LIST_GLOBALS)));
   }
   
   protected void setup(Object... args) {
@@ -62,7 +60,7 @@ topdown
   }
 	
 callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION .? . ^(LIST value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  : ^(f=FUNCTION .? . ^(LIST_ARGS value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(p=PACK value[env]*);
           
 value[EnvironmentProxy env]

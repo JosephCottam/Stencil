@@ -1,7 +1,7 @@
 tree grammar DynamicReducer;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -12,20 +12,19 @@ options {
    *  Must be done after frame references have been added, but before numeralization (or the frame check must switched to be numerical).
    **/
 
-  package stencil.parser.string;
+  package stencil.parser.string;  
   
-  import stencil.parser.tree.*;
-  import static stencil.parser.string.StencilParser.*;
+  import stencil.parser.tree.StencilTree; 
+  import stencil.parser.tree.StencilTree;
   import static stencil.parser.ParserConstants.*;
-  import stencil.parser.tree.util.Environment;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-  public StencilTree changeRefs(List dynamicRules) {
-     Pack p = reducer(dynamicRules);
-     Map<TupleRef, Value> subst = buildSubst(p);
+  public StencilTree changeRefs(StencilTree dynamicRules) {
+     StencilTree reducer = reducer(dynamicRules);
+     Map<StencilTree, StencilTree> subst = buildSubst(reducer.find(PACK));
      StencilTree rules = (StencilTree) adaptor.dupTree(dynamicRules);
 
      StencilTree t = (StencilTree) ReplaceTupleRefs.apply(rules, subst);
@@ -33,40 +32,53 @@ options {
   }
 
   //Build a subst to replace prefixes of stream/local refs with new prefixes to the revised stream ref
-  private Map<TupleRef, Value> buildSubst(Pack p) {
-     Map<TupleRef, Value> subst = new HashMap();
+  private Map<StencilTree, StencilTree> buildSubst(StencilTree p) {
+     Map<StencilTree, StencilTree> subst = new HashMap();
      for(int i=0; i< p.getChildCount(); i++) {
-        TupleRef newRef = (TupleRef) adaptor.create(TUPLE_REF, "TupleRef");
+        StencilTree newRef = (StencilTree) adaptor.create(TUPLE_REF, StencilTree.typeName(TUPLE_REF));
 //        adaptor.addChild(newRef, adaptor.create(NUMBER, Integer.toString(Environment.STREAM_FRAME)));
         adaptor.addChild(newRef, adaptor.create(ID, STREAM_FRAME));
         adaptor.addChild(newRef, adaptor.create(NUMBER, Integer.toString(i)));
+        
         StencilTree oldRef = (StencilTree) adaptor.dupTree((StencilTree) p.getChild(i));
         for (int extraRef=2; extraRef< oldRef.getChildCount(); extraRef++) {
             adaptor.deleteChild(oldRef, extraRef);
         }
-        subst.put((TupleRef) oldRef, newRef);
+        subst.put(oldRef, newRef);
      }
      return subst;
   }
 
-  public Pack reducer(List dynamicRules) {
-     List<TupleRef> refs = (List<TupleRef>) ((StencilTree) dynamicRules).findDescendants(TUPLE_REF);
-     Pack reducer = (Pack) adaptor.create(PACK, "Dynamic Reducer");
-     List reducerLst = new stencil.parser.tree.List.WrapperList(reducer);
+  /**Generate a pack that takes an input and local and produces a tuple to be stored for 
+   ** processing of dynamic rules.
+   **/
+  public StencilTree reducer(StencilTree dynamicRules) {
+     List<StencilTree> refs = dynamicRules.findAllDescendants(TUPLE_REF);
+     StencilTree reducer = (StencilTree) adaptor.create(DYNAMIC_REDUCER, StencilTree.typeName(DYNAMIC_REDUCER));
+     StencilTree pack = (StencilTree) adaptor.create(PACK, StencilTree.typeName(PACK));
+     adaptor.addChild(reducer, pack);
    
-     for (TupleRef ref: refs) {
+     for (StencilTree ref: refs) {
         if (STREAM_FRAME.equals(ref.getChild(0).getText()) || LOCAL_FRAME.equals(ref.getChild(0).getText())) {
-          if (!reducerLst.contains(ref)) {
-              adaptor.addChild(reducer, adaptor.dupTree(ref));
+          if (!hasChild(pack, ref)) {
+              adaptor.addChild(pack, adaptor.dupTree(ref));
           }
         }
      }
      return reducer;
   }
   
+  /**Is the tree a child of the root?**/
+  private boolean hasChild(final StencilTree root, final StencilTree tree) {
+    for (StencilTree child:root) {
+      if (child == tree|| tree.equals(child)) {return true;}
+    }
+    return false;
+  }
 }
 
-topdown: ^(CONSUMES f=. p=. l=. r=. v=. c=. d=.) -> ^(CONSUMES $f $p $l $r $v $c {changeRefs((List) $d)} {reducer((List) $d)});
+topdown: ^(CONSUMES f=. p=. l=. r=. v=. c=. d=.) 
+          -> ^(CONSUMES $f $p $l $r $v $c {changeRefs($d)} {reducer($d)});
 
 
 

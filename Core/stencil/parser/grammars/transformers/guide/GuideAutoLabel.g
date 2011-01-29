@@ -1,7 +1,7 @@
 tree grammar GuideAutoLabel;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	superClass = TreeRewriteSequence;
 	output = AST;
 	filter = true;
@@ -20,56 +20,49 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.interpreter.guide.SeedOperator;
+  import stencil.interpreter.tree.Freezer;
   
-  import static stencil.parser.ParserConstants.GUIDE_LABEL;  
+  import static stencil.parser.ParserConstants.GUIDE_LABEL;
+  import static stencil.parser.ParserConstants.INVOKEABLE;  
 }
 
 @members{
-   public static Program apply (Tree t) {
-     return (Program) TreeRewriteSequence.apply(t);
+   public static StencilTree apply (StencilTree t) {
+     return (StencilTree) TreeRewriteSequence.apply(t);
   }
   
-  private static String getSources(Selector sel) {
-    Program p = (Program) sel.getAncestor(PROGRAM);
-    List<Id> path = sel.getPath();
+  private static String getSources(StencilTree sel) {
+    StencilTree p = sel.getAncestor(PROGRAM);
+    String layerName = sel.getChild(0).getText();
+    String att = sel.getChild(1).getText();
 
-    Layer l = p.getLayer(path.get(0).getID());
-    Consumes c = l.getGroups().get(0);
+    StencilTree l = p.find(LIST_LAYERS).find(LAYER, layerName);
+    StencilTree c = l.find(LIST_CONSUMES).getChild(0); //HACK: The zero-reference is a hack...Should I restrict layers to only one consumes block?
                
-    Rule r= null;
-    for (Rule r2: c.getResultRules()) {
-       if (((TuplePrototype) r2.getGenericTarget().getChild(0)).contains(path.get(1).getID())) {r=r2; break;}
+    StencilTree r= null;
+    for (StencilTree r2: c.find(RULES_RESULT)) {
+       if (Freezer.prototype(r2.find(RESULT).find(TUPLE_PROTOTYPE)).contains(att)) {r=r2; break;}
     }
     assert r != null : "Guide path did not match any rule.";
            
-    CallTarget t = r.getAction().getStart();
-    while (t instanceof Function) {
-      Function f = (Function) t;
-      AstInvokeable target = f.getTarget();
+    StencilTree t = r.find(CALL_CHAIN).find(FUNCTION, PACK);
+    while (t.getType() == FUNCTION) {
+      AstInvokeable target = t.find(INVOKEABLE);
       if (target != null && target.getOperator() instanceof SeedOperator) {
-        return f.getArguments().get(0).getChild(1).getText(); //get child 1 because this is a tuple ref and it has been framed
+        return t.find(LIST_ARGS).find(TUPLE_REF).getChild(1).getText(); //get child 1 because this is a tuple ref and it has been framed
       }
-      t = f.getCall();
+      t = t.find(FUNCTION, PACK);
    }
    throw new Error("Guide path did not lead to location with seed operator");
   }
   
-  private Specializer autoLabel(Specializer spec, Selector sel) {
-    Specializer newSpec = (Specializer) adaptor.dupTree(spec);
-    
-    String fields = getSources(sel); 
-    
-    Tree entry = (Tree) adaptor.create(MAP_ENTRY, GUIDE_LABEL);
-    Tree value = (Tree) adaptor.create(STRING, fields);
-    
-    adaptor.addChild(entry, value);
-    adaptor.addChild(newSpec.getChild(0), entry);
-    return newSpec;
+  private boolean needsLabel(StencilTree spec) {
+     return !Freezer.specializer(spec).containsKey(GUIDE_LABEL);
   }
 }
 
-topdown: 
-    ^(GUIDE_DIRECT ^(GUIDE type=. spec=. selector=. rules=. gen=. query=.))
-      -> {!((Specializer) spec).containsKey(GUIDE_LABEL)}? ^(GUIDE_DIRECT ^(GUIDE $type {autoLabel((Specializer) spec, (Selector) selector)} $selector $rules $gen $query))
-            -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $rules $gen $query));
-    
+topdown:
+     ^(s=SPECIALIZER entries+=.*)
+      -> {(s.getParent().getType() == GUIDE) && (s.getAncestor(GUIDE_DIRECT) != null) && needsLabel($s)}?  //Is this the guide specializer for a direct guide? 
+            ^(SPECIALIZER ^(MAP_ENTRY[GUIDE_LABEL] STRING[getSources($s.getParent().find(SELECTOR))]) $entries*)
+      -> ^(SPECIALIZER $entries*);   

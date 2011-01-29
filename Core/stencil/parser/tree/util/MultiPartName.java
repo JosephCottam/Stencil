@@ -33,9 +33,9 @@ import static stencil.parser.ParserConstants.NAME_SPACE;
 /**Divides a name up into its constituent parts.*/
 //final because it is immutable
 public final class MultiPartName {	
-	private String pre;
-	private String name;
-	private String suffix;
+	private final String pre;
+	private final String name;
+	private final String suffix;
 	
 	public MultiPartName(String name) {
 		String[] parts = name.split(NAME_SEPARATOR_PATTERN);

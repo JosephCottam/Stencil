@@ -31,13 +31,11 @@ package stencil.adapters.java2D.data.guides;
  import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.*;
 
 import stencil.adapters.java2D.data.Glyph2D;
-import stencil.parser.tree.Atom;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
@@ -53,11 +51,11 @@ public abstract class GuideUtils {
 		List<String> names = new ArrayList();
 		List<Object> values = new ArrayList();
 		
-		for (String name: source.getMap().keySet()) {
+		for (String name: source.keySet()) {
 			if (!name.startsWith(prefix)) {continue;}
 			String rootName = getRootName(name);
 			names.add(rootName);
-			values.add(source.getMap().get(name));
+			values.add(source.get(name));
 		}
 		
 		return (T) target.update(new PrototypedTuple(names, values));
@@ -72,15 +70,14 @@ public abstract class GuideUtils {
 	 * appears in the source specializer.
 	 */
 	public static final void setValues(Specializer source, Object target) {
-		Map<String, Atom> map = source.getMap();
 		Class clss = target.getClass();
 		
-		for (String name: map.keySet()) {
+		for (String name: source.keySet()) {
 			if (name.indexOf(NAME_SEPARATOR) >0) {continue;} //Skip compound names, won't match anyway
 			
 			try {
 				Field f = clss.getField(name);
-				f.set(target, Converter.convert(map.get(name), f.getType()));
+				f.set(target, Converter.convert(source.get(name), f.getType()));
 			} catch (NoSuchFieldException e) {//ignored so other properties for the sampler can be included...
 			} catch (SecurityException e) {System.err.println("Attempt to set value that cannot be securely accessed on " + target.toString());
 			} catch (IllegalAccessException e) {System.err.println("Attempt to set value that cannot be accesssed on " + target.toString());

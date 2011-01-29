@@ -27,7 +27,7 @@ from BFS
 	(X,Y) : Ordering(ID) -> Triangular(VALUE) -> (X,Y)
 	 
 
-layer Labels[TEXT]				/*Changes the glyph type. All layers have only one glyph type.*/
+layer Labels["TEXT"]				/*Changes the glyph type. All layers have only one glyph type.*/
 from BFS
 	ID : ID
 	(X,Y): Nodes.find(ID) -> (X,Y)
@@ -35,7 +35,7 @@ from BFS
 	FONT: @Font{10}
 	COLOR: @Color{GRAY60}
 
-layer Edges[LINE]
+layer Edges["LINE"]
 from VertexList 
 	ID: Concatenate(ID1,ID2)
 	(X.1, Y.1): Nodes.find(ID1) -> (X,Y)

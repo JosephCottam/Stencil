@@ -20,7 +20,7 @@ canvas Main
 	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] from Markers YS
 
 
-layer Markers[POLY_LINE]
+layer Markers["POLY_LINE"]
 from Stocks
 	ID : "Google"
 	IDX: "after"
@@ -34,7 +34,7 @@ from Stocks
 		: ScreenToCanvasDimension(20, 20) -> [Pad] Max(Width, Height) -> 
 		  ZoomPadded(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT], Pad[_])
 	
-layer Lookup[SHAPE]
+layer Lookup["SHAPE"]
 from Stocks
    ID : TimeStep(Date)
    X : TimeStep(Date)
@@ -42,7 +42,7 @@ from Stocks
    VISIBLE : "False"
 
 
-layer Selected[TEXT]
+layer Selected["TEXT"]
 from Mouse
   ID : "Selected"
   (X, Y) : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.find(_) -> (X, Y)
@@ -50,7 +50,7 @@ from Mouse
   SCALE_BY: "NONE"
 
 
-layer Highlight[LINE]
+layer Highlight["LINE"]
 from Mouse
   ID : "Highlight"
   (X.1, X.2) : Nearest(X, 3) -> Max(_, canvas[X]) -> (_,_)			

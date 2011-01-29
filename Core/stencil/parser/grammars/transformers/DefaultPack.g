@@ -1,24 +1,19 @@
 tree grammar DefaultPack;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
 }
 
 @header{
-	/**  Convert default PACKs to fully fledged PACKs.
-	 *
-	 * Uses ANTLR tree filter/rewrite: http://www.antlr.org/wiki/display/~admin/2008/11/29/Woohoo!+Tree+pattern+matching\%2C+rewriting+a+reality	  
+	/** Convert default PACKs to fully formed PACKs.
 	 **/
 	package stencil.parser.string;
 	
-  import stencil.parser.tree.util.*;
-	import stencil.module.*;
-	import stencil.module.util.*;
+	import stencil.parser.tree.StencilTree;	
 	import stencil.parser.tree.*;
-	
 }
 
 @members{
@@ -26,17 +21,16 @@ options {
     public DefaultPackExpansionException(String msg) {super(msg);}
   }
   
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
-  public Pack fromDefault(Pack pack) {
-      Rule rule = pack.getRule();
-      StencilTree target = rule.getGenericTarget();
-      TuplePrototype targetPrototype = (TuplePrototype) target.findChild(TUPLE_PROTOTYPE);
+  public Object fromDefault(StencilTree pack) {
+      StencilTree rule = pack.getAncestor(RULE);
+      StencilTree targetPrototype = rule.findDescendant(TUPLE_PROTOTYPE); //Only one prototpye, right under the target
       
-      Pack newPack = (Pack) adaptor.dupNode(pack);
+      Object newPack = adaptor.dupNode(pack);
         
-      for (int i=0; i< targetPrototype.size(); i++) {
-         TupleRef ref = (TupleRef) adaptor.create(TUPLE_REF,"<autogen>");
+      for (int i=0; i< targetPrototype.getChildCount(); i++) {
+         Object ref = adaptor.create(TUPLE_REF, StencilTree.typeName(TUPLE_REF));
          adaptor.addChild(ref, adaptor.create(NUMBER, Integer.toString(i)));
          adaptor.addChild(newPack, ref);
       }
@@ -45,4 +39,4 @@ options {
   }
 }
 
-topdown: ^(r=PACK DEFAULT) -> {fromDefault((Pack) $r)};		
+topdown: ^(r=PACK DEFAULT) -> {fromDefault($r)};		

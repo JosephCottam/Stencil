@@ -48,7 +48,7 @@ public class TestPrototypeParse extends TestCase {
 	
 	private void testPasses(String[] tests) throws Exception {
 		for (String test: tests) {
-			TuplePrototype p = ParseStencil.parsePrototype(test, true);
+			TuplePrototype p = ParseStencil.prototype(test, true);
 			int expected = test.replaceAll("[^,]", "").length() +1;
 			assertEquals("Prototype length not as expected: " + test + ".", expected, p.size());
 		}
@@ -59,7 +59,7 @@ public class TestPrototypeParse extends TestCase {
 			boolean failed = false;
 			
 			SuppressOutput.suppress();
-			try {ParseStencil.parsePrototype(test, false);}
+			try {ParseStencil.prototype(test, false);}
 			catch (ProgramParseException e) {failed = true;}
 			finally{SuppressOutput.restore();}
 			

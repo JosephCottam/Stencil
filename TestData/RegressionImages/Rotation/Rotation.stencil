@@ -9,7 +9,7 @@ SKIP: 1
 
 stream Elements(Name)
 
-layer Text[TEXT]
+layer Text["TEXT"]
 from Elements
 	ID : Name
 	TEXT: Name

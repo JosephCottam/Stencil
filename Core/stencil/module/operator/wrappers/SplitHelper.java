@@ -8,12 +8,10 @@ import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.util.Split;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
-import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import static stencil.module.operator.wrappers.Utilities.noFunctions;
 
-import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -56,11 +54,11 @@ public abstract class SplitHelper implements StencilOperator {
 			return operators.get(key);
 		}
 
-		public StencilOperator viewPoint() {
+		public StencilOperator viewpoint() {
 			UnorderedHelper nop = new UnorderedHelper(split, operator);
 			for (Object key: operators.keySet()) {
 				StencilOperator op = operators.get(key);
-				StencilOperator view = op.viewPoint();
+				StencilOperator view = op.viewpoint();
 				nop.operators.put(key, view);
 			}
 			return nop;
@@ -88,7 +86,7 @@ public abstract class SplitHelper implements StencilOperator {
 			return inv.invoke(newArgs);
 		}
 
-		public StencilOperator viewPoint() {
+		public StencilOperator viewpoint() {
 			OrderedHelper nop = new OrderedHelper(super.split, super.operator);
 			nop.oldKey = this.oldKey;
 			return nop;
@@ -113,6 +111,8 @@ public abstract class SplitHelper implements StencilOperator {
 			return helper.doSplit(facet, arguments);
 		}
 		public Object getTarget() {return this;}
+		
+		public SplitTarget viewpoint() {throw new UnsupportedOperationException("FIX THIS SOON!!!");}
 	}
 
 	private static FacetData STATE_ID_FD = new FacetData(STATE_ID_FACET, FacetData.MemoryUse.READER, "state");
@@ -173,8 +173,8 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	//final because it is a utility method
 	public static final StencilOperator makeOperator(Split split, StencilOperator operator) {
-		if (AbstractOperator.isFunction(operator)) {throw new RuntimeException("Attempt to wrap pure function in Split.");}
  		if (split.getFields() ==0) {return operator;}
+		if (AbstractOperator.isFunction(operator)) {throw new RuntimeException("Attempt to wrap pure function in Split.");}
 		if (split.isOrdered()) {return new OrderedHelper(split, operator);}
 		return new UnorderedHelper(split, operator);
 	}
@@ -184,8 +184,4 @@ public abstract class SplitHelper implements StencilOperator {
 		StencilOperator op = operator.duplicate();
 		return makeOperator(split, op);
 	}
-		
-	//TODO: Support compound operator types.  Then split is a combined categorize followed by a project.
-	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));} //TODO: Handle as a compound categorize and project.  Needs to return list of categorize (split values) and the results of each.  May not work for ordered splits.  
-	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Split cannot autoguide (wrapping %1$s).", operator.getName()));}
 }

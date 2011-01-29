@@ -11,8 +11,8 @@ import java.util.List;
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.Line;
-import stencil.parser.string.util.EnvironmentProxy;
-import stencil.parser.tree.Guide;
+import stencil.interpreter.tree.Specializer;
+import stencil.interpreter.tree.Guide;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
@@ -22,6 +22,7 @@ import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 import static stencil.adapters.java2D.data.guides.GuideUtils.SAMPLE_KEY;
+
 
 public class TrendLine  extends Guide2D {
 	public static final String IMPLANTATION_NAME = "TREND_LINE";
@@ -40,14 +41,15 @@ public class TrendLine  extends Guide2D {
 	
 	public TrendLine(Guide guideDef) {
 		super(guideDef);
-		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
+		TuplePrototype p = guideDef.resultsPrototype();
 		x_idx = ArrayUtil.indexOf("X", TuplePrototypes.getNames(p));
 		y_idx = ArrayUtil.indexOf("Y", TuplePrototypes.getNames(p));
 
 		sorter=new TupleSorter(x_idx);
 		
-		if (guideDef.getSpecializer().getMap().containsKey(SAMPLE_KEY)) {
-			String v = guideDef.getSpecializer().getMap().get(SAMPLE_KEY).toString();
+		Specializer spec = guideDef.specializer();
+		if (spec.containsKey(SAMPLE_KEY)) {
+			String v = (String) spec.get(SAMPLE_KEY);
 			sampleType = SAMPLE_TYPE.valueOf(v);
 		} else {
 			sampleType = SAMPLE_TYPE.LINEAR;

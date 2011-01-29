@@ -1,7 +1,7 @@
 tree grammar DynamicToSimple;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -18,17 +18,14 @@ options {
   package stencil.parser.string;
 	
   import org.antlr.runtime.tree.*;
-  import stencil.parser.tree.Rule;
-  import stencil.tuple.prototype.TuplePrototypes;
-  import java.util.Arrays;
-  import stencil.parser.tree.Program;
+  import stencil.parser.tree.*;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
-topdown: ^(CONSUMES . . . ^(LIST rule*) .*);
+topdown: ^(CONSUMES . . . ^(RESULTS_RULES rule*) .*);
       
 rule: ^(RULE t=. cc=. b=.) -> ^(RULE $t $cc DEFINE[":"]);
 

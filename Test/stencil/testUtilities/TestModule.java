@@ -9,7 +9,8 @@ import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.module.util.*;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.PrototypedTuple;
 
@@ -20,7 +21,7 @@ public class TestModule implements Module {
 	private static final TestModule instance = new TestModule();
 	
 	static {
-		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.parseSpecializer("[range: ALL]"), null));}
+		try {MODULE_DATA.addOperator(new OperatorData("temp", "FilterFail", ParseStencil.specializer("[range: ALL]"), null));}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 		
 		OperatorData od = MODULE_DATA.getOperator("FilterFail");
@@ -41,7 +42,7 @@ public class TestModule implements Module {
 	
 	public ModuleData getModuleData() {return MODULE_DATA;}
 
-	public StencilOperator instance(String name, Specializer specializer)
+	public StencilOperator instance(String name, Context context, Specializer specializer)
 			throws SpecializationException {
 		
 		try {

@@ -5,7 +5,7 @@ import java.util.List;
 
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 

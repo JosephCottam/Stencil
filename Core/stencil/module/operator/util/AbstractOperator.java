@@ -10,7 +10,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.Facet;
 
-public abstract class AbstractOperator implements StencilOperator, Cloneable {
+public abstract class AbstractOperator<T extends StencilOperator> implements StencilOperator<T>, Cloneable {
 	
 	/**Simple implementation for StateID tracking.  
 	 * 
@@ -39,8 +39,8 @@ public abstract class AbstractOperator implements StencilOperator, Cloneable {
 		 * This is sufficient, provided the referenced object and everything it transitively refers to is immutable.
 		 * Otherwise, viewPoint must be implemented by the implementing class.
 		 **/
-		public StencilOperator viewPoint() {
-			try {return (StencilOperator) this.clone();}
+		public Statefull viewPoint() {
+			try {return (Statefull) this.clone();}
 			catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
 		}
 	}
@@ -77,7 +77,7 @@ public abstract class AbstractOperator implements StencilOperator, Cloneable {
 	public StencilOperator duplicate() {return this;}
 
 	/**Default viewpoint is self.  This is safe ONLY if the operator implements a true function.**/
-	public StencilOperator viewPoint() {return this;}
+	public T viewpoint() {return (T) this;}
 	
 	/** Does given operator/meta-data include any stateful facets?  If not, it is a function.**/ 
 	public static boolean isFunction(StencilOperator op) {return isFunction(op.getOperatorData());}

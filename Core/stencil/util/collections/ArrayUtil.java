@@ -28,21 +28,6 @@ public final class ArrayUtil {
 		return -1;
 	}
 	
-	/**Taken from Java 1.6 java.util.Arrays*/
-	public static <T> T[] copyOf(T[] source, int size) {
-		T[] n = (T[]) java.lang.reflect.Array.newInstance(source.getClass().getComponentType(), size);
-		System.arraycopy(source, 0, n, 0, Math.min(source.length, n.length));
-		return n;
-	}
-
-	/**Taken from Java 1.6 java.util.Arrays*/
-	public static <T> T[] copyOfRange(T[] source, int start, int end) {
-		int length = end-start;
-		T[] n = (T[]) java.lang.reflect.Array.newInstance(source.getClass().getComponentType(), length);
-		System.arraycopy(source, start, n, 0, length);
-		return n;
-	}
-	
 	/**Move elements from the iterator to the passed array. 
 	 * Will stop when the array is full or the iterator is exhausted.
 	 * Return value is the passed array.

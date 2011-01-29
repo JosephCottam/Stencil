@@ -4,7 +4,8 @@ import stencil.module.Module;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.ModuleDataParser.MetaDataParseException;
-import stencil.parser.tree.Specializer;
+import stencil.parser.string.util.Context;
+import stencil.interpreter.tree.Specializer;
 
 /**Basic implementation for modules where meta-data is determined largely
  * by the static module data in the configuration file.  
@@ -70,7 +71,7 @@ public abstract class BasicModule implements Module {
 	 * Validates arguments before attempting specialization.
 	 * Context is ignored by default.
 	 */
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
 		OperatorData operatorData = getOperatorData(name, specializer);		

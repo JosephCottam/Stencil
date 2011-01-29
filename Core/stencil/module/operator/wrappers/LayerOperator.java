@@ -23,7 +23,7 @@ import stencil.tuple.prototype.TuplePrototype;
  */
 
 //Marked final because it is immutable (however, it has mutable components....)
-public final class LayerOperator implements StencilOperator {
+public final class LayerOperator implements StencilOperator<StencilOperator> {
 	public static final String FIND_FACET = "find";
 	private static final String FIND_METHOD = "find";
 	
@@ -69,13 +69,11 @@ public final class LayerOperator implements StencilOperator {
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
-	public StencilOperator viewPoint() {
-		return new LayerViewOperator(layer.getView());
-	}
+	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.getView());}
 	
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 	
-	private static class LayerViewOperator implements StencilOperator {
+	private static class LayerViewOperator implements StencilOperator<LayerViewOperator> {
 		final LayerView view;
 		public LayerViewOperator(LayerView view) {this.view = view;}
 		public StencilOperator duplicate() throws UnsupportedOperationException {
@@ -98,10 +96,6 @@ public final class LayerOperator implements StencilOperator {
 			throw new UnsupportedOperationException();
 		}
 
-		public StencilOperator viewPoint() {
-			throw new UnsupportedOperationException();
-		}
-		
+		public LayerViewOperator viewpoint() {throw new UnsupportedOperationException();}
 	}
-	
 }

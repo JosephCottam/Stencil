@@ -37,7 +37,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -48,9 +47,7 @@ import stencil.display.CanvasTuple;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
 import stencil.display.DisplayLayer;
-import stencil.parser.tree.CanvasDef;
-import stencil.parser.tree.Layer;
-import stencil.parser.tree.Selector;
+import stencil.interpreter.tree.*;
 
 
 /**Some of this is derived from Prefuse's display and related objects.*/
@@ -67,15 +64,15 @@ public final class Canvas extends DisplayCanvas {
 	/**Point used in many navigation operations.*/
 	private final Point2D tempPoint = new Point2D.Double();
 	
-	public Canvas(CanvasDef def, List<Layer> layers) {
-		String colorKey = def.getSpecializer().getMap().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name()).toString();
+	public Canvas(stencil.interpreter.tree.Canvas def, Layer[] layers) {
+		String colorKey = (String) def.specializer().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name());
 		Color c = stencil.types.color.ColorCache.get(colorKey);
 		this.setBackground(c);
 		
 		//Copy display layers out of the layer objects
-		this.layers = new DoubleBufferLayer[layers.size()];
-		for (int i=0;i< layers.size();i++) {
-			this.layers[i] = (DoubleBufferLayer) layers.get(i).getDisplayLayer();
+		this.layers = new DoubleBufferLayer[layers.length];
+		for (int i=0;i< layers.length;i++) {
+			this.layers[i] = (DoubleBufferLayer) layers[i].getDisplayLayer();
 		}
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);

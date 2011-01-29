@@ -8,7 +8,7 @@ STRICT: true
 
 stream Degrees(Deg)
 
-layer DoubleLines[LINE]
+layer DoubleLines["LINE"]
 default
   CAP1: "ARROW"
   CAP2: "ARROW"
@@ -27,7 +27,7 @@ from Degrees
   PEN_COLOR: @Color{GRAY70}
 
 
-layer SingleLines2[LINE]
+layer SingleLines2["LINE"]
 from Degrees
 	ID  : IDS("")
 	(X.1, Y.1) : (125,0)
@@ -58,7 +58,7 @@ from Degrees
 	CAP2: "ARROW"
 
 
-layer SingleLines1[LINE]
+layer SingleLines1["LINE"]
 default
 	CAP1: "ARROW"
 from Degrees

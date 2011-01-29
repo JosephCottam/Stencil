@@ -1,7 +1,7 @@
 tree grammar OperatorInstantiateTemplates;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;
+  ASTLabelType = StencilTree;
   superClass = TreeRewriteSequence; 
   output = AST;
   filter = true;
@@ -13,36 +13,41 @@ options {
   
   import stencil.parser.tree.*;  
   import stencil.module.*;
-  import stencil.module.operator.*;
-  import stencil.module.util.OperatorData;
 }
 
 @members{
-  public static Program apply (Tree t, ModuleCache modules) {return (Program) TreeRewriteSequence.apply(t, modules);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-  protected void setup(Object... args) {modules = (ModuleCache) args[0];}
-
-  private ModuleCache modules;
-
-  private StencilTree instantiate(OperatorReference opRef) {
-    OperatorTemplate t = findTemplate(opRef);
-    Specializer spec = (Specializer) opRef.getFirstChildWithType(SPECIALIZER);
-    String name = opRef.getName();
-    return t.instantiate(name, spec, adaptor);
+  private Object instantiate(StencilTree opRef) {
+    StencilTree t = findTemplate(opRef);
+    
+    Object op = adaptor.create(OPERATOR, opRef.getText());
+    for (int i=0; i<t.getChildCount(); i++) {
+      adaptor.addChild(op, adaptor.dupTree(t.getChild(i)));
+    }
+    
+    return op;    
   }
   
-  private OperatorTemplate findTemplate(CommonTree opRef) {
-    OperatorBase base = (OperatorBase) opRef.getFirstChildWithType(OPERATOR_BASE);
-    Program program = (Program) opRef.getAncestor(PROGRAM);
-    String name = base.getName();  
+  private StencilTree findTemplate(StencilTree opRef) {
+    StencilTree base = opRef.find(OPERATOR_BASE);
+    StencilTree program = opRef.getAncestor(PROGRAM);
+    String name = base.getText();  
 
-    for (OperatorTemplate t:program.getOperatorTemplates()) {
-      if (name.equals(t.getName())) {return t;} 
+    for (StencilTree t:program.find(LIST_TEMPLATES)) {
+      if (name.equals(t.getText())) {return t;} 
     }
     return null;
   }
+  
 }
 
 topdown 
   : ^(o=OPERATOR_REFERENCE base=. spec=.) 
-     {findTemplate($o) != null}? -> {instantiate((OperatorReference) o)};
+     {findTemplate($o) != null}? -> {instantiate(o)};
+     
+//Remove templates on the way out (they are no longer needed)     
+bottomup
+  : ^(p=PROGRAM .*)
+    {adaptor.deleteChild(p, p.find(LIST_TEMPLATES).getChildIndex());};
+     

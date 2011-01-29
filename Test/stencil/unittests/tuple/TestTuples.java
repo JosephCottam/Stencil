@@ -41,9 +41,9 @@ public class TestTuples extends StencilTestCase {
 		testOneConversion(new Integer(984567), String.class, "984567");
 
 		//To/From Stencil tree types
-		testOneConversion(stencil.parser.tree.Atom.instance(3), Integer.class, new Integer(3));
-		testOneConversion(stencil.parser.tree.Atom.instance("test"), String.class, "test");
-		testOneConversion(stencil.parser.tree.Atom.instance("3"), Integer.class, new Integer(3));
+		testOneConversion(stencil.parser.tree.Const.instance(3), Integer.class, new Integer(3));
+		testOneConversion(stencil.parser.tree.Const.instance("test"), String.class, "test");
+		testOneConversion(stencil.parser.tree.Const.instance("3"), Integer.class, new Integer(3));
 		
 		
 		//Sigils

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
+import stencil.interpreter.tree.Freezer;
 import stencil.module.MethodInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
@@ -12,7 +13,7 @@ import stencil.parser.ParserConstants;
 import stencil.unittests.StencilTestCase;
 
 public class TestModuleCache extends StencilTestCase {
-	public void setUp() {ModuleCache.clear();}
+	public void setUp() throws Exception {super.setUp(); ModuleCache.clear();}
 	public static void initCache() throws Exception {
 		Properties props = new Properties();
 		props.loadFromXML(new FileInputStream(DEFAULT_PROPERTIES_FILE));		
@@ -40,11 +41,11 @@ public class TestModuleCache extends StencilTestCase {
 		ModuleCache m = new ModuleCache();
 		StencilOperator l= null;
 
-		try {l=m.instance("NoMethod", ParserConstants.BASIC_SPECIALIZER);}
+		try {l=m.instance("", "NoMethod", null, Freezer.specializer(ParserConstants.BASIC_SPECIALIZER));}
 		catch (MethodInstanceException e) {/*Exception expected, tested below.*/}
 		assertNull("Method found when not expected.",l);
 
-		try {m.instance("Concatenate", ParserConstants.BASIC_SPECIALIZER);}
+		try {m.instance("", "Concatenate", null, Freezer.specializer(ParserConstants.BASIC_SPECIALIZER));}
 		catch (MethodInstanceException e) {fail("Method not found when expected.");}
 		catch (Exception e) {fail("Unexpected error looking for method.");}
 	}

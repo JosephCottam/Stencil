@@ -39,8 +39,8 @@ import java.util.TreeSet;
 
 import stencil.display.Display;
 import stencil.interpreter.Interpreter;
-import stencil.parser.tree.Layer;
-import stencil.parser.tree.Program;
+import stencil.interpreter.tree.Program;
+import stencil.interpreter.tree.Layer;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 
@@ -92,10 +92,10 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	
 	/**Returns an unmodifiable copy of the current layers mapping.*/
 	public List<String> getLayers() {
-		String[] layers = new String[program.getLayers().size()];
+		String[] layers = new String[program.layers().length];
 		
 		for (int i=0; i<layers.length; i++) {
-			layers[i] = program.getLayers().get(i).getName();
+			layers[i] = program.layers()[i].getName();
 		}
 		return Arrays.asList(layers);
 	}
@@ -162,7 +162,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		writer.write(getCanvas().toString() + "\n");
 		writer.write(getView().toString() + "\n");
 
-		for (Layer l: program.getLayers()) {
+		for (Layer l: program.layers()) {
 			TreeSet<Tuple> s  =new TreeSet<Tuple>(comp);
 			DisplayLayer<? extends Tuple> layer = l.getDisplayLayer();
 			for (Tuple t: layer.getView()) {s.add(t);}

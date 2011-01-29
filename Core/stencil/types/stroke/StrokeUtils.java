@@ -6,7 +6,7 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.StencilNumber;
+import stencil.parser.tree.StencilTree;
 import stencil.types.Converter;
 import stencil.types.stroke.StrokeTuple.Cap;
 import stencil.types.stroke.StrokeTuple.Join;
@@ -43,8 +43,8 @@ public final class StrokeUtils extends BasicModule {
 		
 		if (input.length ==1 && input[0] instanceof String) {
 			pattern = Pattern.valueOf((String) input[0]).mask;
-		} else if (input[0] instanceof StencilNumber) {
-			
+		} else if (input[0] instanceof StencilTree) {
+			throw new Error("Complete Case");
 		}
 		
 		return new BasicStroke(s.getLineWidth(), s.getEndCap(), s.getLineJoin(), s.getMiterLimit(), pattern, s.getDashPhase());

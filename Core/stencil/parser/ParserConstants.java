@@ -28,10 +28,14 @@
  */
 package stencil.parser;
 
+import stencil.display.DisplayLayer;
 import stencil.module.operator.StencilOperator;
-import stencil.parser.tree.Specializer;
+import stencil.parser.tree.AstInvokeable;
+import stencil.parser.tree.StencilTree;
 
 public abstract class ParserConstants {
+	public static final Class<AstInvokeable> INVOKEABLE = AstInvokeable.class;
+	
 	/**Used to represent a default value that should be automatically derived.
 	 * Not all places can use a default value, but those that can should use this value to 
 	 * indicate that default should be used.*/
@@ -47,16 +51,17 @@ public abstract class ParserConstants {
 	public static final String TERMINATOR = ")";
 	public static final String SIGIL = "@";
 
+
+	
 	//Seletors
 	public static final String SELECTOR_FIELD  = "ID";
-	public static final String SUB_SELECTOR_FIELD  = "IDX";
 
-	//Block tags (for Python and corresponding to operator items)
+	//Block tags
 	public static final String MAP_FACET = StencilOperator.MAP_FACET;
-	public static final String INIT_FACET = "init";
 	public static final String QUERY_FACET = StencilOperator.QUERY_FACET;
 	public static final String STATE_ID_FACET = StencilOperator.STATE_ID_FACET;
 	public static final String CUSTOM_PARSER_FACET = "argumentParser";
+	public static final String DEFAULT_JAVA_SUPER = "stencil.module.operator.util.AbstractOperator";
 	
 	public static final int RANGE_START_INT = 1;
 	public static final int RANGE_END_INT = 0;
@@ -86,17 +91,23 @@ public abstract class ParserConstants {
 	public static final String TRUE_STRING = "TRUE";
 	public static final String FALSE_STRING = "FALSE";
 	
+	
+	public static final StencilTree DEFAULT_CANVAS_SPECIALIZER;
+	public static final StencilTree DEFAULT_LAYER_SPECIALIZER;
+	
 	/**Common safe specializer:
 	 *    * Memory is preserved (range: ALL)
 	 *    * No split is to be performed (split: 0)
 	 */
-	public static final Specializer BASIC_SPECIALIZER;
-	public static final Specializer EMPTY_SPECIALIZER;
+	public static final StencilTree BASIC_SPECIALIZER;	//TODO: Remove when split/range are lifted to higher-order functions
+	public static final StencilTree EMPTY_SPECIALIZER;
 		
 	static {
 		try {
-			EMPTY_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[]"));
-			BASIC_SPECIALIZER = ParseStencil.parseSpecializer(String.format("[range: ALL, split: 0]"));
+			EMPTY_SPECIALIZER = ParseStencil.specializerTree("[]");
+			BASIC_SPECIALIZER = ParseStencil.specializerTree("[range: ALL, split: 0]");
+			DEFAULT_CANVAS_SPECIALIZER = ParseStencil.specializerTree("[BACKGROUND_COLOR: \"white\"]");
+			DEFAULT_LAYER_SPECIALIZER =  ParseStencil.specializerTree(String.format("[%1$s: \"SHAPE\"]", DisplayLayer.TYPE_KEY));
 		} catch (Throwable e) {throw new Error("Error creating reference specializer.", e);}
 	}
 

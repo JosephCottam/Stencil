@@ -10,7 +10,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.OperatorData;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import stencil.module.util.ann.*;
 

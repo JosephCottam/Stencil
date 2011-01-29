@@ -1,49 +1,61 @@
 package stencil.parser.tree;
 
+import static stencil.parser.string.StencilParser.CONST;
+import static stencil.parser.string.StencilParser.ID;
+import static stencil.parser.string.StencilParser.NUMBER;
+import static stencil.parser.string.StencilParser.STRING;
+import static stencil.parser.string.StencilParser.NULL;
+
 import org.antlr.runtime.Token;
 
-import stencil.tuple.Tuple;
-
-public class Const extends Atom {
-	private Tuple tuple;
+public class Const extends StencilTree {
 	private Object value;
 	
 	public Const(Token source) {super(source);}
 	
 	public String getName() {return this.getText();}
 	public Object getValue() {
-		if (getChildCount() >0) {return (Atom) getChild(0);}
-		else if (value != null) {return value;}
-		else if (tuple != null) {return tuple;}
-		throw new Error("Attempt to get value on constant with no value set.");
+		if (value != null) {return value;}
+		else if (getChildCount() >0) {return getChild(0);}
+		return null;
 	}
 	
-	public Tuple getTuple() {
-		assert tuple != null: "Attempt to get tuple value on constant with non-tuple value set";
-		return tuple;
-	}
-
 	public void setValue(Object value) {
-		assert getChildCount() !=0: "Attempt to set value on constant with pre-existing value";
-		assert tuple != null : "Attempt to set value on constant with pre-existing value";
-		assert value != null : "Attempt to set value on constant with pre-existing value";
-		
+		assert this.value == null : "Attempt to set value on constant with pre-existing value";		
 		this.value = value;
 	}
 	
-	public void setTuple(Tuple tuple) {
-		assert getChildCount() == 0 : "Attempt to set value on constant with pre-existing value";
-		assert value == null : "Attempt to set value on constant with pre-existing value";
-		assert tuple == null : "Attempt to set value on constant with pre-existing value";
-		this.tuple = tuple;
-	}
 	
 	public Const dupNode() {
 		Const n = (Const) super.dupNode();
 		n.value = value;
-		n.tuple = tuple;
 		return n;
 	}
 	
-	public String toString() {return "CONST: " + getValue().toString();}
+	public String toString() {return getValue().toString();}
+	public boolean equals(Object other) {
+		if (super.equals(other)) {
+			if (value == null) {return ((Const) value) == null;}
+			else {return value.equals(((Const) other).value);}
+		}
+		return false;
+	}
+	
+	private static final StencilTreeAdapter adaptor = new StencilTreeAdapter();
+	public static StencilTree instance(Object value) {return instance(value, false);}
+	public static StencilTree instance(Object value, boolean idBiased) {
+		if (value == null) {
+			return (StencilTree) adaptor.create(NULL, "NULL");			
+		} else if (value instanceof Number) {
+			return (StencilTree) adaptor.create(NUMBER, ((Number) value).toString());
+		} else if (value instanceof String && idBiased) {
+			return (StencilTree) adaptor.create(ID, value.toString());
+		} else if (value instanceof String) {
+			return (StencilTree) adaptor.create(STRING, value.toString());
+		} else {
+			Const constant = (Const) adaptor.create(CONST,"CONST");
+			constant.setValue(value);
+			return constant;
+		}
+	}
 }

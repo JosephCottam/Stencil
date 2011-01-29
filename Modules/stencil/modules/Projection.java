@@ -42,11 +42,8 @@ import stencil.module.util.ModuleDataParser;
 import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.string.StencilParser;
-import stencil.parser.string.info.UseContext;
 import stencil.parser.string.util.Context;
-import stencil.parser.tree.Program;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
@@ -95,8 +92,8 @@ public class Projection extends BasicModule {
 		
 		public HeatScale(OperatorData opData, Specializer spec) {
 			super(opData);
-			cold = ColorCache.get(spec.get("cold").getValue().toString());
-			hot = ColorCache.get(spec.get("hot").getValue().toString());
+			cold = ColorCache.get(spec.get("cold").toString());
+			hot = ColorCache.get(spec.get("hot").toString());
 			throwExceptions = (Boolean) Converter.convert(spec.get("throw"), Boolean.class);
 		}
 		
@@ -387,11 +384,11 @@ public class Projection extends BasicModule {
 			outMin = Converter.toDouble(spec.get(OUT_MIN));
 			outMax = Converter.toDouble(spec.get(OUT_MAX));
 			
-			if (spec.containsKey(IN_MAX) && spec.get(IN_MAX).getValue() != null) {
+			if (spec.containsKey(IN_MAX) && spec.get(IN_MAX) != null) {
 				inMax = Converter.toDouble(spec.get(IN_MAX));
 			} 
 			
-			if (spec.containsKey(IN_MIN) && spec.get(IN_MIN).getValue() != null) {
+			if (spec.containsKey(IN_MIN) && spec.get(IN_MIN) != null) {
 				inMin = Converter.toDouble(spec.get(IN_MIN));
 			}
 			
@@ -499,12 +496,9 @@ public class Projection extends BasicModule {
 		super.validate(name, specializer);
 	}
 	
-	public StencilOperator instance(String name, Specializer spec) throws SpecializationException {
-		String useName = spec.getParent().getText();
-		Program p = (Program) spec.getAncestor(StencilParser.PROGRAM);
-		Context context = null;
-		if (p != null) {context = UseContext.apply(spec.getAncestor(StencilParser.PROGRAM),useName);}
-		
+	
+	//TODO: Pass Context object in to all instance methods, then restore comment region
+	public StencilOperator instance(String name, Context context, Specializer spec) throws SpecializationException {
 		if (context != null && name.equals("Count")) {
 			if (context.maxArgCount() == 0) {
 				OperatorData od = ModuleDataParser.operatorData(Counter.class, Projection.class.getSimpleName());
@@ -512,6 +506,6 @@ public class Projection extends BasicModule {
 			}
 		}
 		
-		return super.instance(name, spec);
+		return super.instance(name, context, spec);
 	}
 }

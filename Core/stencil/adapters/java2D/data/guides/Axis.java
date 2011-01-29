@@ -14,9 +14,8 @@ import stencil.adapters.java2D.data.Guide2D;
 import stencil.adapters.java2D.data.glyphs.*;
 
 import stencil.parser.ParseStencil;
-import stencil.parser.string.util.EnvironmentProxy;
-import stencil.parser.tree.Guide;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Guide;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
@@ -48,7 +47,7 @@ public class Axis extends Guide2D {
 	private static final String defaultArguments = "[sample: \"CATEGORICAL\", position: NULL, label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, connect: \"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
-		try {DEFAULT_ARGUMENTS = ParseStencil.parseSpecializer(defaultArguments);}
+		try {DEFAULT_ARGUMENTS = ParseStencil.specializer(defaultArguments);}
 		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
 	}
 
@@ -91,10 +90,11 @@ public class Axis extends Guide2D {
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {
 		super(guideDef);
-		axis = AXIS.valueOf(guideDef.getSelector().getAttribute().substring(0,1));//Only the first character matters because of XS,YS, etc
+		axis = AXIS.valueOf(guideDef.selector().attribute().substring(0,1));//Only the first character matters because of XS,YS, etc
+		Specializer spec = guideDef.specializer();
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
-		GuideUtils.setValues(guideDef.getSpecializer(), this);
+		GuideUtils.setValues(spec, this);
 
 		//Apply default registration based on axis orientation
 		String registration = axis==AXIS.X ? "LEFT" : "RIGHT";
@@ -103,16 +103,16 @@ public class Axis extends Guide2D {
 		
 		
 		//Get position info based on axis orientation
-		if (axis == AXIS.X) {position = (guideDef.getSpecializer().containsKey("Y") ? Converter.toDouble(guideDef.getSpecializer().get("Y")) : null);}
-		if (axis == AXIS.Y) {position = (guideDef.getSpecializer().containsKey("X") ? Converter.toDouble(guideDef.getSpecializer().get("X")) : null);}
+		if (axis == AXIS.X) {position = (spec.containsKey("Y") ? Converter.toDouble(spec.get("Y")) : null);}
+		if (axis == AXIS.Y) {position = (spec.containsKey("X") ? Converter.toDouble(spec.get("X")) : null);}
 		
 		prototypeText = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LABEL_PROPERTY_TAG, prototypeText);
-		prototypeText = GuideUtils.applyDefaults(guideDef.getSpecializer(), LABEL_PROPERTY_TAG, prototypeText);
+		prototypeText = GuideUtils.applyDefaults(spec, LABEL_PROPERTY_TAG, prototypeText);
 
 		prototypeLine = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LINE_PROPERTY_TAG, prototypeLine);
-		prototypeLine = GuideUtils.applyDefaults(guideDef.getSpecializer(), LINE_PROPERTY_TAG, prototypeLine);
+		prototypeLine = GuideUtils.applyDefaults(spec, LINE_PROPERTY_TAG, prototypeLine);
 		
-		TuplePrototype p = EnvironmentProxy.calcPrototype(guideDef.getRules());
+		TuplePrototype p = guideDef.resultsPrototype();
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
 		offset_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
 		
@@ -122,8 +122,8 @@ public class Axis extends Guide2D {
 		sorter = new TupleSorter(offset_idx);
 
 		guideLabel = (Text) prototypeText.updateID("label");
-		if (guideDef.getSpecializer().getMap().containsKey(AXIS_LABEL_PROPERTY)) {
-			String label = guideDef.getSpecializer().getMap().get(AXIS_LABEL_PROPERTY).getText();
+		if (spec.containsKey(AXIS_LABEL_PROPERTY)) {
+			String label = (String) spec.get(AXIS_LABEL_PROPERTY);
 			int rotation = axis==AXIS.X ? 0 : 270;
 			registration = axis==AXIS.X ? "TOP" : "BOTTOM";
 			Font font = (Font) guideLabel.get("FONT");

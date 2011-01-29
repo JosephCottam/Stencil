@@ -5,14 +5,16 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-import stencil.parser.tree.Atom;
-import stencil.parser.tree.StencilString;
+import stencil.interpreter.tree.Freezer;
+import stencil.parser.tree.StencilTree;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.*;
 import stencil.util.ConversionException;
 import stencil.util.collections.PropertyUtils;
 import stencil.util.enums.ValueEnum;
+
+import static stencil.parser.string.StencilParser.STRING;
 
 public final class Converter {
 	private static final Map<Class, TypeWrapper> WRAPPER_FOR = new HashMap();
@@ -72,9 +74,10 @@ public final class Converter {
 	
 	public static String toString(Object value) {
 		if (value == null) {return null;}
-		if (value instanceof String) {return (String) value;}
-		if (value instanceof StencilString) {return ((StencilString) value).getString();} 
+		if (value instanceof String) {return (String) value;} 
 		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
+		if (value instanceof StencilTree 
+				&& ((StencilTree) value).getType() == STRING) {return ((StencilTree) value).getText();}
 		if (value.getClass().isEnum()) {return ((Enum) value).name();}
 		if (WRAPPER_FOR.containsKey(value.getClass())) {return (String) WRAPPER_FOR.get(value.getClass()).convert(value, String.class);}
 		return value.toString();
@@ -109,7 +112,10 @@ public final class Converter {
 		try {
 			if (value == null) {return null;}
 			if (value == null || target.equals(Object.class) || target.isInstance(value)) {return value;}
-			if (value instanceof Atom) {return convert(((Atom) value).getValue(), target);}
+			if (value instanceof StencilTree) {
+				Object val = Freezer.freeze(((StencilTree) value));
+				return convert(val, target);
+			}
 						
 			TypeWrapper wrapper = WRAPPER_FOR.get(target);
 			if (wrapper != null) {return wrapper.convert(value, target);}
@@ -122,7 +128,7 @@ public final class Converter {
 
 			if (target.equals(boolean.class) || target.equals(Boolean.class)) {
 				String v = value.toString().toUpperCase();
-				return new Boolean(v.equals("TRUE") || v.equals("#T"));
+				return Boolean.valueOf(v.equals("TRUE") || v.equals("#T"));
 			}
 			
 			if (target.isEnum()) {return Enum.valueOf(target, value.toString());}

@@ -1,7 +1,7 @@
 tree grammar LastToAll;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   output = AST;
   filter = true;
   superClass = TreeRewriteSequence;
@@ -22,18 +22,18 @@ options {
    
   package stencil.parser.string;
   
-  import stencil.parser.tree.Program;
+  import stencil.parser.tree.StencilTree;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
 }
 
 topdown
-   : ^(f=FUNCTION spec=. ^(LIST preArgs+=.* ^(TUPLE_REF LAST) postArgs+=.*) pass=. call=.)
-       -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
-       		^(FUNCTION[$f.text] $spec ^(LIST $preArgs* ^(TUPLE_REF NUMBER["0"]) $postArgs*) $pass $call))
+   : ^(f=FUNCTION spec=. ^(LIST_ARGS preArgs+=.* ^(TUPLE_REF LAST) postArgs+=.*) pass=. call=.)
+       -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST_ARGS ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
+       		^(FUNCTION[$f.text] $spec ^(LIST_ARGS $preArgs* ^(TUPLE_REF NUMBER["0"]) $postArgs*) $pass $call))
    | ^(PACK preArgs+=.* ^(TUPLE_REF LAST) postArgs+=.*)
-   	   -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
+   	   -> ^(FUNCTION["ToArray.query"] ^(SPECIALIZER DEFAULT) ^(LIST_ARGS ^(TUPLE_REF ALL)) DIRECT_YIELD[genSym(FRAME_SYM_PREFIX]
    	   		^(PACK $preArgs* ^(TUPLE_REF NUMBER["0"]) $postArgs*));

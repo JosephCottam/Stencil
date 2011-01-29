@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 
 
 public final class ModuleData {

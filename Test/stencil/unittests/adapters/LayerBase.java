@@ -7,7 +7,7 @@ import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
 import stencil.display.StencilPanel;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Program;
+import stencil.interpreter.tree.Program;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.PrototypedTuple;
 
@@ -26,7 +26,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 	}
 	
 	private DisplayLayer loadData(Adapter adapter) throws Exception {
-		Program program = ParseStencil.parse(ruleSources, adapter);
+		Program program = ParseStencil.program(ruleSources, adapter);
 		panel= adapter.generate(program);
 		DisplayLayer layer = panel.getLayer("Layer1");
 
@@ -41,7 +41,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 	}
 
 	public void testMake(Adapter adapter) throws Exception {
-		Program program = ParseStencil.parse(ruleSources, adapter);
+		Program program = ParseStencil.program(ruleSources, adapter);
 		panel= adapter.generate(program);
 
 		DisplayLayer layer = panel.getLayer("Layer1");

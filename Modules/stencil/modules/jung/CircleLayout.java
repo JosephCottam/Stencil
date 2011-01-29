@@ -5,7 +5,7 @@ import java.util.Comparator;
 import edu.uci.ics.jung.graph.DelegateForest;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
 @Operator(spec="[range: ALL, split: 0, width: 500, height: 500, radius: 100, sort: \"SEQ\"]")
@@ -41,7 +41,7 @@ public final class CircleLayout extends GraphOperator.SizedOperator {
 		radius = Converter.toDouble(spec.get(RADIUS));
 		resetLayout();
 		
-		String sortBy = spec.get(SORTER_KEY).getText().toUpperCase();
+		String sortBy = ((String) spec.get(SORTER_KEY)).toUpperCase();
 		if (sortBy.equals(SEQUENCE_VALUE)) {sorter = SEQUENCE;}
 		else if (sortBy.equals(LEXI_VALUE)) {sorter = LEXICOGRAPHIC;}
 		else {throw new IllegalArgumentException("Unknown sort specified: " + sortBy);}

@@ -34,7 +34,6 @@ import java.util.HashMap;
 
 import stencil.parser.ParserConstants;
 import stencil.types.TypeCreationException;
-import stencil.util.collections.ArrayUtil;
 
 public final class ColorCache {
 	public static final int CLEAR_INT = 0;
@@ -77,13 +76,13 @@ public final class ColorCache {
 		} catch (Exception e) {throw new TypeCreationException(args, e);}
 	}
 	
-	private static String[] trimType(String[] args) {return ArrayUtil.copyOfRange(args, 1, args.length);}
+	private static String[] trimType(String[] args) {return Arrays.copyOfRange(args, 1, args.length);}
 	
 	private static boolean isInt(String v) {try {Integer.parseInt(v); return true;} catch (Exception e) {return false;}}
 	private static String[] ensureAlpha(String[] args, boolean integer) {
 		assert args.length ==3 || args.length ==4 : "Incorrect number of values passed (must be 3 or 4): " + args.length;
 		if (args.length ==3) {
-			String[] extended = ArrayUtil.copyOf(args, 4);
+			String[] extended = Arrays.copyOf(args, 4);
 			if (integer) {extended[3] = Integer.toString(OPAQUE_INT);}
 			else { extended[3] = Float.toString(OPAQUE_FLOAT);}
 			args = extended;

@@ -62,27 +62,27 @@ public class TestSplitSigil extends TestCase {
 	
 	
 	private Case[] passCases = new Case[] {
-			new Case(1, "", 			"SIGIL_ARGS"),
-			new Case(1, "hello", 		"(SIGIL_ARGS hello)"),
-			new Case(1, "test", 		"(SIGIL_ARGS test)"),
-			new Case(1, "1", 			"(SIGIL_ARGS 1)"),
-			new Case(1, "932", 			"(SIGIL_ARGS 932)"),
-			new Case(2, "{[0]}", 		"(SIGIL_ARGS (TUPLE_REF 0))"),
-			new Case(2, "{[8640]}", 	"(SIGIL_ARGS (TUPLE_REF 8640))"),
-			new Case(2, "{test}", 		"(SIGIL_ARGS (TUPLE_REF test))"),
-			new Case(2, "{test[0]}",	"(SIGIL_ARGS (TUPLE_REF test 0))"),
-			new Case(2, "{test[test]}", "(SIGIL_ARGS (TUPLE_REF test test))"),
-			new Case(1, "1+2",			"(SIGIL_ARGS 1+2)"),
-			new Case(2, "1+{[2]}", 		"(SIGIL_ARGS 1+ (TUPLE_REF 2))"),
-			new Case(2, "txt{ref}", 	"(SIGIL_ARGS txt (TUPLE_REF ref))"),
-			new Case(3, "{ref}txt", 	"(SIGIL_ARGS (TUPLE_REF ref) txt)"),
-			new Case(4, "{ref}{ref}", 	"(SIGIL_ARGS (TUPLE_REF ref) (TUPLE_REF ref))"),
-			new Case(3, "txt{ref}txt", 	"(SIGIL_ARGS txt (TUPLE_REF ref) txt)"),
-			new Case(3, "txt {ref} txt","(SIGIL_ARGS txt  (TUPLE_REF ref)  txt)"),
-			new Case(4, "{ref}txt{ref}","(SIGIL_ARGS (TUPLE_REF ref) txt (TUPLE_REF ref))"),
-			new Case(4, "{r} txt {r}",	"(SIGIL_ARGS (TUPLE_REF r)  txt  (TUPLE_REF r))"),
-			new Case(4, "{r} t x t {r}","(SIGIL_ARGS (TUPLE_REF r)  t x t  (TUPLE_REF r))"),
-			new Case(1, "all one thing","(SIGIL_ARGS all one thing)")
+			new Case(1, "", 			"LIST_ARGS"),
+			new Case(1, "hello", 		"(LIST_ARGS hello)"),
+			new Case(1, "test", 		"(LIST_ARGS test)"),
+			new Case(1, "1", 			"(LIST_ARGS 1)"),
+			new Case(1, "932", 			"(LIST_ARGS 932)"),
+			new Case(2, "{[0]}", 		"(LIST_ARGS (TUPLE_REF 0))"),
+			new Case(2, "{[8640]}", 	"(LIST_ARGS (TUPLE_REF 8640))"),
+			new Case(2, "{test}", 		"(LIST_ARGS (TUPLE_REF test))"),
+			new Case(2, "{test[0]}",	"(LIST_ARGS (TUPLE_REF test 0))"),
+			new Case(2, "{test[test]}", "(LIST_ARGS (TUPLE_REF test test))"),
+			new Case(1, "1+2",			"(LIST_ARGS 1+2)"),
+			new Case(2, "1+{[2]}", 		"(LIST_ARGS 1+ (TUPLE_REF 2))"),
+			new Case(2, "txt{ref}", 	"(LIST_ARGS txt (TUPLE_REF ref))"),
+			new Case(3, "{ref}txt", 	"(LIST_ARGS (TUPLE_REF ref) txt)"),
+			new Case(4, "{ref}{ref}", 	"(LIST_ARGS (TUPLE_REF ref) (TUPLE_REF ref))"),
+			new Case(3, "txt{ref}txt", 	"(LIST_ARGS txt (TUPLE_REF ref) txt)"),
+			new Case(3, "txt {ref} txt","(LIST_ARGS txt  (TUPLE_REF ref)  txt)"),
+			new Case(4, "{ref}txt{ref}","(LIST_ARGS (TUPLE_REF ref) txt (TUPLE_REF ref))"),
+			new Case(4, "{r} txt {r}",	"(LIST_ARGS (TUPLE_REF r)  txt  (TUPLE_REF r))"),
+			new Case(4, "{r} t x t {r}","(LIST_ARGS (TUPLE_REF r)  t x t  (TUPLE_REF r))"),
+			new Case(1, "all one thing","(LIST_ARGS all one thing)")
 	};
 	
 	
@@ -104,9 +104,11 @@ public class TestSplitSigil extends TestCase {
 	
 	public void testConstruct() throws Exception {
 		TreeAdaptor adaptor = new StencilTreeAdapter();
+		int i=0;
 		for (Case c: passCases) {
 			Tree t = PrepareCustomArgs.splitArgs(c.text, adaptor);
-			assertEquals(c.tree, t.toStringTree());
+			assertEquals("Error in case " +i, c.tree, t.toStringTree());
+			i++;
 		}
 	}
 	

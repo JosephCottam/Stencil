@@ -7,6 +7,7 @@ public class TestGenerate extends stencil.unittests.adapters.GeneratorBase {
 	private Panel panel;
 	
 	public void tearDown() {
+		super.tearDown();
 		if (panel != null) {panel.dispose();}
 	}
 	

@@ -9,7 +9,7 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 
 @Module
@@ -27,8 +27,8 @@ public class BrewerPalettes  extends BasicModule {
 
 		public BrewerColors(OperatorData od, Specializer spec) {
 			super(od);
-			rootPallet = spec.get(PALETTE).getText().toUpperCase();
-			reserve = stencil.types.color.ColorCache.get(spec.get(RESERVE).getText());
+			rootPallet = ((String) spec.get(PALETTE)).toUpperCase();
+			reserve = stencil.types.color.ColorCache.get((String) spec.get(RESERVE));
 		}
 
 		@Facet(memUse="WRITER", prototype="(Color color)")

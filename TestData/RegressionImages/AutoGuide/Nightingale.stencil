@@ -17,7 +17,7 @@ canvas Main
     REGISTRATION: "CENTER"
     FONT: @Font{4}			/*@\label{rose:postProcessEnd}@*/
 
-layer Rose[SLICE]
+layer Rose["SLICE"]
 from Deaths
    local(month, year) : ParseDate(date)
    ID: Concatenate(type, ":", month)

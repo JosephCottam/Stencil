@@ -1,7 +1,7 @@
 tree grammar OperatorExplicit;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;
+	ASTLabelType = StencilTree;
 	superClass = TreeRewriteSequence;	
   output = AST;
 	filter = true;
@@ -20,26 +20,21 @@ options {
 
   import stencil.parser.tree.util.*;
   import stencil.parser.tree.*;
-  import stencil.module.operator.StencilOperator;
-  import stencil.module.operator.util.Invokeable;
-  import stencil.module.util.FacetData;
-  import stencil.module.util.OperatorData;
   import static stencil.parser.string.util.Utilities.*;
   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
    /**Does the name appear as an operator def/proxy/ref?*/
-   private boolean covered(CommonTree function) {
-	      Program program = (Program) function.getAncestor(PROGRAM);
-	      List<? extends CommonTree> operators = program.getOperators();
+   private boolean covered(StencilTree function) {
+	      StencilTree program = function.getAncestor(PROGRAM);
+	      StencilTree operators = program.find(LIST_OPERATORS);
 	      MultiPartName name = new MultiPartName(function.getText());
-	      Specializer spec = (Specializer) function.getFirstChildWithType(SPECIALIZER);
 	      
-	      for (CommonTree o: operators) {
+	      for (StencilTree o: operators) {
 	          if (o.getText().equals(name.getName())) {return true;}
 	      }
 	      return false;
@@ -48,17 +43,17 @@ options {
    /**Create a cover reference for a given operator IF
     * there is not an operator ref with the given name.
     */
-   private String cover(CommonTree target) {
+   private String cover(StencilTree target) {
       MultiPartName name = new MultiPartName(target.getText());
       if (covered(target)) {return target.getText() ;} 
 	
 	  String newName = genSym(name.getName());    	  //create a new name
-	  Program program = (Program) target.getAncestor(PROGRAM);
-	  List operators = program.getOperators();
+	  StencilTree program = target.getAncestor(PROGRAM);
+	  StencilTree operators = program.find(LIST_OPERATORS);
 	  
 	  Tree ref = (Tree) adaptor.create(OPERATOR_REFERENCE, newName);     	  //Cover operator
 	  adaptor.addChild(ref, adaptor.create(OPERATOR_BASE, name.prefixedName()));
-	  adaptor.addChild(ref, adaptor.dupTree(target.getFirstChildWithType(SPECIALIZER)));
+	  adaptor.addChild(ref, adaptor.dupTree(target.find(SPECIALIZER)));
 	  
 	  adaptor.addChild(operators, ref);  	  //Add new operator to list
 	  

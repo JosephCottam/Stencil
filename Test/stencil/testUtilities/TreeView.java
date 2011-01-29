@@ -49,7 +49,7 @@ public class TreeView {
 		
 
 		stencil.Configure.loadProperties(props);
-		tree = stencil.parser.ParseStencil.parse(text, Adapter.ADAPTER);
+		tree = stencil.parser.ParseStencil.programTree(text, Adapter.ADAPTER);
 		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
 		f.setSize(500, 800);
 		f.setVisible(true);

@@ -37,11 +37,11 @@ import stencil.module.operator.wrappers.RangeHelper;
 import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Atom;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import static stencil.module.operator.StencilOperator.QUERY_FACET;
 import static stencil.module.util.ModuleDataParser.operatorData;
+import stencil.parser.string.util.Context;
 
 @Description("Math functions; includes many simple re-directions to java.lang.Math.")
 @Module()
@@ -71,12 +71,12 @@ public class Numerics extends BasicModule {
 		public static final Double logParam(double base, double value) {return Math.log(value)/Math.log(base);}
 		
 		public static StencilOperator instance(OperatorData od, Specializer spec) {
-			Atom base = spec.get("base");
-			if (base.isString() && base.getText().toLowerCase().equals("e")) {
+			Object base = spec.get("base");
+			if (base instanceof String && ((String) base).toLowerCase().equals("e")) {
 				od = new OperatorData(od);
 				od.setTarget("log");
 				return Modules.instance(java.lang.Math.class, od);
-			} else if (base.isNumber()){
+			} else if (base instanceof Number){
 				double bs = Converter.toDouble(spec.get("base"));
 				if (bs == 10) {
 					od = new OperatorData(od);
@@ -382,7 +382,7 @@ public class Numerics extends BasicModule {
 	//TODO: Remove when converter has its own module/operator
  	public static Number asNumber(Object v) {return Converter.toNumber(v);}
  	
-	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
+	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 		Range range = new Range(specializer.get(Specializer.RANGE));
 
@@ -407,7 +407,7 @@ public class Numerics extends BasicModule {
 				target = RangeHelper.makeOperator(range, target, QUERY_FACET);}
 			else if (name.equals("Min") ) {
 				target = new FullMin(operatorData(FullMin.class, getName()));
-			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; specializer = %2$s.", name, specializer.toStringTree()));}
+			}else {throw new IllegalArgumentException(String.format("Unknown method/specializer combination requested: name = %1$s; %2$s.", name, specializer));}
 
 			
 			target = SplitHelper.makeOperator(new Split(specializer.get(Specializer.SPLIT)), target);

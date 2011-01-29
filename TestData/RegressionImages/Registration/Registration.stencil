@@ -44,7 +44,7 @@ from Reg2
    FILL_COLOR: @Color{RED}
    REGISTRATION: "CENTER"
 
-layer Text[TEXT]
+layer Text["TEXT"]
 from Reg
    ID : Name
    TEXT: Name
@@ -52,7 +52,7 @@ from Reg
    Y: Count(Name) -> Mult(VALUE, 2) -> Add(20, product)
    REGISTRATION:  Name
 
-layer VerticalText[TEXT]
+layer VerticalText["TEXT"]
 from Reg
    ID : Name
    TEXT: Name

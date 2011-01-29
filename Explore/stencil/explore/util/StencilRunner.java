@@ -41,13 +41,14 @@ import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.ConcurrentStream;
-import stencil.parser.tree.Order;
-import stencil.parser.tree.Atom;
+import stencil.interpreter.tree.Order;
 
 /**Thread to manage running a stencil run.
  *
  * This contains the heart of the data coordination engine that is part
  * of the Explore extension to Stencil.
+ * 
+ * TODO: Move ALMOST all of this to a proper dispatcher.  Merge with the stream/stream stuff in the main interpreter branch.
  * 
  * @author jcottam
  *
@@ -77,21 +78,21 @@ public final class StencilRunner extends Thread {
 
 			Map<String, StreamSource> streamSources = model.getSourcesMap();
 			StencilPanel panel = model.getStencilPanel();
-			Order order = panel.getProgram().getStreamOrder();
+			Order order = panel.getProgram().order();
 
-			for (List<? extends Atom> group: order) {
+			//TODO: Re-arrange this whole mess to use the dispatcher defined in the dissertation.
+			for (String[] group: order) {
 				if (!keepRunning) {break;}
 
 				String names = "";
 				TupleStream input;
 
 				List<TupleStream> streams = new ArrayList<TupleStream>();
-				for (Atom name: group) {
-					if (!name.isString() && !name.isName()) {continue;}
-					if (!streamSources.containsKey(name.getValue())) {continue;}
-
-					names = names + " and " + name.getValue();
-					StreamSource stream = streamSources.get(name.getValue());
+				for (String name: group) {
+					if (!streamSources.containsKey(name)) {continue;}
+					
+					names = names + " and " + name;
+					StreamSource stream = streamSources.get(name);
 					if (stream instanceof FileSource) {stream=resolvePaths(((FileSource) stream));}
 					input = stream.getStream(model);
 					streams.add(input);

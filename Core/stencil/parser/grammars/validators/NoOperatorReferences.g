@@ -1,7 +1,7 @@
 tree grammar NoOperatorReferences;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   filter = true;
   superClass = TreeFilterSequence;
 }
@@ -10,9 +10,8 @@ options {
 /* Verifies that all operator references have been removed.*/
   package stencil.parser.string.validators;
   
-  import stencil.parser.tree.*;
+  import stencil.parser.tree.StencilTree;
   import stencil.parser.string.ValidationException;
-  import stencil.parser.ParseStencil;
   import stencil.parser.string.TreeFilterSequence;
 }
 

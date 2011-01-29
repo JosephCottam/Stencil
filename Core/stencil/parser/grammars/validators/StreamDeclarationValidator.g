@@ -1,7 +1,7 @@
 tree grammar StreamDeclarationValidator;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   filter = true;
   superClass = TreeFilterSequence;
 }
@@ -16,47 +16,33 @@ options {
 
   package stencil.parser.string.validators;
   
-  import stencil.parser.tree.Stream;
-  import stencil.parser.string.StencilParser;
-  import stencil.parser.tree.TuplePrototype;
-  import stencil.parser.tree.TupleFieldDef;
-  import stencil.parser.ParseStencil;
+  import stencil.interpreter.tree.Freezer;
   import stencil.parser.string.TreeFilterSequence;
-
-  import java.util.HashSet;
-  import java.util.Set;
-
+  import stencil.tuple.prototype.TuplePrototype;
   import stencil.parser.string.ValidationException;
   import static java.lang.String.format;
-  import static stencil.parser.ParserConstants.SOURCE_FIELD;
+  import stencil.parser.tree.StencilTree;
 }
 
 @members {
   public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 
-  public void uniqueFieldNames(Stream e, TuplePrototype prototype) {
-    String field = null;
-    Set<String> fields = new HashSet<String>();
-    
-    for (TupleFieldDef def: prototype) {
-      field = def.getFieldName();
-      if (!fields.add(field)) {break;}
-      else {field = null;}
-    }  
-
-    String stream = e.getName();  
-    if (field != null) {
-      throw new ValidationException(format("Duplicate field name in stream declaration \%1\$s: \%2\$s.", stream, field));
-    }
-    
-    if (fields.contains(stream)) {
-      throw new ValidationException(format("Field with same name as containing stream: \%1\$s", stream));
-    }
-  }
+  public void uniqueFieldNames(StencilTree stream, StencilTree prototype) {
+     try {
+       TuplePrototype proto = Freezer.prototype(prototype);
+       //TODO: Is this really an error still (now that * as a tuple ref exists)???
+       if (proto.contains(stream.getText())) {
+         throw new ValidationException(format("Field with same name as containing stream: \%1\$s", stream));
+       }
+     } catch (ValidationException v) {throw v;}
+     catch (Exception e) {
+       throw new ValidationException("Error validating prototype def: " + prototype.toStringTree(), e);
+     }
+  } 
   
 }
 
-topdown: ^(e=EXTERNAL_STREAM ^(p=TUPLE_PROTOTYPE .*)) 
+topdown: ^(s=EXTERNAL_STREAM ^(p=TUPLE_PROTOTYPE .*)) 
          {
-            uniqueFieldNames((Stream) e, (TuplePrototype) p);
+            uniqueFieldNames(s, p);
          };

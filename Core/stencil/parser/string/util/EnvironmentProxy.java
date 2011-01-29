@@ -6,10 +6,10 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.samplers.LayerSampler;
+import stencil.interpreter.tree.Freezer;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.module.util.OperatorData;
-import stencil.parser.string.StencilParser;
 import stencil.parser.tree.*;
 import stencil.parser.tree.util.Environment;
 import stencil.parser.tree.util.MultiPartName;
@@ -17,12 +17,13 @@ import stencil.parser.tree.util.Path;
 import stencil.tuple.prototype.SimplePrototype;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
+
+import static stencil.parser.string.StencilParser.*;
 
 /**The environment proxy is used during compilation to mimic the shape of, 
  * but not the content of, runtime environment.
@@ -34,7 +35,8 @@ import org.antlr.runtime.tree.Tree;
  *
  */
 public final class EnvironmentProxy {
-
+	private static final TuplePrototype EMPTY_PROTOTYPE = new SimplePrototype();
+	
 	public static final class FrameException extends RuntimeException {
 		private static String briefMessage(String frame, TuplePrototype contents, FrameException prior) {
 			StringBuilder b = new StringBuilder();
@@ -68,89 +70,93 @@ public final class EnvironmentProxy {
 	 * to potential ancestors of a tree.
 	 */
 	private static final class AncestryPackage {
-		final Consumes c;
-		final OperatorFacet of;
-		final Guide g;
-		final Layer l;
-		final Program program;
+		final StencilTree c;
+		final StencilTree operatorFacet;
+		final StencilTree g;
+		final StencilTree l;
+		final StencilTree program;
 		final CommonTree focus;
 		final boolean inRuleList;
 		final boolean inGuideGenerator;
 		final boolean inDynamicRule;
 		
-		public AncestryPackage(CommonTree t) {
-			c = (Consumes) t.getAncestor(StencilParser.CONSUMES);
-			of = (OperatorFacet) t.getAncestor(StencilParser.OPERATOR_FACET);
-			g = (Guide) t.getAncestor(StencilParser.GUIDE);
-			l = (Layer) t.getAncestor(StencilParser.LAYER);
+		public AncestryPackage(StencilTree t) {
+			c = t.getAncestor(CONSUMES);
+			operatorFacet = t.getAncestor(OPERATOR_FACET);
+			g = t.getAncestor(GUIDE);
+			l = t.getAncestor(LAYER);
 			
-			StencilTree r= (StencilTree) t.getAncestor(StencilParser.RULE);
-			inRuleList = (r==null) ? false : r.getParent().getType() == StencilParser.LIST;
-			inDynamicRule = (r == null || c == null) ? false : r.getAncestor(StencilParser.DYNAMIC_RULE) != null;
-			inGuideGenerator = t.getAncestor(StencilParser.GUIDE_GENERATOR) != null;
+			StencilTree r= (StencilTree) t.getAncestor(RULE);
+			inRuleList = (r==null) ? false : r.getParent().getType() == LIST_RULES || StencilTree.typeName(r.getParent().getType()).startsWith("RULES");	//HACK: The startWith call depends on an incidental property of my naming convention...it could change and there would be no warning
+			inDynamicRule = (r == null || c == null) ? false : r.getAncestor(DYNAMIC_RULE) != null;
+			inGuideGenerator = t.getAncestor(GUIDE_GENERATOR) != null;
 			
-			program = (Program) t.getAncestor(StencilParser.PROGRAM);
+			program = t.getAncestor(PROGRAM);
 			focus = t;
 		}
 	}
 	
 	private static TuplePrototype calcLocalProxy(AncestryPackage anc) {
-		if (anc.c != null) {return calcPrototype(anc.c.getLocalRules());}
-		return new SimplePrototype();
+		if (anc.c != null) {return calcPrototype(anc.c.find(RULES_LOCAL));}
+		return EMPTY_PROTOTYPE;
 	}
 	private static TuplePrototype calcPrefilterProxy(AncestryPackage anc) {
-		if (anc.c != null) {return calcPrototype(anc.c.getPrefilterRules());}
-		if (anc.of != null) {return calcPrototype(anc.of.getPrefilterRules());}
+		if (anc.c != null) {return calcPrototype(anc.c.find(RULES_PREFILTER));}
+		if (anc.operatorFacet != null) {return calcPrototype(anc.operatorFacet.find(RULES_PREFILTER));}
 
-		return new SimplePrototype();
+		return EMPTY_PROTOTYPE;
 	}
 
-	/**Given a list of rules, what is the eventual prototype?*/
-	public static TuplePrototype calcPrototype(List<Rule> rules) {
+	
+	public static TuplePrototype calcPrototype(Iterable<StencilTree> rules) {
 		List<TupleFieldDef> defs = new ArrayList();
-		for (Rule r: rules) {
-		    StencilTree target = r.getGenericTarget();
-		    TuplePrototype<TupleFieldDef> targetPrototype = (TuplePrototype) target.findChild(StencilParser.TUPLE_PROTOTYPE);
+		for (StencilTree r: rules) {
+		    StencilTree target = r.find(TARGET, RESULT, VIEW, CANVAS, LOCAL, PREFILTER);
+		    TuplePrototype<TupleFieldDef> targetPrototype = Freezer.prototype(target.find(TUPLE_PROTOTYPE));
 
-			for (TupleFieldDef def: targetPrototype) {
+			for (TupleFieldDef def: targetPrototype.fields()) {
 				defs.add(def);
 			}
 		}
 		return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
-		if (anc.c == null && anc.l!= null) {return new SimplePrototype();}//This is the characteristic of the defaults block
+		if (anc.c == null && anc.l!= null) {return EMPTY_PROTOTYPE;}//This is the characteristic of the defaults block
 		if (anc.c != null) {
 			if (!anc.inDynamicRule) {
-				return findStream(anc.c.getStream(), anc.program.getStreams()).getPrototype();
+				StencilTree stream = findStream(anc.c.getText(), anc.program.find(LIST_STREAM_DECLS));
+				return Freezer.prototype(stream.find(TUPLE_PROTOTYPE));
 			} else {
-				return new SimplePrototype();	//Any sub-ref will be different if in a dynamic rule, but direct refs are numeralized in reducer creation
+				return EMPTY_PROTOTYPE;	//Any sub-ref will be different if in a dynamic rule, but direct refs are numeralized in reducer creation
 			}
 		}
-		if (anc.of != null) {return anc.of.getArguments();}
+		if (anc.operatorFacet != null) {return Freezer.prototype(anc.operatorFacet.find(YIELDS).getChild(0));}
 		
 		if (anc.g != null) {
-			if (anc.inRuleList && (anc.g.getSeedOperator() instanceof LayerSampler.SeedOperator)) {
-				//In a rule list but not part of the seed operator indicates that 
-				return ((LayerSampler) anc.g.getSampleOperator()).getDisplayLayer().getPrototype();
+			//If there is no SEED_OPERATOR, then there is not yet enough info to generate the prototype
+			if (anc.g.find(SEED_OPERATOR) == null) {throw new RuntimeException("Seed and Sample operators must be set before framing guides.");}
+
+			if (anc.inRuleList && (((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue() instanceof LayerSampler)) {
+				SampleOperator sampler = (SampleOperator) ((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue();
+				return ((LayerSampler) sampler).getDisplayLayer().getPrototype();
 			} else if (anc.inGuideGenerator) {
 				return SampleOperator.PROTOTYPE;
 			} else if (anc.inRuleList) {
-				return (TuplePrototype) anc.g.getGenerator().getGenericTarget().findChild(StencilParser.TUPLE_PROTOTYPE);
+				return Freezer.prototype(anc.g.find(GUIDE_GENERATOR).findDescendant(TUPLE_PROTOTYPE));
 			}
 		}
+		
 		throw new RuntimeException(String.format("Could not calculate stream proxy for %1$s at %2$s", anc.focus.toString(), Path.toString((StencilTree) anc.focus)));
 	}
 	
 	
-	private static Stream findStream(String name, Collection<Stream> externals) {
-		for (Stream s: externals) {if (s.getName().equals(name)) {return s;}}
+	private static StencilTree findStream(String name, Iterable<StencilTree> externals) {
+		for (StencilTree s: externals) {if (s.getText().equals(name)) {return s;}}
 		throw new RuntimeException("Could not find stream of name " + name + ".");
 	}
 
-	public static EnvironmentProxy extend(EnvironmentProxy env, Tree pass, CommonTree callTree, ModuleCache modules) {
+	public static EnvironmentProxy extend(EnvironmentProxy env, Tree pass, StencilTree call, ModuleCache modules) {
 		String label = pass.getText();
-		Function call = (Function) callTree;
 		TuplePrototype prototype = getPrototype(call, modules);
 		EnvironmentProxy p = env.push(label, prototype);
 		return p;
@@ -177,27 +183,27 @@ public final class EnvironmentProxy {
 		return p;
 	}
 
-	private static TuplePrototype getPrototype(Function call, ModuleCache modules) {
-		MultiPartName name= new MultiPartName(call.getName());
+	private static TuplePrototype getPrototype(StencilTree call, ModuleCache modules) {
+		MultiPartName name= new MultiPartName(call.getText());
 		Module m;
 		try{
-			m = modules.findModuleForOperator(name.prefixedName());
+			m = modules.findModuleForOperator(name.getPrefix(), name.getName());
 		} catch (Exception e) {
 			throw new RuntimeException("Error getting module information for operator " + name, e);
 		}
 
 		try {
-			OperatorData od = m.getOperatorData(name.getName(), call.getSpecializer());
+			OperatorData od = m.getOperatorData(name.getName(), Freezer.specializer(call.find(SPECIALIZER)));
 			return od.getFacet(name.getFacet()).getPrototype();
 		} catch (Exception e) {throw new RuntimeException("Error getting operator data for " + name, e);}       
 	}
 
-	public static EnvironmentProxy initialEnv(CommonTree t, ModuleCache modules) {
+	public static EnvironmentProxy initialEnv(StencilTree t, ModuleCache modules) {
 		AncestryPackage ancestry = new AncestryPackage(t);
 		TuplePrototype[] prototypes = new TuplePrototype[Environment.DEFAULT_SIZE];
 		prototypes[Environment.CANVAS_FRAME] = stencil.display.CanvasTuple.PROTOTYPE;
 		prototypes[Environment.VIEW_FRAME] = stencil.display.ViewTuple.PROTOTYPE;
-		prototypes[Environment.GLOBAL_FRAME] = new GlobalsTuple(ancestry.program.getGlobals()).getPrototype();
+		prototypes[Environment.GLOBAL_FRAME] = new GlobalsTuple(ancestry.program.find(LIST_GLOBALS)).getPrototype();
 		prototypes[Environment.STREAM_FRAME] = calcStreamProxy(ancestry, modules);
 		prototypes[Environment.PREFILTER_FRAME] = calcPrefilterProxy(ancestry);
 		prototypes[Environment.LOCAL_FRAME] = calcLocalProxy(ancestry);

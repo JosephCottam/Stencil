@@ -1,7 +1,7 @@
 tree grammar DefaultSpecializers;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -15,19 +15,21 @@ options {
 
   import java.lang.reflect.Field;
     
-  import stencil.parser.ParseStencil;
   import stencil.parser.tree.*;
   import stencil.parser.tree.util.*;
   import stencil.module.*;
   import stencil.module.util.*;
   import stencil.adapters.Adapter;
+  import stencil.interpreter.tree.Specializer;
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
+	import static stencil.parser.ParserConstants.DEFAULT_CANVAS_SPECIALIZER;
+	import static stencil.parser.ParserConstants.DEFAULT_LAYER_SPECIALIZER;
 	
 }
 
 @members{
-  public static Program apply (Tree t, ModuleCache modules, Adapter adapter, boolean blend) {
-     return (Program) TreeRewriteSequence.apply(t, modules, adapter, blend);
+  public static StencilTree apply (Tree t, ModuleCache modules, Adapter adapter, boolean blend) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules, adapter, blend);
   }
 
   protected void setup(Object... args) {
@@ -42,72 +44,87 @@ options {
   
 
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
-  private Specializer getDefault(Specializer spec) {
+  private StencilTree getDefault(StencilTree spec) {
     try {
-	     Function f = (Function) spec.getAncestor(FUNCTION);
-	     if (f != null) {return  getOperatorDefault(f.getName());}
+	     StencilTree f = spec.getAncestor(FUNCTION);
+	     if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.getText()));}
 	     
-	     Guide g = (Guide) spec.getAncestor(GUIDE);
-       if (g != null) {return getGuideDefault(g.getGuideType());}
+	     StencilTree g = spec.getAncestor(GUIDE);
+       if (g != null) {return (StencilTree) adaptor.dupTree(getGuideDefault(g.find(ID).getText()));}
 	     
-	     CanvasDef c = (CanvasDef) spec.getAncestor(CANVAS_DEF);
-	     if (c != null) {return ParseStencil.parseSpecializer(CanvasDef.DEFAULT_SPECIALIZER);}
-	     	     
-	     Import i = (Import) spec.getAncestor(IMPORT);
-	     if (i != null) {return (Specializer) adaptor.dupTree(EMPTY_SPECIALIZER);} 
+       StencilTree c = spec.getAncestor(CANVAS_DEF);
+	     if (c != null) {return (StencilTree) adaptor.dupTree(DEFAULT_CANVAS_SPECIALIZER);}
+	     	     	     
+	     StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
+	     if (ref != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(ref.find(OPERATOR_BASE).getText()));}
+
+       StencilTree layer = spec.getAncestor(LAYER);
+       if (layer != null) {return (StencilTree) adaptor.dupTree(DEFAULT_LAYER_SPECIALIZER);}
 	     
-	     OperatorReference ref = (OperatorReference) spec.getAncestor(OPERATOR_REFERENCE);
-	     if (ref != null) {return getOperatorDefault(ref.getBase().getName());}
-	     
-    } catch (Exception e) {return (Specializer) adaptor.dupTree(spec);}
+    } catch (Exception e) {return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER);}  //HACK: Is removing the default really the right thing?
 	  throw new IllegalArgumentException("Specializer encountered in unexpected context: " + spec.getParent().toStringTree());
   }
   
   /**Work with the graphics adapter to get the default
     * specializer for a given guide type.
     **/
-  private Specializer getGuideDefault(String guideType) {
+  private StencilTree getGuideDefault(String guideType) {
     Class clss = adapter.getGuideClass(guideType);
-    Specializer defaultSpec;
+    StencilTree defaultSpec;
     
     try {
       Field f = clss.getField("DEFAULT_ARGUMENTS");
-      defaultSpec = (Specializer) f.get(null);
+      defaultSpec = ((Specializer) f.get(null)).getSource();
     } catch (Exception e) {
-      try {defaultSpec = (Specializer) adaptor.dupTree(EMPTY_SPECIALIZER);}
-      catch (Exception e2) {throw new Error("Error in parsing of constant specializer...");}
+      defaultSpec = (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER);
     }     
       
-    return  (Specializer) adaptor.dupTree(defaultSpec);
+    assert defaultSpec != null;
+    return  defaultSpec;
   }
 
   /**Get the default guide for a named operator.*/
-  public Specializer getOperatorDefault(String fullName) {
+  public StencilTree getOperatorDefault(String fullName) {
     MultiPartName name= new MultiPartName(fullName);
     ModuleData md;
     
     try {
-        Module m = modules.findModuleForOperator(name.prefixedName());
+        Module m = modules.findModuleForOperator(name.getPrefix(), name.getName());
         md = m.getModuleData();
     } catch (Exception e) {
       throw new RuntimeException("Error getting module information for operator " + name.toString(), e);
     }
     
     try {
-        return  (Specializer) adaptor.dupTree(md.getDefaultSpecializer(name.getName()));
+        StencilTree source = md.getDefaultSpecializer(name.getName()).getSource();
+        assert source != null;
+        return  source;
       } catch (Exception e) {
         throw new RuntimeException("Error finding default specializer for " + name.toString(), e);
       } 
   }
   
   /**Combine a given specializer with the appropriate default.*/
-  private Specializer blendWithDefault(Specializer spec) {
-     return Specializer.blendMaps(getDefault(spec), spec, adaptor);
+  private StencilTree blendWithDefault(StencilTree spec) {
+    Specializer specializer = Specializer.blend(spec, getDefault(spec));
+    StencilTree root = (StencilTree) adaptor.create(spec.getToken());
+
+    for (String key: specializer.keySet()) {
+     Object value = specializer.get(key);
+     StencilTree entry = (StencilTree) adaptor.create(MAP_ENTRY, key);
+     Const valNode = (Const) adaptor.create(CONST, value == null? null:value.toString());
+     valNode.setValue(value);
+     
+     adaptor.addChild(entry, valNode);
+     adaptor.addChild(root, entry);
+    }
+    return root;
   }
 
 }
 
 topdown
   options{backtrack=true;}
-  : ^(s=SPECIALIZER DEFAULT) -> {getDefault((Specializer) s)}
-  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault((Specializer) s)};
+  : ^(s=SPECIALIZER DEFAULT)          -> {getDefault(s)}
+  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault(s)}
+  |{blend}?  s=SPECIALIZER            -> {blendWithDefault(s)};

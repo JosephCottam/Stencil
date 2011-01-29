@@ -1,7 +1,7 @@
 tree grammar AllInvokeables;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   filter = true;
   superClass = TreeFilterSequence;
 }
@@ -12,7 +12,6 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.parser.string.ValidationException;
-  import stencil.parser.ParseStencil;
   import stencil.parser.string.TreeFilterSequence;
 }
 

@@ -2,7 +2,6 @@ package stencil.interpreter.guide;
 
 import stencil.display.DisplayLayer;
 import stencil.interpreter.guide.samplers.*;
-import stencil.parser.tree.Layer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +14,7 @@ public final class Samplers {
 	
 	private Samplers() {}
 
+	/**Sampler mapping used for direct samples*/
 	private static Map<Class, Class<? extends SampleOperator>> samplers = new HashMap();
 	static {
 		samplers.put(Integer.class, NumericSampler.class);
@@ -29,7 +29,6 @@ public final class Samplers {
 		samplers.put(String.class, StringSampler.class);
 		samplers.put(Color.class, ColorSampler.class);
 		samplers.put(DisplayLayer.class, LayerSampler.class);
-		samplers.put(Layer.class, LayerSampler.class);
 	}
 	
 	

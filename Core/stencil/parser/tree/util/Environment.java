@@ -4,7 +4,7 @@ import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
 import stencil.util.collections.ArrayUtil;
 
-public abstract class Environment implements Tuple {
+public abstract class Environment implements Tuple, Cloneable {
 	/**The default frame names.  
 	 * The element "**stream**" is logically replaced by the name 
 	 * of the stream in any frame instance.*/

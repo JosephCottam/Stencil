@@ -1,7 +1,7 @@
 tree grammar ReplaceConstants;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -16,14 +16,13 @@ options {
 	
    import stencil.parser.tree.*;
    import stencil.parser.string.util.*;
-   import stencil.tuple.Tuple;
    import static stencil.parser.ParserConstants.GLOBALS_FRAME;
 }
 
 @members {  
-  public static Program apply (Tree t) {
-     GlobalsTuple globals = new GlobalsTuple(((Program) t).getGlobals());
-     return (Program) TreeRewriteSequence.apply(t, globals);
+  public static StencilTree apply (StencilTree t) {
+     GlobalsTuple globals = new GlobalsTuple(t.find(LIST_GLOBALS));
+     return (StencilTree) TreeRewriteSequence.apply(t, globals);
   }
   
   protected void setup(Object... args) {globals = (GlobalsTuple) args[0];}
@@ -35,5 +34,6 @@ topdown:
 	^(TUPLE_REF frame=ID field=ID) 
 		{$frame.text.equals(GLOBALS_FRAME) &&
   		  globals.getPrototype().contains($field.text)}? ->  {adaptor.dupTree(globals.get($field.text))};
-  		    		  
-bottomup: ^(LIST ^(CONST .*)) -> ^(LIST);  		  
+
+//Delete the global list of constants
+bottomup: ^(p=PROGRAM .*) {adaptor.deleteChild(p, p.find(LIST_GLOBALS).getChildIndex());};

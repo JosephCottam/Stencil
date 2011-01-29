@@ -8,7 +8,7 @@ STRICT: TRUE
 
 stream LineSource(axis1A, axis1B)
 
-layer Vertical[ARC]
+layer Vertical["ARC"]
 from LineSource
 	ID: Concatenate(axis1A, axis1B) 
 	X.1: Concatenate(axis1A, axis1B) -> Spacing(value) 
@@ -19,7 +19,7 @@ from LineSource
 	PEN_COLOR: @Color{GRAY80}
 	PEN: @Stroke{3}
 
-layer Horizontal[ARC]
+layer Horizontal["ARC"]
 from LineSource
 	ID: Concatenate(axis1A, axis1B)
 	Y.1: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (V)
@@ -31,7 +31,7 @@ from LineSource
 	PEN: @Stroke{3}
 
 
-layer Diagonal[ARC]
+layer Diagonal["ARC"]
 from LineSource
 	ID: Concatenate(axis1A, axis1B)
 	X.1: 40

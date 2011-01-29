@@ -1,7 +1,7 @@
 tree grammar EnsureOrders;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
 	superClass = TreeRewriteSequence;
@@ -16,16 +16,16 @@ options {
 }
 
 @members{
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-  public Program downup(Object t) {
-    newOrder = (Order) adaptor.create(ORDER, "Order");
-    adaptor.addChild(newOrder, adaptor.create(LIST, "Streams"));
+  public StencilTree downup(Object t) {
+    newOrder = (StencilTree) adaptor.create(ORDER, StencilTree.typeName(ORDER));
+    adaptor.addChild(newOrder, adaptor.create(LIST_STREAMS, StencilTree.typeName(LIST_STREAMS)));
     downup(t, this, "gatherStreams");
-    return (Program) downup(t, this, "fixOrder");     
+    return (StencilTree) downup(t, this, "fixOrder");     
   }
 
-	private Order newOrder;
+	private StencilTree newOrder;
 	private void addName(String name) {
 		adaptor.addChild(newOrder.getChild(0), adaptor.create(ID, name));
 	}
@@ -38,5 +38,5 @@ fixOrder
 	: ORDER -> {newOrder}
 	| ^(ORDER orderRef+) -> ^(ORDER orderRef+);
 	
-orderRef:  ^(LIST ID+);
+orderRef:  ^(LIST_STREAMS ID+);
 	

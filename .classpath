@@ -10,14 +10,13 @@
 	<classpathentry kind="lib" path="Library/JUNG/jung-algorithms-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-api-2.0.1.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-graph-impl-2.0.1.jar"/>
-	<classpathentry kind="lib" path="Library/antlr-3.2.jar" sourcepath="/Users/jcottam/Library/Java/antlr-3.2/runtime/Java/src/main/java/"/>
 	<classpathentry kind="lib" path="Library/antlr3-ant.jar"/>
 	<classpathentry kind="lib" path="Library/jdom.jar"/>
 	<classpathentry kind="lib" path="Library/pcollections-2.0.0.jar"/>
 	<classpathentry kind="lib" path="Library/rome-1.0.jar"/>
-	<classpathentry kind="lib" path="Library/stringtemplate-3.2.jar"/>
 	<classpathentry kind="lib" path="Library/twitter4j-2.0.8.jar"/>
 	<classpathentry kind="lib" path="Library/umdTreeMaps.jar"/>
 	<classpathentry kind="lib" path="Library/junit-4.8.2.jar"/>
+	<classpathentry kind="lib" path="Library/antlr-3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,7 +1,7 @@
 tree grammar SpecializerDeconstant;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	output = AST;
 	filter = true;
   superClass = TreeRewriteSequence;
@@ -12,16 +12,14 @@ options {
 	package stencil.parser.string;
 	
   import stencil.tuple.prototype.TuplePrototype;
-	import stencil.parser.tree.*;
+	import stencil.parser.tree.StencilTree;
 	import stencil.parser.string.util.*;
-	import stencil.tuple.Tuple;
-  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
 }
 
 @members {  
-  public static Program apply (Tree t) {
-     GlobalsTuple globals = new GlobalsTuple(((Program) t).getGlobals());
-     return (Program) TreeRewriteSequence.apply(t, globals);
+  public static StencilTree apply (StencilTree t) {
+     GlobalsTuple globals = new GlobalsTuple(t.find(LIST_GLOBALS));
+     return (StencilTree) TreeRewriteSequence.apply(t, globals);
   }
   
   protected void setup(Object... args) {

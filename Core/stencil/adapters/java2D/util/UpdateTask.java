@@ -2,16 +2,11 @@ package stencil.adapters.java2D.util;
 
 import java.util.concurrent.Callable;
 
-import stencil.parser.tree.StateQuery;
-import stencil.parser.tree.StencilTree;
-import stencil.parser.tree.util.Path;
+import stencil.interpreter.Viewpoint;
+import stencil.interpreter.tree.StateQuery;
 
-public abstract class UpdateTask<T extends StencilTree> implements Callable<Finisher> {
+public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Finisher> {
 	public static final Finisher NO_WORK = new Finisher() {public void finish() {}};
-	
-	
-	/**The path to the fragment in the source tree**/
-	protected final Path path;
 	
 	/**The base fragment to be updated.*/
 	protected final StateQuery stateQuery;
@@ -25,9 +20,10 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 	 */
 	protected T viewPointFragment;
 	
+	protected final T original;
 	
 	protected UpdateTask(T original, StateQuery stateQuery, String identifier) {
-		this.path = new Path(original);
+		this.original = original;
 		this.stateQuery = stateQuery;
 		this.identifier = this.getClass().getName() + ":" + identifier;
 	}
@@ -41,11 +37,9 @@ public abstract class UpdateTask<T extends StencilTree> implements Callable<Fini
 
 	/**Set the core stencil fragment that will be executed in this update.
 	 * For example, in a dynamic update, this is a derivative of the dynamically bound rule.*/
-	public void setStencilFragment(StencilTree root) {
-		viewPointFragment = (T) path.apply(root); 
+	public void viewPoint() {
+		viewPointFragment = original.viewpoint(); 
 	}
-	
-	public Path getPath() {return path;}
 	
 	/**Run this updater if required.
 	 * Return an appropriate finisher to complete work (if required).

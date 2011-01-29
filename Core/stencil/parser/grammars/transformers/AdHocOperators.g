@@ -1,8 +1,7 @@
-
 tree grammar AdHocOperators;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;
+	ASTLabelType = StencilTree;
 	superClass = TreeRewriteSequence;
 	filter = true;
 	output = AST;
@@ -20,13 +19,17 @@ options {
   import stencil.module.*;
   import stencil.module.util.*;    
   import stencil.module.operator.wrappers.*;
+  import stencil.interpreter.tree.*;
   import stencil.parser.tree.*;
+  import stencil.parser.string.info.UseContext;
+  import stencil.parser.string.util.Context;
   import stencil.parser.tree.util.MultiPartName;
+  import stencil.parser.string.util.JavaCompiler;
 }
 
 @members {
-  public static Program apply (Tree t, ModuleCache modules, Adapter adapter) {
-     return (Program) TreeRewriteSequence.apply(t, modules, adapter);
+  public static StencilTree apply (Tree t, ModuleCache modules, Adapter adapter) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules, adapter);
   }
   
   protected void setup(Object... args) {
@@ -41,24 +44,36 @@ options {
 	
 	public Object downup(Object p) {	
 	   downup(p, this, "simple");
-	   proxyOperators((Program) p);
+	   proxyOperators((StencilTree) p);
 	   return p;
 	}
 	
 	
 
-	protected void makeOperator(Operator op) {
+	protected void makeOperator(StencilTree op) {
 		StencilOperator operator = new SyntheticOperator(adHoc.getModuleData().getName(), op);		
 		adHoc.addOperator(operator);
 	}
 	
-	protected void makeLayer(Layer l) {
+	protected StencilTree makeLayer(StencilTree l) {
 		DisplayLayer dl =adapter.makeLayer(l); 
-		l.setDisplayLayer(dl);
-		
 		LayerOperator operator = new LayerOperator(adHoc.getName(), dl);
 		adHoc.addOperator(operator, operator.getOperatorData());
+		
+		Const c = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
+		c.setValue(dl); 
+		return c;
 	}
+	
+	private void makeJava(StencilTree java) {
+     String name = java.getText();
+     String superClass = java.getChild(0).getText();
+     String header = java.getChild(1).getText();
+     String body = java.getChild(2).getText();
+     
+     adHoc.addOperator(JavaCompiler.compile(name, superClass, header, body));
+  }
+	
 	
 	
 	//--------------- Proxy operator fixed-point ---------------------
@@ -71,11 +86,11 @@ options {
 	   return p;
 	}
 	
-	private Program runOnce(Tree p) {
-	  return (Program) downup(p, this, "proxies");
+	private StencilTree runOnce(Tree p) {
+	  return (StencilTree) downup(p, this, "proxies");
 	}
 	
-  private Tree transferProxy(OperatorReference ref) {
+  private Tree transferProxy(StencilTree ref) {
     OperatorProxy proxy = makeProxy(ref);
      
     if (adHoc.getModuleData().getOperatorNames().contains(proxy.getName())) {return ref;}
@@ -84,8 +99,8 @@ options {
     return proxy;
   } 
   
-  private OperatorProxy makeProxy(OperatorReference ref) {
-      String name = ref.getName();
+  private OperatorProxy makeProxy(StencilTree ref) {
+      String name = ref.getText();
       StencilOperator op = findBase(ref);
        
       OperatorProxy p = (OperatorProxy) adaptor.create(OPERATOR_PROXY, name);
@@ -93,37 +108,31 @@ options {
       return p;
   }
   
-  private StencilOperator findBase(OperatorReference ref) {
-      OperatorBase base = (OperatorBase) ref.getFirstChildWithType(OPERATOR_BASE);
-      Specializer spec = (Specializer) ref.getFirstChildWithType(SPECIALIZER);
-      String baseName = base.getName();
-      String name = ref.getName();  
+  private StencilOperator findBase(StencilTree ref) {
+      Specializer spec = Freezer.specializer(ref.find(SPECIALIZER));
+      MultiPartName baseName = new MultiPartName(ref.find(OPERATOR_BASE).getText());
+      String useName = ref.getText();  
   
-      Module module; 
-      try {module = modules.findModuleForOperator(baseName);}
-      catch (Exception e) {return null;}
-      
-      
-      String opName  = (new MultiPartName(baseName)).getName();
+      StencilTree program = ref.getAncestor(PROGRAM);
+      Context context = UseContext.apply(program, useName);
+
       StencilOperator op;
       try {
-          op = module.instance(opName, spec);
-      } catch (Exception e) {throw new RuntimeException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, name), e);}
-      return op;  
-  }
-  
-	private void makeJava(Java java) {
-	    adHoc.addOperator(java.name(), java.operator(), java.operatorData());
-	}
+          op = modules.instance(baseName.getPrefix(), baseName.getName(), context, spec);
+      } catch (Exception e) {
+        throw new RuntimeException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, useName), e);
+      }
+      return op;
+  }  
 }
  
 simple
-	: ^(r=OPERATOR .*) {makeOperator((Operator) $r);}
-	| ^(r=LAYER .*) {makeLayer((Layer) $r);}
-	| ^(r=JAVA .*) {makeJava((Java) $r);}
+	: ^(r=OPERATOR .*) {makeOperator($r);}
+	| ^(r=LAYER rest+=.*) -> ^(LAYER $rest* {makeLayer($r)})
+	| ^(r=JAVA .*) {makeJava($r);}
   ;
   
 proxies
- : ^(r=OPERATOR_REFERENCE .*) {findBase((OperatorReference) $r) != null}? -> {transferProxy((OperatorReference) $r)}
+ : ^(r=OPERATOR_REFERENCE .*) {findBase($r) != null}? -> {transferProxy($r)}
  ;
 	

@@ -1,7 +1,7 @@
 tree grammar GuideDefaultSelector;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;	
+	ASTLabelType = StencilTree;	
 	filter = true;
   output = AST;	
   superClass = TreeRewriteSequence;
@@ -16,10 +16,9 @@ options {
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 topdown: 
-  ^(SELECTOR DEFAULT p=path) -> ^(SELECTOR[$p.att] ID[$p.att] $p);
-
-path returns [String att]: ^(LIST i=ID+) {$att=$i.text;};
+  ^(s=SELECTOR p+=ID+) 
+    {s.getText().equals("DEFAULT")}? -> ^(SELECTOR[((StencilTree) $p.get($p.size()-1)).getToken()] $p+);

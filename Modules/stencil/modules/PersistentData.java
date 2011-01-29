@@ -7,7 +7,7 @@ import stencil.module.util.FacetData;
 import stencil.module.util.ann.*;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 
 import org.pcollections.*;
 
@@ -24,7 +24,7 @@ public class PersistentData extends BasicModule {
 		public StaticList(OperatorData opData, Specializer spec) {
 			super(opData);
 									
-			String literalMask = spec.get(VALUES_KEY).getText();
+			String literalMask = (String) spec.get(VALUES_KEY);
 			String[] parts = literalMask.split("\\s*,\\s*");
 
 			out = new Object[parts.length];
@@ -104,7 +104,7 @@ public class PersistentData extends BasicModule {
 			return od;
 		}
 
-		private static String[] getNames(Specializer spec) {return spec.get(NAMES).getText().split("\\s*,\\s*");}
+		private static String[] getNames(Specializer spec) {return ((String) spec.get(NAMES)).split("\\s*,\\s*");}
 		
 	}
 	

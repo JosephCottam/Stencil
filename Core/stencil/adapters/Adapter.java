@@ -33,8 +33,8 @@ import java.awt.image.BufferedImage;
 
 import stencil.display.Glyph;
 import stencil.display.StencilPanel;
-import stencil.parser.tree.Program;
-import stencil.parser.tree.Layer;
+import stencil.interpreter.tree.Program;
+import stencil.parser.tree.StencilTree;
 import stencil.display.DisplayLayer;
 
 /**The generator takes a stencil program and generators an
@@ -65,7 +65,7 @@ public interface Adapter<T extends Glyph> {
 	public StencilPanel generate(Program program);
 
 	/**Create a layer in this adapter.*/
-	public DisplayLayer makeLayer(Layer l);
+	public DisplayLayer makeLayer(StencilTree layerDef);
 		
 	
 	/**Given a guide type, return the corresponding class.*/

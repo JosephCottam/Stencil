@@ -31,7 +31,6 @@ package stencil.modules;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import stencil.interpreter.guide.SampleSeed;
@@ -44,10 +43,10 @@ import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Atom;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
@@ -58,9 +57,16 @@ public class StencilUtil extends BasicModule {
 	
 	@Operator(spec="[range: ALL, split: 0]")
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
+	@Description("Use the Converter to change the value(s) passed into a tuple.")
 	public static final Tuple toTuple(Object... values) {return Converter.toTuple(values);} 
 	
-	public static abstract class SeedBase extends AbstractOperator.Statefull implements  SeedOperator, Cloneable {
+	@Operator(spec="[range: ALL, split: 0]")
+	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
+	@Description("Repackage the the values passed as a tuple (simple wrapping, no conversion attempted).")
+	public static final Tuple valuesTuple(Object... values) {return new ArrayTuple(values);} 
+
+	
+	public static abstract class SeedBase extends AbstractOperator.Statefull implements SeedOperator, Cloneable {
 		protected SeedBase(OperatorData opData) {super(opData);}
 						
 		/**Complete the operator data, given the specializer.*/
@@ -84,6 +90,7 @@ public class StencilUtil extends BasicModule {
 
 		@Override
 		public SampleSeed getSeed() {throw new RuntimeException("No implemented.");}
+		public SeedBase viewpoint() {return this;}
 	}
 
 	
@@ -105,10 +112,9 @@ public class StencilUtil extends BasicModule {
 		public SeedContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
 			super(opData);
 			
-			Map<String, Atom> map = spec.getMap();
-			if (map.containsKey(MAX_KEY)) {max = Converter.toDouble(map.get(MAX_KEY));}
-			if (map.containsKey(MIN_KEY)) {min = Converter.toDouble(map.get(MIN_KEY));}
-			rangeLock = map.containsKey(LOCK_KEY) && map.get(LOCK_KEY).getValue().equals(FALSE_STRING);
+			if (spec.containsKey(MAX_KEY)) {max = Converter.toDouble(spec.get(MAX_KEY));}
+			if (spec.containsKey(MIN_KEY)) {min = Converter.toDouble(spec.get(MIN_KEY));}
+			rangeLock = spec.containsKey(LOCK_KEY) && spec.get(LOCK_KEY).equals(FALSE_STRING);
 		}
 		
 		public StencilOperator duplicate() {return new SeedContinuous(operatorData, rangeLock);}
@@ -137,6 +143,14 @@ public class StencilUtil extends BasicModule {
 			}
 			
 			return Tuples.EMPTY_TUPLE;
+		}
+		
+		public SeedContinuous viewpoint() {
+			SeedContinuous rv = new SeedContinuous(operatorData, rangeLock);
+			rv.max = this.max;
+			rv.min = this.min;
+			try {return (SeedContinuous) clone();}
+			catch (Exception e) {throw new Error("Error making viewpoint of seed operator.");}
 		}
 	}
 	
@@ -167,6 +181,11 @@ public class StencilUtil extends BasicModule {
 		
 		@Facet(memUse="READER", prototype="(int VALUE)")		
 		public int stateID() {return seen.size();}
+		
+		public SeedCategorize viewpoint() {
+			try {return (SeedCategorize) clone();}
+			catch (Exception e) {throw new Error("Error making viewpoint of seed operator.");}
+		}
 	}
 	
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
@@ -181,5 +200,5 @@ public class StencilUtil extends BasicModule {
 
 		if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
-	}
+	}	
 }

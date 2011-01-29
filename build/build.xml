@@ -21,21 +21,21 @@
     <!-- Just the core stencil grammar, not the additional processing.-->
     <target name="WorkingGrammar">
         <antlr3
-            target="${grammars}/Stencil.g"
+            target="${grammars}/transformers/guide/GuideLiftGenerator.g"
             outputdirectory="${parser}"
             libdirectory="${parser}"
         />
     </target>
  		
  		
- 	<target name="Stencil" depends="Transformers, Infos, TreeAdapter, Validators, Interpreter, Compile"/>
+ 	<target name="Stencil" depends="Transformers, Infos, Validators, Interpreter, Compile"/>
  	
     <target name="Compile">
-            <javac srcdir="${core}" destdir="${target}">
+            <javac srcdir="${core}" destdir="${target}" includeantruntime="false">
             <classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
             <!-- compilerarg value="-Xlint"/ -->
         </javac>
-        <javac srcdir="${modules}" destdir="${target}">
+        <javac srcdir="${modules}" destdir="${target}"  includeantruntime="false">
             <classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
             <!-- compilerarg value="-Xlint"/ -->
         </javac>
@@ -47,11 +47,11 @@
                <include name="**/*.yml" />
             </fileset>
         </copy>
-        <javac srcdir="${explore}" destdir="${target}">
+        <javac srcdir="${explore}" destdir="${target}"  includeantruntime="false"> 
             <classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
             <!-- compilerarg value="-Xlint"/ -->
         </javac>
-        <javac srcdir="${test}" destdir="${target}">
+        <javac srcdir="${test}" destdir="${target}"  includeantruntime="false">
             <classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
             <!-- compilerarg value="-Xlint"/ -->
         </javac>
@@ -106,39 +106,6 @@
         />          
     </target>
  	
- 	<target name="TreeAdapter" depends="TreeAdapterGrammar, PreAdapterBuild">
-		<java classname="stencil.util.build.GenerateTreeAdapter" fork="true">
-			<classpath>
-				<pathelement path="${target}"/>
-				<pathelement path="${java.class.path}"/>
-			    <fileset dir="${runtimeLibrary}" includes="*.jar"/>
-			</classpath>
-			<arg value="${parser}/Stencil.tokens" />
-			<arg value="${grammars}/StencilTreeAdapter.stg" />
-			<arg value="${core}${ast}/StencilTreeAdapter.java" />
-		</java>
- 	</target>
-
-    <target name="TreeAdapterGrammar" depends="StencilGrammar">
-        <antlr3
-            target="${grammars}/StencilTreeAdapter.g"
-            outputdirectory="${core}${ast}"
-        />
-    </target>
-
-
- 	<target name="PreAdapterBuild">
-        <mkdir dir="${target}${ast}" />
-        <javac sourcepath="" srcdir="${core}${ast}" excludes="StencilTreeAdapter.java" includes="StencilTreeAdapter*" destdir="${target}">
-            <classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
-        </javac>
-
-        <property name="dir" value="/stencil/util/build"/>
-        <mkdir dir="${target}${dir}" />
- 		<javac sourcepath="" srcdir="${core}${dir}" destdir="${target}">
-			<classpath><fileset dir="${runtimeLibrary}" includes="*.jar"/></classpath>
- 		</javac>
- 	</target>
  	
  	<target name="Release" depends="Stencil">
  		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>

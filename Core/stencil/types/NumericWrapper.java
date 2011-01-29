@@ -1,10 +1,11 @@
 package stencil.types;
 
- import stencil.parser.tree.StencilNumber;
+import stencil.parser.tree.StencilTree;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.NumericSingleton;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.enums.ValueEnum;
+import static stencil.parser.string.StencilParser.NUMBER;
 
 public class NumericWrapper implements TypeWrapper {
 	private static final Class[] ACCEPTS = {Number.class, Integer.class, Long.class, Double.class, Float.class, int.class, long.class, double.class, float.class};
@@ -23,7 +24,9 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof Number) {return ((Number) value).doubleValue();}
 		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
 		
-		if (value instanceof StencilNumber) {return new Double(((StencilNumber) value).getValue().doubleValue());}
+		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
+			return new Double(((StencilTree) value).getText());
+		}
 		
 		return Double.parseDouble(value.toString());
 	}
@@ -31,8 +34,12 @@ public class NumericWrapper implements TypeWrapper {
 	public static  Float toFloat(Object value) {
 		if (value instanceof Float) {return (Float) value;}
 		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Float(((StencilNumber) value).getValue().floatValue());}
 		if (value instanceof Number) {return ((Number) value).floatValue();}
+		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
+			return new Float(((StencilTree) value).getText());
+		}
+
+		
 		
 		return Float.parseFloat(value.toString());	
 	}
@@ -41,31 +48,37 @@ public class NumericWrapper implements TypeWrapper {
 		if (value instanceof Integer) {return (Integer) value;}
 		if (value instanceof Long) {return ((Long) value).intValue();}
 		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return new Integer(((StencilNumber) value).getValue().intValue());}
 		if (value instanceof Number) {return ((Number) value).intValue();}
+		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
+			return new Integer(((StencilTree) value).getText());
+		}
 
+		
 		return toFloat(value).intValue();
 	}
 	
 	public static Long toLong(Object value) {
-		if (value instanceof StencilNumber) {return new Long(((StencilNumber) value).getValue().longValue());}
+		if (value instanceof Long) {return (Long) value;}
 		if (value instanceof Number) {return ((Number) value).longValue();}
 		if (value instanceof ValueEnum) {return toLong(((ValueEnum)value).getValue());}
 		if (value instanceof Number) {return ((Number) value).longValue();}
+		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
+			return Long.valueOf(((StencilTree) value).getText());
+		}
+
 		return new Long(Long.parseLong(value.toString()));
 	}
 	
 	public static Number toNumber(Object value) {
 		if (value instanceof Number) {return (Number)value;}
 		if (value instanceof ValueEnum) {return toNumber(((ValueEnum) value).getValue());}
-		if (value instanceof StencilNumber) {return ((StencilNumber) value).getValue();}
 
 		String rep = value.toString();
 		if (rep.contains(".")) {return toDouble(rep);}
 		else {
 			long val = toLong(rep);
-			if (val <= Integer.MIN_VALUE) {
-				return new Integer((int) val);
+			if (val <= Integer.MAX_VALUE && val >= Integer.MIN_VALUE) {
+				return Integer.valueOf((int) val);
 			} else{
 				return val;
 			}

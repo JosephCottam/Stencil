@@ -32,7 +32,6 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.Range;
 import stencil.module.util.OperatorData;
-import stencil.parser.tree.Value;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import static stencil.module.operator.wrappers.Utilities.noFunctions;
@@ -52,7 +51,7 @@ import java.util.List;
  * 
  */
 
-public abstract class RangeHelper implements StencilOperator, Cloneable {
+public abstract class RangeHelper implements StencilOperator<StencilOperator>, Cloneable {
 	private static abstract class AbstractRangeTarget implements Invokeable {
 		final RangeHelper helper;
 		final Invokeable base;
@@ -78,6 +77,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 			Object[] formals = helper.getCache();
 			return base.invoke(formals);
 		}
+		public QueryRangeTarget viewpoint() {throw new UnsupportedOperationException("FIX THIS SOON!!!");}
 	}
 	
 	/**Invokeable object returned by ranging operators.*/
@@ -90,6 +90,7 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 			Object[] formals = helper.updateCache(args);
 			return base.invoke(formals);
 		}
+		public RangeTarget viewpoint() {throw new UnsupportedOperationException("FIX THIS SOON!!!");}
 	}
 	
 	private static final class RelativeHelper extends RangeHelper {
@@ -273,15 +274,10 @@ public abstract class RangeHelper implements StencilOperator, Cloneable {
 		return makeOperator(range, op, baseFacetName);
 	}
 	
-	public StencilOperator viewPoint() {
+	public StencilOperator viewpoint() {
 		try {return (StencilOperator) this.clone();}
 		catch (Exception e) {throw new Error("Error creating viewpoint in range helper.");}
-	}
-
-	
-	public List guide(List<Value> formalArguments, List<Object[]> sourceArguments,  List<String> prototype) {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
-	public boolean refreshGuide() {throw new UnsupportedOperationException(String.format("Range cannot autoguide (wrapping %1$s).", baseOperator.getName()));}
-	
+	}	
 	
 	/**Produce an operator that works over the requested range specification.
 	 * 

@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import static java.util.Arrays.deepToString;
 import static java.lang.String.format;
 
-import stencil.interpreter.NoOutputSignal;
+import stencil.interpreter.Viewpoint;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -59,19 +59,11 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	
 	
 	public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {
-		try {
-			R result = invoke(arguments);
-			Tuple t=null;
-			if (returnsTuple) {t=(Tuple) result;}
-			else if (result != null) {t=Converter.toTuple(result);}
-			return t;
-		} 
-		catch (NoOutputSignal no) {throw no;}
-		catch (MethodInvokeFailedException ex) {
-			if (ex.getCause() instanceof NoOutputSignal) {
-				throw (NoOutputSignal) ex.getCause();
-			} else {throw ex;}
-		}
+		R result = invoke(arguments);
+		Tuple t=null;
+		if (returnsTuple) {t=(Tuple) result;}
+		else if (result != null) {t=Converter.toTuple(result);}
+		return t;
 	}
 	
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
@@ -123,11 +115,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			return (R) method.invoke(target, args);	//99% of method time spent on this one line; 34% of analysis time
 		} 
 		catch (Exception ex) {
-			if (ex.getCause() instanceof NoOutputSignal) {
-				throw (NoOutputSignal) ex.getCause();
-			} else {
-				throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, ex);
-			}
+			throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, ex);
 		}
 	}
 	
@@ -171,5 +159,14 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		ReflectiveInvokeable o = (ReflectiveInvokeable) other;
 		boolean result = target.equals(o.target) && method.equals(o.method) && paramTypes.length == this.paramTypes.length; 
 		return result;
+	}
+	
+	public ReflectiveInvokeable viewpoint() {
+		if (target == null) {return this;}
+		if (Viewpoint.class.isInstance(target)) {
+			return new ReflectiveInvokeable(method,((Viewpoint) target).viewpoint());
+		} else {
+			throw new RuntimeException("Attempt to viewpoint invokeable on instance of class " + target.getClass().getSimpleName());
+		}
 	}
 }

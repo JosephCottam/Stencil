@@ -24,7 +24,7 @@ public final class ComponentEventStream implements TupleStream {
 
 	/**Tuple to represent a state of a frame.*/
 	private static final class ComponentState implements Tuple {
-		private static final Class[] TYPES = new Class[]{String.class, int.class, int.class, int.class, int.class};
+		private static final Class[] TYPES = new Class[]{int.class, int.class, int.class, int.class};
 		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
 		public static final int X = PROTOTYPE.indexOf(X_FIELD);
 		public static final int Y = PROTOTYPE.indexOf(Y_FIELD);

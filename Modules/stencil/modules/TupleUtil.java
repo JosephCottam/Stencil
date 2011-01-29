@@ -8,7 +8,7 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
@@ -98,7 +98,7 @@ public class TupleUtil extends BasicModule {
 		}
 		
 		private static String[] getNames(Specializer spec) {
-			return spec.get(NAMES).getText().split("\\s+,\\s+");
+			return ((String) spec.get(NAMES)).split("\\s+,\\s+");
 		}
 		
 		public static OperatorData complete(OperatorData base, Specializer spec) {

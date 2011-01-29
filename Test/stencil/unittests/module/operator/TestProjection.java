@@ -33,8 +33,9 @@ import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.modules.Projection;
 import stencil.parser.ParseStencil;
+import stencil.parser.string.StencilParser;
 import stencil.parser.tree.OperatorProxy;
-import stencil.parser.tree.Program;
+import stencil.parser.tree.StencilTree;
 import stencil.unittests.StencilTestCase;
 
 public class TestProjection extends StencilTestCase {
@@ -48,13 +49,13 @@ public class TestProjection extends StencilTestCase {
 		StencilOperator op;
 		
 		String simple = "stream S(A,B,C) layer L from S ID: Count()";		
-		Program s = ParseStencil.parse(simple, Adapter.ADAPTER);
-		op = ((OperatorProxy) s.getProxies().get(0)).getOperator();
+		StencilTree s = ParseStencil.programTree(simple, Adapter.ADAPTER);
+		op = ((OperatorProxy) s.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
 		assertEquals("Did not find simple operator when expected.", "Counter", op.getOperatorData().getTarget());
 		
 		String complex = "stream S(A,B,C) layer L from S ID: Count(A)";
-		Program c = ParseStencil.parse(complex, Adapter.ADAPTER);
-		op = ((OperatorProxy) c.getProxies().get(0)).getOperator();
+		StencilTree c = ParseStencil.programTree(complex, Adapter.ADAPTER);
+		op = ((OperatorProxy) c.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
 		assertEquals("Did not find complex operator when expected.", "Count", op.getOperatorData().getTarget());
 	}	
 	

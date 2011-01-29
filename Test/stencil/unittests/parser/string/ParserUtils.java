@@ -3,6 +3,7 @@ package stencil.unittests.parser.string;
 import org.antlr.runtime.ANTLRStringStream;
 import org.antlr.runtime.CommonTokenStream;
 
+import stencil.parser.ParseStencil;
 import stencil.parser.string.StencilLexer;
 import stencil.parser.string.StencilParser;
 
@@ -14,6 +15,7 @@ public class ParserUtils {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 
 		StencilParser parser = new StencilParser(tokens);
+		parser.setTreeAdaptor(ParseStencil.TREE_ADAPTOR);
 		return parser;
 	}
 }

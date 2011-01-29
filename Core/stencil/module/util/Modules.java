@@ -40,46 +40,13 @@ import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.ParserConstants;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Freezer;
+import stencil.interpreter.tree.Specializer;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
 //final because it just a collection of utilities and should never be instantiated (so you can't override it and get an instance)
 public final class Modules {
 	private Modules() {/*Utility class. Not instantiable.*/}
-	
-	/**Convert a method name to the standard case structure used by Stencil from the Java standard. */
-	public static final String stencilCase(String name) {return name.substring(0,1).toUpperCase() + name.substring(1);}
-
-	/**Convert a method name to the standard case structure used by Stencil from the Java standard. */
-	public static final String javaCase(String name) {return name.substring(0,1).toLowerCase() + name.substring(1);}
-
-
-	/**Given an array of names, append a prefix to them.
-	 *
-	 * @param names
-	 * @param prefix
-	 * @return
-	 */
-	public static String[] prefixNames(String prefix, String... names) {
-		String[] longNames = new String[names.length];
-
-		for (int i =0; i< names.length; i++) {
-			longNames[i] = prefixName(prefix, names[i]);
-		}
-		return longNames;
-	}
-
-	public static String prefixName(String prefix, String name) {
-		if (prefix == null || prefix.trim().equals("")) {prefix = "";}
-		else {prefix = prefix + NAME_SPACE;}
-		return prefix + name;
-	}
-
-	/**Remove the prefix from a name (if any exists).*/
-	public static String removePrefix(String name) {
-		String[] parts = name.split(NAME_SEPARATOR);
-		return parts.length ==0 ? name : parts[parts.length-1];
-	}
 
 	/**Finds a member of a class as indicated by the "Target" attribute
 	 * of the OperatorData object.
@@ -173,7 +140,7 @@ public final class Modules {
 	 * @return
 	 */
 	public static OperatorData basicOperatorData(String module, String name, String...fields) {
-		OperatorData od = new OperatorData(module, name, BASIC_SPECIALIZER, null);
+		OperatorData od = new OperatorData(module, name, Freezer.specializer(BASIC_SPECIALIZER), null);
 		od.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, fields));
 		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
 		return od;

@@ -18,7 +18,7 @@ import stencil.util.collections.KeysetConstantMap;
  * This class is used to build an operator out of static methods.
  * Duplicate is NOT supported if the method indicate is not a function.
  */
-public final class InvokeableOperator extends AbstractOperator {
+public final class InvokeableOperator extends AbstractOperator<InvokeableOperator> {
 	private final Map<String, ReflectiveInvokeable> facets;
 	
 	/**All facets are directed towards the same target (a common case for functional operators).*/
@@ -84,6 +84,5 @@ public final class InvokeableOperator extends AbstractOperator {
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
-	
 }
 

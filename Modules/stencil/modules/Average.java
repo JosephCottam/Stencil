@@ -41,10 +41,11 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
+import stencil.parser.string.util.Context;
 
-import static stencil.parser.tree.Specializer.RANGE;
-import static stencil.parser.tree.Specializer.SPLIT;
+import static stencil.interpreter.tree.Specializer.RANGE;
+import static stencil.interpreter.tree.Specializer.SPLIT;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -271,7 +272,7 @@ public class Average extends BasicModule {
 	}
 
 
-	public StencilOperator instance(String name, Specializer specializer)
+	public StencilOperator instance(String name, Context context, Specializer specializer)
 			throws SpecializationException,IllegalArgumentException {
 		StencilOperator target;
 		validate(name, specializer);

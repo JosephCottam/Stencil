@@ -4,7 +4,7 @@ import java.awt.geom.Point2D;
 
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 import stencil.util.collections.Tree;
 

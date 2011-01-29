@@ -1,7 +1,7 @@
 tree grammar GuideExtendQuery;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;	
+  ASTLabelType = StencilTree;	
   filter = true;
   output = AST;	
   superClass = TreeRewriteSequence;
@@ -12,7 +12,6 @@ options {
   
   package stencil.parser.string; 
   
-  import stencil.module.operator.StencilOperator;
   import stencil.module.operator.util.Invokeable;
   import stencil.module.operator.util.ReflectiveInvokeable;
   import stencil.parser.tree.*;
@@ -20,19 +19,19 @@ options {
 }
 
 @members {
-   public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+   public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
-
-topdown:
-  ^(g=GUIDE type=. spec=. selector=. actions=. gen=. query[(Guide) g])
-     -> ^(GUIDE $type $spec $selector $actions $gen query);
      
      
-query[Guide g]
+topdown
    @after{
-      Invokeable seedInv = new ReflectiveInvokeable(STATE_ID_FACET, g.getSeedOperator());
-      AstInvokeable seedAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "seed");
-      seedAInv.setInvokeable(seedInv);
-      adaptor.addChild(gq, seedAInv);
+      StencilTree guide = q.getAncestor(GUIDE);
+      StencilTree summary = q.getAncestor(GUIDE_SUMMARIZATION);
+      if (summary != null) {
+	      Invokeable seedInv = new ReflectiveInvokeable(STATE_ID_FACET, ((Const) guide.find(SEED_OPERATOR).getChild(0)).getValue());
+	      AstInvokeable seedAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "seed");
+	      seedAInv.setInvokeable(seedInv);
+	      adaptor.addChild(q, seedAInv);
+	    }
    }
-   : ^(gq=STATE_QUERY .*); 
+   : ^(q=STATE_QUERY .*); 

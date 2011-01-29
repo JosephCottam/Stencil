@@ -1,7 +1,7 @@
 tree grammar NumeralizeTupleRefs;
 options {
   tokenVocab = Stencil;
-  ASTLabelType = CommonTree;  
+  ASTLabelType = StencilTree;  
   output = AST;
   filter = true;
   superClass = TreeRewriteSequence;
@@ -13,20 +13,17 @@ options {
    
   package stencil.parser.string;
   
-  import stencil.parser.ParserConstants;  
   import stencil.parser.tree.*;
   import stencil.module.*;
-  import stencil.parser.tree.util.*;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.parser.string.util.EnvironmentProxy;
-  import stencil.parser.ParseStencil;
   import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
   import static stencil.parser.string.util.EnvironmentProxy.extend;
 }
 
 @members {
-  public static Program apply (Tree t, ModuleCache modules) {
-     return (Program) TreeRewriteSequence.apply(t, modules);
+  public static StencilTree apply (StencilTree t, ModuleCache modules) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules);
   }
   
   protected void setup(Object... args) {modules = (ModuleCache) args[0];}
@@ -46,10 +43,10 @@ options {
 topdown
 	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
   | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .)
-  | ^(CONSUMES (options {greedy=false;} :.)* ^(p=PACK valueE[initialEnv($p, modules)]*)); 
+  | ^(CONSUMES (options {greedy=false;} :.)* ^(DYNAMIC_REDUCER ^(p=PACK valueE[initialEnv($p, modules)]*))); 
 
 callTarget[EnvironmentProxy env]
-  : ^(f=FUNCTION . . ^(LIST valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
+  : ^(f=FUNCTION . . ^(LIST_ARGS valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
   | ^(PACK valueE[env]*);    
       
       

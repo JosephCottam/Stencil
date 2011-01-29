@@ -22,7 +22,7 @@ from Edges
 	(X,Y):* Ordering(ID2) -> Circular.query(index) -> (X,Y)
 	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
 
-layer Edges[LINE]
+layer Edges["LINE"]
 default
 	PEN_COLOR: @Color{GRAY80, .8}
 from Edges 

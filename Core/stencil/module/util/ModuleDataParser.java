@@ -5,7 +5,7 @@ import java.lang.reflect.*;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.tuple.prototype.TuplePrototype;
 
 public class ModuleDataParser {
@@ -40,7 +40,7 @@ public class ModuleDataParser {
 		String defaultName = m.getName().substring(0,1).toUpperCase() + m.getName().substring(1);
 		final String opName = EMPTY.equals(o.name().trim()) ? defaultName : o.name();
 		
-		final Specializer spec = ParseStencil.parseSpecializer(o.spec());
+		final Specializer spec = ParseStencil.specializer(o.spec());
 		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName());
 
 		
@@ -57,7 +57,7 @@ public class ModuleDataParser {
 
 		final MemoryUse memUse = MemoryUse.valueOf(f.memUse().trim().toUpperCase());
 		
-		final TuplePrototype proto = ParseStencil.parsePrototype(f.prototype(), true);
+		final TuplePrototype proto = ParseStencil.prototype(f.prototype(), true);
 
 		FacetData[] results=new FacetData[aliases.length];
 		for (int i=0;i<aliases.length; i++) {
@@ -81,7 +81,7 @@ public class ModuleDataParser {
 		if (o == null) {return null;}
 		
 		final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
-		final Specializer spec = ParseStencil.parseSpecializer(o.spec());
+		final Specializer spec = ParseStencil.specializer(o.spec());
 		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName());
 
 		for (Method m: c.getMethods()) {

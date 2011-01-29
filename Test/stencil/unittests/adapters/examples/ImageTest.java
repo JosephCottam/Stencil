@@ -85,8 +85,15 @@ public abstract class ImageTest {
 
 	public void diffImage(String original, String testResult, String deltaFile) throws Exception {
 		BufferedImage o,r;
-		try {o = ImageIO.read(new File(original));} catch (Exception e) {throw new RuntimeException("Error opening reference image.", e);}
-		try {r = ImageIO.read(new File(testResult));} catch (Exception e) {throw new RuntimeException("Error opening results image.", e);}
+
+		File f1 = new File(original);
+		File f2 = new File(testResult);
+		assertTrue("Original file could not be found: " + original, f1.exists());
+		assertTrue("Test result file could not be found: " + testResult, f2.exists());
+
+		
+		try {o = ImageIO.read(f1);} catch (Exception e) {throw new RuntimeException("Error opening reference image.", e);}
+		try {r = ImageIO.read(f2);} catch (Exception e) {throw new RuntimeException("Error opening results image.", e);}
 
 		assertEquals("Widths did not match.", o.getWidth(), r.getWidth());
 		assertEquals("Heights did not match.", o.getHeight(), r.getHeight());

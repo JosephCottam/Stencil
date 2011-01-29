@@ -1,7 +1,7 @@
 tree grammar OperatorExtendFacets;
 options {
 	tokenVocab = Stencil;
-	ASTLabelType = CommonTree;
+	ASTLabelType = StencilTree;
 	superClass = TreeRewriteSequence;	
     output = AST;
 	filter = true;
@@ -14,20 +14,14 @@ options {
  
   package stencil.parser.string;
 
-  import stencil.parser.tree.util.*;
-  import stencil.parser.tree.*;
-  import stencil.module.operator.StencilOperator;
-  import stencil.module.operator.util.Invokeable;
-  import stencil.module.util.FacetData;
-  import stencil.module.util.OperatorData;
+  import stencil.parser.tree.StencilTree;
   import static stencil.parser.string.util.Utilities.*;
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.MAP_FACET;
-  import static stencil.parser.ParserConstants.STATE_ID_FACET;
 }
 
 @members {
-  public static Program apply (Tree t) {return (Program) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
   public Object downup(Object t) {
     downup(t, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees

@@ -13,10 +13,6 @@ options {
 
   import java.util.Map;
   import java.util.HashMap;
-  import stencil.parser.tree.TupleRef;
-  import stencil.parser.tree.Program;
-  import stencil.parser.ParseStencil;
-  import static stencil.parser.ParseStencil.TREE_ADAPTOR;
   import static stencil.parser.string.util.Utilities.genSym;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
   
@@ -26,14 +22,14 @@ options {
   /**Old name to new name mapping.*/
   private static Map<String, String> subst = new HashMap();
 
-  public static Program apply (Tree t) {
+  public static Tree apply (Tree t) {
      subst.clear();
-     return (Program) TreeRewriteSequence.apply(t);
+     return (Tree) TreeRewriteSequence.apply(t);
   }
 }
 
 topdown
   : dy=DIRECT_YIELD {String newName = genSym(FRAME_SYM_PREFIX); subst.put($dy.text, newName);} -> DIRECT_YIELD[subst.get($dy.text)]
-  | t=TUPLE_REF -> {subst.containsKey($t.text) && t.getParent().getType() != TUPLE_REF}? TUPLE_REF[subst.get($t)]
-                -> TUPLE_REF
+  | ^(t=TUPLE_REF frame=. rest+=.*)-> {subst.containsKey($frame.getText())}? ^(TUPLE_REF ID[subst.get($frame.getText())] $rest*)
+                -> ^(TUPLE_REF $frame $rest*)
   ;

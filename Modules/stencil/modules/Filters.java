@@ -6,8 +6,7 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.parser.tree.Atom;
-import stencil.parser.tree.Specializer;
+import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
 @Module
@@ -68,8 +67,8 @@ public class Filters extends BasicModule {
 		
 		protected RegExp(OperatorData opData, Specializer specializer, boolean negated) {
 			super(opData);
-			Atom pattern = specializer.get(PATTERN_KEY);
-			patternCache = (pattern == null || pattern.isNull()) ? null : Pattern.compile(pattern.getText());
+			String pattern = (String) specializer.get(PATTERN_KEY);
+			patternCache = pattern == null ? null : Pattern.compile(pattern);
 			this.negated = negated;
 		}
 		

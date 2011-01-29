@@ -29,6 +29,7 @@
 package stencil.module.operator;
 
 
+import stencil.interpreter.Viewpoint;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.util.OperatorData;
 
@@ -47,7 +48,7 @@ import stencil.module.util.OperatorData;
  * @author jcottam
  *
  */
-public interface StencilOperator {
+public interface StencilOperator<T extends StencilOperator> extends Viewpoint<T> {
 	/**Name of the facet used by default in contexts where mutation is permitted.*/
 	public static final String MAP_FACET ="map";
 
@@ -101,5 +102,5 @@ public interface StencilOperator {
 	 * 
 	 * @return
 	 */
-	public StencilOperator viewPoint();
+	public T viewpoint();
 }
