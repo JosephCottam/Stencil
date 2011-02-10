@@ -75,7 +75,7 @@ public class StringUtil extends BasicModule {
 
 	@Operator
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
-	public static String[] split(String value, String pattern) {
+	public static String[] splitOn(String value, String pattern) {
 		return value.split(pattern);
 	}
 
@@ -91,7 +91,9 @@ public class StringUtil extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(String value)", alias={"map","query"})
 	public static String concatenate(Object... os) {
 		StringBuilder b = new StringBuilder();
-		for (Object o:os) {b.append(o!= null ? o.toString() : o);}
+		for (Object o:os) {
+			if (o != null) {b.append(o);}
+		}
 		return b.toString();
 	}
 

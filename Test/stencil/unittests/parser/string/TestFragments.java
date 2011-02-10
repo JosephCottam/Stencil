@@ -39,7 +39,7 @@ public class TestFragments extends TestCase {
 		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("", "BalloonLayout"));		
 
 		
-		t = init("import JUNG as JG");
+		t = init("import JUNG : JG");
 
 		modules = Imports.apply(t);
 		
@@ -127,8 +127,8 @@ public class TestFragments extends TestCase {
 	public void testLiftLayerConstants() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
 		StencilTree program = ParseStencil.programTree(source,  Adapter.ADAPTER);
-		assertEquals("Incorrectly identified defaults count.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).getChildCount());
-		assertEquals("Incorrectly identified defaults count.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).getChildCount());
+		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).getChildCount());
+		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).getChildCount());
 	}
 
 	public void testTargetPackMismatch() throws Exception {
@@ -136,5 +136,7 @@ public class TestFragments extends TestCase {
 		try {ParseStencil.program(source, Adapter.ADAPTER);}
 		catch (TargetMatchesPack.TargetPackMismatchException e) {/**Ignored**/}		
 	}
+	
+	
 	
 }

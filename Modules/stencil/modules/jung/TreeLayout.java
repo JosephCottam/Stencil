@@ -6,7 +6,7 @@ import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
-@Operator(spec="[range: ALL, split: 0, distX: 50, distY: 50]")
+@Operator(spec="[distX: 50, distY: 50]")
 public final class TreeLayout extends GraphOperator {
 	private static final String DIST_X = "distX";
 	private static final String DIST_Y = "distY";

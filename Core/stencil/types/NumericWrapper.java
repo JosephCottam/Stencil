@@ -66,7 +66,7 @@ public class NumericWrapper implements TypeWrapper {
 			return Long.valueOf(((StencilTree) value).getText());
 		}
 
-		return new Long(Long.parseLong(value.toString()));
+		return Long.valueOf(value.toString());
 	}
 	
 	public static Number toNumber(Object value) {

@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 
 /**List that always returns the same value.  Length can be set,
@@ -28,7 +29,10 @@ public class ConstantList<E> implements java.util.List<E> {
 		return new Iterator<E>() {
 			int idx =0;
 			public boolean hasNext() {return idx< size;}
-			public E next() {idx++; return value;}
+			public E next() {
+				if (idx == size) {throw new NoSuchElementException();}
+				idx++; return value;
+			}
 			public void remove() {throw new UnsupportedOperationException();}
 		};
 	}

@@ -100,14 +100,20 @@ public class ModuleCache {
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(String prefix, String name, Context context, Specializer specializer) throws MethodInstanceException {		
+	public StencilOperator instance(String prefix, String name, Context context, Specializer specializer, boolean higherOrder) throws MethodInstanceException {		
 		try {
 			Module module = findModuleForOperator(prefix, name);
 			
 			MultiPartName multiName = new MultiPartName(name);
 			String operatorName = multiName.getName();
 
-			StencilOperator operator = module.instance(operatorName, context, specializer);
+			StencilOperator operator;
+			if (higherOrder) {
+				operator = module.instance(operatorName, context, specializer, this);
+			} else {
+				operator = module.instance(operatorName, context, specializer);
+			}
+			
 			return operator;
 		}
 		catch (Exception e) {throw new MethodInstanceException(name, true, e);}		
@@ -145,15 +151,15 @@ public class ModuleCache {
 
 	/**Get a module.  Only examines imported modules (does not consider "known" modules, 
 	 * static methods should be used to access "known" modules).*/
-	public Module getModule(String name) {
+	public Module getModule(String moduleName) {
 		for(PrefixedModule pm: importedModules) {
 			if (pm.prefix.equals("")) {
-				if (pm.getModuleName().equals(name)) {return pm.module;}	
+				if (pm.getModuleName().equals(moduleName)) {return pm.module;}	
 			} else {
-				if (pm.prefix.equals(name)) {return pm.module;}
+				if (pm.prefix.equals(moduleName)) {return pm.module;}
 			}
 		}
-		throw new RuntimeException("Request made for module that has not been imported: " + name);
+		throw new RuntimeException("Request made for operator that has not been imported or created: " + moduleName);
 	}
 
 	/**Return the ad-hoc module of this module cache.*/

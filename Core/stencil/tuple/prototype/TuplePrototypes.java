@@ -6,6 +6,9 @@ import java.util.List;
 import stencil.tuple.Tuple;
 
 public final class TuplePrototypes {
+	public static final TuplePrototype EMPTY_PROTOTYPE = new SimplePrototype();
+
+	
 	private TuplePrototypes() {/*Utility class; should not be instantiated.*/}
 
 	/**Create a list of default names.  Default names are derived

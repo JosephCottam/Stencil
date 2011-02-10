@@ -183,7 +183,9 @@ public class MouseStream implements TupleStream {
 	}
 
 	public boolean ready() {
-		return hasNext() & !(frequency == ON_CHANGE && sequence == mouse.sequence || mouse.storedEvent == null);
+		synchronized (mouse) {
+			return hasNext() & !(frequency == ON_CHANGE && sequence == mouse.sequence || mouse.storedEvent == null);
+		}
 	}
 
 	/**Throws UnsupportedOpertaionException.*/

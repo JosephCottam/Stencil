@@ -84,8 +84,8 @@ public final class DelimitedParser implements TupleStream {
 		
 		String[] labels = parseLabels(delimitedLabels, splitter);
 		
-		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), delimiter);}
-		else {this.channel = new LooseChannel(Arrays.asList(labels), delimiter);}
+		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), splitter);}
+		else {this.channel = new LooseChannel(Arrays.asList(labels), splitter);}
 
 		prototype = new SimplePrototype(labels);
 

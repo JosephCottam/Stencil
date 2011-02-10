@@ -1,6 +1,7 @@
 package stencil.module.util;
 
 import stencil.module.Module;
+import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.ModuleDataParser.MetaDataParseException;
@@ -71,6 +72,7 @@ public abstract class BasicModule implements Module {
 	 * Validates arguments before attempting specialization.
 	 * Context is ignored by default.
 	 */
+	@Override
 	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
@@ -80,6 +82,14 @@ public abstract class BasicModule implements Module {
 		return operator;
 		
 	}
+
+	/**Throws unsupported operation exception ALWAYS.*/
+	@Override
+	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
+		throw new UnsupportedOperationException(String.format("Higher order instantation not supported (requested for %1$s).", name));
+	}
+
+	
 	
 	/**Verify that the name/specializer combination is valid, throws appropriate exceptions
 	 * if they are not valid.

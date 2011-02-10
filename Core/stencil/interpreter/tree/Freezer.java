@@ -40,28 +40,21 @@ public final class Freezer {
 			case AST_INVOKEABLE: return invokeable(tree);
 			case CONST: return constant(tree);
 			case CONSUMES: return consumes(tree);
-			case ID: return id(tree);
-			case FUNCTION: return function(tree);
+			case ID: return tree.getText();
 			case LIST_ARGS: return valueList(tree);
-			case LIST_RULES: return ruleList(tree);
 			case LAST: return VALUE_LAST;
 			case NUMBER: return number(tree);
 			case NULL: return null;
 			case OPERATOR_FACET: return operatorFacet("**UNKNOWN**", (StencilTree) tree);
 			case RULE: return rule(tree);
 			case SELECTOR: return selector(tree);
-			case RULES_RESULT:
-			case RULES_DEFAULTS:
-			case RULES_VIEW:
-			case RULES_CANVAS:
-			case RULES_LOCAL:
-			case RULES_PREFILTER: return ruleList(tree);
 			case SPECIALIZER: return specializer(tree);
 			case STATE_QUERY: return stateQuery(tree);
 			case STRING: return string(tree);
 			case TUPLE_PROTOTYPE: return prototype(tree);
 			case TUPLE_REF: return tupleRef(tree);
-			default: throw new RuntimeException("Cannot freeze type " + StencilTree.typeName(tree.getType()));
+			case OP_AS_ARG: return tree.getText();
+			default: throw new RuntimeException("Cannot generically freeze type " + StencilTree.typeName(tree.getType()));
 			}
 		} catch (FreezeException fe) {throw fe;}
 		catch (Exception e) {throw new FreezeException(tree, e);}
@@ -112,11 +105,7 @@ public final class Freezer {
 		final StateQuery query = stateQuery(guide.find(STATE_QUERY));
 		final Rule generator = rule(guide.find(GUIDE_GENERATOR).find(RULE));
 		final Specializer spec = specializer(guide.find(SPECIALIZER));
-		final Rule[] rules;
-		try {rules = typedArray(guide.find(LIST_RULES), Rule.class, Freezer.class.getMethod("rule", StencilTree.class));}
-		catch (FreezeException f) {throw f;}
-		catch (Exception e) {throw new FreezeException(guide, e);}
-
+		final Rule rules = ruleFromList(guide.find(LIST_RULES));
 		
 		return new Guide(sel, type, rules, seedOp, sampleOp, query, generator, spec);
 	}
@@ -178,23 +167,18 @@ public final class Freezer {
 	
 	public static CallChain chain(StencilTree chain) {
 		assert verifyType(chain, CALL_CHAIN);
-		ArrayList<Function> functions = new ArrayList();
+		ArrayList<Invokeable> invokeables = new ArrayList();
+		ArrayList<Object[]> args = new ArrayList();
 		for (StencilTree func: chain.findAllDescendants(FUNCTION)) {
-			functions.add(function(func));
+			invokeables.add(invokeable(func.find(AST_INVOKEABLE)));
+			args.add(valueList(func.find(LIST_ARGS)));
 		}
+		Invokeable[] invs = invokeables.toArray(new Invokeable[invokeables.size()]);
+		Object[][] argss = args.toArray(new Object[args.size()][]);
 		Object[] pack = valueList(chain.findDescendant(PACK));		
-		return new CallChain(functions.toArray(new Function[functions.size()]), pack);
+		
+		return new CallChain(invs, argss, pack);
 	}
-	
-	public static Function function(StencilTree function) {
-		assert verifyType(function, FUNCTION);
-		String name = function.getText();
-		Invokeable inv = invokeable(function.find(AST_INVOKEABLE));
-		Object[] args = valueList(function.find(LIST_ARGS));
-		Function.PASS_TYPES pass = Function.PASS_TYPES.valueOf(StencilTree.typeName(function.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD).getType())); 
-		return new Function(name, inv, args, pass);
-	}
-	
 	
 	public static Consumes[] groups(StencilTree source) {
 		assert verifyType(source, LIST_CONSUMES);
@@ -210,11 +194,11 @@ public final class Freezer {
 		
 		String stream = consumes.getText();
 		Predicate[] filters = predicateList(consumes.find(LIST_FILTERS));
-		Rule[] prefilter = ruleList(consumes.find(RULES_PREFILTER));
-		Rule[] local = ruleList(consumes.find(RULES_LOCAL));
-		Rule[] results = ruleList(consumes.find(RULES_RESULT));
-		Rule[] view = ruleList(consumes.find(RULES_VIEW));
-		Rule[] canvas = ruleList(consumes.find(RULES_CANVAS));
+		Rule prefilter = ruleFromList(consumes.find(RULES_PREFILTER));
+		Rule local = ruleFromList(consumes.find(RULES_LOCAL));
+		Rule results = ruleFromList(consumes.find(RULES_RESULT));
+		Rule view = ruleFromList(consumes.find(RULES_VIEW));
+		Rule canvas = ruleFromList(consumes.find(RULES_CANVAS));
 		DynamicRule[] dynamics = dynamicRuleList(consumes.find(RULES_DYNAMIC));
 		Object[] reducer = valueList(consumes.find(DYNAMIC_REDUCER).find(PACK));
 		return new Consumes(consumes.getChildIndex(), stream, filters, prefilter, local, results, view, canvas, dynamics, reducer);
@@ -246,7 +230,7 @@ public final class Freezer {
 		//TODO: Add an "arguments" and "results" tree node to simplify finding these values pre-freeze
 		TuplePrototype arguments = prototype(facet.find(YIELDS).getChild(0));
 		TuplePrototype results = prototype(facet.find(YIELDS).getChild(1));
-		Rule[] prefilters = ruleList(facet.find(RULES_PREFILTER));
+		Rule prefilters = ruleFromList(facet.find(RULES_PREFILTER));
 		OperatorRule[] opRules = opRuleList(opName, facet.find(RULES_OPERATOR));
 		return new OperatorFacet(name, arguments, results, prefilters, opRules);
 	}
@@ -299,22 +283,27 @@ public final class Freezer {
 		return rv;
 	}
 	
-	public static Rule[] ruleList(StencilTree rulesRoot) {
+	public static Rule ruleFromList(StencilTree rulesRoot) {
 		assert verifyType(rulesRoot, LIST_RULES, RULES_CANVAS, RULES_DEFAULTS, RULES_DYNAMIC, RULES_FILTER, RULES_LOCAL, RULES_OPERATOR, RULES_PREDICATES, RULES_PREFILTER, RULES_RESULT, RULES_VIEW);
-		try {
-			Rule[] rules = new Rule[rulesRoot.getChildCount()];
-			for (int i=0; i< rulesRoot.getChildCount(); i++) {
-				rules[i] = rule(rulesRoot.getChild(i));
-			}
-			return rules;
-		} catch (Exception e) {throw new FreezeException(rulesRoot, e);}
+		if (rulesRoot.getChildCount() ==0) {return Rule.EMPTY_RULE;}
+		if (rulesRoot.getChildCount() >1) {throw new IllegalArgumentException("Can only freeze rules lists of length 1, given list of size " + rulesRoot.getChildCount());}
+		return rule(rulesRoot.getChild(0));
 	}
 		
 	public static Rule rule(StencilTree rule) {
 		assert verifyType(rule, RULE);
-		String path = "*** GENERIC PATH ***";  //TODO: Fill in path
-		return  new Rule(path, chain(rule.find(CALL_CHAIN)), target(rule.find(TARGET)));
+	
+		StringBuilder path = new StringBuilder();
+		StencilTree root = rule;
+		while (root.getType() != PROGRAM) {
+			path.append(root.getText() + " <-- ");
+			root = root.getParent();
+		}
+		path.append(root.getText());
+	
+		return  new Rule(path.toString(), chain(rule.find(CALL_CHAIN)), target(rule.find(TARGET)));
 	}
+	
 	
 	public static Target target(StencilTree target) {
 		assert verifyType(target, TARGET, VIEW, CANVAS, RESULT, LOCAL, PREFILTER);
@@ -337,7 +326,7 @@ public final class Freezer {
 	public static OperatorRule operatorRule(String opName, StencilTree opRule) {
 		assert verifyType(opRule, OPERATOR_RULE);
 		Predicate[] preds = predicateList(opRule.find(LIST_PREDICATES));
-		Rule[] rules = ruleList(opRule.find(LIST_RULES));
+		Rule rules = ruleFromList(opRule.find(LIST_RULES));
 		try {return new OperatorRule(opName, preds, rules);}
 		catch (Exception e) {throw new FreezeException(opRule, e);}
 	}
@@ -363,12 +352,6 @@ public final class Freezer {
 		catch (Exception e) {throw new FreezeException(constant, e);}
 	}
 	
-	public static String id(StencilTree id) {
-		assert verifyType(id, ID);
-		try{return id.getText();}
-		catch (Exception e) {throw new FreezeException(id, e);}
-	}
-
 	public static String string(StencilTree tree) {
 		assert verifyType(tree, STRING);
 		try {return tree.getText();}

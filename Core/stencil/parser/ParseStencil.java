@@ -139,10 +139,7 @@ public abstract class ParseStencil {
 			StencilParser.specializer_return parserRV = parser.specializer();
 			if (parser.getNumberOfSyntaxErrors() >0) {throw new SyntaxException(parser.getNumberOfSyntaxErrors(), source);}
 			
-			StencilTree spec = (StencilTree) parserRV.getTree();
-
-			//SpecializerValidator.apply(spec);  //Is not used here because it makes testing some important cases hard...
-			
+			StencilTree spec = (StencilTree) parserRV.getTree();			
 			return spec;
 		} catch (Exception e) {
 			throw new ProgramParseException(String.format("Error parsing specializer: '%1$s'.", source), e);
@@ -278,7 +275,6 @@ public abstract class ParseStencil {
 			FullNumeralize.apply(p);			
 			AllInvokeables.apply(p);
 			OperatorPrefilter.apply(p);
-			MapFoldBalance.apply(p);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {System.err.println(e.getMessage());}

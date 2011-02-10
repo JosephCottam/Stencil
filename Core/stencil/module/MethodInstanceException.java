@@ -5,7 +5,7 @@ public class MethodInstanceException extends Exception {
 	protected boolean found;
 
 	public MethodInstanceException(String name, boolean found, Exception e) {
-		super(String.format("Error creating instance of method %1$s.", name), e);
+		super(String.format("Error creating instance of method `%1$s`.", name), e);
 		this.found = found;
 	}
 	

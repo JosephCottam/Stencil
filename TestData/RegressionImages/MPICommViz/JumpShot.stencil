@@ -52,18 +52,19 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
 
-operator Spacer : Max[range: ALL]
+operator Spacer(v) -> (v) 
+    (ALL) => v : Range[ALL](@Max, _)
     
 
 layer baseline["LINE"]
 from overheads
 	ID: rank
-	X.2: Timescale(skewedStart) -> Max[range: ALL](_)
+	X.2: Timescale(skewedStart) -> Range[ALL](@Max, _)
 	PEN_COLOR: @Color{Gray90}
 	(Y.1, Y.2): Layout(rank) -> (_,_)
 from trans
 	ID: source
-	X.2: Timescale(skewedStart) -> Max[range: ALL](_)
+	X.2: Timescale(skewedStart) -> Range[ALL](@Max, _)
 	PEN_COLOR: @Color{Gray90}
 	(Y.1,Y.2): Layout(source) ->(_,_)
 

@@ -26,21 +26,21 @@ from Stocks
 	ID: "Google_30"
    IDX: "after"
 	XS: TimeStep(Date)
-	YS: Price(Open) -> Mean[range: "-30..n"](Price)	    /*Average the most recent 30 values.*/
+	YS: Price(Open) -> Range["-30..n"](@Mean, Price)	    /*Average the most recent 30 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{LIME,150}
 from Stocks
 	ID: "Google_ALL"
    IDX: "after"
 	XS: TimeStep(Date)
-	YS: Price(Open) -> Mean[range: ALL](Price)		    /*Average all values.*/
+	YS: Price(Open) -> Range[ALL](@Mean, Price)		    /*Average all values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{CRIMSON,150}
 from Stocks
 	ID: "Google_20"
    IDX: "after"
 	XS: TimeStep(Date)
-	YS: Price(Open) -> Mean[range: "-30 .. -10"](Price) /*Average that lags by 10 and includes 20 values.*/
+	YS: Price(Open) -> Range["-30 .. -10"](@Mean, Price) /*Average that lags by 10 and includes 20 values.*/
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{ORANGE,150}
 	

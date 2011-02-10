@@ -1,6 +1,7 @@
 package stencil.testUtilities;
 
 import stencil.module.Module;
+import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
@@ -62,6 +63,13 @@ public class TestModule implements Module {
 			throws SpecializationException, IllegalArgumentException {
 		if (name.equals("FilterFail")) {return MODULE_DATA.getOperator("FilterFail");}
 		throw new IllegalArgumentException("No operator of name " + name);
+	}
+
+	@Override
+	public StencilOperator instance(String name, Context context,
+			Specializer specializer, ModuleCache modules)
+			throws SpecializationException, IllegalArgumentException {
+		throw new UnsupportedOperationException("No higher-order ops implemented.");
 	}
 
 }

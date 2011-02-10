@@ -1,4 +1,4 @@
-tree grammar AdHocOperators;
+  tree grammar AdHocOperators;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = StencilTree;
@@ -112,18 +112,31 @@ options {
       Specializer spec = Freezer.specializer(ref.find(SPECIALIZER));
       MultiPartName baseName = new MultiPartName(ref.find(OPERATOR_BASE).getText());
       String useName = ref.getText();  
+      boolean higherOrder = ref.find(SPECIALIZER).findAllDescendants(OP_AS_ARG).size() != 0;
+  
   
       StencilTree program = ref.getAncestor(PROGRAM);
       Context context = UseContext.apply(program, useName);
 
       StencilOperator op;
       try {
-          op = modules.instance(baseName.getPrefix(), baseName.getName(), context, spec);
+          op = modules.instance(baseName.getPrefix(), baseName.getName(), context, spec, higherOrder);
       } catch (Exception e) {
         throw new RuntimeException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, useName), e);
       }
       return op;
-  }  
+  }
+  
+  /**Are the operators arguments ready for higher-order ops?**/
+  private boolean argsReady(StencilTree ref) {
+    List<StencilTree> ops = ref.findAllDescendants(OP_AS_ARG);
+    for(StencilTree op: ops) {
+       MultiPartName name = new MultiPartName(op.getText());
+       try {modules.findModuleForOperator(name.getPrefix(), name.getName());}
+       catch (IllegalArgumentException e) {return false;}
+    }
+    return true;
+  }
 }
  
 simple
@@ -133,6 +146,6 @@ simple
   ;
   
 proxies
- : ^(r=OPERATOR_REFERENCE .*) {findBase($r) != null}? -> {transferProxy($r)}
+ : ^(r=OPERATOR_REFERENCE .*) {argsReady($r) && findBase($r) != null}? -> {transferProxy($r)}
  ;
 	

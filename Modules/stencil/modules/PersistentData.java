@@ -15,7 +15,7 @@ import org.pcollections.*;
 public class PersistentData extends BasicModule {
 	
 	/**Given a static list of values, returns the value based on the input.*/
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Description("A list that can be de-referenced by the index in the list.  The list is given in the specializer under the key `vals'.")
 	public static class StaticList extends AbstractOperator {
 		private static final String VALUES_KEY = "vals";
@@ -37,7 +37,7 @@ public class PersistentData extends BasicModule {
 		public Object query(int inIndex) {return out[inIndex];}
 	}
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Description("Dictionary for key/value pairs.  The specializer determines how many of the passed values are the key and how many are the values. Retrieval by key yields a tuple with just the values.")
 	public static class Dict extends AbstractOperator.Statefull {		
 		public static final String NAMES = "fields";

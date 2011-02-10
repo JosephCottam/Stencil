@@ -40,4 +40,17 @@ public class ArrayTuple implements Tuple {
 	public int size() {return values.length;}
 	
 	public String toString() {return Tuples.toString(this, TuplePrototypes.defaultNames(size(), PREFIX));}
+	
+	public boolean equals(Object other) {
+		if (!(other instanceof Tuple)) {return false;}
+		Tuple t = (Tuple) other;
+		for (int i=0; i< values.length; i++) {
+			if (values[i] == null && t.get(i) != null
+					|| !values[i].equals(t.get(i))) {return false;}
+		}
+		return true;
+	}
+	
+	/**Direct access to the contained array, for stencil internal use only.*/
+	public Object[] getValues() {return values;} 
 }

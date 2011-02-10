@@ -98,6 +98,7 @@ public final class Canvas extends DisplayCanvas {
 	 * @return
 	 */
 	public Rectangle getContentBounds(boolean includeGuides) {
+		if (layers.length == 0) {return new Rectangle(0,0,0,0);}
 		final Rectangle2D bounds = new Rectangle(layers[0].getView().getBoundsReference());
 		for (DisplayLayer<? extends Glyph2D> l: layers) {
 			bounds.add(l.getView().getBoundsReference());
@@ -212,7 +213,7 @@ public final class Canvas extends DisplayCanvas {
     /**Get the current scale factor factor (in cases
      * where it is significant, this is the X-scale).
      */
-    public double getScale() {return viewTransform.getScaleX();}
+    public synchronized double getScale() {return viewTransform.getScaleX();}
     
 	/**What is the current center of the screen (in canvas coordinates).
 	 * 
@@ -229,7 +230,7 @@ public final class Canvas extends DisplayCanvas {
 	
 
     
-    public void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
+    public synchronized void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;
     	try {this.inverseViewTransform = transform.createInverse();}
     	catch (NoninvertibleTransformException e) {throw e;}
@@ -239,12 +240,12 @@ public final class Canvas extends DisplayCanvas {
     /**Use this transform to convert values from the absolute system
      * to the screen system.
      */
-	public AffineTransform getViewTransform() {return new AffineTransform(viewTransform);}
-	public AffineTransform getViewTransformRef() {return viewTransform;}
+	public synchronized AffineTransform getViewTransform() {return new AffineTransform(viewTransform);}
+	public synchronized AffineTransform getViewTransformRef() {return viewTransform;}
 	
 	/**Use this transform to convert screen values to the absolute/canvas
 	 * values.
 	 */
-	public AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
-	public AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
+	public synchronized AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
+	public synchronized AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
 }

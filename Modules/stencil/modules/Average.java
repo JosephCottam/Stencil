@@ -33,19 +33,16 @@ import java.util.HashMap;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.module.operator.util.Range;
-import stencil.module.operator.util.Split;
-import stencil.module.operator.wrappers.RangeHelper;
-import stencil.module.operator.wrappers.SplitHelper;
+import stencil.modules.stencilUtil.Range;
+import stencil.modules.stencilUtil.StencilUtil;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
+import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.Specializer;
+import stencil.parser.string.StencilParser;
 import stencil.parser.string.util.Context;
-
-import static stencil.interpreter.tree.Specializer.RANGE;
-import static stencil.interpreter.tree.Specializer.SPLIT;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -53,39 +50,6 @@ import static stencil.interpreter.tree.Specializer.SPLIT;
 @Module
 @Description("Module for handling the average, in various manners.")
 public class Average extends BasicModule {
-
-	/**Facet name for use in ranged operations using Stencils range helpers.*/
-	private static final String RANGE_FACET ="range";
-	
-	/**Returns a mean over a range.
-	 * An empty range is considered to have a mean of 0.
-	 * Can be used with zero-length range (n..n) to indicate 'mean of current arguments'
-	 **/
-	@Suppress @Operator(name="Mean", spec="[]")
-	public static class RangeMean extends AbstractOperator {
-		protected RangeMean() {super(ModuleDataParser.operatorData(RangeMean.class, Average.class.getSimpleName()));}
-
-		@Facet(memUse="FUNCTION", prototype="(double avg)")
-		public double range(Object... args) {
-			return map((double[]) RangeHelper.flatten(args, double.class));
-		}
-		
-		@Facet(memUse="FUNCTION", prototype="(double avg)")
-		public double map(double... args) {
-			double mean=0;
-
-			if (args.length !=0) {
-				int sum =0;
-				for (double d: args) {sum += d;}
-				mean = sum/args.length;
-			}
-			return mean;
-		}
-		
-		@Facet(memUse="FUNCTION", prototype="(double avg)")
-		public double query(double... args) {return map(args);}
-	}
-
 	/**Keeps a mean over a range from a fixed start point until the current point
 	 * in a stream.  Start point may be 0 or greater.  If the start point has not
 	 * yet been reached, the mean is returned as 0.
@@ -93,20 +57,16 @@ public class Average extends BasicModule {
 	 * TODO: Implement the 'calculate but do not render' message to handle case where minimum range has not bee reached
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
-	@Suppress @Operator(name="Mean", spec="[range: ALL, split:0]")
+	@Suppress 
+	@Operator(name="Mean", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
 	public static class FullMean extends AbstractOperator.Statefull {
 		int start;
 		double total =0;
 		long count=0;
 
-		public FullMean(OperatorData opData, Specializer specializer) {
-			super(opData);
-			
-			Range range = new Range(specializer.get(RANGE));
-			assert !range.relativeStart() : "Can only use FullMean with an absolute start value.";
-			assert range.endsWithStream() : "Can only use FullMean with a range that ends with the stream.";
-			
-			start = range.getStart();
+		public FullMean(OperatorData opData, Specializer specializer, int start) {
+			super(opData);			
+			this.start = start;
 		}
 		
 		private FullMean(OperatorData opData, int start) {
@@ -144,21 +104,15 @@ public class Average extends BasicModule {
 
 
 	/**Takes a mean over exactly what is passed, keeps no memory*/
-	@Operator(name = "Mean", spec="[range: \"n..n\", split:0]")
-	public static class SimpleMean extends AbstractOperator {
-		public static final String NAME = "Mean";
-		
-		public SimpleMean(OperatorData opData) {super(opData);}		
-		
-		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
-		public double query(double...values) {
-			double sum =0;
-			for (double value: values) {sum += value;}
-			return sum/values.length;
-		}
+	@Operator(name="Mean", tags=StencilUtil.RANGE_FLATTEN_TAG)
+	@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
+	public static double mean(double...values) {
+		double sum =0;
+		for (double value: values) {sum += value;}
+		return sum/values.length;
 	}
-	
-	@Suppress @Operator(name = "Mode", spec="[range: \"n..n\", split:0]")
+
+	@Suppress @Operator(name = "Mode")
 	public static class SimpleMode extends AbstractOperator {
 		public SimpleMode(OperatorData opData) {super(opData);}
 		
@@ -183,7 +137,7 @@ public class Average extends BasicModule {
 		}
 	}
 	
-	@Suppress @Operator(name = "Median", spec="[range: \"n..n\", split:0]")
+	@Suppress @Operator(name = "Median")
 	public static class SimpleMedian extends AbstractOperator {
 		public SimpleMedian(OperatorData opData) {super(opData);}
 		
@@ -207,15 +161,12 @@ public class Average extends BasicModule {
 	 * in the range) or the mean of the two middle-most values.  Median is computed
 	 * the same for full range as sub-range.
 	 */
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	public static class Median extends AbstractOperator {
-		private static final String NAME = "Median";
-
 		protected Median(OperatorData opData) {super(opData);}
 		
 		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 		public double query(double... args) {
-			args = (double[]) RangeHelper.flatten(args, double.class);
 			if (args.length == 0) {throw new RuntimeException("Cannot compute median on empty list");}
 
 			java.util.Arrays.sort(args);
@@ -232,15 +183,12 @@ public class Average extends BasicModule {
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	public static class Mode extends AbstractOperator {
-		private static final String NAME = "Mode";
-
 		public Mode(OperatorData opData) {super(opData);}
 		
 		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 		public double query(Double... args) {
-			args = (Double[]) RangeHelper.flatten(args, Double.class);
 			HashMap<Double, Integer> counts = new HashMap<Double, Integer>();
 
 			//count values into a hash
@@ -266,45 +214,26 @@ public class Average extends BasicModule {
 		}
 	}
 
-	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
-		specializer.isBasic();
-	}
+	public StencilOperator instance(String name, Context context, Specializer specializer) 
+		throws SpecializationException,IllegalArgumentException {
 
-
-	public StencilOperator instance(String name, Context context, Specializer specializer)
-			throws SpecializationException,IllegalArgumentException {
-		StencilOperator target;
 		validate(name, specializer);
 		
-		Range range = new Range(specializer.get(RANGE));
-		Split split = new Split(specializer.get(SPLIT));
-		
 		try {
-			OperatorData opData = this.getOperatorData(name, specializer);
-			if (name.equals(SimpleMean.NAME)) {
-				if (range.isFullRange()) {					
-					target =  new FullMean(ModuleDataParser.operatorData(FullMean.class, "Average"), specializer);
-				} else if (range.isSimple()) {
-					target = new SimpleMean(opData);
-				} else {
-					target = RangeHelper.makeOperator(range, new RangeMean(), RANGE_FACET);
-				}
-			} else if (name.equals(Median.NAME)) {
-				if (range.isSimple()) {target = new SimpleMedian(opData);}
-				else  {target = RangeHelper.makeOperator(range, new Median(opData), RANGE_FACET);}
-			} else if (name.equals(Mode.NAME)) {
-				if (range.isSimple()) {target = new SimpleMode(opData);}
-				else {target = RangeHelper.makeOperator(range, new Mode(opData), RANGE_FACET);}
-			}else {
-				throw new IllegalArgumentException("Method name not found in package: " + name);
-			}
+		if (name.equals("Mean")) {
+			if (context.highOrderUses("Range").size() ==0) {return super.instance(name, context, specializer);}
+			
+			Specializer spec = Freezer.specializer(context.highOrderUses("Range").get(0).findDescendant(StencilParser.SPECIALIZER));
+			Range range = new Range(spec.get(Range.RANGE_KEY));
+
+			if (range.isFullRange()) {
+				StencilOperator op = new FullMean(ModuleDataParser.operatorData(FullMean.class, "Average"), specializer, range.getStart());
+				return op;
+			} 
+			return super.instance(name, context, specializer);}	
 
 		} catch(Exception e) {throw new Error("Error locating method to invoke in Average package.", e);}
-
-		target = SplitHelper.makeOperator(split, target);
-		
-		return target;
+		throw new Error("Unannticiapted argumente combination");
 	}
 
 }

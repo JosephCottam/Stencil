@@ -7,7 +7,7 @@ SKIP: 0
 STRICT: true
 
 import Layouts
-import Geometry as Geo
+import Geometry : Geo
 
 stream RawLines(text)
 
@@ -19,7 +19,11 @@ from RawLines
 stream RawWords (line, word)
 from Lines
    line: line
-   word: Split(text, "\\s+") >> Strip(_) -> ToLower(_)
+   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, *) -> *
+
+operator NormalizeWords(word) -> (word)
+  (ALL) => word: Strip(_) -> ToLower(_)
+
    
 stream Words (line, word)
 from RawWords
@@ -47,10 +51,10 @@ from Words
    (X,Y):* Centroid(word) -> Contract(X,Y) 
    REGISTRATION: "CENTER"
    (COLOR, FONT):* 
-        [count] WordCount.query(word) -> Max[range: ALL](_) -> 
+        [count] WordCount.query(word) -> Range[ALL](@Max, _) -> 
         [freq]  Divide(count[_], _) -> 
-		[color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) ->
-				Scale[min: 50, max:1000](freq[_]) -> @Font{{_}} -> (color[_],_)
+        [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) ->
+                Scale[min: 50, max:1000](freq[_]) -> @Font{{_}} -> (color[_],_)
 
 operator WordCount : Count
 
@@ -59,10 +63,10 @@ operator LineIndex : Dict[fields: "lines"]
 /*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)
   (ALL) =>
-    (X): LineIndex.query(word) -> Get(*,0) >> Layout.query(_) >-
-            Select[field: 0](*) -> Mean[range: LAST](LAST)
-    (Y): LineIndex.query(word) -> Get(*,0) >> Layout.query(_) >-
-            Select[field: 1](*) -> Mean[range: LAST](LAST)
+    (X): LineIndex.query(word) -> Get(*,0) -> Map.query(* , @Layout) ->
+            Select[field: 0](*) -> Mean(LAST)
+    (Y): LineIndex.query(word) -> Get(*,0) -> Map.query(*, @Layout) ->
+            Select[field: 1](*) -> Mean(LAST)
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]

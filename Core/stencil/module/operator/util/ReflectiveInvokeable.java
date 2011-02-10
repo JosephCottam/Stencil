@@ -5,6 +5,7 @@ import static java.util.Arrays.deepToString;
 import static java.lang.String.format;
 
 import stencil.interpreter.Viewpoint;
+import stencil.module.operator.StencilOperator;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
@@ -168,5 +169,11 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		} else {
 			throw new RuntimeException("Attempt to viewpoint invokeable on instance of class " + target.getClass().getSimpleName());
 		}
+	}
+	@Override
+	public String targetIdentifier() {
+		if (target != null &&  target instanceof StencilOperator) {return ((StencilOperator) target).getName();}
+		if (target != null) {return target.getClass().getSimpleName();}
+		return method.getName();
 	}
 }

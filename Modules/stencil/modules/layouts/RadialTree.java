@@ -11,7 +11,7 @@ import stencil.util.collections.Tree;
 
 //TODO: add a fit-to-specific-width option
 /**Based on the prefuse radial layout routines.*/
-@Operator(name="RadialLayout", spec="[range: ALL, split: 0, gap: 50, fallOff: 0, rule: \"simple\", X:0, Y: 0]")
+@Operator(name="RadialLayout", spec="[gap: 50, fallOff: 0, rule: \"simple\", X:0, Y: 0]")
 public class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	

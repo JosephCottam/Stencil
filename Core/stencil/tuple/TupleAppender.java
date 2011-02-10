@@ -31,7 +31,6 @@ package stencil.tuple;
 
 import java.util.*;
 
-import stencil.tuple.instances.MapMergeTuple;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 
@@ -89,67 +88,6 @@ public final class TupleAppender {
 		}
 		return result;
 	}
-	
-	/**Takes an array of tuples and produces a complex append of those tuples.
-	 * Append proceeds in the following cases:
-	 *   IF all sources are of length one
-	 *   	THEN a single tuple is produced per normal append
-	 *   
-	 *   IF ONE source is length n > 1
-	 *      THEN n tuples are produced with one value from the longer source
-	 *           appended with all other source in the normal way
-	 *           
-	 *   IF MORE THAN ONE source is length n > 1
-	 *     THEN n tuples are produced with one value from EACH of the
-	 *          longer tuples and appended with the length 1 sources.
-	 *          
-	 *   IF MORE THAN ONE source is length > 1 BUT at least one is of a different length than the others
-	 *      THEN an exception is produced.
-	 *   
-	 * @param source
-	 * @return
-	 */
-	public static Tuple crossAppend(List<Tuple> sources) {
-		int maxSize = Integer.MIN_VALUE;
-		for (Tuple source: sources) {
-			if ((source instanceof MapMergeTuple)
-				&& (maxSize > 0 && source.size() != maxSize)) {
-				throw new RuntimeException("Cannot cross-append tuples of inconsistent lengths greater than 1.  Data: " + Arrays.deepToString(sources.toArray()));
-			}
-			
-			if (source instanceof MapMergeTuple) {maxSize = Math.max(maxSize, source.size());}
-		}
-		
-		if (maxSize > 0) {return complexCross(sources, maxSize);}	
-		else {return simpleCross(sources);}
-	}
-	
-	public static Tuple simpleCross(List<Tuple> sources) {
-		Tuple result = Tuples.EMPTY_TUPLE;
-		for (Tuple source: sources) {
-			result = append(result, source);
-		}
-		return result;		
-	}
-	
-	
-	public static MapMergeTuple complexCross(final List<Tuple> sources, int size) {
-		final Tuple[] results = new Tuple[size];
-
-		for (int i=0; i< results.length; i++) {
-			List<Tuple> tempSources = new ArrayList(sources.size());
-			
-			for (int j=0; j<sources.size(); j++) {
-				if (sources.get(j) instanceof MapMergeTuple) {
-					tempSources.add((Tuple) sources.get(j).get(i));	//Take a single element from a longer value
-				} else {
-					tempSources.add(sources.get(j));
-				}
-			}
-			results[i] = simpleCross(tempSources);
-		}
-		return new MapMergeTuple(results);
- 	}
 }
 
 

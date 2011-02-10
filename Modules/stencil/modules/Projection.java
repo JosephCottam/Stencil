@@ -35,8 +35,6 @@ import java.awt.Color;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.module.operator.util.Range;
-import stencil.module.operator.util.Split;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.Modules;
@@ -487,17 +485,7 @@ public class Projection extends BasicModule {
 			return new PIXTuple(value, qmin, qmax);
 		}
 	}
-	protected void validate(String name, Specializer specializer) throws SpecializationException {
-		Range r = new Range(specializer.get(Specializer.RANGE));
-		Split s = new Split(specializer.get(Specializer.SPLIT));
-		if (!r.isFullRange() || !s.isVoid())  {
-			throw new SpecializationException(getName(), name, specializer);
-		}
-		super.validate(name, specializer);
-	}
 	
-	
-	//TODO: Pass Context object in to all instance methods, then restore comment region
 	public StencilOperator instance(String name, Context context, Specializer spec) throws SpecializationException {
 		if (context != null && name.equals("Count")) {
 			if (context.maxArgCount() == 0) {

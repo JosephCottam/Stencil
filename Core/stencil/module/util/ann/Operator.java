@@ -8,4 +8,5 @@ import java.lang.annotation.*;
 public @interface Operator {
 	String name() default "";		//If different from the name of the class
 	String spec() default "[]";		//Must conform to specializer grammar AND be include only literal values
+	String[] tags() default {};	//List of tags.  Tags are typically used to communicate properties of a particular implementation
 }

@@ -1,6 +1,8 @@
 package stencil.parser.tree;
 
+import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
+import org.antlr.runtime.TokenStream;
 import org.antlr.runtime.tree.CommonTreeAdaptor;
 
 import stencil.parser.string.StencilParser;
@@ -17,4 +19,12 @@ public class StencilTreeAdapter extends CommonTreeAdaptor {
 		else {t = new StencilTree(token);}
 		return t;
 	}
+
+	@Override
+	public Object errorNode(TokenStream input, Token start, Token stop,
+			RecognitionException e) {
+		return new ErrorNode(start, stop, e);
+	}
+	
+	
 }

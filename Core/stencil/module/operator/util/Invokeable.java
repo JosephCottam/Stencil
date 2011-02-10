@@ -18,5 +18,8 @@ public interface Invokeable<R> extends Viewpoint<Invokeable> {
 	public abstract R invoke(Object[] arguments)
 		throws MethodInvokeFailedException;
 	
+	/**How should the target be identified when error messages are produced?**/
+	public String targetIdentifier();
+	
 	public Invokeable viewpoint();
 }

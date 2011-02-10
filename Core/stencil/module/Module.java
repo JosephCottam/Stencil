@@ -52,17 +52,27 @@ public interface Module {
 	/**Get an instance of the operator of the given name, instantiated
 	 * with the given specializer.  Name may should NOT have a prefix.
 	 * 
-	 * TODO: Replace "specializer" with "context" object
-	 *
 	 * @throws IllegalArgumentException Name passed is not known by this module.
 	 * @throws SpecializationException Specializer passed not permitted with the given operator.
-	 * 
-	 * @param name
-	 * @param specializer
 	 * @return
 	 */
 	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException, IllegalArgumentException;
-
+	
+	/**Get an instance of a higher-oder operator (OPTIONAL OPERATION).
+	 * Higher-order operators take operators as arguments, and thus require the modules cache.
+	 * If the operator is tagged with the OperatorData.HIGHER_ORDER_TAG field, the instantiation will occur through this method.
+	 * 
+	 * @param name
+	 * @param context
+	 * @param specializer
+	 * @param modules
+	 * @return
+	 * @throws SpecializationException
+	 * @throws IllegalArgumentException
+	 * @throws UnsupportedOperationException If the module defines no higher-order operators.
+	 */
+	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException, IllegalArgumentException;
+	
 	/**Get the meta-data about a specific operator, given the specializer.
 	 * 
 	 * TODO: Replace "specializer" with "context" object

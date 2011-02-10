@@ -63,7 +63,9 @@ public final class AstInvokeable<R> extends StencilTree {
 	public int hashCode() {return inv.hashCode();}
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
-		if (!(other instanceof AstInvokeable)) {return false;}
+		if (!super.equals(other)) {return false;}
+		
+		if (!(AstInvokeable.class.equals(other.getClass()))) {return false;}
 		AstInvokeable o = (AstInvokeable) other;
 		boolean result = inv.equals(o.inv);
 		return result;

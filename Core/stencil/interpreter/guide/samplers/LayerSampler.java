@@ -22,7 +22,7 @@ public final class LayerSampler implements SampleOperator {
 		public SeedOperator(DisplayLayer l) {this(l, false);}
 		private SeedOperator(DisplayLayer l, boolean viewpoint) {
 			layer = l;
-			view = viewpoint ? l.getView() : null; ;
+			view = viewpoint ? l.getView() : null;
 		}
 		
 		public TuplePrototype getSamplePrototype() {return layer.getPrototype();}

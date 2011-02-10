@@ -46,7 +46,7 @@ options {
      
      StencilTree f = ref.getAncestor(FUNCTION);
      if (f == null) {return true;}
-     if (f.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD).getText().equals(frame)) {return false;}
+     if (f.find(DIRECT_YIELD, GUIDE_YIELD).getText().equals(frame)) {return false;}
      return replace(f, frame);
   }
 }

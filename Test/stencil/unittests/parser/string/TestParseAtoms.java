@@ -2,6 +2,7 @@ package stencil.unittests.parser.string;
 
 import junit.framework.TestCase;
 import stencil.parser.string.StencilParser;
+import stencil.parser.tree.ErrorNode;
 import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.SuppressOutput;
 
@@ -29,7 +30,7 @@ public class TestParseAtoms extends TestCase {
 	}
 	
 	public void testNonNumbers() {
-		String[] nonNumbers = new String[] {"a", "1b","1.3.4.5"};
+		String[] nonNumbers = new String[] {"a", "1.3.4.5","1b"};
 		
 		for (String nn: nonNumbers) {
 			boolean failed = false;
@@ -40,6 +41,8 @@ public class TestParseAtoms extends TestCase {
 			try {value = (StencilTree) parser.atom().getTree();}
 			catch (Exception e) {failed = true;}
 			finally {SuppressOutput.restore();}
+			
+			if (value instanceof ErrorNode) {failed = true;}
 			
 			assertTrue(String.format("Parser did not fail on atom parse with input %1$s; returned %2$s.", nn, value), failed);
 		}

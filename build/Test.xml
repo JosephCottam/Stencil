@@ -29,7 +29,7 @@
             
             <batchtest todir="${results}">
                 <fileset dir="/home/jcottam/scratch/Stencil/Stencil/bin/">
-                    <include name="**/*TestExamples.class"/>
+                    <include name="**/*TestProjection.class"/>
                 </fileset>
             </batchtest>
         </junit>

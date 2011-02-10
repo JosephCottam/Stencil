@@ -83,6 +83,8 @@ topdown
   | ^(l=RULES_RESULT rules[$l])    -> ^(RULES_RESULT rules)
   | ^(l=RULES_CANVAS rules[$l])    -> ^(RULES_CANVAS rules)
   | ^(l=RULES_VIEW rules[$l])      -> ^(RULES_VIEW rules)
+  | ^(l=LIST_RULES rules[$l])      -> ^(LIST_RULES rules)
+  | ^(l=RULES_DEFAULTS rules[$l])  -> ^(RULES_DEFAULTS rules)
   ; 
   
 rules[StencilTree parent]: .+ -> ^(RULE {mergeTargets($parent)} {mergeChains($parent)} DEFINE);

@@ -17,8 +17,8 @@ final class StrictChannel implements NextChannel {
 	/**Regular expression used to split incoming data.*/
 	private final Pattern splitter;
 	
-	public StrictChannel(List<String> labels, String delimiter) throws Exception {
-		splitter = Pattern.compile(delimiter);
+	public StrictChannel(List<String> labels, Pattern splitter) throws Exception {
+		this.splitter = splitter;
 		this.labels = labels;
 	}
 	

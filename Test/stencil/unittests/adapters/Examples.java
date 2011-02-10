@@ -83,6 +83,11 @@ public abstract class Examples extends TestCase {
 
 	public void testRoseImage() throws Throwable {new AutoGuide_Rose(configs).testPNG();}
 	public void testRoseText() throws Throwable {new AutoGuide_Rose(configs).testTXT();}
+
+	public void testTextArcImage() throws Throwable {new TextArc(configs).testPNG();}
+	/**TODO: REstore **/
+	//public void testTextArcText() throws Throwable {new TextArc(configs).testTXT();}
+
 }
 
 

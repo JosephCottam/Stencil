@@ -20,24 +20,40 @@ options {
 
 @members{
   private static Context inProgress;
-  private static String targetName;
   
   public static Context apply (Tree t, String target) {
      inProgress = new Context(target);
      TreeFilterSequence.apply(t);
      return inProgress;
   }
+  
+  public void downup(Object p) {
+    downup(p, this, "argCount");
+    downup(p, this, "highOrderArg");
+  }
+  
 
   
 }
 
 //TODO: Remove if statement when numeralize is done in return values as well
-topdown
+argCount
  : ^(f=FUNCTION .*)
     { MultiPartName n = new MultiPartName(f.getText());
       if (n.getName().equals(inProgress.target())) {
         inProgress.update(f.find(LIST_ARGS).getChildCount());
         }
     };
+    
+
+highOrderArg
+  : opArg=OP_AS_ARG
+    {MultiPartName n = new MultiPartName(opArg.getText());
+      if (n.getName().equals(inProgress.target())) {
+           StencilTree base = opArg.getAncestor(OPERATOR_REFERENCE);
+           String type = base.find(OPERATOR_BASE).getText();
+           inProgress.addHighOrderUse(type, base);
+      }
+    }; 
   
   

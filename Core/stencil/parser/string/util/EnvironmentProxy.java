@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import org.antlr.runtime.tree.CommonTree;
 import org.antlr.runtime.tree.Tree;
 
+import static stencil.tuple.prototype.TuplePrototypes.EMPTY_PROTOTYPE;
 import static stencil.parser.string.StencilParser.*;
 
 /**The environment proxy is used during compilation to mimic the shape of, 
@@ -35,7 +36,7 @@ import static stencil.parser.string.StencilParser.*;
  *
  */
 public final class EnvironmentProxy {
-	private static final TuplePrototype EMPTY_PROTOTYPE = new SimplePrototype();
+	private static final TuplePrototype NO_PROTOTYPE = new SimplePrototype();
 	
 	public static final class FrameException extends RuntimeException {
 		private static String briefMessage(String frame, TuplePrototype contents, FrameException prior) {
@@ -98,13 +99,15 @@ public final class EnvironmentProxy {
 	
 	private static TuplePrototype calcLocalProxy(AncestryPackage anc) {
 		if (anc.c != null) {return calcPrototype(anc.c.find(RULES_LOCAL));}
-		return EMPTY_PROTOTYPE;
+		return NO_PROTOTYPE;
 	}
 	private static TuplePrototype calcPrefilterProxy(AncestryPackage anc) {
-		if (anc.c != null) {return calcPrototype(anc.c.find(RULES_PREFILTER));}
-		if (anc.operatorFacet != null) {return calcPrototype(anc.operatorFacet.find(RULES_PREFILTER));}
+		TuplePrototype p = null;
+		if (anc.c != null) {p=calcPrototype(anc.c.find(RULES_PREFILTER));}
+		if (anc.operatorFacet != null) {p=calcPrototype(anc.operatorFacet.find(RULES_PREFILTER));}
 
-		return EMPTY_PROTOTYPE;
+		if (p == null || p.size() ==0) {return NO_PROTOTYPE;}
+		return p;
 	}
 
 	
@@ -121,7 +124,7 @@ public final class EnvironmentProxy {
 		return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
-		if (anc.c == null && anc.l!= null) {return EMPTY_PROTOTYPE;}//This is the characteristic of the defaults block
+		if (anc.c == null && anc.l!= null) {return NO_PROTOTYPE;}//This is the characteristic of the defaults block
 		if (anc.c != null) {
 			if (!anc.inDynamicRule) {
 				StencilTree stream = findStream(anc.c.getText(), anc.program.find(LIST_STREAM_DECLS));
@@ -130,7 +133,9 @@ public final class EnvironmentProxy {
 				return EMPTY_PROTOTYPE;	//Any sub-ref will be different if in a dynamic rule, but direct refs are numeralized in reducer creation
 			}
 		}
-		if (anc.operatorFacet != null) {return Freezer.prototype(anc.operatorFacet.find(YIELDS).getChild(0));}
+		if (anc.operatorFacet != null) {
+			return Freezer.prototype(anc.operatorFacet.find(YIELDS).getChild(0));
+		}
 		
 		if (anc.g != null) {
 			//If there is no SEED_OPERATOR, then there is not yet enough info to generate the prototype
@@ -224,7 +229,10 @@ public final class EnvironmentProxy {
 
 	public EnvironmentProxy (String label, TuplePrototype prototype) {this(label, prototype, null);}
 
-	public String getLabel() {return label;}
+	public String getLabel() {
+		if (prototype == NO_PROTOTYPE) {return parent.getLabel();}
+		return label;
+	}
 	
 	EnvironmentProxy (String label, TuplePrototype prototype, EnvironmentProxy parent) {
 		this.label = label;

@@ -41,7 +41,7 @@ public class ModuleDataParser {
 		final String opName = EMPTY.equals(o.name().trim()) ? defaultName : o.name();
 		
 		final Specializer spec = ParseStencil.specializer(o.spec());
-		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName());
+		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName(), o.tags());
 
 		
 		FacetData[] fds = makeFacetData(f, m.getName());
@@ -82,14 +82,15 @@ public class ModuleDataParser {
 		
 		final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
 		final Specializer spec = ParseStencil.specializer(o.spec());
-		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName());
-
+		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.tags());
+		
 		for (Method m: c.getMethods()) {
 			Facet f = (Facet) m.getAnnotation(Facet.class);
 			if (f== null) {continue;}
 			FacetData[] fds = makeFacetData(f, m.getName());
 			for (FacetData fd:fds) {od.addFacet(fd);}
 		}
+		
 		return od;
 	}
 	

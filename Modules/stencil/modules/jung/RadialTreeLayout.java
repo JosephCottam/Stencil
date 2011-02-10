@@ -5,7 +5,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 
-@Operator(spec="[range: ALL, split: 0, width: 500, height: 500, steps: 50]")
+@Operator(spec="[width: 500, height: 500, steps: 50]")
 public final class RadialTreeLayout extends GraphOperator.SizedOperator {
 	public RadialTreeLayout(OperatorData opData, Specializer spec) {
 		super(opData, spec); 

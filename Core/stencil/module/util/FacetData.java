@@ -46,6 +46,6 @@ public final class FacetData {
 	public TuplePrototype getPrototype() {return prototype;}
 	
 	public boolean mutative() {
-		return memory == MemoryUse.WRITER && memory == MemoryUse.OPAQUE;
+		return memory == MemoryUse.WRITER || memory == MemoryUse.OPAQUE;
 	}
 }

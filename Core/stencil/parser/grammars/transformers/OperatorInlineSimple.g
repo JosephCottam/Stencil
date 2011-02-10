@@ -46,7 +46,7 @@ options {
       StencilTree op = simple.get(refName);
       StencilTree facet = getFacetTree(facetName, op);
       StencilTree core = facet.find(RULES_OPERATOR).getChild(0).findAll(RULE).get(0).findAllDescendants(FUNCTION).get(0);    //All of those zeros BECAUSE there is only one rule in the facet
-      StencilTree pass = (StencilTree) adaptor.dupTree(simpleOpRef.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD));
+      StencilTree pass = (StencilTree) adaptor.dupTree(simpleOpRef.find(DIRECT_YIELD, GUIDE_YIELD));
       String frameName = pass.getText();
                     
       StencilTree splice = makeSplice(simpleOpRef.find(LIST_ARGS), facet, core); //Start of the thing being inserted
@@ -66,7 +66,7 @@ options {
             adaptor.deleteChild(lastCall,  spliceTail.getChildIndex());    //Remove the old pack
             adaptor.addChild(lastCall, extension);                         //Add the new call
             
-            subst = buildSubst(frameName, extension.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD).getText());  //Pass holds the frame name
+            subst = buildSubst(frameName, extension.find(DIRECT_YIELD, GUIDE_YIELD).getText());  //Pass holds the frame name
             target = (StencilTree) ReplaceTupleRefs.apply(target, subst);   //Apply the tuple-reference name substitution
             
             lastCall = extension;                                          //Point splicy parts at the new parts
@@ -77,7 +77,7 @@ options {
       adaptor.setChild(lastCall, spliceTail.getChildIndex(), target);
       
       //Rebuild pass properly
-      Tree splicePass = lastCall.find(DIRECT_YIELD, GUIDE_YIELD, MAP, FOLD);
+      Tree splicePass = lastCall.find(DIRECT_YIELD, GUIDE_YIELD);
       frameName = splicePass.getText();
       adaptor.setChild(lastCall, splicePass.getChildIndex(), adaptor.create(pass.getType(), frameName));//Make sure the pass type is retained
                       
@@ -109,7 +109,7 @@ options {
        StencilTree newCall = (StencilTree) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
        Object newArgs = adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
        for (StencilTree arg: pack) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
-       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER));
+       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER_TREE));
        adaptor.addChild(newCall, newArgs);
        adaptor.addChild(newCall, adaptor.create(pass.getType(), frameName));
 

@@ -1,4 +1,4 @@
-package stencil.module.operator.util;
+package stencil.modules.stencilUtil;
 
 import static stencil.parser.ParserConstants.*;
 import stencil.parser.string.ValidationException;
@@ -11,6 +11,8 @@ import stencil.parser.string.ValidationException;
  * 
  * */
 public class Range {
+	public static final String RANGE_KEY = "range";
+	
 	private static final class RangeValidationException extends ValidationException {
 		public RangeValidationException(String source) {
 			super("Invalid range:" + source);

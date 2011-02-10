@@ -1,6 +1,7 @@
 package stencil.module.util;
 
 import stencil.module.Module;
+import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.parser.string.util.Context;
@@ -29,6 +30,11 @@ public class MutableModule implements Module {
 		return operators.get(name);
 	}
 
+	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
+		throw new UnsupportedOperationException(String.format("Higher order instantation not supported (requested for %1$s).", name));
+	}
+
+	
 	public void addOperator(StencilOperator target) {
 		try {
 			addOperator(target, target.getOperatorData());

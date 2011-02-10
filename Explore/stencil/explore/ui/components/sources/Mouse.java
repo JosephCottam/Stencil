@@ -45,7 +45,6 @@ import stencil.util.streams.ui.MouseStream;
 public final class Mouse extends SourceEditor {
 	private static final long serialVersionUID = 2763272640758576637L;
 
-	protected String name;
 	protected int backupFreq = 30;
 
 	protected final JTextField elements = new JTextField();

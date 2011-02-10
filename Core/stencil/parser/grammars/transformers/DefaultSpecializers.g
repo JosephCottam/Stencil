@@ -21,7 +21,7 @@ options {
   import stencil.module.util.*;
   import stencil.adapters.Adapter;
   import stencil.interpreter.tree.Specializer;
-  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
+  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
 	import static stencil.parser.ParserConstants.DEFAULT_CANVAS_SPECIALIZER;
 	import static stencil.parser.ParserConstants.DEFAULT_LAYER_SPECIALIZER;
 	
@@ -46,7 +46,7 @@ options {
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private StencilTree getDefault(StencilTree spec) {
     try {
-	     StencilTree f = spec.getAncestor(FUNCTION);
+	     StencilTree f = spec.getAncestor(FUNCTION, OP_AS_ARG);
 	     if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.getText()));}
 	     
 	     StencilTree g = spec.getAncestor(GUIDE);
@@ -61,7 +61,7 @@ options {
        StencilTree layer = spec.getAncestor(LAYER);
        if (layer != null) {return (StencilTree) adaptor.dupTree(DEFAULT_LAYER_SPECIALIZER);}
 	     
-    } catch (Exception e) {return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER);}  //HACK: Is removing the default really the right thing?
+    } catch (Exception e) {return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);}  //HACK: Is removing the default really the right thing?
 	  throw new IllegalArgumentException("Specializer encountered in unexpected context: " + spec.getParent().toStringTree());
   }
   
@@ -76,7 +76,7 @@ options {
       Field f = clss.getField("DEFAULT_ARGUMENTS");
       defaultSpec = ((Specializer) f.get(null)).getSource();
     } catch (Exception e) {
-      defaultSpec = (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER);
+      defaultSpec = (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);
     }     
       
     assert defaultSpec != null;

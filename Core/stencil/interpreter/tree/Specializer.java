@@ -10,12 +10,6 @@ import static stencil.parser.string.StencilParser.SPECIALIZER;
 import static stencil.parser.ParserConstants.POSITIONAL_ARG;
 
 public final class Specializer {
-	/**Customary key used to store range descriptor.*/
-	public static final String RANGE = "range";
-	
-	/**Customary key used to store split descriptor.*/
-	public static final String SPLIT = "split";
-	
 	private final String[] keys;
 	private final Object[] vals;
 	private final StencilTree source;
@@ -38,19 +32,6 @@ public final class Specializer {
 	public Iterable<String> keySet() {return Arrays.asList(keys);}
 	public boolean isEmpty() {return vals.length==0;}
 	
-	/**A specializer with at most a Range and Split argument.*/
-	public boolean isBasic() {
-		return isEmpty()
-		    || (vals.length == 1 && containsKey(RANGE)) 
-			|| (vals.length ==1 && containsKey(SPLIT))
-			|| (vals.length == 2 && (containsKey(RANGE) && containsKey(SPLIT)));
-	}
-	
-	public boolean isLowMem() {
-		return  ((containsKey(RANGE) && (get(RANGE) == Freezer.VALUE_LAST)) || !containsKey(RANGE))
-		     && ((containsKey(SPLIT) && get(SPLIT).equals(0))   || !containsKey(SPLIT));
-	}
-
 	public StencilTree getSource() {return source;}
 	
 	/**Blend the update with the defaults.  

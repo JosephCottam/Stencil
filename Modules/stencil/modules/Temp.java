@@ -28,18 +28,12 @@
  */
 package stencil.modules;
 
-import static stencil.interpreter.tree.Specializer.SPLIT;
-
 import java.util.*;
 
-import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.module.operator.util.Split;
-import stencil.module.operator.wrappers.SplitHelper;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
@@ -219,14 +213,5 @@ public class Temp extends BasicModule {
 			return nop;
 		}
 		
-	}
-	
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
-		try {
-			StencilOperator op = super.instance(name, context, specializer);
-			
-			Split split = new Split(specializer.get(SPLIT));
-			return SplitHelper.makeOperator(split, op);
-		} catch (Exception e) {throw new Error("Error retriving " + name + " method.",e);}
 	}
 }

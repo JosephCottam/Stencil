@@ -180,6 +180,8 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 		if (othr == null || !(othr instanceof StencilTree)) {return false;}
 		StencilTree other = (StencilTree) othr;
 		
+		if (other.getType() != this.getType()) {return false;}
+		
 		if (other.getText() == null) {return getText() == null;}
 		if (!other.getText().equals(getText())
 				|| other.getChildCount() != getChildCount()) {return false;}

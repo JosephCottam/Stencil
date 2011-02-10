@@ -136,7 +136,7 @@ options {
              if (sharedConstants.contains(pair)) {
                 adaptor.deleteChild(pack, j);
                 adaptor.deleteChild(target, j);
-                j--;//backup one because we just deleted one
+                j--;//backup one was just deleted
              }
           }
        }
@@ -157,10 +157,13 @@ options {
 	
 	private void updateLayer(StencilTree layerDef) {
      try {
-        Rule[] rules = Freezer.ruleList(layerDef.find(RULES_DEFAULTS));
-	      Tuple defaults = Interpreter.processTuple(Tuples.EMPTY_TUPLE, rules);
-	      DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();	
-    	  dl.updatePrototype(defaults);
+        StencilTree rules = layerDef.find(RULES_DEFAULTS);
+        for (StencilTree ruleSource: rules) {
+           Rule rule = Freezer.rule(ruleSource);
+           Tuple defaults = Interpreter.processTuple(Tuples.EMPTY_TUPLE, rule);
+	       DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();	
+    	   dl.updatePrototype(defaults);
+    	}
      } catch (Exception e) {
         throw new RuntimeException("Error updating layer defaults.", e);
      }
@@ -168,7 +171,7 @@ options {
 
 }
 
-liftShared: ^(LAYER type=. defaults=. consumes=. direct=.)
-  -> ^(LAYER $type {augmentDefaults((StencilTree) defaults, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
+liftShared: ^(LAYER spec=. defaultList=. consumes=. direct=.)
+  -> ^(LAYER $spec {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
 	
 updateLayers: ^(l=LAYER .*) {updateLayer(l);};

@@ -20,9 +20,9 @@ import java.lang.reflect.*;
 public class JUNG extends BasicModule {
 	private static final Class[] OPERATOR_CLASSES = new Class[]{BalloonLayout.class, CircleLayout.class, FRLayout.class, ISOMLayout.class, KKLayout.class, RadialTreeLayout.class, SpringLayout.class, TreeLayout.class};
 	private static final Class[] CONSTRUCTOR_TYPES = new Class[]{OperatorData.class, Specializer.class};
-	private static final String MODULE_NAME = "JUNG";
 	
 	protected ModuleData loadOperatorData() throws MetaDataParseException {
+		final String MODULE_NAME = "JUNG";
 		OperatorData[] ods = new OperatorData[]{
 			operatorData(BalloonLayout.class, MODULE_NAME),
 			operatorData(CircleLayout.class, MODULE_NAME),

@@ -1,4 +1,4 @@
-package stencil.module.operator.util;
+package stencil.modules.stencilUtil;
 
 import stencil.parser.string.ValidationException;
 
@@ -15,24 +15,22 @@ import stencil.parser.string.ValidationException;
  *        0,pre, ord	(with 0 in field count, will not do any splitting)
  * */
 public class Split {
+	/**Default key under which a split descriptor should be found in a specializer**/
+	public static final String SPLIT_KEY = "split";
+	public static final String ORDERED_KEY = "ordered";
+	
 	private final boolean ordered;	//Is it an ordered split (incoming values are guaranteed to be in order, default is false)?
-	private final boolean pre;		//Should split occur before range? (default is false)
 	private final int fields;		//How many fields are involved in the split (default is 1)
 	
-	public Split(Object source) {this(source.toString());}
-	public Split(String source) {
-		String[] parts = source.trim().split("\\s*,\\s*");
-		
-		fields = Integer.parseInt(parts[0]);
-		pre = (parts.length > 1) && parts[1].equals("pre");
-		ordered = (parts.length >2) && parts[2].equals("ord");
+	public Split(int keysize, boolean ordered) {
+		fields = keysize;
+		this.ordered = ordered;
 		
 		if (fields <0) {throw new ValidationException("Must supply positive fields count.");}
+		//TODO: Verify that fewer fields than arguments 
 	}
 
 	public boolean isOrdered() {return ordered;}
-	public boolean isPre() {return pre;}
-	public boolean isPost() {return !pre;}
 	
 	/**No split action required.*/
 	public boolean isVoid() {return fields ==0;}
@@ -48,13 +46,11 @@ public class Split {
 		Split alter = (Split) other;
 		
 		return this.ordered == alter.ordered
-			&& this.pre == alter.pre
 			&& this.fields == alter.fields;
 	}
 
 	public int hashCode() {
-		int p = isPre() ? 0x55555555 : 0xAAAAAAAA;		//1010 vs. 0101
 		int o = isOrdered() ? 0x99999999 : 0x66666666;    //1001 vs. 0110
-		return fields * p *o;
+		return fields * o;
 	}
 }

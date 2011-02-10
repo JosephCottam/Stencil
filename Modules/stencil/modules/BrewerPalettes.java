@@ -45,7 +45,7 @@ public class BrewerPalettes  extends BasicModule {
 		}
 		
 		@Facet(memUse="READER", prototype="(int VALUE)")
-		public int StateID() {return seen.size();}
+		public int stateID() {return seen.size();}
 
 		@Facet(memUse="READER", prototype="(Color color)")
 		public Tuple query(Object value) {

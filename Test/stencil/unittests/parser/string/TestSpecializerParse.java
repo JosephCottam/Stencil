@@ -1,6 +1,7 @@
 package stencil.unittests.parser.string;
 
 import junit.framework.TestCase;
+import stencil.modules.stencilUtil.Range;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
 import stencil.parser.string.StencilParser;
@@ -24,13 +25,21 @@ public class TestSpecializerParse extends TestCase {
 	}
 	
 	public void testRangeFail() throws Exception {
-		String[] specializers = new String[] {
-				"[range: \"n .. 1\"]",			//n in first position, not in last
-				"[range: \"10 .. 9\"]",		//Start index after end
-				"[range: \"-10 .. -20\"]",		//Start index after end
-				"[range: \"-1 .. 5\"]",		//Start index after end
+		String[] ranges = new String[] {
+				"n .. 1",			//n in first position, not in last
+				"10 .. 9",		//Start index after end
+				"-10 .. -20",		//Start index after end
+				"-1 .. 5",		//Start index after end
 		};
-		testFails(specializers);
+		
+		for (String test: ranges) {
+			SuppressOutput.suppress();
+			boolean failed = false;
+			try {new Range(test);}
+			catch (ValidationException e) {failed =true;}
+			finally {SuppressOutput.restore();}		
+			assertTrue(String.format("Expected failure parsing %1$s did not occur.", test), failed);
+		}
 	}
 
 	public void testGeneralFail() throws Exception {

@@ -5,12 +5,11 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.util.Properties;
 
-import stencil.interpreter.tree.Freezer;
 import stencil.module.MethodInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
-import stencil.parser.ParserConstants;
 import stencil.unittests.StencilTestCase;
+import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 
 public class TestModuleCache extends StencilTestCase {
 	public void setUp() throws Exception {super.setUp(); ModuleCache.clear();}
@@ -41,11 +40,11 @@ public class TestModuleCache extends StencilTestCase {
 		ModuleCache m = new ModuleCache();
 		StencilOperator l= null;
 
-		try {l=m.instance("", "NoMethod", null, Freezer.specializer(ParserConstants.BASIC_SPECIALIZER));}
+		try {l=m.instance("", "NoMethod", null, EMPTY_SPECIALIZER, false);}
 		catch (MethodInstanceException e) {/*Exception expected, tested below.*/}
 		assertNull("Method found when not expected.",l);
 
-		try {m.instance("", "Concatenate", null, Freezer.specializer(ParserConstants.BASIC_SPECIALIZER));}
+		try {m.instance("", "Concatenate", null, EMPTY_SPECIALIZER, false);}
 		catch (MethodInstanceException e) {fail("Method not found when expected.");}
 		catch (Exception e) {fail("Unexpected error looking for method.");}
 	}

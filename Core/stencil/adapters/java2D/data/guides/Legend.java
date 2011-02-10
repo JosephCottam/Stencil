@@ -64,7 +64,7 @@ public class Legend extends Guide2D {
 
 	//Public because of how the applyDefaualts system works
 	/**Which of the example graphic attributes should be used to display the attribute?**/
-	public String displayOn;
+	public String displayOn = SIMPLE_DEFAULT;
 	
 	private final TupleSorter sorter;
 	private final int label_idx;

@@ -1,13 +1,14 @@
-package stencil.module.operator.wrappers;
+package stencil.modules.stencilUtil;
 
+import stencil.interpreter.tree.Specializer;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.util.ReflectiveInvokeable;
-import stencil.module.operator.util.Split;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.ann.*;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import static stencil.module.operator.wrappers.Utilities.noFunctions;
@@ -15,6 +16,8 @@ import static stencil.module.operator.wrappers.Utilities.noFunctions;
 import java.util.Map;
 import java.util.HashMap;
 
+@Operator(name= "Split", spec="[fields:0, ordered:\"#F\"]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
+@Description("Higher order operator for performing split/cross-tab summarization")
 public abstract class SplitHelper implements StencilOperator {
 	/**Handle unordered split cases (default case).*/
 	public static class UnorderedHelper extends SplitHelper {
@@ -113,6 +116,7 @@ public abstract class SplitHelper implements StencilOperator {
 		public Object getTarget() {return this;}
 		
 		public SplitTarget viewpoint() {throw new UnsupportedOperationException("FIX THIS SOON!!!");}
+		public String targetIdentifier() {return helper.getName();}
 	}
 
 	private static FacetData STATE_ID_FD = new FacetData(STATE_ID_FACET, FacetData.MemoryUse.READER, "state");
@@ -132,7 +136,7 @@ public abstract class SplitHelper implements StencilOperator {
 	public int stateID() {return stateID;}
 	
 	public Invokeable getFacet(String facet) {
-		if (facet.equals(STATE_ID_FD)) {
+		if (facet.equals(STATE_ID_FACET)) {
 			return new ReflectiveInvokeable(STATE_ID_FACET, this);
 		} else {
 			try {operator.getFacet(facet);}	
@@ -172,7 +176,14 @@ public abstract class SplitHelper implements StencilOperator {
 	protected static final Object getKey(Object... args) {return args[0];}
 	
 	//final because it is a utility method
-	public static final StencilOperator makeOperator(Split split, StencilOperator operator) {
+	public static final StencilOperator makeOperator(Specializer spec, StencilOperator operator) {
+		int keysize = Converter.toInteger(spec.get(Split.SPLIT_KEY));
+		Boolean ordered = (Boolean) Converter.convert(spec.get(Split.ORDERED_KEY), Boolean.class);
+		Split split = new Split(keysize, ordered);
+		return makeOperator(split, operator);
+	}
+	
+	private static final StencilOperator makeOperator(Split split, StencilOperator operator) {
  		if (split.getFields() ==0) {return operator;}
 		if (AbstractOperator.isFunction(operator)) {throw new RuntimeException("Attempt to wrap pure function in Split.");}
 		if (split.isOrdered()) {return new OrderedHelper(split, operator);}

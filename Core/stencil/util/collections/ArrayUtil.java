@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
 public final class ArrayUtil {
 	private ArrayUtil() {/*Not instantiable, utility class.*/}
@@ -96,7 +97,10 @@ public final class ArrayUtil {
 				private int idx=0;
 				public boolean hasNext() {return idx < source.length;}
 
-				public Object next() {return source[idx++];}
+				public Object next() {
+					if (idx == source.length) {throw new NoSuchElementException();}
+					return source[idx++];
+				}
 
 				public void remove() {throw new UnsupportedOperationException();}
 			};

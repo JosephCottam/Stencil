@@ -5,6 +5,8 @@ import stencil.interpreter.Viewpoint;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
+import static stencil.tuple.prototype.TuplePrototypes.EMPTY_PROTOTYPE;
+import static stencil.tuple.Tuples.EMPTY_TUPLE;
 
 public class Rule implements Viewpoint<Rule> {
 	private final String path;
@@ -35,4 +37,11 @@ public class Rule implements Viewpoint<Rule> {
 	}
 	
 	public Rule viewpoint() {return new Rule(path, chain.viewpoint(), target);}	
+	
+	public static final Rule EMPTY_RULE = new Rule(null, null, null)  {
+		public String path() {return "No path; empty rule.";}
+		public TuplePrototype prototype() {return EMPTY_PROTOTYPE;}
+		public Tuple apply(Environment env) {return EMPTY_TUPLE;}
+		public Rule viewpoint() {return this;}
+	};
 }

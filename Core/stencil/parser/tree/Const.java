@@ -32,7 +32,10 @@ public class Const extends StencilTree {
 		return n;
 	}
 	
-	public String toString() {return getValue().toString();}
+	public String toString() {
+		return getValue() == null ? "null" : getValue().toString();
+	}
+
 	public boolean equals(Object other) {
 		if (super.equals(other)) {
 			if (value == null) {return ((Const) value) == null;}

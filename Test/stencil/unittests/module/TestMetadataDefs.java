@@ -56,17 +56,4 @@ public class TestMetadataDefs  extends TestCase {
 		assertEquals(MemoryUse.FUNCTION, od.getFacet("query").getMemUse());
 		assertEquals(od.getFacet("query").getTarget(), od.getFacet("map").getTarget());
 	}
-	
-	
-	public void testInheritDetails() throws Exception {
-		ModuleData md = ModuleDataParser.moduleData("stencil.modules.StencilUtil");
-		
-		OperatorData od = md.getOperator("SeedCategorize"); 
-		assertNotNull("Could not find SeedCategorize", od);
-		assertNotNull(od.getFacet("map"));
-		assertNotNull(od.getFacet("query"));
-		assertEquals(MemoryUse.OPAQUE, od.getFacet("map").getMemUse());
-		assertEquals(MemoryUse.OPAQUE,  od.getFacet("query").getMemUse());
-		assertFalse(od.getFacet("query").getTarget().equals(od.getFacet("map").getTarget()));
-	}
 }

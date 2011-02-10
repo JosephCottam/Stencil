@@ -97,7 +97,7 @@ public class DriverManager {
 
 		String className = null;
 		if (nameToClass.keySet().contains(driverName.toUpperCase())) {className = nameToClass.get(driverName.toUpperCase());}
-		else if (nameToClass.entrySet().contains(driverName)) {className = driverName;}
+		else if (nameToClass.values().contains(driverName)) {className = driverName;}
 		if (className == null) {
 			throw new IllegalArgumentException(String.format("Could not identify %1$s as either a class name or short name for database drivers.", driverName));
 		}

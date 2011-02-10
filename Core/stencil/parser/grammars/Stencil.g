@@ -44,6 +44,7 @@ tokens {
   OPERATOR_RULE;     //Combination of filter, return and function calls in a operator
   OPERATOR_BASE;
   OPERATOR_FACET;
+  OP_AS_ARG;         //Identifies when an operator appears in argument position (requires special resolution)
   POST;
   PRE;
   PREDICATE;
@@ -80,12 +81,10 @@ tokens {
   
   //General Keywords
   ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n
-  AS  = 'as';         //used in imports
   CANVAS  = 'canvas';
   CONST = 'const';
   DEFAULT = 'default';
   ELEMENT = 'element';
-  FACET = 'facet';
   FILTER  = 'filter';
   FROM  = 'from';
   GUIDE = 'guide';
@@ -123,8 +122,6 @@ tokens {
    RE  = '=~'; 
    NRE = '!~'; 
   
-
-
   //Bindings
   DEFINE  = ':';
   DYNAMIC = ':*';//Rules that should be periodically re-evaluated
@@ -138,8 +135,6 @@ tokens {
   //Linkages
   YIELDS  	 	 = '->';   // 1:1
   GUIDE_YIELD    = '-#>';   // 1:1, but moves the sample operator
-  MAP    		 = '>>';   // map
-  FOLD 	  		 = '>-';   // reduce
   GATE  	  	 = '=>';   // test
   
   TAG = '@';
@@ -181,6 +176,13 @@ tokens {
   
   public List getErrors() {return errors;}  
   
+  
+  public String ensureFacet(String name, String defaultFacet) {
+    if (name.indexOf(".") >0) {return name;}
+    else {return name + "." + defaultFacet;}
+  }
+  
+  //TODO: Eliminate CUSTOM_PARSER_FACET, just use Map
   public String customArgsCall(String call) {
     return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
 }
@@ -201,7 +203,7 @@ program : imports* (globalValue | externalStream)* order canvasLayer (elementDef
 
 //////////////////////////////////////////// PREAMBLE ///////////////////////////
 imports
-  : IMPORT name=ID AS as=ID -> ^(IMPORT $name $as)
+  : IMPORT name=ID DEFINE as=ID -> ^(IMPORT $name $as)
   | IMPORT name=ID -> ^(IMPORT $name ID[""]);
 
 order
@@ -303,24 +305,19 @@ functionCallTarget
 frameLabel returns [String label]: ARG ID CLOSE_ARG {$label=$ID.text;} -> ID;
 
 functionCall returns[String funcName]
-  : name=callName[MAP_FACET] s=specializer valueList 
+  : name=callName s=specializer valueList 
      {$funcName = ((Tree) name.tree).getText();} 
      -> specializer ^(LIST_ARGS valueList)
-  | name=callName[MAP_FACET] specializer emptySet
+  | name=callName specializer emptySet
      {$funcName = ((Tree) name.tree).getText();} 
      -> specializer ^(LIST_ARGS)
   | t=TAGGED_ID ISLAND_BLOCK
      {$funcName = customArgsCall($t.text);} 
      -> ^(SPECIALIZER DEFAULT) ISLAND_BLOCK;  
 
-//Apply defaultCall to functions that have no explicit call
-callName[String defaultCall]
-  : pre=ID NAMESPACE post=ID 
-    -> {post.getText().indexOf(".") > 0}? ID[$pre.text + "::" + $post.text]
-    ->                    ID[$pre.text + "::" + $post.text + "." + defaultCall]
-  | name=ID
-    -> {name.getText().indexOf(".") > 0}? ID[$name.text] 
-    ->                    ID[$name.text + "." + defaultCall];
+callName
+  : pre=ID NAMESPACE post=ID -> ID[$pre.text + "::" + ensureFacet($post.text, MAP_FACET)]
+  | name=ID -> ID[ensureFacet($name.text, MAP_FACET)];
 
 target[String def]
   : PREFILTER^ tuple[false]
@@ -381,9 +378,16 @@ emptySet: GROUP! CLOSE_GROUP!;
 
 valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!; 
 		
-value : tupleRef | atom;
+value : tupleRef | atom | opRef;
 atom  : number | STRING | DEFAULT | ALL | LAST | NULL;  //TODO: Can ALL, LAST be removed from this list?
-
+opRef : t=TAGGED_ID specializer -> ^(OP_AS_ARG[$t.text.substring(1)]  specializer);
+            //Operator as an argument is prefixed by the tag, strips off tag 
+                      //TODO: Restrict where opRef can be used
+                      //TODO: Extend to chains, not just single names
+                      //TODO: Ensure no facet in op name
+                      //TODO: Does this really belong in the specializer (it gets moved there eventually anyway...)
+                      
+  
 tupleRef
   options{backtrack=true;}
   : simpleRef -> ^(TUPLE_REF simpleRef)
@@ -410,10 +414,8 @@ booleanOp : GT |  GTE | LT | LTE | EQ | NEQ | RE | NRE;
 
 passOp[String label]  
   : YIELDS -> DIRECT_YIELD[label]
-  | GUIDE_YIELD -> GUIDE_YIELD[label]
-  | MAP -> MAP[label]
-  | FOLD -> FOLD[label];
-
+  | GUIDE_YIELD -> GUIDE_YIELD[label];
+  
 //Numbers may be integers or doubles, signed or unsigned.  These rules turn number parts into a single number.
 number  :  doubleNum | intNum;
 

@@ -149,8 +149,8 @@ public final class Tuples {
 			if (!targetFields.contains(field)) {return false;}
 			Object sourceValue = source.get(field);
 			Object targetValue = target.get(field);
-			if (targetValue == sourceValue ||
-				(targetValue != null && !targetValue.equals(sourceValue))) {return false;} //TODO: Why is there this "TargetValue != null" ??? IS this part of layer attribute defaulting?  This messes up some things.
+			if (targetValue != sourceValue &&
+				(targetValue == null || !targetValue.equals(sourceValue))) {return false;}
 		}
 		return true;
 	}
@@ -284,6 +284,7 @@ public final class Tuples {
 	
 	/**Produces an array version of a tuple.  Value are in the same order as the original tuple fields.**/
 	public static Object[] toArray(Tuple t) {
+		if (t instanceof ArrayTuple) {return ((ArrayTuple) t).getValues();}
 		Object[] values = new Object[t.size()];
 		for (int i=0; i< values.length; i++) {values[i] = t.get(i);}
 		return values;

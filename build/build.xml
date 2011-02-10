@@ -21,7 +21,7 @@
     <!-- Just the core stencil grammar, not the additional processing.-->
     <target name="WorkingGrammar">
         <antlr3
-            target="${grammars}/transformers/guide/GuideLiftGenerator.g"
+            target="${grammars}/transformers/AdHocOperators.g"
             outputdirectory="${parser}"
             libdirectory="${parser}"
         />

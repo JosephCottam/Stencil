@@ -49,7 +49,7 @@ public abstract class CacheFeed<T> implements TupleStream {
 
 		if (entryCache.isEmpty()) {updateEntryCache();}
 		while (entryCache.isEmpty()) {
-			try {Thread.sleep(SLEEP_DELAY);}
+			try {this.wait(SLEEP_DELAY);}
 			catch(Exception e) {throw new Error("Error sleeping while waiting for feed update.",e);}
 			updateEntryCache();
 		}

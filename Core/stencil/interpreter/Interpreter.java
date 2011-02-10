@@ -1,7 +1,6 @@
 package stencil.interpreter;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
 
 
 import static java.lang.String.format;
@@ -14,11 +13,11 @@ import stencil.parser.ParserConstants;
 import stencil.parser.tree.util.Environment;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleAppender;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MapMergeTuple;
 import stencil.types.Converter;
+import static stencil.interpreter.tree.Rule.EMPTY_RULE;
 
 public class Interpreter {
 	private final WeakReference<StencilPanel> panel;	//
@@ -29,41 +28,29 @@ public class Interpreter {
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple processTuple(Tuple streamTuple, Rule rule) throws RuleAbortException {return processTuple(streamTuple, new Rule[]{rule});}
-	public static Tuple processTuple(Tuple streamTuple, Rule[] rules) throws RuleAbortException {
+	public static Tuple processTuple(Tuple streamTuple, Rule rule) throws RuleAbortException {
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, streamTuple);
-		return processEnv(env, rules);
+		return processEnv(env, rule);
 	}
 	
 
-	public static Tuple processEnv(Environment env, Rule rule) throws RuleAbortException {return processEnv(env, new Rule[]{rule});}
-	public static Tuple processEnv(Environment env, Rule[] rules) throws RuleAbortException {
-		if (rules == null || env == null) {return Tuples.EMPTY_TUPLE;}
-
-		List<Tuple> resultBuffer = new ArrayList();
+	public static Tuple processEnv(Environment env, Rule rule) throws RuleAbortException {
+		if (rule == null || rule == EMPTY_RULE || env == null) {return Tuples.EMPTY_TUPLE;}
+		Tuple result = Tuples.EMPTY_TUPLE;
 		
 		//Apply all rules
 		try {
-			for (Rule rule: rules) {
-				Tuple result;				
-				try {result = rule.apply(env);}
-				catch (NoOutput.Signal s) {result=NoOutput.TUPLE;}
-				catch (RuleAbortException ra) {throw ra;}
-				catch (Exception e) {throw new RuleAbortException(rule, e);}
-				
-				if (result != NoOutput.TUPLE) {resultBuffer.add(result);}
-			}
-			
+			try {result = rule.apply(env);}
+			catch (NoOutput.Signal s) {result=NoOutput.TUPLE;}
+			catch (RuleAbortException ra) {throw ra;}
+			catch (Exception e) {throw new RuleAbortException(rule, e);}
 		} catch (RuleAbortException ra) {
 			System.out.println("Rule aborted...");
 			System.out.println(ra.getMessage());
 			ra.printStackTrace();
 			return null;			//TODO: Handle rule aborts.
 		}
-		
-		Tuple fullResult = TupleAppender.crossAppend(resultBuffer);
-		
-		return fullResult;
+		return result;
 	}
 	
 	
@@ -84,7 +71,7 @@ public class Interpreter {
 		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
 		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues());
 		
-		prefilter = processEnv(env, group.getPrefilterRules());
+		prefilter = processEnv(env, group.getPrefilterRule());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 		
 		try {matches = group.matches(env);}
@@ -92,13 +79,14 @@ public class Interpreter {
 		
 		if (matches) {
 			
-			local = processEnv(env, group.getLocalRules());				
+			local = processEnv(env, group.getLocalRule());				
 			env.setFrame(Environment.LOCAL_FRAME, local);
 			try {
-				result = processEnv(env, group.getResultRules());				
+				result = processEnv(env, group.getResultRule());				
 				if (result != null && result instanceof MapMergeTuple) {
-					for (int i=0; i< result.size(); i++) {
-						Tuple nt = Converter.toTuple(result.get(i));
+					MapMergeTuple mmt = (MapMergeTuple) result;
+					for (int i=0; i< mmt.size(); i++) {
+						Tuple nt = mmt.getTuple(i);
 						if (target.canStore(nt)) {target.store(nt);}
 					}
 				} else if (result != null && target.canStore(result)) {
@@ -110,13 +98,13 @@ public class Interpreter {
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try {
-				Tuple viewUpdate = processEnv(env, group.getViewRules());
+				Tuple viewUpdate = processEnv(env, group.getViewRule());
 				if (viewUpdate != null) {Tuples.transfer(viewUpdate, Display.view);}
 			}
 			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in %1$s %2$s", targetLabel, target.getName()), e);}
 			
 			try{
-				Tuple canvasUpdate = processEnv(env, group.getCanvasRules());
+				Tuple canvasUpdate = processEnv(env, group.getCanvasRule());
 				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Display.canvas);}
 			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}

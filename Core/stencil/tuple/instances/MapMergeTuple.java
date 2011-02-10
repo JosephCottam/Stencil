@@ -8,4 +8,6 @@ import stencil.tuple.Tuple;
  */
 public class MapMergeTuple extends ArrayTuple {
 	public MapMergeTuple(Tuple... values) {super((Object[]) values);}
+	
+	public Tuple getTuple(int i) {return (Tuple) super.get(i);}
 }

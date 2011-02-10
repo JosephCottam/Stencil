@@ -69,6 +69,8 @@ public final class MultiPartName {
 	
 	/**What was the facet (same as suffix, but used in operator names).*/
 	public String getFacet() {return suffix;}
+	
+	public boolean hasFacet() {return !suffix.equals("");}
 		
 	/**Create a new multi-part name, changing the prefix.  If the prefix is the
 	 * same as the current prefix, the current object is returned.

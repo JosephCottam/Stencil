@@ -40,7 +40,6 @@ import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.parser.ParserConstants;
-import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.Specializer;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
@@ -140,7 +139,7 @@ public final class Modules {
 	 * @return
 	 */
 	public static OperatorData basicOperatorData(String module, String name, String...fields) {
-		OperatorData od = new OperatorData(module, name, Freezer.specializer(BASIC_SPECIALIZER), null);
+		OperatorData od = new OperatorData(module, name, EMPTY_SPECIALIZER, null);
 		od.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, fields));
 		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
 		return od;

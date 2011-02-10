@@ -47,8 +47,8 @@ final class LooseChannel implements NextChannel {
 	
 	private List<String> labels;
 	
-	public LooseChannel(List<String> labels, String delimiter) throws Exception {
-		splitter = Pattern.compile(delimiter);
+	public LooseChannel(List<String> labels, Pattern splitter) throws Exception {
+		this.splitter = splitter;
 		this.labels = labels;
 	}
 

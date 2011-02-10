@@ -13,22 +13,19 @@ import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.SeedOperator;
 import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.tuple.Tuple;
-import stencil.tuple.prototype.SimplePrototype;
-import stencil.tuple.prototype.TupleFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
 
 public class Guide implements Viewpoint<Guide> {
 	private final Selector selector;
 	private final String type;
-	private final Rule[] rules;
+	private final Rule rules;
 	private final SeedOperator seedOp;
 	private final SampleOperator sampleOp;
 	private final StateQuery query;
-	private final Rule[] generator;	//Only has one rule, but it makes it easier to work with the interpreter
+	private final Rule generator;	//Only has one rule, but it makes it easier to work with the interpreter
 	private final Specializer spec;
 	
-	public Guide(Selector selector, String type, Rule[] rules,
+	public Guide(Selector selector, String type, Rule rules,
 			SeedOperator seedOp, SampleOperator sampleOp, StateQuery query,
 			Rule generator, Specializer spec) {
 		super();
@@ -38,7 +35,7 @@ public class Guide implements Viewpoint<Guide> {
 		this.seedOp = seedOp;
 		this.sampleOp = sampleOp;
 		this.query = query;
-		this.generator = new Rule[]{generator};
+		this.generator = generator;
 		this.spec = spec;
 	}
 
@@ -47,18 +44,7 @@ public class Guide implements Viewpoint<Guide> {
 	public Selector selector() {return selector;}
 	public Specializer specializer() {return spec;}
 	
-	public TuplePrototype resultsPrototype() {
-		//TODO: Calc this is the tree, just store it as a StencilTree of the TuplePrototype variety and freeze at guide creation time
-		List<TupleFieldDef> defs = new ArrayList();
-		for (Rule rule: rules) {
-		    TuplePrototype<TupleFieldDef> targetPrototype = rule.prototype();
-
-			for (TupleFieldDef def: targetPrototype.fields()) {
-				defs.add(def);
-			}
-		}
-		return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
-	}
+	public TuplePrototype resultsPrototype() {return rules.prototype();}
 
 	public void update(DisplayGuide guide) {
 		assert guide != null : "Null guide passed.";
@@ -87,19 +73,16 @@ public class Guide implements Viewpoint<Guide> {
 		}
 	}
 
-	private static List<Tuple> processAll(List<Tuple> sources, Rule[] rules) throws Exception {
+	private static List<Tuple> processAll(List<Tuple> sources, Rule rule) throws Exception {
 		List<Tuple> results = new ArrayList();
 		for (Tuple source: sources) {
-			results.add(Interpreter.processTuple(source, rules));
+			results.add(Interpreter.processTuple(source, rule));
 		}
 		return results;
 	}
 
 	
 	public Guide viewpoint() {
-		SeedOperator  sdr = seedOp.viewpoint();
-		final Rule[] vpr = new Rule[rules.length];
-		for (int i=0; i<vpr.length; i++) {vpr[i] = rules[i].viewpoint();}
-		return new Guide(selector, type, vpr, sdr, sampleOp, query.viewpoint(), generator[0].viewpoint(), spec);
+		return new Guide(selector, type, rules.viewpoint(), seedOp.viewpoint(), sampleOp, query.viewpoint(), generator.viewpoint(), spec);
 	}
 }

@@ -41,7 +41,8 @@ options {
   		
   		try {
          Specializer s = Freezer.specializer(func.find(SPECIALIZER));
-         op = modules.instance(name.getPrefix(), name.getName(), null, s);   //null context is fine BECAUSE all ops should be instantiated in the AST already
+         //TODO: Do not use modules for this, instead just search the AST
+         op = modules.instance(name.getPrefix(), name.getName(), null, s, false);   //null context and false is fine BECAUSE all ops should be instantiated in the AST already
     	} catch (Exception e) {
     		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getText()); //TODO: Add path to the point of error...
     		throw new RuntimeException(message, e);

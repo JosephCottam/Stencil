@@ -39,7 +39,7 @@ import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
-import static stencil.parser.ParserConstants.BASIC_SPECIALIZER;
+import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 import stencil.display.Display;
 import stencil.interpreter.tree.OperatorFacet;
 import stencil.interpreter.tree.OperatorRule;
@@ -80,7 +80,7 @@ public class SyntheticOperator implements StencilOperator {
 		this.module = module;
 		this.opDef = opDef;
 
-		OperatorData opData = new OperatorData(module, opDef.getText(), Freezer.specializer(BASIC_SPECIALIZER), null);
+		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null);
 		
 		opData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, findPrototype(MAP_FACET)));	
 		opData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, findPrototype(QUERY_FACET)));	
@@ -158,7 +158,7 @@ public class SyntheticOperator implements StencilOperator {
 		}
 		Tuple prefilter;
 		Tuple tuple = new ArrayTuple(values);
-		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, tuple);
+		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, tuple);//Empty between view and stream tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		
 		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.getName(), facet.getName(), tuple.toString()));}

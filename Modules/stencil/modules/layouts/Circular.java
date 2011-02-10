@@ -19,7 +19,7 @@ import stencil.types.Converter;
  * @author jcottam
  *
  */
-@Operator(name="CircularLayout", spec="[range: ALL, split: 0, pad: 1, start: 0, r: -1, count: -1, size: 10, ratio: 1, X: 0, Y: 0]")
+@Operator(name="CircularLayout", spec="[pad: 1, start: 0, r: -1, count: -1, size: 10, ratio: 1, X: 0, Y: 0]")
 public class Circular extends Layout {
 	public static final String NAME = "CircularLayout";
 	

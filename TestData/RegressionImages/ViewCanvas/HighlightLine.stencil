@@ -59,7 +59,7 @@ from Mouse
   PEN : @Stroke{3}
   PEN_COLOR : @Color{BLUE, 100}
 
-operator Date : Dict [range: ALL, fields:"VALUE, Date"]
+operator Date : Dict [fields:"VALUE, Date"]
 
 operator Price (Open) -> (Price)
 	ALL => (Price) : Mult(-1, Open)

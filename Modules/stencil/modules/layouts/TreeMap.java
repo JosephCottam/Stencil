@@ -9,7 +9,7 @@ import stencil.types.Converter;
 import stencil.util.collections.Tree;
 import edu.umd.cs.treemap.*;
 
-@Operator(spec="[range: ALL, split: 0, style: \"square\", X:0, Y: 0, W:100, H:100]")
+@Operator(spec="[style: \"square\", X:0, Y: 0, W:100, H:100]")
 public class TreeMap extends Layout {
 	public static final String NAME = "TreeMap";
 

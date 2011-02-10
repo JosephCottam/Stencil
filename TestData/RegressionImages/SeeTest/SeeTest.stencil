@@ -107,10 +107,10 @@ from MTTSource
 	PEN_COLOR: Palet("GRID") -> (C)
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Max[range: ALL](sum)
+	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Range[ALL](@Max, sum)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Max[range: ALL](sum)
+	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Range[ALL](@Max, sum)
 
 
 operator NamesIndex(ID) -> (VALUE)

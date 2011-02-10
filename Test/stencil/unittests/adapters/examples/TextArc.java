@@ -6,7 +6,7 @@ public class TextArc extends ImageTest {
 									  "textArc.stencil",
 									  null,
 									  null,
-									  "AliceInWonderland.txt",
-									  "AliceInWonderland.png", configs));
+									  "TextArcAlice.txt",
+									  "TextArcAlice.png", configs));
 	}
 }
