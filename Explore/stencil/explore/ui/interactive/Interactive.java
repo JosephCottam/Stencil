@@ -39,7 +39,7 @@ import java.awt.Font;
 
 import javax.swing.*;
 
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 import static stencil.explore.Application.reporter;
 import stencil.explore.*;
 import stencil.explore.coordination.*;
@@ -243,26 +243,26 @@ public class Interactive implements Runnable {
 				if (arg.getSource() == open) {
 					JFileChooser fc = new JFileChooser();
 
-					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil"));
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"test.stencil"));
 
 					int stat = fc.showOpenDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
 						StencilIO.load(filename, model);
-						WorkingDirectory.setWorkingDir(filename);
+						WorkingDir.set(filename);
 						set(model);
 					} else if (stat == JFileChooser.ERROR_OPTION){
 						java.awt.Toolkit.getDefaultToolkit().beep();
 					}
 				} else if (arg.getSource() == save) {
 					JFileChooser fc = new JFileChooser();
-					fc.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir()+"test.stencil"));
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"test.stencil"));
 
 					int stat = fc.showSaveDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
 						StencilIO.save(filename, model);
-						WorkingDirectory.setWorkingDir(filename);
+						WorkingDir.set(filename);
 					} else if (stat == JFileChooser.ERROR_OPTION) {
 						java.awt.Toolkit.getDefaultToolkit().beep();
 					}
@@ -425,7 +425,7 @@ public class Interactive implements Runnable {
 		String sessionFile = Application.getOpenFile(args);
 		if (sessionFile != null) {
 			Interactive.sessionFile = sessionFile;
-			WorkingDirectory.setWorkingDir(sessionFile);
+			WorkingDir.set(sessionFile);
 		}
 
 

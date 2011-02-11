@@ -32,7 +32,7 @@ package stencil.explore.util;
 import java.util.Map;
 import java.util.ArrayList;
 
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
@@ -119,7 +119,7 @@ public final class StencilRunner extends Thread {
 	/**Make sure the filename is resolved relative to the working directory.*/
 	private FileSource resolvePaths(FileSource source) {
 		String filename = source.filename();
-		filename =WorkingDirectory.resolvePath(filename);
+		filename =WorkingDir.resolve(filename);
 		return source.filename(filename);
 	}
 

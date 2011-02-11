@@ -32,7 +32,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 
 import stencil.explore.*;
-import stencil.WorkingDirectory;
 
 
 /**Batch invocation runs a series of Stencils in headless mode.
@@ -72,8 +71,7 @@ public class Batch {
 		args = new String[rawArgs.length-1];
 		System.arraycopy(rawArgs, 1, args, 0, args.length);
 		prefix = rawArgs[0];
-		WorkingDirectory.setWorkingDir(prefix, true);
-
-		Headless.main(WorkingDirectory.getWorkingDir(), args);
+		
+		Headless.main(prefix, args);
 	}
 }

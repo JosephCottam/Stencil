@@ -36,7 +36,7 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
 import stencil.adapters.general.Registrations;
@@ -170,7 +170,7 @@ public final class Image extends Basic {
 	private void verifyImage() {
 		try {
 			if (base == null && filename !=null) {
-				String filename = WorkingDirectory.resolvePath(this.filename);
+				String filename = WorkingDir.resolve(this.filename);
 				base = javax.imageio.ImageIO.read(new File(filename));
 			}
 		} catch (Exception e) {

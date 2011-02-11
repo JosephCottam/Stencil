@@ -40,7 +40,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import stencil.explore.model.sources.FileSource;
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 
 public class File extends SourceEditor {
 	private static final long serialVersionUID = 4349967365836435540L;
@@ -63,12 +63,12 @@ public class File extends SourceEditor {
 		skip.setText("0");
 
 		fileChooser = new JFileChooser();
-		fileChooser.setSelectedFile(new java.io.File(WorkingDirectory.getWorkingDir() + "input.txt"));
+		fileChooser.setSelectedFile(new java.io.File(WorkingDir.get() + "input.txt"));
 
 		final JPanel parent = this;
 		fileList.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String defaultFile = WorkingDirectory.resolvePath(filename.getText());
+				String defaultFile = WorkingDir.resolve(filename.getText());
 
 				if (!defaultFile.equals("")) {fileChooser.setSelectedFile(new java.io.File(defaultFile));}
 				int rv = fileChooser.showOpenDialog(parent.getRootPane());
@@ -77,7 +77,7 @@ public class File extends SourceEditor {
 					try {name = fileChooser.getSelectedFile().getCanonicalPath();}
 					catch (Exception ex) {name = fileChooser.getSelectedFile().getAbsolutePath();}
 
-					name = WorkingDirectory.relativePath(name);
+					name = WorkingDir.relativize(name);
 					filename.setText(name);
 				}
 				saveValues();
@@ -122,7 +122,7 @@ public class File extends SourceEditor {
 		strict.setSelected(source.strict());
 		skip.setText(Integer.toString(source.skip()));
 		separator.setText(source.separator());
-		filename.setText(WorkingDirectory.relativePath(source.filename()));
+		filename.setText(WorkingDir.relativize(source.filename()));
 	}
 
 }

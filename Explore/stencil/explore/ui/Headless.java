@@ -41,7 +41,7 @@ import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
 import stencil.explore.util.StencilRunner;
 
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 
 public class Headless {
 
@@ -95,16 +95,16 @@ public class Headless {
 
 		String[] configs = PropertyManager.getConfigFiles(args);
 		PropertyManager.loadProperties(configs, PropertyManager.exploreConfig, PropertyManager.stencilConfig);
-
+		WorkingDir.set(prefix);
+		
 		//Load file
 		Model model = new Model();
 		String file = Application.getOpenFile(args);
 		if (file == null) {throw new IllegalArgumentException(String.format("%1$s flag must be used in headless mode.", Application.OPEN_FLAG));}
 		reporter.addMessage("%n%nLoading stencil %1$s.%n", file);
 
-		String filename = prefix + file;
-		StencilIO.load(filename, model);
-		WorkingDirectory.setWorkingDir(filename);
+		StencilIO.load(WorkingDir.resolve(file), model);
+		
 
 		//Load new stream sources
 		String[] sourceRewrites = getSourceRewrites(args);
@@ -117,13 +117,13 @@ public class Headless {
 
 			sources.remove(source);
 			if (source instanceof FileSource) {
-				source = ((FileSource) source).filename(prefix + sourceRewrites[i+1]);
+				source = ((FileSource) source).filename(sourceRewrites[i+1]);
 				sources.add(source);
 			} else {
 				FileSource newSource = new FileSource(source.name());
 				newSource.name(source.name());
 				newSource.header(source.header());
-				newSource.filename(prefix + sourceRewrites[i+1]);
+				newSource.filename(sourceRewrites[i+1]);
 				sources.add(source);
 			}
 		}
@@ -150,7 +150,7 @@ public class Headless {
 					for (int arg=0; arg< argCount; arg++) {
 						arguments[arg] = args[i+arg+1];
 					}
-					model.export(prefix + args[i+argCount+1], format, arguments);
+					model.export(WorkingDir.resolve(args[i+argCount+1]), format, arguments);
 				}
 			}
 		} catch (Exception e) {

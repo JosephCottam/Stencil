@@ -39,7 +39,7 @@ import static stencil.explore.Application.reporter;
 import stencil.display.StencilPanel;
 import stencil.explore.model.AdapterOpts;
 import stencil.explore.ui.interactive.Interactive;
-import stencil.WorkingDirectory;
+import stencil.WorkingDir;
 
 
 public class PropertyManager {
@@ -169,11 +169,11 @@ public class PropertyManager {
 		}
 		
 		if (p.containsKey(WORKING_DIR_KEY)) {
-			try {WorkingDirectory.setWorkingDir(p.getProperty(WORKING_DIR_KEY));}
+			try {WorkingDir.set(p.getProperty(WORKING_DIR_KEY));}
 			catch(Exception e) {System.err.println("Error setting last file from settings file.");}
 		} else {
 			//If no working directory is specified, use the system user directory
-			try {WorkingDirectory.setWorkingDir(System.getProperty("user.dir"));}
+			try {WorkingDir.set(System.getProperty("user.dir"));}
 			catch (Exception e) {System.out.println("Error determining working directory (default is user directory).");}
 		}
 		return props;
@@ -186,7 +186,7 @@ public class PropertyManager {
 	public static void saveSessionProperties(String filename) {
 		Properties p = new Properties();
 
-		p.setProperty(WORKING_DIR_KEY, WorkingDirectory.getWorkingDir());
+		p.setProperty(WORKING_DIR_KEY, WorkingDir.get().getPath());
 
 		try {p.storeToXML(new java.io.FileOutputStream(filename), "");}
 		catch (Exception e) {throw new RuntimeException(String.format("Error saving configuration info to %1$s.", filename), e);}

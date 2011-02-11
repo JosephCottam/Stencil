@@ -28,50 +28,42 @@
  */
 package stencil;
 
+import java.io.File;
+import java.io.IOException;
+
 /**Handles working directory information.*/
-public class WorkingDirectory {
-	private static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
-	public static final String RELATIVE_PREFIX  = "." + FILE_SEPARATOR;
-	private static String workingDir = RELATIVE_PREFIX;
-	
-
-	/**Set working directory, resolved against current working directory.*/
-	public static void setWorkingDir(String filename) {setWorkingDir(filename, false);}
+public class WorkingDir {
+	private static File workingDir = new File(System.getProperty("user.dir"));
 	
 	/**Set the working directory.  If the specified filename starts with
 	 * the relative prefix, it will be resolved against the current working
 	 * directory, unless userDirRoot is set to true.
 	 * 
+	 * Null path is treated as an empty path.
+	 * 
 	 * @param filename
-	 * @param userDirRoot
+	 * @param abs
 	 */
-	public static void setWorkingDir(String filename, boolean userDirRoot) {
-		if (userDirRoot) {
-			workingDir = System.getProperty("user.dir");
-			if (!workingDir.endsWith(FILE_SEPARATOR)) {workingDir = workingDir + FILE_SEPARATOR;} //Different systems will with or without the terminal separtor...unfortunately
-		}
-
-		java.io.File f = new java.io.File(filename);
-		if (!f.isDirectory()) {filename = f.getParent();}
+	public static void set(String path) {
+		if (path == null) {path ="";}
 		
-		if (!filename.endsWith(FILE_SEPARATOR)) {filename = filename + FILE_SEPARATOR;}
-		if (filename.startsWith(RELATIVE_PREFIX)) {filename = resolvePath(filename);}
-		workingDir = filename;
+		File f = new File(path);
+		if (!f.isAbsolute()) {f = new File(workingDir, path);}
+		if (f.isFile()) {f = f.getParentFile();}
+		workingDir = f;
 	}
-	public static String getWorkingDir() {return workingDir;}
 
-	/**Resolve a path relative to the working directory, but only if
-	 * it is relative.
-	 *
-	 * @param filename
-	 * @return
+	public static File get() {return workingDir;}
+
+	/** @param filename
+	 * @return Cannonical path after resolving filename against working directory
+	 * @throws IOException 
 	 */
-	public static String resolvePath(String filename) {
-		if (filename.startsWith(RELATIVE_PREFIX)) {
-			filename = workingDir + filename.substring(RELATIVE_PREFIX.length());
-		}
-		return filename;
+	public static String resolve(String filename) {
+		File f = new File(filename);
+		if (!f.isAbsolute()) {f =new File(workingDir, filename);}
+		try {return f.getCanonicalPath();}
+		catch (Exception e) {throw new RuntimeException("Error resolving path", e);}
 	}
 
 	/**If the filename is prefixed by the working directory, replace
@@ -79,10 +71,8 @@ public class WorkingDirectory {
 	 * @param filename
 	 * @return
 	 */
-	public static String relativePath(String filename) {
-		if (filename.startsWith(workingDir)) {
-			return RELATIVE_PREFIX + filename.substring(workingDir.length());
-		}
-		return filename;
+	public static String relativize(String filename) {
+		File newPath = new File(resolve(filename));
+		return workingDir.toURI().relativize(newPath.toURI()).getPath();
 	}
 }
