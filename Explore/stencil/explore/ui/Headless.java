@@ -104,7 +104,7 @@ public class Headless {
 		reporter.addMessage("%n%nLoading stencil %1$s.%n", file);
 
 		StencilIO.load(WorkingDir.resolve(file), model);
-		
+		WorkingDir.set(file);
 
 		//Load new stream sources
 		String[] sourceRewrites = getSourceRewrites(args);

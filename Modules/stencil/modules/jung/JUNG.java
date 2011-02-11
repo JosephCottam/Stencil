@@ -23,10 +23,12 @@ public class JUNG extends BasicModule {
 	
 	protected ModuleData loadOperatorData() throws MetaDataParseException {
 		final String MODULE_NAME = "JUNG";
+		
 		OperatorData[] ods = new OperatorData[]{
 			operatorData(BalloonLayout.class, MODULE_NAME),
 			operatorData(CircleLayout.class, MODULE_NAME),
 			operatorData(ISOMLayout.class, MODULE_NAME),
+			operatorData(FRLayout.class, MODULE_NAME),
 			operatorData(KKLayout.class, MODULE_NAME),
 			operatorData(RadialTreeLayout.class, MODULE_NAME),
 			operatorData(SpringLayout.class, MODULE_NAME),

@@ -33,7 +33,7 @@ public class PersistentData extends BasicModule {
 			}
 		}
 		
-		@Facet(memUse="FUNCTION", prototype="(VALUE)")
+		@Facet(memUse="FUNCTION", prototype="(VALUE)", alias={"map","query"})
 		public Object query(int inIndex) {return out[inIndex];}
 	}
 	

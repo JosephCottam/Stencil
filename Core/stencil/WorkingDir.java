@@ -33,7 +33,8 @@ import java.io.IOException;
 
 /**Handles working directory information.*/
 public class WorkingDir {
-	private static File workingDir = new File(System.getProperty("user.dir"));
+	
+	private static File workingDir;
 	
 	/**Set the working directory.  If the specified filename starts with
 	 * the relative prefix, it will be resolved against the current working
@@ -48,12 +49,15 @@ public class WorkingDir {
 		if (path == null) {path ="";}
 		
 		File f = new File(path);
-		if (!f.isAbsolute()) {f = new File(workingDir, path);}
+		if (!f.isAbsolute()) {f = new File(get(), path);}
 		if (f.isFile()) {f = f.getParentFile();}
 		workingDir = f;
 	}
 
-	public static File get() {return workingDir;}
+	public static File get() {
+		if (workingDir == null) {workingDir = new File(System.getProperty("user.dir"));}
+		return workingDir;
+	}
 
 	/** @param filename
 	 * @return Cannonical path after resolving filename against working directory
@@ -61,7 +65,7 @@ public class WorkingDir {
 	 */
 	public static String resolve(String filename) {
 		File f = new File(filename);
-		if (!f.isAbsolute()) {f =new File(workingDir, filename);}
+		if (!f.isAbsolute()) {f =new File(get(), filename);}
 		try {return f.getCanonicalPath();}
 		catch (Exception e) {throw new RuntimeException("Error resolving path", e);}
 	}
@@ -73,6 +77,6 @@ public class WorkingDir {
 	 */
 	public static String relativize(String filename) {
 		File newPath = new File(resolve(filename));
-		return workingDir.toURI().relativize(newPath.toURI()).getPath();
+		return get().toURI().relativize(newPath.toURI()).getPath();
 	}
 }
