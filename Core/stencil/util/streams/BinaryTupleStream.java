@@ -104,6 +104,7 @@ public class BinaryTupleStream {
 	public static final class Reader implements TupleStream {
 		/**File channel contents are loaded from**/
 		private FileChannel input;
+		private ByteBuffer mainBuffer;
 		
 		/**Name of the stream**/
 		private final String name;
@@ -115,24 +116,18 @@ public class BinaryTupleStream {
 		
 		///Per-line buffers
 		/**Buffer for loading the prefix.*/
-		private final ByteBuffer prefix;
 		private final int[] offsets;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
 			input = new FileInputStream(sourcefile).getChannel();
-			this.name = streamName;
-			tupleSize = readInt(input);
-			
-			prefix = ByteBuffer.allocate(INT_BYTES + INT_BYTES*tupleSize);
-			offsets = new int[tupleSize];
 			size = input.size();
-		}
-
-		private static int readInt(FileChannel input) throws Exception {
-			ByteBuffer b = ByteBuffer.allocate(INT_BYTES);
-			input.read(b);
-			b.position(0);
-			return b.getInt();
+			mainBuffer = input.map(FileChannel.MapMode.READ_ONLY, 0, size);
+			
+			
+			this.name = streamName;
+			tupleSize = mainBuffer.getInt();
+			
+			offsets = new int[tupleSize];
 		}
 		
 		@Override
@@ -140,31 +135,22 @@ public class BinaryTupleStream {
 
 		@Override
 		public boolean hasNext() {
-			try {
-				return input != null
-						&& input.isOpen()
-						&& input.position() < size;
-			} catch (IOException e) {
-				throw new Error("Error checking status on FastStream.", e);
-			}
+			return input != null
+					&& input.isOpen()
+					&& mainBuffer.position() < size;
 		}
 
 
 		@Override
 		public SourcedTuple next() {
 			try {
-				prefix.position(0);
-				input.read(prefix);										//Read header into permanent buffer
-				prefix.position(0);
-				int dataLength = prefix.getInt();
+				int dataLength = mainBuffer.getInt();
 
-				for (int i=0; i< tupleSize; i++) {
-					offsets[i] =prefix.getInt();
-				}
+				for (int i=0; i< tupleSize; i++) {offsets[i] =mainBuffer.getInt();}
 				
-				ByteBuffer line = ByteBuffer.allocate(dataLength);		//Read remaining line into array
-				input.read(line);								 
-				String base = new String(line.array());
+				byte[] bytes = new byte[dataLength];
+				mainBuffer.get(bytes);
+				String base = new String(bytes);
 				
 				Object[] values = new String[tupleSize];				//Split it up into values
 				for (int i=0, prior=0; i< tupleSize; prior=offsets[i++]) {
@@ -175,7 +161,7 @@ public class BinaryTupleStream {
 				SourcedTuple sourced = new SourcedTuple.Wrapper(name, contents);
 				return sourced;
 			} catch (Exception e) {
-				throw new RuntimeException("Error reading line from file.");
+				throw new RuntimeException("Error reading line from file.", e);
 			}
 		}
 

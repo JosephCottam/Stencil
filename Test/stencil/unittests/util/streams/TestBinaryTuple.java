@@ -29,14 +29,16 @@ public class TestBinaryTuple extends TestCase {
 		//Walk tuple-by-tuple through both streams, all tuples should be equal
 		int i=0;
 		while(oldTuples.hasNext() && newTuples.hasNext()) {
-			Tuple oldT = oldTuples.next().getValues();
-			Tuple newT = newTuples.next().getValues();
-			
-			assertEquals("Unequal size on tuple " +i, oldT.size(), newT.size());
-			for (int field=0; field<oldT.size(); field++) {
-				assertEquals("Uneqaul value on field " + field + " of tuple " + i, oldT.get(field), newT.get(field));
-			}			
-			i++;
+			try {
+				Tuple oldT = oldTuples.next().getValues();
+				Tuple newT = newTuples.next().getValues();
+				
+				assertEquals("Unequal size on tuple " +i, oldT.size(), newT.size());
+				for (int field=0; field<oldT.size(); field++) {
+					assertEquals("Uneqaul value on field " + field + " of tuple " + i, oldT.get(field), newT.get(field));
+				}			
+				i++;
+			} catch (Exception e) {throw new Exception("Error examining tuple " + i, e);}
 		}
 		
 		assertFalse("Old tuples not exhausted.", oldTuples.hasNext());
