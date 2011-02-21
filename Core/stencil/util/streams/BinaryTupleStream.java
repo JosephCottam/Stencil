@@ -58,10 +58,12 @@ public class BinaryTupleStream {
 		public byte[] tupleLine(Tuple t) {
 			final int[] lengths = new int[t.size()];
 			ArrayList<Byte> linebytes = new ArrayList();
+			int prior =0;
 			for (int i=0; i< lengths.length; i++) {
 				String v = Converter.toString(t.get(i));
+				lengths[i] = v.length()+prior;
+				prior = lengths[i];
 				byte[] bytes = v.getBytes();				//TODO: Use an explicit encoder
-				lengths[i] = bytes.length;
 				for (byte b: bytes) {
 					linebytes.add(b);
 				}
@@ -109,25 +111,30 @@ public class BinaryTupleStream {
 		/**Number of value fields per tuple**/
 		private final int tupleSize;
 
+		private final long size;
 		
 		///Per-line buffers
 		/**Buffer for loading the prefix.*/
 		private final ByteBuffer prefix;
-		private final int[] lengths;
+		private final int[] offsets;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
 			input = new FileInputStream(sourcefile).getChannel();
+			this.name = streamName;
+			tupleSize = readInt(input);
 			
+			prefix = ByteBuffer.allocate(INT_BYTES + INT_BYTES*tupleSize);
+			offsets = new int[tupleSize];
+			size = input.size();
+		}
+
+		private static int readInt(FileChannel input) throws Exception {
 			ByteBuffer b = ByteBuffer.allocate(INT_BYTES);
 			input.read(b);
 			b.position(0);
-			tupleSize = b.getInt();
-			this.name = streamName;
-
-			prefix = ByteBuffer.allocate(INT_BYTES + INT_BYTES*tupleSize);
-			lengths = new int[tupleSize];
+			return b.getInt();
 		}
-
+		
 		@Override
 		public boolean ready() {return hasNext();}
 
@@ -136,7 +143,7 @@ public class BinaryTupleStream {
 			try {
 				return input != null
 						&& input.isOpen()
-						&& input.position() != input.size();
+						&& input.position() < size;
 			} catch (IOException e) {
 				throw new Error("Error checking status on FastStream.", e);
 			}
@@ -152,19 +159,16 @@ public class BinaryTupleStream {
 				int dataLength = prefix.getInt();
 
 				for (int i=0; i< tupleSize; i++) {
-					lengths[i] =prefix.getInt();
+					offsets[i] =prefix.getInt();
 				}
 				
 				ByteBuffer line = ByteBuffer.allocate(dataLength);		//Read remaining line into array
 				input.read(line);								 
-				line.position(0);
+				String base = new String(line.array());
 				
-				Object[] values = new String[tupleSize];				//Split it up into values				
-				for (int i=0; i< tupleSize; i++) {
-					int len = lengths[i];
-					byte[] bytes = new byte[len];
-					line.get(bytes);
-					values[i] = new String(bytes);
+				Object[] values = new String[tupleSize];				//Split it up into values
+				for (int i=0, prior=0; i< tupleSize; prior=offsets[i++]) {
+					values[i] = base.substring(prior, offsets[i]);
 				}
 
 				Tuple contents = new ArrayTuple(values);
