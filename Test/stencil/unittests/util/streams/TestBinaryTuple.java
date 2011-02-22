@@ -3,28 +3,26 @@ package stencil.unittests.util.streams;
 import java.io.File;
 
 import stencil.tuple.Tuple;
+import stencil.tuple.TupleStream;
 import stencil.util.streams.BinaryTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 import junit.framework.TestCase;
 
 public class TestBinaryTuple extends TestCase {
-	public static String REGEXP_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord";
-	public static String BIN_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.tuples";
+	public static final String COORD_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord";
+	public static final String COORD_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.tuples";
+
+	public static final String TROVES_FILE = "./TestData/RegressionImages/Sourceforge/project_troves.txt";
+	public static final String TROVES_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/project_troves.tuples";
 
 	
 	public void testEncodeDecode() throws Exception {
-		//remove old output (if any)
-		File f = new File(BIN_TUPLES_FILE);
-		if (f.exists()) {f.delete();}
-
-		//Push old stream through encoder
-		DelimitedParser source = new DelimitedParser("CoordFile", "ID X Y", REGEXP_FILE, "\\s+", true,1);
-		BinaryTupleStream.Writer writer = new BinaryTupleStream.Writer(source);
-		writer.writeStream(BIN_TUPLES_FILE);
+		DelimitedParser source = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		prepBinary(source, COORD_TUPLES_FILE);
 		source.close();
 
-		DelimitedParser oldTuples = new DelimitedParser("CoordFile", "ID X Y", REGEXP_FILE, "\\s+", true,1);
-		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader("CoordFile", BIN_TUPLES_FILE);
+		DelimitedParser oldTuples = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader("CoordFile", COORD_TUPLES_FILE);
 		
 		//Walk tuple-by-tuple through both streams, all tuples should be equal
 		int i=0;
@@ -47,12 +45,29 @@ public class TestBinaryTuple extends TestCase {
 		oldTuples.close();
 		newTuples.close();
 	}
-	
-	public void testSpeed() throws Exception {
-		File f = new File(BIN_TUPLES_FILE);
-		if (!f.exists()) {testEncodeDecode();}
 
-		DelimitedParser reSource = new DelimitedParser("CoordFile", "ID X Y", REGEXP_FILE, "\\s+", true,1);
+	
+	public void testTrovesSpeed() throws Exception {
+		DelimitedParser source = new DelimitedParser("Troves", "ID|ATT", TROVES_FILE, "\\|", true,1);		
+		prepBinary(source, TROVES_TUPLES_FILE);
+		source.close();
+		
+		source = new DelimitedParser("Troves", "ID|ATT", TROVES_FILE, "\\|", true,1);
+		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader("Troves", TROVES_TUPLES_FILE);
+		testSpeed(source, binSource);
+	}
+
+	public void testCoordSpeed() throws Exception {
+		DelimitedParser reSource = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		prepBinary(reSource, COORD_TUPLES_FILE);
+		reSource.close();
+		
+		reSource = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader("CoordFile", COORD_TUPLES_FILE);
+		testSpeed(reSource, binSource);
+	}
+	
+	private void testSpeed(DelimitedParser reSource, BinaryTupleStream.Reader binSource){
 		long reStart = System.currentTimeMillis();
 		long reFields=0;
 		while (reSource.hasNext()) {
@@ -62,18 +77,29 @@ public class TestBinaryTuple extends TestCase {
 		long reEnd = System.currentTimeMillis();
 		long reTime = reEnd-reStart;
 		
-		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader("CoordFile", BIN_TUPLES_FILE);
 		long binStart = System.currentTimeMillis();
 		long binFields=0;
+		int count=0;
 		while(binSource.hasNext()) {
 			Tuple t = binSource.next();
 			binFields += t.size();
+			count++;
 		}
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		System.err.printf("\nBinary parsing is %1$f of regexp parsing (%2$d vs %3$d).\n", 100 * (binTime/(double) reTime), binTime, reTime);
+		System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, count);
 		assertEquals(reFields, binFields);
 		assertTrue("No advantage to binary.", binTime < reTime);
+	}
+	
+	private void prepBinary(TupleStream source, String targetFile) throws Exception {
+		//remove old output (if any)
+		File f = new File(targetFile);
+		if (f.exists()) {f.delete();}
+
+		//Push old stream through encoder
+		BinaryTupleStream.Writer writer = new BinaryTupleStream.Writer(source);
+		writer.writeStream(targetFile);
 	}
 }

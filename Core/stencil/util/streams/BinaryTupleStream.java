@@ -17,17 +17,13 @@ import java.util.*;
 /**Takes stream source and constructs a file caching the stream values as binary.
  * Loading format is thus:
  *  
- *  Header---
+ *  File Prefix---
  *  int: # of fields per line (n)
- *  new-line
  *  
- *  Line---
- *  int: # of bytes in line
- *  n-1 ints: break points in line for each field, field breaks are interpreted w.r.t. the line after the line length
- *  Remaining bytes are line data (interpreted as strings). 
- *  new-line
- *  
- *  This format implies that the first line of the file is always size-of-int bytes plus a newline.
+ *  Each Entry---
+ *  int: # of data bytes in entry (does not include this size int and does not include the break points)
+ *  n ints: break points in entry for each field, field breaks are character positions in the decoded data
+ *  Remaining bytes are entry data (interpreted as strings). 
  **/
 public class BinaryTupleStream {
 	private static final int INT_BYTES = 4;
@@ -123,7 +119,6 @@ public class BinaryTupleStream {
 			size = input.size();
 			mainBuffer = input.map(FileChannel.MapMode.READ_ONLY, 0, size);
 			
-			
 			this.name = streamName;
 			tupleSize = mainBuffer.getInt();
 			
@@ -171,8 +166,18 @@ public class BinaryTupleStream {
 	
 	}
 	
-	//TODO: Disentangle from the Explore application Model class
-	public static void encode(String stencilFile, String targetStream, String targetFile) throws Exception {
+	
+	/**Indicate a stencil an a stream, will load up the stream
+	 * and create a new file of it that can be loaded as a FastStream.
+	 * 
+	 * The stream indicated must be finite
+	 * TODO: Disentangle from the Explore application Model class
+	 * @param args: stencil file, stream to load, file to save in
+	 */
+	public static void main(String[] args) throws Exception {
+		String stencilFile = args[0];
+		String targetStream = args[1];
+		String targetFile = args[2];
 		Model model = new Model();
 		StencilIO.load(stencilFile, model);
 		StreamSource ss = model.getSourcesMap().get(targetStream);
@@ -180,19 +185,5 @@ public class BinaryTupleStream {
 		
 		Writer w = new Writer(stream);
 		w.writeStream(targetFile);
-	}
-	
-	/**Indicate a stencil an a stream, will load up the stream
-	 * and create a new file of it that can be loaded as a FastStream.
-	 * 
-	 * The stream indicated must be finite
-	 * 
-	 * @param args: stencil file, stream to load, file to save in
-	 */
-	public static void main(String[] args) throws Exception {
-		String stencilFile = args[0];
-		String targetStream = args[1];
-		String targetFile = args[2];
-		encode(stencilFile, targetStream, targetFile);
 	}
 }
