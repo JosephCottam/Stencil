@@ -64,13 +64,6 @@ public abstract class CacheFeed<T> implements TupleStream {
 	 * but it may generate a time-out exception after a given period.
 	 */
 	public boolean hasNext() {return feed != null;}
-	public boolean ready() {
-		if (entryCache.isEmpty() && updater == null) {
-			updater = new Thread("CacheFeed: Updater") {public void run() {synchUpdateEntryCache(); updater = null;}};
-			updater.start();
-		}
-		return entryCache.isEmpty();
-	}
 
 	public void remove() {throw new UnsupportedOperationException();}
 

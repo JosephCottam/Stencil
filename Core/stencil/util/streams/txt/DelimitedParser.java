@@ -33,8 +33,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.*;
 
 import stencil.tuple.SourcedTuple;
@@ -42,6 +40,7 @@ import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.SimplePrototype;
+import stencil.util.streams.QueuedStream;
 
 import static java.lang.String.format;
 
@@ -51,7 +50,7 @@ import static java.lang.String.format;
  * @author jcottam
  *
  */
-public final class DelimitedParser implements TupleStream {
+public final class DelimitedParser implements TupleStream, QueuedStream.Queable {
 	/**Reader to get tuples from*/
 	private BufferedReader source;
 
@@ -71,9 +70,10 @@ public final class DelimitedParser implements TupleStream {
 	
 	private final NextChannel channel;
 	
-	/**Stored tuple, returned before anything new will be read.
-	 * */
-	private Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
+	private SourcedTuple lookAhead;
+	
+	/**Has this stream reached its end?*/
+	private boolean ended = false;
 	
 	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
@@ -119,27 +119,24 @@ public final class DelimitedParser implements TupleStream {
 			channel.validate(source);
 		} catch (Exception e) {throw new RuntimeException("Error opening " + filename + ".", e);}
 	}
-
-	private void loadCache() {
-		SourcedTuple t;
-		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
-		if (tupleCache.isEmpty()) {
-			Object[] values; 
-			
-			for (int i=0; i< 100; i++) {
-				try {values = channel.next(source);}
-				catch (NoSuchElementException e) {break;}
-				catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
-			
-				t = new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
-				tupleCache.add(t);
-			}
-		}		
-	}
 	
 	public SourcedTuple next() {
-		loadCache();
-		return tupleCache.poll();
+		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
+		if (lookAhead != null) {
+			SourcedTuple v = lookAhead;
+			lookAhead = null;
+			return v;
+		}
+		
+		Object[] values;
+		try {values = channel.next(source);}
+		catch (NoSuchElementException e) {
+			ended = true;
+			return null;
+		}
+		catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
+	
+		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
 	}
 
 	/**Close the tree stream.  The next operation will no longer work.
@@ -150,7 +147,7 @@ public final class DelimitedParser implements TupleStream {
 			source.close();
 		}
 		source = null;
-		tupleCache.clear();
+		lookAhead = null;
 	}
 
 	/**Returns true if the stream has been opened
@@ -158,17 +155,11 @@ public final class DelimitedParser implements TupleStream {
 	 * are no more tuples (guaranteed to never be more).
 	 */
 	public boolean hasNext() {
-		if (source == null ) {return false;}
-		if (!tupleCache.isEmpty()) {return true;}
-		loadCache();
-		return !tupleCache.isEmpty();
-	}
+		if (lookAhead != null) {return true;}
+		if  (ended || source == null) {return false;}
 
-	
-	/**Is a tuple immediately available?*/
-	public boolean ready() {
-		hasNext();	
-		return !tupleCache.isEmpty();
+		lookAhead = next();
+		return !ended;
 	}
 
 	public String getName() {return name;}

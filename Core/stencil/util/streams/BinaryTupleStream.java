@@ -83,7 +83,9 @@ public class BinaryTupleStream {
 			try {
 				boolean doHeader = true;
 				while(source.hasNext()) {
-					Tuple t = source.next().getValues();
+					SourcedTuple sourced= source.next();
+					if (sourced == null) {continue;}
+					Tuple t = sourced.getValues();
 					if (doHeader) {
 						byte[] header = makeHeader(t.size()); doHeader=false;
 						file.write(header);
@@ -98,7 +100,7 @@ public class BinaryTupleStream {
 	
 	
 	/**Stream source that can read a FastStream written by the above included Writer**/
-	public static final class Reader implements TupleStream {
+	public static final class Reader implements TupleStream, QueuedStream.Queable {
 		/**File channel contents are loaded from**/
 		private FileChannel input;
 		private ByteBuffer mainBuffer;
@@ -125,15 +127,7 @@ public class BinaryTupleStream {
 		}
 		
 		@Override
-		public boolean ready() {return hasNext();}
-
-		@Override
 		public boolean hasNext() {
-//			if (input == null) {System.out.println("Null"); return false;}
-//			if (!input.isOpen()) {System.out.println("Not open"); return false;}
-//			if (!mainBuffer.hasRemaining()) {System.out.println("End of buffer: " + mainBuffer.position() + ", " + size); return false;}
-//			
-//			return true;
 			return input != null
 					&& input.isOpen()
 					&& mainBuffer.hasRemaining();

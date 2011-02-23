@@ -60,7 +60,6 @@ public final class ComponentEventStream implements TupleStream {
 	
 	/**Data source for frame status.*/
 	private interface TupleSource {
-		public boolean ready(); 
 		public Tuple next();
 	}
 	
@@ -70,7 +69,6 @@ public final class ComponentEventStream implements TupleStream {
 		public CurrentStateSource(JComponent source) {
 			this.component = source;
 		}
-		public boolean ready() {return true;}
 		public Tuple next() {return new ComponentState(component.getBounds());}
 	}
 	
@@ -94,8 +92,6 @@ public final class ComponentEventStream implements TupleStream {
 			return new ComponentState(r);
 		}
 
-		public boolean ready() {return lastState.get() != null;}
-		
 		public void componentMoved(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
 		public void componentResized(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
 		public void componentShown(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
@@ -116,7 +112,6 @@ public final class ComponentEventStream implements TupleStream {
 	}
 	
 	public SourcedTuple next() {return new SourcedTuple.Wrapper(name, tupleSource.next());}
-	public boolean ready() {return tupleSource.ready();}
 	public boolean hasNext() {return true;}
 
 	/**Throws UnsupportedOpertaionException.*/

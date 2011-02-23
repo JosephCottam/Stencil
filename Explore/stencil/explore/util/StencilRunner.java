@@ -36,10 +36,12 @@ import stencil.WorkingDir;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
+import stencil.explore.Application;
 import stencil.explore.model.Model;
 import stencil.explore.model.sources.*;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.ConcurrentStream;
+import stencil.util.streams.QueuedStream;
 import stencil.interpreter.tree.Order;
 
 /**Thread to manage running a stencil run.
@@ -95,6 +97,7 @@ public final class StencilRunner extends Thread {
 					if (stream instanceof FileSource) {stream=resolvePaths(((FileSource) stream));}
 					if (stream instanceof BinarySource) {stream=resolvePaths(((BinarySource) stream));}
 					input = stream.getStream(model);
+					if (input instanceof QueuedStream.Queable) {input = new QueuedStream(input, Application.STREAM_QUEUE_SIZE);}
 					streams.add(input);
 				}
 

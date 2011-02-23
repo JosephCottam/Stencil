@@ -58,19 +58,14 @@ public class ConcurrentStream implements TupleStream {
 	}
 
 	public SourcedTuple next() {
+		SourcedTuple nv = null;
+
 		//TODO: This is busy waiting...we should go with a listener architecture.
-		while (!streams.get(offset).ready()) {incrimentOffset();}
-
-		SourcedTuple nv = streams.get(offset).next();
-		incrimentOffset();
-		return nv;
-	}
-
-	public boolean ready() {
-		for (TupleStream stream: streams) {
-			if (stream.ready()) {return true;}
+		while (nv== null) {
+			nv = streams.get(offset).next();	
+			incrimentOffset();
 		}
-		return false;
+		return nv;
 	}
 
 	public boolean hasNext() {

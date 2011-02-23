@@ -33,15 +33,9 @@ import java.util.Iterator;
 /**An iterator that generates tuples.
  *
  * HasNext should return false ONLY if the stream is definitely exhausted.
- * Calling 'next' should always immediately return, but it may return null
- * if there is nothing ready, but the stream is not yet terminated.
- *
+ * Calling 'next' should always return quickly. 
+ * 'next' may return null if there is nothing right now, but may still be in the future.
  * */
 public interface TupleStream extends Iterator<SourcedTuple> {
-	/**A stream is ready when it can return a tuple right away.
-	 * This is different from hasNext, in that a false hasNext value
-	 * indicates the stream will NEVER return more values.
-	 * @return
-	 */
-	public boolean ready();
+
 }

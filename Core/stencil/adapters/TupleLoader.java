@@ -92,11 +92,9 @@ public class TupleLoader implements Runnable {
 
 		while(input.hasNext() && keepRunning) {
 			SourcedTuple tuple;
-			try {
-				if (input.ready()) {tuple = input.next();}
-				else {continue;}
-			}
+			try {tuple = input.next();}
 			catch (InvalidInputLineException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
+
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
 			panel.processTuple(tuple); 
 			recordsLoaded++;

@@ -5,24 +5,21 @@ import java.io.File;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.BinaryTupleStream;
+import stencil.util.streams.QueuedStream;
 import stencil.util.streams.txt.DelimitedParser;
 import junit.framework.TestCase;
 
+import static stencil.unittests.util.streams.Util.*;
+
 public class TestBinaryTuple extends TestCase {
-	public static final String COORD_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord";
-	public static final String COORD_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.tuples";
-
-	public static final String TROVES_FILE = "./TestData/RegressionImages/Sourceforge/project_troves.txt";
-	public static final String TROVES_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/project_troves.tuples";
-
 	
 	public void testEncodeDecode() throws Exception {
-		DelimitedParser source = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		DelimitedParser source = coordStream();
 		prepBinary(source, COORD_TUPLES_FILE);
 		source.close();
 
-		DelimitedParser oldTuples = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
-		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader("CoordFile", COORD_TUPLES_FILE);
+		DelimitedParser oldTuples = coordStream();
+		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader(oldTuples.getName(), COORD_TUPLES_FILE);
 		
 		//Walk tuple-by-tuple through both streams, all tuples should be equal
 		int i=0;
@@ -48,26 +45,38 @@ public class TestBinaryTuple extends TestCase {
 
 	
 	public void testTrovesSpeed() throws Exception {
-		DelimitedParser source = new DelimitedParser("Troves", "ID|ATT", TROVES_FILE, "\\|", true,1);		
+		DelimitedParser source = trovesStream();		
 		prepBinary(source, TROVES_TUPLES_FILE);
-		source.close();
-		
-		source = new DelimitedParser("Troves", "ID|ATT", TROVES_FILE, "\\|", true,1);
-		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader("Troves", TROVES_TUPLES_FILE);
+		source.close();		
+		source = trovesStream();
+		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE);
 		testSpeed(source, binSource);
 	}
 
+	public void testTrovesSpeedQueued() throws Exception {
+		final int QUEUE_SIZE = 300;
+		
+		DelimitedParser source = trovesStream();		
+		prepBinary(source, TROVES_TUPLES_FILE);
+		source.close();
+		
+		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
+		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
+		testSpeed(re, bin);
+	}
+
+	
 	public void testCoordSpeed() throws Exception {
-		DelimitedParser reSource = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		DelimitedParser reSource = coordStream();
 		prepBinary(reSource, COORD_TUPLES_FILE);
 		reSource.close();
 		
-		reSource = new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
-		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader("CoordFile", COORD_TUPLES_FILE);
+		reSource = coordStream();
+		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(reSource.getName(), COORD_TUPLES_FILE);
 		testSpeed(reSource, binSource);
 	}
 	
-	private void testSpeed(DelimitedParser reSource, BinaryTupleStream.Reader binSource){
+	private void testSpeed(TupleStream reSource, TupleStream binSource){
 		long reStart = System.currentTimeMillis();
 		int reTuples=0;
 		while (reSource.hasNext()) {

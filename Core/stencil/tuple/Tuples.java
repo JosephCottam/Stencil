@@ -335,4 +335,20 @@ public final class Tuples {
 		return (!source.getPrototype().contains(field)) ? def : (T) Converter.convert(source.get(field), type);
 	}
 	
+	
+	/**Generic pair-wise value equality.
+	 * Does not check names/prototypes.
+	 ***/
+	public static boolean equals(Tuple t1, Object other) {
+		if (!(other instanceof Tuple)) {return false;}
+		Tuple t2 = (Tuple) other;
+		
+		if (t1.size() != t2.size()) {return false;}
+		
+		for (int i=0; i< t1.size(); i++) {
+			if (t1.get(i) == null && t2.get(i) != null
+					|| !t1.get(i).equals(t2.get(i))) {return false;}
+		}
+		return true;
+	}
 }

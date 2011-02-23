@@ -42,8 +42,6 @@ public class RandomStream implements TupleStream {
 		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
 	}
 
-	public boolean ready() {return hasNext();}
-
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}

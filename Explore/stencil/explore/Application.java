@@ -47,6 +47,7 @@ public class Application {
 	//Global semi-constants (set during initialization and probably never again)
 	public static int CONCURRENT_BIAS = 1;
 	public static int EXPORT_RESOLUTION = 300;
+	public static int STREAM_QUEUE_SIZE = 100;
 
 	//Message reporting infrastructure
 	public static MessageReporter reporter = new SystemMessageReporter();

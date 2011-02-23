@@ -6,21 +6,19 @@ import stencil.util.streams.txt.*;
 import junit.framework.TestCase;
 import junit.framework.Assert;
 
+import static stencil.unittests.util.streams.Util.*;
+
 
 public class TestDelimitParser extends TestCase {
-	public static String coordFile = "./TestData/RegressionImages/Sourceforge/suppliments/clusterCoords_fragment.coord";
-	public static String troveFile = "./TestData/RegressionImages/Sourceforge/project_troves.txt";
-	public static String header_coordFile = "./TestData/RegressionImages/Sourceforge/suppliments/header_coord.txt";
-
 	public void testOpen() throws Exception{
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		DelimitedParser p = coordHeaderStream();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 		SourcedTuple root = p.next();
 		Tuple t = root.getValues();
 		Assert.assertTrue("First tuple not as expected after open.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
 
 		
-		p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		p = coordStream();
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 
 		root = p.next();
@@ -31,7 +29,7 @@ public class TestDelimitParser extends TestCase {
 	
 	
 	public void testHasNext() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true, 1);
+		DelimitedParser p = coordStream();
 		Assert.assertTrue("HasNext false after creation", p.hasNext());
 		
 		p.close();
@@ -43,7 +41,7 @@ public class TestDelimitParser extends TestCase {
 	}
 	
 	public void testNext() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		DelimitedParser p = coordHeaderStream();
 		
 		int i=0;
 		while (p.hasNext() && i< 1000) {p.next(); i++;}
@@ -52,7 +50,7 @@ public class TestDelimitParser extends TestCase {
 	}
 	
 	public void testClose() throws Exception {
-		DelimitedParser p = new DelimitedParser("CoordFile", "ID X Y", header_coordFile, "\\s+", true,1);
+		DelimitedParser p = coordStream();
 		Assert.assertTrue("Stream not ready after open.", p.hasNext());
 		p.close();
 		Assert.assertFalse("Stream did not close.", p.hasNext());
@@ -67,7 +65,7 @@ public class TestDelimitParser extends TestCase {
 	public void testTime() throws Exception {
 		final long max = 2500; //2.5 second
 		
-		DelimitedParser p = new DelimitedParser("Troves", "ID|ATT", troveFile, "\\|", true,1);		
+		DelimitedParser p = trovesStream();		
 		final long start = System.currentTimeMillis();
 		
 		long fields=0;

@@ -1,4 +1,4 @@
-tree grammar TargetMatchesPack;
+tree grammar EventSinglelyMutates;
 options {
   tokenVocab = Stencil;
   ASTLabelType = StencilTree;  
@@ -16,7 +16,9 @@ options {
   import stencil.parser.tree.StencilTree;
   import stencil.parser.string.ValidationException;
   import stencil.parser.string.TreeFilterSequence;
-  import java.util.*;
+  import java.util.ArrayList;
+  import java.util.HashSet;
+  import java.util.Set;
 }
 
 @members {
@@ -34,7 +36,7 @@ options {
     events.clear();
     downup(p, this, "gatherEvents");
   
-    Object events = //Gather possible events
+    List events = new ArrayList(); //Gather possible events
     for (Object event: events) {
        mutations.clear();
        downup(p, this, "mutations");
@@ -46,5 +48,5 @@ options {
 }
 
 gatherEvents: ^(s=STREAM_DEF .*) {events.add($s.getText());};
-mutations:
+mutations: FUNCTION;
   

@@ -115,7 +115,6 @@ public abstract class KeyboardStream implements TupleStream {
 		public boolean hasNext() {return buffer != -1;}
 		public void close() throws IOException {stream.close(); buffer=(char)-1;}
 		public SourcedTuple next() {return new SourcedTuple.Wrapper(source, read());}
-		public boolean ready() {return buffer >0;}
 	}
 
 	/**Turns an component into an input stream.  Key events are buffered and dispensed
@@ -152,8 +151,6 @@ public abstract class KeyboardStream implements TupleStream {
 			control.removeKeyListener(this);
 			buffer.clear();
 		}
-
-		public boolean ready() {return buffer.size() >0;}
 	}
 
 

@@ -9,12 +9,13 @@ import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.util.streams.QueuedStream;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
  * but no other meta-data validation is performed.
  */
-public class QueryTuples implements TupleStream {
+public class QueryTuples implements TupleStream, QueuedStream.Queable {
 	protected Connection connection;
 	protected Statement statement;
 
@@ -76,10 +77,6 @@ public class QueryTuples implements TupleStream {
 		catch (Exception e) {throw new RuntimeException(e);}
 	}
 
-
-	public boolean ready() {
-		return hasNext();
-	}
 
 	public void remove() {throw new UnsupportedOperationException("Remove not supported on Query TupleStream.");}
 }
