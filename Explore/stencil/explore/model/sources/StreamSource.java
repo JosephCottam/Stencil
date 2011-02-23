@@ -72,8 +72,6 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 		catch (Exception e) {return this.getClass().getName();}
 	}
 
-	public abstract String header();
-
 	/**Create a tuple stream based on the information of the stream source.**/
 	public abstract TupleStream getStream(Model context) throws Exception;
 

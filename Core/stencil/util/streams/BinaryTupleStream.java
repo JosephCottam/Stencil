@@ -75,10 +75,11 @@ public class BinaryTupleStream {
 			return buff.array();
 		}
 
-		/**Write all of the tuples in the stream to the file.**/
+		/**Write all of the tuples in the stream to the file.
+		 * @return the number of tuples written
+		 * **/
 		public void writeStream(String filename) throws Exception {
 			FileOutputStream file = new FileOutputStream(filename);
-			
 			try {
 				boolean doHeader = true;
 				while(source.hasNext()) {
@@ -108,15 +109,13 @@ public class BinaryTupleStream {
 		/**Number of value fields per tuple**/
 		private final int tupleSize;
 
-		private final long size;
-		
 		///Per-line buffers
 		/**Buffer for loading the prefix.*/
 		private final int[] offsets;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
 			input = new FileInputStream(sourcefile).getChannel();
-			size = input.size();
+			long size = input.size();
 			mainBuffer = input.map(FileChannel.MapMode.READ_ONLY, 0, size);
 			
 			this.name = streamName;
@@ -130,9 +129,14 @@ public class BinaryTupleStream {
 
 		@Override
 		public boolean hasNext() {
+//			if (input == null) {System.out.println("Null"); return false;}
+//			if (!input.isOpen()) {System.out.println("Not open"); return false;}
+//			if (!mainBuffer.hasRemaining()) {System.out.println("End of buffer: " + mainBuffer.position() + ", " + size); return false;}
+//			
+//			return true;
 			return input != null
 					&& input.isOpen()
-					&& mainBuffer.position() < size;
+					&& mainBuffer.hasRemaining();
 		}
 
 
@@ -165,6 +169,9 @@ public class BinaryTupleStream {
 		public void remove() {throw new UnsupportedOperationException();}
 	
 	}
+	
+	/**Intentionally left empty, use Reader or Writer instances instead.**/
+	private BinaryTupleStream() {}
 	
 	
 	/**Indicate a stencil an a stream, will load up the stream

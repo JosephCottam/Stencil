@@ -76,6 +76,7 @@ public class SourceListEditor extends JPanel implements ChangeListener, StencilM
 
 		sourceType = new JComboBox();
 		sourceType.addItem(FileSource.NAME);
+		sourceType.addItem(BinarySource.NAME);
 		sourceType.addItem(DBSource.NAME);
 		sourceType.addItem(MouseSource.NAME);
 		sourceType.addItem(TwitterSource.NAME);

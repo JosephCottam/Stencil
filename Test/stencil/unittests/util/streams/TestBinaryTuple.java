@@ -69,27 +69,25 @@ public class TestBinaryTuple extends TestCase {
 	
 	private void testSpeed(DelimitedParser reSource, BinaryTupleStream.Reader binSource){
 		long reStart = System.currentTimeMillis();
-		long reFields=0;
+		int reTuples=0;
 		while (reSource.hasNext()) {
-			Tuple t = reSource.next();
-			reFields += t.size();
+			reSource.next();
+			reTuples++;
 		}
 		long reEnd = System.currentTimeMillis();
 		long reTime = reEnd-reStart;
 		
 		long binStart = System.currentTimeMillis();
-		long binFields=0;
-		int count=0;
+		int binTuples=0;
 		while(binSource.hasNext()) {
-			Tuple t = binSource.next();
-			binFields += t.size();
-			count++;
+			binSource.next();
+			binTuples++;
 		}
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, count);
-		assertEquals(reFields, binFields);
+		System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
+		assertEquals("Unequal tuple count.", reTuples, binTuples);
 		assertTrue("No advantage to binary.", binTime < reTime);
 	}
 	

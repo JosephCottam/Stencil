@@ -32,7 +32,6 @@ public class SequenceSource extends StreamSource {
 		return new SequenceStream(name, start, increment, length);
 	}
 
-	@Override
 	public String header() {return "VALUE";}
 
 	@Override

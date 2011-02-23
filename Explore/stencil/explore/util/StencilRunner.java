@@ -37,8 +37,7 @@ import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
 import stencil.explore.model.Model;
-import stencil.explore.model.sources.FileSource;
-import stencil.explore.model.sources.StreamSource;
+import stencil.explore.model.sources.*;
 import stencil.tuple.TupleStream;
 import stencil.util.streams.ConcurrentStream;
 import stencil.interpreter.tree.Order;
@@ -94,6 +93,7 @@ public final class StencilRunner extends Thread {
 					names = names + " and " + name;
 					StreamSource stream = streamSources.get(name);
 					if (stream instanceof FileSource) {stream=resolvePaths(((FileSource) stream));}
+					if (stream instanceof BinarySource) {stream=resolvePaths(((BinarySource) stream));}
 					input = stream.getStream(model);
 					streams.add(input);
 				}
@@ -105,7 +105,7 @@ public final class StencilRunner extends Thread {
 
 				reporter.addMessage("Starting loading %1$s.", names);
 				loader.load();
-				reporter.addMessage("Finished load of %1$s.", names);
+				reporter.addMessage("Finished load of %1$s (%2$s tuples).", names, loader.getRecordsLoaded());
 				panel.repaint();
 			}
 		} catch (Throwable e) {
@@ -119,7 +119,15 @@ public final class StencilRunner extends Thread {
 	/**Make sure the filename is resolved relative to the working directory.*/
 	private FileSource resolvePaths(FileSource source) {
 		String filename = source.filename();
-		filename =WorkingDir.resolve(filename);
+		filename = WorkingDir.resolve(filename);
+		return source.filename(filename);
+	}
+
+	/**Make sure the filename is resolved relative to the working directory.*/
+	//HACK: Join Binary and File sources in the class heirarchy to remove this method
+	private BinarySource resolvePaths(BinarySource source) {
+		String filename = source.filename();
+		filename = WorkingDir.resolve(filename);
 		return source.filename(filename);
 	}
 

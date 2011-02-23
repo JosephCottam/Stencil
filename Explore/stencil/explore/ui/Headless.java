@@ -36,6 +36,7 @@ import java.util.Collection;
 import static stencil.explore.Application.reporter;
 import stencil.explore.*;
 import stencil.explore.model.Model;
+import stencil.explore.model.sources.BinarySource;
 import stencil.explore.model.sources.FileSource;
 import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
@@ -119,12 +120,15 @@ public class Headless {
 			if (source instanceof FileSource) {
 				source = ((FileSource) source).filename(sourceRewrites[i+1]);
 				sources.add(source);
+			} else if (sourceRewrites[i+1].endsWith(".tuples")){
+				BinarySource newSource = new BinarySource(source.name());
+				newSource = newSource.filename(sourceRewrites[i+1]);
+				sources.add(newSource);
 			} else {
 				FileSource newSource = new FileSource(source.name());
-				newSource.name(source.name());
-				newSource.header(source.header());
-				newSource.filename(sourceRewrites[i+1]);
-				sources.add(source);
+				newSource = newSource.header(null);
+				newSource = newSource.filename(sourceRewrites[i+1]);
+				sources.add(newSource);
 			}
 		}
 		model.setSources(sources);

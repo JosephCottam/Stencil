@@ -1,0 +1,36 @@
+STREAM: Binary
+NAME: NodePositions
+SOURCE: ./vx_cluster_0_8.6_min_cuts.tuples
+STREAM: Binary
+NAME: Attributes
+SOURCE: ./project_troves.tuples
+
+stream NodePositions(ID, X,Y)  /*Precomputed layout*/
+stream Attributes(ID, ATT)		 /*Additional attributes*/
+
+order NodePositions > Attributes 		 /*Load the NodePositions first*/
+
+layer Nodes
+from NodePositions
+	ID: ID
+	(X,Y) : (X,Y)
+	SIZE: 3
+	SHAPE: "RECTANGLE"
+	FILL_COLOR: @Color{GRAY}
+
+layer Overlay
+from Attributes
+	filter (ATT =~ "C|Java|Python")				/*Only continue with specific attributes*/
+	filter (NodesID != NULL) 				/*...and with things in the other layer.*/
+	prefilter(NodesID) :  Nodes.find(ID) -> ID
+
+	ID : ID
+	(X,Y) : Nodes.find(ID) -> (X,Y)
+	SHAPE: "CROSS"
+	SIZE: 3.1
+	FILL_COLOR: Coloring(ATT) -> (C)
+
+operator Coloring(ATT) -> (C)
+	(ATT =~ "Python") => C : @Color{30,100,50}
+	(ATT =~ "Java")   => C : @Color{65,70,135}
+	(ATT =~ "C")      => C : @Color{120,40,80}

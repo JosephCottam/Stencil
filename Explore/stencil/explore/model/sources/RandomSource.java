@@ -31,7 +31,6 @@ public class RandomSource extends StreamSource {
 		return new RandomStream(name, size, length);
 	}
 
-	@Override
 	public String header() {
 		try {
 			return asHeader(getStream(null).getFields());

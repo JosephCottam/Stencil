@@ -101,6 +101,7 @@ public class TupleLoader implements Runnable {
 			panel.processTuple(tuple); 
 			recordsLoaded++;
 		}
+		System.out.println(input.hasNext() + ":"  + keepRunning + ":" + recordsLoaded);
 		state = STATE.STOPPED;
 	}
 

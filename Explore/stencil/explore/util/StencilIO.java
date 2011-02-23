@@ -131,6 +131,7 @@ public abstract class StencilIO {
 		else if (type.equals(WindowStateSource.NAME)) {return new WindowStateSource(name);}
 		else if (type.equals(RandomSource.NAME)) {return new RandomSource(name);}
 		else if (type.equals(SequenceSource.NAME)) {return new SequenceSource(name);}
+		else if (type.equals(BinarySource.NAME)) {return new BinarySource(name);}
 		
 		throw new RuntimeException("Could not find source mapping for " + type);
 	}
