@@ -131,12 +131,26 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		else {addMessage(message, true);}
 	}
 
+	
+	private class MessageUpdate implements Runnable {
+		private final String message;
+		private final boolean error;
+		
+		public MessageUpdate(String message, boolean error) {
+			this.message = message.trim();
+			this.error = error;
+		}
+		
+		public void run() {
+			Entry e = new Entry(message, error);
+			((DefaultListModel) messages.getModel()).addElement(e);
+			if (error) {System.err.println(message);}
+			else {System.out.println(message);}			
+		}
+		
+	}
+	
 	protected synchronized void addMessage(String message, boolean error) {
-		message = message.trim();
-
-		Entry e = new Entry(message, error);
-		((DefaultListModel) messages.getModel()).addElement(e);
-		if (error) {System.err.println(message);}
-		else {System.out.println(message);}
+		javax.swing.SwingUtilities.invokeLater(new MessageUpdate(message, error));
 	}
 }
