@@ -141,6 +141,12 @@ public class Axis extends Guide2D {
 
 	public AXIS getAxis() {return axis;} 
 	
+	/**
+	 * @param elements The values to be represented on the guide.   
+	 * 		           Each tuple must be at least a pair with input and output.
+	 *                 Tuples MAY contain other formatting information 
+	 * @param targetBounds the bounds of the layer the guide is applied to
+	 */
 	public synchronized void setElements(List<Tuple> elements, Rectangle2D targetBounds) {
 		marks.clear();
 		

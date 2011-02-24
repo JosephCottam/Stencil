@@ -1,10 +1,10 @@
 package stencil.interpreter.tree;
 
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.display.Display;
 import stencil.display.DisplayGuide;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.Viewpoint;
@@ -46,7 +46,8 @@ public class Guide implements Viewpoint<Guide> {
 	
 	public TuplePrototype resultsPrototype() {return rules.prototype();}
 
-	public void update(DisplayGuide guide) {
+	//TODO: Allow something other than canvas to be passed...when guides can be declared on layers or views
+	public void update(DisplayGuide guide, Rectangle2D bounds) {
 		assert guide != null : "Null guide passed.";
 		
 		List<Tuple> sample, projection, results;
@@ -66,11 +67,7 @@ public class Guide implements Viewpoint<Guide> {
 		try {results = processAll(projection, rules);}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 
-		//TODO: Make this get something other than canvas...when guides can be declared on layers or views
-		//TODO: Fix the object creation order so the canvas exists before the updater is started
-		if (Display.canvas != null) {
-			guide.setElements(results, Display.canvas.getComponent().getContentBounds(false));
-		}
+		guide.setElements(results, bounds);
 	}
 
 	private static List<Tuple> processAll(List<Tuple> sources, Rule rule) throws Exception {

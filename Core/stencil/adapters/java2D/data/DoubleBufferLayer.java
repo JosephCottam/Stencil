@@ -45,7 +45,8 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private List<Glyph2D> store = new ArrayList();
 
 	private Map<String, Integer> updateIndex = new HashMap();
-	private Map<String, DynamicEntry> updateSources = new HashMap();	
+	private Map<String, DynamicEntry> updateSources = new HashMap();
+	private Rectangle2D updateBounds = null;						//The bounds of the update.   Includes both the original and new if the update modified an existing thing
 	private List<Glyph2D> update = new ArrayList();
 	
 	
@@ -165,16 +166,26 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	/**Directly change a single glyph in the tenured collection.*/
 	private void directUpdate(String id, Glyph2D glyph) {
 		Integer storeIDX = index.get(id);
+		
 		if (glyph == DELETE && storeIDX != null) {
+			updateUpdateBounds(store.get(storeIDX).getBoundsReference());
 			store.set(storeIDX, DELETE); //HACK: Causes an index leak (in the long run, a very slow memory leak)
 			index.remove(id);
-			} else if (storeIDX != null) {
+		} else if (storeIDX != null) {
+			updateUpdateBounds(store.get(storeIDX).getBoundsReference());
+			updateUpdateBounds(glyph.getBoundsReference());
 			store.set(storeIDX, glyph);
 		} else {
+			updateUpdateBounds(glyph.getBoundsReference());
 			store.add(glyph);
 			storeIDX = store.size()-1;
 			index.put(id, storeIDX);
 		}
+	}
+	
+	private void updateUpdateBounds(Rectangle2D r) {
+		if (updateBounds == null) {updateBounds = r.getBounds2D();}
+		updateBounds.add(r);
 	}
 	
 	/**For internal use only.
@@ -285,7 +296,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		public String getLayerName() {return name;}
 		public int size() {return index.size();}
 	}
-	
+		
 	protected void updateStateID() {stateID++;} //Occasional missed updates are OK
 	public int getStateID() {return stateID;}
 	
