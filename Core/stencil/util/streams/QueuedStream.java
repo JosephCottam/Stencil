@@ -14,19 +14,20 @@ import stencil.tuple.TupleStream;
  *
  */
 public class QueuedStream implements TupleStream {
+	public static final boolean THREAD = false;
+	
 	/**Tagging interface, indicates to the Stencil runtime that queuing is permitted.**/
 	public static interface Queable {}
 	
 	private final class QueueLoader implements Runnable {
 		public void run() {
 			while (source!= null && source.hasNext()) {
-				if (tupleCache.size() < prefetchSize/2) {
-					loadQueue();
-				} else {
-					synchronized(tupleCache) {
-						try {tupleCache.wait();}
-						catch (InterruptedException e) {}
+				synchronized(tupleCache) {
+					if (tupleCache.size() < prefetchSize/2) {
+						loadQueue();
 					}
+					try {tupleCache.wait();}
+					catch (InterruptedException e) {}
 				}
 			}
 		}
@@ -40,10 +41,21 @@ public class QueuedStream implements TupleStream {
 	/**Prefetched tuples**/
 	private Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
 	
-	public QueuedStream(TupleStream source, int prefetch) {
+	private final Thread loader;
+	
+	public QueuedStream(TupleStream source, int prefetch, boolean thread) {
 		this.source = source;
 		this.prefetchSize = prefetch;
+		if (thread) {
+			loader = new Thread(new QueueLoader());
+			loader.start();
+		} else {
+			loader = null;
+		}
+		
 	}
+
+	public QueuedStream(TupleStream source, int prefetch) {this(source, prefetch, THREAD);}
 	
 	@Override
 	public boolean hasNext() {return !tupleCache.isEmpty() || source.hasNext();}
@@ -51,6 +63,7 @@ public class QueuedStream implements TupleStream {
 	@Override
 	public SourcedTuple next() {
 		if (tupleCache.isEmpty()) {loadQueue();}
+		if (tupleCache.size() < prefetchSize/2) {synchronized(tupleCache) {tupleCache.notify();}}
 		return tupleCache.poll();
 	}
 
