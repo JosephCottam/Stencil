@@ -52,7 +52,7 @@ import stencil.interpreter.tree.*;
 
 /**Some of this is derived from Prefuse's display and related objects.*/
 
-public final class Canvas extends DisplayCanvas {	
+public final class Canvas extends DisplayCanvas {
 	private BufferedImage buffer;
 	
 	private AffineTransform viewTransform = new AffineTransform();

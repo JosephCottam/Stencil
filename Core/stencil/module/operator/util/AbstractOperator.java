@@ -37,11 +37,12 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		
 		/**Default viewpoint creation is to just clone the underlying operator.
 		 * This is sufficient, provided the referenced object and everything it transitively refers to is immutable.
-		 * Otherwise, viewPoint must be implemented by the implementing class.
+		 * Otherwise, viewpoint must be implemented by the implementing class.
 		 **/
-		public Statefull viewPoint() {
+		@Override
+		public Statefull viewpoint() {
 			try {return (Statefull) this.clone();}
-			catch (Exception e) {throw new RuntimeException("Error creating viewPoint.", e);}
+			catch (Exception e) {throw new RuntimeException("Error creating viewpoint.", e);}
 		}
 	}
 	

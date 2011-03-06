@@ -40,6 +40,12 @@ import static stencil.display.LayerView.DynamicEntry;
 public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	private static final String PROTOTYPE_ID = "PROTOTYPE ID -- IF YOU EVER READ THIS IN OUTPUT, ITS PROBABLY AN ERROR.";
 	
+	/**Lock around updates to the tenured generation store.  
+	 * Any calls that modify the tenured generation should be protected by this lock.
+	 * Batch updates should acquire this lock before any updates and release it after all updates.
+	 */
+	private final Object TENURED_UPDATE_LOCK = new Object(); 
+	
 	private Map<Object, Integer> index = new HashMap();
 	private Map<String, DynamicEntry> sourceData = new HashMap();
 	private List<Glyph2D> store = new ArrayList();
@@ -145,10 +151,12 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 */
 	public synchronized StoreView changeGenerations() {
 		// merge generations across
-		for (String id: updateIndex.keySet()) {
-			int updateIDX = updateIndex.get(id);
-			Glyph2D value = update.get(updateIDX);
-			directUpdate(id, value);
+		synchronized(TENURED_UPDATE_LOCK){
+			for (String id: updateIndex.keySet()) {
+				int updateIDX = updateIndex.get(id);
+				Glyph2D value = update.get(updateIDX);
+				directUpdate(id, value);
+			}
 		}
 	
 		sourceData.putAll(updateSources);
@@ -198,16 +206,18 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 * @param glyph
 	 */
 	public void directUpdate(List<Tuple> updates) {
-		for (Tuple update: updates) {
-			assert update.getPrototype().get(0).getFieldName().equals("ID");
-
-			T glyph = (T) find((String) update.get(0));
-			T newGlyph = (T) glyph.update(update);
-			String id = glyph.getID();
-			if (glyph != newGlyph) {directUpdate(id, newGlyph);}
+		synchronized (TENURED_UPDATE_LOCK) {
+			for (Tuple update: updates) {
+				assert update.getPrototype().get(0).getFieldName().equals("ID");
+	
+				T glyph = (T) find((String) update.get(0));
+				T newGlyph = (T) glyph.update(update);
+				String id = glyph.getID();
+				if (glyph != newGlyph) {directUpdate(id, newGlyph);}
+			}
+			storeStateID++;
+			stateID++;
 		}
-		storeStateID++;
-		stateID++;
 	}
 
 	public void addDynamic(int groupID, T target, Tuple sourceData) {

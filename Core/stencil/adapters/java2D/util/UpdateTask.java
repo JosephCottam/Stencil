@@ -18,7 +18,7 @@ public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Fin
 	 * This should correspond to the original fragment in some meaningful way
 	 * (they usually have the same path in their respective trees).
 	 */
-	protected T viewPointFragment;
+	protected T viewpointFragment;
 	
 	protected final T original;
 	
@@ -37,8 +37,8 @@ public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Fin
 
 	/**Set the core stencil fragment that will be executed in this update.
 	 * For example, in a dynamic update, this is a derivative of the dynamically bound rule.*/
-	public void viewPoint() {
-		viewPointFragment = original.viewpoint(); 
+	public void viewpoint() {
+		viewpointFragment = original.viewpoint(); 
 	}
 	
 	/**Run this updater if required.

@@ -10,7 +10,16 @@ import stencil.interpreter.tree.Selector;
 
 /**What should a canvas component be able to do?*/
 public abstract class DisplayCanvas extends JComponent {
-
+	/**Instance lock.  Used to prevent pre-paint/analysis concurrency issues.
+	 * If required concurrently with other locks, locking order is render then vis.
+	 **/
+	public final Object visLock = new Object(); 
+	
+	/**Instance lock.  Used to prevent multiple renderings (including the pre-render tasks) from concurrently running.
+	 * If required concurrently with other locks, locking order is render then vis.
+	 */
+	public final Object renderLock = new Object(); 
+	
 	public abstract DisplayGuide getGuide(Selector sel);
 	public abstract void addGuide(Selector sel, Guide2D guide);
 	public abstract boolean hasGuide(Selector sel);

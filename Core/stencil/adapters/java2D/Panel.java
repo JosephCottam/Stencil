@@ -92,7 +92,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
 	public void export(String filename, String type, Object info) throws Exception {
-		synchronized(canvas) {
+		synchronized(canvas.renderLock) {
 			painter.doUpdates();
 			
 			if (type.equals("PNG") || type.equals("RASTER")) {
@@ -162,7 +162,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
 		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
 		
-		MultiThreadPainter exportPainter = new MultiThreadPainter(canvas, canvas.layers, visLock, program);
+		MultiThreadPainter exportPainter = new MultiThreadPainter(canvas, canvas.layers, program);
 		exportPainter.render(canvas.getBackground(), buffer, exportViewTransform);
 
 		ImageIO.write(buffer, "png", new java.io.File(filename));

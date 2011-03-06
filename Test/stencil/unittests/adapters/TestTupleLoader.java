@@ -33,7 +33,7 @@ public class TestTupleLoader extends StencilTestCase {
 		loader.load();
 
 		
-		synchronized(panel.visLock) {
+		synchronized(panel.getCanvas().getComponent().visLock) {
 			((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
 			assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").getView().size());
 		}

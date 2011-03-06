@@ -30,7 +30,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 		panel= adapter.generate(program);
 		DisplayLayer layer = panel.getLayer("Layer1");
 
-		synchronized(panel.visLock) {
+		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i<TUPLE_COUNT; i++) {
 				Tuple values = new PrototypedTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
 				layer.make(values);
@@ -46,7 +46,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 
 		DisplayLayer layer = panel.getLayer("Layer1");
 
-		synchronized(panel.visLock) {
+		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i<TUPLE_COUNT; i++) {
 				String id = Integer.toString(i);
 				assertEquals(i, layer.getView().size());
@@ -82,7 +82,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 
 		assertEquals(layer.getView().size(), TUPLE_COUNT);
 		
-		synchronized(panel.visLock) {
+		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i< TUPLE_COUNT; i++) {
 				Glyph source = layer.find(Integer.toString(i));
 				try {

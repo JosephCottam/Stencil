@@ -20,7 +20,7 @@ public class GuideTask extends UpdateTask<Guide> {
 
 	public Finisher update() {
 		DisplayGuide guide = canvas.getGuide(selector);
-		viewPointFragment.update(guide, canvas.getContentBounds(false));
+		viewpointFragment.update(guide, canvas.getContentBounds(false));
 		return UpdateTask.NO_WORK;
 	}
 	

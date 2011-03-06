@@ -60,8 +60,8 @@ public class DynamicRule implements Viewpoint<DynamicRule> {
 	}	
 	
 	public DynamicRule viewpoint() {
-		Rule rule = this.rule.viewpoint();
-		StateQuery query = this.query.viewpoint();
-		return new DynamicRule(layerName, groupID, rule, query);
+		Rule ruleVP = this.rule.viewpoint();
+		StateQuery queryVP= this.query.viewpoint();
+		return new DynamicRule(layerName, groupID, ruleVP, queryVP);
 	}
 }

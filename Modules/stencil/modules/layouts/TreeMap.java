@@ -116,7 +116,8 @@ public class TreeMap extends Layout {
 		return candidate.getMapItem();
 	}
 	
-	public TreeMap viewPoint() {
-		return (TreeMap) super.viewPoint();
+	@Override
+	public TreeMap viewpoint() {
+		return (TreeMap) super.viewpoint();
 	}
 }

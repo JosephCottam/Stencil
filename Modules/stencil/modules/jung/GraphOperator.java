@@ -130,9 +130,10 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 			return stateID;
 		}
 		
-		public StepOperator viewPoint() {
+		@Override
+		public StepOperator viewpoint() {
 			if (layout == null) {resetLayout();}
-			return (StepOperator) super.viewPoint();
+			return (StepOperator) super.viewpoint();
 		}
 	}
 

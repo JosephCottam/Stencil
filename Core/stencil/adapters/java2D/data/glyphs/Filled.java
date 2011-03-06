@@ -80,7 +80,7 @@ public abstract class Filled extends Stroked {
 		if (!ColorCache.isTransparent(fill)) {
 			g.setPaint(fill);
 			g.fill(s);
-		}
+		} 
 		super.render(g, s);
 	}
 }

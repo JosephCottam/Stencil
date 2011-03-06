@@ -20,13 +20,11 @@ public final class PainterThread implements Runnable {
 
 	private final Canvas target;
 	
-	private final BufferedImage[] buffers = new BufferedImage[2];
-	private int nextBuffer =0; 
 	protected volatile boolean keepRunning = true;
 	
 	public PainterThread(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
 		this.target = target;
-		this.painter = new MultiThreadPainter(target, layers, panel.visLock, panel.getProgram());
+		this.painter = new MultiThreadPainter(target, layers, panel.getProgram());
 	}
 
 	public synchronized void finalize() {painter.signalShutdown();}
@@ -55,7 +53,6 @@ public final class PainterThread implements Runnable {
 		
 		BufferedImage i = selfBuffer();
 		target.setBackBuffer(i);
-		updateNextBuffer();
 	}
 
 	
@@ -63,28 +60,20 @@ public final class PainterThread implements Runnable {
 		Rectangle size;
 		Color background;
 		AffineTransform viewTransform;
-		
+
+		painter.doUpdates();
+
 		//Gather info in a thread-safe manner
-		synchronized(target) {
+		synchronized(target.visLock) {
 			size = target.getBounds();
 			background = target.getBackground();
-			viewTransform = target.getViewTransform();
+			viewTransform = target.getViewTransform();			
 		}
-			
-		painter.doUpdates();
-			
-		BufferedImage buffer = buffers[nextBuffer];
-			
+
+		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 			
-		//Ensure that the buffer is the 'right' size
-		if (buffer == null ||
-			buffer.getWidth() != size.width ||
-			buffer.getHeight() != size.height) 
-		{
-			buffers[nextBuffer] = newBuffer(target, size.width, size.height);
-			buffer= buffers[nextBuffer];
-		}
+		BufferedImage buffer = newBuffer(target, size.width, size.height);
 	
 		try {
 			painter.render(background, buffer, viewTransform);
@@ -120,9 +109,7 @@ public final class PainterThread implements Runnable {
         }
         return img;
     }
-	
-	private void updateNextBuffer() {nextBuffer = (nextBuffer+1)%(buffers.length);}
-	
+		
 	public void doUpdates() {painter.doUpdates();}
 }
 

@@ -31,7 +31,6 @@ package stencil.display;
 
 import java.awt.BorderLayout;
 import java.awt.LayoutManager;
-import java.awt.Component;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -50,10 +49,7 @@ import stencil.tuple.Tuple;
  * L -- The layer type
  * C -- The canvas type
  * */
-public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C extends Component> extends javax.swing.JPanel {
-	/**Instance lock.  Used to prevent pre-paint/analysis concurrency issues.*/
-	public final Object visLock = new Object(); 
-	
+public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C extends DisplayCanvas> extends javax.swing.JPanel {
 	/**Set flag to true when default interaction states are desired.
 	 * Set to false when all interaction should be handled in stencil rules.
 	 * Default state is true.
@@ -188,7 +184,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * to add values to a visualization. 
 	 */
 	public final void processTuple(SourcedTuple source) throws Exception {
-		synchronized(visLock) {interpreter.processTuple(source);}
+		synchronized(canvas.visLock) {interpreter.processTuple(source);}
 	}
 	
 	/**Actions that must be taken before the run will be valid.*/
