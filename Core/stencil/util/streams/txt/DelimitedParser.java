@@ -36,10 +36,10 @@ import java.util.NoSuchElementException;
 import java.util.regex.*;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
 import static java.lang.String.format;

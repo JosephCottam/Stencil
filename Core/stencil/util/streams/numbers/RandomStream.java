@@ -8,11 +8,11 @@ import java.util.NoSuchElementException;
 import java.util.List;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.tuple.stream.TupleStream;
 
 public class RandomStream implements TupleStream {
 	private final long length; //How many tuples to produce

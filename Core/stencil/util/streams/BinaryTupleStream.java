@@ -5,8 +5,8 @@ import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
 
 import java.nio.*;

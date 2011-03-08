@@ -39,7 +39,7 @@ import static stencil.explore.Application.reporter;
 import stencil.explore.Application;
 import stencil.explore.model.Model;
 import stencil.explore.model.sources.*;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ConcurrentStream;
 import stencil.util.streams.QueuedStream;
 import stencil.interpreter.tree.Order;

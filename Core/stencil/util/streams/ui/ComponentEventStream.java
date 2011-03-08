@@ -10,10 +10,10 @@ import javax.swing.JComponent;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
-import stencil.tuple.TupleStream;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.stream.TupleStream;
 
 public final class ComponentEventStream implements TupleStream {
 	protected static final String X_FIELD = "X";

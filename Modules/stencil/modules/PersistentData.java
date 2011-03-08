@@ -37,6 +37,36 @@ public class PersistentData extends BasicModule {
 		public Object query(int inIndex) {return out[inIndex];}
 	}
 	
+	@Operator
+	@Description("A mutable list.  Can add, remove and query based on indices. (Can hold null, so remove must be done explicitly).")
+	public static final class List extends AbstractOperator.Statefull {
+		private TreePVector list = TreePVector.empty();
+		public  List(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="WRITER", prototype="(value)")
+		@Description("Add an element to the list at the given index.  If index <0, it is added to the end.  Returns the added value.")
+		public Object map(int index, Object value) {
+			if (index < 0) {list = list.plus(value);}
+			else {list = list.plus(index, value);}
+			return value;
+		}
+		
+		@Facet(memUse="WRITER", prototype="(value)")
+		@Description("Removes the element at the given index.  Returns the element removed.")
+		public Object remove(int index) {
+			Object rv = list.get(index);
+			list = list.minus(index);
+			return rv;
+		}
+		
+		@Facet(memUse="READER", prototype="(value)")
+		@Description("Returns the value at the given index.")
+		public Object query(int index) {return list.get(index);}
+		
+		@Facet(memUse="READER", prototype="(size)")
+		public int size() {return list.size();}
+	}
+	
 	@Operator()
 	@Description("Dictionary for key/value pairs.  The specializer determines how many of the passed values are the key and how many are the values. Retrieval by key yields a tuple with just the values.")
 	public static class Dict extends AbstractOperator.Statefull {		

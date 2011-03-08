@@ -90,6 +90,7 @@ public final class MultiThreadPainter {
 			public BufferedImage call() {
 				if (!updateRequired()) {return buffer;}
 				LayerView<Glyph2D> view = layer.getView();
+
 				
 				for (Glyph2D glyph: view.renderOrder()) {
 					if (!glyph.isVisible()) {continue;}
@@ -254,6 +255,7 @@ public final class MultiThreadPainter {
 				
 				executeAll(dynamicUpdaters.values());
 				executeAll(guideUpdaters);
+				
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error running asynchronous updates.", e);

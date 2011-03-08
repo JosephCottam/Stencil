@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
 /**Converts a query and connect string to a stream of tuples.

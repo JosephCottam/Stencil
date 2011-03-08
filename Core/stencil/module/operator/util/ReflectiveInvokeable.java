@@ -58,7 +58,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	public T getTarget() {return target;}
 	public Method getMethod() {return method;}
 	
-	
+	@Override
 	public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {
 		R result = invoke(arguments);
 		Tuple t=null;
@@ -67,6 +67,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return t;
 	}
 	
+	@Override
 	public R invoke(Object[] arguments) throws MethodInvokeFailedException {
 		int expectedNumArgs = paramTypes.length;
 		boolean isVarArgs =method.isVarArgs();
@@ -162,6 +163,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return result;
 	}
 	
+	@Override
 	public ReflectiveInvokeable viewpoint() {
 		if (target == null) {return this;}
 		if (Viewpoint.class.isInstance(target)) {
@@ -170,6 +172,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			throw new RuntimeException("Attempt to viewpoint invokeable on instance of class " + target.getClass().getSimpleName());
 		}
 	}
+	
 	@Override
 	public String targetIdentifier() {
 		if (target != null &&  target instanceof StencilOperator) {return ((StencilOperator) target).getName();}

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import stencil.tuple.stream.InvalidTupleException;
+
 final class StrictChannel implements NextChannel {
 	/**How far ahead can the parser read attempting to verify structure?*/
 	public static final int READ_AHEAD_LIMIT = 1000;
@@ -49,7 +51,7 @@ final class StrictChannel implements NextChannel {
 		else {values = splitter.split(line);}
 		
 		if (values.length != labels.size()) {
-			throw new InvalidInputLineException("Could not treat line as full tuple: '"+ line + "'");
+			throw new InvalidTupleException("Could not treat line as full tuple: '"+ line + "'");
 		}
 		return values;
 	}

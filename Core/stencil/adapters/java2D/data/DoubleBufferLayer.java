@@ -205,7 +205,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 * 
 	 * @param glyph
 	 */
-	public void directUpdate(List<Tuple> updates) {
+	public synchronized void directUpdate(List<Tuple> updates) {
 		synchronized (TENURED_UPDATE_LOCK) {
 			for (Tuple update: updates) {
 				assert update.getPrototype().get(0).getFieldName().equals("ID");

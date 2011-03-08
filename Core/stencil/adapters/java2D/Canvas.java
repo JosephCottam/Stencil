@@ -53,7 +53,7 @@ import stencil.interpreter.tree.*;
 /**Some of this is derived from Prefuse's display and related objects.*/
 
 public final class Canvas extends DisplayCanvas {
-	private BufferedImage buffer;
+	private volatile BufferedImage buffer;
 	
 	private AffineTransform viewTransform = new AffineTransform();
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
@@ -78,11 +78,11 @@ public final class Canvas extends DisplayCanvas {
 		setOpaque(true);
 	}
 	
-	public synchronized void paintComponent(Graphics g) {
+	public void paintComponent(Graphics g) {
 		g.drawImage(buffer, 0, 0, null);
 	}
 	
-	public synchronized void setBackBuffer(BufferedImage i) {
+	public void setBackBuffer(BufferedImage i) {
 		this.buffer = i;
 		this.repaint();
 	}

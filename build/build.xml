@@ -108,6 +108,9 @@
         />          
     </target>
  	
+    <target name="Jar" depends="">
+        <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
+    </target> 
  	
  	<target name="Release" depends="Stencil">
  		<ant antfile="./build/Deploy.xml" inheritRefs="true"/>

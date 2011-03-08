@@ -37,10 +37,10 @@ import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Text;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.stream.TupleStream;
 
 
 public final class TextSource extends StreamSource {

@@ -34,7 +34,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.Mouse;
 import stencil.explore.ui.components.sources.SourceEditor;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ui.MouseStream;
 
 public class MouseSource extends StreamSource {

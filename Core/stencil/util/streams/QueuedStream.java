@@ -4,7 +4,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 
 /**Performs caching for tuple streams.  
  * Will return tuples in the same order as they are produced but performs bulk collection of tuples
@@ -14,7 +14,7 @@ import stencil.tuple.TupleStream;
  *
  */
 public class QueuedStream implements TupleStream {
-	public static final boolean THREAD = true;			//TODO: add a switch for this in the configuration file
+	public static boolean THREAD = false;			//TODO: add a switch for this in the configuration file
 	
 	/**Tagging interface, indicates to the Stencil runtime that queuing is permitted.**/
 	public static interface Queable {}

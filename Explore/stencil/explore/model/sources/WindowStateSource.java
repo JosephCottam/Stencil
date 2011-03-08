@@ -6,7 +6,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.WindowState;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ui.ComponentEventStream;
 
 public class WindowStateSource extends StreamSource {

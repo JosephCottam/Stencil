@@ -13,7 +13,7 @@ options {
    *  with the values.  This is one step towards making all tuple
    *  references numeric at runtime.
    *
-   *  Semanticall ALL retrieves a tuple from the runtime as a tuple.  
+   *  Semantically ALL retrieves a tuple from the runtime as a tuple.  
    *  Whereas LAST refers to just the values in the tuple.  
    *  Therefore, LAST can be replaced with a call to ToArray(ALL).
    *

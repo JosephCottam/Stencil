@@ -20,7 +20,7 @@ public class ReflectiveInvoke {
 			target.add();
 		}
 		long end = System.nanoTime();
-		System.out.printf("%1$d\t\tDirect invoke, no arguments\n", (end-start)/reps);	
+		System.out.printf("%1$d ns\t\tDirect invoke, no arguments\n", (end-start)/reps);	
 		
 		
 		Method m = target.getClass().getMethod("add");
@@ -29,7 +29,7 @@ public class ReflectiveInvoke {
 			m.invoke(target);
 		}
 		end = System.nanoTime();
-		System.out.printf("%1$s\t\tReflect invoke, no arguments\n", (end-start)/reps);	
+		System.out.printf("%1$d ns\t\tReflect invoke, no arguments\n", (end-start)/reps);	
 
 
 		start = System.nanoTime();
@@ -37,7 +37,7 @@ public class ReflectiveInvoke {
 			target.add(1,2,3,4);
 		}
 		end = System.nanoTime();
-		System.out.printf("%1$d\t\tDirect invoke, 4 arguments\n", (end-start)/reps);	
+		System.out.printf("%1$d ns\t\tDirect invoke, 4 arguments\n", (end-start)/reps);	
 		
 		m = target.getClass().getMethod("add", int[].class);
 		start = System.nanoTime();
@@ -46,7 +46,7 @@ public class ReflectiveInvoke {
 			m.invoke(target, args);
 		}
 		end = System.nanoTime();
-		System.out.printf("%1$s\t\tReflect invoke, 4 arguments no packing\n", (end-start)/reps);	
+		System.out.printf("%1$d ns\t\tReflect invoke, 4 arguments no packing\n", (end-start)/reps);	
 		
 		m = target.getClass().getMethod("add", int[].class);
 		start = System.nanoTime();
@@ -55,7 +55,7 @@ public class ReflectiveInvoke {
 			m.invoke(target, args);
 		}
 		end = System.nanoTime();
-		System.out.printf("%1$s\t\tReflect invoke, 4 arguments, packing\n", (end-start)/reps);	
+		System.out.printf("%1$d ns\t\tReflect invoke, 4 arguments, packing\n", (end-start)/reps);	
 		
 	}
 	

@@ -34,7 +34,7 @@ import java.io.IOException;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.File;
 import stencil.explore.ui.components.sources.SourceEditor;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 
 public final class FileSource extends StreamSource {

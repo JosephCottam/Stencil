@@ -33,10 +33,10 @@ import javax.swing.JComponent;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
-import stencil.tuple.TupleStream;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.stream.TupleStream;
 
 import java.io.DataInputStream;
 import java.io.InputStream;

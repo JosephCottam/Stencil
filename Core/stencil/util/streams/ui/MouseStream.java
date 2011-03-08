@@ -36,10 +36,10 @@ import java.awt.geom.Point2D;
 import stencil.display.Display;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleStream;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.enums.EnumUtils;
 
 /**A way to track the mouse position/state at all points in time.

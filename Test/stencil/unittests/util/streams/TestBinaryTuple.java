@@ -3,7 +3,7 @@ package stencil.unittests.util.streams;
 import java.io.File;
 
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.BinaryTupleStream;
 import stencil.util.streams.QueuedStream;
 import stencil.util.streams.txt.DelimitedParser;

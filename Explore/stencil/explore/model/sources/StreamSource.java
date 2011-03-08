@@ -32,7 +32,7 @@ package stencil.explore.model.sources;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.SourceEditor;
 

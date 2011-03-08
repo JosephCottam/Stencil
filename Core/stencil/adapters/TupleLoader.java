@@ -30,8 +30,8 @@ package stencil.adapters;
 
 import stencil.display.StencilPanel;
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
-import stencil.util.streams.txt.InvalidInputLineException;
+import stencil.tuple.stream.InvalidTupleException;
+import stencil.tuple.stream.TupleStream;
 
 /**Load tuples from a stream source into the program
  * via the application engine.
@@ -93,7 +93,7 @@ public class TupleLoader implements Runnable {
 		while(input.hasNext() && keepRunning) {
 			SourcedTuple tuple;
 			try {tuple = input.next();}
-			catch (InvalidInputLineException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
+			catch (InvalidTupleException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
 
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
 			panel.processTuple(tuple); 

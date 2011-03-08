@@ -29,7 +29,7 @@
 package stencil.util.streams;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 
 import java.util.Arrays;
 import java.util.List;

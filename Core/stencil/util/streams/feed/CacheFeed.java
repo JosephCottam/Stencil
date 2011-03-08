@@ -7,7 +7,7 @@ import java.util.Queue;
 
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.TupleStream;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.collections.ConditionSet;
 
 public abstract class CacheFeed<T> implements TupleStream {
