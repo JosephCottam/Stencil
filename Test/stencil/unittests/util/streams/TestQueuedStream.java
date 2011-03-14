@@ -14,15 +14,15 @@ public class TestQueuedStream extends TestCase {
 		
 	public void testContentMatchThread() throws Exception {
 		QueuedStream.THREAD = true;
-		contentMatch();
+		contentMatch(true);
 	}
 	
 	public void testContentMatchUnthreaded() throws Exception {
 		QueuedStream.THREAD = false;
-		contentMatch();
+		contentMatch(false);
 	}
 	
-	private void contentMatch() throws Exception {
+	private void contentMatch(boolean pollNull) throws Exception {
 		TupleStream queued = new QueuedStream(binaryTrovesStream(), 100);
 		TupleStream unqueued = binaryTrovesStream();
 
@@ -31,8 +31,9 @@ public class TestQueuedStream extends TestCase {
 		
 		int n=0;
 		while(queued.hasNext() && unqueued.hasNext()) {
-			Tuple q = queued.next();
-			Tuple u = unqueued.next();
+			Tuple q,u;
+			do {q = queued.next();} while (pollNull && q==null);
+			do {u = unqueued.next();} while (pollNull && u==null);
 			assertEquals("Tuple " + n + " did not match", u,q);
 			n++;
 		}
