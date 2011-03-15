@@ -168,7 +168,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		updateIndex.clear();
 		update.clear();
 		
-		return getView();
+		return viewpoint();
 	}
 	
 	/**Directly change a single glyph in the tenured collection.*/
@@ -223,9 +223,15 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	public void addDynamic(int groupID, T target, Tuple sourceData) {
 		updateSources.put(target.getID(), new DynamicEntry(groupID, sourceData));
 	}
+
 	
-	public StoreView getView() {
-		return new StoreView(storeStateID);
+	private StoreView cachedView;
+	@Override
+	public StoreView viewpoint() {
+		if (cachedView == null || cachedView.creationGeneration !=storeStateID) {
+			cachedView = new StoreView(storeStateID);
+		}
+		return cachedView;
 	}
 
 	protected static final Comparator<Glyph2D> Z_SORTER = new Comparator<Glyph2D>() {
@@ -264,11 +270,13 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		
 		public StoreView(int generation) {creationGeneration = generation;}
 		
+		@Override
 		public Iterator iterator() {
 			if (storeStateID != creationGeneration) {throw new ConcurrentModificationException();}
 			return store.iterator();
 		}
 		
+		@Override
 		public Collection renderOrder() {
 			if (sortZ) {
 				ArrayList sorted = new ArrayList();
@@ -280,6 +288,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			}
 		}
 
+		@Override
 		public Rectangle getBoundsReference() {
 			if (bounds.isEmpty() && store.size() >0) {
 				bounds.setRect(store.get(0).getBoundsReference());
@@ -290,6 +299,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			return bounds;
 		}
 		
+		@Override
 		public T find(String id) {
 			if (storeStateID != creationGeneration) {throw new ConcurrentModificationException();}
 
@@ -301,9 +311,16 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 			return g;
 		}
 		
+		@Override
 		public Map<String, DynamicEntry> getSourceData() {return sourceData;}
+
+		@Override
 		public int getStateID() {return creationGeneration;}
+		
+		@Override
 		public String getLayerName() {return name;}
+
+		@Override
 		public int size() {return index.size();}
 	}
 		

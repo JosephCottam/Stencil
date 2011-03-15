@@ -69,7 +69,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
-	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.getView());}
+	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.viewpoint());}
 	
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 	

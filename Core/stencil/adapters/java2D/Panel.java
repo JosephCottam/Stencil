@@ -114,7 +114,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		AffineTransform base = g.getTransform();
 		
 		for (DisplayLayer<? extends Glyph2D> layer: canvas.layers) {
-			for (Glyph2D glyph: layer.getView().renderOrder()) {
+			for (Glyph2D glyph: layer.viewpoint().renderOrder()) {
 				if (!glyph.isVisible()) {continue;}
 				Rectangle2D r = glyph.getBoundsReference();
 				if (g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {

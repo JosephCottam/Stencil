@@ -22,7 +22,7 @@ public final class LayerSampler implements SampleOperator {
 		public SeedOperator(DisplayLayer l) {this(l, false);}
 		private SeedOperator(DisplayLayer l, boolean viewpoint) {
 			layer = l;
-			view = viewpoint ? l.getView() : null;
+			view = viewpoint ? l.viewpoint() : null;
 		}
 		
 		public TuplePrototype getSamplePrototype() {return layer.getPrototype();}
@@ -38,7 +38,7 @@ public final class LayerSampler implements SampleOperator {
 	public LayerSampler(DisplayLayer layer) {this.layer = layer;}
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		List<Tuple> l = new ArrayList();
-		for (Glyph t: getDisplayLayer().getView()) {l.add(t);}
+		for (Glyph t: getDisplayLayer().viewpoint()) {l.add(t);}
 		return l;
 	}
 	public final DisplayLayer<Glyph> getDisplayLayer() {return layer;}

@@ -99,9 +99,9 @@ public final class Canvas extends DisplayCanvas {
 	 */
 	public Rectangle getContentBounds(boolean includeGuides) {
 		if (layers.length == 0) {return new Rectangle(0,0,0,0);}
-		final Rectangle2D bounds = new Rectangle(layers[0].getView().getBoundsReference());
+		final Rectangle2D bounds = new Rectangle(layers[0].viewpoint().getBoundsReference());
 		for (DisplayLayer<? extends Glyph2D> l: layers) {
-			bounds.add(l.getView().getBoundsReference());
+			bounds.add(l.viewpoint().getBoundsReference());
 		}
 		
 		if (includeGuides) {

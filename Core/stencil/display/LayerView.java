@@ -16,7 +16,7 @@ import stencil.tuple.Tuple;
  *
  * @param <T> Type of the things being stored in the backing layer.
  */
-public interface LayerView<T extends Glyph> extends Iterable<T>{
+public interface LayerView<T extends Glyph> extends Iterable<T> {
 	/**Entry into a dynamic binding.
 	 * TODO: Factor this out somehow, it is an ugly implementation leak...A good idea would be to parameterize getSourceData by the groupID and return a filtering collection of some sort... 
 	 */

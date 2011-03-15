@@ -161,7 +161,7 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		for (Layer l: program.layers()) {
 			TreeSet<Tuple> s  =new TreeSet<Tuple>(comp);
 			DisplayLayer<? extends Tuple> layer = l.getDisplayLayer();
-			for (Tuple t: layer.getView()) {s.add(t);}
+			for (Tuple t: layer.viewpoint()) {s.add(t);}
 			for (Tuple t: s) {
 				writer.write(t.toString().replace("\n", "\\n"));
 				writer.write("\n");

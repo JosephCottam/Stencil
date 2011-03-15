@@ -28,10 +28,11 @@
  */
 package stencil.display;
 
+import stencil.interpreter.Viewpoint;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
-public interface DisplayLayer<T extends Glyph>  {
+public interface DisplayLayer<T extends Glyph> extends Viewpoint {
 	/**Name of the method that should be invoked by clients wanting to use this operator*/
 	public static final String FIND_METHOD  = "find";
 	public static final String MAKE_METHOD = "make";
@@ -39,10 +40,12 @@ public interface DisplayLayer<T extends Glyph>  {
 	public static final String TYPE_KEY = "type";
 
 	
-	/**Get a view of this layer.
-	 * A view is a consistent look at the state of a layer.
+	/**Get a view of this layer. A view is a consistent look at the state of a layer.
+	 * This method may or may not actually CREATE that consistent state.
+	 * If a multi-generation layeer is used, the state may be created using other methods and simply returned with this method.
 	 * */
-	public LayerView<T> getView();
+	@Override
+	public LayerView<T> viewpoint();
 	
 	/**Creates a new item of type T in this layer.
 	 * The properties of the new item are dictated by the values

@@ -33,7 +33,7 @@ public class DynamicRule implements Viewpoint<DynamicRule> {
 	
 	
 	public List<Tuple> apply(DisplayLayer<Glyph> table) {
-		LayerView<Glyph> view = table.getView();
+		LayerView<Glyph> view = table.viewpoint();
 		
 		java.util.List<Tuple> results = new ArrayList(view.size());
 		Map<String, LayerView.DynamicEntry> sourceData = view.getSourceData();

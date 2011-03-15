@@ -1,6 +1,7 @@
 package stencil.module.operator.util;
 
 import java.lang.reflect.*;
+
 import static java.util.Arrays.deepToString;
 import static java.lang.String.format;
 
@@ -34,8 +35,19 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			throw new IllegalArgumentException("Cannot supply a target for static methods.");
 		}
 
+		//Point the method at the right object type.  This is important as this constructor is used in migrating method pointers during viewpoint creation.
+		//HACK: Leads to same-name-and-typed-parameters implies semantic relationship.  This is not necessarily true.
+		//       This hack is used because it is hard to recover the interface a method is declared in.
 		if (target != null && !method.getDeclaringClass().isAssignableFrom(target.getClass())) {
-			throw new IllegalArgumentException("Method and target object are not type compatible.");
+			Method m;
+			try {m = target.getClass().getMethod(method.getName(), method.getParameterTypes());}
+			catch (NoSuchMethodException e ) {m=null;}
+			
+			if (m == null) {
+				throw new IllegalArgumentException(format("Could not find type-compatible method '%1$s' from %2$s with new presented object of type %1$s.", 
+						method.getName(), method.getDeclaringClass().getSimpleName(), target.getClass().getSimpleName()));				
+			}
+			method = m;
 		}
 		
 		this.method = method;
@@ -43,7 +55,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		paramTypes = method.getParameterTypes();
 		returnsTuple = Tuple.class.isAssignableFrom(method.getReturnType());
 	}
-
+	
 	//Find the method amidst the class
 	private static Method findMethod(String methodName, Class clss) {
 		for (Method m: clss.getMethods()) {

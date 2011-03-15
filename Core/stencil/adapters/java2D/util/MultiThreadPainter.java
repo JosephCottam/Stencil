@@ -84,12 +84,12 @@ public final class MultiThreadPainter {
 
 			public Layer(DisplayLayer layer) {this.layer = layer;}
 			
-			public boolean updateRequired() {return forceUpdate || stateID != layer.getView().getStateID();}
+			public boolean updateRequired() {return forceUpdate || stateID != layer.viewpoint().getStateID();}
 			public void forceUpdate() {forceUpdate = true;}
 			
 			public BufferedImage call() {
 				if (!updateRequired()) {return buffer;}
-				LayerView<Glyph2D> view = layer.getView();
+				LayerView<Glyph2D> view = layer.viewpoint();
 
 				
 				for (Glyph2D glyph: view.renderOrder()) {
