@@ -69,7 +69,7 @@ public class PersistentData extends BasicModule {
 	
 	@Operator()
 	@Description("Dictionary for key/value pairs.  The specializer determines how many of the passed values are the key and how many are the values. Retrieval by key yields a tuple with just the values.")
-	public static class Dict extends AbstractOperator.Statefull {		
+	public static final class Dict extends AbstractOperator.Statefull {		
 		public static final String NAMES = "fields";
 		public static final String NAME = "Dict";
 

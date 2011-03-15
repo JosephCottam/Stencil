@@ -78,7 +78,9 @@ public class NumericSampler implements SampleOperator {
 	
 	/**Finds a multiple of 1,2 or 5 or a power of 10 near the passed number.
 	 * 
-	 * From: Graphic Gems, "Nice Numbers for Graph Labels," by Paul Heckbert*/
+	 * From: Graphic Gems, "Nice Numbers for Graph Labels," by Paul Heckbert
+	 * TODO: Change to using Talbots InfoVis 2010 numbers
+	 * */
 	private static float niceNum(double num, boolean round) {
 		int exp;
 		double f;

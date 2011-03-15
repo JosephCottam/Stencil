@@ -15,7 +15,7 @@ import stencil.module.util.ann.Facet;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
-public abstract class SeedBase extends AbstractOperator.Statefull implements SeedOperator, Cloneable {
+public abstract class SeedBase<T extends SeedBase> extends AbstractOperator.Statefull<T> implements SeedOperator<T>, Cloneable {
 	protected SeedBase(OperatorData opData) {super(opData);}
 					
 	/**Complete the operator data, given the specializer.*/
@@ -32,12 +32,11 @@ public abstract class SeedBase extends AbstractOperator.Statefull implements See
 		return od;
 	}
 
-	public abstract Tuple map(Object...args);
+	public abstract Tuple map(Object... args);
 	
 	@Facet(memUse="OPAQUE", prototype="(VALUE)")
 	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 
 	@Override
 	public SampleSeed getSeed() {throw new RuntimeException("No implemented.");}
-	public SeedBase viewpoint() {return this;}
 }

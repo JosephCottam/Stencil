@@ -30,7 +30,7 @@ package stencil.interpreter.guide;
 
 import stencil.interpreter.Viewpoint;
 
-public interface SeedOperator extends Viewpoint {
+public interface SeedOperator<T extends SeedOperator> extends Viewpoint<T> {
 	/**Get information about the values that have been seen.
 	 * This need not be a comprehensive sample (thought it may be,
 	 * especially for categorical variables of unknown domain).
@@ -41,6 +41,4 @@ public interface SeedOperator extends Viewpoint {
 	
 	/**State identifier for the seed operator.**/
 	public int stateID();
-	
-	public SeedOperator viewpoint();
 }

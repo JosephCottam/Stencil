@@ -29,8 +29,12 @@
 
 package stencil.modules;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.awt.Color;
+import org.pcollections.*;
 
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
@@ -175,7 +179,7 @@ public class Projection extends BasicModule {
 	@Operator(spec="[range: ALL, split: 0]")
 	@Description("Record the original presentation order of the combination of arguments")
 	public static final class Index extends AbstractOperator {
-		private List<String> labels = new ArrayList<String>();
+		private PVector<String> labels = TreePVector.empty();
 
 		public Index(OperatorData opData) {super(opData);}
 
@@ -187,7 +191,7 @@ public class Projection extends BasicModule {
 
 		@Facet(memUse="WRITER", prototype="(double index)")
 		public int map(Object key) {
-			if (!labels.contains(key)) {labels.add(key.toString());}
+			if (!labels.contains(key)) {labels = labels.plus(key.toString());}
 			return labels.indexOf(key);
 		}
 
@@ -216,7 +220,7 @@ public class Projection extends BasicModule {
 			}
 		}
 		
-		private Map<CompoundKey, Long> counts = new HashMap();
+		private PMap<CompoundKey, Long> counts = HashTreePMap.empty();
 		
 		public Count(OperatorData opData) {super(opData);}
 		
@@ -229,11 +233,11 @@ public class Projection extends BasicModule {
 				Long l = counts.get(key);
 				value = l.longValue();
 				value++;
-				counts.put(key, value);
 			} else {
 				value = 1;
-				counts.put(key, value);
 			}
+
+			counts = counts.plus(key, value);
 			stateID++;
 			return value;
 		}
@@ -274,7 +278,7 @@ public class Projection extends BasicModule {
 	 * the position in the list on lookup.
 	 */
 	@Operator(spec="[range:ALL, split:0, start: 0]")
-	public static class Rank extends AbstractOperator {
+	public static class Rank extends AbstractOperator.Statefull {
 		/**Compare groups of object, often pair-wise.
 		 * The first non-zero comparison wins.
 		 * If all elements match, the longest array is 'after' the shorter one (so an array is always less than a non-array).
@@ -341,8 +345,8 @@ public class Projection extends BasicModule {
 		private synchronized int rank(boolean add, Object... values) {
 			int rank;
 			if (add && !set.contains(values)) {
-				SortedSet newSet = new TreeSet(COMPARE);
-				newSet.addAll(set);
+				SortedSet newSet = new TreeSet(COMPARE);		//Creates viewpoints as it goes, so the next one is always ready immediately
+				newSet.addAll(set);								//TODO: Investigate self-viewpoint only at requested time or pcollections alternatives
 				newSet.add(values);
 				set = newSet;
 				rank = set.headSet(values).size();
@@ -355,6 +359,7 @@ public class Projection extends BasicModule {
 			return rank;
 		}
 		
+		@Override
 		public int stateID() {return set.size();}
 	}
 

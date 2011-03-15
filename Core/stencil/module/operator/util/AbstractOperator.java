@@ -21,7 +21,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	 * but the stateID facet as defined must be provided by any implementation and the meta-data must match
 	 * the meta-data provided here.
 	 **/
-	public static abstract class Statefull extends AbstractOperator {
+	public static abstract class Statefull<R extends StencilOperator> extends AbstractOperator<R> {
 		protected int stateID = Integer.MIN_VALUE;
 		
 		protected Statefull(OperatorData opData) {super(opData);}
@@ -40,8 +40,8 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		 * Otherwise, viewpoint must be implemented by the implementing class.
 		 **/
 		@Override
-		public Statefull viewpoint() {
-			try {return (Statefull) this.clone();}
+		public R viewpoint() {
+			try {return (R) this.clone();}
 			catch (Exception e) {throw new RuntimeException("Error creating viewpoint.", e);}
 		}
 	}

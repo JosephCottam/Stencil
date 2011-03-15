@@ -19,7 +19,7 @@ public class Guide implements Viewpoint<Guide> {
 	private final Selector selector;
 	private final String type;
 	private final Rule rules;
-	private final SeedOperator seedOp;
+	private final SeedOperator<SeedOperator> seedOp;
 	private final SampleOperator sampleOp;
 	private final StateQuery query;
 	private final Rule generator;	//Only has one rule, but it makes it easier to work with the interpreter

@@ -21,6 +21,7 @@ public class ParseSpeeds {
 		Pattern p = java.util.regex.Pattern.compile(pattern);
 		
 		for (long i =0; i<iterations; i++) {
+			@SuppressWarnings("unused")
 			String[] parts = p.split(TEST);
 		}
 	}

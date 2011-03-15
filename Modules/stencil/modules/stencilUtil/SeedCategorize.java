@@ -42,9 +42,4 @@ public final class SeedCategorize extends SeedBase {
 	
 	@Facet(memUse="READER", prototype="(int VALUE)")		
 	public int stateID() {return seen.size();}
-	
-	public SeedCategorize viewpoint() {
-		try {return (SeedCategorize) clone();}
-		catch (Exception e) {throw new Error("Error making viewpoint of seed operator.");}
-	}
 }
