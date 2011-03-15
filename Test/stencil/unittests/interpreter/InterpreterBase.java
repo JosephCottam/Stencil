@@ -64,9 +64,9 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 		DisplayLayer<Glyph> layer = panel.getLayer("GridLines");
 		((DoubleBufferLayer) layer).changeGenerations();
 		assertNotNull(layer);
-		assertEquals(6, layer.getView().size());
+		assertEquals(6, layer.viewpoint().size());
 
-		for (Tuple t: layer.getView()) {
+		for (Tuple t: layer.viewpoint()) {
 			assertEquals(3.0f, ((BasicStroke) t.get("PEN")).getLineWidth());
 			assertEquals(new java.awt.Color(.8f,.8f,.8f), t.get("PEN_COLOR"));
 		}

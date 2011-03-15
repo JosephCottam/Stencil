@@ -35,7 +35,7 @@ public class TestTupleLoader extends StencilTestCase {
 		
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
-			assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").getView().size());
+			assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").viewpoint().size());
 		}
 	}
 
@@ -58,6 +58,6 @@ public class TestTupleLoader extends StencilTestCase {
 		assertTrue(loader.isStopped());
 
 		//Nothing should load because we don't load the other data.  The filter's never pass, so nothing ever loads.
-		assertEquals("Unexpected number of items loaded.", 0, panel.getLayer("Overlay").getView().size());
+		assertEquals("Unexpected number of items loaded.", 0, panel.getLayer("Overlay").viewpoint().size());
 	}
 }

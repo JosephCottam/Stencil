@@ -49,7 +49,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i<TUPLE_COUNT; i++) {
 				String id = Integer.toString(i);
-				assertEquals(i, layer.getView().size());
+				assertEquals(i, layer.viewpoint().size());
 				Tuple t = layer.make(PrototypedTuple.singleton("ID", id));
 				assertEquals(id, t.get(StandardAttribute.ID.name()));
 				((DoubleBufferLayer) layer).changeGenerations();
@@ -78,9 +78,9 @@ public abstract class LayerBase extends junit.framework.TestCase {
 	public void testRemove(Adapter gen) throws Exception {
 		DisplayLayer layer = loadData(gen);
 		((DoubleBufferLayer) layer).changeGenerations();
-		int expectedSize = layer.getView().size();
+		int expectedSize = layer.viewpoint().size();
 
-		assertEquals(layer.getView().size(), TUPLE_COUNT);
+		assertEquals(layer.viewpoint().size(), TUPLE_COUNT);
 		
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i< TUPLE_COUNT; i++) {
@@ -93,7 +93,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 					fail("Exception on element " + i + ": " + e.getMessage());
 				}
 	
-				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.getView().size());
+				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.viewpoint().size());
 			}
 		}
 	}
