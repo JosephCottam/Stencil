@@ -1,4 +1,4 @@
-tree grammar GuideInsertSeedOp;
+tree grammar GuideInsertMonitorOp;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = StencilTree;	
@@ -49,7 +49,7 @@ options {
     return t;
   }
 
-  private static final String SEED_PREFIX = "seed.";
+  private static final String MONITOR_PREFIX = "monitor.";
 
   private static final boolean isCategorical(Specializer spec) {
     return !spec.containsKey(SAMPLE_KEY) ||
@@ -105,9 +105,9 @@ options {
            String operatorName;
       
       if (spec == null || isCategorical(spec)) {
-        operatorName = "SeedCategorize";
+        operatorName = "MonitorCategorical";
       } else {
-        operatorName = "SeedContinuous";
+        operatorName = "MonitorContinuous";
       }
       
       return String.format("\%1\$s.\%2\$s", operatorName, MAP_FACET);
@@ -136,9 +136,9 @@ options {
       //Get additional map arguments from the guide declaration
       Specializer spec = requestedGuides.get(key(target));
       for (String k: spec.keySet()) {
-          if (k.startsWith(SEED_PREFIX)) {
+          if (k.startsWith(MONITOR_PREFIX)) {
              String value = spec.get(k).toString();
-             String key = k.substring(SEED_PREFIX.length());
+             String key = k.substring(MONITOR_PREFIX.length());
              
              b.append(key);
              b.append(BIND_OPERATOR);

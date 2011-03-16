@@ -10,7 +10,7 @@ import stencil.interpreter.Interpreter;
 import stencil.interpreter.Viewpoint;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
-import stencil.interpreter.guide.SeedOperator;
+import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
@@ -19,14 +19,14 @@ public class Guide implements Viewpoint<Guide> {
 	private final Selector selector;
 	private final String type;
 	private final Rule rules;
-	private final SeedOperator<SeedOperator> seedOp;
+	private final MonitorOperator<MonitorOperator> seedOp;
 	private final SampleOperator sampleOp;
 	private final StateQuery query;
 	private final Rule generator;	//Only has one rule, but it makes it easier to work with the interpreter
 	private final Specializer spec;
 	
 	public Guide(Selector selector, String type, Rule rules,
-			SeedOperator seedOp, SampleOperator sampleOp, StateQuery query,
+			MonitorOperator seedOp, SampleOperator sampleOp, StateQuery query,
 			Rule generator, Specializer spec) {
 		super();
 		this.selector = selector;
@@ -52,7 +52,7 @@ public class Guide implements Viewpoint<Guide> {
 		
 		List<Tuple> sample, projection, results;
 
-		if (seedOp instanceof LayerSampler.SeedOperator) {
+		if (seedOp instanceof LayerSampler.MonitorOperator) {
 			sample = sampleOp.sample(null, spec);
 			projection = sample;
 		} else {

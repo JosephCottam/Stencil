@@ -18,14 +18,14 @@ import stencil.tuple.Tuples;
 /**Returns exactly what it was passed, but
  * records elements seen (for categorization).*/
 @Operator()	
-public final class SeedCategorize extends SeedBase {
-	public static final String NAME = SeedCategorize.class.getSimpleName();
+public final class MonitorCategorical extends MonitorBase {
+	public static final String NAME = MonitorCategorical.class.getSimpleName();
 	
 	private final List<Object[]> seen = new CopyOnWriteArrayList();
 			
-	public SeedCategorize(OperatorData opData) {super(opData);}
-	public SeedCategorize(OperatorData opData, Specializer s) throws SpecializationException {super(opData);}
-	public StencilOperator duplicate() throws UnsupportedOperationException {return new SeedCategorize(operatorData);}
+	public MonitorCategorical(OperatorData opData) {super(opData);}
+	public MonitorCategorical(OperatorData opData, Specializer s) throws SpecializationException {super(opData);}
+	public StencilOperator duplicate() throws UnsupportedOperationException {return new MonitorCategorical(operatorData);}
 	
 	public synchronized SampleSeed getSeed() {return new SampleSeed(false, new ArrayList(seen));}
 

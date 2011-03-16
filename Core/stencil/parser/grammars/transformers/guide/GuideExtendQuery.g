@@ -8,7 +8,7 @@ options {
 }
 
 @header {
-  /**Ensure the query guide includes the seed, sample and any stateful action operations.*/
+  /**Ensure the query guide includes the monitor, sample and any stateful action operations.*/
   
   package stencil.parser.string; 
   
@@ -28,10 +28,10 @@ topdown
       StencilTree guide = q.getAncestor(GUIDE);
       StencilTree summary = q.getAncestor(GUIDE_SUMMARIZATION);
       if (summary != null) {
-	      Invokeable seedInv = new ReflectiveInvokeable(STATE_ID_FACET, ((Const) guide.find(SEED_OPERATOR).getChild(0)).getValue());
-	      AstInvokeable seedAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "seed");
-	      seedAInv.setInvokeable(seedInv);
-	      adaptor.addChild(q, seedAInv);
+	      Invokeable monitorInv = new ReflectiveInvokeable(STATE_ID_FACET, ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue());
+	      AstInvokeable monitorAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "monitor");
+	      monitorAInv.setInvokeable(monitorInv);
+	      adaptor.addChild(q, monitorAInv);
 	    }
    }
    : ^(q=STATE_QUERY .*); 

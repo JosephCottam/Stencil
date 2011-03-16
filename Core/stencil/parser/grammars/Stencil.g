@@ -71,7 +71,7 @@ tokens {
   STATE_QUERY;    //List of entities ot check if state has changed
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
-  SEED_OPERATOR;  //Guide system seed-operator node
+  MONITOR_OPERATOR;  //Guide system monitor-operator node; monitor operators collect and report the status of memory-of-interest
   STREAM_DEF;		  //Root of a stream definition
   TARGET;
   TUPLE_PROTOTYPE;

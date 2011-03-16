@@ -16,8 +16,8 @@ import stencil.types.Converter;
  * seen.  Used for continuous operators and should probably never
  * be used directly.*/
 @Operator()
-public final class SeedContinuous extends SeedBase {
-	public static final String NAME = SeedContinuous.class.getSimpleName();
+public final class MonitorContinuous extends MonitorBase {
+	public static final String NAME = MonitorContinuous.class.getSimpleName();
 	public static final String MAX_KEY = "max";
 	public static final String MIN_KEY = "min";
 	public static final String LOCK_KEY = "lock";
@@ -26,8 +26,8 @@ public final class SeedContinuous extends SeedBase {
 	private double min = Double.MAX_VALUE;	/**Smallest value in last reporting cycle*/
 	private final boolean rangeLock;
 
-	public SeedContinuous(OperatorData opData, boolean lock) {super(opData); this.rangeLock=lock;}
-	public SeedContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
+	public MonitorContinuous(OperatorData opData, boolean lock) {super(opData); this.rangeLock=lock;}
+	public MonitorContinuous(OperatorData opData, Specializer spec) throws SpecializationException {
 		super(opData);
 		
 		if (spec.containsKey(MAX_KEY)) {max = Converter.toDouble(spec.get(MAX_KEY));}
@@ -35,7 +35,7 @@ public final class SeedContinuous extends SeedBase {
 		rangeLock = spec.containsKey(LOCK_KEY) && spec.get(LOCK_KEY).equals(FALSE_STRING);
 	}
 	
-	public StencilOperator duplicate() {return new SeedContinuous(operatorData, rangeLock);}
+	public StencilOperator duplicate() {return new MonitorContinuous(operatorData, rangeLock);}
 
 	public SampleSeed getSeed() {
 		synchronized(this) {return new SampleSeed(true, min, max);}
@@ -63,11 +63,11 @@ public final class SeedContinuous extends SeedBase {
 		return Tuples.EMPTY_TUPLE;
 	}
 	
-	public SeedContinuous viewpoint() {
-		SeedContinuous rv = new SeedContinuous(operatorData, rangeLock);
+	public MonitorContinuous viewpoint() {
+		MonitorContinuous rv = new MonitorContinuous(operatorData, rangeLock);
 		rv.max = this.max;
 		rv.min = this.min;
-		try {return (SeedContinuous) clone();}
-		catch (Exception e) {throw new Error("Error making viewpoint of seed operator.");}
+		try {return (MonitorContinuous) clone();}
+		catch (Exception e) {throw new Error("Error making viewpoint of monitor operator.");}
 	}
 }

@@ -19,7 +19,7 @@ options {
   package stencil.parser.string;
   
   import stencil.parser.tree.*;
-  import stencil.interpreter.guide.SeedOperator;
+  import stencil.interpreter.guide.MonitorOperator;
   import stencil.interpreter.tree.Freezer;
   
   import static stencil.parser.ParserConstants.GUIDE_LABEL;
@@ -48,12 +48,12 @@ options {
     StencilTree t = r.find(CALL_CHAIN).find(FUNCTION, PACK);
     while (t.getType() == FUNCTION) {
       AstInvokeable target = t.find(INVOKEABLE);
-      if (target != null && target.getOperator() instanceof SeedOperator) {
+      if (target != null && target.getOperator() instanceof MonitorOperator) {
         return t.find(LIST_ARGS).find(TUPLE_REF).getChild(1).getText(); //get child 1 because this is a tuple ref and it has been framed
       }
       t = t.find(FUNCTION, PACK);
    }
-   throw new Error("Guide path did not lead to location with seed operator");
+   throw new Error("Guide path did not lead to location with monitor operator");
   }
   
   private boolean needsLabel(StencilTree spec) {

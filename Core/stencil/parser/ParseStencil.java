@@ -211,7 +211,7 @@ public abstract class ParseStencil {
 		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		p = GuideDefaultSelector.apply(p); 
 		p = GuideDistinguish.apply(p);					//Distinguish between guide types		
-		p = GuideInsertSeedOp.apply(p, modules);		//Ensure that auto-guide requirements are met
+		p = GuideInsertMonitorOp.apply(p, modules);		//Ensure that auto-guide requirements are met
 		p = FrameTupleRefs.apply(p, modules, true);		
 		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
 		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache

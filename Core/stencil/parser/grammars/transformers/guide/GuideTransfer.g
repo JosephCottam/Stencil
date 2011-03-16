@@ -28,7 +28,7 @@ options {
   import stencil.parser.tree.*;
   import stencil.parser.tree.util.*;
   import stencil.module.*;
-  import stencil.interpreter.guide.SeedOperator;
+  import stencil.interpreter.guide.MonitorOperator;
   
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.INVOKEABLE;
@@ -73,7 +73,7 @@ options {
    private Tree trimCall(StencilTree tree) {
       if (tree.getType() == StencilParser.PACK) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
 
-      if (tree.find(INVOKEABLE).getOperator() instanceof SeedOperator) {return (Tree) adaptor.dupTree(tree);}
+      if (tree.find(INVOKEABLE).getOperator() instanceof MonitorOperator) {return (Tree) adaptor.dupTree(tree);}
       else {return trimCall(tree.find(FUNCTION, PACK));}
    }
 }

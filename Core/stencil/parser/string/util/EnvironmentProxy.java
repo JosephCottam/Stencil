@@ -138,8 +138,8 @@ public final class EnvironmentProxy {
 		}
 		
 		if (anc.g != null) {
-			//If there is no SEED_OPERATOR, then there is not yet enough info to generate the prototype
-			if (anc.g.find(SEED_OPERATOR) == null) {throw new RuntimeException("Seed and Sample operators must be set before framing guides.");}
+			//If there is no MONITOR_OPERATOR, then there is not yet enough info to generate the prototype
+			if (anc.g.find(MONITOR_OPERATOR) == null) {throw new RuntimeException("Seed and Sample operators must be set before framing guides.");}
 
 			if (anc.inRuleList && (((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue() instanceof LayerSampler)) {
 				SampleOperator sampler = (SampleOperator) ((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue();

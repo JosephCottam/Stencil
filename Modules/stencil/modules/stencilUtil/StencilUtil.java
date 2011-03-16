@@ -96,8 +96,8 @@ public final class StencilUtil extends BasicModule {
 		ModuleData md = moduleData(this.getClass());	//Loads the meta-data for operators defined in this class
 		
 		
-		md.addOperator(operatorData(SeedCategorize.class, MODULE_NAME));
-		md.addOperator(operatorData(SeedContinuous.class, MODULE_NAME));
+		md.addOperator(operatorData(MonitorCategorical.class, MODULE_NAME));
+		md.addOperator(operatorData(MonitorContinuous.class, MODULE_NAME));
 
 		md.addOperator(operatorData(MapWrapper.class, MODULE_NAME));
 		md.addOperator(operatorData(RangeHelper.class, MODULE_NAME));
@@ -116,7 +116,7 @@ public final class StencilUtil extends BasicModule {
 		OperatorData od = moduleData.getOperator(name);
 
 		//HACK: Avoid the direct name-based stuff...its difficult to maintain
-		if (od.getName().contains("Seed")) {od = SeedBase.complete(od, specializer);}
+		if (od.getName().contains("Seed")) {od = MonitorBase.complete(od, specializer);}
 		
 		if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
@@ -125,12 +125,12 @@ public final class StencilUtil extends BasicModule {
 	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
 		if (name.equals("ToTuple") || name.equals("ValuesTuple")) {
 			return super.instance(name, context, specializer);
-		} else if (name.equals("SeedCategorize")) {
+		} else if (name.equals("MonitorCategorical")) {
 			OperatorData operatorData = getOperatorData(name, specializer);
-			return new SeedCategorize(operatorData, specializer);
-		} else if (name.equals("SeedContinuous")) {
+			return new MonitorCategorical(operatorData, specializer);
+		} else if (name.equals("MonitorContinuous")) {
 			OperatorData operatorData = getOperatorData(name, specializer);
-			return new SeedContinuous(operatorData, specializer);			
+			return new MonitorContinuous(operatorData, specializer);			
 		} 
 		
 		throw new Error("Could not instantiate regular operator " + name);

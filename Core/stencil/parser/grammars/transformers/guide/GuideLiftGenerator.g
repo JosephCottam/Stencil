@@ -8,15 +8,15 @@ options {
 }
 
 @header {
-  /**Removes the seed operator from the generator chain but adds
-   * its invokeable to the guide node as the seed operator.
+  /**Removes the monitor operator from the generator chain but adds
+   * its invokeable to the guide node as the monitor operator.
    */
 
   package stencil.parser.string;
 	
   import stencil.parser.ParserConstants;
   import stencil.parser.tree.*;
-  import stencil.interpreter.guide.SeedOperator;
+  import stencil.interpreter.guide.MonitorOperator;
   import stencil.module.operator.util.ReflectiveInvokeable;
   import stencil.interpreter.guide.samplers.LayerSampler;
   import stencil.display.DisplayLayer;
@@ -54,25 +54,25 @@ options {
 lift
   @after{
     StencilTree g = retval.tree.getChild(0);
-    if (seed != null) {
-       Object op = seed.find(INVOKEABLE).getOperator();
-       ((Const) g.find(SEED_OPERATOR).find(CONST)).setValue(op);
+    if (dmonitor != null) {
+       Object op = dmonitor.find(INVOKEABLE).getOperator();
+       ((Const) g.find(MONITOR_OPERATOR).find(CONST)).setValue(op);
     } else {
        String layerName = g.find(SELECTOR).getChild(0).getText();
        StencilTree layer = g.getAncestor(PROGRAM).find(LIST_LAYERS).find(LAYER, layerName);
        DisplayLayer dl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();
        
-       SeedOperator op = new LayerSampler.SeedOperator(dl);
-       ((Const) g.find(SEED_OPERATOR).find(CONST)).setValue(op);
+       MonitorOperator op = new LayerSampler.MonitorOperator(dl);
+       ((Const) g.find(MONITOR_OPERATOR).find(CONST)).setValue(op);
     }
   }
 
   : ^(GUIDE_DIRECT ^(GUIDE type=. spec=. selector=. actions=.
         ^(RULE target=.
-           ^(CALL_CHAIN ^(seed=FUNCTION i=. s=. a=. y=. c=. ))) query=.))        
-     -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query ^(SEED_OPERATOR CONST)))
-  | ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. seeder=. query=.))
-     -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $seeder) $query ^(SEED_OPERATOR CONST)));
+           ^(CALL_CHAIN ^(dmonitor=FUNCTION i=. s=. a=. y=. c=. ))) query=.))        
+     -> ^(GUIDE_DIRECT ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR  ^(RULE $target ^(CALL_CHAIN $c))) $query ^(MONITOR_OPERATOR CONST)))
+  | ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. smonitor=. query=.))
+     -> ^(GUIDE_SUMMARIZATION ^(GUIDE $type $spec $selector $actions ^(GUIDE_GENERATOR $smonitor) $query ^(MONITOR_OPERATOR CONST)));
      
 repackRoot
   : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));

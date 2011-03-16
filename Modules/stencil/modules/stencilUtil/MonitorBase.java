@@ -4,7 +4,7 @@
 package stencil.modules.stencilUtil;
 
 import stencil.interpreter.guide.SampleSeed;
-import stencil.interpreter.guide.SeedOperator;
+import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.tree.Specializer;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
@@ -15,8 +15,8 @@ import stencil.module.util.ann.Facet;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 
-public abstract class SeedBase<T extends SeedBase> extends AbstractOperator.Statefull<T> implements SeedOperator<T>, Cloneable {
-	protected SeedBase(OperatorData opData) {super(opData);}
+public abstract class MonitorBase<T extends MonitorBase> extends AbstractOperator.Statefull<T> implements MonitorOperator<T>, Cloneable {
+	protected MonitorBase(OperatorData opData) {super(opData);}
 					
 	/**Complete the operator data, given the specializer.*/
 	protected static OperatorData complete(OperatorData base, Specializer spec) {

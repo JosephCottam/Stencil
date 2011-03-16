@@ -7,7 +7,7 @@ import java.util.List;
 
 import stencil.display.DisplayLayer;
 import stencil.interpreter.guide.SampleOperator;
-import stencil.interpreter.guide.SeedOperator;
+import stencil.interpreter.guide.MonitorOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.AstInvokeable;
@@ -100,7 +100,7 @@ public final class Freezer {
 		assert verifyType(guide, GUIDE);
 		final Selector sel = selector(guide.find(SELECTOR));
 		final String type = guide.find(ID).getText();
-		final SeedOperator seedOp = (SeedOperator) ((Const) guide.find(SEED_OPERATOR).getChild(0)).getValue();
+		final MonitorOperator seedOp = (MonitorOperator) ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue();
 		final SampleOperator sampleOp =(SampleOperator) ((Const) guide.find(SAMPLE_OPERATOR).getChild(0)).getValue();
 		final StateQuery query = stateQuery(guide.find(STATE_QUERY));
 		final Rule generator = rule(guide.find(GUIDE_GENERATOR).find(RULE));
