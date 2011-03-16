@@ -2,14 +2,10 @@ package stencil.adapters.java2D.util;
 
 import java.util.concurrent.Callable;
 
-import stencil.interpreter.Viewpoint;
-import stencil.interpreter.tree.StateQuery;
+import stencil.interpreter.UpdateableComposite;
 
-public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Finisher> {
+public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Callable<Finisher> {
 	public static final Finisher NO_WORK = new Finisher() {public void finish() {}};
-	
-	/**The base fragment to be updated.*/
-	protected final StateQuery stateQuery;
 
 	/**How should this task be identified in string form?*/
 	protected final String identifier;
@@ -21,16 +17,22 @@ public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Fin
 	protected T viewpointFragment;
 	
 	protected final T original;
+	protected int[] stateIDCache; 
 	
-	protected UpdateTask(T original, StateQuery stateQuery, String identifier) {
+	protected UpdateTask(T original, String identifier) {
 		this.original = original;
-		this.stateQuery = stateQuery;
 		this.identifier = this.getClass().getName() + ":" + identifier;
 	}
 	
 	
-	/**Does this updater need to run?*/
-	public boolean needsUpdate() {return stateQuery.requiresUpdate();}
+	/**Does this updater need to run?
+	 * The updater needs to run if the state of any entity underlying 
+	 * the operator has changed since the updater was last run.
+	 * */
+	public boolean needsUpdate() {
+		stateIDCache = viewpointFragment.stateQuery().requiresUpdate();
+		return stateIDCache != null;
+	}
 	
 	/**Run this updater, regardless of it needs to be run or not.*/
 	public abstract Finisher update();
@@ -45,7 +47,10 @@ public abstract class UpdateTask<T extends Viewpoint<T>> implements Callable<Fin
 	 * Return an appropriate finisher to complete work (if required).
 	 * */
 	public Finisher call() {
-		if (needsUpdate()) {return update();} 
+		if (needsUpdate()) {
+			original.stateQuery().setUpdatePoint(stateIDCache);
+			return update();
+		}
 		return NO_WORK;
 	}
 	

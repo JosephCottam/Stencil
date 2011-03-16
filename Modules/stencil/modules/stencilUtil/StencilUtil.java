@@ -116,7 +116,7 @@ public final class StencilUtil extends BasicModule {
 		OperatorData od = moduleData.getOperator(name);
 
 		//HACK: Avoid the direct name-based stuff...its difficult to maintain
-		if (od.getName().contains("Seed")) {od = MonitorBase.complete(od, specializer);}
+		if (od.getName().contains("Monitor")) {od = MonitorBase.complete(od, specializer);}
 		
 		if (od.isComplete()) {return od;}
 		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);

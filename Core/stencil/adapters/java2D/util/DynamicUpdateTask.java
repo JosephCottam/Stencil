@@ -15,7 +15,7 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	
 	public DynamicUpdateTask(DoubleBufferLayer table, DynamicRule rule) {
 		//TODO: Re-arrange when dynamic rule is frozen
-		super(rule, rule.getStateQuery(), rule.getAction().prototype().toString());
+		super(rule, rule.action().prototype().toString());
 		this.table = (DoubleBufferLayer) table;
 	}
 	

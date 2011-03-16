@@ -27,8 +27,10 @@ public class StateQuery implements Viewpoint<StateQuery> {
 	}
 
 	
-	/**Has any of the contained stateID queries changed?*/
-	public boolean requiresUpdate() {
+	/**Has any of the contained stateID queries changed?
+	 * Returns null if there have been no changes, otherwise it will return an array of the current stateIDs.
+	 * */
+	public int[] requiresUpdate() {
 		final int[] nowIDs = new int[queries.length];
 		if (cachedIDs == null) {
 			cachedIDs = new int[queries.length];
@@ -44,15 +46,22 @@ public class StateQuery implements Viewpoint<StateQuery> {
 		for (int i=0; matches && i < nowIDs.length; i++) {
 			matches = matches && (nowIDs[i] == cachedIDs[i]);
 		}
-		cachedIDs = nowIDs;
-		return !matches;
+		if (!matches) {return nowIDs;}
+		else {return null;}
 	}
+	
+	
+	/**Set the stateID collection that constitute the most recent update.
+	 * A null will force a run next time. 
+	 * @param ids
+	 */
+	public void setUpdatePoint(int[] ids) {cachedIDs = ids;}
 	
 	public StateQuery viewpoint() {
 		final Invokeable[] vps = new Invokeable[queries.length];
 		for (int i=0;i<queries.length;i++) {vps[i] = queries[i].viewpoint();}
-		StateQuery query = new StateQuery(queries);
-		query.cachedIDs = cachedIDs;//Safe because the update method creates a new copy each time it runs
+		StateQuery query = new StateQuery(vps);
+		query.cachedIDs = cachedIDs;//Copy is safe because the update method creates a new copy each time it runs
 		return query;
 	}
 }

@@ -35,8 +35,10 @@ public final class MonitorContinuous extends MonitorBase {
 		rangeLock = spec.containsKey(LOCK_KEY) && spec.get(LOCK_KEY).equals(FALSE_STRING);
 	}
 	
+	@Override
 	public StencilOperator duplicate() {return new MonitorContinuous(operatorData, rangeLock);}
 
+	@Override
 	public SampleSeed getSeed() {
 		synchronized(this) {return new SampleSeed(true, min, max);}
 	}
@@ -63,11 +65,12 @@ public final class MonitorContinuous extends MonitorBase {
 		return Tuples.EMPTY_TUPLE;
 	}
 	
+	@Override
 	public MonitorContinuous viewpoint() {
 		MonitorContinuous rv = new MonitorContinuous(operatorData, rangeLock);
 		rv.max = this.max;
 		rv.min = this.min;
-		try {return (MonitorContinuous) clone();}
+		try {return rv;}
 		catch (Exception e) {throw new Error("Error making viewpoint of monitor operator.");}
 	}
 }

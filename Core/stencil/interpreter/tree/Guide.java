@@ -7,7 +7,7 @@ import java.util.List;
 
 import stencil.display.DisplayGuide;
 import stencil.interpreter.Interpreter;
-import stencil.interpreter.Viewpoint;
+import stencil.interpreter.UpdateableComposite;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.MonitorOperator;
@@ -15,32 +15,32 @@ import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
-public class Guide implements Viewpoint<Guide> {
+public class Guide implements UpdateableComposite<Guide> {
 	private final Selector selector;
 	private final String type;
 	private final Rule rules;
-	private final MonitorOperator<MonitorOperator> seedOp;
+	private final MonitorOperator<MonitorOperator> monitorOp;
 	private final SampleOperator sampleOp;
-	private final StateQuery query;
+	private final StateQuery stateQuery;
 	private final Rule generator;	//Only has one rule, but it makes it easier to work with the interpreter
 	private final Specializer spec;
 	
 	public Guide(Selector selector, String type, Rule rules,
-			MonitorOperator seedOp, SampleOperator sampleOp, StateQuery query,
+			MonitorOperator monitorOp, SampleOperator sampleOp, StateQuery query,
 			Rule generator, Specializer spec) {
 		super();
 		this.selector = selector;
 		this.type = type;
 		this.rules = rules;
-		this.seedOp = seedOp;
+		this.monitorOp = monitorOp;
 		this.sampleOp = sampleOp;
-		this.query = query;
+		this.stateQuery = query;
 		this.generator = generator;
 		this.spec = spec;
 	}
 
 	public String type() {return type;}
-	public StateQuery stateQuery() {return query;}
+	public StateQuery stateQuery() {return stateQuery;}
 	public Selector selector() {return selector;}
 	public Specializer specializer() {return spec;}
 	
@@ -52,11 +52,11 @@ public class Guide implements Viewpoint<Guide> {
 		
 		List<Tuple> sample, projection, results;
 
-		if (seedOp instanceof LayerSampler.MonitorOperator) {
+		if (monitorOp instanceof LayerSampler.MonitorOperator) {
 			sample = sampleOp.sample(null, spec);
 			projection = sample;
 		} else {
-			SampleSeed seed = seedOp.getSeed();
+			SampleSeed seed = monitorOp.getSeed();
 
 			try {
 				sample = sampleOp.sample(seed, spec);
@@ -80,6 +80,6 @@ public class Guide implements Viewpoint<Guide> {
 
 	
 	public Guide viewpoint() {
-		return new Guide(selector, type, rules.viewpoint(), seedOp.viewpoint(), sampleOp, query.viewpoint(), generator.viewpoint(), spec);
+		return new Guide(selector, type, rules.viewpoint(), monitorOp.viewpoint(), sampleOp, stateQuery.viewpoint(), generator.viewpoint(), spec);
 	}
 }

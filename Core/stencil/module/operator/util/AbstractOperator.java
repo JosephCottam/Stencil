@@ -36,7 +36,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		public StencilOperator duplicate() {throw new UnsupportedOperationException();}
 		
 		/**Default viewpoint creation is to just clone the underlying operator.
-		 * This is sufficient, provided the referenced object and everything it transitively refers to is immutable.
+		 * This is sufficient, provided the referenced object and everything it transitively refers to are immutable.
 		 * Otherwise, viewpoint must be implemented by the implementing class.
 		 **/
 		@Override

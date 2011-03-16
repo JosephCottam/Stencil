@@ -108,6 +108,8 @@ public class Legend extends Guide2D {
 	}
 
 	public synchronized void setElements(List<Tuple> elements, Rectangle2D parentBounds) {
+		System.out.println(Arrays.deepToString(elements.toArray()));
+		
 		marks.clear();
 		
 		marks.addAll(createGuideLabel());

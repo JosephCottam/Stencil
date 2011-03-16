@@ -13,14 +13,14 @@ public class GuideTask extends UpdateTask<Guide> {
 	private final Selector selector;
 	
 	public GuideTask(Guide guideDef, DisplayCanvas canvas) {
-		super(guideDef, guideDef.stateQuery(), guideDef.selector().toString());
+		super(guideDef, guideDef.selector().toString());
 		this.canvas = canvas;
 		this.selector = guideDef.selector();
 	}
 
 	public Finisher update() {
 		DisplayGuide guide = canvas.getGuide(selector);
-		viewpointFragment.update(guide, canvas.getContentBounds(false));
+		viewpointFragment.update(guide, canvas.getContentBounds(false));		//HACK: This 'getContentBounds' is a source of non-determinism in the guide system
 		return UpdateTask.NO_WORK;
 	}
 	

@@ -100,14 +100,14 @@ public final class Freezer {
 		assert verifyType(guide, GUIDE);
 		final Selector sel = selector(guide.find(SELECTOR));
 		final String type = guide.find(ID).getText();
-		final MonitorOperator seedOp = (MonitorOperator) ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue();
+		final MonitorOperator monitorOp = (MonitorOperator) ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue();
 		final SampleOperator sampleOp =(SampleOperator) ((Const) guide.find(SAMPLE_OPERATOR).getChild(0)).getValue();
 		final StateQuery query = stateQuery(guide.find(STATE_QUERY));
 		final Rule generator = rule(guide.find(GUIDE_GENERATOR).find(RULE));
 		final Specializer spec = specializer(guide.find(SPECIALIZER));
 		final Rule rules = ruleFromList(guide.find(LIST_RULES));
 		
-		return new Guide(sel, type, rules, seedOp, sampleOp, query, generator, spec);
+		return new Guide(sel, type, rules, monitorOp, sampleOp, query, generator, spec);
 	}
 	
 	public static Layer[] layers(StencilTree root) {

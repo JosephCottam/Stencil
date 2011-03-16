@@ -7,13 +7,13 @@ import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
 import stencil.display.LayerView;
 import stencil.interpreter.Interpreter;
-import stencil.interpreter.Viewpoint;
+import stencil.interpreter.UpdateableComposite;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleAppender;
 import stencil.tuple.instances.PrototypedTuple;
 import java.util.List;
 
-public class DynamicRule implements Viewpoint<DynamicRule> {
+public class DynamicRule implements UpdateableComposite<DynamicRule> {
 	private final int groupID;	//TODO: Convert to a string (for better error reporting)
 	private final String layerName;
 	private final Rule rule;
@@ -27,9 +27,9 @@ public class DynamicRule implements Viewpoint<DynamicRule> {
 	}
 	
 	public String layerName() {return layerName;}
-	public int gropuID() {return groupID;}
-	public Rule getAction() {return rule;}
-	public StateQuery getStateQuery() {return query;}
+	public int groupID() {return groupID;}
+	public Rule action() {return rule;}
+	public StateQuery stateQuery() {return query;}
 	
 	
 	public List<Tuple> apply(DisplayLayer<Glyph> table) {
