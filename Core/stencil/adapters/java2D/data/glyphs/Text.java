@@ -102,7 +102,7 @@ public final class Text extends Basic {
 	private final Rectangle2D horizontalBounds;
 	private final double rotation;
 	
-	private final SoftReference<GeneralPath> renderedTextRef;
+	private SoftReference<GeneralPath> renderedTextRef;
 	
 	public Text(DisplayLayer layer, String id) {
 		super(layer, id);
@@ -118,7 +118,6 @@ public final class Text extends Basic {
 
 		horizontalBounds = new Rectangle2D.Double(X.defaultValue, Y.defaultValue, WIDTH.defaultValue, HEIGHT.defaultValue);
 		super.updateBoundsRef((Rectangle2D) horizontalBounds.clone());
-		renderedTextRef = new SoftReference(new GeneralPath());
 	}
 	
 	protected Text(String id, Text source) {
@@ -166,7 +165,6 @@ public final class Text extends Basic {
 			&& !option.getPrototype().contains(WIDTH.name)
 			&& !option.getPrototype().contains(HEIGHT.name)) {
 			
-			this.renderedTextRef = source.renderedTextRef;
 			super.updateBoundsRef(source.bounds);
 			this.horizontalBounds = source.horizontalBounds;
 		} else {
@@ -188,7 +186,6 @@ public final class Text extends Basic {
 			horizontalBounds = new Rectangle2D.Double(topLeft.getX(), topLeft.getY(), ld.fullWidth, ld.fullHeight);
 			
 			GeneralPath renderedText = renderText();
-			renderedTextRef = new SoftReference(renderedText);
 
 			GeneralPath layout = (GeneralPath) renderedText.clone();
 			layout.transform(AffineTransform.getTranslateInstance(reg.getX(), reg.getY()));
@@ -270,7 +267,14 @@ public final class Text extends Basic {
 		catch (Exception e) {p2 = p;}	
 		g.translate(p2.getX(), p2.getY());
 		
-		GeneralPath renderedText = renderedTextRef.get();
+
+		GeneralPath renderedText;
+		if (renderedTextRef == null) {
+			renderedText = renderText();
+			renderedTextRef = new SoftReference(renderedText);
+		} else {
+			renderedText = renderedTextRef.get();
+		}
 		if (renderedText == null) {renderedText = renderText();}
 		
 		g.fill(renderedText);	//Render

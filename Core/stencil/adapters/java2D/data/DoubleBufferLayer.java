@@ -124,7 +124,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		addToUpdate(ID, update);
 	}
 	
-	private synchronized void addToUpdate(String ID, Glyph2D glyph) {
+	private void addToUpdate(String ID, Glyph2D glyph) {
 		stateID++;
 		Integer idx = updateIndex.get(ID);
 		if (idx != null) {
@@ -149,7 +149,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 * 			Updates requires a full iteration iff it was on the edge AND it did not move the edge it was on to make things larger
 	 * 
 	 */
-	public synchronized StoreView changeGenerations() {
+	public StoreView changeGenerations() {
 		// merge generations across
 		synchronized(TENURED_UPDATE_LOCK){
 			for (String id: updateIndex.keySet()) {
@@ -205,7 +205,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	 * 
 	 * @param glyph
 	 */
-	public synchronized void directUpdate(List<Tuple> updates) {
+	public void directUpdate(List<Tuple> updates) {
 		synchronized (TENURED_UPDATE_LOCK) {
 			for (Tuple update: updates) {
 				assert update.getPrototype().get(0).getFieldName().equals("ID");
