@@ -1,7 +1,6 @@
 package stencil.adapters.java2D.util;
 
 import java.awt.AlphaComposite;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.RenderingHints;
@@ -144,7 +143,6 @@ public final class MultiThreadPainter {
 	private final Map<DynamicRule, DynamicUpdateTask> dynamicUpdaters = new HashMap();
 
 	private AffineTransform renderedViewTransform = AffineTransform.getRotateInstance(Math.PI);
-	private Dimension renderedSize = new Dimension(0,0);
 	
 	private final Canvas canvas;
 
@@ -189,16 +187,14 @@ public final class MultiThreadPainter {
 	
 	public boolean isShutdown() {return renderPool.isShutdown();}
 	
-	public boolean requiresUpdate(AffineTransform trans, Rectangle2D bounds) {
+	public boolean requiresUpdate(AffineTransform trans) {
 		for (int i=0; i< layers.length; i++) {
 			if (layers[i].getStateID() != painters.get(i).stateID()) {return true;}
 		}
 		for (UpdateTask task: guideUpdaters) {if (task.needsUpdate()) {return true;}}
 		for (UpdateTask task: dynamicUpdaters.values()) {if (task.needsUpdate()) {return true;}}
 		
-		return (bounds.getHeight() != renderedSize.getHeight()) 
-				|| (bounds.getWidth() != renderedSize.getWidth())
-				|| !renderedViewTransform.equals(trans);		
+		return !renderedViewTransform.equals(trans);		
 	}
 
 	/**Render to the given.*/
@@ -225,7 +221,6 @@ public final class MultiThreadPainter {
 				}
 			} catch (Exception e) {throw new RuntimeException("Error in multi-thread painting.", e);}
 
-			renderedSize = new Dimension(buffer.getWidth(), buffer.getHeight());
 			renderedViewTransform = trans;
 		} catch (Exception e) {
 			e.printStackTrace();

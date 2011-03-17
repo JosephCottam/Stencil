@@ -30,7 +30,7 @@ public class StateQuery implements Viewpoint<StateQuery> {
 	/**Has any of the contained stateID queries changed?
 	 * Returns null if there have been no changes, otherwise it will return an array of the current stateIDs.
 	 * */
-	public int[] requiresUpdate() {
+	public synchronized int[] requiresUpdate() {
 		final int[] nowIDs = new int[queries.length];
 		if (cachedIDs == null) {
 			cachedIDs = new int[queries.length];
@@ -55,9 +55,9 @@ public class StateQuery implements Viewpoint<StateQuery> {
 	 * A null will force a run next time. 
 	 * @param ids
 	 */
-	public void setUpdatePoint(int[] ids) {cachedIDs = ids;}
+	public synchronized void setUpdatePoint(int[] ids) {cachedIDs = ids;}
 	
-	public StateQuery viewpoint() {
+	public synchronized StateQuery viewpoint() {
 		final Invokeable[] vps = new Invokeable[queries.length];
 		for (int i=0;i<queries.length;i++) {vps[i] = queries[i].viewpoint();}
 		StateQuery query = new StateQuery(vps);

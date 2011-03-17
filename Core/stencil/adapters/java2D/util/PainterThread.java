@@ -42,9 +42,8 @@ public final class PainterThread implements Runnable {
 	}
 	
 	private boolean requiresUpdate() {
-		Rectangle bounds = target.getBounds();
 		AffineTransform trans = target.getViewTransformRef();
-		boolean requires = painter.requiresUpdate(trans, bounds);
+		boolean requires = painter.requiresUpdate(trans);
 		return requires;
 	}
 	
