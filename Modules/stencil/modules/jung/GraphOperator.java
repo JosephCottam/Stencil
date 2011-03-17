@@ -121,6 +121,8 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 			return super.query(id);
 		}
 		
+		
+		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {
 			if (layout == null) {resetLayout();}
 			if (!layout.done()) {

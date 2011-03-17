@@ -265,7 +265,7 @@ public abstract class RangeHelper implements StencilOperator<StencilOperator>, C
 	protected abstract Object[][] getCache();
 	
 	/**StateID indicating changes to the cache.*/
-	@Facet(memUse="READER")
+	@Facet(memUse="READER", prototype="(int VALUE)")
 	public int stateID() {return stateID.intValue();}
 	
 	/**For convenient operator data construction.  Always throws an error.**/

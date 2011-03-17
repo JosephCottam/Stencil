@@ -360,6 +360,7 @@ public class Projection extends BasicModule {
 		}
 		
 		@Override
+		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {return set.size();}
 	}
 

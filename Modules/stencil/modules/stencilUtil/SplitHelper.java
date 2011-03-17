@@ -133,6 +133,7 @@ public abstract class SplitHelper implements StencilOperator {
 		this.operatorData.addFacet(STATE_ID_FD);
 	}
 	
+	@Facet(memUse="READER", prototype="(int VALUE)")
 	public int stateID() {return stateID;}
 	
 	public Invokeable getFacet(String facet) {
