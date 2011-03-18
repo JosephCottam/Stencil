@@ -46,7 +46,6 @@ public class Guide implements UpdateableComposite<Guide> {
 	
 	public TuplePrototype resultsPrototype() {return rules.prototype();}
 
-	//TODO: Allow something other than canvas to be passed...when guides can be declared on layers or views
 	public void update(DisplayGuide guide, Rectangle2D bounds) {
 		assert guide != null : "Null guide passed.";
 		

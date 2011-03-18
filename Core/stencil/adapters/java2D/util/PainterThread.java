@@ -108,7 +108,10 @@ public final class PainterThread implements Runnable {
         }
         return img;
     }
-		
+
+    /**Force updates to run now.  Used when rendering will be pushed to something other
+     * than the internal buffers (e.g., non-self buffering).
+     */
 	public void doUpdates() {painter.doUpdates();}
 }
 

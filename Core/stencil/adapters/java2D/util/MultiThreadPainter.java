@@ -197,7 +197,7 @@ public final class MultiThreadPainter {
 		return !renderedViewTransform.equals(trans);		
 	}
 
-	/**Render to the given.*/
+	/**Render to the given buffer.*/
 	public void render(Paint background, BufferedImage buffer, AffineTransform trans) {
 		Graphics2D g = buffer.createGraphics();	
 
@@ -238,15 +238,15 @@ public final class MultiThreadPainter {
 	 * */
 	public void doUpdates() {
 		try {
-			synchronized(canvas.renderLock) {					//Prevent rendering
+			synchronized(canvas.renderLock) {					//Prevent competing renders
 				synchronized(canvas.visLock) { 					//Suspend analysis until the viewpoint is ready
 					for (DisplayLayer layer: layers) {
 						((DoubleBufferLayer) layer).changeGenerations();
 					}
 	
-					for (UpdateTask ut: guideUpdaters) {ut.viewpoint();}
 					for (UpdateTask ut: dynamicUpdaters.values()) {ut.viewpoint();}
-				}
+					for (UpdateTask ut: guideUpdaters) {ut.viewpoint();}
+				}												//Resume analysis while rendering completes
 				
 				executeAll(dynamicUpdaters.values());
 				executeAll(guideUpdaters);
