@@ -50,6 +50,7 @@ options {
   }
 
   private static final String MONITOR_PREFIX = "monitor.";
+  private static final String SEED_PREFIX = "seed.";
 
   private static final boolean isCategorical(Specializer spec) {
     return !spec.containsKey(SAMPLE_KEY) ||
@@ -129,26 +130,28 @@ options {
        return newArgs;
     }
     
-    //HACK: Do this more directly, just build the tree (specializer is simpler than it used to be)
     private StencilTree spec(StencilTree target) {
-      StringBuilder b = new StringBuilder("[range" + BIND_OPERATOR + " ALL,");      
+      StencilTree newSpec = (StencilTree) adaptor.create(SPECIALIZER, "");
       
       //Get additional map arguments from the guide declaration
       Specializer spec = requestedGuides.get(key(target));
       for (String k: spec.keySet()) {
+          String key = null;
           if (k.startsWith(MONITOR_PREFIX)) {
-             String value = spec.get(k).toString();
-             String key = k.substring(MONITOR_PREFIX.length());
-             
-             b.append(key);
-             b.append(BIND_OPERATOR);
-             b.append(value);
-             b.append(",");
+              key = k.substring(MONITOR_PREFIX.length());       
+          } else if (k.startsWith(SEED_PREFIX)) {
+              key = k.substring(SEED_PREFIX.length());       
+          }
+      
+          if (key != null) {
+             Object entry = adaptor.create(MAP_ENTRY, key);
+             Const value = (Const) adaptor.create(CONST, "");
+             value.setValue(spec.get(k));
+             adaptor.addChild(entry, value);
+             adaptor.addChild(newSpec, entry);
           }
       }
-      b.replace(b.length()-1, b.length(), "]");
-      try {return ParseStencil.specializerTree(b.toString());}
-      catch (Exception e) {throw new Error("Error parsing synthesized specializer: " + b.toString());}
+      return newSpec;
     }
         
     private String selectOperator(StencilTree t) {

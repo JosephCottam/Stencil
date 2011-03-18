@@ -64,13 +64,4 @@ public final class MonitorContinuous extends MonitorBase {
 		
 		return Tuples.EMPTY_TUPLE;
 	}
-	
-	@Override
-	public MonitorContinuous viewpoint() {
-		MonitorContinuous rv = new MonitorContinuous(operatorData, rangeLock);
-		rv.max = this.max;
-		rv.min = this.min;
-		try {return rv;}
-		catch (Exception e) {throw new Error("Error making viewpoint of monitor operator.");}
-	}
 }
