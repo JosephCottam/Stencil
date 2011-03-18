@@ -2,7 +2,7 @@ STREAM: File
 NAME: VertexList
 HEADER: ID1, ID2
 SEPARATOR: ,
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/NodeLink/tree2.tree
+SOURCE: ./tree2.tree
 SKIP: 1
 STRICT: true
 
@@ -32,10 +32,9 @@ from VertexList
 layer Labels["TEXT"]
 from VertexList
 	ID : child
-	(X,Y):* Nodes.find(child) -> (X,Y)
+	(X,Y):* Nodes.query(child) -> (X,Y)
 	TEXT: child
 	FONT: @Font{10}
 	COLOR: @Color{GRAY60}
-
 
 operator Layout : BalloonLayout
