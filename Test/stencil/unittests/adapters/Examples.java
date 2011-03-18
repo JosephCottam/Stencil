@@ -66,8 +66,8 @@ public abstract class Examples extends TestCase {
 	public void testStocksText() throws Throwable {new Stocks(configs).testTXT();}
 	public void testStocksImage() throws Throwable {new Stocks(configs).testPNG();}
 	
-	public void testTweetCountText() throws Throwable {new TweetCount(configs).testTXT();}
-	public void testTweetCountImage() throws Throwable {new TweetCount(configs).testPNG();}
+	public void testAutoguide_TweetCountText() throws Throwable {new AutoGuide_TweetCount(configs).testTXT();}
+	public void testAutoguide_TweetCountImage() throws Throwable {new AutoGuide_TweetCount(configs).testPNG();}
 	
 	public void testFillGridText() throws Throwable {new VSM_FillGrid(configs).testTXT();}
 	public void testFillGridImage() throws Throwable {new VSM_FillGrid(configs).testPNG();}
@@ -85,9 +85,27 @@ public abstract class Examples extends TestCase {
 	public void testRoseText() throws Throwable {new AutoGuide_Rose(configs).testTXT();}
 
 	public void testTextArcImage() throws Throwable {new TextArc(configs).testPNG();}
-	/**TODO: REstore **/
-	//public void testTextArcText() throws Throwable {new TextArc(configs).testTXT();}
+	public void testTextArcText() throws Throwable {new TextArc(configs).testTXT();}
+	
+	public void testArcsText() throws Throwable {new Arcs(configs).testTXT();}
+	public void testArcsImage() throws Throwable {new Arcs(configs).testPNG();}
+	
+	public void testArrowheadsText() throws Throwable {new Arrowheads(configs).testTXT();}
+	public void testArrowheadsImage() throws Throwable {new Arrowheads(configs).testPNG();}
+	
+	public void testJungTreeText() throws Throwable {new JungTree(configs).testTXT();}
+	public void testJungTreeImage() throws Throwable {new JungTree(configs).testPNG();}
+	
+	public void testRadialTreeText() throws Throwable {new RadialTree(configs).testTXT();}
+	public void testRadialTreeImage() throws Throwable {new RadialTree(configs).testPNG();}
+	
+	public void testUMDTreeMapText() throws Throwable {new UMDTreeMap(configs).testTXT();}
+	public void testUMDTreeMapImage() throws Throwable {new UMDTreeMap(configs).testPNG();}
 
+	public void testSquareShellsText() throws Throwable {new SquareShells(configs).testTXT();}
+	public void testSquareShellsImage() throws Throwable {new SquareShells(configs).testPNG();}
+
+	
 }
 
 

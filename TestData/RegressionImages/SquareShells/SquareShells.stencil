@@ -1,0 +1,31 @@
+STREAM: File
+NAME: Layout
+HEADER: ID  X  Y
+SEPARATOR: \s+
+SOURCE: ./squarified_10K.txt
+SKIP: 1
+STRICT: true
+
+
+stream Layout(ID, X, Y)
+
+layer Nodes
+from Layout
+    ID: ID
+    (X,Y) :* Range[ALL](@Max, ID) -> Sub(_, ID)  -> Layout(_)
+/*  (X,Y) : Layout(ID)*/
+    FILL_COLOR:* HeatScale[](ID)
+    SIZE: 1
+
+operator Layout (i) -> (X,Y) 
+    ALL => (X,Y): Sqrt(i) -> 
+             [shell] Floor(_) ->
+                [n] Add1(_) -> Pow(n[_],2) -> 
+                [center] Sub(_, n[_]) -> 
+                ByOdds(i,shell[_],center[_]) 
+
+operator ByOdds (i,shell,center) -> (x,y)
+    (i < center) => (x,y) : Pow(shell,2) -> Sub(i, _) -> (shell,_)
+    (i > center) => (x,y) : Sub(i, center) -> Sub(shell, _) -> (_,shell)
+    (ALL) => (x,y) : (shell,shell)
+

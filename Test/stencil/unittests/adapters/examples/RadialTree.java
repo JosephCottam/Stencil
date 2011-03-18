@@ -28,13 +28,13 @@
  */
 package stencil.unittests.adapters.examples;
 
-public class TweetCount extends ImageTest {
-	public TweetCount(String[] configs) {
-		super(new TestRecord("./TestData/RegressionImages/AutoGuide/",
-				  "TweetCountLocal.stencil",
+public class RadialTree extends ImageTest {
+	public RadialTree(String[] configs) {
+		super(new TestRecord("./TestData/RegressionImages/NodeLink/",
+				  "RadialTree.stencil",
 				  null,
 				  null,
-				  "tweetCount.txt",
-				  "tweetCount.png", configs));
+				  "radialTree.txt",
+				  "radialTree.png", configs));
 	}
 }

@@ -28,13 +28,13 @@
  */
 package stencil.unittests.adapters.examples;
 
-public class AutoGuide_BarleyPositional extends ImageTest {
-	public AutoGuide_BarleyPositional(String[] configs) {
-		super(new TestRecord("./TestData/RegressionImages/AutoGuide/",
-				  "BarleyCellPositional.stencil",
+public class UMDTreeMap extends ImageTest {
+	public UMDTreeMap(String[] configs) {
+		super(new TestRecord("./TestData/RegressionImages/NodeLink/",
+				  "UMDTreeMap.stencil",
 				  null,
 				  null,
-				  "barleyCell.txt",
-				  "barleyCell.png", configs));
+				  "UMDTreeMap.txt",
+				  "UMDTreeMap.png", configs));
 	}
 }
