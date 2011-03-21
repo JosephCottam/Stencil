@@ -3,16 +3,16 @@ import static com.sun.btrace.BTraceUtils.*;
 
 
 /**
- * Assuming the btrace jars are one level below stencil and assuming the tracer
+ * Assuming the btrace jars are one level below prefuse and assuming the tracer
  * is with them then this will trace properly:
  * 
- * java -javaagent:../btrace-agent.jar=script=../Tracer.class -jar Stencil.jar -headless -open ./StencilExplore.stencil -sources Entities ../DataSets/count_50000.txt
+ * java -javaagent:../btrace-agent.jar=script=../StencilThreadActivity.class -jar Stencil.jar -headless -open ./StencilExplore.stencil -sources Entities ../DataSets/count_50000.txt
  * @author jcottam
  *
  */
 
 @BTrace
-public class Tracer {
+public class StencilThreadActivityTracer {
 	//Shared hook for data loading
 	@OnMethod(clazz="stencil.display.StencilPanel", method="processTuple", location=@Location(Kind.ENTRY))
     public static void loadEnter() {println(strcat("Load: Entry: ", str(timeMillis())));}
