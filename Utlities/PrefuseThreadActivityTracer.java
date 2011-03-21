@@ -13,7 +13,7 @@ import static com.sun.btrace.BTraceUtils.*;
 @BTrace
 public class PrefuseThreadActivityTracer {
 	//Hooks for data loading
-	@OnMethod(clazz="persistentTests.prefuse.SquareShells", method="add", location=@Location(Kind.ENTRY))
+	@OnMethod(clazz="persistentTests.prefuse.SquareShells", method="add", location=@Location(value=Kind.SYNC_ENTRY, where=Where.AFTER))
     public static void loadEnter() {println(strcat("Load: Entry: ", str(timeMillis())));}
 
     @OnMethod(clazz="persistentTests.prefuse.SquareShells", method="add", location=@Location(Kind.RETURN))
@@ -28,10 +28,18 @@ public class PrefuseThreadActivityTracer {
     public static void onUpdatesLeave() {println(strcat("Updates: Return: ", str(timeMillis())));}
 	
 	
-	//Hooks for rendering 
-    @OnMethod(clazz="prefuse.Display", method="paintDisplay", location=@Location(Kind.ENTRY))
-    public static void paintEnter() {println(strcat("Render: Entry: ", str(timeMillis())));}
-
+	
+	//Hooks for pre-rendering
+	private static String ignore;
+    @OnMethod(clazz="prefuse.Display", method="paintDisplay", location=@Location(value=Kind.SYNC_ENTRY, where=Where.AFTER))
+        public static void onSyncEntry(Object obj) {
+        	String id = identityStr(obj);
+        	if (ignore == null || strcmp(id, ignore) == 0) {ignore = id; return;}	//locking of m_vis needs to be ignored
+            println(strcat("Render: Entry: ", str(timeMillis())));
+        }
+	
     @OnMethod(clazz="prefuse.Display", method="paintDisplay", location=@Location(Kind.RETURN))
-    public static void paintExit() {println(strcat("Render: Return: ", str(timeMillis())));}
+    public static void paintExit() {
+    	println(strcat("Render: Return: ", str(timeMillis())));
+    }
 }
