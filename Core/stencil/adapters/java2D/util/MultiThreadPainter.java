@@ -155,8 +155,8 @@ public final class MultiThreadPainter {
 		this.layers = layers;
 		this.canvas = canvas;
 		
-		renderPool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("render"));
-		updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update"));
+		renderPool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("render", Thread.MAX_PRIORITY));
+		updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update", Thread.MAX_PRIORITY));
 		
 		painters = new ArrayList();		
 		
