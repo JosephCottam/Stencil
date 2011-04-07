@@ -43,7 +43,6 @@ import stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.InvalidNameException;
@@ -59,7 +58,6 @@ public abstract class Basic implements Glyph2D {
 	protected static final AffineTransform IDENTITY_TRANSFORM = new AffineTransform();
 	
 	protected static final Attribute ID = new Attribute(StandardAttribute.ID);
-	protected static final Attribute LAYERNAME = new Attribute(StandardAttribute.LAYERNAME);
 	public static final Attribute IMPLANTATION = new Attribute(StandardAttribute.IMPLANTATION);
 	public static final Attribute<Double> Z = new Attribute(StandardAttribute.Z);
 
@@ -71,7 +69,6 @@ public abstract class Basic implements Glyph2D {
 	static {
 		ATTRIBUTES.add(ID);
 
-		ATTRIBUTES.add(LAYERNAME);
 		ATTRIBUTES.add(IMPLANTATION);
 		ATTRIBUTES.add(VISIBLE);
 		ATTRIBUTES.add(REGISTRATION);
@@ -81,10 +78,7 @@ public abstract class Basic implements Glyph2D {
 	protected final String id;
 	
 	protected final Registration registration;
-	
-	/**What layer does this glyph belong to?*/
-	protected final DisplayLayer layer;
-	
+		
 	/**Should this glyph be drawn?**/
 	protected final boolean visible;
 	
@@ -92,9 +86,7 @@ public abstract class Basic implements Glyph2D {
 	
 	protected final double z;
 	
-	protected Basic(DisplayLayer layer, String id) {
-		this.layer = layer;
-
+	protected Basic(String id) {
 		this.id = id;
 		visible = VISIBLE.defaultValue;
 		registration = REGISTRATION.defaultValue;
@@ -103,7 +95,6 @@ public abstract class Basic implements Glyph2D {
 
 	protected Basic(String id, Basic source) {
 		this.id = id;
-		this.layer = source.layer;
 		this.registration = source.registration;
 		this.visible = source.visible;
 		this.z = source.z;
@@ -112,7 +103,6 @@ public abstract class Basic implements Glyph2D {
 	
 	protected Basic(Basic source, Tuple option, AttributeList unsettables) {
 		validateOptions(option, unsettables);
-		this.layer = source.layer;
 		updateBoundsRef(source.getBoundsReference());
 		id = switchCopy(source.id, (String) safeGet(option, ID));
 		visible = switchCopy(source.visible, safeGet(option, VISIBLE));
@@ -164,7 +154,6 @@ public abstract class Basic implements Glyph2D {
 	
 	public Object get(String name) {
 		if (ID.is(name)) {return id;}
-		if (LAYERNAME.is(name)) {return layer==null?null:layer.getName();}
 		if (IMPLANTATION.is(name)) {return getImplantation();}
 		if (REGISTRATION.is(name)) {return registration;}
 		if (VISIBLE.is(name)) {return visible;}
@@ -173,8 +162,6 @@ public abstract class Basic implements Glyph2D {
 	}
 
 
-	public String getLayerName() {return layer==null?null:layer.getName();}
-	
 	public boolean hasField(String name) {return getAttributes().getNames().contains(name);}
 
 	public boolean isDefault(String name, Object value) {
@@ -194,8 +181,6 @@ public abstract class Basic implements Glyph2D {
 		String[] fields = includeFields.toArray(new String[includeFields.size()]);
 		return Tuples.toString(this, fields);
 	}
-	
-	public DisplayLayer getLayer() {return layer;}
 	
 	public String getID() {return id;}
 	public double getZ() {return z;}

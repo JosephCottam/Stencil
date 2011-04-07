@@ -8,7 +8,11 @@ options {
 }
 
 @header {
-  /**Ensure the query guide includes the monitor, sample and any stateful action operations.*/
+  /**Ensure the query guide includes the monitor, sample and any stateful action operations.
+   * This is required for summaraization guides because the monitor operator is never in the call chain.
+   * Direct guides already have their monitor included in the state query because
+   * the monitor operator is integrated into the analysis chain.
+   */
   
   package stencil.parser.string; 
   
@@ -23,15 +27,18 @@ options {
 }
      
      
-topdown
+topdown: ^(LIST_GUIDE_MONITORS monitor+);
+   
+monitor
    @after{
-      StencilTree guide = q.getAncestor(GUIDE);
-      StencilTree summary = q.getAncestor(GUIDE_SUMMARIZATION);
-      if (summary != null) {
-	      Invokeable monitorInv = new ReflectiveInvokeable(STATE_ID_FACET, ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue());
-	      AstInvokeable monitorAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "monitor");
-	      monitorAInv.setInvokeable(monitorInv);
-	      adaptor.addChild(q, monitorAInv);
-	    }
+     StencilTree summary = op.getAncestor(GUIDE_SUMMARIZATION);
+     if (summary != null) {
+       StencilTree queries = summary.findDescendant(STATE_QUERY);
+        Invokeable monitorInv = new ReflectiveInvokeable(STATE_ID_FACET, ((Const) op).getValue());
+        AstInvokeable monitorAInv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "monitor");
+        monitorAInv.setInvokeable(monitorInv);
+        adaptor.addChild(queries, monitorAInv);
+     }
    }
-   : ^(q=STATE_QUERY .*); 
+   : ^(MONITOR_OPERATOR op=.);
+     

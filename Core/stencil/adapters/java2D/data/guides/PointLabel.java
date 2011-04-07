@@ -15,7 +15,7 @@ import stencil.interpreter.tree.Guide;
 import stencil.tuple.Tuple;
 
 public class PointLabel extends Guide2D {
-	protected Glyph2D prototypeText = new Text(null, "prototype");
+	protected Glyph2D prototypeText = new Text("prototype");
 	
 	protected final Collection<Glyph2D> marks = new ArrayList();
 

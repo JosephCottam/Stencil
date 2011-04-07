@@ -124,7 +124,7 @@ public final class EnvironmentProxy {
 		return new SimplePrototype(TuplePrototypes.getNames(defs), TuplePrototypes.getTypes(defs));
 	}
 	private static TuplePrototype calcStreamProxy(AncestryPackage anc, ModuleCache modules) {
-		if (anc.c == null && anc.l!= null) {return NO_PROTOTYPE;}//This is the characteristic of the defaults block
+		if (anc.c == null && anc.l!= null && anc.g == null) {return NO_PROTOTYPE;}//This is the characteristic of the defaults block
 		if (anc.c != null) {
 			if (!anc.inDynamicRule) {
 				StencilTree stream = findStream(anc.c.getText(), anc.program.find(LIST_STREAM_DECLS));
@@ -137,17 +137,26 @@ public final class EnvironmentProxy {
 			return Freezer.prototype(anc.operatorFacet.find(YIELDS).getChild(0));
 		}
 		
+		//HACK: does not handle multiple monitor operators or generators
 		if (anc.g != null) {
 			//If there is no MONITOR_OPERATOR, then there is not yet enough info to generate the prototype
-			if (anc.g.find(MONITOR_OPERATOR) == null) {throw new RuntimeException("Monitor and Sample operators must be set before framing guides.");}
+			if (anc.g.findAllDescendants(MONITOR_OPERATOR) == null) {
+				throw new RuntimeException("Monitor and Sample operators must be set before framing guides.");
+			}
 
-			if (anc.inRuleList && (((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue() instanceof LayerSampler)) {
-				SampleOperator sampler = (SampleOperator) ((Const) (anc.g.find(SAMPLE_OPERATOR).getChild(0))).getValue();
+			if (anc.inRuleList && (((Const) (anc.g.findAllDescendants(SAMPLE_OPERATOR).get(0).getChild(0))).getValue() instanceof LayerSampler)) {
+				SampleOperator sampler = (SampleOperator) ((Const) (anc.g.findDescendant(SAMPLE_OPERATOR).getChild(0))).getValue();
 				return ((LayerSampler) sampler).getDisplayLayer().getPrototype();
 			} else if (anc.inGuideGenerator) {
-				return SampleOperator.PROTOTYPE;
+				return SampleOperator.Util.prototype(anc.g.find(LIST_GUIDE_SAMPLERS).getChildCount());
 			} else if (anc.inRuleList) {
-				return Freezer.prototype(anc.g.find(GUIDE_GENERATOR).findDescendant(TUPLE_PROTOTYPE));
+				List<StencilTree> protos = anc.g.find(LIST_GUIDE_GENERATORS).findAllDescendants(TUPLE_PROTOTYPE);
+				if (protos.size() ==1) {return Freezer.prototype(protos.get(0));}
+				else {
+					final TuplePrototype[] prototypes = new TuplePrototype[protos.size()];
+					for(int i=0; i< prototypes.length; i++) {prototypes[i] = Freezer.prototype(protos.get(i));}
+					return TuplePrototypes.append(prototypes);
+				}
 			}
 		}
 		

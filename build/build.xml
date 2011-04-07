@@ -21,12 +21,13 @@
     <!-- Just the core stencil grammar, not the additional processing.
          Which grammar is specified at the command line with -Dn=...   -->
     <target name="WG">
-    	<input message="Target Grammar: " addproperty="n" />  
-        <antlr3
-            target="${grammars}/${n}.g"
-            outputdirectory="${parser}"
-            libdirectory="${parser}"
-        />
+        <loadfile property="nDef" srcFile="lastBuild.txt" failonerror="false"/>
+    	<input message="Target Grammar: " addproperty="n" defaultvalue="${nDef}"/>
+    	<echo message="${n}" file="lastBuild.txt"/>
+        <foreach target="antlrBuild" param="file" inheritall="true">
+            <fileset dir="${grammars}" includes="**/${n}.g"/>
+            <param name="antlrTarget" value="${parser}"/>
+        </foreach>
     </target>
  		
  		

@@ -127,8 +127,8 @@ public class TestFragments extends TestCase {
 	public void testLiftLayerConstants() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
 		StencilTree program = ParseStencil.programTree(source,  Adapter.ADAPTER);
-		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).getChildCount());
-		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).getChildCount());
+		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD_DEF).size());
+		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD_DEF).size());
 	}
 
 	public void testTargetPackMismatch() throws Exception {

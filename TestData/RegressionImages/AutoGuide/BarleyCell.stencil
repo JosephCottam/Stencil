@@ -13,19 +13,15 @@ stream Barley(year, site, yield, variety)
 const MAX: 100
 const MIN: 10
 
-canvas Main
-  guide axis[guideLabel: "Variety", X:0] from BarleySite Y
-  guide 
-    axis[guideLabel: "Yield", 
-         sample: "LINEAR", round: "T", seed.min: MIN, seed.max: MAX]
-    from BarleySite X
-  guide 
-    legend[X: 75, Y: -60] 
-    from BarleySite PEN_COLOR
-      example.FILL_COLOR: @Color{GRAY90}
-
 layer BarleySite
-  from Barley
+guide 
+  axis[guideLabel: "Variety", X:0] from Y
+  axis[guideLabel: "Yield", round: "T", seed.min: MIN, seed.max: MAX]
+    Linear from X
+  legend[X: 75, Y: -60] Categorical from PEN_COLOR
+      element.FILL_COLOR: @Color{GRAY90}
+
+from Barley
     filter(site =~ "University Farm") 
     ID: Concatenate(variety,year)
     PEN_COLOR: BrewerColors[palette: "PuRd"](year)

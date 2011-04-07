@@ -12,6 +12,7 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
+
 /**Iterates the tuples of a layer as the sample.*/
 public final class LayerSampler implements SampleOperator {
 	/**Special seed operator to accompany this sampler type.*/
@@ -26,7 +27,7 @@ public final class LayerSampler implements SampleOperator {
 		}
 		
 		public TuplePrototype getSamplePrototype() {return layer.getPrototype();}
-		public SampleSeed getSeed() {return new SampleSeed(false);}
+		public SampleSeed getSeed() {throw new UnsupportedOperationException("Should never seek the seed of a layer sampler.");}
 		public int stateID() {return (view != null) ? view.getStateID() : layer.getStateID();}
 		public MonitorOperator viewpoint() {
 			return new MonitorOperator(layer);

@@ -6,8 +6,6 @@ import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
-
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -46,8 +44,8 @@ public class Slice extends Filled {
 	
 	private final Arc2D glyph;
 	
-	public Slice(DisplayLayer layer, String id) {
-		super(layer, id);
+	public Slice(String id) {
+		super(id);
 		x = X.defaultValue;
 		y = Y.defaultValue;
 		start = START.defaultValue;
@@ -116,6 +114,8 @@ public class Slice extends Filled {
 	private Arc2D makeArc(){return new Arc2D.Double(bounds(), start, end-start, Arc2D.PIE);}
 	
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
+		
 		super.render(g, glyph);
 		super.postRender(g, null);
 	}

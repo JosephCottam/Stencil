@@ -8,11 +8,11 @@ import stencil.interpreter.tree.Guide;
  * should be defined (otherwise, a zero-argument list will be used).
  */
 public abstract class Guide2D implements DisplayGuide, Renderable {
-	protected final String attribute;
+	protected final String identifier;
 	protected Guide2D(Guide def) {
-		attribute = def.selector().attribute();
+		identifier = def.identifier();
 	}
 	
 	/**What is this guide for?*/
-	public String getAttribute() {return attribute;}
+	public String getIdentifier() {return identifier;}
 }

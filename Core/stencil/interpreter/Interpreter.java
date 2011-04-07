@@ -161,7 +161,7 @@ public class Interpreter {
 	private boolean singleRegisterDynamic(Layer layer, Consumes group, Tuple source, Tuple result) {
 		if (!layer.canStore(result)) {return false;}
 		try {
-			String id = Converter.toString(result.get(ParserConstants.SELECTOR_FIELD));
+			String id = Converter.toString(result.get(ParserConstants.IDENTIFIER_FIELD));
 			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
 			assert glyph != null;
 			

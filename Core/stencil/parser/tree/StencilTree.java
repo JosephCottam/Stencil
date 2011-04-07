@@ -110,7 +110,7 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 		java.util.List<? extends CommonTree> l = searchDescendants(true, types);
 		
 		assert l.size() ==1 : "Searched for single child, but multiple children found " + l.size();
-		if (l.size() ==1) {return (StencilTree) l.get(0);}
+		if (l.size() == 1) {return (StencilTree) l.get(0);}
 		else {return null;}
 	}
 	

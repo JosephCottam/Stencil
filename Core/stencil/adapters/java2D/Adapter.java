@@ -50,7 +50,7 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private boolean defaultMouse;
 	
 	public Panel generate(Program program) {
-		Canvas canvas = new Canvas(program.canvas(), program.layers());
+		Canvas canvas = new Canvas(program.canvasSpec(), program.layers());
 		constructGuides(canvas, program);
 		Panel panel = new Panel(canvas, program);
 		
@@ -98,19 +98,22 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 	private void constructGuides(Canvas canvas, Program program) {
 		int legendCount = 0;//How many side-bars have been created?
 		
-		for (Guide guideDef : program.canvas().guides()) {
+		for (Guide guideDef : program.allGuides()) {
 			if (guideDef.type().equals("axis")) {
 				Guide2D guide = new Axis(guideDef);
-				canvas.addGuide(guideDef.selector(), guide);
+				canvas.addGuide(guideDef.identifier(), guide);
 			} else if (guideDef.type().equals("legend")) {
 				Guide2D guide = new Legend(guideDef, legendCount++);
-				canvas.addGuide(guideDef.selector(), guide);
+				canvas.addGuide(guideDef.identifier(), guide);
 			} else if (guideDef.type().equals("pointLabels")) {
 				Guide2D guide = new PointLabel(guideDef);
-				canvas.addGuide(guideDef.selector(), guide);
+				canvas.addGuide(guideDef.identifier(), guide);
 			} else if (guideDef.type().equals("trend")) {
 				Guide2D guide = new TrendLine(guideDef);
-				canvas.addGuide(guideDef.selector(), guide);
+				canvas.addGuide(guideDef.identifier(), guide);
+			} else if (guideDef.type().equals("crossLegend")) {
+				Guide2D guide = new CrossLegend(guideDef, legendCount++);
+				canvas.addGuide(guideDef.identifier(), guide);
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " + guideDef.type());
 			}

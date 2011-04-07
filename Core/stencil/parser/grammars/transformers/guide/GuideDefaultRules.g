@@ -23,27 +23,24 @@ options {
    import stencil.tuple.prototype.TuplePrototype;
    import stencil.parser.string.util.EnvironmentProxy;
 
-   import static stencil.parser.ParserConstants.BIND_OPERATOR;	
+   import static stencil.parser.ParserConstants.BIND_OPERATOR;
+   import static stencil.parser.ParserConstants.IDENTIFIER_FIELD;	
+   import static stencil.parser.ParserConstants.SEQUENCE_FIELD;
+   import static stencil.parser.ParserConstants.X_FIELD;
+   import static stencil.parser.ParserConstants.Y_FIELD;
+   import static stencil.parser.ParserConstants.TEXT_FIELD;
+   import static stencil.parser.ParserConstants.INPUT_FIELD;
+   import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
+   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 }
 
 @members {
    public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-   private static final StencilTree OUTPUT_RULE;
-   private static final StencilTree INPUT_RULE;
-   private static final String OUTPUT_FIELD = "Output";
-   private static final String INPUT_FIELD = "Input";
-   private static final String X_FIELD = "X";
-   private static final String Y_FIELD = "Y";
-   private static final String ID_FIELD = "ID";
-   private static final String TEXT_FIELD = "TEXT";
-   
-   static {
-       OUTPUT_RULE = parseRule(OUTPUT_FIELD + BIND_OPERATOR + OUTPUT_FIELD);
-       INPUT_RULE = parseRule(INPUT_FIELD + BIND_OPERATOR + INPUT_FIELD);
-   }
-   
-   private static final StencilTree parseRule(String input) {
+   //Create a Stencil rule object that binds like to : from
+   //Actually performs the parsing so a tree is returned
+   private static final StencilTree parseRule(String to, String from) {
+      String input = to + BIND_OPERATOR + from;
       ANTLRStringStream input1 = new ANTLRStringStream(input);
       StencilLexer lexer = new StencilLexer(input1);
       CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -56,8 +53,7 @@ options {
          throw new Error("Error constructing default rule for guides.",e);
       }
    }
-    
-   
+       
    public StencilTree reform(StencilTree g) {
      StencilTree rules = g.find(LIST_RULES);
      TuplePrototype p = EnvironmentProxy.calcPrototype(rules);
@@ -65,36 +61,41 @@ options {
 
      String guideType = g.find(ID).getText();
      if (guideType.equals("pointLabels")) {
-        if (!names.contains(X_FIELD)) {
-           StencilTree r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
-           adaptor.addChild(rules, r);
+        if (!names.contains(X_FIELD)) { 
+           adaptor.addChild(rules, parseRule(X_FIELD, X_FIELD));
         }
         if (!names.contains(Y_FIELD)) {
-           StencilTree r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
-           adaptor.addChild(rules, r);
+           adaptor.addChild(rules, parseRule(Y_FIELD, Y_FIELD));
         }
         if (!names.contains(TEXT_FIELD)) {
-           StencilTree r= parseRule(TEXT_FIELD + BIND_OPERATOR + ID_FIELD);
-           adaptor.addChild(rules, r);
+           adaptor.addChild(rules, parseRule(TEXT_FIELD, IDENTIFIER_FIELD));
         }
      } else if (guideType.equals("trend")) {
         if (!names.contains(X_FIELD)) {
-           StencilTree r = parseRule(X_FIELD + BIND_OPERATOR + X_FIELD); 
-           adaptor.addChild(rules, r);
+           adaptor.addChild(rules, parseRule(X_FIELD, X_FIELD));
         }
         if (!names.contains(Y_FIELD)) {
-           StencilTree r = parseRule(Y_FIELD + BIND_OPERATOR + Y_FIELD); 
-           adaptor.addChild(rules, r);
+           adaptor.addChild(rules, parseRule(Y_FIELD, Y_FIELD));
         }        
      } else {          
-	     if (!names.contains(OUTPUT_FIELD)) {
-	        adaptor.addChild(rules, adaptor.dupTree(OUTPUT_RULE));   
-	     }
-	     
-	     if (!names.contains(INPUT_FIELD)) {
-	        adaptor.addChild(rules, adaptor.dupTree(INPUT_RULE));
-	     }
+       for (StencilTree s: g.find(LIST_SELECTORS)) {
+          String boundField = s.getText();
+          String displayField = GUIDE_ELEMENT_TAG + NAME_SEPARATOR + s.getText();
+          if (!names.contains(boundField)) {
+             adaptor.addChild(rules, parseRule(displayField, boundField));
+          }
+       }
+       
+       for (StencilTree s: g.find(LIST_GUIDE_MONITORS)) {
+           String inputField = INPUT_FIELD + (s.getChildIndex() > 0 ? s.getChildIndex() : "");
+            if (!names.contains(inputField)) {
+               adaptor.addChild(rules, parseRule(inputField, inputField));  //Make the sample inputs accessible
+            }
+       }
      }
+     
+     //TODO: Add sequence field so, for example, legend layouts can be computed in rules
+     //if (!names.contains(SEQUENCE_FIELD)) {adaptor.addChild(rules, parseRule(SEQUENCE_FIELD, SEQUENCE_FIELD));}
           
      return (StencilTree) adaptor.dupTree(g);   
    }

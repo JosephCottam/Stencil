@@ -57,15 +57,15 @@ public final class Canvas extends DisplayCanvas {
 	
 	private AffineTransform viewTransform = new AffineTransform();
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
-	private final Map<Selector, Guide2D> guides  = new ConcurrentHashMap();
+	private final Map<String, Guide2D> guides  = new ConcurrentHashMap();
 	
 	final DoubleBufferLayer<? extends Glyph2D>[] layers;
 
 	/**Point used in many navigation operations.*/
 	private final Point2D tempPoint = new Point2D.Double();
 	
-	public Canvas(stencil.interpreter.tree.Canvas def, Layer[] layers) {
-		String colorKey = (String) def.specializer().get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name());
+	public Canvas(Specializer canvasSpec, Layer[] layers) {
+		String colorKey = (String) canvasSpec.get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name());
 		Color c = stencil.types.color.ColorCache.get(colorKey);
 		this.setBackground(c);
 		
@@ -87,9 +87,9 @@ public final class Canvas extends DisplayCanvas {
 		this.repaint();
 	}
 	
-	public DisplayGuide getGuide(Selector sel) {return guides.get(sel);}
-	public void addGuide(Selector sel, Guide2D guide) {guides.put(sel, guide);}
-	public boolean hasGuide(Selector sel) {return guides.containsKey(sel);}
+	public DisplayGuide getGuide(String identifier) {return guides.get(identifier);}
+	public void addGuide(String identifier, Guide2D guide) {guides.put(identifier, guide);}
+	public boolean hasGuide(String identifier) {return guides.containsKey(identifier);}
 	public Collection<Guide2D> getGuides() {return guides.values();}
 	
 	/**What are the bounds of everything currently on this canvas 

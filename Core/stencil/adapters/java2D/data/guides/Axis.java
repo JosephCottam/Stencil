@@ -26,6 +26,8 @@ import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 
 import static stencil.parser.ParserConstants.GUIDE_LABEL;
+import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
+import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 
 public class Axis extends Guide2D {
 	/**Fields used in creating marks.*/
@@ -44,7 +46,7 @@ public class Axis extends Guide2D {
 	 */
 	public static final String LINE_PROPERTY_TAG = "line";
 
-	private static final String defaultArguments = "[sample: \"CATEGORICAL\", position: NULL, label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, connect: \"FALSE\"]";
+	private static final String defaultArguments = "[position: NULL, label.FONT: 4, label.COLOR: \"BLACK\", line.PEN: .4, line.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, connect: \"FALSE\"]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.specializer(defaultArguments);}
@@ -74,8 +76,8 @@ public class Axis extends Guide2D {
 	
 	protected final AXIS axis;
 	
-	protected Glyph2D prototypeText = new Text(null, "prototype");
-	protected Glyph2D prototypeLine = new Line(null, "prototype");
+	protected Glyph2D prototypeText = new Text("prototype");
+	protected Glyph2D prototypeLine = new Line("prototype");
 
 	protected final ArrayList<Glyph2D> marks  = new ArrayList();
 
@@ -90,7 +92,8 @@ public class Axis extends Guide2D {
 	/**@param Which axis should this go on (valid values are X and Y)*/
 	public Axis(Guide guideDef) {
 		super(guideDef);
-		axis = AXIS.valueOf(guideDef.selector().attribute().substring(0,1));//Only the first character matters because of XS,YS, etc
+		final String axisTag = guideDef.identifier().substring(guideDef.identifier().indexOf("->")+2); 
+		axis = AXIS.valueOf(axisTag.substring(0,1));//Only the first character matters because of XS,YS, etc
 		Specializer spec = guideDef.specializer();
 		
 		GuideUtils.setValues(DEFAULT_ARGUMENTS, this);
@@ -114,7 +117,7 @@ public class Axis extends Guide2D {
 		
 		TuplePrototype p = guideDef.resultsPrototype();
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
-		offset_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
+		offset_idx = ArrayUtil.indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag, TuplePrototypes.getNames(p));
 		
 		assert label_idx >=0 : "Input field not found for labeling in results prototype";
 		assert offset_idx >=0 : "Output field not found for labeling in results prototype";

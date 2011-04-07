@@ -31,26 +31,24 @@ public class NumericSampler implements SampleOperator {
 		Iterable source;
 		int sourceSize;
 		
-		if (!seed.isRange()) {
-			source = seed;
-			sourceSize = seed.size();
-		} else {
-			double min = ((Number) seed.get(0)).doubleValue();
-			double max = ((Number) seed.get(1)).doubleValue();
-			
-			int tickCount = 10;
-			boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
+		if (!seed.isContinuous()) {throw new RuntimeException("Can only use numeric sample on continuous ranges.");}
+		if (seed.size() ==0) {return new ArrayList();}//No seed -> No sample
+		
+		double min = ((Number) seed.get(0)).doubleValue();
+		double max = ((Number) seed.get(1)).doubleValue();
+		
+		int tickCount = 10;
+		boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
 
-			if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
-				double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));
-				tickCount = (int) Math.ceil((max-min)/stride);
-			} else if (spec.containsKey(SAMPLE_COUNT)) {
-				tickCount =  Converter.toInteger(spec.get(SAMPLE_COUNT));
-			}
-			
-			source = buildRange(max, min, tickCount, useIntegers);
-			sourceSize = ((List) source).size();
+		if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
+			double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));
+			tickCount = (int) Math.ceil((max-min)/stride);
+		} else if (spec.containsKey(SAMPLE_COUNT)) {
+			tickCount =  Converter.toInteger(spec.get(SAMPLE_COUNT));
 		}
+		
+		source = buildRange(max, min, tickCount, useIntegers);
+		sourceSize = ((List) source).size();
 
 		List<Tuple> sample = new ArrayList(sourceSize);
 		for (Object sv: source) {sample.add(Converter.toTuple(sv));}

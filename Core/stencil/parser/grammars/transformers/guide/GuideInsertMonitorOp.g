@@ -13,7 +13,6 @@ options {
    *  after the last project operator in a chain or 
    *  at the start of the chain (in that order of precedence).
    *
-   *  TODO: Needs to be fixed so that constants don't mess this up...ARG!!!!
    *  TODO: Extend so to can handle more than the first field in a mapping definition
    **/
 	 
@@ -25,10 +24,11 @@ options {
    import stencil.parser.ParseStencil;
    import stencil.interpreter.tree.Freezer;
    import stencil.interpreter.tree.Specializer;
+   import stencil.interpreter.guide.Samplers;
    
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.MAP_FACET;
-   import static stencil.interpreter.guide.Samplers.CATEGORICAL;
+   import static stencil.interpreter.guide.Samplers.Monitor;
    import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
@@ -52,20 +52,16 @@ options {
   private static final String MONITOR_PREFIX = "monitor.";
   private static final String SEED_PREFIX = "seed.";
 
-  private static final boolean isCategorical(Specializer spec) {
-    return !spec.containsKey(SAMPLE_KEY) ||
-           CATEGORICAL.equals(spec.get(SAMPLE_KEY));
-  }
-
 	protected ModuleCache modules;
 
-  //Mapping from requested guides to descriptor construction strategy.  This is populated by the 'build' pass
-  protected HashMap<String, Specializer> requestedGuides = new HashMap();
+  //Mapping from guide descriptors to the guide request
+  //The keys are layer/attribute pairs
+  protected HashMap<String, StencilTree> requestedGuides = new HashMap();
     
     /**Given a tree, how should it be looked up in the guides map?*/
     private String key(StencilTree tree) {
       if (tree.getType() == SELECTOR) {
-          return key(tree.getChild(0).getText(), tree.getChild(1).getText()); //TODO: Extend the range of keys beyond layer/att pairs to full paths
+          return key(tree.getAncestor(LAYER).getText(), tree.getText());
       } else if (tree.getType() == PACK || tree.getType() == FUNCTION) {
           return key(tree.getAncestor(RULE));
       } else if (tree.getType() == RULE) {
@@ -92,8 +88,8 @@ options {
     private boolean requiresChanges(StencilTree chain) {
       StencilTree r = chain.getAncestor(RULE);
       if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
-      Specializer strat = requestedGuides.get(key(r));
-      String operatorName = operatorName(strat);
+      String type = requestedGuides.get(key(r)).find(SAMPLE_TYPE).getText();
+      String operatorName = operatorName(type);
       StencilTree call = chain.find(FUNCTION, PACK);
       while(call.getType() == FUNCTION) {
         if (operatorName.equals(call.getText())) {return false;}
@@ -102,15 +98,16 @@ options {
       return true;
     }
     
-    private static final String operatorName(Specializer spec) {
-           String operatorName;
-      
-      if (spec == null || isCategorical(spec)) {
-        operatorName = "MonitorCategorical";
-      } else {
-        operatorName = "MonitorContinuous";
+    private static final String operatorName(String type) {
+      Monitor mon = Samplers.monitor(type);
+      String operatorName;
+      switch (mon) {
+        case FLEX : operatorName = "MonitorFlex"; break; 
+        case CATEGORICAL : operatorName = "MonitorCategorical"; break;   
+        case CONTINUOUS : operatorName = "MonitorContinuous"; break; 
+        case NONE : throw new RuntimeException("Attempt to acquire null monitor in guide system.");
+        default : throw new Error(String.format("Monitor type \%2\$s not handled (requested for sample type \%1\$s)", mon, type));
       }
-      
       return String.format("\%1\$s.\%2\$s", operatorName, MAP_FACET);
     }
  
@@ -129,46 +126,42 @@ options {
        }
        return newArgs;
     }
+        
+    private String selectOperator(StencilTree t) {
+      StencilTree layer = t.getAncestor(LAYER);
+      StencilTree r = t.getAncestor(RULE);
+      String field = r.findDescendant(TUPLE_PROTOTYPE).getChild(0).getChild(0).getText();
+      
+      String type = requestedGuides.get(key(layer.getText(), field)).find(SAMPLE_TYPE).getText();
+      return operatorName(type);
+    }
     
-    private StencilTree spec(StencilTree target) {
-      StencilTree newSpec = (StencilTree) adaptor.create(SPECIALIZER, "");
-      
-      //Get additional map arguments from the guide declaration
-      Specializer spec = requestedGuides.get(key(target));
-      for (String k: spec.keySet()) {
-          String key = null;
-          if (k.startsWith(MONITOR_PREFIX)) {
-              key = k.substring(MONITOR_PREFIX.length());       
-          } else if (k.startsWith(SEED_PREFIX)) {
-              key = k.substring(SEED_PREFIX.length());       
-          }
-      
-          if (key != null) {
+    private StencilTree spec(StencilTree t) {
+       StencilTree guide = requestedGuides.get(key(t.getAncestor(RULE))).getAncestor(GUIDE);
+       Specializer spec = Freezer.specializer(guide.find(SPECIALIZER));
+       StencilTree newSpec = (StencilTree) adaptor.create(SPECIALIZER, "");
+       
+       for (String k: spec.keySet()) {
+          if (k.startsWith(SEED_PREFIX)) {
+             String key = k.substring(SEED_PREFIX.length());       
              Object entry = adaptor.create(MAP_ENTRY, key);
              Const value = (Const) adaptor.create(CONST, "");
              value.setValue(spec.get(k));
              adaptor.addChild(entry, value);
              adaptor.addChild(newSpec, entry);
-          }
-      }
-      return newSpec;
-    }
-        
-    private String selectOperator(StencilTree t) {
-      StencilTree layer = t.getAncestor(StencilParser.LAYER);
-      StencilTree r = t.getAncestor(StencilParser.RULE);
-      String field = r.findDescendant(TUPLE_PROTOTYPE).getChild(0).getChild(0).getText();
-      
-      Specializer strat = requestedGuides.get(key(layer.getText(), field));
-      return operatorName(strat);
+          }       
+       }
+       return newSpec;
     }
 }
 
 //Identify requested guides from canvas def
-listRequirements: ^(GUIDE_DIRECT ^(guide=GUIDE .*)) 
-   {requestedGuides.put(key(guide.find(SELECTOR)), Freezer.specializer(guide.find(SPECIALIZER)));};
+listRequirements: ^(sel=SELECTOR .*)
+   {if (sel.getAncestor(GUIDE_DIRECT) != null) {
+     requestedGuides.put(key(sel), sel);
+   }};
 
-//Replace the #-> with an echo operator...
+//Replace the #-> with a monitor operator...
 replaceCompactForm:
  ^(f=FUNCTION s=. a=. gy=GUIDE_YIELD t=.) ->
 		^(FUNCTION $s $a DIRECT_YIELD[$gy.text] ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] $t));  
@@ -177,8 +170,8 @@ ensure:
   ^(c=CALL_CHAIN t=.)
 		  {$c.getParent().getChild(0).getType() == RESULT &&  requiresChanges($c)}? ->
 		    ^(CALL_CHAIN    
-		         ^(FUNCTION[selectOperator($t)] 
-                {spec($t)} 
-                {echoArgs($t)} 
-                DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
-                $t));
+		       ^(FUNCTION[selectOperator($t)] 
+                  {spec($t)} 
+                  {echoArgs($t)} 
+                  DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
+                  $t));

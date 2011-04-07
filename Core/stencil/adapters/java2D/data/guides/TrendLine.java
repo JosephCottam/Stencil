@@ -29,7 +29,7 @@ public class TrendLine  extends Guide2D {
 	private static String[] UPDATE_NAMES = new String[]{"X.1", "Y.1", "X.2", "Y.2"};
 	private static enum SAMPLE_TYPE {LINEAR, SIMPLE}
 
-	protected Glyph2D prototypeLine = new Line(null, "prototype");
+	protected Glyph2D prototypeLine = new Line("prototype");
 	
 	protected final TupleSorter sorter;
 	protected final int x_idx;

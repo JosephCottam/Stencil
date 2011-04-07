@@ -8,8 +8,10 @@ import java.util.Properties;
 import org.antlr.runtime.tree.*;
 
 import stencil.adapters.java2D.Adapter;
+import stencil.interpreter.tree.Freezer;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.*;
+import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.treeView.ANTLRNode;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
@@ -60,6 +62,13 @@ public class TreeView {
 			System.err.println("Error checking ancestory:");
 			System.err.println(e.getMessage());
 		}
-
+		
+		if (tree instanceof StencilTree && tree.getType()==StencilParser.PROGRAM) {
+			try {Freezer.program((StencilTree) tree);}
+			catch (Exception e) {
+				System.err.println("Error freezing program");
+				e.printStackTrace();
+			}
+		}
 	}
 }

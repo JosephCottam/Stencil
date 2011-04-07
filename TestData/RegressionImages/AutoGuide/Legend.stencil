@@ -1,0 +1,22 @@
+STREAM: File
+NAME: survey
+HEADER: fruit
+SEPARATOR: $^
+SOURCE: ./Fruits.txt
+SKIP: 0
+STRICT: true
+
+stream survey(fruit)
+
+layer plot
+guide
+  axis from X                           /*@\label{fruit:Xguide}@*/
+  legend Categorical from FILL_COLOR
+from survey
+   ID: Count()
+   X:* Rank(fruit) -> Mult(5, rank)             /*@\label{fruit:XRank}@*/
+/* X:* Index(fruit) -> Mult(5, index)*/             /*@\label{fruit:XIndex}@*/
+/* X:* Index(fruit) -> Mult(10, index)*/                /*@\label{fruit:XIndex10}@*/
+   Y: Count(fruit) -> Mult(-5, count)
+   FILL_COLOR:* Count(fruit) -#> HeatScale[hot:"GRAY90"](count)
+   REGISTRATION: "CENTER"

@@ -8,16 +8,14 @@ STRICT: TRUE
 
 import ViewCanvas
 
-stream Tweets(MESSAGE)
-
-canvas Main
-	guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Counts X
-        label.FONT: @Font{10}
-        line.PEN: @Stroke{1} 
-        label.REGISTRATION: "LEFT"
-	
+stream Tweets(MESSAGE)	
 
 layer Counts
+guide axis[tickSize: 5, textOffset: 6] Categorical from X
+   label.FONT: @Font{10}
+   line.PEN: @Stroke{1} 
+   label.REGISTRATION: "LEFT"
+
 from Tweets
 	ID: firstLetter(MESSAGE) -> Letter
 	X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11, rank)

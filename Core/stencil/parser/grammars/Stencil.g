@@ -23,6 +23,9 @@ tokens {
   LIST_CONSUMES;
   LIST_FILTERS;
   LIST_GUIDES;
+  LIST_GUIDE_GENERATORS;
+  LIST_GUIDE_MONITORS;
+  LIST_GUIDE_SAMPLERS;
   LIST_GLOBALS;
   LIST_IMPORTS;
   LIST_JAVAS;
@@ -30,11 +33,11 @@ tokens {
   LIST_OPERATORS;
   LIST_PREDICATES;
   LIST_RULES;
+  LIST_SELECTORS;
   LIST_STREAMS;
   LIST_STREAM_DECLS;
   LIST_STREAM_DEFS;
   LIST_TEMPLATES;
-  
   MAP_ENTRY;
   NUMBER;
   OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
@@ -67,7 +70,8 @@ tokens {
   PROTOTYPE_ARG;
   PROTOTYPE_RESULT;
 
-  SAMPLE_OPERATOR;//Guide system sample-operator node  
+  SAMPLE_OPERATOR;//Guide system sample-operator node
+  SAMPLE_TYPE;    //Guide system sample-operator indicator  
   STATE_QUERY;    //List of entities ot check if state has changed
   SPECIALIZER;
   SELECTOR;		    //Indicate some part of a stencil
@@ -223,20 +227,12 @@ globalValue
 externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
-
 canvasLayer
-  : CANVAS name=ID specializer guideDef* 
-    -> ^(CANVAS_DEF[$name.text] specializer ^(LIST_GUIDES["Guides"] guideDef*))
-  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT) ^(LIST_GUIDES["Guides"]));
+  : CANVAS name=ID specializer 
+    -> ^(CANVAS_DEF[$name.text] specializer)
+  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT));
 
-guideDef: GUIDE ID specializer FROM selector rule["result"]* 
-			-> ^(GUIDE ID specializer selector ^(LIST_RULES rule*));
-
-selector
-  options{backtrack=true;}
-  : att=ID DEFINE path+=ID+ -> ^(SELECTOR[$att.text] $path+)
-  |               path+=ID+ -> ^(SELECTOR["DEFAULT"] $path+);
-
+  
 //////////////////////////////////////////// STREAM, LAYER, ELEMENT ///////////////////////////
 
 streamDef
@@ -244,8 +240,8 @@ streamDef
     -> ^(STREAM_DEF[$name.text] tuple ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 layerDef
-  : LAYER name=ID specializer defaultsBlock consumesBlock+
-    -> ^(LAYER[$name.text] specializer defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+));
+  : LAYER name=ID specializer guidesBlock defaultsBlock consumesBlock+
+    -> ^(LAYER[$name.text] specializer guidesBlock defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 elementDef
   : ELEMENT name=ID specializer defaultsBlock consumesBlock+
@@ -260,6 +256,22 @@ consumesBlock
     -> ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+));
 
 filter: FILTER! predicate;
+
+guidesBlock
+   : GUIDE guideDef+ -> ^(LIST_GUIDES guideDef*)
+   |                  -> ^(LIST_GUIDES);
+   
+guideDef: type=ID specializer selectorList rule["result"]*
+      -> ^(GUIDE $type specializer selectorList ^(LIST_RULES rule*));
+
+selectorList
+  options{backtrack=true;}
+  : selector (SEPARATOR selector)* -> ^(LIST_SELECTORS selector+);
+
+selector
+  : sample=ID FROM field=ID -> ^(SELECTOR[$field.text] SAMPLE_TYPE[$sample.text])
+  |           FROM field=ID -> ^(SELECTOR[$field.text] DEFAULT);
+
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
 

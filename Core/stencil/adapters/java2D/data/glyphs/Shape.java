@@ -39,7 +39,6 @@ import stencil.adapters.general.ScaleWith;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.ScaleWith.ScaleBy;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -81,8 +80,8 @@ public class Shape extends Filled {
 	private final double regY;
 	private final ScaleBy scale;
 	
-	public Shape(DisplayLayer layer, String id) {
-		super(layer, id);
+	public Shape(String id) {
+		super(id);
 		
 		shape =  SHAPE.defaultValue;
 		width = WIDTH.defaultValue;
@@ -172,7 +171,7 @@ public class Shape extends Filled {
 
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
-		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
+		if (!visible || bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 		java.awt.Shape glyph = glyphRef.get();  
 		if (glyph == null) {glyph = createShape();}
 		glyph = ScaleWith.scale(glyph, scale, base);

@@ -47,7 +47,6 @@ public final class Freezer {
 			case NULL: return null;
 			case OPERATOR_FACET: return operatorFacet("**UNKNOWN**", (StencilTree) tree);
 			case RULE: return rule(tree);
-			case SELECTOR: return selector(tree);
 			case SPECIALIZER: return specializer(tree);
 			case STATE_QUERY: return stateQuery(tree);
 			case STRING: return string(tree);
@@ -73,64 +72,71 @@ public final class Freezer {
 		Order order = order(program.find(ORDER));
 		Layer[] layers = layers(program.find(LIST_LAYERS));
 		StreamDef[] streams = streams(program.find(LIST_STREAM_DEFS));
-		Canvas canvas = canvas(program.find(CANVAS_DEF));
+		Specializer canvasSpec = specializer(program.find(CANVAS_DEF).find(SPECIALIZER));
 		
 		List<StencilTree> dynamicRules = program.findAllDescendants(DYNAMIC_RULE);
 		final DynamicRule[] dynamics = new DynamicRule[dynamicRules.size()];
-		for (int i=0; i< dynamics.length; i++) {
-			dynamics[i] = dynamicRule(dynamicRules.get(i));
-		}
-		return new Program(canvas, layers, streams, order, dynamics);
-	}
-	
-	public static Canvas canvas(StencilTree canvas) {
-		assert verifyType(canvas, CANVAS_DEF);
+		for (int i=0; i< dynamics.length; i++) {dynamics[i] = dynamicRule(dynamicRules.get(i));}
 		
-		Specializer spec = specializer(canvas.find(SPECIALIZER));
-		Guide[] guides;
-
-		try {guides = typedArray(canvas.find(LIST_GUIDES), Guide.class, Freezer.class.getMethod("guide", StencilTree.class));}
-		catch (FreezeException f) {throw f;}
-		catch (Exception e) {throw new FreezeException(canvas, e);}
-		return new Canvas(spec, guides);
+		List<StencilTree> guideDefs = program.findAllDescendants(GUIDE);
+		final Guide[] guides = new Guide[guideDefs.size()];
+		for (int i=0; i< guides.length;i++) {guides[i]=guide(guideDefs.get(i));}
 		
+		return new Program(canvasSpec, layers, streams, order, dynamics, guides);
 	}
 	
 	public static Guide guide(StencilTree guide) {
 		assert verifyType(guide, GUIDE);
-		final Selector sel = selector(guide.find(SELECTOR));
+		final String id= guide.find(SELECTOR).getText();
 		final String type = guide.find(ID).getText();
-		final MonitorOperator monitorOp = (MonitorOperator) ((Const) guide.find(MONITOR_OPERATOR).getChild(0)).getValue();
-		final SampleOperator sampleOp =(SampleOperator) ((Const) guide.find(SAMPLE_OPERATOR).getChild(0)).getValue();
+		final MonitorOperator[] monitorOps = typedArray(guide.find(LIST_GUIDE_MONITORS), MonitorOperator.class, "monitorOperator"); 
+		final SampleOperator[] sampleOps = typedArray(guide.find(LIST_GUIDE_SAMPLERS), SampleOperator.class, "sampleOperator");
 		final StateQuery query = stateQuery(guide.find(STATE_QUERY));
-		final Rule generator = rule(guide.find(GUIDE_GENERATOR).find(RULE));
+		final Rule[] generators = typedArray(guide.findDescendant(LIST_GUIDE_GENERATORS), Rule.class, "guideGenerator");
 		final Specializer spec = specializer(guide.find(SPECIALIZER));
 		final Rule rules = ruleFromList(guide.find(LIST_RULES));
 		
-		return new Guide(sel, type, rules, monitorOp, sampleOp, query, generator, spec);
+		return new Guide(id, type, rules, monitorOps, sampleOps, query, generators, spec);
 	}
+
+	public static Rule guideGenerator(StencilTree generator) {
+		assert verifyType(generator, GUIDE_GENERATOR);
+		return rule(generator.find(RULE));
+	}
+	
+	public static MonitorOperator monitorOperator(StencilTree root) {
+		assert verifyType(root, MONITOR_OPERATOR);
+		return (MonitorOperator) ((Const) root.find(CONST)).getValue();
+	}
+	
+	public static SampleOperator sampleOperator(StencilTree root) {
+		assert verifyType(root, SAMPLE_OPERATOR);
+		return (SampleOperator) ((Const) root.find(CONST)).getValue();
+	}
+	
+	
 	
 	public static Layer[] layers(StencilTree root) {
 		assert verifyType(root, LIST_LAYERS);
-		try {return typedArray(root, Layer.class, Freezer.class.getMethod("layer", StencilTree.class));}
-		catch (FreezeException f) {throw f;}
-		catch (Exception e) {throw new FreezeException(root, e);}
+		return typedArray(root, Layer.class, "layer");
 	}
 	
 	public static StreamDef[] streams(StencilTree root) {
 		assert verifyType(root, LIST_STREAM_DEFS);
-		try {return typedArray(root, StreamDef.class, Freezer.class.getMethod("streamDef", StencilTree.class));}
-		catch (FreezeException f) {throw f;}
-		catch (Exception e) {throw new FreezeException(root, e);}
+		return typedArray(root, StreamDef.class, "streamDef");
 	}
 	
-	private static <T> T[] typedArray(StencilTree root, Class<T> type, Method freezer)  {
-		Object value = Array.newInstance(type, root.getChildCount());
-		for (int i=0;i < root.getChildCount(); i++) {
-			try {Array.set(value, i, freezer.invoke(null, root.getChild(i)));}
-			catch (Exception e) {throw new FreezeException(root.getChild(i), e);}
-		}
-		return (T[]) value;
+	private static <T> T[] typedArray(StencilTree root, Class<T> type, String freezerName) throws FreezeException {
+		try {
+			Method freezer = Freezer.class.getMethod(freezerName, StencilTree.class);
+
+			Object value = Array.newInstance(type, root.getChildCount());
+			for (int i=0;i < root.getChildCount(); i++) {
+				try {Array.set(value, i, freezer.invoke(null, root.getChild(i)));}
+				catch (Exception e) {throw new FreezeException(root.getChild(i), e);}
+			}
+			return (T[]) value;
+		} catch (Exception e) {throw new FreezeException(root, e);}
 	}
 	
 	public static Layer layer(StencilTree layer) {
@@ -153,16 +159,6 @@ public final class Freezer {
 			}
 		}		
 		return new Order(clauses);
-	}
-	
-	public static Selector selector(StencilTree sel) {
-		assert verifyType(sel, SELECTOR);
-		final String att = sel.getText();
-		final String[] path = new String[sel.getChildCount()];
-		for (int i=0; i<path.length; i++) {
-			path[i] = sel.getChild(i).getText();
-		}
-		return new Selector(att, path);
 	}
 	
 	public static CallChain chain(StencilTree chain) {

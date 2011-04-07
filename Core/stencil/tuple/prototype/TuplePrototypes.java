@@ -74,5 +74,23 @@ public final class TuplePrototypes {
 		Arrays.fill(types, Object.class);
 		return types;
 	}
+	
+	/**Appends the prototypes together.  Assumes that names are disjoint (does not do any shared-name checks)**/
+	public static TuplePrototype append(final TuplePrototype... prototypes) {
+		int total=0;
+		for (TuplePrototype proto:prototypes) {total+=proto.size();}
+		String[] names = new String[total];
+		Class[] types = new Class[total];
+		
+		int offset=0;
+		for (TuplePrototype proto:prototypes) {
+			for (int i=0; i<proto.size(); i++) {
+				names[i+offset] = proto.get(i).getFieldName();
+				types[i+offset] = proto.get(i).getFieldType();
+			}
+			offset += proto.size();
+		}
+		return new SimplePrototype(names, types);
+	}
 
 }

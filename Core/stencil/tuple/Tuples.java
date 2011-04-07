@@ -38,6 +38,7 @@ import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
+import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.SIGIL;
 
 /**Utility methods for working with tuples.*/
@@ -75,12 +76,18 @@ public final class Tuples {
 		for (String field:TuplePrototypes.getNames(source)) {
 			if (field.startsWith(prefix)) {
 				values.add(source.get(field));
-				fields.add(field.substring(prefix.length()));
+				fields.add(getRootName(field));
 			}
 		}
 		
 		return new PrototypedTuple(fields, values);
 	}
+	
+	private static final String getRootName(final String name) {
+		try {return name.split(NAME_SEPARATOR_PATTERN)[1];}
+		catch (Exception e) {throw new RuntimeException("Could not find root name in " + name, e);}
+	}
+
 
 	
 	/**Creates a read-only copy of the given tuple.  Values

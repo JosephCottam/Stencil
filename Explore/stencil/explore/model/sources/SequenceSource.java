@@ -10,17 +10,17 @@ import stencil.util.streams.numbers.SequenceStream;
 
 public class SequenceSource extends StreamSource {
 	public static final String NAME = "SequenceNumbers";
-	private final long length;
-	private final long increment;
-	private final long start;
+	private final double start;
+	private final double increment;
+	private final double stop;
 	
-	public SequenceSource(String name) {this(name, 0,1, Integer.MIN_VALUE);}
+	public SequenceSource(String name) {this(name, 0,1, Double.MAX_VALUE);}
 	
-	public SequenceSource(String name, long start, long increment, long length) {
+	public SequenceSource(String name, double start, double increment, double stop) {
 		super(name);
 		this.start= start;
 		this.increment = increment;
-		this.length = length;
+		this.stop = stop;
 	}
 
 	
@@ -29,7 +29,7 @@ public class SequenceSource extends StreamSource {
 
 	@Override
 	public SequenceStream getStream(Model context) throws Exception {
-		return new SequenceStream(name, start, increment, length);
+		return new SequenceStream(name, start, increment, stop);
 	}
 
 	public String header() {return "VALUE";}
@@ -40,25 +40,25 @@ public class SequenceSource extends StreamSource {
 	@Override
 	public SequenceSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new SequenceSource(name, start, increment, length);
+		return new SequenceSource(name, start, increment, stop);
 	}
 
-	public long start() {return start;}
-	public SequenceSource start(long start) {
+	public double start() {return start;}
+	public SequenceSource start(double start) {
 		if (this.start == start) {return this;}
-		return new SequenceSource(name, start, increment, length);
+		return new SequenceSource(name, start, increment, stop);
 	}
 
-	public long increment() {return increment;}
-	public SequenceSource increment(long increment) {
+	public double increment() {return increment;}
+	public SequenceSource increment(double increment) {
 		if (this.increment == increment) {return this;}
-		return new SequenceSource(name, start, increment, length);
+		return new SequenceSource(name, start, increment, stop);
 	}
 	
-	public long length() {return length;}
-	public SequenceSource length(long length) {
-		if (this.length == length) {return this;}
-		return new SequenceSource(name, start, increment, length);
+	public double stop() {return stop;}
+	public SequenceSource stop(double stop) {
+		if (this.stop == stop) {return this;}
+		return new SequenceSource(name, start, increment, stop);
 	}
 	
 	@Override
@@ -69,14 +69,14 @@ public class SequenceSource extends StreamSource {
 			if (line.startsWith("NAME")) {
 				String name = line.substring(line.indexOf(":") +2);
 				result = result.name(name);
-			} else if (line.startsWith("LENGTH")) {
-				long length = Long.parseLong(line.substring(line.indexOf(":") +2));
-				result = result.length(length);
+			} else if (line.startsWith("STOP")) {
+				double stop = Double.parseDouble(line.substring(line.indexOf(":") +2));
+				result = result.stop(stop);
 			} else if (line.startsWith("START")) {
-				long start = Integer.parseInt(line.substring(line.indexOf(":") +2));
+				double start = Double.parseDouble(line.substring(line.indexOf(":") +2));
 				result = result.start(start);
 			} else if (line.startsWith("INCREMENT")) {
-				long increment = Integer.parseInt(line.substring(line.indexOf(":") +2));
+				double increment = Double.parseDouble(line.substring(line.indexOf(":") +2));
 				result = result.increment(increment);
 			}
 			input.mark(100);
@@ -94,8 +94,8 @@ public class SequenceSource extends StreamSource {
 		b.append("NAME: ");
 		b.append(name);
 		b.append("\n");
-		b.append("LENGTH: ");
-		b.append(length);
+		b.append("STOP: ");
+		b.append(stop);
 		b.append("\n");
 		b.append("INCREMENT: ");
 		b.append(increment);

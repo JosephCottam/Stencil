@@ -42,20 +42,22 @@ public abstract class ParserConstants {
 	 * indicate that default should be used.*/
 	public static final String SIMPLE_DEFAULT = "DEFAULT";
 	
-	public static final String DEFAULT_RESTRICTION = "ANY";
-	public static final String DEFAULT_FIELD_TYPE_LABEL="NOMINAL";
-
+	//Common fields
+	public static final String IDENTIFIER_FIELD  = "ID";
+	public static final String SEQUENCE_FIELD = "SEQ";
+	public static final String INPUT_FIELD = "Input";
+	public static final String X_FIELD = "X";
+	public static final String Y_FIELD = "Y";
+	public static final String TEXT_FIELD = "TEXT";
+	
 	public static final String GUIDE_LABEL = "guideLabel";
+	public static final String GUIDE_ELEMENT_TAG = "element";
 	public static final String POSITIONAL_ARG = "#POSITIONAL";
 	public static final String SEPARATOR = ",";
 	public static final String INITIATOR = "(";
 	public static final String TERMINATOR = ")";
 	public static final String SIGIL = "@";
 
-
-	
-	//Seletors
-	public static final String SELECTOR_FIELD  = "ID";
 
 	//Block tags
 	public static final String MAP_FACET = StencilOperator.MAP_FACET;

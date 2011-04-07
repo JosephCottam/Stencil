@@ -40,7 +40,7 @@ public class TestPath extends TestCase {
 	}
 
 	public void testGuide() {
-		StencilTree r = tree1.find(CANVAS_DEF).findAllDescendants(GUIDE).get(0);
+		StencilTree r = tree1.find(LIST_LAYERS).getChild(0).findAllDescendants(GUIDE).get(0);
 		test(r);
 	}
 

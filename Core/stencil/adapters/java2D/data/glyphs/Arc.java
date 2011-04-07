@@ -35,7 +35,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.QuadCurve2D;
 
 import stencil.adapters.general.Registrations;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -82,8 +81,8 @@ public class Arc extends Stroked {
 
 	private final QuadCurve2D arc;
 	
-	public Arc(DisplayLayer layer, String id) {
-		super(layer, id);
+	public Arc(String id) {
+		super(id);
 		
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
@@ -139,6 +138,8 @@ public class Arc extends Stroked {
 	
 	@Override
 	public void render(Graphics2D g, AffineTransform base) {
+		if (!visible) {return;}
+		
 		super.render(g, arc);
 		super.postRender(g, null);
 	}

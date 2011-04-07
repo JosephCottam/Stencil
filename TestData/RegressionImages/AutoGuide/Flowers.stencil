@@ -11,15 +11,13 @@ import BrewerPalettes
 stream flowers(sepalL, petalW, sepalW, 
                         petalL, species, obs)
 
-canvas Main
-  guide trend[sample: "SIMPLE"] from FlowerPlot ID 
-  guide legend[X: 15, Y: -90] from FlowerPlot FILL_COLOR
-  guide axis[sample: "Linear", guideLabel: "Petal Length"] 
-    from FlowerPlot Y
-  guide axis[sample: "Linear", guideLabel: "Petal Width"] 
-     from FlowerPlot X
-
 layer FlowerPlot
+guide
+ trend[sample: "SIMPLE"] from ID 
+ legend[X: 15, Y: -90] Categorical from FILL_COLOR
+ axis[guideLabel: "Petal Length"] Linear from Y
+ axis[guideLabel: "Petal Width"] Linear from X
+
 from flowers
    ID: obs
    X:* Scale[min: 0, max:100](petalL)

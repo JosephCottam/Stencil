@@ -38,5 +38,5 @@ public abstract class MonitorBase<T extends MonitorBase> extends AbstractOperato
 	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 
 	@Override
-	public SampleSeed getSeed() {throw new RuntimeException("No implemented.");}
+	public abstract SampleSeed getSeed();
 }

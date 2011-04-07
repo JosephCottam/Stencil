@@ -36,7 +36,6 @@ import java.awt.Shape;
 
 import stencil.adapters.general.Fills;
 import stencil.adapters.general.Fills.FillProperty;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -53,8 +52,8 @@ public abstract class Filled extends Stroked {
 	
 	protected final Paint fill;
 	
-	protected Filled(DisplayLayer layer, String id) {
-		super(layer, id, Stroked.PEN.defaultValue, PEN_COLOR.defaultValue);
+	protected Filled(String id) {
+		super(id, Stroked.PEN.defaultValue, PEN_COLOR.defaultValue);
 		fill = Fills.getDefault();
 	}
 	

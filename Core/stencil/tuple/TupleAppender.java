@@ -31,6 +31,7 @@ package stencil.tuple;
 
 import java.util.*;
 
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototypes;
 
@@ -87,6 +88,14 @@ public final class TupleAppender {
 			result = append(result, sources[i]);
 		}
 		return result;
+	}
+	
+	public static Tuple valueMerge(Tuple source1, Tuple source2) {
+		Object[] values = new Object[source1.size() + source2.size()];
+		final int source1Size = source1.size();
+		for (int i =0; i<source1Size; i++) {values[i]=source1.get(i);}
+		for (int i=0; i< source2.size(); i++) {values[i+source1Size] = source2.get(i);}
+		return new ArrayTuple(values);
 	}
 }
 

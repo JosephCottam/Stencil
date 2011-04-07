@@ -1,6 +1,5 @@
 package stencil.adapters.java2D.data.guides;
 
-import  static stencil.parser.ParserConstants.SIMPLE_DEFAULT;
 import  static stencil.parser.ParserConstants.GUIDE_LABEL;
 
 import java.awt.Font;
@@ -29,21 +28,23 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.collections.ArrayUtil;
 
+import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
+import static stencil.parser.ParserConstants.SEPARATOR;
+import static stencil.display.DisplayLayer.TYPE_KEY;
+
 public class Legend extends Guide2D {
-	
-	public static final String IMPLANTATION_NAME = "SIDE_BAR";
+	public static final String GEOM_TAG = "layer" + SEPARATOR + TYPE_KEY;
 	public static final String LABEL_PROPERTY_TAG = "label";
-	public static final String EXAMPLE_PROPERTY_TAG = "example";
 	
-	private static final String defaultArguments = "[sample: \"CATEGORICAL\", label.FONT: 4, label.FCOLOR: \"BLACK\", example.SIZE: 4, spacing: .25, displayOn: \"" + SIMPLE_DEFAULT + "\"]";
+	private static final String defaultArguments = "[label.FONT: 4, label.FCOLOR: \"BLACK\", element.SIZE: 4, spacing: .25]";
 	public static final Specializer DEFAULT_ARGUMENTS;
 	static {
 		try {DEFAULT_ARGUMENTS = ParseStencil.specializer(defaultArguments);}
 		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
 	}
 	
-	private Text prototypeLabel = new Text(null, "prototype");
-	private Shape prototypeExample = new Shape(null, "prototype");
+	private Text prototypeLabel = new Text("prototype");
+	private final Glyph2D prototypeExample;
 	private final Collection<Glyph2D> marks = new ArrayList();
 	private float exampleWidth;
 	private float exampleHeight;
@@ -61,14 +62,9 @@ public class Legend extends Guide2D {
 	//Public because of how the applyDefaualts system works
 	/**How far apart should elements be?**/
 	public float spacing = .25f;
-
-	//Public because of how the applyDefaualts system works
-	/**Which of the example graphic attributes should be used to display the attribute?**/
-	public String displayOn = SIMPLE_DEFAULT;
 	
 	private final TupleSorter sorter;
 	private final int label_idx;
-	private final int value_idx;
 	private final String guideLabel;
 	
 	
@@ -83,8 +79,10 @@ public class Legend extends Guide2D {
 		prototypeLabel = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, LABEL_PROPERTY_TAG, prototypeLabel);
 		prototypeLabel = GuideUtils.applyDefaults(specializer, LABEL_PROPERTY_TAG, prototypeLabel);
 
-		prototypeExample = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, EXAMPLE_PROPERTY_TAG, prototypeExample);
-		prototypeExample = GuideUtils.applyDefaults(specializer, EXAMPLE_PROPERTY_TAG, prototypeExample);
+		
+		Glyph2D prototype = new Shape("prototype");  //CONSTRUCT BASED ON GEOM....
+		prototype = GuideUtils.applyDefaults(DEFAULT_ARGUMENTS, GUIDE_ELEMENT_TAG, prototype);
+		prototypeExample = GuideUtils.applyDefaults(specializer, GUIDE_ELEMENT_TAG, prototype);
 		
 		guideLabel = (String) specializer.get(GUIDE_LABEL);
 		
@@ -95,14 +93,11 @@ public class Legend extends Guide2D {
 		
 		
 		if (specializer.containsKey(StandardAttribute.X.name()) || specializer.containsKey(StandardAttribute.Y.name())) {autoPlace = false;}
-		if (SIMPLE_DEFAULT.equals(displayOn)) {displayOn = guideDef.selector().attribute();}
 		
 		TuplePrototype p = guideDef.resultsPrototype();
 		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
-		value_idx = ArrayUtil.indexOf("Output", TuplePrototypes.getNames(p));
 		
 		assert label_idx >=0 : "Input field not found for labeling in results prototype";
-		assert value_idx >=0 : "Output field not found for labeling in results prototype";
 
 		sorter = new TupleSorter(label_idx);
 	}
@@ -130,18 +125,11 @@ public class Legend extends Guide2D {
 	private Collection<Glyph2D> createGuideLabel() {
 		List<Glyph2D> parts = new ArrayList(2);
 		Font font = (Font) prototypeLabel.get("FONT");
-//		font = font.deriveFont(Font.ITALIC);
 		
 		String[] labelFields = new String[]{"FONT", "X","Y","TEXT", "REGISTRATION"};
 		Object[] labelValues = new Object[]{font, 0, 0, guideLabel, "LEFT"};
 		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
 		parts.add(label);
-
-//		double offset = label.getBoundsReference().getHeight() + vSpacing/2.0;
-//		String[] lineFields = new String[]{"X.1","Y.1","X.2", "Y.2"};
-//		Object[] lineValues = new Object[]{0, offset ,label.getBoundsReference().getWidth(), offset};
-//		Line line = new Line(null, "guide line").update(new PrototypedTuple(lineFields, lineValues));
-//		parts.add(line);
 		
 		return parts;
 	}
@@ -151,23 +139,24 @@ public class Legend extends Guide2D {
 		Collection<Glyph2D> marks = new ArrayList<Glyph2D>(elements.size() *2);
 		for (int i=0; i< elements.size(); i++) {
 			Tuple t = elements.get(i);
-			marks.addAll(createLabeledBox(t, i+1));	//Plus 1 because of the guide label
+			marks.addAll(createLabeledBox(i+1, t));	//i+1 because of the guide label	
 		}
 		return marks;
 	}
 	
-	private Collection<Glyph2D> createLabeledBox(Tuple contents, int idx) {
+	// TODO: Move the layout/registration to guide rules		
+	private Collection<Glyph2D> createLabeledBox(int idx, Tuple contents) {
 		float indexOffset = (idx * exampleHeight) + (idx * vSpacing);  
 		
 		String[] labelFields = new String[]{"X","Y","TEXT", "REGISTRATION"};
 		Object[] labelValues = new Object[]{hSpacing, indexOffset, contents.get(label_idx), "LEFT"};
 		Text label = prototypeLabel.update(new PrototypedTuple(labelFields, labelValues));
-		label = label.update(Tuples.sift("label.", contents));
+		label = label.update(Tuples.sift(LABEL_PROPERTY_TAG, contents));
 		
-		String[] exampleFields = new String[]{"Y", displayOn, "REGISTRATION"};
-		Object[] exampleValues = new Object[]{indexOffset, contents.get(value_idx), "RIGHT"};
-		Shape example = prototypeExample.update(new PrototypedTuple(exampleFields, exampleValues));
-		example = example.update(Tuples.sift("example.", contents));
+		String[] exampleFields = new String[]{"Y", "REGISTRATION"};
+		Object[] exampleValues = new Object[]{indexOffset, "RIGHT"};
+		Glyph2D example = prototypeExample.update(new PrototypedTuple(exampleFields, exampleValues));
+		example = example.update(Tuples.sift(GUIDE_ELEMENT_TAG, contents));
 		
 		return Arrays.asList(new Glyph2D[]{label, example});
 	}	

@@ -48,20 +48,19 @@ options {
   protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
   
   public Object downup(Object p) {
-    downup(p, this, "buildMappings");
-    downup(p, this, "transferMappings");
-    downup(p, this, "trimGuide");
-    downup(p, this, "copyQuery");
-    downup(p, this, "renameMappingsDown");
+    downup(p, this, "buildMappings");     //Get a listing of layer/attribute definitions
+    downup(p, this, "transferMappings");  //Move the needed ones to the guide definitions
+    downup(p, this, "fillFragments");     //Convert the transfered parts to rules
+    downup(p, this, "trimGuide");         //Throw out the rule parts not required
+    downup(p, this, "copyQuery");         //Create the state query
+    downup(p, this, "changeFacets");      //Switch the facet invoked
     return p;
   }
 
     private String key(StencilTree sel) {
-      return key(sel.getChild(0), sel.getChild(1)); //TODO: Extend the range of keys beyond layer/att pairs to full paths
+      return key(sel.getAncestor(LAYER).getText(), sel.getText());
     }
     
-    private String key(Tree layer, Tree attribute) {return key(layer.getText(), attribute.getText());}
-    private String key(String layer, Tree attribute) {return key(layer, attribute.getText());}
     private String key(String layer, String attribute) {
       MultiPartName att = new MultiPartName(attribute);
       String key = layer + ":" + att.getName();	//Trim to just the attribute name
@@ -71,10 +70,24 @@ options {
 	//EnsureGuideOp guarantees that a sample operator exists; this
 	//cuts things down so the generator only includes things after that point
    private Tree trimCall(StencilTree tree) {
-      if (tree.getType() == StencilParser.PACK) {throw new RuntimeException("Error trimming (no sample operator found): " + tree.toStringTree());}
+      if (tree.getType() == StencilParser.PACK) {throw new RuntimeException("Error trimming (no monitor operator found): " + tree.getAncestor(CALL_CHAIN).toStringTree());}
 
       if (tree.find(INVOKEABLE).getOperator() instanceof MonitorOperator) {return (Tree) adaptor.dupTree(tree);}
       else {return trimCall(tree.find(FUNCTION, PACK));}
+   }
+   
+   private StencilTree generators(StencilTree selectors) {
+      StencilTree generators = (StencilTree) adaptor.create(LIST_GUIDE_GENERATORS, "LIST_GENERATORS");
+      for(StencilTree sel:selectors) {
+         assert sel.getType() == SELECTOR : "Non selector in selectors list.";
+         StencilTree gen = attDefs.get(key(sel));
+         if (gen==null) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(sel));}
+         
+         StencilTree node = (StencilTree) adaptor.create(GEN_FRAGMENT, sel.getText());  //Gen-fragement for a particular output field
+         adaptor.addChild(node, adaptor.dupTree(gen));
+         adaptor.addChild(generators, node);
+      }
+      return generators;
    }
 }
 
@@ -82,43 +95,48 @@ options {
 buildMappings: ^(c=CONSUMES {$c.getAncestor(LAYER) !=null}? . . . ^(RULES_RESULT mapping[$c.getAncestor(LAYER).getText()]*) . .);
 mapping[String layerName] 
   : ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
-		{attDefs.put(key(layerName, field), group);};
+		{attDefs.put(key(layerName, field.getText()), group);};
+
+
+
 
 //Move in the appropriate mappings -----------------------------------------------
+//The adaptor.dupTree($selectors) is required to prevent an interesting mid-stream rewrite from destroying the selectors context before it can be used in the generators call
 transferMappings
-	 : ^(GUIDE_DIRECT ^(GUIDE type=ID spec=. selector=. actions=.))
-	 	{
-	 	 if (!attDefs.containsKey(key(selector))) {throw new AutoGuideException("Guide requested for unavailable glyph attribute " + key(selector));}
-	 	}
-	 	-> ^(GUIDE_DIRECT 
-	 	     ^(GUIDE $type $spec $selector $actions 
-	 	        ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["Output"] DEFAULT))) {adaptor.dupTree(attDefs.get(key(selector)))})))
-	 | ^(GUIDE_SUMMARIZATION ^(GUIDE type=ID spec=. selector=. actions=.))
+	 :   ^(GUIDE_DIRECT ^(GUIDE type=ID spec=. selectors=. actions=.))
+	 	-> ^(GUIDE_DIRECT ^(GUIDE $type   $spec  {adaptor.dupTree($selectors)}  $actions {generators($selectors)}))
+                                              
+	 | ^(GUIDE_SUMMARIZATION ^(GUIDE type=ID spec=. selectors=. actions=.))
 	   -> ^(GUIDE_SUMMARIZATION 
-	         ^(GUIDE $type $spec $selector $actions 
+	         ^(GUIDE $type $spec $selectors $actions 
 	            ^(RULE ^(RESULT TUPLE_PROTOTYPE) ^(CALL_CHAIN PACK))));
 
-
-//Update query creation -----------------------------------------------
-copyQuery: ^(GUIDE type=. spec=. selector=. actions=. ^(gen=RULE t=. ^(CALL_CHAIN chain=.))) ->
-        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($gen)} {stateQueryList(adaptor, $chain)});
+//Turn mappings into rules -------------------------------------------------------
+fillFragments: ^(gf=GEN_FRAGMENT rule=.) -> ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING[$gf.text] DEFAULT))) $rule);
 
 
 //trimMappings  -----------------------------------------------
 trimGuide
-  : ^(g=GUIDE layer=. type=. spec=. map=. ^(RULE t=. ^(CALL_CHAIN c=.)))
-    {g.getAncestor(GUIDE_DIRECT) != null}?
-    -> ^(GUIDE $layer $type $spec $map ^(RULE $t ^(CALL_CHAIN {trimCall(c)})));
+  : ^(g=GUIDE . . . . ^(LIST_GUIDE_GENERATORS trimGuideGenRule*));
 
-//^(CALL_CHAIN call=. size=.) {call.getAncestor(GUIDE) != null}? -> ^(CALL_CHAIN {trimCall(call)});
+trimGuideGenRule
+  : ^(RULE t=. ^(CALL_CHAIN c=.))
+    {t.getAncestor(GUIDE_DIRECT) != null}? -> ^(RULE $t ^(CALL_CHAIN {trimCall(c)}));
+
+
+
+//Update query creation -----------------------------------------------
+copyQuery: ^(GUIDE type=. spec=. selector=. actions=. lgg=.) ->
+        ^(GUIDE $type $spec $selector $actions $lgg {stateQueryList(adaptor, $lgg)});
+
 
 //Rename mappings -----------------------------------------------
 //Pick the 'guide'-related function instead of whatever else
 //was selected for each function
-renameMappingsDown
+changeFacets
    @after{
-     StencilTree func = $renameMappingsDown.tree;
+     StencilTree func = $changeFacets.tree;
      func.find(INVOKEABLE).changeFacet(QUERY_FACET);
      //TODO: Remove when no longer relying on copy propagation to keep shared state correct
    }
-   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(GUIDE) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);
+   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);

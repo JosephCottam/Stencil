@@ -78,6 +78,16 @@ public abstract class Examples extends TestCase {
 	public void testFlowersImage() throws Throwable {new AutoGuide_Flowers(configs).testPNG();}
 	public void testFlowersText() throws Throwable {new AutoGuide_Flowers(configs).testTXT();}
 
+	public void testFlowersCrossImage() throws Throwable {new AutoGuide_FlowersCross(configs).testPNG();}
+	public void testFlowersCrossText() throws Throwable {new AutoGuide_FlowersCross(configs).testTXT();}
+
+	public void testFlowersMultiImage() throws Throwable {new AutoGuide_FlowersMulti(configs).testPNG();}
+	public void testFlowersMultiText() throws Throwable {new AutoGuide_FlowersMulti(configs).testTXT();}
+
+	public void testFlowersFlexImage() throws Throwable {new AutoGuide_FlowersFlex(configs).testPNG();}
+	public void testFlowersFlexText() throws Throwable {new AutoGuide_FlowersFlex(configs).testTXT();}
+
+	
 	public void testBarleyImage() throws Throwable {new AutoGuide_Barley(configs).testPNG();}
 	public void testBarleyText() throws Throwable {new AutoGuide_Barley(configs).testTXT();}
 

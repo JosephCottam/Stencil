@@ -37,18 +37,18 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototypes;
+import stencil.types.Converter;
 
 public abstract class Poly extends Stroked {
 	public static class PolyLine extends Poly {
 		public static final String IMPLANTATION = "POLY_LINE";
 		
-		public PolyLine(DisplayLayer layer, String id) {super(layer, id, false);}
+		public PolyLine(String id) {super(id, false);}
 		protected PolyLine(String id, PolyLine source) {super(id, source);}
 		protected PolyLine(PolyLine source, Tuple option) {
 			super(source, option, false);
@@ -67,7 +67,7 @@ public abstract class Poly extends Stroked {
 	public static class Polygon extends Poly {
 		public static final String IMPLANTATION = "POLYGON";
 		
-		public Polygon(DisplayLayer layer,String id) {super(layer, id, true);}
+		public Polygon(String id) {super(id, true);}
 		protected Polygon(String id, Polygon source) {super(id, source);}
 		protected Polygon(Polygon source, Tuple option) {
 			super(source, option, true);
@@ -113,8 +113,8 @@ public abstract class Poly extends Stroked {
 	private final boolean connect;
 	private final String scaleBy;
 	
-	public Poly(DisplayLayer layer, String id, boolean connect) {
-		super(layer, id);
+	public Poly(String id, boolean connect) {
+		super(id);
 		this.connect = connect;
 		
 		xs = new ArrayList();
@@ -214,8 +214,7 @@ public abstract class Poly extends Stroked {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-		if (path == null) {return;}
-		
+		if (path == null || !visible) {return;}
 		GeneralPath p = fixTransform(g);
 		super.render(g, p);
 		super.postRender(g, base);
@@ -231,7 +230,7 @@ public abstract class Poly extends Stroked {
 		else if (index.equals("after")) {idx = xs.size();}
 		else if (index.equals("first")) {idx = 0;}
 		else if (index.equals("last")) {idx = xs.size()-1;}
-		else {idx = Integer.parseInt(index.toString());}
+		else {idx = Converter.toInteger(index.toString());}
 		
 		if (idx <0) {idx = xs.size() - idx;}//Wrapp around...
 

@@ -14,13 +14,11 @@ import ViewCanvas
 stream Stocks(Date, Open)
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
-canvas Main
-	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] from Markers XS
-		label.TEXT: Date.query(_) -> Print(Date)
-	guide axis[sample: "LINEAR", tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] from Markers YS
-
-
 layer Markers["POLY_LINE"]
+guide 
+  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] Linear from XS
+        label.TEXT: Date.query(_) -> Print(Date)
+  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] Linear from YS
 from Stocks
 	ID : "Google"
 	IDX: "after"

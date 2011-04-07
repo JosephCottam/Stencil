@@ -28,17 +28,16 @@
  */
 package stencil.adapters.java2D.data.guides;
 
- import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.awt.geom.Rectangle2D;
 import java.lang.reflect.*;
 
 import stencil.adapters.java2D.data.Glyph2D;
 import stencil.interpreter.tree.Specializer;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
+import stencil.tuple.instances.SpecializerTuple;
 import stencil.types.Converter;
-import static stencil.parser.ParserConstants.NAME_SEPARATOR_PATTERN;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 
 public abstract class GuideUtils {
@@ -48,24 +47,10 @@ public abstract class GuideUtils {
 	 * Only values that start with the given prefix (plus a name separator) will be applied.
 	 */
 	public static final <T extends Glyph2D> T applyDefaults(Specializer source, String prefix, T target) {
-		List<String> names = new ArrayList();
-		List<Object> values = new ArrayList();
-		
-		for (String name: source.keySet()) {
-			if (!name.startsWith(prefix)) {continue;}
-			String rootName = getRootName(name);
-			names.add(rootName);
-			values.add(source.get(name));
-		}
-		
-		return (T) target.update(new PrototypedTuple(names, values));
+		Tuple update = Tuples.sift(prefix, new SpecializerTuple(source));		
+		return (T) target.update(update);
 	}
-	
-	private static final String getRootName(final String name) {
-		try {return name.split(NAME_SEPARATOR_PATTERN)[1];}
-		catch (Exception e) {throw new RuntimeException("Could not find root name in " + name, e);}
-	}
-	
+		
 	/**Sets visible instance variables on the target if the variable name
 	 * appears in the source specializer.
 	 */

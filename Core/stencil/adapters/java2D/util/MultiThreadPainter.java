@@ -121,7 +121,7 @@ public final class MultiThreadPainter {
 				guideDef.render(g, base);
 				return buffer;
 			}
-			public String toString() {return "Guide Painter for " + guideDef.getAttribute();}
+			public String toString() {return "Guide Painter for " + guideDef.getIdentifier();}
 		}
 		
 		//Factory methods....
@@ -161,7 +161,7 @@ public final class MultiThreadPainter {
 		painters = new ArrayList();		
 		
 		
-		for (Guide g: program.canvas().guides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
+		for (Guide g: program.allGuides()) {guideUpdaters.add(new GuideTask(g, canvas));}			
 		for (DynamicRule rule : program.allDynamics()) {
 			DoubleBufferLayer layer= null;
 			for (DoubleBufferLayer t: layers) {if (t.getName().equals(rule.layerName())) {layer = t; break;}}
@@ -250,8 +250,8 @@ public final class MultiThreadPainter {
 				
 				executeAll(dynamicUpdaters.values());
 				executeAll(guideUpdaters);
-				
 			}
+			
 		} catch (Exception e) {
 			throw new RuntimeException("Error running asynchronous updates.", e);
 		}

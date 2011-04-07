@@ -208,9 +208,9 @@ public abstract class ParseStencil {
 		p = FrameTupleRefs.apply(p, modules, true);//Ensure that all tuple references have a frame reference
 		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
 		
-		//BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
-		p = GuideDefaultSelector.apply(p); 
+//		BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		p = GuideDistinguish.apply(p);					//Distinguish between guide types		
+		p = GuideDefaultSelector.apply(p); 
 		p = GuideInsertMonitorOp.apply(p, modules);		//Ensure that auto-guide requirements are met
 		p = FrameTupleRefs.apply(p, modules, true);		
 		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
@@ -218,15 +218,17 @@ public abstract class ParseStencil {
 													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
 		
 		p = GuideTransfer.apply(p, modules);		
-		p = GuideLiftGenerator.apply(p);
+		p = GuideModifyGenerator.apply(p);
 		p = GuideDefaultRules.apply(p);
 		p = GuideAutoLabel.apply(p);
+		p = GuideLegendGeom.apply(p);
 
 		p = DefaultSpecializers.apply(p, modules, adapter, false); 
 		p = SetOperators.apply(p, modules);
 
 		p = GuideSampleOp.apply(p);
 		p = GuideExtendQuery.apply(p);
+		p = GuideRemoveSelectors.apply(p);
 		p = GuideClean.apply(p);
 		p = FrameTupleRefs.apply(p, modules, false);		//Ensure that all tuple references have a frame reference
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
@@ -247,7 +249,9 @@ public abstract class ParseStencil {
 		p = UnifyTargetTypes.apply(p);
 		p = ReplaceConstantOps.apply(p, modules);			//Evaluate functions that only have constant arguments, propagate results around
 		p = LiftLayerConstants.apply(p);					//Move constant property assignments to the defaults section so they are only applied once.
-
+		p = GuideAdoptLayerDefaults.apply(p);				//Take identified layer constants, apply them to the guides
+		p = CombineRules.apply(p);
+		
 		validate(p);
 		return p;
 	}

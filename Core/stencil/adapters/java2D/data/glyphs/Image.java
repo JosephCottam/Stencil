@@ -40,7 +40,6 @@ import stencil.WorkingDir;
 import stencil.adapters.GlyphAttributes.StandardAttribute;
 
 import stencil.adapters.general.Registrations;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -80,8 +79,8 @@ public final class Image extends Basic {
 	private BufferedImage base;
 	private BufferedImage display;
 
-	public Image(DisplayLayer layer, String id) {
-		super(layer, id);
+	public Image(String id) {
+		super(id);
 		
 		filename = FILE.defaultValue;
 		
@@ -180,6 +179,8 @@ public final class Image extends Basic {
 
 	@Override
 	public void render(Graphics2D g, AffineTransform baseTransform) {
+		if (!visible) {return;}
+		
 		verifyImage();
 		if (base == null) {return;}
 		

@@ -8,11 +8,11 @@ STRICT: true
 
 stream Stocks(Date, Open)
 
-canvas Main
-  guide axis from Ticker XS
-  guide axis[sample:"linear"] from Ticker YS
-
 layer Ticker["POLY_LINE"]		/*Poly-line is a set of line segments treated as a group.*/
+guide
+  axis from XS
+  axis Linear from YS
+
 from Stocks
 	ID: "Google"
    IDX: "after"

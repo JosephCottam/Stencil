@@ -28,31 +28,31 @@ public class TestGlyphAttributes extends StencilTestCase {
 	}
 
 	public void testText() throws Exception {
-		testAttributes(new Text(null, "MyID"));
+		testAttributes(new Text("MyID"));
 	}
 	
 	public void testShape() throws Exception {
-		testAttributes(new Shape(null, "MyID"));
+		testAttributes(new Shape("MyID"));
 	}
 
 	public void testImage() throws Exception {
-		testAttributes(new Image(null, "MyID"), "HEIGHT", "WIDTH");
+		testAttributes(new Image("MyID"), "HEIGHT", "WIDTH");
 	}
 
 	public void testLine() throws Exception {
-		testAttributes(new Line(null, "MyID"), "X", "Y", "HEIGHT", "WIDTH");
+		testAttributes(new Line("MyID"), "X", "Y", "HEIGHT", "WIDTH");
 	}
 	
 	public void testPolyLine() throws Exception {
-		testAttributes(new Poly.PolyLine(null, "MyID"), "X", "Y", "XS", "YS");
+		testAttributes(new Poly.PolyLine("MyID"), "X", "Y", "XS", "YS");
 	}
 	
 	public void testPoly() throws Exception {
-		testAttributes(new Poly.Polygon(null, "MyID"), "X", "Y", "XS", "YS");
+		testAttributes(new Poly.Polygon("MyID"), "X", "Y", "XS", "YS");
 	}
 	
 	public void testPie() throws Exception {
-		testAttributes(new Pie(null, "MyID"));
+		testAttributes(new Pie("MyID"));
 	}
 
 }

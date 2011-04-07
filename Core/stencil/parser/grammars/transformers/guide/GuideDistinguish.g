@@ -20,14 +20,11 @@ options {
 
 @members {
   //TODO: Get the list of direct types from the adaptor
-  private static List<String> DIRECT_TYPES = Arrays.asList("AXIS", "LEGEND");
+  public static List<String> DIRECT_TYPES = Arrays.asList("axis", "legend");
 
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-  private boolean isDirect(Tree t) {
-    String type = t.getText().toUpperCase();
-    return DIRECT_TYPES.contains(type);
-  }
+  private boolean isDirect(Tree t) {return DIRECT_TYPES.contains(t.getText());}
   
   private Tree taggedType(Tree t) {
      if (isDirect(t)) {

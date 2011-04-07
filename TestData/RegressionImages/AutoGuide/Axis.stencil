@@ -8,19 +8,18 @@ STRICT: true
 
 stream Values(Category)
 
-canvas Main
-    guide axis[sample: "LINEAR", count: 5, round: "T", tickSize: 5, textOffset: 6] from Chart Y
-        label.FONT: @Font{10}
-        line.PEN: @Stroke{1}
-        label.REGISTRATION: "RIGHT"
-
-    guide axis[sample: "CATEGORICAL", tickSize: 5, textOffset: 6] from Chart X
-        label.REGISTRATION: "LEFT"
-        label.FONT: @Font{10}
-        line.PEN: @Stroke{1} 
-
-        
 layer Chart
+guide
+   axis[count: 5, round: "T", tickSize: 5, textOffset: 6] Linear from Y
+      label.FONT: @Font{10}
+      line.PEN: @Stroke{1}
+      label.REGISTRATION: "RIGHT"
+
+   axis[tickSize: 5, textOffset: 6] Categorical from X
+      label.REGISTRATION: "LEFT"
+      label.FONT: @Font{10}
+      line.PEN: @Stroke{1} 
+
 from Values
   ID : Count()
   X : Index(Category) -> Add(index, 1) -> Mult(sum, 11)

@@ -1,9 +1,6 @@
 package stencil.util.streams.numbers;
 
-import static java.lang.String.format;
-
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.PrototypedTuple;
@@ -12,34 +9,33 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 
 public class SequenceStream implements TupleStream {
-	private final long length;
-	private long count;
+	private double current;
 	
-	private final long start; 	
-	private final long increment;	
+	private final double increment;	
+	private final double stop;
 	private final String name;	//Name of the stream
 
 	private static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{"VALUE"}, new Class[]{Long.class});
 	                                               
-	public SequenceStream(String name) {this(name, 0,1, -1);}
+	public SequenceStream(String name) {this(name, 0,1, 1);}
 	
-	public SequenceStream(String name, long start, long increment, long length) {
+	public SequenceStream(String name, double start, double increment, double stop) {
 		this.name = name;
-		this.start =start;
+		this.stop = stop;
 		this.increment = increment;
-		this.length =length;
-		count =0;
+		current=start-increment;
+		
+		if (increment ==0) {throw new IllegalArgumentException("Increment cannot be 0.");}
+		else if ((increment >0 && start > stop) 
+				|| (increment < 0 && start < stop)) {throw new IllegalArgumentException("Increment must move start towards stop.");}
 	}
 	
 	public SourcedTuple next() {
-		if (length > 0 && count >= length) {throw new NoSuchElementException(format("Stream %1$s exhausted.", name));}
-		long value = (count * increment) + start;
-		count++;
-		
-		return new SourcedTuple.Wrapper(name, new PrototypedTuple(PROTOTYPE, Arrays.asList(value)));
+		current = current + increment;
+		return new SourcedTuple.Wrapper(name, new PrototypedTuple(PROTOTYPE, Arrays.asList(current)));
 	}
 
-	public boolean hasNext() {return (length < 0 || count < length);}
+	public boolean hasNext() {return increment>0 ? current < stop : current > stop;}
 
 	public void remove() {throw new UnsupportedOperationException();}
 }

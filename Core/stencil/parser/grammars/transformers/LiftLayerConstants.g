@@ -110,7 +110,7 @@ options {
 	         if (value.getType() == TUPLE_REF) {continue;}
 	         
 	         String name = ((StencilTree) target.getChild(resultID)).findDescendant(ID).getText();
-           if (selectorRule(name)) {continue;}
+           if (identifierRule(name)) {continue;}
            consts.add(new Pair(name, value));
 	      }
 	   } 
@@ -144,8 +144,8 @@ options {
      return blocks;
 	}
 
-	/**Is this a selector field (e.g. it sets ID)?  Selectors cannot be lifted.*/	
-	private boolean selectorRule(String name) {return name.startsWith(ParserConstants.SELECTOR_FIELD);}
+	/**Is this a identifier field (e.g. it sets ID)?  Identifiers cannot be lifted.*/	
+	private boolean identifierRule(String name) {return name.startsWith(ParserConstants.IDENTIFIER_FIELD);}
 	
 	private Object augmentDefaults(StencilTree defaults, StencilTree consumes) {
 		Collection<Pair> sharedConstants = sharedConstants(consumes);
@@ -171,7 +171,7 @@ options {
 
 }
 
-liftShared: ^(LAYER spec=. defaultList=. consumes=. direct=.)
-  -> ^(LAYER $spec {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
+liftShared: ^(LAYER spec=. guides=. defaultList=. consumes=. direct=.)
+  -> ^(LAYER $spec $guides {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
 	
 updateLayers: ^(l=LAYER .*) {updateLayer(l);};

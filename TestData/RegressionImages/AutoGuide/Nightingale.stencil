@@ -8,16 +8,16 @@ STRICT: true
 
 stream Deaths(date, type, count)
 
-canvas Main
-  guide legend[X: -75, Y: -50] from Rose FILL_COLOR
+layer Rose["SLICE"]
+guide
+  legend[X: -75, Y: -50] from FILL_COLOR
 
-  guide pointLabels from Rose ID
-    TEXT: MakeLabel(ID)			/*@\label{rose:postProcessStart}@*/
+  pointLabels from ID
+    TEXT: MakeLabel(ID)         /*@\label{rose:postProcessStart}@*/
     (X,Y): MinRadius.query(50, X, Y, OUTERX, OUTERY)
     REGISTRATION: "CENTER"
-    FONT: @Font{4}			/*@\label{rose:postProcessEnd}@*/
+    FONT: @Font{4}          /*@\label{rose:postProcessEnd}@*/
 
-layer Rose["SLICE"]
 from Deaths
    local(month, year) : ParseDate(date)
    ID: Concatenate(type, ":", month)

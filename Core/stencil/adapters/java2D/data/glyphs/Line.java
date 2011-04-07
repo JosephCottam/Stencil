@@ -43,7 +43,6 @@ import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Shapes;
 import stencil.adapters.general.Registrations.Registration;
 import stencil.adapters.general.Shapes.StandardShape;
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 
@@ -95,8 +94,8 @@ public final class Line extends Stroked {
 	
 	private final SoftReference<Line2D> glyph;
 	
-	public Line(DisplayLayer layer, String id) {
-		super(layer, id);
+	public Line(String id) {
+		super(id);
 		x1 = X1.defaultValue;
 		y1 = Y1.defaultValue;
 		x2 = X2.defaultValue;
@@ -192,7 +191,7 @@ public final class Line extends Stroked {
 	}
 	
 	public void render(Graphics2D g, AffineTransform base) {
-		if (bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
+		if (!visible || bounds.getWidth() ==0 || bounds.getHeight() ==0) {return;}
 
 		Line2D l = glyph.get();
 		if (l == null) {l = makeLine();}

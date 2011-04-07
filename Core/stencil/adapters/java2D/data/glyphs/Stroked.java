@@ -42,7 +42,6 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 
-import stencil.display.DisplayLayer;
 import stencil.adapters.java2D.util.Attribute;
 import stencil.adapters.java2D.util.AttributeList;
 import stencil.tuple.Tuple;
@@ -89,9 +88,9 @@ public abstract class Stroked extends Basic {
 	}
 	
 	
-	protected Stroked(DisplayLayer layer, String id) {this(layer, id, PEN.defaultValue, PEN_COLOR.defaultValue);}
-	protected Stroked(DisplayLayer layer, String id, Stroke outlineStyle, Paint outlinePaint) {
-		super(layer, id);
+	protected Stroked(String id) {this(id, PEN.defaultValue, PEN_COLOR.defaultValue);}
+	protected Stroked(String id, Stroke outlineStyle, Paint outlinePaint) {
+		super(id);
 		this.outlineStyle = outlineStyle;
 		this.outlinePaint = outlinePaint;
 		this.gradientSource = null;

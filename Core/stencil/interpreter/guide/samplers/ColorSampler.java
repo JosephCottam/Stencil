@@ -16,7 +16,7 @@ public class ColorSampler implements SampleOperator {
 	 * TODO: Implement continuous sample in color
 	 */
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
-		if (!seed.isRange()) {
+		if (!seed.isContinuous()) {
 			List<Tuple> sample = new ArrayList(seed.size());
 			for (Object c: seed) {sample.add(Converter.toTuple(c));}
 			return sample;

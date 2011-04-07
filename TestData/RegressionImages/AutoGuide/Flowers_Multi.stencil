@@ -1,0 +1,27 @@
+STREAM: File
+NAME: flowers
+HEADER: sepalLength, petalWidth, sepalWidth, petalLength, species, obs
+SEPARATOR: \s*,\s*
+SOURCE: ./AndersonsFlowers.csv
+SKIP: 1
+STRICT: true
+
+import BrewerPalettes
+
+stream flowers(sepalL, petalW, sepalW, 
+                        petalL, species, obs)
+
+layer FlowerPlot
+guide
+ trend[sample: "SIMPLE"] from ID 
+ legend[X: 15, Y: -90] Categorical from FILL_COLOR, from PEN_COLOR
+ axis[guideLabel: "Petal Length"] Linear from Y
+ axis[guideLabel: "Petal Width"] Linear from X
+
+from flowers
+   ID: obs
+   X:* Scale[min: 0, max:100](petalL)
+   Y:* Scale[min: 0, max:100](petalW) -> Mult(_,-1)
+   FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
+   PEN_COLOR: BrewerColors(species) ->  Darker(_)
+   REGISTRATION: "CENTER"

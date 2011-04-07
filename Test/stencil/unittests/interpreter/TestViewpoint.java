@@ -23,7 +23,7 @@ public class TestViewpoint extends stencil.unittests.StencilTestCase {
 	
 	public void testStateQuery() throws Exception {
 		Program p = ParseStencil.program(StringUtils.getContents("./TestData/RegressionImages/AutoGuide/Flowers.stencil"), ADAPTER);
-		StateQuery sq = p.canvas().guides()[0].stateQuery();
+		StateQuery sq = p.allGuides()[0].stateQuery();
 		StateQuery vp = sq.viewpoint();
 		
 		assertNotSame("Viewpoint did not return distinct entity.", sq, vp);

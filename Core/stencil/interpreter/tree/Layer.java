@@ -11,6 +11,7 @@ public class Layer implements TupleStore {
 	private final DisplayLayer impl;
 	private final String name;
 	private final Consumes[] groups;
+	
 	public Layer(DisplayLayer impl, String name, Consumes[] groups) {
 		super();
 		this.impl = impl;
@@ -25,6 +26,6 @@ public class Layer implements TupleStore {
 	public void store(Tuple t) {impl.makeOrFind(t);}
 	public boolean canStore(Tuple t) {
 		return t instanceof PrototypedTuple &&
-		((PrototypedTuple) t).getPrototype().contains(ParserConstants.SELECTOR_FIELD);
+		((PrototypedTuple) t).getPrototype().contains(ParserConstants.IDENTIFIER_FIELD);
 	}
 }

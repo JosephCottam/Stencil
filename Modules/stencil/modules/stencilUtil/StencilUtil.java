@@ -98,6 +98,7 @@ public final class StencilUtil extends BasicModule {
 		
 		md.addOperator(operatorData(MonitorCategorical.class, MODULE_NAME));
 		md.addOperator(operatorData(MonitorContinuous.class, MODULE_NAME));
+		md.addOperator(operatorData(MonitorFlex.class, MODULE_NAME));
 
 		md.addOperator(operatorData(MapWrapper.class, MODULE_NAME));
 		md.addOperator(operatorData(RangeHelper.class, MODULE_NAME));
@@ -131,6 +132,9 @@ public final class StencilUtil extends BasicModule {
 		} else if (name.equals("MonitorContinuous")) {
 			OperatorData operatorData = getOperatorData(name, specializer);
 			return new MonitorContinuous(operatorData, specializer);			
+		} else if (name.equals("MonitorFlex")) {
+			OperatorData operatorData = getOperatorData(name, specializer);
+			return new MonitorFlex(operatorData, specializer);			
 		} 
 		
 		throw new Error("Could not instantiate regular operator " + name);

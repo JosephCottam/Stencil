@@ -7,14 +7,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.*;
 
-import stencil.adapters.java2D.data.glyphs.Arc;
-import stencil.adapters.java2D.data.glyphs.Image;
-import stencil.adapters.java2D.data.glyphs.Line;
-import stencil.adapters.java2D.data.glyphs.Pie;
-import stencil.adapters.java2D.data.glyphs.Poly;
-import stencil.adapters.java2D.data.glyphs.Shape;
-import stencil.adapters.java2D.data.glyphs.Slice;
-import stencil.adapters.java2D.data.glyphs.Text;
 import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.LayerView;
@@ -90,7 +82,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 	}
 	
 	public Glyph makeOrFind(Tuple values) {
-		Object id = values.get(ParserConstants.SELECTOR_FIELD);
+		Object id = values.get(ParserConstants.IDENTIFIER_FIELD);
 		if (id == null) {throw new IDException(name);}		
 		
 		String ID = Converter.toString(id);
@@ -341,28 +333,7 @@ public class DoubleBufferLayer<T extends Glyph2D> implements DisplayLayer<T> {
 		}
 		
 		DoubleBufferLayer layer = new DoubleBufferLayer(name, sortZ);
-		Glyph2D prototype = null;
-		try {
-			if (layerType.equals(Shape.IMPLANTATION)) {
-				prototype = new Shape(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Line.IMPLANTATION)) {
-				prototype = new Line(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Text.IMPLANTATION)) {
-				prototype = new Text(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Pie.IMPLANTATION)) {
-				prototype = new Pie(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Image.IMPLANTATION)) {
-				prototype = new Image(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Poly.PolyLine.IMPLANTATION)) {
-				prototype = new Poly.PolyLine(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Poly.Polygon.IMPLANTATION)) {
-				prototype = new Poly.Polygon(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Arc.IMPLANTATION)) {
-				prototype = new Arc(layer, PROTOTYPE_ID);
-			} else if (layerType.equals(Slice.IMPLANTATION)) {
-				prototype = new Slice(layer, PROTOTYPE_ID);
-			} 
-		} catch (Throwable e) {throw new RuntimeException("Error instantiating table for implantation: " + layerType, e);}
+		Glyph2D prototype = Glyph2D.Util.instance(layerType, PROTOTYPE_ID);
 		if (prototype == null) {throw new IllegalArgumentException("Glyph type not know: " + layerType);}
 		
 		layer.setPrototype(prototype);

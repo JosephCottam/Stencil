@@ -2,14 +2,14 @@ STREAM: File
 NAME: NodePositions
 HEADER: ID X Y
 SEPARATOR: \s+
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
+SOURCE: ../Sourceforge/vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
 STRICT: true
 STREAM: File
 NAME: Attributes
 HEADER: ID|ATT
 SEPARATOR: \|
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/project_troves.txt
+SOURCE: ../Sourceforge/project_troves.txt
 SKIP: 1
 STRICT: true
 

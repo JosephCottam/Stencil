@@ -37,10 +37,23 @@ import stencil.tuple.prototype.TuplePrototype;
 
 
 public interface SampleOperator {
-	/**Tuple prototype for all sample results.  
-	 * This always includes exactly one field: #Sample.
-	 */
-	public TuplePrototype PROTOTYPE = new SimplePrototype("#Sample");
+	public static final String SAMPLE_PREFIX = "#Sample";
+
+	public static final class Util { 
+		private Util() {}
+		
+		/**Tuple prototype is similar for all sampler sets: #Sample + i
+		 * One i for each sampler considered.
+		 */
+		public static final TuplePrototype prototype(final int samplers) {
+			final String[] names = new String[samplers];
+			for (int i=0; i<samplers;i ++) {
+				names[i] = SAMPLE_PREFIX + (i==0 ? "" : i);
+			}
+			return new SimplePrototype(names);
+		}
+	}
+
 	
 	/**Generate a sample based on the seed values and the details.
 	 * The values of details that are actually paid attention to 
