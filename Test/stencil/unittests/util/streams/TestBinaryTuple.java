@@ -50,7 +50,7 @@ public class TestBinaryTuple extends TestCase {
 		source.close();		
 		source = trovesStream();
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE);
-		testSpeed(source, binSource);
+		testSpeed("trove unqueued", source, binSource);
 	}
 
 	public void testTrovesSpeedQueued() throws Exception {
@@ -62,7 +62,7 @@ public class TestBinaryTuple extends TestCase {
 		
 		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
 		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
-		testSpeed(re, bin);
+		testSpeed("trove queued", re, bin);
 	}
 
 	
@@ -73,10 +73,10 @@ public class TestBinaryTuple extends TestCase {
 		
 		reSource = coordStream();
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(reSource.getName(), COORD_TUPLES_FILE);
-		testSpeed(reSource, binSource);
+		testSpeed("coord", reSource, binSource);
 	}
 	
-	private void testSpeed(TupleStream reSource, TupleStream binSource){
+	private void testSpeed(String tag, TupleStream reSource, TupleStream binSource){
 		long reStart = System.currentTimeMillis();
 		int reTuples=0;
 		while (reSource.hasNext()) {
@@ -95,12 +95,12 @@ public class TestBinaryTuple extends TestCase {
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
+		System.out.printf("\n%1$s: Binary parsing is %2$f of regexp parsing (%3$d ms vs %4$d ms over %5$s tuples).\n", tag, 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
 		assertEquals("Unequal tuple count.", reTuples, binTuples);
 		assertTrue("No advantage to binary.", binTime < reTime);
 	}
 	
-	private void prepBinary(TupleStream source, String targetFile) throws Exception {
+	public static void prepBinary(TupleStream source, String targetFile) throws Exception {
 		//remove old output (if any)
 		File f = new File(targetFile);
 		if (f.exists()) {f.delete();}

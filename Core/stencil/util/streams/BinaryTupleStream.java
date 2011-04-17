@@ -102,8 +102,8 @@ public class BinaryTupleStream {
 	/**Stream source that can read a FastStream written by the above included Writer**/
 	public static final class Reader implements TupleStream, QueuedStream.Queable {
 		/**File channel contents are loaded from**/
-		private FileChannel input;
-		private ByteBuffer mainBuffer;
+		private final ByteChannel input;
+		private final ByteBuffer mainBuffer;
 		
 		/**Name of the stream**/
 		private final String name;
@@ -116,7 +116,8 @@ public class BinaryTupleStream {
 		private final int[] offsets;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
-			input = new FileInputStream(sourcefile).getChannel();
+			FileChannel input = new FileInputStream(sourcefile).getChannel();
+			this.input = input;
 			long size = input.size();
 			mainBuffer = input.map(FileChannel.MapMode.READ_ONLY, 0, size);
 			
@@ -125,6 +126,7 @@ public class BinaryTupleStream {
 			
 			offsets = new int[tupleSize];
 		}
+
 		
 		@Override
 		public boolean hasNext() {
@@ -138,30 +140,34 @@ public class BinaryTupleStream {
 		public SourcedTuple next() {
 			try {
 				int dataLength = mainBuffer.getInt();
-
-				for (int i=0; i< tupleSize; i++) {offsets[i] =mainBuffer.getInt();}
-				
+				for (int i=0; i< offsets.length; i++) {offsets[i] =mainBuffer.getInt();}
 				byte[] bytes = new byte[dataLength];
 				mainBuffer.get(bytes);
-				String base = new String(bytes);
-				
-				Object[] values = new String[tupleSize];				//Split it up into values
-				for (int i=0, prior=0; i< tupleSize; prior=offsets[i++]) {
-					values[i] = base.substring(prior, offsets[i]);
-				}
 
-				Tuple contents = new ArrayTuple(values);
-				SourcedTuple sourced = new SourcedTuple.Wrapper(name, contents);
-				return sourced;
+				return thaw(name, bytes, offsets);
 			} catch (Exception e) {
 				throw new RuntimeException("Error reading line from file.", e);
 			}
 		}
 
-		public void close() throws Exception {input.close(); input=null;}
+		public void close() throws Exception {input.close();}
 		@Override
 		public void remove() {throw new UnsupportedOperationException();}
 	
+	}
+	
+	public static final SourcedTuple thaw(String name, byte[] bytes, final int[] offsets) {
+		String base = new String(bytes);
+		
+		Object[] values = new String[offsets.length];				//Split it up into values
+		for (int i=0, prior=0; i< offsets.length; prior=offsets[i++]) {
+			values[i] = base.substring(prior, offsets[i]);
+		}
+
+		Tuple contents = new ArrayTuple(values);
+		SourcedTuple sourced = new SourcedTuple.Wrapper(name, contents);
+		return sourced;
+
 	}
 	
 	/**Intentionally left empty, use Reader or Writer instances instead.**/

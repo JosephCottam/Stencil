@@ -13,7 +13,7 @@ public class RunTest {
 		//JUnitCore.main("stencil.unittests.module.operator.TestMean");
 		//JUnitCore.main("stencil.unittests.module.operator.TestHigherOrder");
 		//JUnitCore.main("stencil.unittests.TestWorkingDir");
-		JUnitCore.main("stencil.unittests.util.streams.TestBinaryTuple");
+		JUnitCore.main("stencil.unittests.util.streams.TestSocketStream");
 		//JUnitCore.main("stencil.unittests.util.streams.TestQueuedStream");
 	}
 
