@@ -39,6 +39,7 @@
  			<fileset dir="./TestData/RegressionImages/">
  				<include name="**"/>
  				<exclude name="**/*.png"/>
+ 				<exclude name="**/*.stencils"/>
  			</fileset>
  		</copy>
  		
