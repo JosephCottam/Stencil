@@ -1,56 +1,21 @@
 package stencil.unittests.util.streams;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
 import stencil.tuple.Tuple;
-import stencil.util.streams.SocketTupleStream;
+import stencil.tuple.stream.TupleStream;
+import stencil.util.streams.binary.SocketTupleSender;
+import stencil.util.streams.binary.SocketTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 import junit.framework.TestCase;
 
 import static stencil.unittests.util.streams.Util.*;
 
 public class TestSocketStream extends TestCase {
-	private static final class BinarySender implements Runnable {
-		FileInputStream input;
-		Socket output;
-		ServerSocket endpoint;
-
-		public BinarySender(String binaryFile, ServerSocket endpoint) throws UnknownHostException, IOException {
-			input = new FileInputStream(binaryFile);
-			output = new Socket();	
-			output.bind(null);
-			this.endpoint = endpoint;
-		}
-		
-		public void run() {
-			int b = 0;
-			try {
-				output.connect(endpoint.getLocalSocketAddress());
-				while(b >= 0) {	 // -1 is end-of-stream
-						b = input.read();
-						output.getOutputStream().write(b);
-				}
-				output.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-	}
-		
 	public void testEncodeDecode() throws Exception {
-		DelimitedParser source = coordStream();
-		TestBinaryTuple.prepBinary(source, COORD_TUPLES_FILE);
-		source.close();
-		
 		DelimitedParser oldTuples = coordStream();
 		SocketTupleStream newTuples = new SocketTupleStream(oldTuples.getName(), null);
 		
-		BinarySender sender = new BinarySender(COORD_TUPLES_FILE, newTuples.socket());
+		TupleStream stream = coordStream();
+		SocketTupleSender sender = new SocketTupleSender(stream, newTuples.socket().getLocalSocketAddress());
 		Thread senderThread = new Thread(sender);
 		senderThread.start();
 		newTuples.init();
@@ -69,6 +34,8 @@ public class TestSocketStream extends TestCase {
 				i++;
 			} catch (Exception e) {throw new Exception("Error examining tuple " + i, e);}
 		}
+		
+		
 		
 		assertFalse("Old tuples not exhausted.", oldTuples.hasNext());
 		assertFalse("New tuples not exhausted.", newTuples.hasNext());

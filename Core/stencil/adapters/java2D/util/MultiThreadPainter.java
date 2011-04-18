@@ -177,7 +177,6 @@ public final class MultiThreadPainter {
 			painters.add(PaintTask.newTask(layer));
 		}
 		for (Guide2D guide: canvas.getGuides()) {painters.add(PaintTask.newTask(guide));}
-		
 	}
 
 	public synchronized void signalShutdown() {

@@ -1,11 +1,13 @@
-package stencil.util.streams;
+package stencil.util.streams.binary;
 
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.stream.TupleStream;
+import stencil.util.streams.QueuedStream;
 
 public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 	/**File channel contents are loaded from**/
@@ -66,8 +68,11 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 			stream.readFully(bytes);
 			
 			lookahead = BinaryTupleStream.thaw(name, bytes, offsets);
+		} catch (EOFException e) {
+			return;
 		} catch (Exception e) {
-			try {close();}
+			try {close();
+				throw e;}
 			catch (Exception ex) {throw new RuntimeException("Error closing socket", ex);}
 		}
 	}

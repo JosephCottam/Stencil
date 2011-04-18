@@ -1,6 +1,6 @@
 package stencil.unittests.util.streams;
 
-import stencil.util.streams.BinaryTupleStream;
+import stencil.util.streams.binary.BinaryTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 
 public class Util {

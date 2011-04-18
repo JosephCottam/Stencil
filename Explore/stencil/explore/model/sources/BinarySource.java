@@ -35,7 +35,7 @@ import stencil.explore.model.Model;
 import stencil.explore.ui.components.sources.Binary;
 import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.tuple.stream.TupleStream;
-import stencil.util.streams.BinaryTupleStream;
+import stencil.util.streams.binary.BinaryTupleStream;
 
 public final class BinarySource extends StreamSource {
 	public static final String NAME = "Binary";

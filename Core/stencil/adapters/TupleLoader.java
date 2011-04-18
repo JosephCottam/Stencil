@@ -1,3 +1,4 @@
+
 /* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
  * All rights reserved.
  *
@@ -96,7 +97,7 @@ public class TupleLoader implements Runnable {
 			catch (InvalidTupleException e) {Thread.yield(); continue;} //Ignore when a full line does not parse right.
 
 			if (tuple == null) {panel.repaint(); Thread.yield(); continue;} //Ignore null tuples; Stream is not over, but has not immediate contents
-			panel.processTuple(tuple); 
+			panel.processTuple(tuple);
 			recordsLoaded++;
 		}
 		state = STATE.STOPPED;

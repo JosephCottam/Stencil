@@ -1,4 +1,4 @@
-package stencil.util.streams;
+package stencil.util.streams.binary;
 
 import stencil.explore.model.Model;
 import stencil.explore.model.sources.StreamSource;
@@ -8,6 +8,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
+import stencil.util.streams.QueuedStream;
 
 import java.nio.*;
 import java.nio.channels.*;
@@ -34,24 +35,24 @@ public class BinaryTupleStream {
 		
 		public Writer(TupleStream source) {this.source = source;}
 		
-		public byte[] makeHeader(int tupleSize) {
-			assert tupleSize >0;
+		public static byte[] makeHeader(Tuple sample) {
+			assert sample != null;
 			
-			byte[] size = intBytes(tupleSize);
+			byte[] size = intBytes(sample.size());
 
 			byte[] rslt = new byte[INT_BYTES];
 			System.arraycopy(size, 0, rslt, 0, size.length);
 			return rslt;
 		}
 		
-		private byte[] intBytes(int i ){
+		private static byte[] intBytes(int i ){
 			 return ByteBuffer.allocate(INT_BYTES).putInt(i).array();
 		}
 		
 		/**Get a byte array of the next line.
 		 * Assumes that the value of Converter.toString(t.get(i)) will be sufficient to recover the data on reload
 		 * **/
-		public byte[] tupleLine(Tuple t) {
+		public static byte[] asBinary(Tuple t) {
 			final int[] lengths = new int[t.size()];
 			ArrayList<Byte> linebytes = new ArrayList();
 			int prior =0;
@@ -87,15 +88,14 @@ public class BinaryTupleStream {
 					if (sourced == null) {continue;}
 					Tuple t = sourced.getValues();
 					if (doHeader) {
-						byte[] header = makeHeader(t.size()); doHeader=false;
+						byte[] header = makeHeader(t); doHeader=false;
 						file.write(header);
 					}
-					byte[] nextline = tupleLine(t);
+					byte[] nextline = asBinary(t);
 					file.write(nextline);
 				}
 			} finally {file.close();}
 		}
-		
 	}
 	
 	
@@ -167,7 +167,6 @@ public class BinaryTupleStream {
 		Tuple contents = new ArrayTuple(values);
 		SourcedTuple sourced = new SourcedTuple.Wrapper(name, contents);
 		return sourced;
-
 	}
 	
 	/**Intentionally left empty, use Reader or Writer instances instead.**/

@@ -4,8 +4,8 @@ import java.io.File;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.stream.TupleStream;
-import stencil.util.streams.BinaryTupleStream;
 import stencil.util.streams.QueuedStream;
+import stencil.util.streams.binary.BinaryTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 import junit.framework.TestCase;
 

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**Based on Executors.defaultThreadFactory*/
 public final class StencilThreadFactory implements ThreadFactory {
-    static final AtomicInteger threadNumber = new AtomicInteger(1);
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
 	private final ThreadGroup group;
 	private final int priority;
 	
