@@ -14,11 +14,7 @@ import stencil.parser.string.ValidationException;
  *        2,pre, unord   (anything otehr than 'ord' indicats unordered, but 'unord' is suggested)
  *        0,pre, ord	(with 0 in field count, will not do any splitting)
  * */
-public class Split {
-	/**Default key under which a split descriptor should be found in a specializer**/
-	public static final String SPLIT_KEY = "split";
-	public static final String ORDERED_KEY = "ordered";
-	
+public class Split {	
 	private final boolean ordered;	//Is it an ordered split (incoming values are guaranteed to be in order, default is false)?
 	private final int fields;		//How many fields are involved in the split (default is 1)
 	

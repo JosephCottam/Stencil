@@ -19,6 +19,11 @@ import java.util.HashMap;
 @Operator(name= "Split", spec="[fields:0, ordered:\"#F\"]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
 @Description("Higher order operator for performing split/cross-tab summarization")
 public abstract class SplitHelper implements StencilOperator {
+	/**Keys that compose a split descriptor in a specializer**/
+	public static final String SPLIT_KEY = "fields";
+	public static final String ORDERED_KEY = "ordered";
+
+	
 	/**Handle unordered split cases (default case).*/
 	public static class UnorderedHelper extends SplitHelper {
 		protected Map<Object, StencilOperator> operators = new HashMap();
@@ -178,8 +183,8 @@ public abstract class SplitHelper implements StencilOperator {
 	
 	//final because it is a utility method
 	public static final StencilOperator makeOperator(Specializer spec, StencilOperator operator) {
-		int keysize = Converter.toInteger(spec.get(Split.SPLIT_KEY));
-		Boolean ordered = (Boolean) Converter.convert(spec.get(Split.ORDERED_KEY), Boolean.class);
+		int keysize = Converter.toInteger(spec.get(SPLIT_KEY));
+		Boolean ordered = (Boolean) Converter.convert(spec.get(ORDERED_KEY), Boolean.class);
 		Split split = new Split(keysize, ordered);
 		return makeOperator(split, operator);
 	}
