@@ -122,20 +122,9 @@ options {
       try {
           op = modules.instance(baseName.getPrefix(), baseName.getName(), context, spec, higherOrder);
       } catch (Exception e) {
-        throw new RuntimeException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, useName), e);
+        return null;
       }
       return op;
-  }
-  
-  /**Are the operators arguments ready for higher-order ops?**/
-  private boolean argsReady(StencilTree ref) {
-    List<StencilTree> ops = ref.findAllDescendants(OP_AS_ARG);
-    for(StencilTree op: ops) {
-       MultiPartName name = new MultiPartName(op.getText());
-       try {modules.findModuleForOperator(name.getPrefix(), name.getName());}
-       catch (IllegalArgumentException e) {return false;}
-    }
-    return true;
   }
 }
  
@@ -146,6 +135,6 @@ simple
   ;
   
 proxies
- : ^(r=OPERATOR_REFERENCE .*) {argsReady($r) && findBase($r) != null}? -> {transferProxy($r)}
+ : ^(r=OPERATOR_REFERENCE .*) {findBase($r) != null}? -> {transferProxy($r)}
  ;
 	

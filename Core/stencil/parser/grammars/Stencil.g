@@ -281,8 +281,10 @@ operatorDef
   : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
     ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER["Prefilters"] $pf*) ^(RULES_OPERATOR["Rules"] operatorRule+))
   | OPERATOR name=ID DEFINE base=opName specializer
-    -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer);
-  	  
+    -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer)
+  | OPERATOR name=ID DEFINE base=opName specializer GROUP opRef CLOSE_GROUP
+    -> ^(OPERATOR_REFERENCE[$name.text] ^(OPERATOR_BASE[$base.text] specializer ^(LIST_ARGS opRef)));
+
 opName
   : pre=ID NAMESPACE post=ID -> ID[$pre + "::" + $post] 
   | ID;

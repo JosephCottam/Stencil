@@ -109,7 +109,7 @@ options {
        StencilTree newCall = (StencilTree) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
        Object newArgs = adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
        for (StencilTree arg: pack) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
-       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER_TREE));
+       adaptor.addChild(newCall, adaptor.create(SPECIALIZER, ""));
        adaptor.addChild(newCall, newArgs);
        adaptor.addChild(newCall, adaptor.create(pass.getType(), frameName));
 

@@ -197,7 +197,7 @@ public abstract class ParseStencil {
 		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
 		p = DefaultPack.apply(p);				//Add default packs where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
-		p = OperatorInstantiateTemplates.apply(p);		//Remove all operator references
+		p = OperatorInstantiateTemplates.apply(p);		//Remove all template references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
 

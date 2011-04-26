@@ -102,12 +102,10 @@ public abstract class ParserConstants {
 	 *    * Memory is preserved (range: ALL)
 	 *    * No split is to be performed (split: 0)
 	 */
-	public static final StencilTree EMPTY_SPECIALIZER_TREE;
 	public static final Specializer EMPTY_SPECIALIZER;
 		
 	static {
 		try {
-			EMPTY_SPECIALIZER_TREE = ParseStencil.specializerTree("[]");
 			EMPTY_SPECIALIZER = ParseStencil.specializer("[]");
 			DEFAULT_CANVAS_SPECIALIZER = ParseStencil.specializerTree("[BACKGROUND_COLOR: \"white\"]");
 			DEFAULT_LAYER_SPECIALIZER =  ParseStencil.specializerTree(String.format("[%1$s: \"SHAPE\"]", DisplayLayer.TYPE_KEY));

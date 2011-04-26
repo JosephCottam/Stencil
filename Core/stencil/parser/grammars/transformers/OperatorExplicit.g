@@ -22,7 +22,6 @@ options {
   import stencil.parser.tree.*;
   import static stencil.parser.string.util.Utilities.*;
   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
-  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
   import static stencil.parser.ParserConstants.MAP_FACET;
 }
 
@@ -32,7 +31,7 @@ options {
   public StencilTree downup(Object t) {
     downup(t, this, "highOrderArgs");          //Pull out higher-order arguments, make them explicit
     downup(t, this, "operatorApplication");    //Pull out the higher-order ops and make them explicit
-    downup(t, this, "simpleArgs");    //Remove operator references from argument lists
+    downup(t, this, "simpleArgs");             //Remove operator references from argument lists
     return (StencilTree) t;  
   }
   
@@ -132,7 +131,11 @@ highOrderArgs
    : ^(a=OP_AS_ARG .) -> OP_AS_ARG[cover($a)];
 
 operatorApplication
-   : ^(f=FUNCTION spec=. rest+=.*)  -> ^(FUNCTION[cover($f)] {adaptor.dupTree(EMPTY_SPECIALIZER_TREE)} $rest*);
+   : ^(f=FUNCTION spec=. rest+=.*)  -> ^(FUNCTION[cover($f)] SPECIALIZER $rest*)
+   | ^(OPERATOR_REFERENCE highOrderBase) -> ^(OPERATOR_REFERENCE highOrderBase SPECIALIZER);
+   
+highOrderBase
+   : ^(b=OPERATOR_BASE spec=. op=.) -> OPERATOR_BASE[cover($b)];
 
 simpleArgs: ^(l=LIST_ARGS .*) -> {filterOpArgs($l)};
         

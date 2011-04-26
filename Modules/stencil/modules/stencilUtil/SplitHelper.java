@@ -120,7 +120,9 @@ public abstract class SplitHelper implements StencilOperator {
 		}
 		public Object getTarget() {return this;}
 		
-		public SplitTarget viewpoint() {throw new UnsupportedOperationException("FIX THIS SOON!!!");}
+		public SplitTarget viewpoint() {
+			return new SplitTarget((SplitHelper) helper.viewpoint(), facet);
+		}
 		public String targetIdentifier() {return helper.getName();}
 	}
 
