@@ -2,7 +2,7 @@ STREAM: File
 NAME: times
 HEADER: elapse, size, refs, perm, type, i
 SEPARATOR: \s*,\s*
-SOURCE: ./StateVsFlowRuntimes.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/StateVsFlowRuntimes.csv
 SKIP: 1
 STRICT: true
 
@@ -12,14 +12,15 @@ stream times(elapse, size, refs, perm, type, i)
 
 layer Runtimes["POLY_LINE"]
 guide
-  axis from XS
+  axis Linear from YS
+  axis Linear from XS
   legend from PEN_COLOR
 from times
   local(name):  Concatenate(refs, perm, type)
   ID: name
   IDX: Index(size)
-  XS: Mult(size, 100)
-  YS: Split[1](@Avg, name, elapse) -> Mult(_, -1)
+  XS: Mult(size,2)
+  YS: Split[1](@Avg, name, elapse) -#> Log(2,_) -> Mult(_, -100)
   PEN_COLOR: BrewerColors(name)
 
 operator Avg: Range[ALL](@Mean)
