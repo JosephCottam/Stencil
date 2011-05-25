@@ -46,11 +46,7 @@ public final class NumericSingleton extends Number implements Tuple {
 	public TuplePrototype getPrototype() {return new stencil.tuple.prototype.SimplePrototype(Tuple.DEFAULT_KEY);}
 	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 
-
-	public boolean isDefault(String name, Object value) {
-		if (value instanceof Number) {return ((Number) value).doubleValue() == 0;}
-		return false;
-	}
+	public boolean isDefault(String name, Object value) {return false;}
 
 	public int size() {return 1;}	
 	public String toString() {return Tuples.toString(this);}
