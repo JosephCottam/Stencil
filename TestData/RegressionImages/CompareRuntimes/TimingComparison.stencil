@@ -2,7 +2,7 @@ STREAM: File
 NAME: times
 HEADER: elapse, size, refs, perm, type, i
 SEPARATOR: \s*,\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/StateVsFlowRuntimes.csv
+SOURCE: ./StateVsFlowRuntimes.csv
 SKIP: 1
 STRICT: true
 
