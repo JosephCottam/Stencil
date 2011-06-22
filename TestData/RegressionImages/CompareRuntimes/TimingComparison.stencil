@@ -20,7 +20,7 @@ from times
   ID: name
   IDX: Index(size)
   XS: Mult(size,2)
-  YS: Split[1](@Avg, name, elapse) -#> Log(2,_) -> Mult(_, -100)
+  YS: Split[1](@Avg, name, size, elapse) -#> Log(2,_) -> Mult(_, -100)
   PEN_COLOR: BrewerColors(name)
 
 operator Avg: Range[ALL](@Mean)
