@@ -19,10 +19,6 @@ options {
 }
 
 @members {
-  private static final class TargetPackMismatchException extends ValidationException {
-      public TargetPackMismatchException() {super("");}
-  }  
-  
   public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
