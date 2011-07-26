@@ -3,7 +3,6 @@
 	<classpathentry kind="src" path="Explore"/>
 	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="src" path="Modules"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.launching.macosx.MacOSXType/JVM 1.6.0 (MacOS X Default)"/>
 	<classpathentry kind="lib" path="Library/JUNG/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/colt-1.2.0.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-algorithms-2.0.1.jar"/>
@@ -18,5 +17,6 @@
 	<classpathentry kind="lib" path="Library/junit-4.8.2.jar"/>
 	<classpathentry kind="lib" path="Library/antlr-3.3.jar"/>
 	<classpathentry kind="src" path="Core"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
