@@ -1,7 +1,7 @@
 package stencil.interpreter.tree;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.Viewpoint;
-import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 
 public class OperatorRule implements Viewpoint<OperatorRule> {

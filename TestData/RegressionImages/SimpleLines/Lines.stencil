@@ -1,24 +1,23 @@
-STREAM: File
+STREAM: SequenceNumbers
 NAME: LineSource
-HEADER:  graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail
-SEPARATOR: \s+\|\s+
-SOURCE: ./18049-arch-compiler.output.txt
-SKIP: 1
-STRICT: false
+START: 0
+STOP: 4
+INCREMENT: 1
 
 /*Dead simple test.  Just draws some lines.*/
 
-stream LineSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+stream LineSource(count)
  
 layer GridLines["LINE"]
 from LineSource
-	ID: Concatenate(axis1A, axis1B)
-	X.1: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (X)
-	X.2: Concatenate(axis1A, axis1B) -> Spacing(value)  -> (X)
-	Y.1: -5
-	Y.2: 10
-	PEN_COLOR: @Color{GRAY80}
-	PEN: @Stroke{3}
+    ID: count
+    X1: Spacing(count)
+    X2: Spacing(count)
+    Y1: 5
+    Y2: -10
+    PEN_COLOR: @Color{GRAY80}
+    PEN: @Stroke{3}
 
 operator Spacing (ID) -> (X) 
-	ALL => X : Index(ID) -> Mult(index, 5) -> (product)
+    default => X : Index(ID) -> Mult(Index, 5)
+

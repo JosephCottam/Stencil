@@ -69,7 +69,7 @@ public class TreeMap extends Layout {
 	public Rectangle2D query(final Object id) {
 		Mappable layoutNode = layoutFor(id); 
 		Rect r = layoutNode.getBounds();
-		Rectangle2D result = new Rectangle2D.Double(r.x, r.y, r.w, r.h);
+		Rectangle2D result = new Rectangle2D.Double(r.x, (r.y+r.h), r.w, r.h);
 		return result;
 	}
 	
@@ -81,8 +81,8 @@ public class TreeMap extends Layout {
 
 	@Facet(memUse="WRITER", prototype="(X,Y,W,H)")
 	public boolean add(final Object id, final Object parentID, double value) {
-		LayoutTree parent = Tree.findNode(root, parentID);
 		stateID++;
+		LayoutTree parent = Tree.findNode(root, parentID);
     	
 		layout=null;
 		if (parent == null) {
@@ -99,8 +99,9 @@ public class TreeMap extends Layout {
 	 * Will populate the layout array.
 	 */
 	private void layout() {
+		stateID++;
 		layout = root.getLayoutTree();
-		layout.layout(algorithm,new Rect(origin.getX(), origin.getY(), width, height));
+		layout.layout(algorithm,new Rect(origin.getX(), -origin.getY(), width, height));
 	}
 	
 	/**What is the layout info for the given id?

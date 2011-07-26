@@ -4,7 +4,6 @@ import stencil.parser.tree.StencilTree;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.NumericSingleton;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.util.enums.ValueEnum;
 import static stencil.parser.string.StencilParser.NUMBER;
 
 public class NumericWrapper implements TypeWrapper {
@@ -20,9 +19,8 @@ public class NumericWrapper implements TypeWrapper {
 
 	public static Double toDouble(Object value) {
 		if (value instanceof Double) {return (Double) value;}
-		if (value instanceof ValueEnum) {return toDouble(((ValueEnum) value).getValue());}
 		if (value instanceof Number) {return ((Number) value).doubleValue();}
-		if (value.equals("VERTICAL")) {return new Double(-90);} //TODO: Is there a better way to handle special values like this?
+		if (value.equals("VERTICAL")) {return Math.toRadians(-90);} //TODO: Is there a better way to handle special values like this?
 		
 		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
 			return new Double(((StencilTree) value).getText());
@@ -33,7 +31,6 @@ public class NumericWrapper implements TypeWrapper {
 	
 	public static  Float toFloat(Object value) {
 		if (value instanceof Float) {return (Float) value;}
-		if (value instanceof ValueEnum) {return toFloat(((ValueEnum) value).getValue());}
 		if (value instanceof Number) {return ((Number) value).floatValue();}
 		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
 			return new Float(((StencilTree) value).getText());
@@ -47,7 +44,6 @@ public class NumericWrapper implements TypeWrapper {
 	public static Integer toInteger(Object value) {
 		if (value instanceof Integer) {return (Integer) value;}
 		if (value instanceof Long) {return ((Long) value).intValue();}
-		if (value instanceof ValueEnum) {return toInteger(((ValueEnum) value).getValue());}
 		if (value instanceof Number) {return ((Number) value).intValue();}
 		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
 			return new Integer(((StencilTree) value).getText());
@@ -60,7 +56,6 @@ public class NumericWrapper implements TypeWrapper {
 	public static Long toLong(Object value) {
 		if (value instanceof Long) {return (Long) value;}
 		if (value instanceof Number) {return ((Number) value).longValue();}
-		if (value instanceof ValueEnum) {return toLong(((ValueEnum)value).getValue());}
 		if (value instanceof Number) {return ((Number) value).longValue();}
 		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
 			return Long.valueOf(((StencilTree) value).getText());
@@ -71,7 +66,6 @@ public class NumericWrapper implements TypeWrapper {
 	
 	public static Number toNumber(Object value) {
 		if (value instanceof Number) {return (Number)value;}
-		if (value instanceof ValueEnum) {return toNumber(((ValueEnum) value).getValue());}
 
 		String rep = value.toString();
 		if (rep.contains(".")) {return toDouble(rep);}

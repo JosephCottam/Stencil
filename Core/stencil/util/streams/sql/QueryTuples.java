@@ -1,13 +1,9 @@
 package stencil.util.streams.sql;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.SimplePrototype;
-import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
@@ -20,17 +16,14 @@ public class QueryTuples implements TupleStream, QueuedStream.Queable {
 	protected Statement statement;
 
 	protected final String name;
-	protected final TuplePrototype prototype;
-	protected final String[] fields;
 	protected final String query;
-	protected int columnCount =0;
+	protected final int columnCount;
 	protected ResultSet results;
 
 
-	public QueryTuples(String name, String driver, String connect, String query, String header, String separator) throws Exception {
-		this.fields = header.split(separator);
-		this.prototype = new SimplePrototype(fields); 
+	public QueryTuples(String name, int columnCount, String driver, String connect, String query) throws Exception {
 		this.name = name;
+		this.columnCount = columnCount;
 
 		connection = DriverManager.connect(driver, connect);
 		statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
@@ -38,7 +31,7 @@ public class QueryTuples implements TupleStream, QueuedStream.Queable {
 
 		reset();
 
-		if (results.getMetaData().getColumnCount() != fields.length) {throw new RuntimeException("Query does not return as many columns as field specified in header.");}
+		if (results.getMetaData().getColumnCount() != columnCount) {throw new RuntimeException("Query does not return the quantity of columns specified.");}
 	}
 
 	/**Closes connection.
@@ -55,21 +48,20 @@ public class QueryTuples implements TupleStream, QueuedStream.Queable {
 	}
 
 	public SourcedTuple next() {
-		List values = new ArrayList(columnCount);
+		Object[] values = new Object[columnCount];
 
 		try {results.next();}
 		catch (Exception e) {throw new RuntimeException("Error advancing to next row.", e);}
 
 		for (int i=1; i<= columnCount; i++) {
-			try {values.set(i-1, results.getString(i));}
+			try {values[i-1] = results.getString(i);}//r
 			catch (Exception e) {throw new RuntimeException(String.format("Error retrieving value %1$d for tuples.", i),e);}
 		}
-		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
+		return new SourcedTuple.Wrapper(name, new ArrayTuple(values));
 	}
 
 	public void reset() throws Exception {
 		results = statement.executeQuery(query);
-		columnCount = results.getMetaData().getColumnCount();
 	}
 
 	public boolean hasNext() {

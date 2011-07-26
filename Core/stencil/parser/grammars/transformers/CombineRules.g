@@ -20,23 +20,28 @@ options {
 
 @members {  
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
-  
-  public Object mergeTargets(StencilTree rules) {
-    stencil.tuple.prototype.TuplePrototype<stencil.tuple.prototype.TupleFieldDef> p = EnvironmentProxy.calcPrototype(rules);    
-
-    Object target = adaptor.create(TARGET, "Result");
-    Object proto = adaptor.create(TUPLE_PROTOTYPE, "");
-    for (stencil.tuple.prototype.TupleFieldDef def: p.fields()) {
-       Object fd = adaptor.create(TUPLE_FIELD_DEF, "");
-       adaptor.addChild(fd, adaptor.create(ID, def.getFieldName()));
-       adaptor.addChild(fd, adaptor.create(DEFAULT, ""));//Update when types are properly handled
-       adaptor.addChild(proto, fd);
-    }
-    
-    adaptor.addChild(target, proto);
-    return target;
+ 
+  //Merge the targets----------------------------------------------
+  public Object mergeTargets(StencilTree rulesRoot) {
+    Object tuple = adaptor.create(TARGET_TUPLE, "");
+    for (StencilTree def: gatherTargets(rulesRoot)) {
+       adaptor.addChild(tuple, adaptor.dupTree(def));
+    }    
+    return tuple;
   }
   
+   
+  public static Iterable<StencilTree> gatherTargets(Iterable<StencilTree> rules) {
+        List<StencilTree> defs = new ArrayList();
+        for (StencilTree r: rules) {
+            StencilTree target = r.find(TARGET);    //Will only actually find one time if this is run after the types have been separated
+            defs.addAll(target.findAllDescendants(TUPLE_FIELD));
+        }
+        return defs;
+  }
+  
+
+  //Merge the chains and  packs
   public StencilTree mergeChains(Object rules) {
     StencilTree newPack = (StencilTree) adaptor.create(PACK, "");
 
@@ -46,7 +51,7 @@ options {
 
     for (int i=0; i<((Tree) rules).getChildCount(); i++) {
        StencilTree rule = (StencilTree) ((Tree) rules).getChild(i);
-       StencilTree chain = rule.find(CALL_CHAIN);
+       StencilTree chain = (StencilTree) RenameFrames.apply((Tree) adaptor.dupTree(rule.find(CALL_CHAIN)));
        
        //Splice in call chain
        Object splice = chain.find(FUNCTION);
@@ -81,12 +86,10 @@ topdown
   : ^(l=RULES_PREFILTER rules[$l]) -> ^(RULES_PREFILTER rules)  
   | ^(l=RULES_LOCAL rules[$l])     -> ^(RULES_LOCAL rules)  
   | ^(l=RULES_RESULT rules[$l])    -> ^(RULES_RESULT rules)
-  | ^(l=RULES_CANVAS rules[$l])    -> ^(RULES_CANVAS rules)
-  | ^(l=RULES_VIEW rules[$l])      -> ^(RULES_VIEW rules)
   | ^(l=LIST_RULES rules[$l])      -> ^(LIST_RULES rules)
   | ^(l=RULES_DEFAULTS rules[$l])  -> ^(RULES_DEFAULTS rules)
   ; 
   
-rules[StencilTree parent]: .+ -> ^(RULE {mergeTargets($parent)} {mergeChains($parent)} DEFINE);
+rules[StencilTree parent]: .+ -> ^(RULE ^(TARGET {mergeTargets($parent)}) {mergeChains($parent)} DEFINE);
   
   

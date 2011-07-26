@@ -4,16 +4,15 @@ import java.awt.BasicStroke;
 import java.awt.Stroke;
 
 import stencil.tuple.InvalidNameException;
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.collections.ArrayUtil;
 
 /**Pen is the pattern information about a stroke or
  * a fill, but not its color elements (those are in "Paint").*/
-public class StrokeTuple implements Tuple {
+public class StrokeTuple implements PrototypedTuple {
 	static final String SELF    = "self";
 	static final String WIDTH   = "width";
 	static final String JOIN    = "join";
@@ -32,7 +31,7 @@ public class StrokeTuple implements Tuple {
 	public static final Stroke DEFAULT_STROKE = new BasicStroke(DEFAULT_WIDTH, DEFAULT_CAP.v, DEFAULT_JOIN.v, DEFAULT_LIMIT, DEFAULT_PATTERN, DEFAULT_PHASE);
 	private static final String[] FIELDS = new String[] {SELF, WIDTH, JOIN, CAP, PATTERN, PHASE, LIMIT};
 	private static final Class[] TYPES = new Class[] {BasicStroke.class, Double.class, Join.class, Cap.class, float[].class, float.class, float.class};
-	private static TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+	private static TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS, TYPES);
 	public static final int SELF_IDX = ArrayUtil.indexOf(SELF, FIELDS);
 	public static final int WIDTH_IDX = ArrayUtil.indexOf(WIDTH, FIELDS);
 	public static final int JOIN_IDX = ArrayUtil.indexOf(JOIN, FIELDS);
@@ -89,7 +88,7 @@ public class StrokeTuple implements Tuple {
 		throw new TupleBoundsException(idx, this);
 	}
 
-	public TuplePrototype getPrototype() {return PROTOTYPE;}
+	public TuplePrototype prototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {
 		if (name.equals(WIDTH)) {return value.equals(DEFAULT_WIDTH);}

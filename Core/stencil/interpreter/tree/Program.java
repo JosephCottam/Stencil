@@ -8,10 +8,12 @@ public class Program {
 	private final DynamicRule[] dynamics;
 	private final Guide[] guides;
 	private final Order order;
-	private final Specializer canvasSpec;
+	private final ViewOrCanvas view;
+	private final ViewOrCanvas canvas;
 	
-	public Program(Specializer canvasSpec, Layer[] layers, StreamDef[] streams, Order order, DynamicRule[] dynamics, Guide[] guides) {
-		this.canvasSpec = canvasSpec;
+	public Program(ViewOrCanvas view, ViewOrCanvas canvas, Layer[] layers, StreamDef[] streams, Order order, DynamicRule[] dynamics, Guide[] guides) {
+		this.view = view;
+		this.canvas = canvas;
 		this.order = order;
 		this.layers = layers;
 		this.streamDefs = streams;
@@ -19,7 +21,9 @@ public class Program {
 		this.guides = guides;
 	}
 	
-	public Specializer canvasSpec() {return canvasSpec;}
+	public ViewOrCanvas view() {return view;}
+	public ViewOrCanvas canvas() {return canvas;}
+	
 	public Layer getLayer(String name) {
 		for (Layer layer: layers) {
 			if (layer.getName().equals(name)) {return layer;}

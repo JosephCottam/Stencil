@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Arrays;
 
 import stencil.parser.ParserConstants;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.instances.PrototypedArrayTuple;
+import stencil.tuple.instances.Singleton;
 
 public class TestBasicTuple extends TestCase {
-	private Tuple reference;
+	private PrototypedTuple reference;
 	
 	public static final String SOURCE = "TestTuple";
 	public static final List<String> names = Arrays.asList(new String[]{"StringField", "IntegerField", "DoubleField", "Field4", "ColorField", ParserConstants.SOURCE_FIELD}); 
@@ -17,7 +19,7 @@ public class TestBasicTuple extends TestCase {
 	public static final List<Class> types = Arrays.asList(new Class[]{String.class, Integer.class, Double.class, String.class, String.class, String.class});
 	
 	public void setUp() {
-		reference = new PrototypedTuple(names, types, values);
+		reference = new PrototypedArrayTuple(names, types, values);
 	}
 		
 	public void testGet()
@@ -29,7 +31,7 @@ public class TestBasicTuple extends TestCase {
 	}
 	
 	public void testSingleton() {
-		Tuple t = PrototypedTuple.singleton("MyValue");
-		assertEquals("MyValue", t.get(Tuple.DEFAULT_KEY));
+		Tuple t = Singleton.from("MyValue");
+		assertEquals("MyValue", t.get(0));
 	}
 }

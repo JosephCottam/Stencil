@@ -2,7 +2,7 @@
     <target name="RunTests" depends="JUnit"/>
     
     <target name="CleanUpTests">
-        <delete><fileset dir="testResults" includes="**/TEST_*"/></delete>
+        <delete failonerror="false"><fileset dir="testResults" includes="**/TEST_*"/></delete>
     </target>
     
     <target name="MakeJar">
@@ -10,10 +10,10 @@
     </target>
     
     <target name="OneTest" depends="CleanUpTests,MakeJar">
-        <property name="results" location="./testResults/" />
+        <tstamp><format property="now" pattern="ddMMMyyyy HH:mm"/></tstamp>
+        <property name="results" location="./testResults/${now}" />
 
         <move file="Stencil.jar" toDir="TestData"/>
-        <delete dir="${results}"/>
         <mkdir dir="${results}"/>
 
         
@@ -38,15 +38,20 @@
     </target>
     
     <target name="JUnit" depends="CleanUpTests,MakeJar">
-        <property name="results" location="./testResults/" />
+        <tstamp><format property="now" pattern="ddMMMyyyy hh:mm"/></tstamp>
+        <property name="base" location="./testResults/${now}" />
+        <property name="results" location="${base}/raw" />
+        <property name="report" location="${base}" />
 
         <move file="Stencil.jar" toDir="TestData"/>
-        <delete dir="${results}"/>
+        <delete failonerror="false" dir="${base}"/>
+        <mkdir dir="${base}"/>
         <mkdir dir="${results}"/>
+        <mkdir dir="${report}"/>
 
         
         <junit fork="yes" dir="./">
-            <formatter type="brief"/>
+            <formatter type="xml"/>
 
             <classpath>
                 <pathelement location="./TestData/Stencil.jar"/>
@@ -68,8 +73,16 @@
         </junit>
         
         <delete file="TestData/Stencil.jar"/>
+        
+        <junitreport todir="${report}">
+           <fileset dir="${results}">
+               <include name="TEST-*.xml"/>
+            </fileset>
+    
+           <report todir="${report}" format="frames"/>
+        </junitreport>
+        
     </target>
-
 
     <target name="JUnit-Singles" depends="CleanUpTests,MakeJar">
         <move file="Stencil.jar" toDir="TestData"/>

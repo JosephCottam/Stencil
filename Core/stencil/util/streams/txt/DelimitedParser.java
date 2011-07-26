@@ -1,44 +1,13 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.util.streams.txt;
 
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.Arrays;
+import java.util.zip.*;
+import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
@@ -57,9 +26,6 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	/**File the reader is reading from*/
 	private final String filename;
 
-	/**Column labels*/
-	private final TuplePrototype prototype;
-
 	/**Name of the stream*/
 	private final String name;
 
@@ -69,37 +35,22 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	private final int skip;
 	
 	private final NextChannel channel;
-	
-	private SourcedTuple lookAhead;
-	
+		
 	/**Has this stream reached its end?*/
 	private boolean ended = false;
 	
-	public DelimitedParser(String name, String delimitedLabels, String filename, String delimiter, boolean strict, int skip) throws Exception {
+	public DelimitedParser(String name, String filename, String delimiter, int tupleSize, boolean strict, int skip) throws Exception {
 		splitter = Pattern.compile(delimiter);
 		
 		this.name = name;
-		this.filename = filename;
+		this.filename = filename != null ? filename.trim() : null;
 		this.skip = skip;
 		
-		String[] labels = parseLabels(delimitedLabels, splitter);
-		
-		if (strict) {this.channel = new StrictChannel(Arrays.asList(labels), splitter);}
-		else {this.channel = new LooseChannel(Arrays.asList(labels), splitter);}
-
-		prototype = new SimplePrototype(labels);
+		if (strict) {this.channel = new StrictChannel(tupleSize, splitter);}
+		else {this.channel = new LooseChannel(tupleSize, splitter);}
 
 		open();
 	}
-
-	private static String[] parseLabels(String value, Pattern splitter) {
-		String[] labels = splitter.split(value);
-		for (int i=0; i< labels.length; i++) {
-			labels[i] = labels[i].trim();
-		}
-		return labels;
-	}
-
 	
 	/**Makes the stream ready to be read from.
 	 *
@@ -108,10 +59,20 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	 * @param filename
 	 */
 	private void open() {
-		assert (filename != null && !filename.trim().equals("")) : "Invalid filename supplied.  May not be null.  May not be empty.";
+		assert (filename != null && !filename.equals("")) : "Invalid filename supplied.  May not be null.  May not be empty.";
 
 		try {
-			source = new BufferedReader(new FileReader(filename));
+			if (filename.endsWith("gz")) {
+				InputStream is = new GZIPInputStream(new FileInputStream(filename));
+				source = new BufferedReader(new InputStreamReader(is));				
+			} else if (filename.endsWith("zip")) {
+				ZipFile zf = new ZipFile(filename);
+				ZipEntry ze = zf.entries().nextElement();
+				source = new BufferedReader(new InputStreamReader(zf.getInputStream(ze)));				
+			} else {
+				source = new BufferedReader(new FileReader(filename));				
+			}
+			
 			int skip = this.skip;
 			try {while (skip-- > 0) {source.readLine();}}
 			catch (Exception e) {throw new RuntimeException("Error trying to skip indicated lines.", e);}
@@ -122,11 +83,6 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	
 	public SourcedTuple next() {
 		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
-		if (lookAhead != null) {
-			SourcedTuple v = lookAhead;
-			lookAhead = null;
-			return v;
-		}
 		
 		Object[] values;
 		try {values = channel.next(source);}
@@ -136,7 +92,7 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 		}
 		catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 	
-		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
+		return new SourcedTuple.Wrapper(name, new ArrayTuple(values));
 	}
 
 	/**Close the tree stream.  The next operation will no longer work.
@@ -147,20 +103,13 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 			source.close();
 		}
 		source = null;
-		lookAhead = null;
 	}
 
 	/**Returns true if the stream has been opened
 	 * and there are more tuples on it.  False if there
 	 * are no more tuples (guaranteed to never be more).
 	 */
-	public boolean hasNext() {
-		if (lookAhead != null) {return true;}
-		if  (ended || source == null) {return false;}
-
-		lookAhead = next();
-		return !ended;
-	}
+	public boolean hasNext() {return source != null && !ended;}
 
 	public String getName() {return name;}
 

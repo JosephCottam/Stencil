@@ -14,7 +14,7 @@ options {
 
   import stencil.parser.string.ValidationException;
   import stencil.parser.string.TreeFilterSequence;
-  import stencil.parser.tree.util.Path;
+  import stencil.parser.tree.Path;
   import stencil.parser.tree.StencilTree;
   import stencil.parser.string.StencilParser;
   import stencil.interpreter.tree.Freezer;
@@ -41,11 +41,10 @@ topdown
  : ^(t=TUPLE_REF .*) 
     {if (t.getAncestor(StencilParser.TARGET) == null) {
       if (t.getFirstChildWithType(ID) != null
-          || t.getFirstChildWithType(ALL) != null
-          || t.getFirstChildWithType(LAST) != null) {throw NumeralizationException.incomplete(t);}
+          || t.getFirstChildWithType(ALL) != null) {throw NumeralizationException.incomplete(t);}
 
        for (StencilTree child: t) {
-          Object c = Freezer.freeze(child);
+          Object c = Freezer.freezeValue(child);
           if (!(c instanceof Number) ||
                (((Number) c).intValue() <0)) {
               throw NumeralizationException.bad(t);

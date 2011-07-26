@@ -29,11 +29,10 @@ public final class NoOutput {
 	public static final class Signal extends RuntimeException {}
 	
 	/**Tuple that will generate a NoOutput.Signal anytime it is accessed.*/
-	public static final stencil.tuple.Tuple TUPLE = new stencil.tuple.Tuple() {
+	public static final stencil.tuple.Tuple TUPLE = new stencil.tuple.PrototypedTuple() {
 		public Object get(String name) throws InvalidNameException {throw new Signal();}
 		public Object get(int idx) throws TupleBoundsException {throw new Signal();}
-		public TuplePrototype getPrototype() {throw new Signal();}
-		public boolean isDefault(String name, Object value) {throw new Signal();}
+		public TuplePrototype prototype() {throw new Signal();}
 		public int size() {throw new Signal();}		
 	};
 

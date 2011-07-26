@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import stencil.tuple.Tuple;
 
-public class TupleRef {
+public class TupleRef 	{
 	private final int[] steps;
 	private final int hashCode;
 	
@@ -19,12 +19,12 @@ public class TupleRef {
 		hashCode = code;
 	}
 
-	/**Given a list of candidates for resolution (e.g., lexical arguments),
-	 * resolve each and return the results of resolution.
+	/**Resolve all of the candiadtes from the source to values of the given type.
+	 * Candidates may not be tuple refs, they may be values instead.  
+	 * In this case, resolution is not attempted, only type conversion.
 	 */
 	public static final Object[] resolveAll(Object[] candidates, Tuple valueSource) {
-		//Pack arguments...
-		Object[] formals = new Object[candidates.length];
+		Object[] formals = new Object[candidates.length];	//TODO: Can this array be beneficially cached, maybe taken as argument and cached at the call location?
 		for (int i=0; i< formals.length; i++) {
 			if (candidates[i] instanceof TupleRef) {
 				formals[i] = ((TupleRef) candidates[i]).resolve(valueSource);
@@ -32,7 +32,6 @@ public class TupleRef {
 				formals[i] = candidates[i];
 			}
 		}
-
 		return formals;
 	}
 	
@@ -52,7 +51,7 @@ public class TupleRef {
 	
 	public boolean equals(Object o) {
 		if (o == null 
-				|| !(o instanceof TupleRef)
+				|| !(o instanceof TupleField)
 				|| (o.hashCode() != hashCode)) {return false;}
 		
 		TupleRef other = (TupleRef) o;

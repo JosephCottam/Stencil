@@ -24,7 +24,7 @@ options {
   
   protected void setup(Object... args) {
     globals = (GlobalsTuple) args[0];
-    prototype = globals.getPrototype();
+    prototype = globals.prototype();
   }
   
   private GlobalsTuple globals;

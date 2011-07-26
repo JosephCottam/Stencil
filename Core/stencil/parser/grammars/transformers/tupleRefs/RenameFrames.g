@@ -29,7 +29,9 @@ options {
 }
 
 topdown
-  : dy=DIRECT_YIELD {String newName = genSym(FRAME_SYM_PREFIX); subst.put($dy.text, newName);} -> DIRECT_YIELD[subst.get($dy.text)]
-  | ^(t=TUPLE_REF frame=. rest+=.*)-> {subst.containsKey($frame.getText())}? ^(TUPLE_REF ID[subst.get($frame.getText())] $rest*)
-                -> ^(TUPLE_REF $frame $rest*)
+  : dy=DIRECT_YIELD {subst.put($dy.text, genSym(FRAME_SYM_PREFIX));} 
+        -> DIRECT_YIELD[subst.get($dy.text)]
+  | ^(t=TUPLE_REF frame=. rest+=.*)
+        -> {subst.containsKey($frame.getText())}? ^(TUPLE_REF ID[subst.get($frame.getText())] $rest*)
+        -> ^(TUPLE_REF $frame $rest*)
   ;

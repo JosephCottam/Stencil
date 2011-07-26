@@ -22,8 +22,12 @@ public class TestWorkingDir extends junit.framework.TestCase {
 		assertFalse("Files same after update.", post.equals(prior));
 		assertEquals("Update not performed.", new File(path), post);
 		
-		WorkingDir.set(null);
+		WorkingDir.set((String) null);
 		assertNotNull(WorkingDir.get());
+
+		WorkingDir.set((File) null);
+		assertNotNull(WorkingDir.get());
+
 		
 		path = "/Some/Path/To/Somewhere";
 		WorkingDir.set(path);

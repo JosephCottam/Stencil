@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Edges
-HEADER: ID1,ID2
+TUPLE_SIZE: 2
 SEPARATOR: ,
 SOURCE: ./er_100_0.005.adj
 CHECKHEADER: true
@@ -14,12 +14,12 @@ layer Nodes
 from Edges
 	ID: ID1 
 	FILL_COLOR: @Color{MAROON}
-	(X,Y):* Ordering(ID1) -> Circular.query(index) -> (X,Y)
+	(X,Y):* Ordering(ID1) -> Circular.query(Ordering.index) -> (Circular.X, Circular.Y)
 	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
 from Edges
 	ID: ID2
 	FILL_COLOR: @Color{MAROON}
-	(X,Y):* Ordering(ID2) -> Circular.query(index) -> (X,Y)
+	(X,Y):* Ordering(ID2) -> Circular.query(Ordering.index) -> (Circular.X,Circular.Y)
 	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
 
 layer Edges["LINE"]
@@ -27,12 +27,12 @@ default
 	PEN_COLOR: @Color{GRAY80, .8}
 from Edges 
 	ID: Concatenate(ID1,ID2)
-	(X.1, Y.1):* Nodes.find(ID1) -> (X,Y)
-	(X.2, Y.2):* Nodes.find(ID2) ->  (X,Y)
+	(X1, Y1):* Nodes.find(ID1) -> (Nodes.X,Nodes.Y)
+	(X2, Y2):* Nodes.find(ID2) ->  (Nodes.X,Nodes.Y)
 	PEN: @Stroke{.25}
 
 operator Ordering (ID)->(index)  
-	(ALL) => index : Index(ID)
+	default => index : Index(ID)
 
 java Circular {
     int max=0;

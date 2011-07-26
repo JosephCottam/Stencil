@@ -1,14 +1,14 @@
 STREAM: File
 NAME: VertexList
-HEADER: ID1,ID2
+TUPLE_SIZE: 2
 SEPARATOR: ,
 SOURCE: ./ws_400_12_0.1.adj
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: BFS
-HEADER: ID
-SEPARATOR: ,
+TUPLE_SIZE: 1
+SEPARATOR: ,    
 SOURCE: ./ws_400_12_0.1.bfs
 SKIP: 1
 STRICT: true
@@ -28,7 +28,7 @@ layer VSM
 from VertexPair
    ID : Concatenate(ID1, ID2) 
    X : Ordering(ID1)
-   Y : Ordering(ID2) -> Mult(_, -1)
+   Y : Ordering(ID2)
    FILL_COLOR: @Color{RED}
    (SIZE, SHAPE) : (1, "RECTANGLE")
  
@@ -37,5 +37,5 @@ from BFS
 	() : Ordering(ID) -> ()
 
 operator Ordering (ID) -> (VALUE)
-	(ALL) => VALUE : Index(ID)
+	default => VALUE : Index(ID)
 

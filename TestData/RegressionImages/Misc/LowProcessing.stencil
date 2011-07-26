@@ -1,13 +1,13 @@
 STREAM: File
 NAME: NodePositions
-HEADER: ID X Y
+TUPLE_SIZE: 3
 SEPARATOR: \s+
 SOURCE: ../Sourceforge/vx_cluster_0_8.6_min_cuts.coord
 SKIP: 0
 STRICT: true
 STREAM: File
 NAME: Attributes
-HEADER: ID|ATT
+TUPLE_SIZE: 2
 SEPARATOR: \|
 SOURCE: ../Sourceforge/project_troves.txt
 SKIP: 1

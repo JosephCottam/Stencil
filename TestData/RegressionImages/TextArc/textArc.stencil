@@ -1,6 +1,6 @@
 STREAM: File
 NAME: RawLines
-HEADER: text
+TUPLE_SIZE: 1
 SEPARATOR: $^
 SOURCE: ./AliceInWonderland.txt
 SKIP: 0
@@ -14,7 +14,7 @@ stream RawLines(text)
 stream Lines (line, text)
 from RawLines
    line: Count()
-   words: text
+   text: text
 
 stream RawWords (line, word)
 from Lines
@@ -22,52 +22,53 @@ from Lines
    word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, *) -> *
 
 operator NormalizeWords(word) -> (word)
-  (ALL) => word: Strip(_) -> ToLower(_)
+  default => word: Strip(word) -> ToLower(_)
 
    
 stream Words (line, word)
 from RawWords
-   filter(stopWord !~ "true", word !~ "")
+   filter(prefilter.stopWord !~ "true", word !~ "")
    prefilter(stopWord) : StopWords(word)
    line: line
    word: word
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> ExtendTuple(_, line) -> LineIndex(word, *)
+ () : LineIndex.query(word) -> ExtendTuple(LineIndex.0, line) -> LineIndex(word, ExtendTuple.*)
  () : WordCount(word)
 
 layer Border["TEXT"]
 from Lines
    ID: line
    TEXT: text
-   (X,Y):* Layout(line) 
+   (X,Y):* Layout(line) -> Mult(-1, Layout.Y) -> (Layout.X,_)
 
 
 layer Center["TEXT"]
 from Words
    ID: word
    TEXT: word
-   (X,Y):* Centroid(word) -> Contract(X,Y) 
+   (X,Y):* Centroid(word) -> Contract(Centroid.X, Centroid.Y) 
    REGISTRATION: "CENTER"
    (COLOR, FONT):* 
         [count] WordCount.query(word) -> Range[ALL](@Max, _) -> 
-        [freq]  Divide(count[_], _) -> 
-        [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq[_]) ->
-                Scale[min: 50, max:1000](freq[_]) -> @Font{{_}} -> (color[_],_)
+        [freq]  Divide(count, _) -> 
+        [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq) ->
+                Scale[min: 50, max:1000](freq) -> @Font{{_}} -> (color, _)
 
 operator WordCount : Count
 
 operator LineIndex : Dict[fields: "lines"]
 
-/*TODO: Add a labeling facility to Fold so LineIndex/Split/Layout only need to be done once.*/
 operator Centroid (word) -> (X,Y)
-  (ALL) =>
-    (X): LineIndex.query(word) -> Get(*,0) -> Map.query(* , @Layout) ->
-            Select[field: 0](*) -> Mean(LAST)
-    (Y): LineIndex.query(word) -> Get(*,0) -> Map.query(*, @Layout) ->
-            Select[field: 1](*) -> Mean(LAST)
+  default =>
+    (X,Y): LineIndex.query(word) -> [Points] Map. query(LineIndex.0 , @Layout) 
+            -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
+            -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
+            -> (X,Y)
+            
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]
 operator Contract : Geo::Scale[by: .94]
+

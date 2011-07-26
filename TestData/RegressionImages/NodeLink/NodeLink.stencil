@@ -1,13 +1,13 @@
 STREAM: File
 NAME: VertexList
-HEADER: ID1, ID2
+TUPLE_SIZE: 2
 SEPARATOR: ,
 SOURCE: ./er_100_0.005.adj
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: BFS
-HEADER: ID
+TUPLE_SIZE: 1
 SEPARATOR: \s+
 SOURCE: ./er_100_0.005.bfs
 SKIP: 1
@@ -16,35 +16,35 @@ STRICT: true
 stream BFS (ID) 
 stream VertexList (ID1, ID2)
 
-order BFS > VertexList			/*Load the node list before the vertex list.*/
+order BFS > VertexList          /*Load the node list before the vertex list.*/
 
 layer Nodes
 from BFS 
-	ID: ID
-	REGISTRATION : "CENTER"
-	FILL_COLOR:  @Color{BLUE}
-	(SHAPE, SIZE) : ("ELLIPSE", 10)
-	(X,Y) : Ordering(ID) -> Triangular(VALUE) -> (X,Y)
-	 
+    ID: ID
+    REGISTRATION : "CENTER"
+    FILL_COLOR:  @Color{BLUE}
+    (SHAPE, SIZE) : ("ELLIPSE", 10)
+    (X,Y) : Ordering(ID) -> Triangular(Ordering)
+     
 
-layer Labels["TEXT"]				/*Changes the glyph type. All layers have only one glyph type.*/
+layer Labels["TEXT"]                /*Changes the glyph type. All layers have only one glyph type.*/
 from BFS
-	ID : ID
-	(X,Y): Nodes.find(ID) -> (X,Y)
-	TEXT: ID
-	FONT: @Font{10}
-	COLOR: @Color{GRAY60}
+    ID : ID
+    (X,Y): Nodes.find(ID) -> (Nodes.X,Nodes.Y)
+    TEXT: ID
+    FONT: @Font{10}
+    COLOR: @Color{GRAY60}
 
 layer Edges["LINE"]
 from VertexList 
-	ID: Concatenate(ID1,ID2)
-	(X.1, Y.1): Nodes.find(ID1) -> (X,Y)
-	(X.2, Y.2): Nodes.find(ID2) ->  (X,Y)
-	PEN_COLOR: @Color{GRAY30,80}
+    ID: Concatenate(ID1,ID2)
+    (X1, Y1): Nodes.find(ID1) -> (Nodes.X,Nodes.Y)
+    (X2, Y2): Nodes.find(ID2) ->  (Nodes.X,Nodes.Y)
+    PEN_COLOR: @Color{GRAY30,80}
 
 
 operator Ordering (ID)->(VALUE)  
-	(ALL) => VALUE : Index(ID)
+    default => VALUE : Index(ID)
 
 java Triangular {
     public Triangular(OperatorData od) {super(od);}

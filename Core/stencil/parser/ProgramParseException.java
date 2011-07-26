@@ -2,6 +2,8 @@ package stencil.parser;
 
 import java.util.Collection;
 
+/**Exception to indicate simple errors in the structure of the input program.
+ * **/
 public final class ProgramParseException extends Exception {
 	private Collection<String> errors;
 	

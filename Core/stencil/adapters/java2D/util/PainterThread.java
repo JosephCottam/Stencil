@@ -8,23 +8,35 @@ import java.awt.image.BufferedImage;
 
 import stencil.adapters.java2D.Canvas;
 import stencil.adapters.java2D.Panel;
-import stencil.adapters.java2D.data.DoubleBufferLayer;
 
 
 /**Automatically paints a panel.
  **/
 public final class PainterThread implements Runnable {
+	/**Amount of time to sleep after a checking if rendering is required. 
+	 * Setting this value to zero results in just a yield call.
+	 * Setting this value to -1 results in no delay.
+	 */
+	public static int DELAY = 0; 	
+	private int paintCount =0;
+
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	
 	private final MultiThreadPainter painter; 
 
 	private final Canvas target;
 	
+	private int used =0;
+	private int unused = 1;
+	
+	//The buffer currently being used by the canvas is always in position indicated by member variable 'used'
+	private final BufferedImage[] backBuffers = new BufferedImage[2];
+	
 	protected volatile boolean keepRunning = true;
 	
-	public PainterThread(final DoubleBufferLayer[] layers, final Canvas target, final Panel panel) {
-		this.target = target;
-		this.painter = new MultiThreadPainter(target, layers, panel.getProgram());
+	public PainterThread(final Panel panel) {
+		this.target = panel.getCanvas().getComponent();
+		this.painter = new MultiThreadPainter(panel.getProgram(), panel);
 	}
 
 	public synchronized void finalize() {painter.signalShutdown();}
@@ -37,7 +49,11 @@ public final class PainterThread implements Runnable {
 	public void run() {
 		while(keepRunning) {
 			if (requiresUpdate()) {runOnce();}
-			Thread.yield();
+			if (DELAY == 0) {Thread.yield();}
+			else if (DELAY >0) {
+				try {Thread.sleep(DELAY);}
+				catch (InterruptedException e) {throw new RuntimeException("Error delaying between renders.", e);}
+			}
 		}
 	}
 	
@@ -49,41 +65,53 @@ public final class PainterThread implements Runnable {
 	
 	private synchronized void runOnce() {
 		if (painter.isShutdown()) {return;}
-		
 		BufferedImage i = selfBuffer();
 		target.setBackBuffer(i);
+		swapBuffers();
+		paintCount++;
 	}
 
+	
 	
 	private BufferedImage selfBuffer() {
 		Rectangle size;
 		Color background;
 		AffineTransform viewTransform;
 
+		//synchronized(target.visLock) { 			//Enable and add matching parenthesis for render-state lock
+
 		painter.doUpdates();
 
-		//Gather info in a thread-safe manner
-		synchronized(target.visLock) {
-			size = target.getBounds();
-			background = target.getBackground();
-			viewTransform = target.getViewTransform();			
-		}
-
+		size = target.getBounds();
+		background = target.getBackground();
+		viewTransform = target.getViewTransform();			
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 			
-		BufferedImage buffer = newBuffer(target, size.width, size.height);
+		BufferedImage buffer = nextBuffer(size);
 	
 		try {
 			painter.render(background, buffer, viewTransform);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
-			
+		}
 		return buffer;
 	}
 
-	/**Create a new buffer if required.
+	private BufferedImage nextBuffer(Rectangle size) {
+		if (backBuffers[unused] == null 
+				|| size.width != backBuffers[unused].getWidth() 
+				|| size.height != backBuffers[unused].getHeight()) {backBuffers[unused] = newBuffer(target, size.width, size.height);}
+		return backBuffers[unused];
+	}
+	
+	private void swapBuffers() {
+		int hold = unused;
+		unused = used;
+		used = hold;
+	}
+	
+	/**Create a new back buffers
 	 * The buffer will be created for the target canvas.
 	 * A buffer will only be 'required' if the size or transparency of the passed
 	 * buffer do not match the passed target size or passed transparency.
@@ -113,5 +141,7 @@ public final class PainterThread implements Runnable {
      * than the internal buffers (e.g., non-self buffering).
      */
 	public void doUpdates() {painter.doUpdates();}
+	
+	public int paintCount() {return paintCount;}
 }
 

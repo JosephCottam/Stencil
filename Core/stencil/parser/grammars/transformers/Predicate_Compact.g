@@ -28,7 +28,7 @@ options {
 }
 
 //Remove the rule furniture from pedicates
-flatPreds: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. spec=. args=. .+)))) -> ^(PREDICATE[$f.text] $inv $args); 
+flatPreds: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. ^(OP_NAME . n=. .) spec=. args=. .+)))) -> ^(PREDICATE[$n.getText()] $inv $args); 
 
 //Remove the nesting from filter predicates (they are just anded by the interpreter anyway)
 //TODO: Remove this step if OR is introduced into the filters list

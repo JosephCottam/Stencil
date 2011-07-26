@@ -58,7 +58,6 @@ public class TestSpecializerParse extends TestCase {
 				"[range: \"1..n\", more: \"one\", more2: \"two\", more3: \"three\"]",
 				"[range: \"1..n\", more: 1, more2: 2, more3: 3]",
 				"[range: ALL]",
-				"[range: LAST]"
 				};
 		testPasses(specializers,true);
 	}

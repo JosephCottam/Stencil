@@ -52,7 +52,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		
 		this.method = method;
 		this.target =target;
-		paramTypes = method.getParameterTypes();
+		paramTypes = simplifyTypes(method.getParameterTypes());
 		returnsTuple = Tuple.class.isAssignableFrom(method.getReturnType());
 	}
 	
@@ -67,7 +67,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	
 	/**Is the underlying method static?*/
 	public boolean isStatic() {return target==null;}
-	public T getTarget() {return target;}
 	public Method getMethod() {return method;}
 	
 	@Override
@@ -87,6 +86,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 		try {
 			if (isVarArgs) {
+
 				if (!(arguments.length >= expectedNumArgs-1)) {
 					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking varArgs method %1$s (expected at least %2$s; received: %3$s).", method.getName(), expectedNumArgs-1, arguments.length));
 				}
@@ -95,8 +95,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				validateTypes(arguments, paramTypes, 0, args.length-1, args);
 
 				//Prepare variable argument for last position of arguments array
-				
-				
 				Object varArgs;
 				if (arguments.length > 0 && arguments[0] != null && arguments[0].getClass().isArray()) {
 					Class type = paramTypes[paramTypes.length-1];
@@ -104,11 +102,11 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 					if (arguments[0].getClass().isAssignableFrom(type)) {
 						varArgs = type.cast(arguments[0]);
 					} else {
-						varArgs = validateType(arguments[0], type.getComponentType());
+						varArgs = validateType(arguments[0], type);
 					}
 					
 				} else {
-					Class type = paramTypes[paramTypes.length-1].getComponentType();
+					Class type = paramTypes[paramTypes.length-1];
 					Object[] remainingArguments = new Object[arguments.length-expectedNumArgs+1];
 					System.arraycopy(arguments, expectedNumArgs-1, remainingArguments, 0, remainingArguments.length);
 					varArgs = validateType(remainingArguments, type);
@@ -126,10 +124,10 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		}
 			
 		try {
-			return (R) method.invoke(target, args);	//99% of method time spent on this one line; 34% of analysis time
+			return (R) method.invoke(target, args);
 		} 
 		catch (Exception ex) {
-			throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(args)),method, target, ex);
+			throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(arguments)),method, target, ex);
 		}
 	}
 	
@@ -163,7 +161,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return varArgs;
 	}
 	
-	
 	public int hashCode() {return method.hashCode();}
 	
 	public boolean equals(Object other) {
@@ -191,4 +188,14 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		if (target != null) {return target.getClass().getSimpleName();}
 		return method.getName();
 	}
+	
+	
+	/**Given an array of types, returns an array of types where all array types have been reduced
+	 * to their component types.**/
+	private static Class[] simplifyTypes(final Class[] types) {
+		Class[] newTypes = new Class[types.length];
+		for (int i=0; i< types.length ;i++) {newTypes[i] = types[i].isArray() ? types[i].getComponentType() : types[i];}
+		return newTypes;
+	}
+
 }

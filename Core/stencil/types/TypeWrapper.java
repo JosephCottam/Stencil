@@ -1,7 +1,6 @@
 package stencil.types;
 
 import stencil.tuple.Tuple;
-import stencil.tuple.prototype.TuplePrototype;
 
 /**Class for the exchanging tuples and java classes.
  * 
@@ -9,22 +8,6 @@ import stencil.tuple.prototype.TuplePrototype;
  *
  */
 public interface TypeWrapper<T extends Tuple> {
-	/**Get an object that expresses the internal state of passed tuple.  
-	 * The type of the returned object should be assignment compatible with
-	 * the passed class object.  The returned object does not have
-	 * to be independent of the passed tuple.  
-	 * 
-	 * The returned
-	 * object should be assignment compatible with the passed class.
-	 * This method may assume that the passed class is contained in the
-	 * class list returned from 'accepts.'
-	 * 
-	 * Information may be lost during conversion.
-	 * 
-	 * @return
-	 */
-	public <E> E external(Tuple t, TuplePrototype p, Class<E> c);
-	
 	/**Convert the passed object to the given class.
 	 * Should accept objects of the types in the 'accepts' list  
 	 * AND any tuple that may be produced by 'toTuple' without throwing an exception. 

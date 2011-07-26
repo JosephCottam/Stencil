@@ -1,34 +1,7 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.explore.ui.interactive;
 
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,8 +9,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.Font;
+import java.util.Properties;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import stencil.WorkingDir;
 import static stencil.explore.Application.reporter;
@@ -50,6 +25,7 @@ import stencil.explore.util.StencilRunner;
 import stencil.explore.ui.components.AdapterOptsPanel;
 import stencil.explore.ui.components.MessagePanel;
 import stencil.explore.ui.interactive.components.MainEditor;
+import stencil.types.geometry.GeometryWrapper;
 
 /**Wraps the application with a GUI.**/
 public class Interactive implements Runnable {
@@ -108,7 +84,7 @@ public class Interactive implements Runnable {
 	protected Model model;
 	protected Controller controller = new Controller();
 
-	public Interactive(Model model) {
+	public Interactive(Model model, Properties properties) {
 		reporter = messages;  //Set message reporting to the window system
 		
 		editor.getStencilEditor().addStencilChangedListener(controller);
@@ -144,9 +120,14 @@ public class Interactive implements Runnable {
 
 		});
 
+		editorFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		editorFrame.addWindowListener(new AppCloser(this));
+
+		positionWindows(properties);
 		setupMenus();
 	}
 
+	
 	public void executeApplication() {
 		if (model.isRunning()) {
 			messages.addMessage("Stopping prior execution...");
@@ -212,8 +193,38 @@ public class Interactive implements Runnable {
 	}
 
 	
+	private void positionWindows(Properties properties) {
+		GeometryWrapper wrapper = new GeometryWrapper();
+		Rectangle editorWindow, stencilWindow, messageWindow; //Dimensions for each of the windows
+		try {
+			editorWindow = (Rectangle) wrapper.convert(properties.getProperty("editorWindow"), Rectangle.class);
+			stencilWindow = (Rectangle) wrapper.convert(properties.getProperty("imageWindow"), Rectangle.class);
+			messageWindow = (Rectangle) wrapper.convert(properties.getProperty("messageWindow"), Rectangle.class);
+			
+			editorFrame.setBounds(editorWindow);
+			stencilFrame.setBounds(stencilWindow);
+			messageFrame.setBounds(messageWindow);
+			
+		} catch (Exception e) {
+			//Setup size and location
+			java.awt.Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+			int width = dim.width/2;
+			if (width < editorFrame.getMinimumSize().width) {width =editorFrame.getMinimumSize().width;}
+			editorFrame.setSize(width, (int) (dim.height*.6));
+			editorFrame.setLocation(10, 10);
+
+			stencilFrame.setSize(((int) (dim.getWidth() * .3)), ((int) (dim.getHeight() * .3)));
+			stencilFrame.setLocation(editorFrame.getWidth() + editorFrame.getX() + 10, 0);
+
+			messageFrame.setSize(editorFrame.getWidth(), ((int) (editorFrame.getHeight() * .3)));
+			messageFrame.setLocation(editorFrame.getX(), editorFrame.getHeight() +editorFrame.getY() + 20);			
+		}
+
+
+	}
+	
 	//TODO: Implement dynamic export menu that lists all options supported by the adapter (and no others)
-	public void setupMenus() {
+	private void setupMenus() {
 		JMenuBar b = new JMenuBar();
 		editorFrame.setJMenuBar(b);
 
@@ -242,7 +253,7 @@ public class Interactive implements Runnable {
 			public void actionPerformed(ActionEvent arg) {
 				if (arg.getSource() == open) {
 					JFileChooser fc = new JFileChooser();
-
+					fc.setFileFilter(new FileNameExtensionFilter("Stencil File", "stencil"));
 					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"test.stencil"));
 
 					int stat = fc.showOpenDialog(editorFrame);
@@ -367,23 +378,6 @@ public class Interactive implements Runnable {
 	}
 
 	public void run() {
-		editorFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-
-		//Setup size and location
-		java.awt.Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-		int width = dim.width/2;
-		if (width < editorFrame.getMinimumSize().width) {width =editorFrame.getMinimumSize().width;}
-		editorFrame.setSize(width, (int) (dim.height*.6));
-		editorFrame.setLocation(10, 10);
-
-		stencilFrame.setSize(((int) (dim.getWidth() * .3)), ((int) (dim.getHeight() * .3)));
-		stencilFrame.setLocation(editorFrame.getWidth() + editorFrame.getX() + 10, 0);
-
-		messageFrame.setSize(editorFrame.getWidth(), ((int) (editorFrame.getHeight() * .3)));
-		messageFrame.setLocation(editorFrame.getX(), editorFrame.getHeight() +editorFrame.getY() + 20);
-
-		editorFrame.addWindowListener(new AppCloser(this));
-
 		editorFrame.setVisible(true);
 		editor.naturalSize();
 		messageFrame.setVisible(true);
@@ -406,8 +400,6 @@ public class Interactive implements Runnable {
 			}
 		} catch (Exception e) {/*Ignore, changes are cosmetic.*/}
 		
-		String[] configs = PropertyManager.getConfigFiles(args);
-		PropertyManager.loadProperties(configs, PropertyManager.exploreConfig, PropertyManager.stencilConfig, SESSION_CONFIGURATION_FILE);
 
 		//OS-Specific items...
 		String os;
@@ -419,9 +411,11 @@ public class Interactive implements Runnable {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
 
+		String[] configs = PropertyManager.getConfigFiles(args);
+		Properties properties = PropertyManager.loadProperties(configs, PropertyManager.exploreConfig, PropertyManager.stencilConfig, SESSION_CONFIGURATION_FILE);
 
 		Model model = new Model();
-		Interactive app = new Interactive(model);
+		Interactive app = new Interactive(model, properties);
 		String sessionFile = Application.getOpenFile(args);
 		if (sessionFile != null) {
 			Interactive.sessionFile = sessionFile;

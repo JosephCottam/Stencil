@@ -7,7 +7,7 @@
 
  	<target name="Release" depends="CompiledJar, CleanUpTests">
  		<property name="release" location="./release"/>
- 		<tstamp><format property="today" pattern="ddMMMyyy"/></tstamp>
+ 		<tstamp><format property="today" pattern="ddMMMyyyy"/></tstamp>
  		<property name="result" value="Stencil_${today}.zip"/>
 
  		<!--Clear up prior attempts-->
@@ -55,7 +55,6 @@
  			<exclude name="**/TestData/**" />
  			<exclude name="**/bin/**" />
  			<exclude name="**/${release}/**" />
- 			<exclude name="jrat.xml"/>
  			<exclude name="*.zip"/>
  		</zip>
  		

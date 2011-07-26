@@ -12,7 +12,6 @@ import stencil.tuple.Tuples;
 import stencil.tuple.instances.*;
 import stencil.util.ConversionException;
 import stencil.util.collections.PropertyUtils;
-import stencil.util.enums.ValueEnum;
 
 import static stencil.parser.string.StencilParser.STRING;
 
@@ -68,14 +67,13 @@ public final class Converter {
 		
 		if (Number.class.isAssignableFrom(clazz)) {return new NumericSingleton((Number) value);}
 		
-		return new Singleton(value);
+		return Singleton.from(value);
 	}
 	
 	
 	public static String toString(Object value) {
 		if (value == null) {return null;}
 		if (value instanceof String) {return (String) value;} 
-		if (value instanceof ValueEnum) {return toString(((ValueEnum) value).getValue());}
 		if (value instanceof StencilTree 
 				&& ((StencilTree) value).getType() == STRING) {return ((StencilTree) value).getText();}
 		if (value.getClass().isEnum()) {return ((Enum) value).name();}
@@ -84,9 +82,10 @@ public final class Converter {
 	}
 	
 	public static Double toDouble(Object value) {return NumericWrapper.toDouble(value);}
-	public static  Float toFloat(Object value) {return NumericWrapper.toFloat(value);}
+	public static Float toFloat(Object value) {return NumericWrapper.toFloat(value);}
 	public static Integer toInteger(Object value) {return NumericWrapper.toInteger(value);}
 	public static Number toNumber(Object value) {return NumericWrapper.toNumber(value);}
+	public static Boolean toBoolean(Object value) {return Boolean.valueOf(value.toString());}
 	
 	/**Tries to convert values from the current class to
 	 * the target class.  
@@ -104,26 +103,23 @@ public final class Converter {
 	 *  Enumerations are returned through Enum.valueOf
 	 *
 	 *
-	 * @param value
-	 * @param target
+	 * @param value   Value to convert
+	 * @param target  Desired class
+	 * @param nullVal Value to return in the value argument is null
 	 * @return
 	 */
-	public static final Object convert(Object value, Class target) throws ConversionException {
+	public static final Object convert(Object value, Class target, Object nullVal) throws ConversionException {
 		try {
-			if (value == null) {return null;}
+			if (value == null) {return nullVal;}
 			if (value == null || target.equals(Object.class) || target.isInstance(value)) {return value;}
 			if (value instanceof StencilTree) {
-				Object val = Freezer.freeze(((StencilTree) value));
+				Object val = Freezer.freezeValue(((StencilTree) value));
 				return convert(val, target);
 			}
 						
 			TypeWrapper wrapper = WRAPPER_FOR.get(target);
 			if (wrapper != null) {return wrapper.convert(value, target);}
 			
-			if (value instanceof ValueEnum) {
-				value = ((ValueEnum) value).getValue();
-				if (target.isInstance(value)) {return value;}
-			}
 			if (target.equals(String.class)) {return toString(value);}
 
 			if (target.equals(boolean.class) || target.equals(Boolean.class)) {
@@ -140,6 +136,8 @@ public final class Converter {
 		
 		throw new ConversionException(value, target);
 	}
+	public static final Object convert(Object value, Class target) throws ConversionException {return convert(value, target, null);}
+
 	
 	/**Convert a value for storage in the given target.
 	 * This method should only be used if the target is the exact type

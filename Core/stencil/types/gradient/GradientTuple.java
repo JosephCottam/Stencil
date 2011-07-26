@@ -12,10 +12,9 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.ColorModel;
 
 import stencil.tuple.InvalidNameException;
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.collections.ArrayUtil;
 
@@ -26,7 +25,7 @@ import stencil.util.collections.ArrayUtil;
  * @author jcottam
  *
  */
-public class GradientTuple implements Tuple, Paint {
+public class GradientTuple implements PrototypedTuple, Paint {
 	private static String SELF_LABEL = "self";
 	private static String START_LABEL = "start";
 	private static String END_LABEL = "end";
@@ -36,7 +35,7 @@ public class GradientTuple implements Tuple, Paint {
 	
 	private static final String[] FIELDS = new String[]{SELF_LABEL, START_LABEL, END_LABEL, LENGTH_LABEL, ABSOLUTE_LABEL, CYCLIC_LABEL};
 	private static final Class[] TYPES = new Class[]{GradientTuple.class, Color.class, Color.class, double.class, boolean.class, boolean.class};
-	private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+	private static final TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS, TYPES);
 	public static final int SELF = ArrayUtil.indexOf(SELF_LABEL, FIELDS);
 	public static final int START = ArrayUtil.indexOf(START_LABEL, FIELDS);
 	public static final int END = ArrayUtil.indexOf(END_LABEL, FIELDS);
@@ -73,7 +72,7 @@ public class GradientTuple implements Tuple, Paint {
 	}
 
 	@Override
-	public TuplePrototype getPrototype() {return PROTOTYPE;}
+	public TuplePrototype prototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {return false;}
 

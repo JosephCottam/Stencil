@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.explore.model.sources;
  
 import java.io.BufferedReader;
@@ -37,9 +9,7 @@ import stencil.explore.ui.components.sources.SourceEditor;
 import stencil.explore.ui.components.sources.Text;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.SimplePrototype;
-import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 
 
@@ -48,17 +18,15 @@ public final class TextSource extends StreamSource {
 	public final static class TextStream implements TupleStream {
 		private final String separator;
 		private final String name;
-		private final TuplePrototype prototype;
 		private final String[] rows;
+		private final int tupleSize;
 		private int index =0;
 		private boolean closed = false;
 
-		public TextStream(String name, String header, String separator, String text) {
+		public TextStream(String name, int tupleSize, String separator, String text) {
 			this.separator = separator;
 			this.name = name;
-
-			String[] labels = header.split(separator);
-			this.prototype = new SimplePrototype(labels);
+			this.tupleSize = tupleSize;
 			
 			rows = text.split("\n");
 		}
@@ -68,8 +36,9 @@ public final class TextSource extends StreamSource {
 		public SourcedTuple next() {
 			if (!hasNext()) {throw new RuntimeException("Cannot call next when hasNext is false.");}
 			String[] values = rows[index].split(separator);
-			
-			Tuple rv = new PrototypedTuple(prototype, values);
+			if (values.length != tupleSize) {throw new RuntimeException(String.format("Line %1$s has unexpected number of values (expected %1$s, found %2$s).", index, tupleSize, values.length));}
+
+			Tuple rv = new ArrayTuple(values);
 			index++;
 			return new SourcedTuple.Wrapper(name, rv);
 		}
@@ -88,14 +57,12 @@ public final class TextSource extends StreamSource {
 
 	}
 
-	private final String header;
 	private final String separator;
 	private final String text;
 
-	public TextSource(String name) {this(name, null, null, null);}
-	public TextSource(String name, String header, String separator, String text) {
-		super(name);
-		this.header = header;
+	public TextSource(String name) {this(name, 0, null, null);}
+	public TextSource(String name, int size, String separator, String text) {
+		super(name, size);
 		this.separator = separator;
 		this.text = text;
 	}
@@ -106,32 +73,31 @@ public final class TextSource extends StreamSource {
 
 	public TextSource name(String name) {
 		if(this.name.equals(name)) {return this;}
-		return new TextSource(name, header, separator, text);		
+		return new TextSource(name, tupleSize, separator, text);		
 	}
 	
-	public String header() {return header;}
-	public TextSource header(String header) {
-		if(this.header.equals(header)) {return this;}
-		return new TextSource(name, header, separator, text);
+	public TextSource tupleSize(int size) {
+		if (this.tupleSize == size) {return this;}
+		return new TextSource(name, size, separator, text);
 	}
 
 	public String separator() {return separator;}
 	public TextSource separator(String separator) {
 		if(this.separator.equals(separator)) {return this;}
-		return new TextSource(name, header, separator, text);
+		return new TextSource(name, tupleSize, separator, text);
 	}
 
 	public String text() {return text;}
 	public TextSource text(String text) {
 		if(this.text.equals(text)) {return this;}
-		return new TextSource(name, header, separator, text);
+		return new TextSource(name, tupleSize, separator, text);
 	}
 
-	public TupleStream getStream(Model context) throws Exception {return new TextStream(name, header, separator, text);}
+	public TupleStream getStream(Model context) throws Exception {return new TextStream(name, tupleSize, separator, text);}
 
 	public boolean isReady() {
-		return header !=null && separator != null && text != null &&
-			!header.equals("") && !separator.equals("") && !text.equals("");
+		return separator != null && text != null
+			&& !separator.equals("") && !text.equals("");
 	}
 
 	@Override

@@ -14,17 +14,23 @@ import stencil.tuple.stream.TupleStream;
  *
  */
 public class QueuedStream implements TupleStream {
-	public static boolean THREAD = false;			//TODO: add a switch for this in the configuration file
+	/**How large should the queue be at its maximum**/
+	public static int DEFAULT_QUEUE_SIZE = 50;		
+	
+	/**Should queueing be done in a separate thread?**/
+	public static boolean THREAD = false;			
 	
 	/**Tagging interface, indicates to the Stencil runtime that queuing is permitted.**/
 	public static interface Queable {}
 	
 	private final class QueueLoader implements Runnable {
 		public void run() {
-			while (source!= null && source.hasNext()) {
-				if (tupleCache.size() < prefetchSize) {
-					loadQueue();
-				}
+			while (source != null) {
+				if (!source.hasNext()) {break;}
+				int getMore = prefetchSize - tupleCache.size(); //queue.size is not necessarily constant time, so the value is grabbed and used in the inner loop
+				boolean doSleep = getMore < 10;					//Not much to get, take a quick break
+				for (int i=0; i<getMore; i++) {loadQueue();}
+				if (doSleep) {Thread.yield();}
 			}
 		}
 	}	
@@ -34,12 +40,12 @@ public class QueuedStream implements TupleStream {
 	/**Maximum queue size.**/
 	private final int prefetchSize;
 	
-	/**Prefetched tuples**/
-	//TODO: Investigate a BlockingQueue implementation 
-	private Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
+	/**Pre-fetched tuples**/
+	private final Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
 	
 	private final Thread loader;
 	
+	public QueuedStream(TupleStream source) {this(source, DEFAULT_QUEUE_SIZE, THREAD);}
 	public QueuedStream(TupleStream source, int prefetch) {this(source, prefetch, THREAD);}
 	public QueuedStream(TupleStream source, int prefetch, boolean thread) {
 		this.source = source;
@@ -55,7 +61,10 @@ public class QueuedStream implements TupleStream {
 
 	
 	@Override
-	public boolean hasNext() {return !tupleCache.isEmpty() || source.hasNext();}
+	public boolean hasNext() {
+		//if (!tupleCache.isEmpty()) {return true;}
+		return !tupleCache.isEmpty() || source.hasNext();
+	}
 
 	@Override
 	public SourcedTuple next() {

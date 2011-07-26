@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.util.streams.ui;
 
 import java.awt.Point;
@@ -34,13 +6,13 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.display.Display;
+import stencil.parser.ParseStencil;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.instances.PrototypedArrayTuple;
+import stencil.tuple.prototype.TupleFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
-import stencil.util.enums.EnumUtils;
 
 /**A way to track the mouse position/state at all points in time.
  *
@@ -108,8 +80,14 @@ public class MouseStream implements TupleStream {
 	 * CTRL, ALT, SHIFT, META: Modifier keys concurrently pressed
 	 * TYPE: Click/Press/Move/Drag
 	 */
-	public static enum Names {X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE}
-	private static final TuplePrototype PROTOTYPE = new SimplePrototype(EnumUtils.allNames(Names.class)); 
+	private static String PROTOTYPE_STRING = "(int X, int Y, int BUTTON, int SCREEN_X, int SCREEN_Y, int DELTA_X, int DELTA_Y, int CLICK_COUNT, boolean CTRL, booealn ALT, boolean SHIFT, boolean META, String TYPE)";
+	public static final TuplePrototype<TupleFieldDef> PROTOTYPE;
+	static {
+		TuplePrototype proto = null;
+		try {proto = ParseStencil.prototype(PROTOTYPE_STRING, false);}
+		catch (Throwable e) {e.printStackTrace();}
+		PROTOTYPE = proto;
+	}
 	
 	
 	public static enum Types {CLICK, PRESS, RELEASE, MOVE, DRAG;
@@ -145,7 +123,7 @@ public class MouseStream implements TupleStream {
 
 	/**What is the current mouse state?*/
 	public SourcedTuple next() {
-		Object[] values = new Object[Names.values().length];
+		Object[] values = new Object[PROTOTYPE.size()];
 
 		synchronized(mouse) {
 			if (!ready()) {return null;}
@@ -155,24 +133,24 @@ public class MouseStream implements TupleStream {
 
 			sequence = mouse.sequence;
 
-			values[Names.X.ordinal()] = mouse.currentCanvas.getX();
-			values[Names.Y.ordinal()] = mouse.currentCanvas.getY();
-			values[Names.BUTTON.ordinal()] = mouse.storedEvent.getButton();
-			values[Names.DELTA_X.ordinal()] = mouse.current.getX() - mouse.prior.getX();
-			values[Names.DELTA_Y.ordinal()] = mouse.current.getY() - mouse.prior.getY();
-			values[Names.SCREEN_X.ordinal()] = mouse.current.getX();
-			values[Names.SCREEN_Y.ordinal()] = mouse.current.getY();
-			values[Names.CLICK_COUNT.ordinal()] = mouse.storedEvent.getClickCount();
-			values[Names.CTRL.ordinal()] = mouse.storedEvent.isControlDown();
-			values[Names.ALT.ordinal()] = mouse.storedEvent.isAltDown();
-			values[Names.SHIFT.ordinal()] = mouse.storedEvent.isShiftDown();
-			values[Names.META.ordinal()] = mouse.storedEvent.isMetaDown();
-			values[Names.TYPE.ordinal()] = Types.getType(mouse.storedEvent.getID()).toString();
+			values[PROTOTYPE.indexOf("X")] = mouse.currentCanvas.getX();
+			values[PROTOTYPE.indexOf("Y")] = -mouse.currentCanvas.getY();
+			values[PROTOTYPE.indexOf("BUTTON")] = mouse.storedEvent.getButton();
+			values[PROTOTYPE.indexOf("DELTA_X")] = mouse.current.getX() - mouse.prior.getX();
+			values[PROTOTYPE.indexOf("DELTA_Y")] = mouse.current.getY() - mouse.prior.getY();
+			values[PROTOTYPE.indexOf("SCREEN_X")] = mouse.current.getX();
+			values[PROTOTYPE.indexOf("SCREEN_Y")] = mouse.current.getY();
+			values[PROTOTYPE.indexOf("CLICK_COUNT")] = mouse.storedEvent.getClickCount();
+			values[PROTOTYPE.indexOf("CTRL")] = mouse.storedEvent.isControlDown();
+			values[PROTOTYPE.indexOf("ALT")] = mouse.storedEvent.isAltDown();
+			values[PROTOTYPE.indexOf("SHIFT")] = mouse.storedEvent.isShiftDown();
+			values[PROTOTYPE.indexOf("META")] = mouse.storedEvent.isMetaDown();
+			values[PROTOTYPE.indexOf("TYPE")] = Types.getType(mouse.storedEvent.getID()).toString();
 
 			mouse.prior = mouse.current;
 		}
 
-		Tuple t= new PrototypedTuple(PROTOTYPE, values);
+		Tuple t= new PrototypedArrayTuple(PROTOTYPE, values);
 		return new SourcedTuple.Wrapper(NAME, t);
 	}
 

@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
-import stencil.adapters.java2D.data.Guide2D;
+import stencil.adapters.java2D.render.guides.Guide2D;
 
 /**What should a canvas component be able to do?*/
 public abstract class DisplayCanvas extends JComponent {
@@ -14,10 +14,11 @@ public abstract class DisplayCanvas extends JComponent {
 	 **/
 	public final Object visLock = new Object(); 
 	
-	/**Instance lock.  Used to prevent multiple renderings (including the pre-render tasks) from concurrently running.
-	 * If required concurrently with other locks, locking order is render then vis.
+	/**Instance lock.  Used to prevent ensure that tableView grabs capture all layers in a consistent state
+	 * (i.e., no layer gets merged after some layers have been grabbed).
+	 * If required concurrently with visLock, locking order is vis then tableCapture.
 	 */
-	public final Object renderLock = new Object(); 
+	public final Object tableCaptureLock = new Object(); 
 	
 	public abstract DisplayGuide getGuide(String identifier);
 	public abstract void addGuide(String identifier, Guide2D guide);

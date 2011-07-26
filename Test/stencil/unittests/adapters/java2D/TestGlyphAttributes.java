@@ -4,55 +4,64 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.glyphs.*;
+import stencil.adapters.java2D.Adapter;
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.display.SchemaFieldDef;
+import stencil.interpreter.tree.Specializer;
+import stencil.parser.ParseStencil;
+import stencil.parser.ProgramParseException;
+import stencil.tuple.PrototypedTuple;
+import stencil.tuple.instances.Singleton;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.unittests.StencilTestCase;
+import static stencil.display.DisplayLayer.TYPE_KEY;
 
 //TODO: Add tests for failure cases
 public class TestGlyphAttributes extends StencilTestCase {
-	private void testAttributes(Glyph2D node, String...ignores) throws Exception {
+	private void testAttributes(Table table, String...ignores) throws Exception {
 		List<String> ignore = new ArrayList(Arrays.asList(ignores));
 		ignore.add("ID");
-		ignore.add("IMPLANTATION");
 		
-		for(String att : TuplePrototypes.getNames(node.getPrototype())) {
-			if (ignore.contains(att)) {continue;} 
-			Object value = node.get(att);
-			assertTrue(String.format("Default value not returned for %1$s when expected (got %2$s)", att, value), node.isDefault(att, value));
+		table.update(Singleton.from("ID","ID"));
+		PrototypedTuple node = table.find("ID");
+		
+		for(SchemaFieldDef att : table.prototype()) {
+			if (ignore.contains(att.name())) {continue;} 
+			Object value = node.get(att.name());
+			Object def = att.defaultValue();
+			assertEquals(String.format("Default value not returned for %1$s when expected '%2$s' got '%3$s'", att.name(), def, value), att.defaultValue(), value);
 		}
 		
-		for (String att: TuplePrototypes.getNames(node.getPrototype())) {
-			assertTrue(String.format("Expected to find %1$s in glyph of type %2$s", att, node.get("IMPLANTATION")), node.getPrototype().contains(att));
+		for (String att: TuplePrototypes.getNames(node.prototype())) {
+			assertTrue(String.format("Expected to find %1$s in glyph of type %2$s", att, node.get("#TYPE")), node.prototype().contains(att));
 		}
 	}
 
+	private Specializer spec(String type) throws ProgramParseException {return ParseStencil.specializer(String.format("[%1$s : \"%2$s\"]", TYPE_KEY, type));}
+ 	
 	public void testText() throws Exception {
-		testAttributes(new Text("MyID"));
+		testAttributes(Adapter.ADAPTER.makeLayer("MyID", spec("TEXT")));
 	}
 	
 	public void testShape() throws Exception {
-		testAttributes(new Shape("MyID"));
+		testAttributes(Adapter.ADAPTER.makeLayer("MyID", spec("SHAPE")));
 	}
 
 	public void testImage() throws Exception {
-		testAttributes(new Image("MyID"), "HEIGHT", "WIDTH");
+		testAttributes(Adapter.ADAPTER.makeLayer("MyID", spec("IMAGE")), "HEIGHT", "WIDTH");
 	}
 
 	public void testLine() throws Exception {
-		testAttributes(new Line("MyID"), "X", "Y", "HEIGHT", "WIDTH");
+		testAttributes(Adapter.ADAPTER.makeLayer("MyID", spec("LINE")), "X", "Y", "HEIGHT", "WIDTH");
 	}
 	
 	public void testPolyLine() throws Exception {
-		testAttributes(new Poly.PolyLine("MyID"), "X", "Y", "XS", "YS");
+		testAttributes(Adapter.ADAPTER.makeLayer("MyID", spec("POLY_POINT")), "X", "Y", "XS", "YS");
 	}
 	
-	public void testPoly() throws Exception {
-		testAttributes(new Poly.Polygon("MyID"), "X", "Y", "XS", "YS");
-	}
 	
 	public void testPie() throws Exception {
-		testAttributes(new Pie("MyID"));
+		Adapter.ADAPTER.makeLayer("MyID", spec("PIE"));
 	}
 
 }

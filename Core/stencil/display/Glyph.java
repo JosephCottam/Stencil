@@ -1,23 +1,22 @@
 package stencil.display;
 
-import stencil.tuple.Tuple;
+import java.awt.geom.Rectangle2D;
+
+import stencil.tuple.PrototypedTuple;
 
 /**A glyph is a tuple that will eventually be rendered.
  * The graphics adapter is primarily concerned with
  * instantiating glyphs based on interpreter results
  * and later rendering those glyphs.
+ * 
+ * This is principally a tagging interface, but the ID
+ * allows the glyph to be tied back to source data.
  */
-public interface Glyph extends Tuple {
+public interface Glyph extends PrototypedTuple {
 	/**Get an identifier for this glyph.*/
-	public String getID();
+	public Comparable getID();
 	
-	/**Update a glyph given a set of values.
-	 * 
-	 * The returned glyph MAY be originally provided glyph,
-	 * depending on adapter implementation.
-	 * It is suggested that glyphs be immutable, and this
-	 * method on return the original glyph if the values
-	 * passed do not represent a change.
-	 * */
-	public Glyph update(Tuple values);
+	public boolean isVisible();
+	
+	public Rectangle2D getBoundsReference();
 }

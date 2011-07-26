@@ -21,8 +21,8 @@ options {
   import stencil.module.*;
   import stencil.module.operator.StencilOperator;
   import stencil.parser.tree.*;
-  import stencil.parser.tree.util.*;
   import stencil.interpreter.tree.Specializer;
+  import stencil.interpreter.tree.MultiPartName;
   import stencil.interpreter.tree.Freezer;
 }
 
@@ -37,26 +37,26 @@ options {
 	
     public AstInvokeable makeInvokeable(StencilTree func) {
   		StencilOperator op;
-   		MultiPartName name = new MultiPartName(func.getText());
+   		MultiPartName name =  Freezer.multiName(func.find(OP_NAME));
   		
   		try {
          Specializer s = Freezer.specializer(func.find(SPECIALIZER));
          //TODO: Do not use modules for this, instead just search the AST
-         op = modules.instance(name.getPrefix(), name.getName(), null, s, false);   //null context and false is fine BECAUSE all ops should be instantiated in the AST already
+         op = modules.instance(name, null, s, false);   //null context and false is fine BECAUSE all ops should be instantiated in the AST already
     	} catch (Exception e) {
-    		String message = String.format("Error creating invokeable instance for function \%1\$s.", func.getText()); //TODO: Add path to the point of error...
+    		String message = String.format("Error creating invokeable instance for function \%1\$s.", name); //TODO: Add path to the point of error...
     		throw new RuntimeException(message, e);
     	}
     	
        AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
        inv.setOperator(op);
-       inv.setInvokeable(op.getFacet(name.getFacet()));
+       inv.setInvokeable(op.getFacet(name.facet()));
        return inv;
     }
 }
 
 topdown 
   : (FUNCTION AST_INVOKEABLE ) => ^(f=FUNCTION AST_INVOKEABLE .*) 
-  | ^(f=FUNCTION spec=. args=. yield=. pack=.) -> ^(FUNCTION {makeInvokeable($f)} $spec $args $yield $pack);
+  | ^(f=FUNCTION name=. spec=. args=. yield=. pack=.) -> ^(FUNCTION {makeInvokeable($f)} $name $spec $args $yield $pack);
 
 

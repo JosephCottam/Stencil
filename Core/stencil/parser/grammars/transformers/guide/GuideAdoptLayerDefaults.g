@@ -14,11 +14,11 @@ options {
 
   package stencil.parser.string;
   
-  import stencil.parser.tree.*;
-  import stencil.interpreter.guide.MonitorOperator;
+  import stencil.parser.tree.StencilTree;
+  import stencil.interpreter.tree.TupleField;
   import stencil.interpreter.tree.Freezer;
-
-  import static stencil.parser.ParserConstants.*;
+  import stencil.parser.tree.StencilTree;
+  import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 }
 
 @members{
@@ -31,29 +31,47 @@ options {
      if (defaults.getChildCount() ==0) {return (StencilTree) adaptor.dupTree(guide);}
      
      guide = (StencilTree) adaptor.dupTree(guide);
-     StencilTree rules = guide.find(LIST_RULES);
+     StencilTree guideRules = guide.find(LIST_RULES);
      
-     for (StencilTree rule: defaults) {
-        if (!useRule(rule)) {continue;} 
-        adaptor.addChild(rules, modRule(rule));
+     for (StencilTree defRule: defaults) {
+        StencilTree candidate = modRule(defRule);
+        if (!useRule(candidate, guideRules)) {continue;} 
+        adaptor.addChild(guideRules, candidate);
      }
      return guide;
   }
   
   
-  //TODO: Simplify this process by calculating guide defaults only once (like layer defaults)
-  private boolean useRule(StencilTree rule) {
-    StencilTree target = rule.findDescendant(TUPLE_FIELD_DEF).getChild(0);
-    return !target.getText().equals("REGISTRATION")
-            && ! target.getText().equals("X")
-            && ! target.getText().equals("Y");
+  /**Should the candidate guide-default be used?  
+     Reasons not to include an existing rule in the guide or setting properties that would otherwise cause problems later.
+  */
+  private boolean useRule(StencilTree candidate, StencilTree guideRules) {
+    TupleField target = Freezer.tupleField(candidate.findDescendant(TARGET_TUPLE).getChild(0));
+    
+    for (StencilTree tt : guideRules.findAllDescendants(TARGET_TUPLE)) {
+        for (StencilTree field: tt) {
+            TupleField guideField = Freezer.tupleField(field);
+            if (guideField.equals(target)) {return false;}
+        }
+    }
+
+    
+    //TODO: Can these restrictions be removed?      (uses parts(1) because parts(0) should be GUIDE_ELEMENT_TAG for all of them)    
+    return !target.parts(1).equals("REGISTRATION")
+            && ! target.parts(1).equals("X")
+            && ! target.parts(1).equals("Y");
   }
+
 
   /**Make the rule target the example properties.*/
   private StencilTree modRule(StencilTree rule) {
      rule = (StencilTree) adaptor.dupTree(rule);
-     StencilTree target = rule.findDescendant(TUPLE_FIELD_DEF).getChild(0);
-     target.token.setText(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + target.getText());
+     StencilTree target = rule.findDescendant(TARGET_TUPLE).getChild(0);
+     StencilTree backup = (StencilTree) adaptor.dupTree(target);
+
+     for (int i=0; i< target.getChildCount(); i++) {target.deleteChild(i);}
+     adaptor.addChild(target, adaptor.create(ID, GUIDE_ELEMENT_TAG));
+     for (int i=0; i< backup.getChildCount(); i++) {adaptor.addChild(target, adaptor.dupTree(backup.getChild(i)));}
      return rule;
   }
 }

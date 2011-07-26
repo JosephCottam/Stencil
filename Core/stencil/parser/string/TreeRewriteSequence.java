@@ -14,6 +14,7 @@ import org.antlr.runtime.tree.TreeVisitor;
 import org.antlr.runtime.tree.TreeVisitorAction;
 
 import stencil.parser.ParseStencil;
+import stencil.parser.ProgramCompileException;
 
 public abstract class TreeRewriteSequence extends TreeRewriter {
 	private static final String DEFAULT_UP_OPERATION = "bottomup";
@@ -36,7 +37,7 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
 				if (e.getCause() instanceof RecognitionException) {
 					throw (RecognitionException) e.getCause();
 				} else {
-					throw new Error("Error invoking sequence item.",e);
+					throw new RuntimeException("Error invoking sequence item.",e);
 				}
 			}
 		}
@@ -62,7 +63,17 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
             public Object pre(Object tree)  { return applyOnce(tree, down); }
             public Object post(Object tree) { return applyRepeatedly(tree, up); }
         };
-        t = v.visit(t, actions);
+        try {t = v.visit(t, actions);}
+        catch (ProgramCompileException ce) {throw ce;}
+        catch (Exception e) {
+        	Throwable ex=e.getCause();
+        	while (ex != null) {
+        		if (ex instanceof ProgramCompileException) {throw (ProgramCompileException) ex;}
+        		ex = ex.getCause();
+        	}
+        	if (e instanceof RuntimeException) {throw (RuntimeException) e;}
+        	throw new RuntimeException(e);
+        }
         return t;    
     }
 

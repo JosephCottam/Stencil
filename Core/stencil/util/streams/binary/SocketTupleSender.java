@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 import stencil.util.streams.txt.DelimitedParser;
 
 /**Given a tuple stream, sends that tuple stream across a socket in the binary
@@ -66,7 +67,7 @@ public class SocketTupleSender implements Runnable {
 		} else {
 			final String delimiter = args[3];
 			final String fields = args[4];
-			stream = new DelimitedParser("none", fields, filename, delimiter, true, 0);
+			stream = new DelimitedParser("none", filename, delimiter, Converter.toInteger(fields), true, 0);
 		}
 		
 		SocketTupleSender sender = new SocketTupleSender(stream, endpoint);

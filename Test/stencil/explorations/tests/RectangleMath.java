@@ -11,21 +11,25 @@ public class RectangleMath {
 		System.out.println();
 	}
 	
+	
 	public static void main(String[] args) throws Exception {
-		Rectangle empty = new Rectangle(0,0,0,0);
+		Rectangle2D empty = new Rectangle(0,0,0,0);
 		report(empty);
-		
-		Rectangle root = new Rectangle(0,0,-1,-1);
+
+		Rectangle2D root = new Rectangle(0,0,-1,-1);
 		report(root);
 
-		Rectangle r1 = new Rectangle(0,0,100,100);
+		Rectangle2D r1 = new Rectangle(0,0,100,100);
 		System.out.println("Union with: " + r1);
-		report(root.union(r1));
+		report(root.createUnion(r1));
 		
-		Rectangle r2 = new Rectangle(-100,-100,100,100);
+		Rectangle2D r2 = new Rectangle(-100,-100,1,1);
 		System.out.println("Union with: " + r2);
-		report(root.union(r2));
+		report(root.createUnion(r2));
 		
+		Rectangle2D r3 = new Rectangle(100,100,1,1);
+		System.out.println("Union with: " + r3);
+		report(root.createUnion(r3));
 		
 	}
 }

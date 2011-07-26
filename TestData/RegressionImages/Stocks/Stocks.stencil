@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Stocks
-HEADER: Date,Open,High,Low,Close,Volume
+TUPLE_SIZE: 6
 SEPARATOR: ,
 SOURCE: ./google_stocks.csv
 SKIP: 1
@@ -8,45 +8,47 @@ STRICT: true
 
 stream Stocks(Date, Open)
 
-layer Ticker["POLY_LINE"]		/*Poly-line is a set of line segments treated as a group.*/
+layer Ticker["POLY_POINT"]		/*Poly-line is a set of line segments treated as a group.*/
 guide
-  axis from XS
-  axis Linear from YS
+   axis from X
+   axis from Y
 
 from Stocks
-	ID: "Google"
-   IDX: "after"
-	XS: TimeStep(Date)           /*Indicates that a new segment of a poly-line is to be crated.*/
-	YS: Price(Open)         		/*All news in a block indicate the same extension until a new input is started.*/
-	PEN: @Stroke{1}
-	PEN_COLOR: @Color{BLUE}
+   ID: Ids()
+   GROUP: "Google"
+   ORDER: Count()
+   X: TimeStep(Date)
+   Y: Open  
+   PEN: @Stroke{1}
+   COLOR: @Color{BLUE}
 
-layer Averages["POLY_LINE"]
+layer Averages["POLY_POINT"]
 from Stocks
-	ID: "Google_30"
-   IDX: "after"
-	XS: TimeStep(Date)
-	YS: Price(Open) -> Range["-30..n"](@Mean, Price)	    /*Average the most recent 30 values.*/
-	PEN: @Stroke{1}
-	PEN_COLOR: @Color{LIME,150}
+   ID: Ids()
+   GROUP: "Google_30"
+   ORDER: Count()
+   X: TimeStep(Date)
+   Y: Range["-30..n"](@Mean, Open)	    /*Average the most recent 30 values.*/
+   PEN: @Stroke{1}
+   COLOR: @Color{LIME,150}
 from Stocks
-	ID: "Google_ALL"
-   IDX: "after"
-	XS: TimeStep(Date)
-	YS: Price(Open) -> Range[ALL](@Mean, Price)		    /*Average all values.*/
-	PEN: @Stroke{1}
-	PEN_COLOR: @Color{CRIMSON,150}
+   ID: Ids()
+   GROUP: "Google_ALL"
+   ORDER: Count()
+   X: TimeStep(Date)
+   Y: Range[ALL](@Mean, Open)		    /*Average all values.*/
+   PEN: @Stroke{1}
+   COLOR: @Color{CRIMSON,150}
 from Stocks
-	ID: "Google_20"
-   IDX: "after"
-	XS: TimeStep(Date)
-	YS: Price(Open) -> Range["-30 .. -10"](@Mean, Price) /*Average that lags by 10 and includes 20 values.*/
-	PEN: @Stroke{1}
-	PEN_COLOR: @Color{ORANGE,150}
-	
+   ID: Ids()
+   GROUP: "Google_20"
+   ORDER: Count()
+   X: TimeStep(Date)
+   Y: Range["-30 .. -10"](@Mean, Open) /*Average that lags by 10 and includes 20 values.*/
+   PEN: @Stroke{1}
+   COLOR: @Color{ORANGE,150}
 
-operator Price (Open) -> (Price)
-	ALL => (Price) : Mult(-1, Open)
+operator Ids : Count
 
 operator TimeStep (T) -> (VALUE)
-	ALL => (VALUE) :  Index(T) -> Mult(_, 3)
+	default => (VALUE) :  Index(T) -> Mult(_, 3)

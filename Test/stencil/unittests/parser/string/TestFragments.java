@@ -6,6 +6,7 @@ import java.util.Properties;
 import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.java2D.Adapter;
+import stencil.interpreter.tree.MultiPartName;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.parser.ParseStencil;
@@ -36,7 +37,7 @@ public class TestFragments extends TestCase {
 		ModuleCache modules = Imports.apply(t);
 		
 		assertNotNull("Import unsuccessful; could not find module by name.", modules.getModule("JUNG"));
-		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator("", "BalloonLayout"));		
+		assertNotNull("Could not find imported operator's module.", modules.findModuleForOperator(new MultiPartName("", "BalloonLayout")));		
 
 		
 		t = init("import JUNG : JG");
@@ -45,7 +46,7 @@ public class TestFragments extends TestCase {
 		
 		assertNotNull("Proxy name import unsuccessful; could not find  module by prefix.", modules.getModule("JG"));
 		
-		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator("JG", "BalloonLayout"));
+		assertNotNull("Could not find prefixed operator's module.", modules.findModuleForOperator(new MultiPartName("JG", "BalloonLayout")));
 	}
 	
 	public void testAdHocPrime() throws Exception {
@@ -62,7 +63,6 @@ public class TestFragments extends TestCase {
 		
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
-		p = LastToAll.apply(p);					//Remove all uses of the LAST tuple reference
 		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
 		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
 		p = DefaultPack.apply(p);				//Add default packs where required
@@ -127,8 +127,8 @@ public class TestFragments extends TestCase {
 	public void testLiftLayerConstants() throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
 		StencilTree program = ParseStencil.programTree(source,  Adapter.ADAPTER);
-		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD_DEF).size());
-		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD_DEF).size());
+		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD).size());
+		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD).size());
 	}
 
 	public void testTargetPackMismatch() throws Exception {

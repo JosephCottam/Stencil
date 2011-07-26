@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.explore.ui.components.sources;
 
 import java.awt.BorderLayout;
@@ -47,7 +19,7 @@ public final class Text extends stencil.explore.ui.components.sources.SourceEdit
 	private static final long serialVersionUID = -6217403692229831654L;
 
 	private final JTextArea data;
-	private final JTextField header;
+	private final JTextField tupleSize;
 	private final JTextField separator;
 
 	public Text(TextSource source) {
@@ -57,7 +29,7 @@ public final class Text extends stencil.explore.ui.components.sources.SourceEdit
 
 	private Text() {
 		super("");
-		header = new JTextField();
+		tupleSize = new JTextField();
 		separator = new JTextField();
 		data = new JTextArea();
 
@@ -69,7 +41,7 @@ public final class Text extends stencil.explore.ui.components.sources.SourceEdit
 		JLabel headerLabel = new JLabel("Header:");
 		headerPanel.setLayout(new BorderLayout());
 		headerPanel.add(headerLabel, BorderLayout.WEST);
-		headerPanel.add(header, BorderLayout.CENTER);
+		headerPanel.add(tupleSize, BorderLayout.CENTER);
 
 
 		JPanel separatorPanel = new JPanel();
@@ -104,20 +76,20 @@ public final class Text extends stencil.explore.ui.components.sources.SourceEdit
 
 		data.addFocusListener(fl);
 		separator.addFocusListener(fl);
-		header.addFocusListener(fl);
+		tupleSize.addFocusListener(fl);
 		this.addFocusListener(fl);
 	}
 
 	public void set(TextSource source) {
 		assert source != null : "Cannot pass a null to 1-argument set.";
 		super.set(source);
-		header.setText(source.header());
+		tupleSize.setText(Integer.toString(source.size()));
 		separator.setText(source.separator());
 		data.setText(source.text());
 	}
 
 	public TextSource get() {
-		return new TextSource(name, header.getText(), separator.getText(), data.getText());
+		return new TextSource(name, Integer.parseInt(tupleSize.getText()), separator.getText(), data.getText());
 	}
 
 }

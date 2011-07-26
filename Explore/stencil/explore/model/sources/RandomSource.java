@@ -12,13 +12,11 @@ import stencil.util.streams.numbers.RandomStream;
 public class RandomSource extends StreamSource {
 	public static final String NAME = "RandomNumbers";
 	private final long length;
-	private final int size;
 	
-	public RandomSource(String name) {this(name, 2, Integer.MIN_VALUE);}
+	public RandomSource(String name) {this(name, 1, Integer.MIN_VALUE);}
 	
 	public RandomSource(String name, int size, long length) {
-		super(name);
-		this.size = size;
+		super(name, size);
 		this.length = length;
 	}
 
@@ -28,7 +26,7 @@ public class RandomSource extends StreamSource {
 
 	@Override
 	public RandomStream getStream(Model context) throws Exception {
-		return new RandomStream(name, size, length);
+		return new RandomStream(name, tupleSize, length);
 	}
 
 	public String header() {
@@ -54,19 +52,19 @@ public class RandomSource extends StreamSource {
 	@Override
 	public RandomSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new RandomSource(name, size, length);
+		return new RandomSource(name, tupleSize, length);
 	}
 
-	public int size() {return size;}
-	public RandomSource size(int size) {
-		if (this.size == size) {return this;}
+	public int size() {return tupleSize;}
+	public RandomSource tupleSize(int size) {
+		if (this.tupleSize == size) {return this;}
 		return new RandomSource(name, size, length);
 	}
 	
 	public long length() {return length;}
 	public RandomSource length(long length) {
 		if (this.length == length) {return this;}
-		return new RandomSource(name, size, length);
+		return new RandomSource(name, tupleSize, length);
 	}
 	
 	@Override
@@ -80,9 +78,9 @@ public class RandomSource extends StreamSource {
 			} else if (line.startsWith("LENGTH")) {
 				long length = Long.parseLong(line.substring(line.indexOf(":") +2));
 				result = result.length(length);
-			} else if (line.startsWith("SIZE")) {
+			} else if (line.startsWith("TUPLE_SIZE")) {
 				int size = Integer.parseInt(line.substring(line.indexOf(":") +2));
-				result = result.size(size);
+				result = result.tupleSize(size);
 			}
 			input.mark(100);
 			line = input.readLine();
@@ -102,8 +100,8 @@ public class RandomSource extends StreamSource {
 		b.append("LENGTH: ");
 		b.append(length);
 		b.append("\n");
-		b.append("SIZE: ");
-		b.append(size);
+		b.append("TUPLE_SIZE: ");
+		b.append(tupleSize);
 		b.append("\n");
 		return b.toString();
 

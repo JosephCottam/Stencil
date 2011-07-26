@@ -35,12 +35,13 @@ public class TreeView {
 		ANTLRNode.showClass= true;
 		
 		if (args.length >0){
-			if (args[1].equals(HEADER_FLAG)) {
+			boolean skipHeader = args[1].toLowerCase().equals(HEADER_FLAG);
+			if (skipHeader) {
 				file =args[2];
-				text = StringUtils.getContents(args[2], true);
+				text = StringUtils.getContents(file, true);
 			} else {
 				file =args[1];
-				text = StringUtils.getContents(args[1], false);
+				text = StringUtils.getContents(file, false);
 			}
 		}
 		

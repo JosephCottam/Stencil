@@ -1,21 +1,20 @@
 package stencil.parser.string.util;
 
 import stencil.tuple.InvalidNameException;
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.parser.tree.*;
-import stencil.tuple.prototype.SimplePrototype;
 
 /**Tuple that encapsulates the globals of a program.*/
-public class GlobalsTuple implements Tuple {
+public class GlobalsTuple implements PrototypedTuple {
 	private final Object[] values;
 	private final TuplePrototype prototype;
 	
 	public GlobalsTuple(StencilTree defs) {
 		if (defs == null) {
-			prototype = new SimplePrototype();
+			prototype = new TuplePrototype();
 			values = new Object[0];
 		} else {
 			String[] names = new String[defs.getChildCount()];
@@ -24,7 +23,7 @@ public class GlobalsTuple implements Tuple {
 				values[i] = ((Const) defs.getChild(i)).getValue();
 				names[i] = defs.getChild(i).getText();
 			}
-			prototype = new SimplePrototype(names);
+			prototype = new TuplePrototype(names);
 		}
 	}
 	
@@ -33,12 +32,11 @@ public class GlobalsTuple implements Tuple {
 	}
 
 	public Object get(int idx) throws TupleBoundsException {
-		try {
-			return values[idx];
-		} catch (ArrayIndexOutOfBoundsException e) {throw new TupleBoundsException(idx, this);}
+		try {return values[idx];}
+		catch (ArrayIndexOutOfBoundsException e) {throw new TupleBoundsException(idx, this);}
 	}
 
-	public TuplePrototype getPrototype() {return prototype;}
+	public TuplePrototype prototype() {return prototype;}
 
 	public boolean isDefault(String name, Object value) {return false;}
 

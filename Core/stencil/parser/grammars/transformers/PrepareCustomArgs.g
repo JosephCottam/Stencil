@@ -19,12 +19,13 @@ options {
 
 	import java.util.regex.Pattern;
 	import stencil.parser.tree.StencilTree;
+	import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
 @members{
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
-	public static final String PRINTF_OP = "Format.map";
+	public static final String PRINTF_OP = "Format";
 	public static final String VALIDATE_PATTERN = "([^\\{\\}]*(\\{.+\\})?)*";
 	public static final String SPLIT_PATTERN = "\\{|\\}";
 	private static final Pattern SPLITTER = Pattern.compile(SPLIT_PATTERN);
@@ -35,10 +36,6 @@ options {
 		}
 		return SPLITTER.split(input);
 	}
-
-   private String sigilCall(Tree call) {
-    return call.getText().substring(1) + ".customParser";
-   }
    
    /**Divide the input up into string and tuple refs.  
     * The input text MUST NOT include the island grammar markers (e.g. the quotes or braces...or whatever they end up being)
@@ -100,6 +97,7 @@ options {
    private static String stripBraces(Tree t) {return t.getText().substring(1, t.getText().length()-1);}
 }
 
-topdown: ^(FUNCTION s=. b=ISLAND_BLOCK y=. c=.) 
-			 -> {doPrintf($b)}? ^(FUNCTION[PRINTF_OP] ^(SPECIALIZER DEFAULT) {printfArgs($b)} DIRECT_YIELD ^(FUNCTION $s ^(LIST_ARGS ^(TUPLE_REF ^(NUMBER["0"]))) $y $c))
-			 -> ^(FUNCTION $s ^(LIST_ARGS ^(STRING[stripBraces($b)])) $y $c);
+topdown: ^(FUNCTION n=. s=. b=ISLAND_BLOCK y=. c=.) 
+			 -> {doPrintf($b)}? ^(FUNCTION ^(OP_NAME DEFAULT ID[PRINTF_OP] ID[QUERY_FACET]) ^(SPECIALIZER DEFAULT) {printfArgs($b)} DIRECT_YIELD 
+			         ^(FUNCTION $n $s ^(LIST_ARGS ^(TUPLE_REF ^(NUMBER["0"]))) $y $c))
+			 -> ^(FUNCTION $n $s ^(LIST_ARGS ^(STRING[stripBraces($b)])) $y $c);

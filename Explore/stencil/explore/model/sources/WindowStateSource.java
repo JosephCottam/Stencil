@@ -26,7 +26,7 @@ public class WindowStateSource extends StreamSource {
 	
 	public WindowStateSource(String name) {this(name, false);}
 	public WindowStateSource(String name, boolean onChange) {
-		super(name);
+		super(name, 0);
 		this.onChange = onChange;
 	}
 	

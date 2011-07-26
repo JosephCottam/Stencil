@@ -1,82 +1,63 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
+
 package stencil.adapters.java2D;
 
 import java.awt.Color;
 
-import stencil.adapters.java2D.data.DoubleBufferLayer;
-import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.Guide2D;
+import stencil.adapters.java2D.columnStore.Table;
 import stencil.parser.ParseStencil;
-import stencil.parser.tree.StencilTree;
+import stencil.interpreter.TupleStore;
 import stencil.interpreter.tree.Program;
 import stencil.interpreter.tree.Guide;
-import stencil.adapters.java2D.data.glyphs.Basic;
-import stencil.adapters.java2D.data.guides.*;
+import stencil.interpreter.tree.Specializer;
+import stencil.adapters.java2D.interaction.CanvasAsStore;
+import stencil.adapters.java2D.interaction.ViewAsStore;
+import stencil.adapters.java2D.interaction.ZoomPanHandler;
+import stencil.adapters.java2D.render.guides.Guide2D;
+import stencil.adapters.java2D.render.guides.*;
+import stencil.adapters.java2D.render.Renderer;
 import stencil.adapters.java2D.util.MultiThreadPainter;
-import stencil.adapters.java2D.util.ZoomPanHandler;
-import twitter4j.Trend;
+import stencil.display.DisplayLayer;
 
 
-public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
+public final class Adapter implements stencil.adapters.Adapter {
 	public static final Adapter ADAPTER = new Adapter();
 	
 	private boolean defaultMouse;
-	
-	public Panel generate(Program program) {
-		Canvas canvas = new Canvas(program.canvasSpec(), program.layers());
+
+	private Panel currentPanel;
+	public synchronized Panel compile(String programSource) throws Exception {
+		currentPanel = new Panel();
+		Program program = ParseStencil.program(programSource, this);
+		Canvas canvas = new Canvas(program.canvas().specializer(), program.layers());
 		constructGuides(canvas, program);
-		Panel panel = new Panel(canvas, program);
+
+		currentPanel.init(canvas, program);
+
 		
 		if (defaultMouse) {
 			ZoomPanHandler zp = new ZoomPanHandler();
-			panel.addMouseListener(zp);
-			panel.addMouseMotionListener(zp);
+			currentPanel.addMouseListener(zp);
+			currentPanel.addMouseMotionListener(zp);
 		}
-		return panel;
+		return currentPanel;
 	}
 
 	public Class getGuideClass(String name) {
 		if (name.equals("axis")) {return Axis.class;}
 		else if (name.equals("legend")) {return Legend.class;}
-		else if (name.equals("trend")) {return Trend.class;}
+		else if (name.equals("trend")) {return TrendLine.class;}
 		else if (name.equals("pointLabels")) {return PointLabel.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
 
-	public stencil.display.DisplayLayer makeLayer(StencilTree l) {
-		return DoubleBufferLayer.instance(l);
+	public Table makeLayer(String name, Specializer spec) {
+		String type = (String) spec.get(DisplayLayer.TYPE_KEY);
+		return LayerTypeRegistry.makeTable(name, type);
 	}
 
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
-	public void setDebugColor(Color c) {Basic.DEBUG_COLOR = c;}
+	public void setDebugColor(Color c) {Renderer.Util.DEBUG_COLOR = c;}
 	
 
 	public void setRenderQuality(String value) throws IllegalArgumentException {
@@ -87,10 +68,6 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 		} else {
 			throw new IllegalArgumentException("Could not set render quality to unknown value: " + value);
 		}
-	}
-	
-	public Panel compile(String programSource) throws Exception {
-		return generate(ParseStencil.program(programSource, this));
 	}
 	
 	
@@ -119,4 +96,10 @@ public final class Adapter implements stencil.adapters.Adapter<Glyph2D> {
 			}
 		}
 	}
+
+	@Override
+	public TupleStore makeCanvas(Specializer spec) {return new CanvasAsStore();}
+
+	@Override
+	public TupleStore makeView(Specializer spec) {return new ViewAsStore();}
 }

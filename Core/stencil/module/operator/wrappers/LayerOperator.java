@@ -33,7 +33,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 	private static final String CONTAINS_FACET = "contains";
 	private static final String CONTAINS_METHOD = "contains";
 
-	private static final String STATE_ID_METHOD = "getStateID";
+	private static final String STATE_ID_METHOD = "stateID";
 	
 	protected final DisplayLayer layer;
 	protected final OperatorData operatorData;
@@ -41,7 +41,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 	public LayerOperator(String module, DisplayLayer layer) {
 		this.layer = layer;
 
-		TuplePrototype prototype = layer.getPrototype();
+		TuplePrototype prototype = layer.prototype();
 		operatorData = Modules.basicOperatorData(module, getName());
 		operatorData.addFacet(new FacetData(FIND_FACET, MemoryUse.READER, prototype));
 		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, prototype));
@@ -51,7 +51,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 		operatorData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 	}
 	
-	public String getName() {return layer.getName();}
+	public String getName() {return layer.name();}
 
 	public Invokeable getFacet(String facet) {
 		if (StencilOperator.MAP_FACET.equals(facet) 
@@ -90,7 +90,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 			throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 		}
 
-		public String getName() {return view.getLayerName();}
+		public String getName() {return view.getName();}
 
 		public OperatorData getOperatorData() {
 			throw new UnsupportedOperationException();

@@ -2,30 +2,65 @@ package stencil.modules;
 
 import java.util.regex.Pattern;
 
-import stencil.module.operator.util.AbstractOperator;
+import stencil.module.operator.util.DirectOperator;
+import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
+import stencil.types.NumericWrapper;
 
 @Module
 @Description("Module for doing boolean comparisons.  These are the operators used in the Filter operations.")
 public class Filters extends BasicModule {
-
-	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
-	public static final boolean GTE(double n1, double n2) {return n1 >= n2;}
-
-	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
-	public static final boolean GT(double n1, double n2) {return n1 > n2;}
-	
-	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
-	public static final boolean LT(double n1, double n2) {return n1 < n2;}
-
-	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
-	public static final boolean LTE(double n1, double n2) {return n1 <= n2;}
-
+	/**Base class for non-reflectively invoked filters.**/
+	private static abstract class FilterOp extends DirectOperator {
+		protected FilterOp(OperatorData od) {super(od);}
 		
+		/**Actual work to be performed.**/
+		protected abstract boolean op(double arg1, double arg2);
+		@Override
+		public Object invoke(Object[] arguments)
+				throws MethodInvokeFailedException {
+			double d0 = NumericWrapper.toDouble(arguments[0]);
+			double d1 = NumericWrapper.toDouble(arguments[1]);			
+			return op(d0, d1);
+		}		
+	}
+	
+	@Operator 
+	public static final class GTE extends FilterOp {
+		public GTE(OperatorData od) {super(od);}
+
+		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+		public boolean op(double n1, double n2) {return n1 >= n2;}		
+	}
+
+	@Operator 
+	public static final class GT extends FilterOp {
+		public GT(OperatorData od) {super(od);}
+
+		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+		public boolean op(double n1, double n2) {return n1 > n2;}		
+	}
+
+	@Operator 
+	public static final class LT extends FilterOp {
+		public LT(OperatorData od) {super(od);}
+
+		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+		public boolean op(double n1, double n2) {return n1 < n2;}		
+	}
+
+	@Operator 
+	public static final class LTE extends FilterOp {
+		public LTE(OperatorData od) {super(od);}
+
+		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
+		public boolean op(double n1, double n2) {return n1 <= n2;}		
+	}
+	
 	@Operator @Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 	public static final boolean EQ(Object lhs, Object rhs) {
 		if (rhs == null || lhs == null) {return lhs == rhs;}
@@ -56,7 +91,7 @@ public class Filters extends BasicModule {
 	
 	
 	@Operator(name="RE")
-	public static class RegExp extends AbstractOperator {
+	public static class RegExp extends DirectOperator {
 		private static final String PATTERN_KEY = "pattern";
 		private final Pattern patternCache; 
 		private final boolean negated;
@@ -83,6 +118,13 @@ public class Filters extends BasicModule {
 			assert patternCache != null;
 			return !negated == patternCache.matcher(value).matches();
 		}
+
+		public Boolean invoke(Object[] arguments) {
+			if (arguments.length ==1) {return match(arguments[0].toString());}
+			else if (arguments.length ==2) {return query(arguments[0].toString(), arguments[1].toString());}
+			else {throw new IllegalArgumentException(String.format("Received %1$s, but expect 1 or 2.", arguments.length));} 
+		}
+
 	}
 
 	

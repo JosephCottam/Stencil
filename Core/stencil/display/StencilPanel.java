@@ -1,38 +1,10 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.display;
 
 
 import java.awt.BorderLayout;
 import java.awt.LayoutManager;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -42,6 +14,7 @@ import stencil.interpreter.tree.Program;
 import stencil.interpreter.tree.Layer;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
+import stencil.util.IndexTupleSorter;
 
 /**Wraps the layers and glyphs to tie them to a display context.
  * 
@@ -71,34 +44,45 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	
 	public static int ABSTRACT_SCREEN_RESOLUTION = 72;
 
-	public StencilPanel() {super();}
-	public StencilPanel(boolean isDoubleBuffered) {super(isDoubleBuffered);}
-	public StencilPanel(LayoutManager manager, boolean isDoubleBuffered) {super(manager, isDoubleBuffered);}
-	public StencilPanel(LayoutManager manager) {super(manager);}
+	public StencilPanel() {super(); init();}
+	public StencilPanel(boolean isDoubleBuffered) {super(isDoubleBuffered); init();}
+	public StencilPanel(LayoutManager manager, boolean isDoubleBuffered) {super(manager, isDoubleBuffered); init();}
+	public StencilPanel(LayoutManager manager) {super(manager); init();}
 	public StencilPanel(Program program, C canvas) {
 		super();
-		this.program = program;
-		this.canvas = canvas;
-		this.interpreter = new Interpreter(this);
-
-		
-		this.setLayout(new BorderLayout());
-		this.add(canvas, BorderLayout.CENTER);
+		init();
+		setProgram(program);
+		setCanvas(canvas);
 	}
 	
+	protected void init() {
+		this.setLayout(new BorderLayout());		
+	}
+	
+	protected void setProgram(Program program) {
+		this.program = program;
+		this.interpreter = new Interpreter(this);
+	}
+	protected void setCanvas(C canvas) {
+		this.canvas = canvas;
+		this.add(canvas, BorderLayout.CENTER);
+		this.validate();
+	}
+	
+	
 	/**Returns an unmodifiable copy of the current layers mapping.*/
-	public List<String> getLayers() {
-		String[] layers = new String[program.layers().length];
+	public List<L> layers() {
+		List<L> layers = new ArrayList(program.layers().length);
 		
-		for (int i=0; i<layers.length; i++) {
-			layers[i] = program.layers()[i].getName();
+		for (Layer l:program.layers()) {
+			layers.add((L) l.implementation());
 		}
-		return Arrays.asList(layers);
+		return Collections.unmodifiableList(layers);
 	}
 
 	/**Get a named layer from the layers map.  Returns null if no layer was found.
 	 **/
-	public L getLayer(String name) {return (L) program.getLayer(name).getDisplayLayer();}
+	public L getLayer(String name) {return (L) program.getLayer(name).implementation();}
 
 	/**Returns an unmodifiable set of the underlying rules.*/
 	public Program getProgram() {return program;}
@@ -153,14 +137,15 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 */
 	protected void exportTuples(String filename) throws Exception {
 		java.io.FileWriter writer = new java.io.FileWriter(filename);
-		IDOrdered comp = new IDOrdered();
 
 		writer.write(getCanvas().toString() + "\n");
 		writer.write(getView().toString() + "\n");
 
 		for (Layer l: program.layers()) {
-			TreeSet<Tuple> s  =new TreeSet<Tuple>(comp);
-			DisplayLayer<? extends Tuple> layer = l.getDisplayLayer();
+			DisplayLayer<? extends Tuple> layer = l.implementation();
+			int idIndex = layer.prototype().indexOf("ID");
+			IndexTupleSorter sorter = new IndexTupleSorter(idIndex);
+			TreeSet<Tuple> s  = new TreeSet(sorter);
 			for (Tuple t: layer.viewpoint()) {s.add(t);}
 			for (Tuple t: s) {
 				writer.write(t.toString().replace("\n", "\\n"));
@@ -169,23 +154,19 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		}
 		writer.close();
 	}
+		
+	/**Shutdown any panel-related threads.*/
+	public void signalStop() {}
 	
-	protected static final class IDOrdered implements Comparator<Tuple> {
-		public int compare(Tuple o1, Tuple o2) {
-			String s1 = o1.get("ID").toString();
-			String s2 = o2.get("ID").toString();
-			return s1.compareTo(s2);
-		}	
-	}
 	
 	//------------------------------------------------------------------------------------------
 	//Interpreter Operators
 	/**Process a tuple for this visualization.  This is the preferred means
-	 * to add values to a visualization. 
+	 * to add values to a visualization because it is the only means that is
+	 * guaranteed to preserve consistency.
 	 */
 	public final void processTuple(SourcedTuple source) throws Exception {
 		synchronized(canvas.visLock) {interpreter.processTuple(source);}
-		Thread.yield();
 	}
 	
 	/**Actions that must be taken before the run will be valid.*/
@@ -194,4 +175,13 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		Display.canvas = getCanvas();
 		Display.view = getView();
 	}
+	
+	
+	/**Optional diagnostic method.  Returns how many times the panel has been painted; returns -1 by default.**/
+	public int paintCount() {return -1;}
+	
+	/**Perform post-run tasks preparatory to a "final" rendering (usually an export; may not actually be final).
+	 * This typically involves forcing the pre-render tasks to run.**/
+	public void postRun() {}
+
 }

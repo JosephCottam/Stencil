@@ -8,31 +8,34 @@ stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CT
 
 canvas main[BACKGROUND_COLOR: "BLACK"]
 
+view
+from Mouse
+    filter(BUTTON=1) 
+    filter(TYPE=~"DRAG")
+    filter(SHIFT!~"TRUE")
+    X : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, ScreenToCanvasDimension.Width)
+    Y : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view.Y, ScreenToCanvasDimension.Height)
+from Mouse
+    filter(BUTTON=1)
+    filter(SHIFT=~"true")
+    filter(TYPE=~"DRAG") 
+    ZOOM : Mult(DELTA_Y, .01) -> Add(Mult, view.ZOOM)
+from Mouse
+    filter(BUTTON=1)
+    filter(CLICK_COUNT=3)
+    (WIDTH, HEIGHT, X,Y) : (canvas.WIDTH, canvas.HEIGHT, canvas.X, canvas.Y)
+
+
+
 layer Heat
 from Mouse
-	ID : Count()
-	(X,Y) : (X,Y)
-	FILL_COLOR: Colorize(META) -> C
-	SIZE: 10
-	PEN_COLOR : @Color{CLEAR}
+    ID : Count()
+    (X,Y) : (X,Y)
+    FILL_COLOR: Colorize(META)
+    SIZE: 10
+    PEN_COLOR : @Color{CLEAR}
 
-layer Nav
-from Mouse
-	filter(BUTTON=1) 
-	filter(TYPE=~"DRAG")
-	filter(SHIFT!~"TRUE")
-	view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
-	view(Y) : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view[Y], Height)
-from Mouse
-	filter(BUTTON=1)
-	filter(SHIFT=~"true")
-	filter(TYPE=~"DRAG") 
-	view(ZOOM) : Mult(DELTA_Y, .01) -> Add(product, view[ZOOM])
-from Mouse
-	filter(BUTTON=1)
-	filter(CLICK_COUNT=3)
-	view(WIDTH, HEIGHT, X,Y) : (canvas[WIDTH], canvas[HEIGHT], canvas[X], canvas[Y])
 
 operator Colorize(Meta) -> C
-	(Meta !~ "true") => C: @Color{WHITE}
-	(Meta =~ "true") => C: @Color{GREEN}
+    (Meta !~ "true") => C: @Color{WHITE}
+    (Meta =~ "true") => C: @Color{GREEN}

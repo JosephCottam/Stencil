@@ -27,9 +27,8 @@ public class TupleUtil extends BasicModule {
     @Operator
     @Facet(memUse="FUNCTION", prototype="(Size)", alias={"map", "query"})
 	public static final int Size(Tuple t) {return t.size();}
-	
-	
-    @Description("Tuple -> Tuple where the original tuple values are wrapped in tuples.")
+
+    @Description("Tuple -> Tuple; The original tuple values are now each tuples in the new tuple.")
     @Operator
     @Facet(memUse="FUNCTION", prototype="()", alias={"map", "query"})
 	public static final Tuple[] EnfoldValues(Tuple t) {
@@ -67,6 +66,37 @@ public class TupleUtil extends BasicModule {
 			return values;
 		}
 	}
+    
+    
+    
+    @Description("Object* -> Tuple: Given objects, will create a tuple out of them.  Also does type conversion (default is for all Objects).")
+    @Operator(spec="[CONVERT: \"java.lang.Object\"]")
+    public static final class ToTuple extends AbstractOperator {
+    	private final Class[] converts;
+    	
+		public ToTuple(OperatorData opData, Specializer spec) {
+			super(opData);
+			String[] types = Converter.toString(spec.get("CONVERT")).split("\\s+,\\s+");
+			converts = new Class[types.length];
+			
+			for (int i=0; i< types.length; i++) {
+				try {converts[i] = Class.forName(types[i]);}
+				catch (Exception e) {throw new RuntimeException("Error loading class: " + types[i],e);}
+			}
+		}
+		
+	    @Facet(memUse="FUNCTION", prototype="()", alias={"map", "query"})
+		public Tuple query(Object... values) {
+	    	Object[] vals = new Object[values.length];
+	    	for (int i=0; i< values.length;i++) {
+	    		int classIdx = (i >= converts.length ? converts.length-1 : i);
+	    		vals[i] = Converter.convert(values[i], converts[classIdx]);
+	    	}	    	
+	    	return new ArrayTuple(vals);
+		}
+    	
+    	
+    }
 	
 	
 	/**Rename the components of a tuple with new names; 
@@ -150,7 +180,13 @@ public class TupleUtil extends BasicModule {
     @Facet(memUse="FUNCTION", prototype="(value)", alias={"map","query"})
 	public static final Tuple toArray(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
 
+    @Description("Convert a tuple to a singleton tuple containing an array of the original values")
+    @Operator
+    @Facet(memUse="FUNCTION", prototype="(values)", alias={"map","query"})
+	public static final Tuple values(Tuple t) {return new ArrayTuple(new Object[]{Tuples.toArray(t)});}
 
+    
+    
 	/**Given a tuple, select part of that tuple.
 	 * If end <0, it will select the remainder of the tuple.*/
     @Description("Get a contiguous subset of the passed tuple (includes first index, does not include second; -1 as second index indicates all remaining values).")

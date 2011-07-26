@@ -37,7 +37,7 @@ public class TestConverter extends StencilTestCase {
 	}
 	
 	public void testToTuple() {
-		assertEquals(Singleton.class, Converter.toTuple("Hello").getClass());
+		assertTrue(Converter.toTuple("Hello") instanceof Singleton);
 		assertEquals(Ints.class, Converter.toTuple(new int[]{1,2,3}).getClass());
 		assertEquals(Doubles.class, Converter.toTuple(new double[]{1.0,2.0,3.0}).getClass());
 		assertEquals(NumericSingleton.class, Converter.toTuple(1.0).getClass());

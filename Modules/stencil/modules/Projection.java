@@ -1,35 +1,9 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 
 package stencil.modules;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -47,10 +21,10 @@ import stencil.module.util.ann.*;
 import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.InvalidNameException;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.types.color.ColorCache;
@@ -60,7 +34,7 @@ public class Projection extends BasicModule {
 	
 	/**Given a bin-size, determines what bin a particular value falls into.**/
 	@Description("Calculates a bin that something falls into.  Bins are fixed size, with a potentially infinite number.  Bin size must be supplied in specializer.")
-	@Operator(spec="[size: 1, range:ALL, split: 0]")
+	@Operator(spec="[size: 1]")
 	public static class Bin extends AbstractOperator {
 		private static final String SIZE="size";
 		private final Number binSize;
@@ -83,7 +57,7 @@ public class Projection extends BasicModule {
 	
 	/**Projects a range of numbers onto a red/white scale.*/
 	@Description("Project between two colors; records the max/min seen.")
-	@Operator(spec="[range: ALL, split: 0, cold: \"RED\", hot: \"WHITE\", throw: \"TRUE\"]")
+	@Operator(spec="[cold: \"RED\", hot: \"WHITE\", throw: \"TRUE\"]")
 	public static final class HeatScale extends AbstractOperator.Statefull {
 		private float min = Float.NaN;
 		private float max = Float.NaN;
@@ -176,10 +150,10 @@ public class Projection extends BasicModule {
 	 * presented always returns index one).  Ordering
 	 * is independent for each IndexScale created.
 	 */
-	@Operator(spec="[range: ALL, split: 0]")
+	@Operator(spec="[]")
 	@Description("Record the original presentation order of the combination of arguments")
 	public static final class Index extends AbstractOperator {
-		private PVector<String> labels = TreePVector.empty();
+		private PVector labels = TreePVector.empty();
 
 		public Index(OperatorData opData) {super(opData);}
 
@@ -191,7 +165,7 @@ public class Projection extends BasicModule {
 
 		@Facet(memUse="WRITER", prototype="(double index)")
 		public int map(Object key) {
-			if (!labels.contains(key)) {labels = labels.plus(key.toString());}
+			if (!labels.contains(key)) {labels = labels.plus(key);}
 			return labels.indexOf(key);
 		}
 
@@ -207,7 +181,7 @@ public class Projection extends BasicModule {
 	 */
 
 	@Description("Count the number of times the argument combination has been seen (including the current one)")
-	@Operator(spec="[range: ALL, split: 0]")
+	@Operator(spec="[]")
 	public static final class Count extends AbstractOperator.Statefull {
 		private static final class CompoundKey {
 			final Object[] values;
@@ -257,7 +231,7 @@ public class Projection extends BasicModule {
 	}
 
 	/**Counting when there are no keys to worry about.**/
-	@Suppress @Operator(spec="[range: ALL, split: 0]")
+	@Suppress @Operator(spec="[]")
 	public static final class Counter extends AbstractOperator {
 		private long count =1;
 		public Counter(OperatorData opData) {super(opData);}
@@ -274,10 +248,57 @@ public class Projection extends BasicModule {
 		public int stateID() {return (int) count % Integer.MAX_VALUE;}
 	}
 	
+	
 	/**Keeps sorted lists of elements, reporting back
 	 * the position in the list on lookup.
 	 */
-	@Operator(spec="[range:ALL, split:0, start: 0]")
+	@Operator(spec="[]")
+	public static class RankSingle extends AbstractOperator.Statefull {
+		private final ArrayList list;
+	
+		public RankSingle(OperatorData opData, Specializer spec) {
+			super(opData);
+			list = new ArrayList(1000);
+		}
+		public RankSingle(OperatorData opData, ArrayList values) {
+			super(opData);
+			list = new ArrayList(values.size());
+			list.addAll(values);
+		}
+	
+		@Facet(memUse="WRITER", prototype="(int rank)")
+		public int map(Comparable value) {return rank(true, value);} 
+		
+		@Facet(memUse="READER", prototype="(int rank)")
+		public int query(Comparable value) {return rank(false, value);}
+	
+		/**What is the rank of the values passed.
+		 * -1 indicates no rank (not seen before and not added)
+		 * @param add Should this set of values be added to the set if it is not already there?
+		 * @param values What set of values needs ranking?
+		 */
+		private synchronized int rank(boolean add, Comparable value) {
+			int rank = Collections.binarySearch(list, value);
+			if (rank >=0) {return rank;}
+			else if (add) {
+				list.add(-rank-1, value);
+				return -rank-1;
+			} else {return -1;}
+		}
+		
+		@Override
+		@Facet(memUse="READER", prototype="(int VALUE)")
+		public int stateID() {return list.size();}
+		
+		@Override
+		public RankSingle viewpoint() {return new RankSingle(super.operatorData, list);}
+
+	}
+	
+	/**Keeps sorted lists of elements, reporting back
+	 * the position in the list on lookup.
+	 */
+	@Operator(spec="[]")
 	public static class Rank extends AbstractOperator.Statefull {
 		/**Compare groups of object, often pair-wise.
 		 * The first non-zero comparison wins.
@@ -327,9 +348,13 @@ public class Projection extends BasicModule {
 		}
 		private static final CompoundCompare COMPARE = new CompoundCompare();
 		
-		private SortedSet set = new TreeSet(COMPARE);
+		private final SortedSet set = new TreeSet(COMPARE);
 	
 		public Rank(OperatorData opData, Specializer spec) {super(opData);}
+		private Rank(OperatorData opData, SortedSet values) {
+			super(opData);
+			set.addAll(values);
+		}
 	
 		@Facet(memUse="WRITER", prototype="(int rank)")
 		public int map(Object... values) {return rank(true, values);} 
@@ -345,10 +370,7 @@ public class Projection extends BasicModule {
 		private synchronized int rank(boolean add, Object... values) {
 			int rank;
 			if (add && !set.contains(values)) {
-				SortedSet newSet = new TreeSet(COMPARE);		//Creates viewpoints as it goes, so the next one is always ready immediately
-				newSet.addAll(set);								//TODO: Investigate self-viewpoint only at requested time or pcollections alternatives
-				newSet.add(values);
-				set = newSet;
+				set.add(values);								//TODO: Investigate pcollection alternatives
 				rank = set.headSet(values).size();
 			}else if (set.contains(values)) {
 				rank = set.headSet(values).size();
@@ -362,6 +384,12 @@ public class Projection extends BasicModule {
 		@Override
 		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {return set.size();}
+		
+		
+		@Override
+		public Rank viewpoint() {
+			return new Rank(super.operatorData, set);
+		}
 	}
 
 	/**Projects one range of values into another.
@@ -372,7 +400,7 @@ public class Projection extends BasicModule {
 	 * arbitrary values to numbers can be used to scale arbitrary items. 
 	 * @author jcottam
 	 */
-	@Operator(spec="[min: 0, max: 1, inMin: NULL, inMax: NULL, range: ALL, split:0]")
+	@Operator(spec="[min: 0, max: 1, inMin: NULL, inMax: NULL]")
 	public static final class Scale extends AbstractOperator.Statefull {
 		private static final String IN_MAX = "inMax";
 		private static final String IN_MIN = "inMin";
@@ -438,14 +466,13 @@ public class Projection extends BasicModule {
 	/**Perform a linear interpolation between zero and one, returning the Percent, mIn and maX (thus PIX).*/
 	@Operator
 	public static final class PIX extends AbstractOperator.Statefull {
-		private static final class PIXTuple implements Tuple {
-			private static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{"p","min","max"}, new Class[]{Number.class, Number.class, Number.class});
+		private static final class PIXTuple implements PrototypedTuple {
+			private static final TuplePrototype PROTOTYPE = new TuplePrototype(new String[]{"p","min","max"}, new Class[]{Number.class, Number.class, Number.class});
 			private final Number[] values;
 			private PIXTuple(Number percent, Number min, Number max){values=new Number[]{percent, min, max};}			
 			public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 			public Object get(int idx) throws TupleBoundsException {return values[idx];}
-			public TuplePrototype getPrototype() {return PROTOTYPE;}
-			public boolean isDefault(String name, Object value) {return false;}
+			public TuplePrototype prototype() {return PROTOTYPE;}
 			public int size() {return PROTOTYPE.size();}			
 		}
 		
@@ -497,6 +524,12 @@ public class Projection extends BasicModule {
 			if (context.maxArgCount() == 0) {
 				OperatorData od = ModuleDataParser.operatorData(Counter.class, Projection.class.getSimpleName());
 				return Modules.instance(this.getClass(), od, spec);
+			}
+		} if (context != null && name.equals("Rank")) {
+			if (context.maxArgCount() == 1) {
+				OperatorData od = ModuleDataParser.operatorData(RankSingle.class, Projection.class.getSimpleName());
+				return Modules.instance(this.getClass(), od, spec);
+				
 			}
 		}
 		

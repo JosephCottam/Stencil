@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Barley
-HEADER: year, site, yield, variety
+TUPLE_SIZE: 4
 SEPARATOR: \s*,\s+
 SOURCE: ./BeckersBarley.csv
 SKIP: 1
@@ -18,8 +18,8 @@ guide
   axis[guideLabel: "Variety", X:0] from Y
   axis[guideLabel: "Yield", round: "T", seed.min: MIN, seed.max: MAX]
     Linear from X
-  legend[X: 75, Y: -60] Categorical from PEN_COLOR
-      element.FILL_COLOR: @Color{GRAY90}
+  legend[X: 75, Y: 60] Categorical from PEN_COLOR
+      ele.FILL_COLOR: @Color{GRAY90}
 
 from Barley
     filter(site =~ "University Farm") 
@@ -27,5 +27,5 @@ from Barley
     PEN_COLOR: BrewerColors[palette: "PuRd"](year)
     FILL_COLOR: @Color{CLEAR}
     X:* Scale[min: 0, max:100, inMin: MIN, inMax: MAX](yield)
-    Y:* Rank(variety) -> Mult(-7,_) -> Add(-5,_)
+    Y:* Rank(variety) -> Mult(7,_) -> Add(-5,_)
     REGISTRATION: "CENTER"

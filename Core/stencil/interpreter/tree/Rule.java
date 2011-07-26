@@ -1,8 +1,8 @@
 package stencil.interpreter.tree;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.RuleAbortException;
 import stencil.interpreter.Viewpoint;
-import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 import static stencil.tuple.prototype.TuplePrototypes.EMPTY_PROTOTYPE;

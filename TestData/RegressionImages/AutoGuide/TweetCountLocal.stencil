@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Tweets
-HEADER: MESSAGE
+TUPLE_SIZE: 1
 SEPARATOR: ,
 SOURCE: ./Tweets.txt
 SKIP: 1
@@ -10,6 +10,11 @@ import ViewCanvas
 
 stream Tweets(MESSAGE)	
 
+view
+from Tweets
+    ZOOM : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT)
+    (X,Y): (canvas.X, canvas.Y)
+
 layer Counts
 guide axis[tickSize: 5, textOffset: 6] Categorical from X
    label.FONT: @Font{10}
@@ -17,17 +22,13 @@ guide axis[tickSize: 5, textOffset: 6] Categorical from X
    label.REGISTRATION: "LEFT"
 
 from Tweets
-	ID: firstLetter(MESSAGE) -> Letter
-	X:* firstLetter(MESSAGE) -#> Rank(Letter) -> Mult(11, rank)
-	Y: firstLetter(MESSAGE) -> Count(Letter) -> Mult(-11, count)
+	ID: firstLetter(MESSAGE) -> firstLetter
+	X:* firstLetter(MESSAGE) -#> Rank(firstLetter) -> Mult(11, Rank)
+	Y: firstLetter(MESSAGE) -> Count(firstLetter) -> Mult(11, Count)
 	REGISTRATION: "BOTTOM"
 	SIZE: 10
-	
-layer Tracking
-from Tweets
-	view(ZOOM) : Zoom(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT]) -> _
-	view(X,Y): (canvas[X], canvas[Y])
+
 	
 
 operator firstLetter(Phrase) -> (Letter)
-	(ALL) => Letter: Trim(Phrase) -> Substring(value, 0,1)
+	default => Letter: Trim(Phrase) -> Substring(Trim, 0,1)

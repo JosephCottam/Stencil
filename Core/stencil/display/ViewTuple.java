@@ -1,48 +1,13 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.display;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.List;
 
-import stencil.adapters.GlyphAttributes.StandardAttribute;
-import stencil.tuple.MutableTuple;
+import stencil.parser.ParseStencil;
+import stencil.parser.ProgramParseException;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.util.enums.Attribute;
 
 /** The ViewTuple is the interface to a view
  * of the canvas.  To be complete, an adapter
@@ -67,54 +32,25 @@ import stencil.util.enums.Attribute;
  * @author jcottam
  *
  */
-public abstract class ViewTuple implements MutableTuple {
-	public enum ViewAttribute implements Attribute{
-		IMPLANTATION (null, String.class),
-		ZOOM (0, Double.class),
-		X (null,StandardAttribute.X.getType()),
-		Y (null,StandardAttribute.Y.getType()),
-		WIDTH (StandardAttribute.WIDTH.getDefaultValue(),StandardAttribute.WIDTH.getType()),
-		HEIGHT (StandardAttribute.HEIGHT.getDefaultValue(),StandardAttribute.HEIGHT.getType()),
-		PORTAL_WIDTH (0, Double.class),
-		PORTAL_HEIGHT (0, Double.class);
-
-		final Object defaultValue;
-		final Class type;
-
-		ViewAttribute(Object defaultValue, Class type)  {
-			this.defaultValue = defaultValue;
-			this.type = type;
-		}
-
-		public Class getType() {return type;}
-		public Object getDefaultValue() {return defaultValue;}
-	}
-
+public abstract class ViewTuple implements PrototypedTuple {
 	public static final String VIEW_IMPLANTATION = "STENCIL_VIEW";
 	public static final TuplePrototype PROTOTYPE;
-	protected static final List<String> FIELDS;
-	protected static final Class[] TYPES;
-
+	public static final String PROTOTYPE_STRING = "(double ZOOM, double X, double Y, double WIDTH, double HEIGHT, double PORTAL_WIDTH, double PORTAL_HEIGHT, double BOTTOM, double RIGHT)";
+	
 	static {
-		HashSet<String> s = new HashSet<String>();
-		for (ViewAttribute a: EnumSet.allOf(ViewAttribute.class)) {s.add(a.name());}
-		FIELDS = Collections.unmodifiableList(new ArrayList(s));
-
-		TYPES = new Class[FIELDS.size()];
-		for (int i=0; i< FIELDS.size(); i++) {
-			TYPES[i] = ViewAttribute.valueOf(FIELDS.get(i)).type;
-		}
-
-		PROTOTYPE = new SimplePrototype(FIELDS, Arrays.asList(TYPES));
+		TuplePrototype proto = null;
+		try {proto = ParseStencil.prototype(PROTOTYPE_STRING, false);}
+		catch (ProgramParseException e) {System.err.println("Error parsing view tuple prototype.)");}
+		PROTOTYPE = proto;
 	}
 
 	//TODO: Convert so the numeric de-reference is the primary one
 	public Object get(int idx) {
-		try {return get(FIELDS.get(idx));}
+		try {return get(PROTOTYPE.get(idx).name());}
 		catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
 	}
 
-	public TuplePrototype getPrototype() {return PROTOTYPE;}
+	public TuplePrototype prototype() {return PROTOTYPE;}
 	public int size() {return PROTOTYPE.size();}		
 	/**Gets the default value for the named property.
 	 * If the named property has no defined default, it is assumed to be 'null'.
@@ -122,11 +58,7 @@ public abstract class ViewTuple implements MutableTuple {
 	 * @param name Property to look up default value of.
 	 * @return Default value of property.
 	 */
-	public boolean isDefault(String name, Object value) {
-		if (PROTOTYPE.contains(name)) {return false;}
-		Object def = ViewAttribute.valueOf(name).defaultValue;
-		return def == value || (def != null && def.equals(value));
-	}
+	public boolean isDefault(String name, Object value) {return false;}
 
 	public String toString() {return stencil.tuple.Tuples.toString(this);}
 

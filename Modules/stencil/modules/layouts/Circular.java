@@ -56,7 +56,7 @@ public class Circular extends Layout {
 		this.origin = new Point2D.Double(cx != null ? cx : origin.getX(), cy != null ? cy : origin.getY());
 
 		stateID++; //TODO: Only update stateID when something actually changes...
-		return new ArrayTuple(startAngle, elementCount, pad, radius, ratio, origin);
+		return ArrayTuple.from(startAngle, elementCount, pad, radius, ratio, origin);
 	}
 	
 	@Facet(memUse="READER", prototype="(X,Y)")

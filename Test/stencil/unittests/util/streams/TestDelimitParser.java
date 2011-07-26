@@ -15,7 +15,10 @@ public class TestDelimitParser extends TestCase {
 		Assert.assertTrue("Opened, but no hasNext", p.hasNext());
 		SourcedTuple root = p.next();
 		Tuple t = root.getValues();
-		Assert.assertTrue("First tuple not as expected after open.", t.get("ID").equals("\"collective\"") && t.get("X").equals("95.852867") && t.get("Y").equals("67.091820"));
+		Assert.assertTrue("First tuple not as expected after open.", 
+				t.get(0).equals("\"collective\"") 
+				&& t.get(1).equals("95.852867") 
+				&& t.get(2).equals("67.091820"));
 
 		
 		p = coordStream();
@@ -24,7 +27,9 @@ public class TestDelimitParser extends TestCase {
 		root = p.next();
 		t = root.getValues();
 		Assert.assertFalse("First tuple same as header after open with header.", 
-							t.get("ID").equals("ID") && t.get("X").equals("X") && t.get("Y").equals("Y"));
+							t.get(0).equals("ID") 
+							&& t.get(1).equals("X") 
+							&& t.get(2).equals("Y"));
 	}
 	
 	
@@ -71,7 +76,7 @@ public class TestDelimitParser extends TestCase {
 		long fields=0;
 		while (p.hasNext()) {
 			Tuple t = p.next();
-			fields = t.size() + fields;
+			if (t!=null) {fields = t.size() + fields;}
 		}
 		final long end = System.currentTimeMillis();		
 		final long elapse = end-start;

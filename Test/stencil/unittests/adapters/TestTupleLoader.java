@@ -1,10 +1,10 @@
+
 package stencil.unittests.adapters;
 
-import stencil.adapters.TupleLoader;
+ import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
-import stencil.adapters.java2D.data.DoubleBufferLayer;
-import stencil.parser.ParseStencil;
-import stencil.interpreter.tree.Program;
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.adapters.java2D.columnStore.TableShare;
 import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
 import stencil.util.streams.txt.DelimitedParser;
@@ -25,16 +25,18 @@ public class TestTupleLoader extends StencilTestCase {
 	public void testLoad() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 		
-		Program program = ParseStencil.program(ruleSource, Adapter.ADAPTER);
-		panel = Adapter.ADAPTER.generate(program);
+		panel = Adapter.ADAPTER.compile(ruleSource);
 
-		DelimitedParser input = new DelimitedParser("NodePositions", "ID X Y", COORDS, "\\s+", true, 0);
+		DelimitedParser input = new DelimitedParser("NodePositions", COORDS, "\\s+", 3, true, 0);
 		TupleLoader loader = new TupleLoader(panel, input);
 		loader.load();
 
 		
 		synchronized(panel.getCanvas().getComponent().visLock) {
-			((DoubleBufferLayer) panel.getLayer("Nodes")).changeGenerations();
+			TableShare share = ((Table) panel.getLayer("Nodes")).changeGenerations();
+			share.simpleUpdate();
+			((Table) panel.getLayer("Nodes")).merge(share);
+			
 			assertEquals("Unexpected number of items loaded.", 151, panel.getLayer("Nodes").viewpoint().size());
 		}
 	}
@@ -42,10 +44,9 @@ public class TestTupleLoader extends StencilTestCase {
 	public void testThread() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 
-		Program program = ParseStencil.program(ruleSource, Adapter.ADAPTER);
-		panel = Adapter.ADAPTER.generate(program);
+		panel = Adapter.ADAPTER.compile(ruleSource);
 
-		DelimitedParser input = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_FULL, "\\|", true,1);
+		DelimitedParser input = new DelimitedParser("NodeAttributes", OVERLAY_FULL, "\\|", 2, true,1);
 		TupleLoader loader = new TupleLoader(panel, input);
 
 		Thread thread = new Thread(loader);

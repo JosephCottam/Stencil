@@ -3,14 +3,13 @@ package stencil.types.font;
 import java.awt.Font;
 
 import stencil.tuple.InvalidNameException;
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.util.collections.ArrayUtil;
 
-public final class FontTuple implements Tuple {
+public final class FontTuple implements PrototypedTuple {
 	
 	static final String SELF = "self";
 	static final String FAMILY = "family";
@@ -18,15 +17,15 @@ public final class FontTuple implements Tuple {
 	static final String BOLD = "bold";
 	static final String ITALIC = "italic";	
 	
-	static final String DEFAULT_FAMILY = "Helvetica";
-	static final Double DEFAULT_SIZE  = 12d;
-	static final Boolean DEFAULT_BOLD = false;
-	static final Boolean DEFAULT_ITALIC = false;
+	public static final String DEFAULT_FAMILY = "Helvetica";
+	public static final Double DEFAULT_SIZE  = 12d;
+	public static final Boolean DEFAULT_BOLD = false;
+	public static final Boolean DEFAULT_ITALIC = false;
 	public static final Font DEFAULT_FONT = new Font(DEFAULT_FAMILY, Font.PLAIN, DEFAULT_SIZE.intValue());
 	
 	private static final String[] FIELDS = new String[]{SELF, FAMILY, SIZE, BOLD, ITALIC};
 	private static Class[] TYPES = new Class[] {Font.class, String.class, Double.class, Boolean.class, Boolean.class};
-	private static TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+	private static TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS, TYPES);
 	public static final int SELF_IDX = ArrayUtil.indexOf(SELF, FIELDS);
 	public static final int FONT_IDX = ArrayUtil.indexOf(FAMILY, FIELDS);
 	public static final int SIZE_IDX = ArrayUtil.indexOf(SIZE, FIELDS);
@@ -64,7 +63,7 @@ public final class FontTuple implements Tuple {
 	}
 
 	public Font getFont() {return font;}
-	public TuplePrototype getPrototype() {return PROTOTYPE;}
+	public TuplePrototype prototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {
 		if (name.equals(FAMILY)) {return DEFAULT_FAMILY.equals(value);}

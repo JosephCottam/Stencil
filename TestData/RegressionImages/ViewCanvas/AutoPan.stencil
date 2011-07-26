@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Stocks
-HEADER: Date,Open,High,Low,Close,Volume
+TUPLE_SIZE: 6
 SEPARATOR: ,
 SOURCE: ./google_stocks.csv
 SKIP: 1
@@ -16,37 +16,40 @@ stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CT
 
 order (Stocks | Mouse)
 
-layer Ticker["POLY_LINE"]
+view 
 from Stocks
-    ID : "Google"   
-    X.new: TimeStep(Date) 
-    Y.new: Mult(Open, -1)
-    PEN: @Stroke{1}
-    PEN_COLOR: @Color{BLUE}
+    (HEIGHT, Y) : (canvas.HEIGHT, canvas.Y)
 from Stocks
-    view(HEIGHT, Y) :(canvas[HEIGHT], canvas[Y])
-from Stocks
-    filter(Margin < 50)
-    filter(TimeStep < RIGHT)
+    filter(prefilter.Margin < 50)
+    filter(prefilter.TimeStep < prefilter.RIGHT)
     prefilter(TimeStep, Margin, RIGHT) : 
-        [Right] TranslateRegistration("TOP_LEFT", view[X], view[Y], view[WIDTH], view[HEIGHT], "RIGHT") ->
-        [Time] TimeStep(Date) -> Sub(Right[X], _) -> (Time[VALUE], diff, Right[X]) 
+        [Right] TranslateRegistration("TOP_LEFT", view.X, view.Y, view.WIDTH, view.HEIGHT, "RIGHT") ->
+        [Time] TimeStep(Date) -> Sub(Right.X, _) -> (Time.VALUE, Sub, Right.X) 
     
-    view(X): Add(3, view[X])
-
-layer Nav
+    X: Add(3, view.X)
 from Mouse
     filter(BUTTON = 1)
     filter(SHIFT !~ "true")
-    view(X) : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view[X], Width)
+    X : [dim] ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, dim.Width)
 from Mouse
     filter(BUTTON = 1)
     filter(SHIFT =~ "true")
-    view(Y): ScreenToCanvasDimension(0,DELTA_Y) -> Sub(Height, view[Y])
+    Y: [dim] ScreenToCanvasDimension(0,DELTA_Y) -> Sub(dim.Height, view.Y)
 from Mouse
     filter(CLICK_COUNT = 3)
     filter(BUTTON = 1)
-    view(X, Y, WIDTH, HEIGHT) : (canvas[X], canvas[Y], canvas[WIDTH], canvas[HEIGHT])
+    (X, Y, WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+
+
+
+layer Ticker["POLY_POINT"]
+from Stocks
+    ID: Count()
+    GROUP : "Google"   
+    X: TimeStep(Date) 
+    Y: Open
+    PEN: @Stroke{1}
+    PEN_COLOR: @Color{BLUE}
 
 operator TimeStep (Date) -> (VALUE)
-    ALL => VALUE : Index(Date) -> Mult(3, index)
+    default => VALUE : Index(Date) -> Mult(3, Index)

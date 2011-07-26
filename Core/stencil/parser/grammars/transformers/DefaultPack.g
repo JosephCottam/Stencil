@@ -25,12 +25,14 @@ options {
 
   public Object fromDefault(StencilTree pack) {
       StencilTree rule = pack.getAncestor(RULE);
-      StencilTree targetPrototype = rule.findDescendant(TUPLE_PROTOTYPE); //Only one prototpye, right under the target
+      StencilTree targetPrototype = rule.findDescendant(TARGET_TUPLE);
+      String frame = pack.getParent().find(DIRECT_YIELD, GUIDE_YIELD).getText();  //The frame name of the immediate prior call
       
       Object newPack = adaptor.dupNode(pack);
         
       for (int i=0; i< targetPrototype.getChildCount(); i++) {
          Object ref = adaptor.create(TUPLE_REF, StencilTree.typeName(TUPLE_REF));
+         adaptor.addChild(ref, adaptor.create(ID, frame)); 
          adaptor.addChild(ref, adaptor.create(NUMBER, Integer.toString(i)));
          adaptor.addChild(newPack, ref);
       }

@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.modules.stencilUtil;
 
 
@@ -35,14 +7,20 @@ import stencil.module.MethodInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
+import stencil.module.operator.util.DirectOperator;
+import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ModuleDataParser.MetaDataParseException;
 import stencil.module.util.ann.*;
 import stencil.parser.string.util.Context;
+import stencil.interpreter.guide.SampleOperator;
+import stencil.interpreter.guide.SampleSeed;
+import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 
@@ -84,6 +62,20 @@ public final class StencilUtil extends BasicModule {
 	@Description("Use the Converter to change the value(s) passed into a tuple.")
 	public static final Tuple toTuple(Object... values) {return Converter.toTuple(values);} 
 	
+	
+	@Operator()
+	@Description("No-Op.  Always returns the empty tuple.")
+	public static final class Nop extends DirectOperator implements SampleOperator {
+		protected Nop(OperatorData od) {super(od);}
+
+		@Override
+		@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
+		public Object invoke(Object[] arguments) throws MethodInvokeFailedException {return Tuples.EMPTY_TUPLE;}
+
+		@Override
+		public List<Tuple> sample(SampleSeed seed, Specializer details) {return new ArrayList();}
+	}
+	
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	@Description("Repackage the the values passed as a tuple (simple wrapping, no conversion attempted).")
@@ -103,6 +95,8 @@ public final class StencilUtil extends BasicModule {
 		md.addOperator(operatorData(MapWrapper.class, MODULE_NAME));
 		md.addOperator(operatorData(RangeHelper.class, MODULE_NAME));
 		md.addOperator(operatorData(SplitHelper.class, MODULE_NAME));
+		md.addOperator(operatorData(SpecialTuples.Canvas.class, MODULE_NAME));
+		md.addOperator(operatorData(SpecialTuples.View.class, MODULE_NAME));
 		
 		return md;
 	}
@@ -124,18 +118,23 @@ public final class StencilUtil extends BasicModule {
 	}
 	
 	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
+		OperatorData operatorData = getOperatorData(name, specializer);
+
 		if (name.equals("ToTuple") || name.equals("ValuesTuple")) {
 			return super.instance(name, context, specializer);
+		} else if (name.equals("Nop")) {
+			return new Nop(operatorData);
 		} else if (name.equals("MonitorCategorical")) {
-			OperatorData operatorData = getOperatorData(name, specializer);
 			return new MonitorCategorical(operatorData, specializer);
 		} else if (name.equals("MonitorContinuous")) {
-			OperatorData operatorData = getOperatorData(name, specializer);
 			return new MonitorContinuous(operatorData, specializer);			
 		} else if (name.equals("MonitorFlex")) {
-			OperatorData operatorData = getOperatorData(name, specializer);
 			return new MonitorFlex(operatorData, specializer);			
-		} 
+		} else if (name.equals("view")) {
+			return new SpecialTuples.View(operatorData);
+		} else if (name.equals("canvas")) {
+			return new SpecialTuples.Canvas(operatorData);
+		}
 		
 		throw new Error("Could not instantiate regular operator " + name);
 	}
@@ -149,7 +148,7 @@ public final class StencilUtil extends BasicModule {
 			if (key.startsWith("Op")) {
 				StencilOperator op;
 				try {
-					op = modules.instance("", (String) specializer.get(key), null, EMPTY_SPECIALIZER, false);
+					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);
 					opArgs.add(op);
 				} catch (MethodInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
 			}
@@ -162,13 +161,10 @@ public final class StencilUtil extends BasicModule {
 		if (name.equals("Map")) {
 			return new MapWrapper(opArgs.get(0));
 		} else if (name.equals("Range")) {
-			//TODO: Fix Range helper so it works for stateful operators CORRECTLY
-					//Use the duplicate method for stateful operators, instantiate a new operator for each call 
-					//Stateless operators can just have the range values applied directly (after conversion)
 			return RangeHelper.makeOperator(specializer, opArgs.get(0));	
 		} else if (name.equals("Split")) {
 			return SplitHelper.makeOperator(specializer, opArgs.get(0));			
-		}
+		} 
 		
 		throw new Error("Could not instantiate higher-order operator " + name);
 	}

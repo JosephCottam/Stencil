@@ -2,27 +2,47 @@ package stencil.types.geometry;
 
 import java.awt.geom.Rectangle2D;
 
-import stencil.tuple.AbstractTuple;
+import stencil.tuple.InvalidNameException;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
+import stencil.tuple.prototype.TuplePrototype;
 
-public final class RectangleTuple extends AbstractTuple {
-	private static final String[] FIELDS = new String[]{"X","Y","W","H"};
-	private static final Number DEFAULT = new Double(0);
-	private final Rectangle2D content;
+/**Wrapper for a rectangle.
+ * These tuples are based in a Y-Up/positive coordinate system.
+ * This means that the X/Y position are the lower-left of the rectangle (not the upper-left, as the standard Java2D rectangles are).
+ * Translation occurs when the RectangleTuple is instantiated, so the construction arguments should not be translated.
+ * Furthermore, the rectangle returned from the basis method is in the standard Y-Up/negative system.
+ * @author jcottam
+ *
+ */
+public final class RectangleTuple implements PrototypedTuple {
+	private static final TuplePrototype PROTO = new TuplePrototype(new String[]{"X","Y","W","H"}, new Class[]{double.class, double.class, double.class, double.class});
+	private final Rectangle2D basis;
 	
-	public RectangleTuple(Rectangle2D content) {
-		super(FIELDS, DEFAULT);
-		this.content = content;
-	}
+	public RectangleTuple(Rectangle2D basis) {this.basis = basis;}
 	
 	public Object get(int idx) throws TupleBoundsException {
-		if (idx ==0) {return content.getX();}
-		if (idx ==1) {return content.getY();}
-		if (idx ==2) {return content.getWidth();}
-		if (idx ==3) {return content.getHeight();}
+		if (idx ==0) {return getY();}
+		if (idx ==1) {return getX();}
+		if (idx ==2) {return basis.getWidth();}
+		if (idx ==3) {return basis.getHeight();}
 		throw new TupleBoundsException(idx, this);
 	}
 
+	public double getX() {return -basis.getMinY();}
+	public double getY() {return basis.getMinX();}
+	
 	public String toString() {return Tuples.toString("Rectangle", this, 0);}
+
+	@Override
+	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
+
+	@Override
+	public TuplePrototype prototype() {return PROTO;}
+
+	@Override
+	public int size() {return PROTO.size();}
+	
+	public  Rectangle2D basis() {return basis;}
 }

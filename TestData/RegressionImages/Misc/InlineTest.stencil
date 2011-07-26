@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Elements
-HEADER: Name
+TUPLE_SIZE: 1
 SEPARATOR: ,
 SOURCE: ../Rotation/RotationData.txt
 SKIP: 1
@@ -20,8 +20,8 @@ layer Shape
 from Elements
 	ID: Concatenate(Name, "TL")
 	SHAPE: "CROSS"
-	X : XLayout(Name) -> Mult(40, VALUE)
+	X : XLayout(Name) -> Mult(40, _)
    FILL_COLOR: @Color{GREEN, 128}
 
 operator XLayout(Name) -> (VALUE) 
-	(ALL) => VALUE : Index(Name)
+	default => VALUE : Index(Name)

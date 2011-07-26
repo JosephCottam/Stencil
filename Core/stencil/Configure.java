@@ -19,6 +19,9 @@ public class Configure {
 
 	public static final String THREAD_POOL_SIZE_KEY = "threadPoolSize";
 	public static int threadPoolSize = 2;
+
+	public static final String QUEUED_LOADER_SIZE_KEY = "queueLoader_size";
+	public static final String QUEUED_LOADER_THREAD_KEY = "queuedLoader_thread";
 	
 	private Configure() {/*Utility, non-instantiable class.*/}
 
@@ -37,6 +40,14 @@ public class Configure {
 		if (threadPoolSize <1) {
 			threadPoolSize = (int) (Runtime.getRuntime().availableProcessors()/2f)+1;
 		}
+		
+		
+		if (props.containsKey(QUEUED_LOADER_SIZE_KEY)) {
+			stencil.util.streams.QueuedStream.DEFAULT_QUEUE_SIZE=Integer.parseInt(props.getProperty(QUEUED_LOADER_SIZE_KEY));
+		}
+		if (props.containsKey(QUEUED_LOADER_THREAD_KEY)) {
+			stencil.util.streams.QueuedStream.THREAD=Boolean.parseBoolean(props.getProperty(QUEUED_LOADER_THREAD_KEY));
+		}		
 	}
 
 	public static void loadProperties(String... urls) throws Exception {

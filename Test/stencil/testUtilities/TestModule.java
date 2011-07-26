@@ -13,7 +13,7 @@ import stencil.parser.ParseStencil;
 import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.instances.Singleton;
 
 import java.lang.reflect.*;
  
@@ -37,7 +37,7 @@ public class TestModule implements Module {
 		public static Tuple doFilter(String ID) {
 			count++;
 			if (count ==10) {count =0; return null;}
-			return PrototypedTuple.singleton(ID);
+			return Singleton.from(ID);
 		}
 	}
 	

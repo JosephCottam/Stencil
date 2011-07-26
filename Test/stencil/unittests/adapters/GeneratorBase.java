@@ -1,6 +1,10 @@
 package stencil.unittests.adapters;
 
 import static stencil.unittests.adapters.TestTupleLoader.OVERLAY_SHORT;
+
+import java.io.File;
+
+import stencil.WorkingDir;
 import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
@@ -8,24 +12,34 @@ import stencil.interpreter.tree.Layer;
 import stencil.interpreter.tree.Program;
 import stencil.parser.ParseStencil;
 import stencil.testUtilities.StringUtils;
+import stencil.unittests.StencilTestCase;
 import stencil.util.streams.txt.DelimitedParser;
 
-public abstract class GeneratorBase extends junit.framework.TestCase {
-	private static final String sourceFile = "./TestData/RegressionImages/SeeTest/SeeTest.stencil"; 
+public abstract class GeneratorBase extends StencilTestCase {
+	private static final String sourceFile = "./TestData/RegressionImages/SeeTest/SeeTest.stencil";
+	private File originalWorkingDir;
+	
 	private StencilPanel panel;
 	
-	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}
-	public void tearDown() {if (panel !=null) {panel.dispose();}}
+	public void setUp() throws Exception {
+		super.setUp();
+		originalWorkingDir = WorkingDir.get();
+		WorkingDir.set(sourceFile);
+	}
 	
-	public StencilPanel testGenerate(Adapter adapter) throws Exception {
+	public void tearDown() {
+		if (panel !=null) {panel.dispose();}
+		WorkingDir.set(originalWorkingDir);
+	}
+	
+	public StencilPanel testCompile(Adapter adapter) throws Exception {
 		String streamRules = StringUtils.getContents(sourceFile);
 		Program program = ParseStencil.program(streamRules, adapter);
-		panel = adapter.generate(program);
+		panel = adapter.compile(streamRules);
 
 		assertNotNull("Program not found", panel.getProgram());
-		assertEquals("Program not as expected", program, panel.getProgram());
 
-		assertEquals("Layer count mismatch", program.layers().length, panel.getLayers().size());
+		assertEquals("Layer count mismatch", program.layers().length, panel.layers().size());
 
 		for (Layer layer:program.layers()) {
 			String name = layer.getName();
@@ -37,9 +51,8 @@ public abstract class GeneratorBase extends junit.framework.TestCase {
 
 	public TupleLoader testMakeLoader(Adapter adapter) throws Exception {
 		String streamRules = StringUtils.getContents(sourceFile);
-		Program program = ParseStencil.program(streamRules, adapter);
-		panel = adapter.generate(program);
-		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT", OVERLAY_SHORT, "\\|", true,1);
+		panel = adapter.compile(streamRules);
+		DelimitedParser stream = new DelimitedParser("NodeAttributes",OVERLAY_SHORT, "\\|", 2, true,1);
 		TupleLoader loader = new TupleLoader(panel, stream);
 
 		assertNotNull(loader);

@@ -7,11 +7,9 @@ package stencil.adapters.java2D.util;
  *   BUT the updates must be applied to the layer only after other updates
  *   have been done. 
  *   
- *   Updates run the parallel part through an executor.  The parallel part
- *   returns the part that must be serialized as a Finalizer object. 
- *   
- * @author jcottam
- *
+ *   Updates run the parallel part through an executor. 
+ *   Then finishers execute after all updates have completed.  
+ *   Finishers may be run in parallel with each other.
  */
 interface Finisher {
 	/**Perform the work that could not be done in parallel with other updates.*/

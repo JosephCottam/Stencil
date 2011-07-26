@@ -12,6 +12,10 @@ public class Const extends StencilTree {
 	private Object value;
 	
 	public Const(Token source) {super(source);}
+	public Const(Token source, Object value) {
+		super(source);
+		this.value = value;
+	}
 	
 	public String getName() {return this.getText();}
 	public Object getValue() {

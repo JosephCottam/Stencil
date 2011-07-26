@@ -13,6 +13,8 @@ options {
   
   import stencil.parser.tree.*;  
   import stencil.module.*;
+  import stencil.interpreter.tree.Freezer;
+  import stencil.interpreter.tree.MultiPartName;
 }
 
 @members{
@@ -32,10 +34,12 @@ options {
   private StencilTree findTemplate(StencilTree opRef) {
     StencilTree base = opRef.find(OPERATOR_BASE);
     StencilTree program = opRef.getAncestor(PROGRAM);
-    String name = base.getText();  
+    
+    MultiPartName name = Freezer.multiName(base);
+    if (name.prefixed()) {return null;}
 
     for (StencilTree t:program.find(LIST_TEMPLATES)) {
-      if (name.equals(t.getText())) {return t;} 
+      if (name.name().equals(t.getText())) {return t;} 
     }
     return null;
   }
@@ -43,7 +47,7 @@ options {
 }
 
 topdown 
-  : ^(o=OPERATOR_REFERENCE base=. spec=.) 
+  : ^(o=OPERATOR_REFERENCE .*) 
      {findTemplate($o) != null}? -> {instantiate(o)};
      
 //Remove templates on the way out (they are no longer needed)     

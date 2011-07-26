@@ -5,22 +5,18 @@ import java.lang.ref.WeakReference;
 
 import static java.lang.String.format;
 
-import stencil.display.Display;
 import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.interpreter.tree.*;
-import stencil.parser.ParserConstants;
-import stencil.parser.tree.util.Environment;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MapMergeTuple;
-import stencil.types.Converter;
 import static stencil.interpreter.tree.Rule.EMPTY_RULE;
 
 public class Interpreter {
-	private final WeakReference<StencilPanel> panel;	//
+	private final WeakReference<StencilPanel> panel;
 	private final Program program;
 	
 	public Interpreter(StencilPanel panel) {
@@ -29,7 +25,7 @@ public class Interpreter {
 	}
 	
 	public static Tuple processTuple(Tuple streamTuple, Rule rule) throws RuleAbortException {
-		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, streamTuple);
+		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, streamTuple);
 		return processEnv(env, rule);
 	}
 	
@@ -54,14 +50,9 @@ public class Interpreter {
 	}
 	
 	
-	private static final class ProcessResults {
-		final Tuple local, result;
-		public ProcessResults(Tuple local, Tuple result) {this.local = local;this.result = result;}
-	}
-	
 
 	//Parallelize here???  Checks all groups in parallel...
-	public ProcessResults process(SourcedTuple source, TupleStore target, Consumes group) throws RuleAbortException {
+	public void process(SourcedTuple source, TupleStore target, Consumes group) throws RuleAbortException {
 		final String targetLabel = (target instanceof Layer) ? "Layer": "stream";
 		boolean matches;
 		Tuple prefilter;
@@ -69,7 +60,7 @@ public class Interpreter {
 		Tuple result = null;
 		
 		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
-		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues());
+		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, source.getValues());
 		
 		prefilter = processEnv(env, group.getPrefilterRule());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
@@ -86,29 +77,17 @@ public class Interpreter {
 				if (result != null && result instanceof MapMergeTuple) {
 					MapMergeTuple mmt = (MapMergeTuple) result;
 					for (int i=0; i< mmt.size(); i++) {
-						Tuple nt = mmt.getTuple(i);
+						PrototypedTuple nt = (PrototypedTuple) mmt.getTuple(i);
 						if (target.canStore(nt)) {target.store(nt);}
 					}
 				} else if (result != null && target.canStore(result)) {
-					target.store(result);
+					target.store((PrototypedTuple) result);
 				}
 
 			}
 			catch (IDException IDex) {throw IDex;}
 			catch (Exception e) {throw new RuntimeException(format("Error processing glyph rules in %1$s %2$s", targetLabel, target.getName()), e);}
-			
-			try {
-				Tuple viewUpdate = processEnv(env, group.getViewRule());
-				if (viewUpdate != null) {Tuples.transfer(viewUpdate, Display.view);}
-			}
-			catch (Exception e) {throw new RuntimeException(format("Error processing view rules in %1$s %2$s", targetLabel, target.getName()), e);}
-			
-			try{
-				Tuple canvasUpdate = processEnv(env, group.getCanvasRule());
-				if (canvasUpdate != null) {Tuples.transfer(canvasUpdate, Display.canvas);}
-			} catch (Exception e) {throw new RuntimeException(format("Error processing canvas rules in %1$s %2$s", targetLabel, target.getName()), e);}
 		}
-		return new ProcessResults(local, result);
 	}
 	
 	/**Takes a single tuple and works it through all applicable
@@ -133,44 +112,25 @@ public class Interpreter {
 		for (Layer layer:program.layers()) {			
 			for(Consumes group:layer.getGroups()) {
 				if (!group.getStream().equals(source.getSource())) {continue;}
-				ProcessResults results = process(source, layer, group);
-				actionsTaken = registerDynamics(layer, group, source, results.local, results.result) && actionsTaken;
+				process(source, layer, group);
 				actionsTaken = true;
 			}
 		}
-		return actionsTaken;
-	}
-
-	private boolean registerDynamics(Layer layer, Consumes group, SourcedTuple source, Tuple local, Tuple result) {
-		boolean actionsTaken = false;
 		
-		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, source.getValues(), Tuples.EMPTY_TUPLE, local);
-		Tuple merged = new ArrayTuple(TupleRef.resolveAll(group.getDynamicReducer(), env));
-		
-		if (result != null && result instanceof MapMergeTuple) {
-			for (int i=0; i<result.size(); i++) {
-				Tuple rslt = (Tuple) result.get(i);
-				singleRegisterDynamic(layer, group, merged, rslt);
-			}
-		} else if (result != null) {
-			singleRegisterDynamic(layer, group, merged, result);
-		}		
-		return actionsTaken;
-	}
-	
-	private boolean singleRegisterDynamic(Layer layer, Consumes group, Tuple source, Tuple result) {
-		if (!layer.canStore(result)) {return false;}
-		try {
-			String id = Converter.toString(result.get(ParserConstants.IDENTIFIER_FIELD));
-			stencil.display.Glyph glyph = layer.getDisplayLayer().find(id);
-			assert glyph != null;
-			
-			layer.getDisplayLayer().addDynamic(group.groupID(), glyph, source);
-
-			return true;
-		} catch (Exception e) {
-			throw new RuntimeException(format("Error updating layer %1$s with tuple %2$s", layer.getName(), result.toString()), e);
+		for(Consumes group:program.view().getGroups()) {
+			if (!group.getStream().equals(source.getSource())) {continue;}
+			process(source, (TupleStore) program.view(), group);
+			actionsTaken = true;
 		}
+		
+		for(Consumes group:program.canvas().getGroups()) {
+			if (!group.getStream().equals(source.getSource())) {continue;}
+			process(source, (TupleStore) program.canvas(), group);
+			actionsTaken = true;
+		}
+
+		
+		return actionsTaken;
 	}
 	
 	public void processTuple(SourcedTuple source) throws Exception {

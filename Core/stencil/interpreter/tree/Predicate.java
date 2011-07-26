@@ -1,10 +1,8 @@
 package stencil.interpreter.tree;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.Viewpoint;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
-import stencil.module.operator.util.ReflectiveInvokeable;
-import stencil.parser.tree.util.Environment;
 
 public class Predicate implements Viewpoint<Predicate> {
 	private final Invokeable inv;
@@ -16,12 +14,12 @@ public class Predicate implements Viewpoint<Predicate> {
 	}
 	
 	public Predicate viewpoint() {
-		if (inv.getTarget() == null) {return this;}
-		else if (inv.getTarget() instanceof StencilOperator) {
-			Invokeable vp = new ReflectiveInvokeable(((ReflectiveInvokeable) inv).getMethod(), ((StencilOperator) inv.getTarget()).viewpoint());
+		try {
+			Invokeable vp = inv.viewpoint();
 			return new Predicate(vp, args);
-		} 
-		throw new Error("Could not viewpoint predicate when requested.");
+		} catch (Exception e) {
+			throw new Error("Could not viewpoint predicate when requested.");
+		}
 	}
 
 

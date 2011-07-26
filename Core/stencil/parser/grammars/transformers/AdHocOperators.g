@@ -21,10 +21,10 @@ options {
   import stencil.module.operator.wrappers.*;
   import stencil.interpreter.tree.*;
   import stencil.parser.tree.*;
-  import stencil.parser.string.info.UseContext;
   import stencil.parser.string.util.Context;
-  import stencil.parser.tree.util.MultiPartName;
+  import stencil.interpreter.tree.MultiPartName;
   import stencil.parser.string.util.JavaCompiler;
+  import stencil.parser.ProgramCompileException;
 }
 
 @members {
@@ -55,8 +55,26 @@ options {
 		adHoc.addOperator(operator);
 	}
 	
+	protected StencilTree makeView(StencilTree vd) {
+        Specializer spec = Freezer.specializer(vd.find(SPECIALIZER));
+        Object canvas = adapter.makeView(spec);
+        Const c = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
+        c.setValue(canvas); 
+        return c;
+	}
+	
+	protected StencilTree makeCanvas(StencilTree cd) {
+	    Specializer spec = Freezer.specializer(cd.find(SPECIALIZER));
+	    Object canvas = adapter.makeCanvas(spec);
+	    Const c = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
+        c.setValue(canvas); 
+        return c;
+	}
+	
 	protected StencilTree makeLayer(StencilTree l) {
-		DisplayLayer dl =adapter.makeLayer(l); 
+    	Specializer spec = Freezer.specializer(l.find(SPECIALIZER));
+		
+		DisplayLayer dl =adapter.makeLayer(l.getText(), spec); 
 		LayerOperator operator = new LayerOperator(adHoc.getName(), dl);
 		adHoc.addOperator(operator, operator.getOperatorData());
 		
@@ -110,31 +128,43 @@ options {
   
   private StencilOperator findBase(StencilTree ref) {
       Specializer spec = Freezer.specializer(ref.find(SPECIALIZER));
-      MultiPartName baseName = new MultiPartName(ref.find(OPERATOR_BASE).getText());
+      MultiPartName baseName = Freezer.multiName(ref.find(OPERATOR_BASE));
       String useName = ref.getText();  
       boolean higherOrder = ref.find(SPECIALIZER).findAllDescendants(OP_AS_ARG).size() != 0;
-  
   
       StencilTree program = ref.getAncestor(PROGRAM);
       Context context = UseContext.apply(program, useName);
 
       StencilOperator op;
       try {
-          op = modules.instance(baseName.getPrefix(), baseName.getName(), context, spec, higherOrder);
+          op = modules.instance(baseName, context, spec, higherOrder);
       } catch (Exception e) {
-        return null;
+        throw new ProgramCompileException(String.format("Error instantiating \%1\$s as base for \%2\$s", baseName, useName), ref, e);
       }
       return op;
+  }
+  
+  /**Are the operators arguments ready for higher-order ops?**/
+  private boolean argsReady(StencilTree ref) {
+    List<StencilTree> ops = ref.findAllDescendants(OP_AS_ARG);
+    for(StencilTree op: ops) {
+       MultiPartName name = Freezer.multiName(op.find(OP_NAME));
+       try {modules.findModuleForOperator(name);}
+       catch (IllegalArgumentException e) {return false;}
+    }
+    return true;
   }
 }
  
 simple
-	: ^(r=OPERATOR .*) {makeOperator($r);}
-	| ^(r=LAYER rest+=.*) -> ^(LAYER $rest* {makeLayer($r)})
-	| ^(r=JAVA .*) {makeJava($r);}
+	: ^(s=OPERATOR .*) {makeOperator($s);}
+	| ^(s=LAYER rest+=.*) -> ^(LAYER $rest* {makeLayer($s)})
+	| ^(s=JAVA .*) {makeJava($s);}
+	| ^(s=VIEW rest+=.*) -> ^(VIEW $rest* {makeView($s)})
+	| ^(s=CANVAS rest+=.*) -> ^(CANVAS $rest* {makeCanvas($s)})
   ;
   
 proxies
- : ^(r=OPERATOR_REFERENCE .*) {findBase($r) != null}? -> {transferProxy($r)}
+ : ^(r=OPERATOR_REFERENCE .*) {argsReady($r) && findBase($r) != null}? -> {transferProxy($r)}
  ;
 	

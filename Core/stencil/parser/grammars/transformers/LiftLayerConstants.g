@@ -8,30 +8,35 @@ options {
 }
 
 @header {
-	/**Moves values from the rule set to the default blocks if the value:
-	 *   (1) Appears in all consumes blocks
-	 *   (2) Is an atom
-	 *   (3) Is not a layer identity field (e.g. ID, IDX)
-	 *   
-	 *   Must be run after constant propogation and constant operator evaluation
-	 **/
+  /**Moves values from the rule set to the default blocks if the value:
+   *   (1) Appears in all consumes blocks
+   *   (2) Is an atom
+   *   (3) Is not a layer identity field (e.g. ID, IDX)
+   *   
+   *   Also tags the constant fields in the schema as constants (reducing the amount of copying done and storage used).
+   *   Must be run after constant propagation and constant operator evaluation
+  **/
 
-	package stencil.parser.string;
+  package stencil.parser.string;
 
-	import java.util.Set;
-	import java.util.HashSet;
-	import java.util.ArrayList;
+  import java.util.Set;
+  import java.util.HashSet;
   import java.util.Collection;
 
-  import stencil.tuple.Tuple;
+ 
+  import stencil.tuple.PrototypedTuple;
   import stencil.tuple.Tuples;
+  import stencil.tuple.prototype.TuplePrototype;
+  import stencil.tuple.prototype.TuplePrototype;
   import stencil.interpreter.Interpreter;
-  import stencil.interpreter.tree.Freezer;
-  import stencil.interpreter.tree.Rule;
+  import stencil.interpreter.tree.*;
   import stencil.parser.tree.StencilTree;
   import stencil.parser.tree.Const;
   import stencil.parser.ParserConstants;  
   import stencil.display.DisplayLayer;
+  import stencil.display.SchemaFieldDef;
+  import stencil.types.Converter;
+  
 }
 
 @members {	
@@ -40,6 +45,7 @@ options {
   public Object downup(Object t) {
     downup(t, this, "liftShared");
     downup(t, this, "updateLayers");  
+    downup(t, this, "flagConstantFields");  
     return t;
   }
 
@@ -66,12 +72,11 @@ options {
        adaptor.addChild(r, cc);
        adaptor.addChild(r, adaptor.create(DEFINE, ""));
            
-       Object proto = adaptor.create(TUPLE_PROTOTYPE, "TUPLE_PROTOTYPE");
-       Object fd = adaptor.create(TUPLE_FIELD_DEF, "TUPLE_FIELD_DEF");
-       adaptor.addChild(tar, proto);
-       adaptor.addChild(proto, fd);
+       Object result = adaptor.create(TARGET_TUPLE, "TARGET_TUPLE");
+       Object fd = adaptor.create(TUPLE_FIELD, "TUPLE_FIELD");
+       adaptor.addChild(tar, result);
+       adaptor.addChild(result, fd);
        adaptor.addChild(fd, adaptor.create(ID, att));
-       adaptor.addChild(fd, adaptor.create(DEFAULT, "DEFAULT"));
 
        Object pack = adaptor.create(PACK, "PACK");
        adaptor.addChild(pack, adaptor.dupTree(value));
@@ -102,14 +107,14 @@ options {
 	   Tree results = (StencilTree) block.find(RULES_RESULT);
 	   for (int ruleID=0; ruleID<results.getChildCount(); ruleID++) {
 	      StencilTree rule = (StencilTree) results.getChild(ruleID);
-        Tree target = ((StencilTree) rule.findDescendant(TARGET)).find(TUPLE_PROTOTYPE);
+        Tree target = ((StencilTree) rule.findDescendant(TARGET)).find(TARGET_TUPLE);
         Tree pack = rule.findDescendant(PACK);
 	      
 	      for (int resultID=0; resultID<pack.getChildCount(); resultID++) {
 	         Tree value = pack.getChild(resultID);
 	         if (value.getType() == TUPLE_REF) {continue;}
 	         
-	         String name = ((StencilTree) target.getChild(resultID)).findDescendant(ID).getText();
+	         String name = ((StencilTree) target.getChild(resultID)).getChild(0).getText();
            if (identifierRule(name)) {continue;}
            consts.add(new Pair(name, value));
 	      }
@@ -120,18 +125,17 @@ options {
 	private Object reduceConstants(StencilTree blocks) {
 	   blocks = (StencilTree) adaptor.dupTree(blocks);
 	   Collection<Pair> sharedConstants = sharedConstants(blocks);
-	   List<Pair> consts = new ArrayList();
      
      for (int b=0; b< blocks.getChildCount(); b++) {
        Tree block = blocks.getChild(b);
        Tree results = ((StencilTree) block).find(RULES_RESULT);
        for (int i=0; i<results.getChildCount(); i++) {
           StencilTree rule = (StencilTree) results.getChild(i);
-          Tree target = ((StencilTree) rule.findDescendant(TARGET)).find(TUPLE_PROTOTYPE);
+          Tree target = ((StencilTree) rule.findDescendant(TARGET)).find(TARGET_TUPLE);
           Tree pack = rule.findDescendant(PACK);
           for (int j=0; j<pack.getChildCount(); j++) {
              Tree value = pack.getChild(j);
-             String name = ((StencilTree) target.getChild(j)).findDescendant(ID).getText();
+             String name = ((StencilTree) target.getChild(j)).getChild(0).getText();
              Pair pair = new Pair(name, value);
              if (sharedConstants.contains(pair)) {
                 adaptor.deleteChild(pack, j);
@@ -145,7 +149,7 @@ options {
 	}
 
 	/**Is this a identifier field (e.g. it sets ID)?  Identifiers cannot be lifted.*/	
-	private boolean identifierRule(String name) {return name.startsWith(ParserConstants.IDENTIFIER_FIELD);}
+	private boolean identifierRule(String name) {return name.equals(ParserConstants.IDENTIFIER_FIELD);}
 	
 	private Object augmentDefaults(StencilTree defaults, StencilTree consumes) {
 		Collection<Pair> sharedConstants = sharedConstants(consumes);
@@ -159,15 +163,66 @@ options {
      try {
         StencilTree rules = layerDef.find(RULES_DEFAULTS);
         for (StencilTree ruleSource: rules) {
+           DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();
            Rule rule = Freezer.rule(ruleSource);
-           Tuple defaults = Interpreter.processTuple(Tuples.EMPTY_TUPLE, rule);
-	       DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();	
-    	   dl.updatePrototype(defaults);
+           
+           //Find the defaults...
+           PrototypedTuple updates = (PrototypedTuple) Interpreter.processTuple(Tuples.EMPTY_TUPLE, rule);
+           
+           //Merge with existing layer schema
+           //TODO: Push the default values into the layer around the time specializers are set, then this lookup/merge can be skipped
+            
+           TuplePrototype<SchemaFieldDef> current = dl.prototype();
+           SchemaFieldDef[] updated = new SchemaFieldDef[current.size()];
+           for (int i=0; i<current.size(); i++) {
+              SchemaFieldDef def = current.get(i);
+              if (!updates.prototype().contains(def.name())) {
+                  updated[i] = def;
+              } else {
+                  Object val = Converter.convert(updates.get(def.name()), def.type());
+                  updated[i] = new SchemaFieldDef(def.name(), val, def.type(), false);
+              }
+           }
+           
+           //Update the layer
+    	   dl.updatePrototype(new TuplePrototype(updated));
     	}
      } catch (Exception e) {
         throw new RuntimeException("Error updating layer defaults.", e);
      }
 	}
+	
+	/**Mark constant fields as constants in the layer.
+	 * Must be done AFTER constant lifting and the layer def has been updated.
+	 **/ 
+	private void flagConstFields(StencilTree layerDef) {
+     try {
+       DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();
+ 
+       //Calculate which columns are actually updated
+       List<StencilTree> resultRules = layerDef.findAllDescendants(RULES_RESULT);
+       List<String> setFields = new ArrayList();
+       for (StencilTree resultRule: resultRules) {
+           if (resultRule.getChildCount() ==0) {continue;}
+           TargetTuple fields = Freezer.targetTuple(resultRule.findDescendant(TARGET_TUPLE));
+           for (TupleField field: fields) {setFields.add(field.toString());}
+       }
+       
+       
+       //Mark schema fields that are not modified as constant
+       TuplePrototype<SchemaFieldDef> proto = dl.prototype();
+       SchemaFieldDef[] maybeConstants = stencil.util.collections.ArrayUtil.fromIterator(proto, new SchemaFieldDef[proto.size()]);
+       for (int i=0; i< maybeConstants.length; i++) {
+           SchemaFieldDef def = maybeConstants[i];
+           if (!setFields.contains(def.name())) {
+               maybeConstants[i] = new SchemaFieldDef(def.name(), def.defaultValue(), def.type(), true);
+           }
+       }
+       dl.updatePrototype(new TuplePrototype(maybeConstants));
+     } catch (Exception e) {
+        throw new RuntimeException("Error flaging constant fields.", e);
+     }
+   }
 
 }
 
@@ -175,3 +230,4 @@ liftShared: ^(LAYER spec=. guides=. defaultList=. consumes=. direct=.)
   -> ^(LAYER $spec $guides {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
 	
 updateLayers: ^(l=LAYER .*) {updateLayer(l);};
+flagConstantFields: ^(l=LAYER .*) {flagConstFields(l);};

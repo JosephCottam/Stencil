@@ -8,71 +8,133 @@ options {
 }
 
 @header{
-  /** Makes all tuple refs qualified by their frame offsets.
+  /** Makes all tuple refs qualified by their frames.
+   **  Rules are:
+   **     *,_,LAST,etc are take to the most recent frame
+   **     Constants are resolved to the constants frame
+   **     Anything else whose first part is not a valid frame are set to the stream frame
    ** 
-   ** Since frame references return values, framing also removes ALL from tuple references by truncating them.  
-   **
+   ** In source code, if a frame reference is "bare", it is taken as "default value"; to get the whole frame, a * must have been applied.
+   ** However, after this step a bare reference is a reference to the whole frame value
    **/
    
   package stencil.parser.string;
   
   import stencil.module.*;
-  import stencil.parser.string.util.EnvironmentProxy;  
   import stencil.parser.string.util.GlobalsTuple;
   import stencil.parser.tree.*;
-  import static stencil.parser.string.util.EnvironmentProxy.extend;
-  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
-  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
-  
+  import static stencil.parser.string.util.EnvironmentUtil.*;
+  import stencil.tuple.prototype.TuplePrototype;  
+  import static stencil.parser.ParserConstants.*;
+  import java.util.Arrays;
+  import stencil.parser.ProgramCompileException;
+
 }
 
 @members {
-  private static final class FramingException extends RuntimeException {
-      public FramingException(Tree at, EnvironmentProxy.FrameException fe) {
-        super("Error Framing" + at.toStringTree() + "\n" + fe.getMessage(), fe.getCause());}
-  }
-
-  private static boolean ignoreErrors;
-  public static StencilTree apply (StencilTree t, ModuleCache modules, boolean ignoreErrors) {
-     FrameTupleRefs.ignoreErrors= ignoreErrors;
-     return (StencilTree) TreeRewriteSequence.apply(t, modules, new GlobalsTuple(t.find(LIST_GLOBALS)));
+  private static final class FramingException extends ProgramCompileException {
+      public FramingException(StencilTree at) {
+         super("Could not find a frame for tuple reference '" + at.toStringTree() + "'",  at);}
   }
   
+  public Object downup(Object p) {
+    p = downup(p, this, "ensureFrames");
+    p = downup(p, this, "removeAlls");
+    p = downup(p, this, "generalizeStreamFrames");
+    return p;
+  }  
+
+  private GlobalsTuple globals;
+  
+  public static StencilTree apply (StencilTree t, ModuleCache modules) {
+     return (StencilTree) TreeRewriteSequence.apply(t, new GlobalsTuple(t.find(LIST_GLOBALS)));
+  }
+  
+  //Called by the instance apply function
   protected void setup(Object... args) {
-     modules = (ModuleCache) args[0];
-     globals = (GlobalsTuple) args[1];
+     globals = (GlobalsTuple) args[0];
+  }
+  
+  //If it has been determined that a frame name is required....
+  public String getFrame(StencilTree toPrefix) {
+     String name = toPrefix.getText();
+     TuplePrototype stream = streamFor(toPrefix);
+     if (stream.indexOf(name)>=0) {return STREAM_FRAME;}
+     if (globals.prototype().indexOf(name) >= 0) {return GLOBALS_FRAME;}
+     throw new FramingException(toPrefix);
+  }
+  
+  public List<String> initialFrames(StencilTree target) {
+      List<String> frames = new ArrayList<String>(Arrays.asList(GLOBALS_FRAME, STREAM_FRAME, PREFILTER_FRAME, LOCAL_FRAME));
+      StencilTree consumes = target.getAncestor(CONSUMES);
+      if (consumes != null) {extend(frames, consumes);}
+      return frames;
+  }
+  
+  public static List<String> extend(List<String> known, StencilTree nameSource) {
+      known.add(0, nameSource.getText());
+      return known;
+  }
+  
+  public static String mostRecent(List<String> frames) {return frames.get(0);}
+  public StencilTree trimAll(StencilTree tr) {
+     tr = (StencilTree) adaptor.dupTree(tr);
+     int lastChild = tr.getChildCount()-1;
+     if (tr.getChild(lastChild).is(ALL)) {
+        adaptor.deleteChild(tr, lastChild);
+     }
+     return tr;
+  }
+  
+  private String deStream(StencilTree maybeFrame) {
+      String maybeFrameName = maybeFrame.getText();
+      if (maybeFrameName.equals(STREAM_FRAME)) {return maybeFrameName;} //No work to be done
+
+      StencilTree consumes = maybeFrame.getAncestor(CONSUMES);
+      if (consumes == null) {return maybeFrameName;}  //No consumes->no stream!
+      
+      StencilTree cursor = maybeFrame.getAncestor(FUNCTION);
+      while(cursor != null) {
+         if (cursor.find(DIRECT_YIELD) == null || cursor.find(DIRECT_YIELD).getText().equals(maybeFrameName)) {return maybeFrameName;}
+         cursor = cursor.getAncestor(FUNCTION);
+      }
+      
+      
+      
+      if (consumes.getText().equals(maybeFrameName)) {return STREAM_FRAME;}  //If the stream matched, replace it
+      return maybeFrameName;
   }
 
-  private ModuleCache modules;
-  private GlobalsTuple globals;
 }
 
-topdown
-  : ^(p=PREDICATE value[initialEnv($p, modules)] op=. value[initialEnv($p, modules)])
-  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .?);
-	catch [EnvironmentProxy.FrameException fe] {
-	 if (c != null) {throw new FramingException(c, fe);}
-     else if (p != null) {throw new FramingException(p, fe);}
-	 else {throw new Error("Error in framing: No root.");}
-  }
-  catch [RuntimeException ex] {
-     if (!ignoreErrors) {throw ex;}
-  }
+//Make sure all tuple refs are composed of frame references
+ensureFrames
+  : ^(p=PREDICATE value[initialFrames($p)] op=. value[initialFrames($p)])
+  | ^(c=CALL_CHAIN callTarget[initialFrames($c)] .?);
 	
-callTarget[EnvironmentProxy env] 
-  : ^(f=FUNCTION .? . ^(LIST_ARGS value[env]*) y=. callTarget[extend(env, $y, $f, modules)])
-  | ^(p=PACK value[env]*);
+callTarget[List<String> frames]
+  : ^(f=FUNCTION a=.? n=. s=. ^(LIST_ARGS value[frames]*) y=. callTarget[extend(frames, $y)])
+  | ^(p=PACK value[frames]*);
           
-value[EnvironmentProxy env]
-  options{backtrack=true;}
+value[List<String> frames]
   : ^(TUPLE_REF n=ID v+=.+)
-      -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n $v*)		//Already is a frame ref, no need to extend 
-      -> ^(TUPLE_REF NUMBER[Integer.toString(env.frameRefFor($n.text))] $n $v*)
-  | ^(TUPLE_REF NUMBER) -> ^(TUPLE_REF ID[env.getLabel()] NUMBER) 
-  | ^(TUPLE_REF ALL) -> ^(TUPLE_REF ID[env.getLabel()])
+      -> {frames.contains($n.text)}? ^(TUPLE_REF $n $v*)        		//Already is a frame ref, no need to extend 
+      -> ^(TUPLE_REF ID[getFrame($n)] $n $v*)
+  | ^(TUPLE_REF NUMBER) -> ^(TUPLE_REF ID[mostRecent(frames)] NUMBER) 
+  | ^(TUPLE_REF ALL) -> ^(TUPLE_REF ID[mostRecent(frames)])
   | ^(TUPLE_REF n=ID) 
-      -> {env.isFrameRef($n.text)}? ^(TUPLE_REF $n)
-      -> {env.canFrame($n.text)}? ^(TUPLE_REF ID[env.frameNameFor($n.text)] $n)
-  	  -> {globals.getPrototype().contains($n.text)}? ^(TUPLE_REF ID[GLOBALS_FRAME] $n)
-  	  -> {env.frameNameFor($n.text)} //invoked to get a good exception out of it...
-  | (STRING | NUMBER);
+      -> {frames.contains($n.text)}? ^(TUPLE_REF $n NUMBER["0"])        //By default, frame refs are to the default element of the frame; must be <frame>.* to be whole frame 
+      -> {globals.prototype().contains($n.text)}? ^(TUPLE_REF ID[GLOBALS_FRAME] $n)
+      -> ^(TUPLE_REF ID[getFrame($n)] $n)
+  | (STRING | NUMBER | NULL);
+
+
+
+//Remove trailing "all" statements; ref of just frame name is now sufficient to return the tuple 
+removeAlls:  ^(tr=TUPLE_REF parts+=.*) -> {trimAll($tr)};
+//    ^(TUPLE_REF parts+=(ID|NUMBER)+ ALL) -> ^(TUPLE_REF $parts+);  <<<---What I REALLY tried to get to work :(
+
+
+//Replace all references to the stream that use the stream name itself.  
+//Insted use the context independnet "stream frame" name
+generalizeStreamFrames : ^(TUPLE_REF f=. parts+=.*) -> ^(TUPLE_REF ID[deStream($f)] $parts*);    

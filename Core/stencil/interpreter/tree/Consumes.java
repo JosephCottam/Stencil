@@ -1,7 +1,7 @@
 package stencil.interpreter.tree;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.tree.Predicate;
-import stencil.parser.tree.util.Environment;
 
 public class Consumes {
 	private final int groupID;
@@ -10,23 +10,17 @@ public class Consumes {
 	private final Rule prefilter;
 	private final Rule local;
 	private final Rule results;
-	private final Rule view;
-	private final Rule canvas;
 	private final DynamicRule[] dynamics;
-	private final Object[] reducer;
 	
 	public Consumes(int groupID, String stream, Predicate[] filters, Rule prefilter, Rule local,
-			Rule results, Rule view, Rule canvas, DynamicRule[] dynamics, Object[] reducer) {
+			Rule results, DynamicRule[] dynamics) {
 		this.groupID = groupID;
 		this.stream = stream;
 		this.filters = filters;
 		this.prefilter = prefilter;
 		this.local = local;
 		this.results = results;
-		this.view = view;
-		this.canvas = canvas;
 		this.dynamics = dynamics;
-		this.reducer = reducer;
 	}
 	
 	public int groupID() {return groupID;}
@@ -35,10 +29,7 @@ public class Consumes {
 	public Rule getPrefilterRule() {return prefilter;}
 	public Rule getLocalRule() {return local;}
 	public Rule getResultRule() {return results;}
-	public Rule getViewRule() {return view;}
-	public Rule getCanvasRule() {return canvas;}
 	public DynamicRule[] getDynamicRules() {return dynamics;}
-	public Object[] getDynamicReducer() {return reducer;}
 
 	/**Check that all filters match the passed environment.*/
 	public boolean matches(Environment env) {return Predicate.matches(filters, env);}

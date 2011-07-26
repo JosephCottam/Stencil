@@ -3,6 +3,8 @@ package stencil.interpreter.guide.samplers;
 import java.util.ArrayList;
 import java.util.List;
 
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.adapters.java2D.columnStore.TableView;
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
 import stencil.display.LayerView;
@@ -26,9 +28,9 @@ public final class LayerSampler implements SampleOperator {
 			view = viewpoint ? l.viewpoint() : null;
 		}
 		
-		public TuplePrototype getSamplePrototype() {return layer.getPrototype();}
+		public TuplePrototype getSamplePrototype() {return layer.prototype();}
 		public SampleSeed getSeed() {throw new UnsupportedOperationException("Should never seek the seed of a layer sampler.");}
-		public int stateID() {return (view != null) ? view.getStateID() : layer.getStateID();}
+		public int stateID() {return (view != null) ? view.stateID() : layer.stateID();}
 		public MonitorOperator viewpoint() {
 			return new MonitorOperator(layer);
 		}
@@ -39,7 +41,8 @@ public final class LayerSampler implements SampleOperator {
 	public LayerSampler(DisplayLayer layer) {this.layer = layer;}
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		List<Tuple> l = new ArrayList();
-		for (Glyph t: getDisplayLayer().viewpoint()) {l.add(t);}
+		TableView view = ((Table) layer).tenured();
+		for (Glyph t: view) {l.add(t);}
 		return l;
 	}
 	public final DisplayLayer<Glyph> getDisplayLayer() {return layer;}

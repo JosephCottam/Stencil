@@ -1,11 +1,7 @@
 package stencil.util.streams.numbers;
 
-import java.util.Arrays;
-
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.SimplePrototype;
-import stencil.tuple.prototype.TuplePrototype;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 
 public class SequenceStream implements TupleStream {
@@ -15,8 +11,6 @@ public class SequenceStream implements TupleStream {
 	private final double stop;
 	private final String name;	//Name of the stream
 
-	private static final TuplePrototype PROTOTYPE = new SimplePrototype(new String[]{"VALUE"}, new Class[]{Long.class});
-	                                               
 	public SequenceStream(String name) {this(name, 0,1, 1);}
 	
 	public SequenceStream(String name, double start, double increment, double stop) {
@@ -32,7 +26,7 @@ public class SequenceStream implements TupleStream {
 	
 	public SourcedTuple next() {
 		current = current + increment;
-		return new SourcedTuple.Wrapper(name, new PrototypedTuple(PROTOTYPE, Arrays.asList(current)));
+		return new SourcedTuple.Wrapper(name, new ArrayTuple(current));
 	}
 
 	public boolean hasNext() {return increment>0 ? current < stop : current > stop;}

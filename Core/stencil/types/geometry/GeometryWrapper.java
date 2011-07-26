@@ -35,6 +35,18 @@ public class GeometryWrapper implements TypeWrapper {
 				double y = Converter.toDouble(Array.get(v, 0));
 				return new Point2D.Double(x,y);
 			}
+		} else if (c.equals(String.class)) {
+			return v.toString();
+		} else if (c.equals(Rectangle.class) && v instanceof String) {
+			/*Take a comma separated list of integers and make a rectangle out of it.*/
+			try {
+				String[] parts = ((String) v).split("\\s*,\\s*");
+				int[] dims = new int[4];
+				for (int i=0; i<dims.length;i++) {
+					dims[i] = Integer.parseInt(parts[i]);
+				}
+				return new Rectangle(dims[0], dims[1], dims[2], dims[3]);
+			} catch (Exception e) {throw new ConversionException(v,c,e);}
 		}
 		throw new ConversionException(v,c);
 	}
@@ -56,13 +68,13 @@ public class GeometryWrapper implements TypeWrapper {
 			double w = Converter.toDouble(t.get(wIdx));
 			double h = Converter.toDouble(t.get(hIdx));
 			return new Rectangle2D.Double(x,y,w,h);
-			
-		}
+		} 
 		throw new RuntimeException("Could not externalize: " + t.toString());
 	}
 
 	@Override
 	public Tuple toTuple(Object o) {
+		if (o instanceof RectangleTuple || o instanceof PointTuple) {return (Tuple) o;}
 		if (o instanceof Point2D) {return new PointTuple((Point2D) o);}
 		if (o instanceof Rectangle2D) {return new RectangleTuple((Rectangle2D) o);}
 		throw new RuntimeException("Error wrapping: " + o.toString());

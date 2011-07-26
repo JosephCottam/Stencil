@@ -35,7 +35,7 @@ public class TestMetadataDefs  extends TestCase {
 			catch (Throwable e) {
 				e.printStackTrace();
 				File f = new File(fileName);
-				errors.add(f.getName());
+				errors.add(f.getCanonicalFile());
 			}			
 		}		
 		

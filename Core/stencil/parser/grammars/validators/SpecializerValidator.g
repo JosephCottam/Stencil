@@ -28,10 +28,10 @@ options {
 }
 
 topdown
-	: ^(s=SPECIALIZER DEFAULT) {throw new ValidationException("Default specializer found after all supposedly removed.");}
+	: ^(s=SPECIALIZER DEFAULT) {throw new ValidationException("Default specializer found after all supposedly removed:" +  $s.getParent().toStringTree());}
 	| id=ID {if ($id.getAncestor(SPECIALIZER) != null) {throw new ValidationException("Non-constant ID found in specializer: " + $id.text);}}
 	| ^(s=SPECIALIZER .*) 
 	     {
-	       try {Specializer spec = Freezer.specializer(s);}
+	       try {Freezer.specializer(s);}
   	     catch (Exception e) {throw new ValidationException("Error validating specializer by freezing.", e);}
        };

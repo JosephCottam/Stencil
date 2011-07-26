@@ -7,11 +7,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.TupleBoundsException;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 
@@ -23,9 +23,9 @@ public final class ComponentEventStream implements TupleStream {
 	public static final String[] FIELDS = new String[]{X_FIELD, Y_FIELD, WIDTH_FIELD, HEIGHT_FIELD};
 
 	/**Tuple to represent a state of a frame.*/
-	private static final class ComponentState implements Tuple {
+	private static final class ComponentState implements PrototypedTuple {
 		private static final Class[] TYPES = new Class[]{int.class, int.class, int.class, int.class};
-		private static final TuplePrototype PROTOTYPE = new SimplePrototype(FIELDS, TYPES);
+		private static final TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS, TYPES);
 		public static final int X = PROTOTYPE.indexOf(X_FIELD);
 		public static final int Y = PROTOTYPE.indexOf(Y_FIELD);
 		public static final int WIDTH = PROTOTYPE.indexOf(WIDTH_FIELD);
@@ -54,8 +54,7 @@ public final class ComponentEventStream implements TupleStream {
 		}
 		
 		public int size() {return PROTOTYPE.size();}
-		public TuplePrototype getPrototype() {return PROTOTYPE;}
-		public boolean isDefault(String name, Object value) {return false;}		
+		public TuplePrototype prototype() {return PROTOTYPE;}
 	}
 	
 	/**Data source for frame status.*/

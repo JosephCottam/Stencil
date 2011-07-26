@@ -1,43 +1,14 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.adapters.java2D;
 
 import stencil.display.DisplayLayer;
-import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.CanvasTuple;
-import stencil.adapters.java2D.data.ViewTuple;
+import stencil.adapters.java2D.columnStore.util.StoreTuple;
+import stencil.adapters.java2D.interaction.CanvasTuple;
+import stencil.adapters.java2D.interaction.ViewTuple;
 import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
 import stencil.interpreter.tree.Program;
 import stencil.types.Converter;
-import stencil.util.epsExport.EpsGraphics2D;
 
 import java.awt.Insets;
 import java.awt.Rectangle;
@@ -45,28 +16,37 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.lang.reflect.Array;
 
 import javax.imageio.ImageIO;
 
-public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> {
-	private final PainterThread painter;
-	private final Thread painterThread;	//Thread for painting after loading is complete
-
-	public Panel(Canvas canvas, Program p) {
-		super(p, canvas);
-		painter = new PainterThread(canvas.layers, canvas, this);
-		painterThread = new Thread(painter, "Painter");
+public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Canvas> {
+	private PainterThread painter;
+	private Thread painterThread;	//Thread for painting after loading is complete
+	
+	/**When the canvas and the program are ready, this method finishes constructing the panel.
+	 * A panel cannot be used prior to this method being called.
+	 */
+	protected void init(Canvas canvas, Program program) {
+		setProgram(program);
+		setCanvas(canvas);
 		
+		painter = new PainterThread(this);
+		painterThread = new Thread(painter, "Painter");
+	}
+
+	public void preRun() {
+		super.preRun();
 		if (continuousPainting) {painterThread.start();}
 	}
 	
+	@Override
+	public void signalStop() {painter.signalStop();}
+	
 	@SuppressWarnings("deprecation")
 	public void dispose() {
-		if (painterThread.isAlive()) {
+		if (painterThread != null && painterThread.isAlive()) {
 			painter.signalStop();
 			try {
 				painterThread.join(2000);
@@ -91,44 +71,13 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
 	public void export(String filename, String type, Object info) throws Exception {
-		synchronized(canvas.renderLock) {
-			painter.doUpdates();
-			
-			if (type.equals("PNG") || type.equals("RASTER")) {
-				exportPNG(filename, Converter.toInteger(Array.get(info,0)));
-			} else if (type.equals("PNG2")) {
-				exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
-			} else if (type.equals("EPS") || type.equals("VECTOR") && info == null) {
-				exportEPS(filename);
-			} else if (type.equals("EPS2") || type.equals("VECTOR")) {
-				exportEPS(filename, (Rectangle) info);
-			} else {super.export(filename, type, info);}
-		}
+		if (type.equals("PNG") || type.equals("RASTER")) {
+			exportPNG(filename, Converter.toInteger(Array.get(info,0)));
+		} else if (type.equals("PNG2")) {
+			exportPNG(filename, Converter.toInteger(Array.get(info,0)), Converter.toInteger(Array.get(info, 1)));
+		} else {super.export(filename, type, info);}
 	}
 	
-	private void exportEPS(String filename, Rectangle bounds) throws Exception {
-		File f= new File(filename);
-		EpsGraphics2D g = new EpsGraphics2D("Stencil Output", f, bounds.x, bounds.y, bounds.x+ bounds.width, bounds.y+ bounds.height);
-		
-		AffineTransform base = g.getTransform();
-		
-		for (DisplayLayer<? extends Glyph2D> layer: canvas.layers) {
-			for (Glyph2D glyph: layer.viewpoint().renderOrder()) {
-				if (!glyph.isVisible()) {continue;}
-				Rectangle2D r = glyph.getBoundsReference();
-				if (g.hitClip((int) r.getX(), (int) r.getY(), (int) r.getWidth(), (int) r.getHeight())) {
-					glyph.render(g, base);
-				}
-			}
-		}
-		
-		g.close();
-		g.dispose();		
-		
-	}
-	private void exportEPS(String filename) throws Exception {
-		exportEPS(filename, canvas.getContentBounds(true));
-	}
 
 	private void exportPNG(String filename, Integer width, Integer height) throws Exception {
 		if (width <1 && height <1) {exportPNG(filename, StencilPanel.ABSTRACT_SCREEN_RESOLUTION); return;}
@@ -149,6 +98,8 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		
 		if (width <1)  {width  = (int) (contentWidth  * (height / contentHeight));}
 		if (height <1) {height = (int) (contentHeight * (width  / contentWidth));}
+		if (width <1)  {width = 1;}
+		if (height <1) {height =1;}
 		double xScale = width/contentWidth;
 		double yScale = height/contentHeight;
 		double scale = Math.max(xScale, yScale);
@@ -161,8 +112,7 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());
 		exportViewTransform.scale(scale * viewTransform.getScaleX(), scale* viewTransform.getScaleY());
 		
-		MultiThreadPainter exportPainter = new MultiThreadPainter(canvas, canvas.layers, program);
-		exportPainter.render(canvas.getBackground(), buffer, exportViewTransform);
+		MultiThreadPainter.renderNow(canvas, buffer, exportViewTransform);
 
 		ImageIO.write(buffer, "png", new java.io.File(filename));
 	}
@@ -216,4 +166,10 @@ public class Panel extends StencilPanel<Glyph2D, DisplayLayer<Glyph2D>, Canvas> 
 							bounds.width-(insets.left+insets.right),
 							bounds.height-(insets.top+insets.bottom));
 	}
+	
+	@Override
+	public int paintCount() {return painter.paintCount();}
+	
+	@Override
+	public void postRun() {painter.doUpdates();}
 }

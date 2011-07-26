@@ -6,19 +6,16 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MapMergeTuple;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
 
 public class Target {
-	private final TuplePrototype proto;
+	private final TargetTuple tt;
 	
-	public Target(TuplePrototype proto) {
-		this.proto = proto;
-	}
+	public Target(TargetTuple tt) {this.tt= tt;}
+	
+	public TuplePrototype prototype() {return tt.asPrototype();}
 
-	public TuplePrototype prototype() {return proto;}
-	
 	/**Create a new tuple where the names are take from the tuple prototype and
 	 * values are take from the source.
 	 * 
@@ -43,13 +40,9 @@ public class Target {
 
 	
 	private final Tuple finalizeOne(Tuple source) {
-		String[] fields = TuplePrototypes.getNames(proto);
-		Object[] values = new Object[fields.length];
-
-		int size = fields.length;
-		for (int i=0; i< size; i++) {values[i] = source.get(i);}
-
-		return new PrototypedTuple(fields, values);
+		final Object[] values = new Object[tt.size()];
+		for (int i=0; i< values.length; i++) {values[i] = source.get(i);}
+		return new PrototypedArrayTuple(tt.asPrototype(), values);
 	}
 
 

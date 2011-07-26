@@ -1,6 +1,6 @@
 STREAM: File
 NAME: VertexList
-HEADER: ID1, ID2
+TUPLE_SIZE: 2
 SEPARATOR: ,
 SOURCE: ./tree2.tree
 SKIP: 1
@@ -16,25 +16,25 @@ from VertexList
 
 layer Nodes
 from VertexList 
-	ID: child
-	REGISTRATION : "CENTER"
-	FILL_COLOR:  @Color{BLUE}
-	(SHAPE, SIZE) : ("ELLIPSE", 5)
-	(X,Y) :* Layout.query(child)
-	 
+    ID: child
+    REGISTRATION : "CENTER"
+    FILL_COLOR:  @Color{BLUE}
+    (SHAPE, SIZE) : ("ELLIPSE", 5)
+    (X,Y) :* Layout.query(child)
+     
 layer Edges["LINE"]
 from VertexList 
-	ID: Concatenate(parent, child)
-	(X.1, Y.1):* Nodes.find(parent) -> (X,Y)
-	(X.2, Y.2):* Nodes.find(child) ->  (X,Y)
-	PEN_COLOR: @Color{GRAY30,80}
+    ID: Concatenate(parent, child)
+    (X1, Y1):* Nodes.find(parent) -> (Nodes.X, Nodes.Y)
+    (X2, Y2):* Nodes.find(child) ->  (Nodes.X, Nodes.Y)
+    PEN_COLOR: @Color{GRAY30,80}
 
 layer Labels["TEXT"]
 from VertexList
-	ID : child
-	(X,Y):* Nodes.query(child) -> (X,Y)
-	TEXT: child
-	FONT: @Font{10}
-	COLOR: @Color{GRAY60}
+    ID : child
+    (X,Y):* Nodes.query(child) -> (Nodes.X, Nodes.Y)
+    TEXT: child
+    FONT: @Font{10}
+    COLOR: @Color{GRAY60}
 
 operator Layout : BalloonLayout

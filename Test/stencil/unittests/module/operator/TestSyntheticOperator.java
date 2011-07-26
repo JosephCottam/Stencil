@@ -1,6 +1,7 @@
 package stencil.unittests.module.operator;
 
 import stencil.adapters.Adapter;
+import stencil.interpreter.tree.Program;
 import stencil.module.operator.*;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
@@ -89,8 +90,9 @@ public class TestSyntheticOperator extends TestCase {
 		source = "operator bad(X,Y,Z) -> (X,Y,Z) (A=~ \".*\") => (X,Y,Z) : (Z,Y,X)";
 		failed = false;
 		try {
-			ParseStencil.program(source, ADAPTER);
-		} catch (Exception e) {failed = true;}
+			Program p = ParseStencil.program(source, ADAPTER);
+			assertNotNull(p);
+		} catch (Throwable e) {failed = true;}
 		finally {assertTrue("Exception not thrown with unknown argument in filter.", failed);}
 	}
 

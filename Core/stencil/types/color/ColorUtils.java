@@ -1,35 +1,7 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.types.color;
 
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.instances.Singleton;
 import stencil.types.Converter;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
@@ -84,11 +56,23 @@ public final class ColorUtils extends BasicModule {
 	
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
-	public static Tuple darker(Object o) {return PrototypedTuple.singleton(validate(o).darker());}
+	public static Tuple darker(Object o) {return Singleton.from(validate(o).darker());}
 
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
-	public static Tuple brighter(Object o) {return PrototypedTuple.singleton(validate(o).brighter());}
+	public static Tuple brighter(Object o) {return Singleton.from(validate(o).brighter());}
+	
+	@Operator(spec="[range: ALL, split:0]")
+	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
+	@Description("Move the color towards white by the passed factor (e.g. .5 will move it half-way to white from where it is now).")
+	public static ColorTuple lighten(Object o, double factor) {
+		ColorTuple c = validate(o);
+		int r = (int) Math.min(255, ((255-c.getRed())*factor) + c.getRed());
+		int g = (int) Math.min(255, ((255-c.getGreen())*factor) + c.getGreen());
+		int b = (int) Math.min(255, ((255-c.getBlue())*factor) + c.getBlue());
+		return ColorCache.toTuple(new java.awt.Color(r,g,b).getRGB());
+	}
+
 	
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(int blue)", alias={"map","query"})
@@ -100,7 +84,7 @@ public final class ColorUtils extends BasicModule {
 
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(int red)", alias={"map","query"})
-	public static Tuple getRed(Object v) {return PrototypedTuple.singleton(validate(v).getRed());}
+	public static Tuple getRed(Object v) {return Singleton.from(validate(v).getRed());}
 	
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
@@ -108,7 +92,7 @@ public final class ColorUtils extends BasicModule {
 
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(int green)", alias={"map","query"})
-	public static Tuple getGreen(Object v) {return PrototypedTuple.singleton(validate(v).getGreen());}
+	public static Tuple getGreen(Object v) {return Singleton.from(validate(v).getGreen());}
 
 
 	@Operator(spec="[range: ALL, split:0]")
@@ -117,7 +101,7 @@ public final class ColorUtils extends BasicModule {
 
 	@Operator(spec="[range: ALL, split:0]")
 	@Facet(memUse="FUNCTION", prototype="(int alpha)", alias={"map","query"})
-	public static Tuple getAlpha(Object v) {return PrototypedTuple.singleton(validate(v).getAlpha());}
+	public static Tuple getAlpha(Object v) {return Singleton.from(validate(v).getAlpha());}
 	
 
 	@Operator(spec="[range: ALL, split:0]")

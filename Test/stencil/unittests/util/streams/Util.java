@@ -12,15 +12,15 @@ public class Util {
 	public static final String COORD_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.tuples";
 
 	public static DelimitedParser coordStream() throws Exception {
-		return new DelimitedParser("CoordFile", "ID X Y", COORD_FILE, "\\s+", true,1);
+		return new DelimitedParser("CoordFile", COORD_FILE, "\\s+", 3, true,1);
 	}
 	
 	public static DelimitedParser coordHeaderStream() throws Exception {
-		return new DelimitedParser("CoordFile", "ID X Y", COORD_FILE_HEADER, "\\s+", true,1);
+		return new DelimitedParser("CoordFile", COORD_FILE_HEADER, "\\s+", 3, true,1);
 	}
 	
 	public static DelimitedParser trovesStream() throws Exception {
-		return new DelimitedParser("Troves", "ID|ATT", TROVES_FILE, "\\|", true,1);
+		return new DelimitedParser("Troves", TROVES_FILE, "\\|", 2, true,1);
 	}
 
 	public static BinaryTupleStream.Reader binaryTrovesStream() throws Exception{

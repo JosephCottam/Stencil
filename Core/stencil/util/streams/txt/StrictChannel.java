@@ -14,14 +14,14 @@ final class StrictChannel implements NextChannel {
 	public static final int READ_AHEAD_LIMIT = 1000;
 
 	/**Column labels*/
-	private List<String> labels;
+	private final int tupleSize;
 
 	/**Regular expression used to split incoming data.*/
 	private final Pattern splitter;
 	
-	public StrictChannel(List<String> labels, Pattern splitter) throws Exception {
+	public StrictChannel(int tupleSize, Pattern splitter) throws Exception {
 		this.splitter = splitter;
-		this.labels = labels;
+		this.tupleSize = tupleSize;
 	}
 	
 
@@ -47,10 +47,10 @@ final class StrictChannel implements NextChannel {
 		
 		//TODO: Convert things by some type schema here.
 		String[] values;
-		if (labels.size() == 1) {values = new String[]{line};}
+		if (tupleSize == 1) {values = new String[]{line};}
 		else {values = splitter.split(line);}
 		
-		if (values.length != labels.size()) {
+		if (values.length != tupleSize) {
 			throw new InvalidTupleException("Could not treat line as full tuple: '"+ line + "'");
 		}
 		return values;
@@ -75,15 +75,15 @@ final class StrictChannel implements NextChannel {
 	public void validate(BufferedReader source) throws Exception, FileValidationException
 	{
 		if (source ==null) {throw new Exception("Parse file cannot be validated before reader has been intialized.");}
-		if (labels ==null) {throw new Exception("Parse file cannot be validated when there is no labels list.");}
+		if (tupleSize < 0) {throw new Exception("Invalid tuple size.");}
 
 		source.mark(READ_AHEAD_LIMIT);
 		String line = source.readLine();
 		
 		String[] parts = splitter.split(line);
 		List<String> header = Arrays.asList(parts);
-		if (header.size() != labels.size()) {
-			throw new FileValidationException(labels, header.size());
+		if (header.size() != tupleSize) {
+			throw new FileValidationException(tupleSize, header.size());
 		}
 		source.reset();
 	}

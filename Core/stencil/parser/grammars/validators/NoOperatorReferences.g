@@ -10,6 +10,7 @@ options {
 /* Verifies that all operator references have been removed.*/
   package stencil.parser.string.validators;
   
+  import stencil.interpreter.tree.Freezer;
   import stencil.parser.tree.StencilTree;
   import stencil.parser.string.ValidationException;
   import stencil.parser.string.TreeFilterSequence;
@@ -17,8 +18,8 @@ options {
 
 @members {
   private static final class ReferenceNotRemovedException extends ValidationException {
-  	public ReferenceNotRemovedException(String name, String base) {
-  		super(String.format("Operator \%1\$s not instantiated (base \%2\$s).", name, base));
+  	public ReferenceNotRemovedException(String name, StencilTree base) {
+       super(String.format("Operator \%1\$s not instantiated (base \%2\$s).", name, Freezer.multiName(base).toString()));
   	}
   }
 
@@ -26,6 +27,6 @@ options {
 }
 
 topdown
- : ^(r=OPERATOR_REFERENCE base=. spec=.) {throw new ReferenceNotRemovedException($r.getText(), $base.getText());};
+ : ^(r=OPERATOR_REFERENCE base=. spec=.) {throw new ReferenceNotRemovedException($r.getText(), $base);};
   
   

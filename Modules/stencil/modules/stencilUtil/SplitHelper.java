@@ -118,7 +118,6 @@ public abstract class SplitHelper implements StencilOperator {
 				throws MethodInvokeFailedException {
 			return helper.doSplit(facet, arguments);
 		}
-		public Object getTarget() {return this;}
 		
 		public SplitTarget viewpoint() {
 			return new SplitTarget((SplitHelper) helper.viewpoint(), facet);

@@ -11,7 +11,6 @@ tokens {
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
-  CANVAS_DEF;
   DIRECT_YIELD;
   DYNAMIC_RULE;
   DYNAMIC_REDUCER;
@@ -38,8 +37,11 @@ tokens {
   LIST_STREAM_DECLS;
   LIST_STREAM_DEFS;
   LIST_TEMPLATES;
+  LIST_CANVAS;
+  LIST_VIEW;
   MAP_ENTRY;
   NUMBER;
+  NO_UPDATE;
   OPERATOR_INSTANCE; //Operator, fully specified in stencil (either directly or through a template/specializer)
   OPERATOR_PROXY;    //Operator, specfied by base reference to an instance of an imported operator 
   OPERATOR_REFERENCE;//Operator, specified by base reference to a template or imported operator (instantiates to either a proxy or an instance)
@@ -48,6 +50,7 @@ tokens {
   OPERATOR_BASE;
   OPERATOR_FACET;
   OP_AS_ARG;         //Identifies when an operator appears in argument position (requires special resolution)
+  OP_NAME;
   POST;
   PRE;
   PREDICATE;
@@ -56,7 +59,6 @@ tokens {
   RESULT;		//Consumes blocks value that indicates the contextual result (e.g. glyph value, stream tuple or operator tuple); can only be derived, not specified
 
   RULE;
-  RULES_CANVAS;
   RULES_DEFAULTS;
   RULES_DYNAMIC;
   RULES_FILTER;
@@ -65,8 +67,7 @@ tokens {
   RULES_PREDICATES;
   RULES_PREFILTER;  
   RULES_RESULT;
-  RULES_VIEW;
-
+  
   PROTOTYPE_ARG;
   PROTOTYPE_RESULT;
 
@@ -80,8 +81,11 @@ tokens {
   TARGET;
   TUPLE_PROTOTYPE;
   TUPLE_FIELD_DEF;
+  TARGET_TUPLE;
+  TUPLE_FIELD;
   TUPLE_REF;
   TYPE;
+  
   
   //General Keywords
   ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n
@@ -94,7 +98,6 @@ tokens {
   GUIDE = 'guide';
   IMPORT  = 'import';
   LAYER = 'layer';
-  LAST ='LAST';     //Proxy value for n..n range
   LOCAL = 'local';  //Target to indicate temporary storage after filtering
   NULL = 'NULL';
   OPERATOR= 'operator';
@@ -104,6 +107,9 @@ tokens {
   TEMPLATE= 'template';
   STREAM  = 'stream';
   VIEW  = 'view';
+  RENDER = '#Render';
+  TRUE = 'true';
+  FALSE = 'false';
 
   //Markers
   GROUP   = '(';
@@ -111,6 +117,7 @@ tokens {
   ARG     = '[';
   CLOSE_ARG = ']';
   SEPARATOR = ',';
+  DOT = '.';
 
 
   //Name manipulation
@@ -148,11 +155,8 @@ tokens {
   package stencil.parser.string;
 
   import static stencil.parser.ParserConstants.*;
-  import java.util.ArrayList;
-  import java.util.List;
-  import stencil.parser.ParserConstants;
-  import static stencil.parser.string.util.Utilities.genSym;
-  import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
+  import stencil.parser.tree.StencilTree;
+  import stencil.interpreter.tree.Freezer;
 }
 
 @lexer::header{
@@ -184,20 +188,17 @@ tokens {
   public String ensureFacet(String name, String defaultFacet) {
     if (name.indexOf(".") >0) {return name;}
     else {return name + "." + defaultFacet;}
-  }
-  
-  //TODO: Eliminate CUSTOM_PARSER_FACET, just use Map
-  public String customArgsCall(String call) {
-    return call.substring(SIGIL.length()) + NAME_SEPARATOR + CUSTOM_PARSER_FACET;  }
+  }  
 }
 
-program : imports* (globalValue | externalStream)* order canvasLayer (elementDef | layerDef | operatorDef | operatorTemplate | streamDef | javaDef)*
+program : imports* (globalValue | externalStream)* order  (canvasLayer | viewLayer | elementDef | layerDef | operatorDef | operatorTemplate | streamDef | javaDef)*
     -> ^(PROGRAM  
           ^(LIST_IMPORTS imports*) 
           ^(LIST_GLOBALS globalValue*)
           ^(LIST_STREAM_DECLS externalStream*)
           order 
-          canvasLayer
+          ^(LIST_CANVAS canvasLayer*)
+          ^(LIST_VIEW viewLayer*)
           ^(LIST_STREAM_DEFS streamDef*) 
           ^(LIST_LAYERS layerDef* elementDef*) 
           ^(LIST_OPERATORS operatorDef* operatorTemplate*) 
@@ -223,36 +224,43 @@ globalValue
 //  options{backtrack=true;}
   : CONST name=ID DEFINE atom -> ^(CONST[$name] atom);
 //  | CONST name=ID -> ^(CONST[$name]);
+//TODO: Allow calculations using only constant values (maybe process the constants before doing the rest of the program)
+
 
 externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 canvasLayer
-  : CANVAS name=ID specializer 
-    -> ^(CANVAS_DEF[$name.text] specializer)
-  | -> ^(CANVAS_DEF["default"] ^(SPECIALIZER DEFAULT));
+  : CANVAS name=ID specializer consumesBlock[true]*
+    -> ^(CANVAS[$name.text] specializer ^(LIST_CONSUMES consumesBlock*));
 
-  
+
+viewLayer
+    : VIEW specializer consumesBlock[true]*
+      -> ^(VIEW specializer ^(LIST_CONSUMES consumesBlock*));
+    
 //////////////////////////////////////////// STREAM, LAYER, ELEMENT ///////////////////////////
 
 streamDef
-  : STREAM name=ID tuple[true]  consumesBlock+
+  : STREAM name=ID tuple[true]  consumesBlock[false]+
     -> ^(STREAM_DEF[$name.text] tuple ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 layerDef
-  : LAYER name=ID specializer guidesBlock defaultsBlock consumesBlock+
+  : LAYER name=ID specializer guidesBlock defaultsBlock consumesBlock[false]+
     -> ^(LAYER[$name.text] specializer guidesBlock defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 elementDef
-  : ELEMENT name=ID specializer defaultsBlock consumesBlock+
+  : ELEMENT name=ID specializer defaultsBlock consumesBlock[false]+
   	->^(ELEMENT[$name.text] specializer defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+)); 
     
 defaultsBlock
-  : DEFAULT rule["result"]+ -> ^(RULES_DEFAULTS rule+)
+  : DEFAULT rule[RESULT]+ -> ^(RULES_DEFAULTS rule+)
   | -> RULES_DEFAULTS;
   
-consumesBlock
-  : FROM stream=ID filter* rule["result"]+ 
+consumesBlock[boolean allowRender]
+  : FROM stream=ID filter* rule[RESULT]+
+     ->  ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+))
+  | {allowRender}? FROM stream=RENDER filter*  rule[RESULT]+
     -> ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+));
 
 filter: FILTER! predicate;
@@ -261,7 +269,7 @@ guidesBlock
    : GUIDE guideDef+ -> ^(LIST_GUIDES guideDef*)
    |                  -> ^(LIST_GUIDES);
    
-guideDef: type=ID specializer selectorList rule["result"]*
+guideDef: type=ID specializer selectorList rule[RESULT]*
       -> ^(GUIDE $type specializer selectorList ^(LIST_RULES rule*));
 
 selectorList
@@ -275,30 +283,30 @@ selector
 
 //////////////////////////////////////////// OPERATORS ///////////////////////////
 
-operatorTemplate : TEMPLATE OPERATOR name=ID -> ^(OPERATOR_TEMPLATE[$name.text]);
+operatorTemplate : TEMPLATE od=operatorDef -> ^(OPERATOR_TEMPLATE[((Tree) $od.tree).getText()] operatorDef);
   
 operatorDef
-  : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule["prefilter"]* operatorRule+
-    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER["Prefilters"] $pf*) ^(RULES_OPERATOR["Rules"] operatorRule+))
-  | OPERATOR name=ID DEFINE base=opName specializer
-    -> ^(OPERATOR_REFERENCE[$name.text] OPERATOR_BASE[$base.text] specializer)
-  | OPERATOR name=ID DEFINE base=opName specializer GROUP opRef CLOSE_GROUP
-    -> ^(OPERATOR_REFERENCE[$name.text] ^(OPERATOR_BASE[$base.text] specializer ^(LIST_ARGS opRef)));
+  : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule[PREFILTER]* operatorRule+
+    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER $pf*) ^(RULES_OPERATOR operatorRule+))
+  | OPERATOR name=ID DEFINE opName specializer
+    -> ^(OPERATOR_REFERENCE[$name.text] opName specializer)
+  | OPERATOR name=ID DEFINE opName specializer GROUP opRef CLOSE_GROUP
+    -> ^(OPERATOR_REFERENCE[$name.text] opName specializer ^(LIST_ARGS opRef));
 
 opName
-  : pre=ID NAMESPACE post=ID -> ID[$pre + "::" + $post] 
-  | ID;
+  : pre=ID NAMESPACE post=ID -> ^(OPERATOR_BASE ID ID) 
+  | post=ID -> ^(OPERATOR_BASE DEFAULT ID);
 
 operatorRule
-  : predicate GATE rule["result"]+
+  : predicate GATE rule[RESULT]+
     -> ^(OPERATOR_RULE predicate ^(LIST_RULES["Rules"] rule+));
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
-rule[String def]
-  : target[def] (DEFINE | DYNAMIC) callChain
+rule[int defaultTarget]  : target[defaultTarget] (DEFINE | DYNAMIC) callChain
     -> ^(RULE target callChain DEFINE? DYNAMIC?);
 
 callChain: callChainMember -> ^(CALL_CHAIN callChainMember);
+
 callChainMember
   : value -> ^(PACK value)
   | emptySet -> ^(PACK)
@@ -307,41 +315,47 @@ callChainMember
   
   
 functionCallTarget
-  :	l=frameLabel f1=functionCall passOp[$l.label] f2=callChainMember
-  		-> ^(FUNCTION[$f1.funcName] $f1 passOp $f2)
-  | f1=functionCall passOp[genSym(FRAME_SYM_PREFIX)] f2=callChainMember    
-  		-> ^(FUNCTION[$f1.funcName] $f1 passOp $f2)
-  | l=frameLabel f1=functionCall 
-      -> ^(FUNCTION[$f1.funcName] $f1 DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
-  | f1=functionCall 
-      -> ^(FUNCTION[$f1.funcName] $f1 DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] ^(PACK DEFAULT));
+  :	l=frameLabel functionCall passOp[$l.label] callChainMember
+  		-> ^(FUNCTION functionCall passOp callChainMember)
+  | fc=functionCall passOp[$fc.baseName] callChainMember    
+  		-> ^(FUNCTION functionCall passOp callChainMember)
+  | l=frameLabel functionCall 
+      -> ^(FUNCTION functionCall DIRECT_YIELD[$l.label] ^(PACK DEFAULT))
+  | fc=functionCall 
+      -> ^(FUNCTION functionCall DIRECT_YIELD[$fc.baseName] ^(PACK DEFAULT));
    
 frameLabel returns [String label]: ARG ID CLOSE_ARG {$label=$ID.text;} -> ID;
 
-functionCall returns[String funcName]
-  : name=callName s=specializer valueList 
-     {$funcName = ((Tree) name.tree).getText();} 
-     -> specializer ^(LIST_ARGS valueList)
-  | name=callName specializer emptySet
-     {$funcName = ((Tree) name.tree).getText();} 
-     -> specializer ^(LIST_ARGS)
+functionCall returns [String baseName]
+  @after{retval.baseName = ((Tree) retval.tree).getChild(0).getChild(1).getText();} //Unpack the OP_NAME
+  : callName specializer valueList 
+     -> callName specializer ^(LIST_ARGS valueList)
+  | callName specializer emptySet
+     -> callName specializer ^(LIST_ARGS)
   | t=TAGGED_ID ISLAND_BLOCK
-     {$funcName = customArgsCall($t.text);} 
-     -> ^(SPECIALIZER DEFAULT) ISLAND_BLOCK;  
+     -> ^(OP_NAME DEFAULT ID[$t.text.substring(1)] ID[CUSTOM_PARSER_FACET]) ^(SPECIALIZER DEFAULT) ISLAND_BLOCK
+  | ID NAMESPACE t=TAGGED_ID ISLAND_BLOCK
+     -> ^(OP_NAME ID ID[$t.text.substring(1)] ID[CUSTOM_PARSER_FACET]) ^(SPECIALIZER DEFAULT) ISLAND_BLOCK;  
 
 callName
-  : pre=ID NAMESPACE post=ID -> ID[$pre.text + "::" + ensureFacet($post.text, MAP_FACET)]
-  | name=ID -> ID[ensureFacet($name.text, MAP_FACET)];
+  : ID NAMESPACE ID        -> ^(OP_NAME ID ID ID[MAP_FACET])
+  | ID NAMESPACE ID DOT ID -> ^(OP_NAME ID ID ID)
+  | ID                     -> ^(OP_NAME DEFAULT ID ID[MAP_FACET])
+  | ID DOT ID              -> ^(OP_NAME DEFAULT ID ID);
 
-target[String def]
-  : PREFILTER^ tuple[false]
-  | CANVAS^ tuple[false]
-  | LOCAL^ tuple[false]
-  | VIEW^ tuple[false]
-  | tuple[true]
-    -> {def.equals("prefilter")}? ^(PREFILTER tuple)
-    -> {def.equals("result")}? ^(RESULT tuple)
-    -> ^(DEFAULT tuple); //TODO: Can this case be removed???
+target[int defaultTarget] 
+  : PREFILTER^ targetTuple
+  | LOCAL^ targetTuple
+  | targetTuple
+    -> ^({adaptor.create(defaultTarget, StencilTree.typeName(defaultTarget))} targetTuple);
+
+targetTuple
+  : GROUP CLOSE_GROUP -> ^(TARGET_TUPLE)
+  | longName -> ^(TARGET_TUPLE longName)
+  | GROUP longName (SEPARATOR longName)* CLOSE_GROUP 
+      -> ^(TARGET_TUPLE longName*);
+
+longName : ID (DOT ID)* -> ^(TUPLE_FIELD ID*);
 
 //////////////////////////////////////////// JAVA ///////////////////////////
 
@@ -353,8 +367,8 @@ javaDef
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 predicate
-  : GROUP? ALL CLOSE_GROUP?
-    -> ^(LIST_PREDICATES ^(PREDICATE ALL))
+  : DEFAULT
+    -> ^(LIST_PREDICATES ^(PREDICATE ALL))  //TODO: Change this (and down-stream references) to be DEFAULT as well
   | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
     -> ^(LIST_PREDICATES ^(PREDICATE value booleanOp value)+);
 
@@ -374,8 +388,8 @@ mapList
   : mapEntry (SEPARATOR! mapEntry)*;
   
 private mapEntry 
-  : k=ID DEFINE v=atom -> ^(MAP_ENTRY[$k.text] $v)
-  | k=ID DEFINE r=ID   -> ^(MAP_ENTRY[$k.text] $r);
+  : k=longName DEFINE v=atom -> ^(MAP_ENTRY[Freezer.tupleField((StencilTree) k.tree).toString()] $v)
+  | k=longName DEFINE r=ID   -> ^(MAP_ENTRY[Freezer.tupleField((StencilTree) k.tree).toString()] $r);
 
 tuple[boolean allowEmpty]
   : emptySet {allowEmpty}?
@@ -393,8 +407,9 @@ emptySet: GROUP! CLOSE_GROUP!;
 valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!; 
 		
 value : tupleRef | atom | opRef;
-atom  : number | STRING | DEFAULT | ALL | LAST | NULL;  //TODO: Can ALL, LAST be removed from this list?
-opRef : t=TAGGED_ID specializer -> ^(OP_AS_ARG[$t.text.substring(1)]  specializer);
+atom  : number | STRING | DEFAULT | ALL | TRUE | FALSE  | NULL;
+opRef : o=TAGGED_ID specializer -> ^(OP_AS_ARG ^(OP_NAME DEFAULT ID[$o.text.substring(1)] DEFAULT)   specializer)
+      | ns=TAGGED_ID NAMESPACE o=ID specializer -> ^(OP_AS_ARG ^(OP_NAME ID[$ns.text.substring(1)] $o DEFAULT)  specializer);      
             //Operator as an argument is prefixed by the tag, strips off tag 
                       //TODO: Restrict where opRef can be used
                       //TODO: Extend to chains, not just single names
@@ -411,18 +426,18 @@ private simpleRef
   : ID 
   | DEFAULT_VALUE -> NUMBER["0"]
   | TUPLE_VALUE -> ALL
-  | LAST 
-  | ALL 
   | ARG! number CLOSE_ARG!
   | c=CANVAS -> ID[$c.text]
   | l=LOCAL -> ID[$l.text]
   | v=VIEW -> ID[$v.text]
+  | p=PREFILTER -> ID[$p.text]
   ;
 
 private qualifiedRef 
-  : ARG i=ID CLOSE_ARG -> $i
-  | ARG n=number CLOSE_ARG -> $n
-  | ARG DEFAULT_VALUE CLOSE_ARG -> NUMBER["0"];
+  : DOT i=ID -> $i
+  | DOT n=intNum -> $n
+  | DOT DEFAULT_VALUE -> NUMBER["0"]
+  | DOT TUPLE_VALUE -> ALL;
 
 booleanOp : GT |  GTE | LT | LTE | EQ | NEQ | RE | NRE;
 
@@ -438,15 +453,15 @@ private intNum
   | d=DIGITS -> ^(NUMBER[$d.text]);
 
 private doubleNum
-  : '.' d2=DIGITS -> ^(NUMBER["0." + $d2.text])
-  | d=DIGITS '.' d2=DIGITS -> ^(NUMBER[$d.text + "." + $d2.text])
-  | (n='-' | p='+') d=DIGITS '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text])
-  | (n='-' | p='+') '.' d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + "." + $d2.text]);
+  : DOT d2=DIGITS -> ^(NUMBER["0." + $d2.text])
+  | d=DIGITS DOT d2=DIGITS -> ^(NUMBER[$d.text + "." + $d2.text])
+  | (n='-' | p='+') d=DIGITS DOT d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + $d.text + "." + $d2.text])
+  | (n='-' | p='+') DOT d2=DIGITS -> ^(NUMBER[p!=null?"+":"-" + "." + $d2.text]);
 
 
 TAGGED_ID: TAG ID;
 
-ID    : ('a'..'z' | 'A'..'Z' | '_') ('.'? ('a'..'z' | 'A'..'Z' | '_' | '0'..'9'))*;
+ID    : ('a'..'z' | 'A'..'Z' | '_')  ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 
 DIGITS  : '0'..'9'+;
 

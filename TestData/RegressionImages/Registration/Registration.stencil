@@ -1,13 +1,13 @@
 STREAM: File
 NAME: Reg
-HEADER: Name
+TUPLE_SIZE: 1
 SEPARATOR: \s+
 SOURCE: ./RegistrationData.txt
 STRICT: TRUE
 SKIP: 0
 STREAM: File
 NAME: Reg2
-HEADER: Name
+TUPLE_SIZE: 1
 SEPARATOR: \s+
 SOURCE: ./RegistrationData.txt
 STRICT: TRUE
@@ -21,10 +21,10 @@ order Reg > Reg2
 
 layer Points
 from Reg
-	ID: Name
-	SIZE: 4
-	X: Count(Name) 
-	REGISTRATION: Name
+    ID: Name
+    SIZE: 4
+    X: Count(Name) 
+    REGISTRATION: Name
 
 layer Points2
 from Reg
@@ -39,7 +39,7 @@ layer Marks
 from Reg2
    ID : Name
    SIZE: 3
-   (X,Y): Points.find(Name) -> (X,Y)
+   (X,Y): Points.find(Name) -> (Points.X, Points.Y)
    SHAPE: "CROSS"
    FILL_COLOR: @Color{RED}
    REGISTRATION: "CENTER"
@@ -49,7 +49,7 @@ from Reg
    ID : Name
    TEXT: Name
    X: 5
-   Y: Count(Name) -> Mult(VALUE, 2) -> Add(20, product)
+   Y: Count(Name) -> Mult(Count, 2) -> Add(20, Mult)
    REGISTRATION:  Name
 
 layer VerticalText["TEXT"]
@@ -57,11 +57,11 @@ from Reg
    ID : Name
    TEXT: Name
    Y: 150
-   X: Count(Name) -> Mult(VALUE, 2) -> Add(200, product)
+   X: Count(Name) -> Mult(Count, 2) -> Add(200, Mult)
    REGISTRATION:  Name
-	ROTATION: "VERTICAL"
+   ROTATION: "VERTICAL"
 
 
 
 operator Count(C) -> (VALUE)
-   ALL => VALUE: Index(C) -> Mult(10, index)
+   default => VALUE: Index(C) -> Mult(10, Index)

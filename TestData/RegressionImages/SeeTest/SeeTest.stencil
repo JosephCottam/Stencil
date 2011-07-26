@@ -1,17 +1,19 @@
 STREAM: File
 NAME: MTTSource
-HEADER:  graphLabel | axis1A | axis1B | axis2A |  axis2B | suite_name | pass  | fail
+TUPLE_SIZE: 8
 SEPARATOR: \s*\|\s*
 SOURCE: ./18049-arch-compiler.output.txt
 SKIP: 2
 STRICT: false
 STREAM: File
 NAME: MTTNotApplicable
-HEADER: axis1A, axis1B, axis2A, axis2B
+TUPLE_SIZE: 4
 SEPARATOR: ,\s*
 SOURCE: ./NoData-Comp.txt
 SKIP: 1
 STRICT: true
+
+import PatternUtils
 
 stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
 stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
@@ -20,117 +22,127 @@ order MTTSource > MTTNotApplicable
 
 layer Trivial
 from MTTSource
-	filter (suite_name =~ "trivial")
-	ID : Concatenate(axis1A, axis1B, axis2A, axis2B)
-	(X,Y): Layout(axis1A, axis1B, axis2A, axis2B) ->(X,Y)
- 	FILL_COLOR : BasicFails(fail) -> (C)
-	SIZE: 50
-	SHAPE: "RECTANGLE"
-	REGISTRATION: "TOP_LEFT"
+    filter (suite_name =~ "trivial")
+    ID : Concatenate(axis1A, axis1B, axis2A, axis2B)
+    (X,Y): Layout(axis1A, axis1B, axis2A, axis2B)
+    FILL_COLOR : BasicFails(fail)
+    SIZE: 50
+    SHAPE: "RECTANGLE"
+    REGISTRATION: "TOP_LEFT"
 
-layer Others["PIE"]
-from MTTSource
-	filter(suite_name !~"trivial")
-	ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
-	(X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name) -> (X,Y)
-	SIZE: 13
-	PEN: @Stroke{3}
-	PEN_COLOR: RelativeFails(fail, pass)
-	SLICE: fail
-	FIELD: pass
-	SLICE_COLOR: Palet("FAIL")
-	FIELD_COLOR: @Color{WHITE}
 
 layer NotApplicable
 from MTTNotApplicable
-	ID: Concatenate(axis1A, axis1B, axis2A, axis2B) 
-	(X,Y) : Layout.query(axis1A, axis1B, axis2A, axis2B) -> (X,Y)
-	FILL_COLOR: Palet("N/A") -> (C)
-	SIZE: 50
-	SHAPE: "RECTANGLE"
-	REGISTRATION: "TOP_LEFT"
-	PATTERN: "HATCH"
-	PATTERN_WEIGHT: 1.1
+    ID: Concatenate(axis1A, axis1B, axis2A, axis2B) 
+    (X,Y) : Layout.query(axis1A, axis1B, axis2A, axis2B)
+    SIZE: 50
+    SHAPE: "RECTANGLE"
+    REGISTRATION: "TOP_LEFT"
+     FILL_COLOR: [fore] Palette("N/A") -> PatternFill("hatch", fore, NULL, 10, 1.1)
+
+
+layer Others["PIE"]
+from MTTSource
+    filter(suite_name !~"trivial")
+    ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
+    (X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name)
+    SIZE: 13
+    PEN: @Stroke{3}
+    PEN_COLOR: RelativeFails(fail, pass)
+    SLICE: fail
+    FIELD: pass
+    SLICE_COLOR: Palette("FAIL")
+    FIELD_COLOR: @Color{WHITE}
+
 
 layer SubLabels["TEXT"]
 from MTTSource
-	filter(suite_name !~"trivial")
-	local(ID): Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
-	ID: local[ID]
-	(X,Y): Others.find(local[ID]) -> (X,Y)
-	TEXT: suite_name
-	FONT: @Font{5}
-	ROTATION: -45
-	REGISTRATION: "CENTER"
-	FONT_STYLE: "BOLD"
-	COLOR: @Color{0,0,0,166}
+    filter(suite_name !~"trivial")
+    local(ID): Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
+    ID: local.ID
+    (X,Y): Others.find(local.ID) -> (Others.X, Others.Y)
+    TEXT: suite_name
+    FONT: @Font{5}
+    ROTATION: -45
+    REGISTRATION: "CENTER"
+    FONT_STYLE: "BOLD"
+    COLOR: @Color{0,0,0,166}
 
-layer Labels["TEXT"]
+layer YLabels["TEXT"]
 from MTTSource
-	ID: Concatenate(axis1A, axis1B)
-	X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 12)
-	TEXT: Concatenate(axis1A, "\n", axis1B)
-	(Y, WIDTH): (-5, 50)
-	(ROTATION, JUSTIFY): ("VERTICAL", "LEFT")
-from MTTSource
-	ID: Concatenate(axis2A, axis2B)
-	Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 12)
-	TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(value) -> Label
-	X : -5
-	(JUSTIFY, REGISTRATION): ("RIGHT", "TOP_RIGHT")
-from MTTSource
-	ID: graphLabel
-	Y: NamesIndex(graphLabel)
-	TEXT: graphLabel
-	X: -375
+    ID: Concatenate(axis1A, axis1B)
+    X: Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Layout.X, 12)
+    TEXT: Concatenate(axis1A, "\n", axis1B)
+    (Y, WIDTH): (5, 50)
+    (ROTATION, JUSTIFY): ("VERTICAL", "LEFT")
 
+
+
+layer XLabels["TEXT"]
+from MTTSource
+    ID: Concatenate(axis2A, axis2B)
+    Y: Layout(axis1A, axis1B, axis2A, axis2B) -> Sub(Layout.Y, 12)
+    TEXT: Concatenate(axis2A, "\n", axis2B) -> Break(_) -> Break.Label
+    X : -5
+    (JUSTIFY, REGISTRATION): ("RIGHT", "TOP_RIGHT")
+
+
+
+layer CanvasLabel["TEXT"]
+from MTTSource
+    ID: graphLabel
+    Y: NamesIndex(graphLabel)
+    TEXT: graphLabel
+    X: -375
 
 layer Legend["IMAGE"]
 from MTTSource
-	ID: "LegendImage"
-	FILE: "./SeeTest-Key.png"
-	(X,Y,WIDTH,HEIGHT) : (-375,10,200, 200)
+    ID: "LegendImage"
+    FILE: "./SeeTest-Key.png"
+    (X,Y,WIDTH,HEIGHT) : (-375,-10,200, 200)
 
 
-layer GridLines["LINE"]
+layer XGridLines["LINE"]
 from MTTSource
-	ID : Concatenate(axis1A, axis1B)
-	(X.1, X.2): Layout(axis1A, axis1B, axis2A, axis2B) -> (X, X)
-	Y.1 :-5
-	Y.2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) -> Y2
-	PEN_COLOR : Palet("GRID")
+    ID : Concatenate(axis1A, axis1B)
+    (X1, X2): Layout(axis1A, axis1B, axis2A, axis2B) -> (Layout.X, Layout.X)
+    Y1 : 5
+    Y2 :* EqualHeight(axis1A, axis1B, axis2A, axis2B) 
+    PEN_COLOR : Palette("GRID")
+
+layer YGridLines["LINE"]
 from MTTSource
-	ID : Concatenate(axis2A, axis2B)
-	(Y.1,Y.2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Y,Y)
-	X.1 : -5
-	X.2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B) -> (X2)
-	PEN_COLOR: Palet("GRID") -> (C)
+    ID : Concatenate(axis2A, axis2B)
+    (Y1,Y2) : Layout(axis1A, axis1B, axis2A, axis2B) -> (Layout.Y, Layout.Y)
+    X1 : -5
+    X2 :* EqualWidth(axis1A, axis1B, axis2A, axis2B)
+    PEN_COLOR: Palette("GRID")
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-	ALL => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(X, 55) -> Range[ALL](@Max, sum)
+    default => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Layout.X, 55) -> Range[ALL](@Max, Add)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-	ALL => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Y, 55) -> Range[ALL](@Max, sum)
+    default => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Sub(Layout.Y, 55) -> Range[ALL](@Min, Sub)
 
 
 operator NamesIndex(ID) -> (VALUE)
-	ALL => VALUE: Index(ID)
+    default => VALUE: Index(ID)
 
 operator BasicFails(fails) -> (C)
-	(fails = 0) => C: Palet("PASS") -> SetAlpha(51, C)
-	(fails > 0) => C: Palet("FAIL") -> SetAlpha(102,C)
+    (fails = 0) => C: Palette("PASS") -> SetAlpha(51, Palette.C)
+    (fails > 0) => C: Palette("FAIL") -> SetAlpha(102, Palette.C)
 
 operator RelativeFails(fails, passes) -> (C)
-	(passes= 0) => C: @Color{BLACK}
-	(fails = 0) => C: Palet("PASS")
-	(fails > 0) => C: Palet("FAIL")
+    (passes= 0) => C: @Color{BLACK}
+    (fails = 0) => C: Palette("PASS")
+    (fails > 0) => C: Palette("FAIL")
 
-operator Palet(Name) -> (C)
-	(Name =~"FAIL")    => C: @Color{200,30,30}
-	(Name =~"PASS")    => C: @Color{0,180,0}
-	(Name =~"MISSING") => C: @Color{WHITE}
-	(Name =~"N/A")     => C: @Color{GRAY90}
-	(Name =~"GRID")    => C: @Color{GRAY80}
+operator Palette(Name) -> (C)
+    (Name =~"FAIL")    => C: @Color{200,30,30}
+    (Name =~"PASS")    => C: @Color{0,180,0}
+    (Name =~"MISSING") => C: @Color{WHITE}
+    (Name =~"N/A")     => C: @Color{GRAY90}
+    (Name =~"GRID")    => C: @Color{GRAY80}
 
 java Break
 {
@@ -148,7 +160,7 @@ java Layout
 {
    static final List<String> suites = Arrays.asList("ibm", "imb", "intel", "mpicxx");
    static final double majorOffset = 50;
-   static final int border = 10;
+   static final int border = 15;
    static final int minorOffset = 18;
    static final List<String> XIndex = new ArrayList();
    static final List<String> YIndex = new ArrayList();
@@ -159,7 +171,7 @@ java Layout
       if (suites.indexOf(suite) <0) {throw new IllegalArgumentException("Unknown suite: " + suite);}
       int offset = suites.indexOf(suite);
       double x = base[0] + border + (offset%2 * minorOffset);
-      double y = base[1] + border+ (offset/2 * minorOffset);
+      double y = -(-base[1] + border + (offset/2 * minorOffset));
       return new double[]{x,y};
    }
    
@@ -170,7 +182,7 @@ java Layout
         if (!XIndex.contains(XBase)) {XIndex.add(XBase);}
         if (!YIndex.contains(YBase)) {YIndex.add(YBase);}
         double X = XIndex.indexOf(XBase) * majorOffset;
-        double Y = YIndex.indexOf(YBase) * majorOffset;
+        double Y = -(YIndex.indexOf(YBase) * majorOffset);
         return new double[]{X,Y};
    }
 
@@ -181,7 +193,8 @@ java Layout
         if (!XIndex.contains(XBase)) {return new double[]{-375,300};}
         if (!YIndex.contains(YBase)) {return new double[]{-375,300};}
         double X = XIndex.indexOf(XBase) * majorOffset;
-        double Y = YIndex.indexOf(YBase) * majorOffset;
+        double Y = -(YIndex.indexOf(YBase) * majorOffset);
         return new double[]{X,Y};
    }
 }
+

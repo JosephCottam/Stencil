@@ -18,15 +18,23 @@ options {
 
   package stencil.parser.string;
   
+  import stencil.parser.ProgramCompileException;
   import stencil.parser.tree.*;
   import stencil.interpreter.guide.MonitorOperator;
   import stencil.interpreter.tree.Freezer;
+  import stencil.parser.string.util.EnvironmentUtil;
+  import stencil.tuple.prototype.TuplePrototype;
+  
   
   import static stencil.parser.ParserConstants.GUIDE_LABEL;
-  import static stencil.parser.ParserConstants.INVOKEABLE;  
+  import static stencil.parser.ParserConstants.INVOKEABLE;
 }
 
 @members{
+   private static final class SelectorException extends RuntimeException {
+      public SelectorException(String message) {super(message);}
+   }
+
    public static StencilTree apply (StencilTree t) {
      return (StencilTree) TreeRewriteSequence.apply(t);
   }
@@ -37,7 +45,10 @@ options {
     
     List<String> labels = new ArrayList();
     for (StencilTree sel: selectors) {
-       String att = getSource(program, layerName, sel.getText());
+       String att;
+       try {att= getSource(program, layerName, sel.getText());}
+       catch (SelectorException e) {throw new ProgramCompileException(e.getMessage(), sel);}
+       
        if (att==null) {continue;}
        if (!labels.contains(att)) {labels.add(att);}
     }
@@ -53,23 +64,39 @@ options {
                
     StencilTree r= null;
     for (StencilTree r2: c.find(RULES_RESULT)) {
-       if (Freezer.prototype(r2.find(RESULT).find(TUPLE_PROTOTYPE)).contains(att)) {r=r2; break;}
+       if (Freezer.targetTuple(r2.find(TARGET).find(TARGET_TUPLE)).contains(att)) {r=r2; break;}
     }
     assert r != null : "Guide path did not match any rule.";
            
     StencilTree t = r.find(CALL_CHAIN).find(FUNCTION, PACK);
+    AstInvokeable target=null;
+    
     while (t.getType() == FUNCTION) {
-      AstInvokeable target = t.find(INVOKEABLE);
-      if (target != null && target.getOperator() instanceof MonitorOperator) {
-        String text = t.find(LIST_ARGS).find(TUPLE_REF).getChild(1).getText();    //get child 1 because this is a tuple ref and it has been framed
-        try {
-          Integer.parseInt(text);                                       //If it is a number, don't return it
-          return "????";
-        } catch (Exception e) {return text;}        
-      }
+      target = t.find(INVOKEABLE);
+      if (target != null && target.getOperator() instanceof MonitorOperator) {break;}
       t = t.find(FUNCTION, PACK);
-   }
-   throw new Error("Guide path did not lead to location with monitor operator");
+    }
+
+
+    if (target == null || !(target.getOperator() instanceof MonitorOperator)) {
+       throw new SelectorException("Guide path did not lead to location with monitor operator");
+    }
+   
+   
+    StencilTree tupleRef = t.find(LIST_ARGS).find(TUPLE_REF);
+    StencilTree fieldRef = tupleRef.getChild(0);
+    
+    if (tupleRef.getChildCount() >1) {
+        fieldRef = tupleRef.getChild(1);
+    }
+    
+    if (fieldRef.getType() ==ID) {
+        return fieldRef.getText();
+    } else {
+       int fieldIdx = Integer.parseInt(fieldRef.getText());                              //If it is a number, resolve it
+       TuplePrototype proto = EnvironmentUtil.framePrototypeFor(tupleRef);
+       return proto.get(fieldIdx).name();
+    }
   }
   
   private boolean needsLabel(StencilTree spec) {

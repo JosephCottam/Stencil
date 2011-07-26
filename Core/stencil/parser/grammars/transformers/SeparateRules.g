@@ -1,4 +1,4 @@
-tree grammar SeparateRules;
+    tree grammar SeparateRules;
 options {
     tokenVocab = Stencil;
     ASTLabelType = StencilTree;	
@@ -8,7 +8,8 @@ options {
 }
 
 @header {
-/** Takes layer rules and separates them by target type.
+/** Takes layer rules and separates them by target type,
+ *  then removes the individual target types.
  */
 
 	package stencil.parser.string;
@@ -21,12 +22,19 @@ options {
   
    private StencilTree siftRules(StencilTree rules, int type, int listType) {return siftRules(adaptor, rules, type, listType, -1);}
  
-   //This binding check will be a problem when animated bindings come into play
+   //TODO: This binding check will be a problem when animated bindings come into play
+   /**Create a new collection of rules from an old collection of rules.
+    * If a rule's binding is of the given type, 
+    *    AND its binding is less than zero or of the given type 
+    *    THEN a new rule is made.  
+    * All newly create rules are made part of a list of type listType.
+    * This new list is the return value.
+    **/  
    public static StencilTree siftRules(TreeAdaptor adaptor, StencilTree rules, int type, int listType, int binding) {
       StencilTree list = (StencilTree) adaptor.create(listType, StencilTree.typeName(listType));
       
       for(StencilTree rule: rules) {
-         if(rule.find(TARGET, RESULT, VIEW, CANVAS, LOCAL, PREFILTER).getType() == type) {
+         if(rule.find(type) != null) {
             if (binding < 0 || rule.find(DEFINE, DYNAMIC, ANIMATED,ANIMATED_DYNAMIC).getType() == binding) {
               adaptor.addChild(list, adaptor.dupTree(rule));
             }
@@ -36,8 +44,6 @@ options {
    }
 
    protected StencilTree local(StencilTree source)         {return siftRules(source, LOCAL, RULES_LOCAL);}   
-   protected StencilTree canvas(StencilTree source)        {return siftRules(source, CANVAS, RULES_CANVAS);}
-   protected StencilTree view(StencilTree source)          {return siftRules(source, VIEW, RULES_VIEW);}
    protected StencilTree prefilter(StencilTree source)     {return siftRules(source, PREFILTER, RULES_PREFILTER);}
    protected StencilTree result(StencilTree source)        {return siftRules(source, RESULT, RULES_RESULT);}
 }
@@ -48,6 +54,11 @@ topdown: ^(CONSUMES filters=. rules=.)
               $filters 
               {prefilter(rules)} 
               {local(rules)} 
-              {result(rules)} 
-              {view(rules)} 
-              {canvas(rules)});
+              {result(rules)});
+              
+              
+//Remove individual target types, target type is no identified by grouping type
+bottomup
+    : ^(LOCAL s+=.*)     -> ^(TARGET["Local"] $s*)
+    | ^(PREFILTER s+=.*) -> ^(TARGET["Prefilter"] $s*)
+    | ^(RESULT s+=.*)    -> ^(TARGET["Result"] $s*);

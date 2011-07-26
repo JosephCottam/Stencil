@@ -31,7 +31,7 @@
     </target>
  		
  		
- 	<target name="Stencil" depends="Transformers, Infos, Validators, Interpreter, Compile"/>
+ 	<target name="Stencil" depends="Transformers, Infos, Validators, Compile"/>
  	
     <target name="Compile">
             <javac srcdir="${core}" destdir="${target}" includeantruntime="false">
@@ -80,7 +80,7 @@
     <target name="Infos" depends="StencilGrammar">
         <foreach target="antlrBuild" param="file" inheritall="true">
            <fileset dir="${grammars}/info" />
-           <param name="antlrTarget" value="${parser}/info"/>
+           <param name="antlrTarget" value="${parser}"/>
         </foreach>
     </target>
 
@@ -92,15 +92,6 @@
     	</foreach>
     </target>
 
-    <target name="Interpreter" depends="StencilGrammar">
-    	<foreach target="antlrBuild" param="file" inheritall="true">
-    	   <fileset dir="${interpreter}" includes="*.g"/>
-           <param name="antlrTarget" value="${interpreter}"/>
-    	</foreach>
-    </target>
-
- 	
- 	
  	<target name="antlrBuild">
         <antlr3
             target="${file}"
@@ -135,4 +126,7 @@
  	<target name="Test" depends="Stencil"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
+	<target name="Report" depends=""> 
+        <ant antfile="./build/Test.xml" inheritRefs="true" target="JUnit-Report"/>
+    </target>
  </project>

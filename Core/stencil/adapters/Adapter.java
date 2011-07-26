@@ -31,10 +31,9 @@
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import stencil.display.Glyph;
 import stencil.display.StencilPanel;
-import stencil.interpreter.tree.Program;
-import stencil.parser.tree.StencilTree;
+import stencil.interpreter.TupleStore;
+import stencil.interpreter.tree.Specializer;
 import stencil.display.DisplayLayer;
 
 /**The generator takes a stencil program and generators an
@@ -50,7 +49,7 @@ import stencil.display.DisplayLayer;
  * @author jcottam
  *
  */
-public interface Adapter<T extends Glyph> {
+public interface Adapter {
 	/**Graphics object that may be used by adapters for planning purposes.*/
 	public static final BufferedImage REFERENCE_CANVAS = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 	public static final Graphics2D REFERENCE_GRAPHICS = (Graphics2D) REFERENCE_CANVAS.getGraphics();
@@ -59,19 +58,21 @@ public interface Adapter<T extends Glyph> {
 	//Compile-time support operations.  These methods are used by the host application
 	//and compiler to create the visualization before any data is added.
 
-	/**Create a StencilPanel that corresponds to this adapter.  
-	 * The panel should be compatible with the layers, guides, etc. produced 
-	 * by this adapter.*/
-	public StencilPanel generate(Program program);
-
 	/**Create a layer in this adapter.*/
-	public DisplayLayer makeLayer(StencilTree layerDef);
+	public DisplayLayer makeLayer(String name, Specializer spec);
 		
+	/**Create the interface to the view.**/
+	public TupleStore makeView(Specializer spec);
+
+	/**Create the interface to the panel**/
+	public TupleStore makeCanvas(Specializer spec);
 	
 	/**Given a guide type, return the corresponding class.*/
 	public Class getGuideClass(String name);
 
-	/**Given a stencil program as a string, return a new panel ready to go...*/
+	/**Given a stencil program as a string, return a new panel.
+	 * The panel should be compatible with the layers, guides, etc. produced 
+	 * by this adapter.*/
 	public StencilPanel compile(String programSource)  throws Exception;
 	
 	//------------------------------------------------------------------------------------------

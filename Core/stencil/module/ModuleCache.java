@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.module;
 
 import java.util.*;
@@ -33,7 +5,7 @@ import java.util.*;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.*;
 import stencil.parser.string.util.Context;
-import stencil.parser.tree.util.MultiPartName;
+import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 import stencil.util.collections.PropertyUtils;
 
@@ -100,12 +72,10 @@ public class ModuleCache {
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(String prefix, String name, Context context, Specializer specializer, boolean higherOrder) throws MethodInstanceException {		
+	public StencilOperator instance(MultiPartName name, Context context, Specializer specializer, boolean higherOrder) throws MethodInstanceException {		
 		try {
-			Module module = findModuleForOperator(prefix, name);
-			
-			MultiPartName multiName = new MultiPartName(name);
-			String operatorName = multiName.getName();
+			Module module = findModuleForOperator(name);
+			String operatorName = name.name();
 
 			StencilOperator operator;
 			if (higherOrder) {
@@ -116,18 +86,21 @@ public class ModuleCache {
 			
 			return operator;
 		}
-		catch (Exception e) {throw new MethodInstanceException(name, true, e);}		
+		catch (Exception e) {throw new MethodInstanceException(name.toString(), true, e);}		
 	}
 		
 	/** @param name operator name to find (should not include facet). Must be prefixed if corresponding module was imported prefixed. 
 	 * @return Prefixed Module which contains the operator.
 	 * @throws IllegalArgumentException Name does not indicate any known operator 
 	 */
-	public Module findModuleForOperator(String prefix, String name) throws IllegalArgumentException {
+	public Module findModuleForOperator(MultiPartName name) throws IllegalArgumentException {
+		String prefix = name.prefix();
+		String opName = name.name();
+		
 		for (PrefixedModule pm: importedModules) {
 			if (!prefix.equals(pm.prefix)) {continue;}
 			for (String operatorName: pm.module.getModuleData().getOperatorNames()) {
-				if (name.equals(operatorName)) {
+				if (opName.equals(operatorName)) {
 					return pm.module;
 				}
 			}

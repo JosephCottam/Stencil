@@ -1,6 +1,6 @@
 STREAM: File
 NAME: survey
-HEADER: fruit
+TUPLE_SIZE: 1
 SEPARATOR: $^
 SOURCE: ./Fruits.txt
 SKIP: 0
@@ -14,9 +14,9 @@ guide
   legend Categorical from FILL_COLOR
 from survey
    ID: Count()
-   X:* Rank(fruit) -> Mult(5, rank)             /*@\label{fruit:XRank}@*/
-/* X:* Index(fruit) -> Mult(5, index)*/             /*@\label{fruit:XIndex}@*/
-/* X:* Index(fruit) -> Mult(10, index)*/                /*@\label{fruit:XIndex10}@*/
-   Y: Count(fruit) -> Mult(-5, count)
-   FILL_COLOR:* Count(fruit) -#> HeatScale[hot:"GRAY90"](count)
+   X:* Rank(fruit) -> Mult(5, Rank)             /*@\label{fruit:XRank}@*/
+/* X:* Index(fruit) -> Mult(5, Index)*/             /*@\label{fruit:XIndex}@*/
+/* X:* Index(fruit) -> Mult(10, Index)*/                /*@\label{fruit:XIndex10}@*/
+   Y: Count(fruit) -> Mult(5, Count)
+   FILL_COLOR:* Count(fruit) -#> HeatScale[hot:"GRAY90"](Count)
    REGISTRATION: "CENTER"

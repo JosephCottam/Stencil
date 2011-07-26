@@ -39,19 +39,22 @@ topdown
   : ^(PREDICATE ALL)
    -> ^(PREDICATE 
           ^(RULE 
-             ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["RESULT"] TYPE["BOOLEAN"])))
+             ^(TARGET ^(TARGET_TUPLE ^(TUPLE_FIELD ID["RESULT"])))
              ^(CALL_CHAIN
-                 ^(FUNCTION["TrivialTrue.query"] 
+                 ^(FUNCTION
+                      ^(OP_NAME DEFAULT ID["TrivialTrue"] ID["query"])  
                       ^(SPECIALIZER DEFAULT) 
                       LIST_ARGS 
                       DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
                       ^(PACK DEFAULT))))) 
+                      
  | ^(PREDICATE lhs=. (patOp=RE | patOp=NRE) pattern=STRING) 
    -> ^(PREDICATE 
           ^(RULE 
-             ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["RESULT"] TYPE["BOOLEAN"])))
+            ^(RESULT ^(TARGET_TUPLE ^(TUPLE_FIELD ID["RESULT"])))
              ^(CALL_CHAIN
-                 ^(FUNCTION[opName($patOp.getText()) + ".match"] 
+                 ^(FUNCTION
+                    ^(OP_NAME DEFAULT ID[opName($patOp.getText())] ID["match"]) 
                     ^(SPECIALIZER ^(MAP_ENTRY["pattern"] STRING[$pattern.getText()]))
                     ^(LIST_ARGS $lhs) 
                     DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
@@ -60,9 +63,10 @@ topdown
  | ^(PREDICATE lhs=. op=. rhs=.) 
    -> ^(PREDICATE 
           ^(RULE 
-             ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["RESULT"] TYPE["BOOLEAN"])))
+             ^(RESULT ^(TARGET_TUPLE ^(TUPLE_FIELD ID["RESULT"])))
              ^(CALL_CHAIN
-                 ^(FUNCTION[opName($op.getText()) + ".query"] 
+                 ^(FUNCTION
+                      ^(OP_NAME DEFAULT ID[opName($op.getText())] ID["query"])
                       ^(SPECIALIZER DEFAULT) 
                       ^(LIST_ARGS $lhs $rhs) 
                       DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]

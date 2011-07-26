@@ -20,7 +20,7 @@ public class StringSampler implements SampleOperator {
 			if (v.getClass().isArray()) {
 				sample.add(new ArrayTuple((Object[]) v));
 			} else {
-				sample.add(new Singleton(v.toString()));
+				sample.add(Singleton.from(v.toString()));
 			}
 		}
 		return sample;

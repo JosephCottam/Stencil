@@ -31,7 +31,7 @@ consumes[String name]
   
 rules[String name]
   : ^(LIST_RULES rule+=.*) -> 
-  		^(LIST_RULES ^(RULE ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING["ID"] DEFAULT)) ^(CALL_CHAIN ^(PACK STRING[$name]) DEFINE)) $rule+)
+  		^(LIST_RULES ^(RULE ^(TARGET_TUPLE ^(TUPLE_FIELD STRING["ID"])) ^(CALL_CHAIN ^(PACK STRING[$name]) DEFINE)) $rule+)
   ;
 
   

@@ -18,17 +18,15 @@ options {
 
 @members {
   public static final class TargetPackMismatchException extends ValidationException {
-      public TargetPackMismatchException() {super("");}
+      public TargetPackMismatchException(StencilTree chain) {super("Target/Pack mismatch for: " + chain.toStringTree());}
   }
 
   public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
-topdown: ^(RULE target=. chain[target.getFirstChildWithType(TUPLE_PROTOTYPE).getChildCount()] .*);
-chain[int size] : ^(CALL_CHAIN callTargets[size]);
-callTargets[int size]
-     : ^(FUNCTION . . . chain[size])
-     | ^(p=PACK .*)
-        {if (size != p.getChildCount()) {throw new TargetPackMismatchException();}};
-
-  
+topdown: (p=PACK .*)
+    {StencilTree rule = p.getAncestor(RULE);
+     if (rule != null && rule.findDescendant(TARGET_TUPLE).getChildCount() != $p.getChildCount()) {
+        throw new TargetPackMismatchException(rule);
+     }
+    };

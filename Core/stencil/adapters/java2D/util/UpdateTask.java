@@ -40,12 +40,13 @@ public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Ca
 	/**Set the core stencil fragment that will be executed in this update.
 	 * For example, in a dynamic update, this is a derivative of the dynamically bound rule.*/
 	public void viewpoint() {
-		viewpointFragment = original.viewpoint(); 
+		viewpointFragment = original.viewpoint();
 	}
 	
 	/**Run this updater if required.
 	 * Return an appropriate finisher to complete work (if required).
 	 * */
+	@Override
 	public Finisher call() {
 		if (needsUpdate()) {
 			original.stateQuery().setUpdatePoint(stateIDCache);

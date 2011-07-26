@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.explore.model;
 
 import java.util.Arrays;
@@ -35,6 +7,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
 import stencil.explore.model.sources.StreamSource;
@@ -50,7 +23,8 @@ import stencil.explore.coordination.*;
  */
 public final class Model implements StencilMutable.Config, StencilMutable.Sources<StreamSource>, StencilMutable.Stencil {
 	public static final String NEW_LINE = System.getProperty("line.separator");
-
+	public static boolean VERBOSE_END_OF_RUN = false;
+	
 	protected ListenerQueues listeners = new ListenerQueues();
 
 	protected String stencil;
@@ -114,17 +88,31 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
 
 				long endTime = System.currentTimeMillis();
-				long duration = endTime - startTime;
+				final long duration = endTime - startTime;
 				
 				if (runner.getThrowable() == null) {
 					reporter.addMessage("Execution terminated.");
+					if (VERBOSE_END_OF_RUN) {
+						for (Object l: stencilPanel.layers()) {
+							DisplayLayer layer = (DisplayLayer) l;
+							reporter.addMessage("\tLayer %1$s has %2$s glyphs.", layer.name(), layer.size());
+						}
+					}
 				}
 				else {
 					reporter.addMessage("Execution terminated abnormally.");
 					runner.getThrowable().printStackTrace();
 				}
-				reporter.addMessage("Approximate runtime  %d seconds (%d ms).", 
-										TimeUnit.MILLISECONDS.toSeconds(duration), duration);
+				
+				long remaining = duration;
+				long hours = TimeUnit.MILLISECONDS.toHours(remaining);
+				remaining = remaining - (hours *3600000);
+				long minutes = TimeUnit.MILLISECONDS.toMinutes(remaining);
+				remaining = remaining - (minutes * 60000);
+				long seconds = TimeUnit.MILLISECONDS.toSeconds(remaining);
+				
+				reporter.addMessage("Approximate runtime  %d h: %d m: %d s (%d ms total).",
+							hours, minutes, seconds, duration);
 			}
 		};
 

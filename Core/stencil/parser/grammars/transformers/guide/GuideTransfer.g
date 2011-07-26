@@ -26,7 +26,6 @@ options {
   import org.antlr.runtime.tree.*;
 
   import stencil.parser.tree.*;
-  import stencil.parser.tree.util.*;
   import stencil.module.*;
   import stencil.interpreter.guide.MonitorOperator;
   
@@ -62,9 +61,7 @@ options {
     }
     
     private String key(String layer, String attribute) {
-      MultiPartName att = new MultiPartName(attribute);
-      String key = layer + ":" + att.getName();	//Trim to just the attribute name
-      return key;
+      return layer + ":" + attribute;	//Trim to just the attribute name
     }
 
 	//EnsureGuideOp guarantees that a sample operator exists; this
@@ -77,7 +74,7 @@ options {
    }
    
    private StencilTree generators(StencilTree selectors) {
-      StencilTree generators = (StencilTree) adaptor.create(LIST_GUIDE_GENERATORS, "LIST_GENERATORS");
+      StencilTree generators = (StencilTree) adaptor.create(LIST_GUIDE_GENERATORS, "LIST_GUIDE_GENERATORS");
       for(StencilTree sel:selectors) {
          assert sel.getType() == SELECTOR : "Non selector in selectors list.";
          StencilTree gen = attDefs.get(key(sel));
@@ -94,7 +91,7 @@ options {
 //Move mappings from the declarations in the consumes block up to the guides section
 buildMappings: ^(c=CONSUMES {$c.getAncestor(LAYER) !=null}? . . . ^(RULES_RESULT mapping[$c.getAncestor(LAYER).getText()]*) . .);
 mapping[String layerName] 
-  : ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF field=. type=.))) group=. .)
+  : ^(RULE ^(TARGET ^(TARGET_TUPLE ^(TUPLE_FIELD field=.*))) group=. .)
 		{attDefs.put(key(layerName, field.getText()), group);};
 
 
@@ -109,10 +106,10 @@ transferMappings
 	 | ^(GUIDE_SUMMARIZATION ^(GUIDE type=ID spec=. selectors=. actions=.))
 	   -> ^(GUIDE_SUMMARIZATION 
 	         ^(GUIDE $type $spec $selectors $actions 
-	            ^(RULE ^(RESULT TUPLE_PROTOTYPE) ^(CALL_CHAIN PACK))));
+	            ^(RULE ^(TARGET TARGET_TUPLE) ^(CALL_CHAIN PACK))));
 
 //Turn mappings into rules -------------------------------------------------------
-fillFragments: ^(gf=GEN_FRAGMENT rule=.) -> ^(RULE ^(RESULT ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF STRING[$gf.text] DEFAULT))) $rule);
+fillFragments: ^(gf=GEN_FRAGMENT rule=.) -> ^(RULE ^(TARGET ^(TARGET_TUPLE ^(TUPLE_FIELD ID[$gf.text]))) $rule);
 
 
 //trimMappings  -----------------------------------------------
@@ -139,4 +136,5 @@ changeFacets
      func.find(INVOKEABLE).changeFacet(QUERY_FACET);
      //TODO: Remove when no longer relying on copy propagation to keep shared state correct
    }
-   : ^(f=FUNCTION i=. spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> ^(FUNCTION[queryName($f.text)] $i $spec $args $style $c);
+   : ^(f=FUNCTION i=. ^(OP_NAME pre=. base=. facet=.) spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> 
+        ^(FUNCTION $i ^(OP_NAME $pre $base ID[QUERY_FACET]) $spec $args $style $c);

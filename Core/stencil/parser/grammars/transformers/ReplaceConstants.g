@@ -33,7 +33,7 @@ options {
 topdown: 
 	^(TUPLE_REF frame=ID field=ID) 
 		{$frame.text.equals(GLOBALS_FRAME) &&
-  		  globals.getPrototype().contains($field.text)}? ->  {adaptor.dupTree(globals.get($field.text))};
+  		  globals.prototype().contains($field.text)}? ->  {adaptor.dupTree(globals.get($field.text))};
 
 //Delete the global list of constants
 bottomup: ^(p=PROGRAM .*) {adaptor.deleteChild(p, p.find(LIST_GLOBALS).getChildIndex());};

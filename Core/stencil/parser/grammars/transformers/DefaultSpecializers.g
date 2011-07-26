@@ -15,15 +15,22 @@ options {
 
   import java.lang.reflect.Field;
     
+  import stencil.interpreter.tree.Freezer;
   import stencil.parser.tree.*;
-  import stencil.parser.tree.util.*;
   import stencil.module.*;
   import stencil.module.util.*;
   import stencil.adapters.Adapter;
   import stencil.interpreter.tree.Specializer;
-	import static stencil.parser.ParserConstants.DEFAULT_CANVAS_SPECIALIZER;
-	import static stencil.parser.ParserConstants.DEFAULT_LAYER_SPECIALIZER;
-	
+  import stencil.interpreter.tree.MultiPartName;
+  import stencil.parser.ProgramCompileException;
+  import stencil.tuple.Tuple;
+  import stencil.tuple.Tuples;
+  import stencil.tuple.prototype.TupleFieldDef;
+  import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
+  import static stencil.parser.ParserConstants.DEFAULT_CANVAS_SPECIALIZER;
+  import static stencil.parser.ParserConstants.DEFAULT_VIEW_SPECIALIZER;
+  import static stencil.parser.ParserConstants.DEFAULT_LAYER_SPECIALIZER;
+  import static stencil.parser.ParserConstants.POSITIONAL_ARG;
 }
 
 @members{
@@ -45,23 +52,27 @@ options {
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private StencilTree getDefault(StencilTree spec) {
     try {
-	     StencilTree f = spec.getAncestor(FUNCTION, OP_AS_ARG);
-	     if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.getText()));}
+	   StencilTree f = spec.getAncestor(FUNCTION, OP_AS_ARG);
+	   if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.find(OP_NAME)));}
 	     
-	     StencilTree g = spec.getAncestor(GUIDE);
+	   StencilTree g = spec.getAncestor(GUIDE);
        if (g != null) {return (StencilTree) adaptor.dupTree(getGuideDefault(g.find(ID).getText()));}
 	     
-       StencilTree c = spec.getAncestor(CANVAS_DEF);
-	     if (c != null) {return (StencilTree) adaptor.dupTree(DEFAULT_CANVAS_SPECIALIZER);}
+       StencilTree c = spec.getAncestor(CANVAS);
+	   if (c != null) {return (StencilTree) adaptor.dupTree(DEFAULT_CANVAS_SPECIALIZER);}
+
+       StencilTree v = spec.getAncestor(VIEW);
+       if (v != null) {return (StencilTree) adaptor.dupTree(DEFAULT_VIEW_SPECIALIZER);}
+
 	     	     	     
-	     StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
-	     if (ref != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(ref.find(OPERATOR_BASE).getText()));}
+	   StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
+	   if (ref != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(ref.find(OPERATOR_BASE)));}
 
        StencilTree layer = spec.getAncestor(LAYER);
        if (layer != null) {return (StencilTree) adaptor.dupTree(DEFAULT_LAYER_SPECIALIZER);}
 	     
-    } catch (Exception e) {return (StencilTree) adaptor.create(SPECIALIZER, "");}  //HACK: Is removing the default really the right thing?
-	  throw new IllegalArgumentException("Specializer encountered in unexpected context: " + spec.getParent().toStringTree());
+    } catch (Exception e) {return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);}  //HACK: Is removing the default really the right thing?
+	  throw new ProgramCompileException("Specializer encountered in unexpected context: " + spec.getParent().getToken());
   }
   
   /**Work with the graphics adapter to get the default
@@ -72,10 +83,10 @@ options {
     StencilTree defaultSpec;
     
     try {
-      Field f = clss.getField("DEFAULT_ARGUMENTS");
+      Field f = clss.getField("DEFAULT_SPECIALIZER");
       defaultSpec = ((Specializer) f.get(null)).getSource();
     } catch (Exception e) {
-      defaultSpec = (StencilTree) adaptor.create(SPECIALIZER, "");
+      defaultSpec = (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);
     }     
       
     assert defaultSpec != null;
@@ -83,19 +94,19 @@ options {
   }
 
   /**Get the default guide for a named operator.*/
-  public StencilTree getOperatorDefault(String fullName) {
-    MultiPartName name= new MultiPartName(fullName);
+  public StencilTree getOperatorDefault(StencilTree opRef) {
+    MultiPartName name= Freezer.multiName(opRef);
     ModuleData md;
     
     try {
-        Module m = modules.findModuleForOperator(name.getPrefix(), name.getName());
+        Module m = modules.findModuleForOperator(name);
         md = m.getModuleData();
     } catch (Exception e) {
-      throw new RuntimeException("Error getting module information for operator " + name.toString(), e);
+      throw new ProgramCompileException("Error getting module information for operator " + name.toString(), opRef, e);
     }
     
     try {
-        StencilTree source = md.getDefaultSpecializer(name.getName()).getSource();
+        StencilTree source = md.getDefaultSpecializer(name.name()).getSource();
         assert source != null;
         return  source;
       } catch (Exception e) {
@@ -105,7 +116,7 @@ options {
   
   /**Combine a given specializer with the appropriate default.*/
   private StencilTree blendWithDefault(StencilTree spec) {
-    Specializer specializer = Specializer.blend(spec, getDefault(spec));
+    Specializer specializer = blend(spec, getDefault(spec));
     StencilTree root = (StencilTree) adaptor.create(spec.getToken());
 
     for (String key: specializer.keySet()) {
@@ -119,6 +130,36 @@ options {
     }
     return root;
   }
+
+  /**Blend the update with the defaults.  
+   * The update values take precedence over the default values.*/
+  public static Specializer blend(StencilTree updates, StencilTree defaults) {
+    assert updates.getType() == SPECIALIZER;
+    assert defaults.getType() == SPECIALIZER;
+  
+    Specializer updatez = Freezer.specializer(updates);
+    Specializer defaultz = Freezer.specializer(defaults);
+    
+    List<String> keys =new ArrayList();
+    List<Object> values = new ArrayList();
+    for (int i=0; i<updatez.size(); i++) {
+      if (updatez.prototype().get(i).name().equals(POSITIONAL_ARG)) {
+        keys.add(defaultz.prototype().get(i).name());
+      } else {
+        keys.add(updatez.prototype().get(i).name());        
+      }
+      values.add(updatez.get(i));
+    }
+
+    
+    for (String key: defaultz.keySet()) {
+      if (keys.contains(key)) {continue;}
+      keys.add(key);
+      values.add(defaultz.get(key));
+    }
+    return new Specializer(keys.toArray(new String[keys.size()]), values.toArray(), updates);
+  }
+  
 
 }
 

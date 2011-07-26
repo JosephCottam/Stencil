@@ -1,6 +1,7 @@
 package stencil.interpreter.guide;
 
 import stencil.interpreter.guide.samplers.*;
+import stencil.modules.stencilUtil.StencilUtil;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -8,7 +9,7 @@ import java.util.Map;
 
 public final class Samplers {
 	public static final String SAMPLE_KEY = "sample";
-	public static enum Monitor {CATEGORICAL, CONTINUOUS, FLEX, NONE}
+	public static enum Monitor {CATEGORICAL, CONTINUOUS, FLEX, NONE, NOP}
 	
 	private Samplers() {}
 
@@ -25,6 +26,7 @@ public final class Samplers {
 		add("CATEGORICAL", Monitor.CATEGORICAL, StringSampler.class);
 		add("COLOR", Monitor.CATEGORICAL, ColorSampler.class);
 		add("LAYER", Monitor.NONE, LayerSampler.class);
+		add("NOP", Monitor.NOP, StencilUtil.Nop.class);
 	}
 	
 	

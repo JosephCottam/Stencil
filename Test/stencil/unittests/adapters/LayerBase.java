@@ -1,20 +1,20 @@
 package stencil.unittests.adapters;
 
-import static stencil.adapters.GlyphAttributes.StandardAttribute;
 import stencil.adapters.Adapter;
-import stencil.adapters.java2D.data.DoubleBufferLayer;
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.adapters.java2D.columnStore.TableShare;
+import stencil.adapters.java2D.render.Renderer;
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
 import stencil.display.StencilPanel;
-import stencil.parser.ParseStencil;
-import stencil.interpreter.tree.Program;
-import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedTuple;
+import stencil.tuple.PrototypedTuple;
+import stencil.tuple.instances.PrototypedArrayTuple;
+import stencil.tuple.instances.Singleton;
 
 public abstract class LayerBase extends junit.framework.TestCase {
 	private static final int TUPLE_COUNT = 100;
 	
-	private String ruleSources ="stream Stream1(Source, A,B,C) layer Layer1 from Stream1 X: A";
+	private String ruleSources ="stream Stream1(Source, A,B,C) layer Layer1 from Stream1 (ID,X,Y,Z) : (Source,A,B,C)";
 	private StencilPanel panel;
 
 	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}
@@ -26,33 +26,32 @@ public abstract class LayerBase extends junit.framework.TestCase {
 	}
 	
 	private DisplayLayer loadData(Adapter adapter) throws Exception {
-		Program program = ParseStencil.program(ruleSources, adapter);
-		panel= adapter.generate(program);
+		panel= adapter.compile(ruleSources);
 		DisplayLayer layer = panel.getLayer("Layer1");
+		panel.signalStop();
 
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i<TUPLE_COUNT; i++) {
-				Tuple values = new PrototypedTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
-				layer.make(values);
+				PrototypedTuple values = new PrototypedArrayTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
+				layer.update(values);
 			}
-			((DoubleBufferLayer) layer).changeGenerations();
+			((Table) layer).changeGenerations();
 		}
 		return layer;
 	}
 
 	public void testMake(Adapter adapter) throws Exception {
-		Program program = ParseStencil.program(ruleSources, adapter);
-		panel= adapter.generate(program);
+		panel= adapter.compile(ruleSources);
 
 		DisplayLayer layer = panel.getLayer("Layer1");
 
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i<TUPLE_COUNT; i++) {
 				String id = Integer.toString(i);
-				assertEquals(i, layer.viewpoint().size());
-				Tuple t = layer.make(PrototypedTuple.singleton("ID", id));
-				assertEquals(id, t.get(StandardAttribute.ID.name()));
-				((DoubleBufferLayer) layer).changeGenerations();
+				assertEquals(i, layer.size());
+				layer.update(Singleton.from("ID", id));
+				PrototypedTuple t = layer.find(id);
+				assertEquals(id, t.get(Renderer.ID.name()));
 			}
 		}
 
@@ -77,23 +76,24 @@ public abstract class LayerBase extends junit.framework.TestCase {
 
 	public void testRemove(Adapter gen) throws Exception {
 		DisplayLayer layer = loadData(gen);
-		((DoubleBufferLayer) layer).changeGenerations();
-		int expectedSize = layer.viewpoint().size();
-
-		assertEquals(layer.viewpoint().size(), TUPLE_COUNT);
+		TableShare share = ((Table) layer).viewpoint();
+		share.simpleUpdate();
+		
+		int expectedSize = layer.size();
+		assertEquals(layer.size(), TUPLE_COUNT);
 		
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i< TUPLE_COUNT; i++) {
 				Glyph source = layer.find(Integer.toString(i));
 				try {
 					layer.remove((String) source.get("ID"));
-					((DoubleBufferLayer) layer).changeGenerations();
+					share = ((Table) layer).changeGenerations();
 					expectedSize = expectedSize -1;
 				} catch (Exception e) {
 					fail("Exception on element " + i + ": " + e.getMessage());
 				}
 	
-				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.viewpoint().size());
+				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.size());
 			}
 		}
 	}

@@ -1,31 +1,3 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.unittests.parser.string.grammars;
 
 import org.antlr.runtime.tree.Tree;
@@ -48,11 +20,12 @@ public class TestSplitSigil extends TestCase {
 		}
 	}
 	
+	//Syntactically invalid
 	private Case[] validateFails = new Case[] {
-			new Case(1, "{"),
+			new Case(1, "{"),			//Unbalanced and empty
 			new Case(1, "}"),
-			new Case(1, "{}"),
-			new Case(1, "{0923"),
+			new Case(1, "{}"),			//Empty
+			new Case(1, "{0923"),	    //Unbalanced, non-empty
 			new Case(1, "{hello"),
 			new Case(1, "}hello"),
 			new Case(1, "hello{"),
@@ -60,20 +33,26 @@ public class TestSplitSigil extends TestCase {
 			new Case(1, "he}llo")
 	}; 
 	
+	//Semantically invalid
+	private Case[] failCases = new Case[] {
+			new Case(1, "{0}"),
+			new Case(1, "{300}")
+	};
 	
+	
+	//Semantically valid
 	private Case[] passCases = new Case[] {
 			new Case(1, "", 			"LIST_ARGS"),
 			new Case(1, "hello", 		"(LIST_ARGS hello)"),
 			new Case(1, "test", 		"(LIST_ARGS test)"),
 			new Case(1, "1", 			"(LIST_ARGS 1)"),
 			new Case(1, "932", 			"(LIST_ARGS 932)"),
-			new Case(2, "{[0]}", 		"(LIST_ARGS (TUPLE_REF 0))"),
-			new Case(2, "{[8640]}", 	"(LIST_ARGS (TUPLE_REF 8640))"),
 			new Case(2, "{test}", 		"(LIST_ARGS (TUPLE_REF test))"),
-			new Case(2, "{test[0]}",	"(LIST_ARGS (TUPLE_REF test 0))"),
-			new Case(2, "{test[test]}", "(LIST_ARGS (TUPLE_REF test test))"),
+			new Case(2, "{test.test}",	"(LIST_ARGS (TUPLE_REF test test))"),
+			new Case(2, "{test.0}",		"(LIST_ARGS (TUPLE_REF test 0))"),
+			new Case(2, "{test.8640}",	"(LIST_ARGS (TUPLE_REF test 8640))"),
 			new Case(1, "1+2",			"(LIST_ARGS 1+2)"),
-			new Case(2, "1+{[2]}", 		"(LIST_ARGS 1+ (TUPLE_REF 2))"),
+			new Case(2, "1+{test.2}", 	"(LIST_ARGS 1+ (TUPLE_REF test 2))"),
 			new Case(2, "txt{ref}", 	"(LIST_ARGS txt (TUPLE_REF ref))"),
 			new Case(3, "{ref}txt", 	"(LIST_ARGS (TUPLE_REF ref) txt)"),
 			new Case(4, "{ref}{ref}", 	"(LIST_ARGS (TUPLE_REF ref) (TUPLE_REF ref))"),
@@ -102,11 +81,28 @@ public class TestSplitSigil extends TestCase {
 		}
 	}
 	
+	public void testConstructFail() throws Exception {
+		final TreeAdaptor adaptor = new StencilTreeAdapter();
+
+		for (int i=0; i< failCases.length; i++) {
+			Case c = failCases[i];
+
+			boolean failed = false;
+			try {PrepareCustomArgs.splitArgs(c.text, adaptor);}
+			catch (Throwable ex) {failed=true;}
+			assertTrue("Did not fail when expected: " + c.text, failed);
+		}
+	}
+	
 	public void testConstruct() throws Exception {
-		TreeAdaptor adaptor = new StencilTreeAdapter();
+		final TreeAdaptor adaptor = new StencilTreeAdapter();
 		int i=0;
 		for (Case c: passCases) {
-			Tree t = PrepareCustomArgs.splitArgs(c.text, adaptor);
+			Tree t = null;
+			
+			try {t = PrepareCustomArgs.splitArgs(c.text, adaptor);}
+			catch (Throwable ex) {fail("Error parsing " + c.text + "\n" + ex.getMessage()); continue;}
+			
 			assertEquals("Error in case " +i, c.tree, t.toStringTree());
 			i++;
 		}

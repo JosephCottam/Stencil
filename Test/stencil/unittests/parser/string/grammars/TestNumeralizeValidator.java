@@ -25,7 +25,6 @@ public class TestNumeralizeValidator extends TestCase {
 	
 	public void testInvalidID() throws Exception {testAll(ID, "X");}
 	public void testInvalidAll() throws Exception {testAll(ALL, "ALL");}
-	public void testInvalidLast() throws Exception {testAll(LAST, "LAST");}
 	
 	private static void testAll(int token, String value) {
 		for (int i=0; i< 10; i++) {

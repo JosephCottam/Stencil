@@ -36,8 +36,8 @@ public class TestBinaryTuple extends TestCase {
 			} catch (Exception e) {throw new Exception("Error examining tuple " + i, e);}
 		}
 		
-		assertFalse("Old tuples not exhausted.", oldTuples.hasNext());
-		assertFalse("New tuples not exhausted.", newTuples.hasNext());
+		assertTrue("Old tuples not exhausted.", !oldTuples.hasNext() || oldTuples.next() == null);
+		assertTrue("New tuples not exhausted.", !newTuples.hasNext() || newTuples.next() == null);
 
 		oldTuples.close();
 		newTuples.close();
@@ -80,8 +80,8 @@ public class TestBinaryTuple extends TestCase {
 		long reStart = System.currentTimeMillis();
 		int reTuples=0;
 		while (reSource.hasNext()) {
-			reSource.next();
-			reTuples++;
+			Tuple t = reSource.next();
+			if (t!= null) {reTuples++;}
 		}
 		long reEnd = System.currentTimeMillis();
 		long reTime = reEnd-reStart;
@@ -89,13 +89,13 @@ public class TestBinaryTuple extends TestCase {
 		long binStart = System.currentTimeMillis();
 		int binTuples=0;
 		while(binSource.hasNext()) {
-			binSource.next();
-			binTuples++;
+			Tuple t = binSource.next();
+			if (t!=null) {binTuples++;}
 		}
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		System.out.printf("\n%1$s: Binary parsing is %2$f of regexp parsing (%3$d ms vs %4$d ms over %5$s tuples).\n", tag, 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
+		//System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
 		assertEquals("Unequal tuple count.", reTuples, binTuples);
 		assertTrue("No advantage to binary.", binTime < reTime);
 	}

@@ -3,7 +3,7 @@ package stencil.display;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
 
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
 
 /**Conforming to this interface is required for guides used as automatic generation targets.
  * 
@@ -15,5 +15,5 @@ public interface DisplayGuide {
 	 * @param elements The list of input/result pairs
 	 * @param parentBounds The bounds of the entity this guide is associated  with (bounds should not guides) 
 	 */
-	public void setElements(List<Tuple> elements, Rectangle2D parentBounds);
+	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds);
 }

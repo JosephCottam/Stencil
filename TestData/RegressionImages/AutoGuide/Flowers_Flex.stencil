@@ -1,6 +1,6 @@
 STREAM: File
 NAME: flowers
-HEADER: sepalLength, petalWidth, sepalWidth, petalLength, species, obs
+TUPLE_SIZE: 6
 SEPARATOR: \s*,\s*
 SOURCE: ./AndersonsFlowers.csv
 SKIP: 1
@@ -14,13 +14,13 @@ stream flowers(sepalL, petalW, sepalW,
 layer FlowerPlot
 guide
  trend[sample: "SIMPLE"] from ID 
- legend[X: 15, Y: -90] from FILL_COLOR
+ legend[X: 15, Y: 90] from FILL_COLOR
  axis[guideLabel: "Petal Length"] from Y
  axis[guideLabel: "Petal Width"] from X
 
 from flowers
    ID: obs
    X:* Scale[min: 0, max:100](petalL)
-   Y:* Scale[min: 0, max:100](petalW) -> Mult(_,-1)
+   Y:* Scale[min: 0, max:100](petalW)
    FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
    REGISTRATION: "CENTER"

@@ -1,12 +1,8 @@
 package stencil.util.collections;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-
 public final class ArrayUtil {
 	private ArrayUtil() {/*Not instantiable, utility class.*/}
 	
@@ -25,6 +21,13 @@ public final class ArrayUtil {
 	public static <T> int indexOf(T element, T[] values) {
 		for (int i=0; i< values.length;i++) {
 			if (element == values[i] || (element != null && element.equals(values[i]))) {return i;}
+		}
+		return -1;
+	}
+
+	public static <T> int indexOf(T element, Object values) {
+		for (int i=0; i< Array.getLength(values); i++) {
+			if (element == Array.get(values, i)) {return i;}
 		}
 		return -1;
 	}
@@ -51,92 +54,22 @@ public final class ArrayUtil {
 		return b.toString();
 	}
 	
-	/**List implementation backed by an array that cannot be re-sized.
-	 * This IS NOT an immutable, elements may still be set.  However, it
-	 * cannot be grown/shrunk. 
-	 * 
-	 * WARNING: ToArray returns the exact array passed in, instead of a copy.  
-	 * This means this violates the contract of 'collection.'  
-	 **/
-	public static final class ArrayToList<T> implements List<T>{
-		protected final T[] source;
-
-		public ArrayToList(T[] source) {this.source =source;}
-
-		public int size() {return source.length;}
-
-		/** WARNING: ToArray also the exact array passed in, instead of a copy.  
-		 * This means this violates the contract of 'collection.'
-		 */  
-		public Object[] toArray() {return source;}
-
-		public boolean contains(Object o) {
-			for (T v: source) {if (o.equals(v)) {return true;}}
-			return false;
+	/**String formatted for error messages.**/
+	public static final String prettyString(Object[] entries) {
+		StringBuilder b = new StringBuilder();
+		for (Object entry: entries) {
+			b.append(entry.toString());
+			b.append(", ");
 		}
-
-		public boolean containsAll(Collection<?> c) {
-			for (Object v: c) {if (!contains(v)) {return false;}}
-			return true;
-		}
-
-		public T get(int index) {return source[index];}
-
-		public T set(int index, T element) {
-			T prior = source[index];
-			source[index] = element;
-			return prior;
-		}
-
-		public int indexOf(Object o) {return -1;}
-
-		public boolean isEmpty() {return source.length >0;}
-
-		public Iterator<T> iterator() {
-			return new Iterator() {
-				private int idx=0;
-				public boolean hasNext() {return idx < source.length;}
-
-				public Object next() {
-					if (idx == source.length) {throw new NoSuchElementException();}
-					return source[idx++];
-				}
-
-				public void remove() {throw new UnsupportedOperationException();}
-			};
-		}
-
-		public int lastIndexOf(Object o) {
-			int last = -1;
-			
-			for (int i=0; i< source.length; i++) {
-				if (o.equals(source[i])) {last = i;}
-			}
-			return last;
-		}
-
-		public List<T> subList(int fromIndex, int toIndex) {
-			T[] t = (T[]) Array.newInstance(source.getClass(), toIndex-fromIndex);
-			System.arraycopy(source, fromIndex, t, 0, t.length);
-			return new ArrayToList(t);
-		}
-
+		b.deleteCharAt(b.length()-1);
+		b.deleteCharAt(b.length()-1);
+		return b.toString();
+	}
+	
+	public static int[] intArray(List<Integer> values) {
+		final int[] ints = new int[values.size()];
+		for (int i=0 ;i < ints.length; i++) {ints[i] = values.get(i).intValue();}
+		return ints;
 		
-		public ListIterator<T> listIterator() {throw new UnsupportedOperationException();}
-		public ListIterator<T> listIterator(int index) {throw new UnsupportedOperationException();}
-
-
-		public <V> V[] toArray(V[] a) {throw new UnsupportedOperationException();}
-
-		public boolean add(T o) {throw new UnsupportedOperationException();}
-		public void add(int index, T element) {throw new UnsupportedOperationException();}
-		public boolean addAll(Collection<? extends T> c) {throw new UnsupportedOperationException();}
-		public boolean addAll(int index, Collection<? extends T> c) {throw new UnsupportedOperationException();}
-		public void clear() {throw new UnsupportedOperationException();}
-
-		public boolean remove(Object o) {throw new UnsupportedOperationException();}
-		public T remove(int index) {throw new UnsupportedOperationException();}
-		public boolean removeAll(Collection<?> c) {throw new UnsupportedOperationException();}
-		public boolean retainAll(Collection<?> c) {throw new UnsupportedOperationException();}
 	}
 }

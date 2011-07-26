@@ -17,7 +17,7 @@ public class SequenceSource extends StreamSource {
 	public SequenceSource(String name) {this(name, 0,1, Double.MAX_VALUE);}
 	
 	public SequenceSource(String name, double start, double increment, double stop) {
-		super(name);
+		super(name,1);
 		this.start= start;
 		this.increment = increment;
 		this.stop = stop;

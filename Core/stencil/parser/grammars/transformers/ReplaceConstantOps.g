@@ -10,15 +10,16 @@ options {
 @header {
   /**Identifies operations that are constant and replaces them with "Const" nodes.
    **/
-	package stencil.parser.string;
+  package stencil.parser.string;
 	
-	import stencil.module.*;
-	import stencil.module.util.*;
-	import stencil.parser.tree.*;
-	import stencil.parser.tree.util.*;
-	import stencil.tuple.Tuple;
+  import stencil.module.*;
+  import stencil.module.util.*;
+  import stencil.parser.tree.*;
+  import stencil.interpreter.Environment;
+  import stencil.tuple.Tuple;
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.Specializer;
+  import stencil.interpreter.tree.MultiPartName;
   
   import static stencil.tuple.Tuples.EMPTY_TUPLE;
   import static stencil.parser.ParserConstants.INVOKEABLE;
@@ -53,14 +54,15 @@ options {
        return isTrueFunction(func) && (func.find(LIST_ARGS).find(TUPLE_REF) == null);
     }
     
-    //Is the passed Function using a facet that is a mathematical function?
-    private boolean isTrueFunction(StencilTree f) {
-    	MultiPartName name= new MultiPartName(f.getText());
+    //Is operator wrapped by the invokeable a mathematical function?
+    private boolean isTrueFunction(StencilTree func) {
+      MultiPartName name= Freezer.multiName(func.find(OP_NAME));
+      Specializer spec = Freezer.specializer(func.find(SPECIALIZER));
+      
       try{
-    		Module m = modules.findModuleForOperator(name.getPrefix(), name.getName());
-    		Specializer spec = Freezer.specializer(f.find(SPECIALIZER));
-        OperatorData od = m.getOperatorData(name.getName(), spec);
-    		FacetData fd=od.getFacet(name.getFacet());
+    		Module m = modules.findModuleForOperator(name);
+            OperatorData od = m.getOperatorData(name.name(), spec);
+    		FacetData fd=od.getFacet(name.facet());
     		return fd.getMemUse() == FacetData.MemoryUse.FUNCTION;
    		} catch (Exception e) {
    			throw new RuntimeException("Error getting module information for operator " + name, e);
@@ -118,8 +120,9 @@ options {
   
   private int afterFrame; 
   private Object reframe(Object tree) {
-     afterFrame = 5;
+
      Tree cursor = (Tree) tree;
+     afterFrame = Environment.DEFAULT_FRAME_NAMES.length-1;   //-1 is required becuase the loop will always execute at least once.
      while (cursor.getType() != CALL_CHAIN) {afterFrame++; cursor = cursor.getParent();}
      
      return downup(adaptor.dupTree(tree), this, "frameSub1");
@@ -139,7 +142,7 @@ replaceOps
     c.setValue(evaluate($f));
     changed=true;
   }
-  : ^(f=FUNCTION inv=. spec=. args=. yield=. target=.)
+  : ^(f=FUNCTION inv=. name=. spec=. args=. yield=. target=.)
         {isConstant($f) && f.getAncestor(CALL_CHAIN) != null}? -> ^(CONST["CONST"] $yield $target);
 
 //Propogate constants through call chains        
@@ -147,8 +150,8 @@ propogateValues
   : ^(c=CALL_CHAIN chain[defaultEnvironment($c)] depth=.);        
 
 chain[Environment env]
-  : ^(f=FUNCTION inv=. spec=. args=. yield=. target=chain[env.extend(EMPTY_TUPLE)])
-    -> ^(FUNCTION[$f.text] $inv $spec {updateArgs($args, env)} $yield $target)
+  : ^(f=FUNCTION inv=. name=. spec=. args=. yield=. target=chain[env.extend(EMPTY_TUPLE)])
+    -> ^(FUNCTION $inv $name $spec {updateArgs($args, env)} $yield $target)
   | ^(c=CONST yield=. target=chain[env.extend((Tuple) ((Const) c).getValue())])
   | ^(p=PACK .*)
     -> {updatePack($p, env)};
@@ -156,7 +159,7 @@ chain[Environment env]
 //Remove all CONST entities with their targets
 removeConsts
   : ^(CALL_CHAIN ^(CONST . target=.)) -> ^(CALL_CHAIN {reframe($target)}) 
-  | ^(FUNCTION inv=. spec=. args=. yield=. ^(CONST constYield=. target=.)) -> ^(FUNCTION $inv $spec $args $constYield {reframe($target)});
+  | ^(FUNCTION inv=. name=. spec=. args=. yield=. ^(CONST constYield=. target=.)) -> ^(FUNCTION $inv $name $spec $args $constYield {reframe($target)});
   
   
 frameSub1: ^(TUPLE_REF frame=. rest+=.*) -> ^(TUPLE_REF NUMBER[maybeSub1($frame)] $rest*);

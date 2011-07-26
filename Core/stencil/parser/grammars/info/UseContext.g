@@ -10,11 +10,12 @@ options {
   /**Gets the usage context of a given operator instance.**/
    
 
-  package stencil.parser.string.info;
+  package stencil.parser.string;
   
   import stencil.parser.string.TreeFilterSequence;
   import stencil.parser.string.util.Context;
-  import stencil.parser.tree.util.MultiPartName;
+  import stencil.interpreter.tree.MultiPartName;
+  import stencil.interpreter.tree.Freezer;
   import stencil.parser.tree.StencilTree;
 }
 
@@ -38,9 +39,9 @@ options {
 
 //TODO: Remove if statement when numeralize is done in return values as well
 argCount
- : ^(f=FUNCTION .*)
-    { MultiPartName n = new MultiPartName(f.getText());
-      if (n.getName().equals(inProgress.target())) {
+ : ^(f=FUNCTION r=OP_NAME . . . .)
+    { MultiPartName n = Freezer.multiName(r);
+      if (n.name().equals(inProgress.target())) {
         inProgress.update(f.find(LIST_ARGS).getChildCount());
         }
     };
@@ -48,10 +49,10 @@ argCount
 
 highOrderArg
   : opArg=OP_AS_ARG
-    {MultiPartName n = new MultiPartName(opArg.getText());
-      if (n.getName().equals(inProgress.target())) {
+    {MultiPartName n = Freezer.multiName(opArg.find(OP_NAME));
+      if (n.name().equals(inProgress.target())) {
            StencilTree base = opArg.getAncestor(OPERATOR_REFERENCE);
-           String type = base.find(OPERATOR_BASE).getText();
+           String type = Freezer.multiName(base.find(OPERATOR_BASE)).toString();
            inProgress.addHighOrderUse(type, base);
       }
     }; 

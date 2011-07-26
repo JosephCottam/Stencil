@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Deaths
-HEADER: date, type, count
+TUPLE_SIZE: 3
 SEPARATOR: \s*,\s*
 SOURCE: ./NightingaleCrimeaSplit.csv
 SKIP: 1
@@ -10,24 +10,24 @@ stream Deaths(date, type, count)
 
 layer Rose["SLICE"]
 guide
-  legend[X: -75, Y: -50] from FILL_COLOR
+  legend[X: -75, Y:50] from FILL_COLOR
 
   pointLabels from ID
     TEXT: MakeLabel(ID)         /*@\label{rose:postProcessStart}@*/
-    (X,Y): MinRadius.query(50, X, Y, OUTERX, OUTERY)
+    (X,Y): MinRadius.query(50, X, Y, OUTER.0, OUTER.1)
     REGISTRATION: "CENTER"
     FONT: @Font{4}          /*@\label{rose:postProcessEnd}@*/
 
 from Deaths
    local(month, year) : ParseDate(date)
-   ID: Concatenate(type, ":", month)
+   ID: Concatenate(type, ":", local.month)
    FILL_COLOR: ColorBy(type)
    PEN: @Stroke{.5}
    PEN_COLOR: @Color{Gray70}
-   HEIGHT:* Scale[min:0, max:250](count)
+   SIZE:* Scale[min:0, max:250](count)
    Z: Mult(-1, count)
    (X,Y): (0,0)
-   (START, END): Sub1(month) -> Partition(_)  
+   (START, END): Sub1(local.month) -> Partition(_)  
     
 operator ColorBy (t) -> (C)
    (t=~"wounds") => C:@Color{LightPink}
@@ -35,18 +35,18 @@ operator ColorBy (t) -> (C)
    (t=~"disease") => C:@Color{LightBlue}
 
 operator ParseDate (d) -> (m,y)
-   (ALL) => (m,y): [s] IndexOf(d, "/") -> 
-                   [m] Substring(d, 0, s[0]) ->
-                     Add1(s[0]) -> Substring(d, _, -1) -> (m[0], _) 
+   default => (m,y): [s] IndexOf(d, "/") -> 
+                     [m] Substring(d, 0, s) ->
+                     Add1(s) -> Substring(d, _, -1) -> (m, _) 
 
 operator MakeLabel(id) -> (text)
    (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) -> MonthAbr(_)
-   (ALL) => text: ""
+   default => text: ""
 
 operator Partition(n) -> (start, end)
-   (ALL) => (start, end): Sub(12, n) -> [n] Sub(_,4) -> 
-                          [end] Mult(30, n[0]) ->
-                          Add1(n[0]) -> Mult(30,_) -> (_,end[_])
+   default => (start, end): Sub(12, n) -> [n] Sub(_,4) -> 
+                          [end] Mult(30, n) ->
+                          Add1(n) -> Mult(30,_) -> (_,end)
 
 
 operator MonthAbr (n) -> (month) 
@@ -62,7 +62,7 @@ operator MonthAbr (n) -> (month)
    (n=10) => month: "Oct"
    (n=11) => month: "Nov"
    (n=12) => month: "Dec"
-   (ALL) => month: "ERROR"
+   default => month: "ERROR"
 
 
 java MinRadius {	/*@\label{rose:javaStart}@*/

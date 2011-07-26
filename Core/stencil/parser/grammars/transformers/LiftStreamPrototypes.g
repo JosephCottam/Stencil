@@ -8,7 +8,7 @@ options {
 }
 
 @header {
-   /**Creates a stream prototype for internally defined streams. **/
+   /**Creates a stream prototype for internally defined and system streams . **/
 
    package stencil.parser.string;
 	
@@ -17,6 +17,12 @@ options {
 
 @members {
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+
+  public StencilTree downup(Object t) {
+    t = downup(t, this, "topdown"); 
+    t = downup(t, this, "addSystemStreams");
+    return (StencilTree) t; 
+  }
 
    private Object makePrototype(StencilTree streamDef) {
       assert streamDef.getType() == STREAM_DEF : "Did not recieve stream def when expected.";
@@ -34,6 +40,12 @@ options {
    }
 }
 
-topdown 
-  : ^(PROGRAM i=. gv=. sd=. o=. cd=. s=. r+=.*) 
-      -> ^(PROGRAM $i $gv {addPrototypes($sd, $s)} $o $cd $s $r*);
+//Add stream defs for internally defined streams
+topdown
+  : ^(PROGRAM i=. gv=. sd=. o=. cd=. vd=. s=. r+=.*) 
+      -> ^(PROGRAM $i $gv {addPrototypes($sd, $s)} $o $cd $vd $s $r*);
+
+  
+//Add stream defs for system streams
+addSystemStreams
+  : ^(LIST_STREAM_DECLS defs+=.*) -> ^(LIST_STREAM_DECLS ^(STREAM["#Render"] ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["#COUNT"] DEFAULT))) $defs*);

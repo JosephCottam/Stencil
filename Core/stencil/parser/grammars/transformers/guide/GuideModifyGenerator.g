@@ -27,7 +27,7 @@ options {
   public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   public StencilTree downup(Object t) {
-    downup(t, this, "duplicateGens"); //Direct guide transformation
+    downup(t, this, "duplicateGens"); 
     downup(t, this, "topdown", "tagCompoundGuides");
     downup(t, this, "topdown", "identifyCrosses");
     downup(t, this, "simplifyGens");
@@ -128,9 +128,11 @@ simplifyGens
   : ^(LIST_GUIDE_GENERATORS simplifyGen+);
 
 simplifyGen
-  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION i=. s=. a=. y=. c=. )))
+//  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION (options {greedy=false;} :.)* c=.)))  <--Why doesn't this work???
+  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION . . . . . c=.)))
     {target.getAncestor(GUIDE_DIRECT) != null}?
       -> ^(GUIDE_GENERATOR ^(RULE $target ^(CALL_CHAIN $c)));
+
 
 
 //Strip away extra stuff from the monitors
@@ -173,7 +175,7 @@ combineCompoundGuides:
      
 //Combine changes the the target type to TARGET, so it matches
 sameTargets
-  : ^(r=RESULT rs+=.*) {$r.getAncestor(GUIDE_DIRECT) != null}? -> ^(TARGET $rs*);
+  : ^(r=TARGET rs+=.*) {$r.getAncestor(GUIDE_DIRECT) != null}? -> ^(TARGET $rs*);
 
 
 
@@ -182,8 +184,8 @@ repackGeneratorRule
   : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack) .?)) -> ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
 
 retarget
-  : ^(t=TARGET ^(TUPLE_PROTOTYPE p+=.+))
-      -> ^(TARGET ^(TUPLE_PROTOTYPE $p* ^(TUPLE_FIELD_DEF STRING["Input" + index($t)] STRING["DEFAULT"])));
+  : ^(t=TARGET ^(TARGET_TUPLE p+=.+))
+      -> ^(TARGET ^(TARGET_TUPLE $p* ^(TUPLE_FIELD ID["Input" + index($t)])));
 
 //Add sample output to the result prototpye      
 repack

@@ -18,18 +18,18 @@ options {
 	 
    package stencil.parser.string;
 	    
-   import stencil.parser.tree.util.*;
    import stencil.module.*;
    import stencil.parser.tree.*;
-   import stencil.parser.ParseStencil;
+   import stencil.parser.ParserConstants;
    import stencil.interpreter.tree.Freezer;
    import stencil.interpreter.tree.Specializer;
+   import stencil.interpreter.tree.MultiPartName;
    import stencil.interpreter.guide.Samplers;
-   
+   import stencil.parser.ParserConstants;
+      
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.MAP_FACET;
    import static stencil.interpreter.guide.Samplers.Monitor;
-   import static stencil.interpreter.guide.Samplers.SAMPLE_KEY;
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
@@ -49,7 +49,6 @@ options {
     return t;
   }
 
-  private static final String MONITOR_PREFIX = "monitor.";
   private static final String SEED_PREFIX = "seed.";
 
 	protected ModuleCache modules;
@@ -66,7 +65,7 @@ options {
           return key(tree.getAncestor(RULE));
       } else if (tree.getType() == RULE) {
 		      Tree layer = tree.getAncestor(LAYER);
-		      Tree attRef = tree.find(TARGET, RESULT, LOCAL, PREFILTER, VIEW, CANVAS).find(TUPLE_PROTOTYPE).getChild(0);
+		      Tree attRef = tree.find(TARGET).find(TARGET_TUPLE).getChild(0);
 		      if (attRef == null) {return null;} //rule has no target, happens when the rule is for side effects only
 		      Tree att = attRef.getChild(0);
 		      if (layer == null || att==null) {return null;}
@@ -78,11 +77,7 @@ options {
     }
     
     
-	  private String key(String layer, String attribute) {
-     	MultiPartName att = new MultiPartName(attribute);
-    	String key= layer + BIND_OPERATOR + att.getName();	//Trim to just the attribute name
-    	return key;
-    }
+	private String key(String layer, String att) {return layer + BIND_OPERATOR + att;}
     
     /**Does the given call group already have the appropriate sampling operator?**/ 
     private boolean requiresChanges(StencilTree chain) {
@@ -92,23 +87,25 @@ options {
       String operatorName = operatorName(type);
       StencilTree call = chain.find(FUNCTION, PACK);
       while(call.getType() == FUNCTION) {
-        if (operatorName.equals(call.getText())) {return false;}
+        MultiPartName name = Freezer.multiName(call.find(OP_NAME));
+        if (operatorName.equals(name.name())) {return false;}
         call = call.find(FUNCTION, PACK);
       }
       return true;
     }
     
+    //TODO: This sems to duplicate information in the `Samplers.samplers' map...can this be removed?
     private static final String operatorName(String type) {
       Monitor mon = Samplers.monitor(type);
       String operatorName;
       switch (mon) {
-        case FLEX : operatorName = "MonitorFlex"; break; 
-        case CATEGORICAL : operatorName = "MonitorCategorical"; break;   
-        case CONTINUOUS : operatorName = "MonitorContinuous"; break; 
-        case NONE : throw new RuntimeException("Attempt to acquire null monitor in guide system.");
+        case FLEX : return "MonitorFlex";  
+        case CATEGORICAL : return "MonitorCategorical";    
+        case CONTINUOUS : return "MonitorContinuous";  
+        case NOP : return "Nop";
+        case NONE : throw new RuntimeException("Attempt to acquire `NONE' monitor for direct guide.");
         default : throw new Error(String.format("Monitor type \%2\$s not handled (requested for sample type \%1\$s)", mon, type));
       }
-      return String.format("\%1\$s.\%2\$s", operatorName, MAP_FACET);
     }
  
     /**Construct the arguments section of an echo call block.
@@ -127,17 +124,28 @@ options {
        return newArgs;
     }
         
-    private String selectOperator(StencilTree t) {
+    /**Determine which monitor operator to use.  
+      *If this is to replace a compact form, the flag should be set to true (different error conditions apply)
+      **/
+    private String selectOperator(StencilTree t, boolean compactForm) {
       StencilTree layer = t.getAncestor(LAYER);
       StencilTree r = t.getAncestor(RULE);
-      String field = r.findDescendant(TUPLE_PROTOTYPE).getChild(0).getChild(0).getText();
-      
-      String type = requestedGuides.get(key(layer.getText(), field)).find(SAMPLE_TYPE).getText();
-      return operatorName(type);
+      String field = Freezer.tupleField(r.findDescendant(TARGET_TUPLE).getChild(0)).toString();
+
+      StencilTree request = requestedGuides.get(key(layer.getText(), field));
+      if (request == null && !compactForm) {throw new RuntimeException("Error construction guide: Request for guide does not correspond to a property with rules.");}
+      else if (request == null) {return operatorName("NOP");}
+      else {
+          String type = request.find(SAMPLE_TYPE).getText();
+          return operatorName(type);
+      }
     }
     
-    private StencilTree spec(StencilTree t) {
-       StencilTree guide = requestedGuides.get(key(t.getAncestor(RULE))).getAncestor(GUIDE);
+    private StencilTree spec(StencilTree t, boolean compactForm) {
+       StencilTree request = requestedGuides.get(key(t.getAncestor(RULE)));
+       if (request == null && compactForm) {return ParserConstants.EMPTY_SPECIALIZER_TREE;}
+       
+       StencilTree guide = request.getAncestor(GUIDE);
        Specializer spec = Freezer.specializer(guide.find(SPECIALIZER));
        StencilTree newSpec = (StencilTree) adaptor.create(SPECIALIZER, "");
        
@@ -163,15 +171,22 @@ listRequirements: ^(sel=SELECTOR .*)
 
 //Replace the #-> with a monitor operator...
 replaceCompactForm:
- ^(f=FUNCTION s=. a=. gy=GUIDE_YIELD t=.) ->
-		^(FUNCTION $s $a DIRECT_YIELD[$gy.text] ^(FUNCTION[selectOperator($f)] {spec($t)} {echoArgs($t)} DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] $t));  
+ ^(f=FUNCTION n=. s=. a=. gy=GUIDE_YIELD t=.) ->
+		^(FUNCTION  $n $s $a DIRECT_YIELD[$gy.text] 
+		      ^(FUNCTION 
+		          ^(OP_NAME DEFAULT ID[selectOperator($t, true)] ID[MAP_FACET]) 
+		          {spec($t, true)} 
+		          {echoArgs($t)} 
+		          DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
+		          $t));  
 		
 ensure:
   ^(c=CALL_CHAIN t=.)
-		  {$c.getParent().getChild(0).getType() == RESULT &&  requiresChanges($c)}? ->
+		  {$c.getAncestor(RULES_RESULT) != null &&  requiresChanges($c)}? ->
 		    ^(CALL_CHAIN    
-		       ^(FUNCTION[selectOperator($t)] 
-                  {spec($t)} 
+		       ^(FUNCTION
+		          ^(OP_NAME DEFAULT ID[selectOperator($t, false)] ID[MAP_FACET]) 
+                  {spec($t, true)} 
                   {echoArgs($t)} 
                   DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
                   $t));

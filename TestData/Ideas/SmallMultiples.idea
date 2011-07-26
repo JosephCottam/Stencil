@@ -1,13 +1,18 @@
-glyph BarChart
-    hide Lines(ID, X1,X2,Y1,Y2)
-    properties(Cat, Value)
-    
-    item Title[Text]
+group BarChart 
+    data Cat
+    data Value
 
-    layer Lines[Line]
+    item Title["Text"]
+    default
+       Reg: CENTER
+    from data
+       X : Center(Parent[Bounds]) -> X
+       Y : Sub(Parent[Bounds][Y], Parent[Bounds][HEIGHT]) -> Sub(_, 10)
+
+    layer Bars["SHAPE"]
     from properties(Cat, Value)
       ID: Cat
-      (X1, X2) : Index(ID) -> (_,_)
+      (X1, X2) : Index(Cat) -> (_,_) 
       (Y1, Y2) : (0, value)
 
 
@@ -16,7 +21,7 @@ stream values(Type, Cat, Value)
 layer Mutliples[BarChart]
   from values
       ID: Type
-      Title[TEXT]: Type
+      Title.TEXT: Type
       Cat: Cat
       Value: Value
       (X,Y): layout(Type)
@@ -36,49 +41,53 @@ will convert from the local space to the global canvas space.
 
 
 Here is a labeled shape glyph:
-glyph LabeledTic
-  hide Label X,Y
-  hide Tick X,Y
+group Axis
+   data INPUT
+   data OUTPUT
+   data Orient : "V"
+   data Align : "BOTTOM"
+   data TickSize : 5
+   data Baseline : 0
 
-  properties (position)
+   element["LINE"] line
+   from  data
+   filter(Orient =~ "V")
+      X1 : Range[ALL](@Min, OUTPUT)
+      X2 : Range[ALL](@Max, OUTPUT)
+      (Y1,Y2) : (Baseline, Baseline)
+   filter(Orient =~ "H")
+      Y1 : Range[ALL](@Min, OUTPUT)
+      Y2 : Range[ALL](@Max, OUTPUT)
+      (X1,X2) : (Baseline, Baseline)
 
-   element Label[Text]
-   from properties
-        (X,Y, REGISTRATION) : reposition(position)
-   
-   element Tick[SHAPE]
-   defaults
-      REGISTRATION: "Center"
-      SHAPE: "TICK"
+   layer["LabeledTick", ID: "Auto", Align: "Bottom"]
+   from data
+   filter(Orient =~ "V")
+      X1,X2: OUTPUT, OUTPUT
+      Y1: Div(TickSize, 2) -> Add(Baseline, _)
+      Y2: Div(TickSize, 2) -> Sub(Baseline, _)
 
-   operator reposition (v) -> (X,Y,R)
-      (v =~"top")        => X,Y : top(Tick) -> (X,Y, "BOTTOM")
-      (v =~"bottom") => X,Y : bottom(Tick) -> (X,Y, "TOP")
-      (v =~"left")        => X,Y : left(Tick) -> (X,Y, "RIGHT")
-      (v =~"right")     => X,Y : right(Tick) -> (X,Y, "LEFT")
-      
-The 'position' attribute is used to determine where
-the label is relative to the shape.  'top', 'bottom', 'left' and 'right'
-are operators that get respective X,Y locations of the named element.
 
-Below is a scene-graph style declaration of axes
-(using the labeled shape defined above):
 
-glyph[AXIS, OFFSET] axisGuide
-   hide extent(X1,Y1,X2,Y2)
-   hide tics(X,Y, REGISTRATION)
+group LabeledTick
+   data Spacing : 5     //properties that can be set in stream or specializer
+   data Align   : "BOTTOM"  //Setting in specializer is the same as setting a new default for the instance
+   data X1:0            //You may also walk the hierarchy and set any property, 
+   data Y1:0            //  though data-based binding happens second 
+   data X2:0            // (so setting Tick.X1 works, but will be overwritten,
+   data Y2:0            //  but Tick.PEN will have an effect).
+   data TEXT:"" 
 
-   element extent[LINE]
-       (X1,Y1,X2,Y2): 
-            bounds(tics) -> layout(X,Y,WIDTH,HEIGHT)
+   element["LINE"] Tick
+   from data
+      (X1,Y1,X2,Y2) : (X1,Y1,X2,Y2)
 
-    layer tics[LabeledTic]
+   element["TEXT"] Label
+   from data
+    REG : Align
+        TEXT: TEXT
+        (X, Y) : RegisterP(X1,Y1,X2,Y2, ALIGN)  //RegisterP (x,y,x,y) -> x,y; result is the registration of the bounding box
+                        // that contains the points
 
-    //AXIS and OFFSET are  the specializer arguments from the glyph definition
-    operator layout (X,Y,WIDTH, HEIGHT) -> (X1,Y1,X2,Y2)
-         (AXIS =~ "X") => (X1,Y1,X2,Y2): sum(X, WIDTH) -[X2]> 
-                                       X, OFFSET, X2[_], OFFSET
-         (AXIS =~ "Y") => (X1,Y1,X2,Y2): sum(X, WIDTH) -[Y2]> 
-                                       OFFSET, Y, OFFSET, Y2[_]
 
 

@@ -44,7 +44,7 @@ public class TestHigherOrder extends StencilTestCase {
 	}
 
 	
-	private final String MAP_TEST = "stream S(v1, v2) layer L from S ID: Map(@Reform, v1) X: Map(@Add1, *) operator Reform (v) -> (v) (ALL) => v: Trim(v)";
+	private final String MAP_TEST = "stream S(v1, v2)\n layer L\n from S\n ID: Map(@Reform, v1)\n X: Map(@Add1, *)\n operator Reform (v) -> (v) default => v: Trim(v)";
 	public void testSimpleMap() throws Exception {
 		StencilTree p = ParseStencil.programTree(MAP_TEST, Adapter.ADAPTER);
 		
@@ -60,7 +60,7 @@ public class TestHigherOrder extends StencilTestCase {
 		assertNotNull("Facet on map not not found.", iMap);
 		assertNotNull("Facet on map not not found.", iQuery);
 		
-		ArrayTuple numbers = new ArrayTuple(1,2,3,4,5);
+		ArrayTuple numbers = ArrayTuple.from(1,2,3,4,5);
 		assertEquals(mapTuple(2.0d,3.0d,4.0d,5.0d,6.0d), iMap.invoke(new Object[]{numbers}));
 	}
 	
@@ -77,7 +77,7 @@ public class TestHigherOrder extends StencilTestCase {
 		assertNotNull("Facet on map not not found.", iMap);
 		assertNotNull("Facet on map not not found.", iQuery);
 		
-		ArrayTuple values = new ArrayTuple("   A", "   1","   B","   2");
+		ArrayTuple values = ArrayTuple.from("   A", "   1","   B","   2");
 		assertEquals(mapTuple("A","1", "B", "2"), iMap.invoke(new Object[]{values}));
 	}
 	

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import stencil.display.DisplayLayer;
+import stencil.interpreter.TupleStore;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.MonitorOperator;
 import stencil.module.operator.util.Invokeable;
@@ -13,7 +14,6 @@ import stencil.parser.string.StencilParser;
 import stencil.parser.tree.AstInvokeable;
 import stencil.parser.tree.Const;
 import stencil.parser.tree.StencilTree;
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
@@ -21,42 +21,54 @@ import static stencil.parser.string.StencilParser.*;
 
 public final class Freezer {
 	public static Object VALUE_ALL = new String("ALL");	//New strings because these need to be distinct from other "random" usages of the word, but still have these contents
-	public static Object VALUE_LAST = new String("LAST");
+
+	/**Indicates when extending that the original or default value should be used, not the one present in the update values.
+	 * This is used to enable consumes blocks with different results prototypes in the same layer.
+	 */
+	public static final Object NO_UPDATE = new Object();
+	
+	/**A value to indicate that the default value should be used instead.**/
+	public static final Object VALUE_DEFAULT = new Object();
 	
 	private Freezer() {}
 
 	public static boolean verifyType(StencilTree tree, int... types) {
 		for (int type: types) {
-			if (tree.getType() == type) {return true;}
+			if (tree.is(type)) {return true;}
 		}
 		throw new Error("Found " + StencilTree.typeName(tree.getType()));
 	}
 
 	
-	public static Object freeze(StencilTree tree) {
+	public static Object freezeValue(StencilTree tree) {
 		try {
 			switch (tree.getType()) {
 			case ALL: return VALUE_ALL;
-			case AST_INVOKEABLE: return invokeable(tree);
 			case CONST: return constant(tree);
-			case CONSUMES: return consumes(tree);
+			case DEFAULT: return VALUE_DEFAULT;
 			case ID: return tree.getText();
-			case LIST_ARGS: return valueList(tree);
-			case LAST: return VALUE_LAST;
 			case NUMBER: return number(tree);
 			case NULL: return null;
-			case OPERATOR_FACET: return operatorFacet("**UNKNOWN**", (StencilTree) tree);
-			case RULE: return rule(tree);
-			case SPECIALIZER: return specializer(tree);
-			case STATE_QUERY: return stateQuery(tree);
 			case STRING: return string(tree);
-			case TUPLE_PROTOTYPE: return prototype(tree);
 			case TUPLE_REF: return tupleRef(tree);
-			case OP_AS_ARG: return tree.getText();
-			default: throw new RuntimeException("Cannot generically freeze type " + StencilTree.typeName(tree.getType()));
+			case OP_AS_ARG: return multiName(tree.find(OP_NAME));
+			case TRUE: return true;
+			case FALSE: return false; 
+			case StencilParser.NO_UPDATE: return NO_UPDATE;
+			default: throw new RuntimeException("Unknown value freeze requested " + StencilTree.typeName(tree.getType()));
 			}
 		} catch (FreezeException fe) {throw fe;}
 		catch (Exception e) {throw new FreezeException(tree, e);}
+	}
+	
+	public static MultiPartName multiName(StencilTree name) {
+		assert verifyType(name, OP_NAME, OPERATOR_BASE);
+		String pre = name.getChild(0).is(DEFAULT) ? "" : name.getChild(0).toString();
+		String base = name.getChild(1).toString();
+		String facet = (name.getChildCount() < 3 || name.getChild(2).is(DEFAULT))
+							? null 
+							: name.getChild(2).toString();
+		return new MultiPartName(pre, base, facet);
 	}
 	
 	public static StreamDef streamDef(StencilTree streamDef) {
@@ -70,9 +82,10 @@ public final class Freezer {
 	public static Program program(StencilTree program) {
 		assert verifyType(program, PROGRAM);
 		Order order = order(program.find(ORDER));
+		ViewOrCanvas view = viewOrCanvas(program.find(VIEW));
+		ViewOrCanvas canvas = viewOrCanvas(program.find(CANVAS));
 		Layer[] layers = layers(program.find(LIST_LAYERS));
 		StreamDef[] streams = streams(program.find(LIST_STREAM_DEFS));
-		Specializer canvasSpec = specializer(program.find(CANVAS_DEF).find(SPECIALIZER));
 		
 		List<StencilTree> dynamicRules = program.findAllDescendants(DYNAMIC_RULE);
 		final DynamicRule[] dynamics = new DynamicRule[dynamicRules.size()];
@@ -82,13 +95,14 @@ public final class Freezer {
 		final Guide[] guides = new Guide[guideDefs.size()];
 		for (int i=0; i< guides.length;i++) {guides[i]=guide(guideDefs.get(i));}
 		
-		return new Program(canvasSpec, layers, streams, order, dynamics, guides);
+		return new Program(view, canvas, layers, streams, order, dynamics, guides);
 	}
 	
 	public static Guide guide(StencilTree guide) {
 		assert verifyType(guide, GUIDE);
-		final String id= guide.find(SELECTOR).getText();
+		final String id= guide.getText();
 		final String type = guide.find(ID).getText();
+		final Specializer selectors = selectors(guide.find(LIST_SELECTORS));
 		final MonitorOperator[] monitorOps = typedArray(guide.find(LIST_GUIDE_MONITORS), MonitorOperator.class, "monitorOperator"); 
 		final SampleOperator[] sampleOps = typedArray(guide.find(LIST_GUIDE_SAMPLERS), SampleOperator.class, "sampleOperator");
 		final StateQuery query = stateQuery(guide.find(STATE_QUERY));
@@ -96,7 +110,17 @@ public final class Freezer {
 		final Specializer spec = specializer(guide.find(SPECIALIZER));
 		final Rule rules = ruleFromList(guide.find(LIST_RULES));
 		
-		return new Guide(id, type, rules, monitorOps, sampleOps, query, generators, spec);
+		return new Guide(id, type, selectors, rules, monitorOps, sampleOps, query, generators, spec);
+	}
+	public static Specializer selectors(StencilTree selectors) {
+		String[] keys = new String[selectors.getChildCount()];
+		String[] values = new String[selectors.getChildCount()];
+		
+		for (int i=0; i< selectors.getChildCount(); i++) {
+			keys[i] = selectors.getChild(i).getText();
+			values[i] = selectors.getChild(i).find(SAMPLE_TYPE).getText();
+		}
+		return new Specializer(keys, values);
 	}
 
 	public static Rule guideGenerator(StencilTree generator) {
@@ -126,25 +150,47 @@ public final class Freezer {
 		return typedArray(root, StreamDef.class, "streamDef");
 	}
 	
-	private static <T> T[] typedArray(StencilTree root, Class<T> type, String freezerName) throws FreezeException {
+
+	private static <T> T[] typedArray(StencilTree root, Class<T> type, String freezerName) throws FreezeException {return typedArray(root, root.getChildCount(), type, freezerName);}
+	private static <T> T[] typedArray(Iterable<StencilTree> root, int size, Class<T> type, String freezerName) throws FreezeException {
 		try {
 			Method freezer = Freezer.class.getMethod(freezerName, StencilTree.class);
 
-			Object value = Array.newInstance(type, root.getChildCount());
-			for (int i=0;i < root.getChildCount(); i++) {
-				try {Array.set(value, i, freezer.invoke(null, root.getChild(i)));}
-				catch (Exception e) {throw new FreezeException(root.getChild(i), e);}
+			Object value = Array.newInstance(type, size);
+			int i=0;
+			for (StencilTree child: root) {
+				try {Array.set(value, i, freezer.invoke(null, child));}
+				catch (Exception e) {throw new FreezeException(child, e);}
+				i++;
 			}
 			return (T[]) value;
-		} catch (Exception e) {throw new FreezeException(root, e);}
+		} 
+		catch (FreezeException fe) {throw fe;}
+		catch (Exception e) {
+			if (root instanceof StencilTree) {throw new FreezeException((StencilTree) root, e);}
+			else {throw new FreezeException(e);}			
+		}
+	}
+	
+	//TODO: Merge ViewOrCanvas with Layer
+	public static ViewOrCanvas viewOrCanvas(StencilTree source) {
+		assert verifyType(source, VIEW, CANVAS);	
+		
+		String name = source.getText();
+		Specializer spec = specializer(source.find(SPECIALIZER));
+		Consumes[] groups = groups(source.find(StencilParser.LIST_CONSUMES));
+		TupleStore impl = (TupleStore) ((Const) source.find(CONST)).getValue();
+		return new ViewOrCanvas(impl, name, spec, groups);
 	}
 	
 	public static Layer layer(StencilTree layer) {
 		assert verifyType(layer, LAYER);
 		String name = layer.getText();
-		Consumes[] groups = Freezer.groups(layer.find(StencilParser.LIST_CONSUMES));
-		DisplayLayer impl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();
-		return new Layer(impl, name, groups);
+		Specializer spec = specializer(layer.find(SPECIALIZER));
+		Consumes[] groups = groups(layer.find(StencilParser.LIST_CONSUMES));
+		DisplayLayer impl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();			
+
+		return new Layer(impl, name, spec, groups);
 	}
 	
 	public static Order order(StencilTree order) {
@@ -165,6 +211,7 @@ public final class Freezer {
 		assert verifyType(chain, CALL_CHAIN);
 		ArrayList<Invokeable> invokeables = new ArrayList();
 		ArrayList<Object[]> args = new ArrayList();
+		
 		for (StencilTree func: chain.findAllDescendants(FUNCTION)) {
 			invokeables.add(invokeable(func.find(AST_INVOKEABLE)));
 			args.add(valueList(func.find(LIST_ARGS)));
@@ -193,11 +240,8 @@ public final class Freezer {
 		Rule prefilter = ruleFromList(consumes.find(RULES_PREFILTER));
 		Rule local = ruleFromList(consumes.find(RULES_LOCAL));
 		Rule results = ruleFromList(consumes.find(RULES_RESULT));
-		Rule view = ruleFromList(consumes.find(RULES_VIEW));
-		Rule canvas = ruleFromList(consumes.find(RULES_CANVAS));
 		DynamicRule[] dynamics = dynamicRuleList(consumes.find(RULES_DYNAMIC));
-		Object[] reducer = valueList(consumes.find(DYNAMIC_REDUCER).find(PACK));
-		return new Consumes(consumes.getChildIndex(), stream, filters, prefilter, local, results, view, canvas, dynamics, reducer);
+		return new Consumes(consumes.getChildIndex(), stream, filters, prefilter, local, results, dynamics);
 		
 	}
 	
@@ -250,6 +294,24 @@ public final class Freezer {
 		}
 		return new TupleRef(steps);
 	}
+
+	public static TupleField tupleField(StencilTree longName) {
+		assert verifyType(longName, TUPLE_FIELD);
+		String[] parts = new String[longName.getChildCount()];
+		for (int j=0; j<parts.length; j++) {
+			parts[j] = longName.getChild(j).getText();
+		}
+		return new TupleField(parts);
+	}
+	
+	public static TargetTuple targetTuple(StencilTree tuple) {
+		assert verifyType(tuple, TARGET_TUPLE);
+		final TupleField[] names = new TupleField[tuple.getChildCount()];
+		for (int i=0; i< names.length; i++) {
+			names[i] = tupleField(tuple.getChild(i));
+		}
+		return new TargetTuple(names);
+	}
 	
 	public static TuplePrototype prototype(StencilTree prototype) {
 		assert verifyType(prototype, TUPLE_PROTOTYPE);
@@ -265,7 +327,7 @@ public final class Freezer {
 			//try {types[i] = Class.forName(field.getChild(1).getText());}
 			//catch (ClassNotFoundException e) {throw new IllegalArgumentException("Could not freeze prototype (unknown type): " + prototype.toStringTree());}
 		}
-		return new SimplePrototype(names, types);
+		return new TuplePrototype(names, types);
 	}
 	
 	
@@ -274,13 +336,13 @@ public final class Freezer {
 
 		final Object[] rv = new Object[list.getChildCount()];
 		for (int i=0; i<rv.length; i++) {
-			rv[i] = freeze(list.getChild(i));
+			rv[i] = freezeValue(list.getChild(i));
 		}
 		return rv;
 	}
 	
 	public static Rule ruleFromList(StencilTree rulesRoot) {
-		assert verifyType(rulesRoot, LIST_RULES, RULES_CANVAS, RULES_DEFAULTS, RULES_DYNAMIC, RULES_FILTER, RULES_LOCAL, RULES_OPERATOR, RULES_PREDICATES, RULES_PREFILTER, RULES_RESULT, RULES_VIEW);
+		assert verifyType(rulesRoot, LIST_RULES, RULES_DEFAULTS, RULES_DYNAMIC, RULES_FILTER, RULES_LOCAL, RULES_OPERATOR, RULES_PREDICATES, RULES_PREFILTER, RULES_RESULT);
 		if (rulesRoot.getChildCount() ==0) {return Rule.EMPTY_RULE;}
 		if (rulesRoot.getChildCount() >1) {throw new IllegalArgumentException("Can only freeze rules lists of length 1, given list of size " + rulesRoot.getChildCount());}
 		return rule(rulesRoot.getChild(0));
@@ -291,7 +353,7 @@ public final class Freezer {
 	
 		StringBuilder path = new StringBuilder();
 		StencilTree root = rule;
-		while (root.getType() != PROGRAM) {
+		while (!root.is(PROGRAM)) {
 			path.append(root.getText() + " <-- ");
 			root = root.getParent();
 		}
@@ -302,10 +364,10 @@ public final class Freezer {
 	
 	
 	public static Target target(StencilTree target) {
-		assert verifyType(target, TARGET, VIEW, CANVAS, RESULT, LOCAL, PREFILTER);
+		assert verifyType(target, TARGET); // RESULT, LOCAL, PREFILTER;
 		try {
-			TuplePrototype proto = prototype(target.find(TUPLE_PROTOTYPE));
-			return new Target(proto);
+			TargetTuple tt = targetTuple(target.find(TARGET_TUPLE));
+			return new Target(tt);
 		} catch (Exception e) {throw new FreezeException(target, e);}
 	}
 	
@@ -378,7 +440,7 @@ public final class Freezer {
 				assert verifyType(entry, MAP_ENTRY);
 				assert entry.getChildCount() == 1 : "Malformed MAP_ENTRY found" + entry.toStringTree();
 				keys[i] = entry.getText();
-				vals[i] = freeze(entry.getChild(0));
+				vals[i] = freezeValue(entry.getChild(0));
 			}
 			if (spec instanceof StencilTree) {
 				return new Specializer(keys, vals, (StencilTree) spec);

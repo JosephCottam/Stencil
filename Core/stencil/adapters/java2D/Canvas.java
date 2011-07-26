@@ -1,34 +1,6 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.adapters.java2D;
 
- import java.awt.Color;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
@@ -40,13 +12,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import stencil.adapters.java2D.data.DoubleBufferLayer;
-import stencil.adapters.java2D.data.Glyph2D;
-import stencil.adapters.java2D.data.Guide2D;
+import stencil.adapters.general.ShapeUtils;
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.adapters.java2D.render.guides.Guide2D;
 import stencil.display.CanvasTuple;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
-import stencil.display.DisplayLayer;
 import stencil.interpreter.tree.*;
 
 
@@ -59,20 +30,20 @@ public final class Canvas extends DisplayCanvas {
 	private AffineTransform inverseViewTransform = new AffineTransform(); //Default transform is its own inverse
 	private final Map<String, Guide2D> guides  = new ConcurrentHashMap();
 	
-	final DoubleBufferLayer<? extends Glyph2D>[] layers;
+	public final Table[] layers;
 
 	/**Point used in many navigation operations.*/
 	private final Point2D tempPoint = new Point2D.Double();
 	
 	public Canvas(Specializer canvasSpec, Layer[] layers) {
-		String colorKey = (String) canvasSpec.get(CanvasTuple.CanvasAttribute.BACKGROUND_COLOR.name());
+		String colorKey = (String) canvasSpec.get(CanvasTuple.BACKGROUND_COLOR);
 		Color c = stencil.types.color.ColorCache.get(colorKey);
 		this.setBackground(c);
 		
 		//Copy display layers out of the layer objects
-		this.layers = new DoubleBufferLayer[layers.length];
+		this.layers = new Table[layers.length];
 		for (int i=0;i< layers.length;i++) {
-			this.layers[i] = (DoubleBufferLayer) layers[i].getDisplayLayer();
+			this.layers[i] = (Table) layers[i].implementation();
 		}
 		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
@@ -99,14 +70,14 @@ public final class Canvas extends DisplayCanvas {
 	 */
 	public Rectangle getContentBounds(boolean includeGuides) {
 		if (layers.length == 0) {return new Rectangle(0,0,0,0);}
-		final Rectangle2D bounds = new Rectangle(layers[0].viewpoint().getBoundsReference());
-		for (DisplayLayer<? extends Glyph2D> l: layers) {
-			bounds.add(l.viewpoint().getBoundsReference());
+		final Rectangle2D bounds = new Rectangle(0,0,-1,-1);
+		for (Table l: layers) {
+			ShapeUtils.add(bounds, l.tenured().getBoundsReference());
 		}
 		
 		if (includeGuides) {
 			for (Guide2D g: guides.values()) {
-				bounds.add(g.getBoundsReference());
+				ShapeUtils.add(bounds, g.getBoundsReference());
 			}
 		}
 		
@@ -152,7 +123,11 @@ public final class Canvas extends DisplayCanvas {
         viewTransform.scale(scaleX,scaleY);
         viewTransform.translate(-zx, -zy);
         try {setViewTransform(viewTransform);}
-        catch (NoninvertibleTransformException e ) {throw new Error("Supposedly impossible error occured.", e);}
+        catch (NoninvertibleTransformException e ) {
+        	try {setViewTransform(new AffineTransform());}
+			catch (NoninvertibleTransformException e1) {}	//Default transform is invertible...so everything is safe
+        	throw new Error("Supposedly impossible error occured.", e);
+        }
 	}
 	
     /**
@@ -232,8 +207,7 @@ public final class Canvas extends DisplayCanvas {
     
     public synchronized void setViewTransform(AffineTransform transform) throws NoninvertibleTransformException {
     	this.viewTransform = transform;
-    	try {this.inverseViewTransform = transform.createInverse();}
-    	catch (NoninvertibleTransformException e) {throw e;}
+    	this.inverseViewTransform = transform.createInverse();
     }
     
     

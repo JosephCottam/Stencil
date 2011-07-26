@@ -1,8 +1,6 @@
 package stencil.util.streams.txt;
 
 import java.io.BufferedReader; 
-import java.util.Arrays;
-import java.util.List;
 
 /**Means to get the next value from a stream.
  * 
@@ -14,11 +12,11 @@ public interface NextChannel {
 	public class FileValidationException extends RuntimeException {
 		private static final long serialVersionUID = 1L;
 
-		public FileValidationException(List<String> expected, int found) {
+		public FileValidationException(int expected, int found) {
 			this(expected, found, null);
 		}
-		public FileValidationException(List<String> expected, int found, Exception cause) {
-			super(String.format("Column count does not match the length of the labels list (found %1$s, expected %2$s)", found, Arrays.deepToString(expected.toArray())), cause);
+		public FileValidationException(int expected, int found, Exception cause) {
+			super(String.format("Column count does not match the length of the labels list (found %1$s, expected %2$s)", found, expected), cause);
 		}
 	}
 	

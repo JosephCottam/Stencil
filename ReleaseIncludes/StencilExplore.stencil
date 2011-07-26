@@ -1,6 +1,6 @@
 STREAM: File
 NAME: flowers
-HEADER: sepalLength, petalWidth, sepalWidth, petalLength, species, obs
+TUPLE_SIZE: 5
 SEPARATOR: \s*,\s*
 SOURCE: ./AndersonsFlowers.csv
 SKIP: 1

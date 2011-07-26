@@ -1,9 +1,9 @@
 package stencil.interpreter.tree;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.NoOutput;
 import stencil.interpreter.Viewpoint;
 import stencil.module.operator.util.Invokeable;
-import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple; 
 
@@ -46,9 +46,11 @@ public class CallChain implements Viewpoint<CallChain> {
 			try {
 				Object[] formals = TupleRef.resolveAll(args[target], env);
 				result = inv.tupleInvoke(formals);
-			} catch (NoOutput.Signal s) {result = NoOutput.TUPLE;
-			} catch (Exception e) {
-				throw new FunctionApplicationException(inv.targetIdentifier(), env, e);}
+			} 
+			catch (NoOutput.Signal s) {result = NoOutput.TUPLE;}
+			catch (Exception e) {
+				throw new FunctionApplicationException(inv.targetIdentifier(), env, e);
+			}
 			env.extend(result);
 		}
 
@@ -60,7 +62,7 @@ public class CallChain implements Viewpoint<CallChain> {
 	
 	private static final class FunctionApplicationException extends RuntimeException {
 		public FunctionApplicationException(String name, Tuple t, Exception e) {
-			super(String.format("Error applying function %1$s with tuple %2$s.", name, t.toString()), e);
+			super(String.format("Error applying function %1$s with environment %2$s.", name, t.toString()), e);
 		}
 	}
 }

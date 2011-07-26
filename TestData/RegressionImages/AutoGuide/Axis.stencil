@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Values
-HEADER: Category
+TUPLE_SIZE: 1
 SEPARATOR: ,
 SOURCE: ./Fruits.txt
 SKIP: 0
@@ -13,17 +13,15 @@ guide
    axis[count: 5, round: "T", tickSize: 5, textOffset: 6] Linear from Y
       label.FONT: @Font{10}
       line.PEN: @Stroke{1}
-      label.REGISTRATION: "RIGHT"
 
    axis[tickSize: 5, textOffset: 6] Categorical from X
-      label.REGISTRATION: "LEFT"
       label.FONT: @Font{10}
       line.PEN: @Stroke{1} 
 
 from Values
   ID : Count()
-  X : Index(Category) -> Add(index, 1) -> Mult(sum, 11)
-  Y : Count(Category) -#> Mult(count, -11)
+  X : Index(Category) -> Add(Index, 1) -> Mult(Add, 11)
+  Y : Count(Category) -#> Mult(Count, 11)
   FILL_COLOR: @Color{BLUE}
   SIZE: 10
   REGISTRATION: "CENTER"

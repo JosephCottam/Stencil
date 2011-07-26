@@ -1,8 +1,5 @@
 package stencil.module.util;
 
-import java.util.Arrays;
-
-import stencil.tuple.prototype.SimplePrototype;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
@@ -14,7 +11,7 @@ public final class FacetData {
 	private String target;
 	private String roles;
 	
-	public FacetData(String name, MemoryUse memory, String... fields) {this(name, memory, new SimplePrototype(Arrays.asList(fields)));}
+	public FacetData(String name, MemoryUse memory, String... fields) {this(name, memory, new TuplePrototype(fields));}
 	public FacetData(String name, MemoryUse memory, TuplePrototype prototype) {this(name, name, memory, prototype);}
 	public FacetData(String name, String target, MemoryUse memory, TuplePrototype prototype) {
 		this.name = name;

@@ -1,6 +1,6 @@
 STREAM: File
 NAME: Stocks
-HEADER: Date,Open,High,Low,Close,Volume
+TUPLE_SIZE: 6
 SEPARATOR: ,
 SOURCE: ./google_stocks.csv
 SKIP: 1
@@ -14,23 +14,24 @@ import ViewCanvas
 stream Stocks(Date, Open)
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
-layer Markers["POLY_LINE"]
-guide 
-  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] Linear from XS
-        label.TEXT: Date.query(_) -> Print(Date)
-  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] Linear from YS
+view
 from Stocks
-	ID : "Google"
-	IDX: "after"
-	XS : TimeStep(Date) -> Date(VALUE, VALUE, Date) -#> VALUE
-	YS : Add(Open, 0) -#> Price(sum) -> Price
+    (ZOOM, X,Y, WIDTH) 
+        : [dim] ScreenToCanvasDimension(20, 20) -> [Pad] Max(dim.Width, dim.Height) -> 
+          ZoomPadded(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT, Pad)
+
+layer Markers["POLY_POINT"]
+guide 
+  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] Linear from X
+        label.TEXT: Date.query(_) -> Print(Date)
+  axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] Linear from Y
+from Stocks
+    ID: Count()
+	GROUP : "Google"
+	X : TimeStep(Date) -> Date(TimeStep, TimeStep, Date) -#> Date.VALUE
+	Y : Add(Open, 0) -#> Price(Add) -> Price
 	PEN: @Stroke{1}
 	PEN_COLOR: @Color{BLUE}
-
-from Stocks
-	view(ZOOM, X,Y, WIDTH) 
-		: ScreenToCanvasDimension(20, 20) -> [Pad] Max(Width, Height) -> 
-		  ZoomPadded(view[PORTAL_WIDTH], view[PORTAL_HEIGHT], canvas[WIDTH], canvas[HEIGHT], Pad[_])
 	
 layer Lookup["SHAPE"]
 from Stocks
@@ -43,25 +44,24 @@ from Stocks
 layer Selected["TEXT"]
 from Mouse
   ID : "Selected"
-  (X, Y) : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.find(_) -> (X, Y)
-  TEXT : Nearest(X, 3) -> Max(canvas[X], _) -> Min(canvas[WIDTH], _) -> ToString(_) -> Lookup.find(_) -> Mult(-1, Y)
+  (X, Y) : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.find(_) -> (Lookup.X, Lookup.Y)
+  TEXT : Nearest(X, 3) -> Max(canvas.X, _) -> Min(canvas.WIDTH, _) -> ToString(_) -> Lookup.find(_) -> Mult(-1, Lookup.Y)
   SCALE_BY: "NONE"
 
 
 layer Highlight["LINE"]
 from Mouse
   ID : "Highlight"
-  (X.1, X.2) : Nearest(X, 3) -> Max(_, canvas[X]) -> (_,_)			
-  Y.1 : 0
-  Y.2 : Add(canvas[Y], 3)
+  (X1, X2) : Nearest(X, 3) -> Max(_, canvas.X) -> (_,_)			
+  Y1 : 0
+  Y2 : Add(canvas.Y, 3)
   PEN : @Stroke{3}
   PEN_COLOR : @Color{BLUE, 100}
 
 operator Date : Dict [fields:"VALUE, Date"]
 
 operator Price (Open) -> (Price)
-	ALL => (Price) : Mult(-1, Open)
+	default => (Price) :  Open
 
-operator TimeStep (T) -> (VALUE, Date)
-	ALL => VALUE : Index(T) -> Mult(index, 3)
-			Date : T
+operator TimeStep (T) -> (VALUE)
+	default => VALUE : Index(T) -> Mult(Index, 3)

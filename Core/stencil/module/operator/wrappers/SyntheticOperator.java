@@ -1,35 +1,8 @@
-/* Copyright (c) 2006-2008 Indiana University Research and Technology Corporation.
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * - Redistributions of source code must retain the above copyright notice, this
- *  list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright notice,
- *  this list of conditions and the following disclaimer in the documentation
- *  and/or other materials provided with the distribution.
- *
- * - Neither the Indiana University nor the names of its contributors may be used
- *  to endorse or promote products derived from this software without specific
- *  prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
 package stencil.module.operator.wrappers;
 
 import java.util.Arrays;
 
+import stencil.interpreter.Environment;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Freezer;
 import stencil.module.operator.StencilOperator;
@@ -40,12 +13,10 @@ import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
-import stencil.display.Display;
 import stencil.interpreter.tree.OperatorFacet;
 import stencil.interpreter.tree.OperatorRule;
 import stencil.interpreter.tree.StateQuery;
 import stencil.parser.tree.StencilTree;
-import stencil.parser.tree.util.Environment;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
@@ -53,10 +24,7 @@ import stencil.tuple.prototype.TuplePrototype;
 
 import static stencil.parser.string.StencilParser.*;
 
-/**Operator defined through a stencil definition.
- * 
- * TODO: These aren't always projects...but they are for now!
- * */
+/**Operator defined through a stencil definition.**/
 public class SyntheticOperator implements StencilOperator {
 	/**Exception to indicate that no rule matches the parameters passed to the given synthetic operator.*/
 	public static class NoMatchException extends RuntimeException {
@@ -158,7 +126,7 @@ public class SyntheticOperator implements StencilOperator {
 		}
 		Tuple prefilter;
 		Tuple tuple = new ArrayTuple(values);
-		Environment env = Environment.getDefault(Display.canvas, Display.view, Tuples.EMPTY_TUPLE, tuple);//Empty between view and stream tuple is the globals frame;  TODO: Replace with globals when runtime global exist
+		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		
 		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.getName(), facet.getName(), tuple.toString()));}
@@ -168,9 +136,7 @@ public class SyntheticOperator implements StencilOperator {
 
 		if (action != null) {
 			try {
-				 Tuple result = action.invoke(env);
-				 result = Tuples.align(result, facet.getResults());
-				 return result;
+				 return action.invoke(env);
 			} catch (Exception e) {
 				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", operatorData.getName(), facet.getName()),e);
 			}

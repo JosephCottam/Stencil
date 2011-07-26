@@ -17,6 +17,7 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.interpreter.tree.Freezer;
+  import static stencil.adapters.java2D.render.guides.Legend.GEOM_TAG;
   import static stencil.display.DisplayLayer.TYPE_KEY;
 }
 
@@ -25,7 +26,7 @@ options {
 
    public StencilTree extendSpec(StencilTree spec) {
       String type = (String)  Freezer.specializer(spec.getAncestor(LAYER).find(SPECIALIZER)).get(TYPE_KEY);
-      Object entry = adaptor.create(MAP_ENTRY, "layer" + SEPARATOR + TYPE_KEY);
+      Object entry = adaptor.create(MAP_ENTRY, GEOM_TAG);
       
       type=type.toUpperCase();
       if (type.contains("LINE") || type.contains("ARC")) {type="LINE";}

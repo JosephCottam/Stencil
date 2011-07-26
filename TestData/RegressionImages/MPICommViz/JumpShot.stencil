@@ -1,5 +1,6 @@
 STREAM: File
 NAME: trans
+TUPLE_SIZE: 8
 HEADER: op source dest start end size G r g b
 SEPARATOR: \s+
 SOURCE: ./diss_16.viz
@@ -8,6 +9,7 @@ STRICT: false
 STREAM: File
 NAME: overheads
 HEADER: op rank cpu start end r g b
+TUPLE_SIZE: 8
 SEPARATOR: \s+
 SOURCE: ./diss_16.viz
 SKIP: 0
@@ -28,8 +30,8 @@ from ranks
 	COLOR: @Color{GRAY70}
 	REGISTRATION: "RIGHT"
 from overheads
-	filter (start > margin)
-	prefilter(start, margin): Spacer.query() -> Add(5000,_) -> (start, sum)
+	filter (start > prefilter.margin)
+	prefilter(margin): Spacer.query() -> Add(5000,_) 
 	
 	ID: start
 	TEXT: start
@@ -40,8 +42,8 @@ from overheads
 	ROTATION: "VERTICAL"
 	() : Spacer.map(start)
 from overheads
-	filter (end > margin)
-	prefilter(end, margin): Spacer.query() -> Add(5000,_) -> (end, sum)
+	filter (end > prefilter.margin)
+	prefilter(margin): Spacer.query() -> Add(5000,_)
 	
 	ID: end
 	TEXT: end
@@ -53,20 +55,20 @@ from overheads
 	() : Spacer.map(end)
 
 operator Spacer(v) -> (v) 
-    (ALL) => v : Range[ALL](@Max, _)
+    default => v : Range[ALL](@Max, _)
     
 
 layer baseline["LINE"]
 from overheads
 	ID: rank
-	X.2: Timescale(skewedStart) -> Range[ALL](@Max, _)
+	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
 	PEN_COLOR: @Color{Gray90}
-	(Y.1, Y.2): Layout(rank) -> (_,_)
+	(Y1, Y2): Layout(rank) -> (_,_)
 from trans
 	ID: source
-	X.2: Timescale(skewedStart) -> Range[ALL](@Max, _)
+	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
 	PEN_COLOR: @Color{Gray90}
-	(Y.1,Y.2): Layout(source) ->(_,_)
+	(Y1,Y2): Layout(source) ->(_,_)
 
 
 layer compressions["SHAPE"]
@@ -83,9 +85,9 @@ layer overhead["LINE"]
 from overheads
 	filter(op !~ "clocalop") 
 	ID: Count()
-	(Y.1, Y.2): Layout(rank) -> (_,_)
-	X.1: Timescale(skewedStart)
-	X.2: Timescale(skewedEnd)
+	(Y1, Y2): Layout(rank) -> (_,_)
+	X1: Timescale(skewedStart)
+	X2: Timescale(skewedEnd)
 	PEN_COLOR : ColorByOp(op)
     PEN: WeightByOp(op)
 
@@ -93,10 +95,10 @@ from overheads
 layer coms["LINE"]
 from trans
     ID: Count()
-	Y.1: Layout(source)
-	Y.2: Layout(dest)
-	X.1: Timescale(skewedStart)
-	X.2: Timescale(skewedEnd)
+	Y1: Layout(source)
+	Y2: Layout(dest)
+	X1: Timescale(skewedStart)
+	X2: Timescale(skewedEnd)
 	PEN_COLOR : ColorByOp(op)
 	CAP2: "ARROW"
 
@@ -104,18 +106,18 @@ operator ColorByOp(op) -> (C)
 	(op =~ "osend") => C: @Color{SlateBlue}
 	(op =~ "orecv") => C: @Color{MediumSlateBlue}
 	(op =~ "transmission") => C: @Color{FireBrick}
-	ALL => C: @Color{BLACK, .5}
+	default => C: @Color{BLACK, .5}
 
 operator WeightByOp(op) -> (W)
 	(op =~ "osend") => W : @Stroke{1}
  	(op =~ "orecv") => W : @Stroke{1}
 	(op =~ "transmission") => W: @Stroke{5}
-	ALL => W: @Stroke{2}
+	default => W: @Stroke{2}
    
 	
 operator Layout (rank)->(Y)
-  ALL => (Y) : Mult(20, rank)
+  default => (Y) : Mult(-20, rank)
  
 
 operator Timescale(time) -> (time)
-  ALL => time : Div(time, 50)
+  default => time : Div(time, 50)

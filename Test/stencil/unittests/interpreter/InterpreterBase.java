@@ -6,17 +6,17 @@ import java.awt.BasicStroke;
 
 import stencil.adapters.Adapter;
 import stencil.adapters.TupleLoader;
-import stencil.adapters.java2D.data.DoubleBufferLayer;
+import stencil.adapters.java2D.columnStore.Table;
+import stencil.adapters.java2D.columnStore.TableShare;
 import stencil.display.DisplayLayer;
 import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.module.ModuleCache;
-import stencil.parser.ParseStencil;
-import stencil.interpreter.tree.Program;
 import stencil.testUtilities.StringUtils;
 import stencil.testUtilities.TestModule;
-import stencil.tuple.Tuple;
+import stencil.tuple.PrototypedTuple;
+import stencil.util.streams.numbers.SequenceStream;
 import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class InterpreterBase extends junit.framework.TestCase{
@@ -24,7 +24,7 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 											"stream NodeAttributes(ID, ATT, Source)"+
 											"layer Overlay from NodeAttributes" +
 											"   filter(ATT =~ \"C\")" +
-											"   ID: FilterFail(ID) -> (VALUE)";
+											"   ID: FilterFail(ID)";
 
 	StencilPanel panel;
 	
@@ -39,11 +39,10 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 	}
 
 	public void testRegisterFails(Adapter adapter) throws Exception{
-		Program program = ParseStencil.program(registerFailRule, adapter);
-		panel = adapter.generate(program);
+		panel = adapter.compile(registerFailRule);
 		boolean error =false;
 		
-		DelimitedParser stream = new DelimitedParser("NodeAttributes", "ID|ATT",OVERLAY_SHORT, "\\|", true,0);
+		DelimitedParser stream = new DelimitedParser("NodeAttributes", OVERLAY_SHORT, "\\|", 2, true,0);
 		TupleLoader loader = new TupleLoader(panel, stream);
 		try {loader.load();}
 		catch (IDException e) {error=true;}
@@ -53,20 +52,19 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 
 	public void testSimpleLines(Adapter adapter) throws Exception {
 		String source = StringUtils.getContents("./TestData/RegressionImages/SimpleLines/Lines.stencil");
-
-		Program program = ParseStencil.program(source, adapter);
-		panel = adapter.generate(program);
-		DelimitedParser stream = new DelimitedParser("LineSource", "graphLabel | axis1A | axis1B | axis2A | axis2B | suite_name | pass | fail", "./TestData/RegressionImages/SimpleLines/18049-arch-compiler.output.txt", "\\s+\\|\\s+", false, 0);
+		panel = adapter.compile(source);
+		
+		SequenceStream stream = new SequenceStream("LineSource", 0, 1, 5);
 
 		TupleLoader loader = new TupleLoader(panel, stream);
 		loader.load();
 
-		DisplayLayer<Glyph> layer = panel.getLayer("GridLines");
-		((DoubleBufferLayer) layer).changeGenerations();
+		DisplayLayer<? extends Glyph> layer = panel.getLayer("GridLines");
 		assertNotNull(layer);
-		assertEquals(6, layer.viewpoint().size());
+		TableShare share = ((Table) layer).changeGenerations();
+		assertEquals(6, share.size());
 
-		for (Tuple t: layer.viewpoint()) {
+		for (PrototypedTuple t: layer.viewpoint()) {
 			assertEquals(3.0f, ((BasicStroke) t.get("PEN")).getLineWidth());
 			assertEquals(new java.awt.Color(.8f,.8f,.8f), t.get("PEN_COLOR"));
 		}

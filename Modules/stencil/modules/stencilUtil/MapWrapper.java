@@ -25,16 +25,22 @@ public class MapWrapper implements StencilOperator {
 			this.name = name;
 		}
 		
-		public Object getTarget() {return wrapper;}
-
 		public Object invoke(Object[] arguments) throws MethodInvokeFailedException {
-			assert arguments[0] instanceof Tuple;
-			assert arguments.length == 1;
-
 			Tuple t = (Tuple) arguments[0];
 			Tuple[] results = new Tuple[t.size()];
 			final int size = t.size();
-			for (int i=0; i<size; i++) {results[i] = inv.tupleInvoke(new Object[]{t.get(i)});}
+			for (int i=0; i<size; i++) {
+				Object[] innerArgs = new Object[arguments.length];	//To be passed to the op-as-arg
+				for (int arg=0; arg<arguments.length; arg++) {
+					if (arguments[arg] instanceof Tuple) {
+						innerArgs[arg] = ((Tuple) arguments[arg]).get(i);
+					} else {
+						innerArgs[arg] = arguments[arg];
+					}
+				}
+				
+				results[i] = inv.tupleInvoke(innerArgs);
+			}
 			return new MapMergeTuple(results);
 		}
 

@@ -8,7 +8,7 @@ options {
 }
 
 @header {
- /**Moves synthetic operators that only have one branch (the ALL branch)
+ /**Moves synthetic operators that only have one branch (the default branch)
   * up to their call site.  Requires that the OperatorExplicit has already
   * been run to ensure that state sharing is still correct.
   **/
@@ -16,7 +16,7 @@ options {
   package stencil.parser.string;
 
   import stencil.parser.tree.*;
-  import stencil.parser.tree.util.MultiPartName;
+  import stencil.interpreter.tree.MultiPartName;
   import stencil.parser.ParserConstants;
   import stencil.tuple.prototype.TupleFieldDef;
   import stencil.tuple.prototype.TuplePrototype;
@@ -109,7 +109,7 @@ options {
        StencilTree newCall = (StencilTree) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
        Object newArgs = adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
        for (StencilTree arg: pack) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
-       adaptor.addChild(newCall, adaptor.create(SPECIALIZER, ""));
+       adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER_TREE));
        adaptor.addChild(newCall, newArgs);
        adaptor.addChild(newCall, adaptor.create(pass.getType(), frameName));
 
@@ -126,7 +126,7 @@ options {
     */   
    private StencilTree makeSplice(StencilTree inArgs, StencilTree facet, StencilTree core) {
       try {             
-         TuplePrototype inputPrototype  = (TuplePrototype) facet.find(YIELDS).getChild(0);
+         TuplePrototype inputPrototype  = Freezer.prototype(facet.find(YIELDS).getChild(0));
          Map<StencilTree, StencilTree> subst = buildSubst(ParserConstants.STREAM_FRAME, inputPrototype, inArgs);
          
          StencilTree workingCore = (StencilTree) adaptor.dupTree(core);
@@ -148,7 +148,7 @@ options {
        for (int i=0; i<values.getChildCount(); i++) {
           StencilTree value = (StencilTree) adaptor.dupTree(values.getChild(i));
           TupleFieldDef def = names.get(i);
-          String name = def.getFieldName();
+          String name = def.name();
           subst.put(makeRef(frame, name), value);
           subst.put(makeRef(frame, i), value);
        }
@@ -175,31 +175,25 @@ options {
        return rootRef;
    }
          
-   private String getName(Object t) {
-      MultiPartName name = new MultiPartName(((Tree) t).getText());
-      return name.getName();
-   }
-   
-   private String getFacet(Object t) {
-      MultiPartName name = new MultiPartName(((Tree) t).getText());
-      return name.getFacet();
-   }
+   private String getName(StencilTree t) {return Freezer.multiName(t).name();}   
+   private String getFacet(StencilTree t) {return Freezer.multiName(t).facet();}
+   private String predName(StencilTree pred) {return pred.findDescendant(OP_NAME).getChild(1).getText();} 
 }
 
 //Identify operators that only have one branch
 search: ^(OPERATOR_FACET . LIST_PREFILTER opRules);				    //This rule  ensures there are no pre-filters (part of being in-line-able)
 opRules: ^(RULES_OPERATOR ^(OPERATOR_RULE ^(LIST_PREDICATES pred=predicate) ^(LIST_RULES .)))   //This step ensures there is only one rule (part of being in-line-able)  TODO: Inline multiple rules after explicit framing is universal
-  {if ($pred.pred.getText().startsWith("#TrivialTrue")) {
+  {if (predName(pred.tree).equals("TrivialTrue")) {
      Tree op = pred.tree.getAncestor(OPERATOR);
      simple.put(op.getText(), (StencilTree) op);
   }};
 
-predicate returns [Tree pred]: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=.))) {$pred = $f;};
+predicate: ^(PREDICATE ^(RULE . ^(CALL_CHAIN f=.)));
 
 
 replace: ^(cc=CALL_CHAIN chain[cc]);
 chain[Tree prior]
-  : ^(f=FUNCTION spec=. args=. pass=. target=chain[f])
-      -> {simple.containsKey(getName($f))}?  {replaceRef($f)}
-      -> 									^(FUNCTION $spec $args $pass $target)
+  : ^(f=FUNCTION n=. spec=. args=. pass=. target=chain[f])
+      -> {simple.containsKey(getName($n))}?  {replaceRef($f)}
+      -> 									^(FUNCTION $n $spec $args $pass $target)
   | ^(PACK .*);

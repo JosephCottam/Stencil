@@ -8,13 +8,14 @@ import java.util.NoSuchElementException;
 import java.util.List;
 
 import stencil.tuple.SourcedTuple;
-import stencil.tuple.instances.PrototypedTuple;
-import stencil.tuple.prototype.SimplePrototype;
+import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.tuple.stream.TupleStream;
 
 public class RandomStream implements TupleStream {
+	public static final Class VALUE_TYPE  = double.class;
+	
 	private final long length; //How many tuples to produce
 	private long count;			//How many tuples have been produced
 	private final String name;	//Name of thes tream
@@ -30,7 +31,7 @@ public class RandomStream implements TupleStream {
 
 		count =0;
 		String[] fields = TuplePrototypes.defaultNames(size, "VALUE");
-		prototype = new SimplePrototype(fields);
+		prototype = new TuplePrototype(fields);
 	}
 	
 	public SourcedTuple next() {
@@ -39,7 +40,7 @@ public class RandomStream implements TupleStream {
 		
 		List<Double> values = new ArrayList(size);
 		for (int i =0; i<size; i++) {values.add(Math.random());}
-		return new SourcedTuple.Wrapper(name, new PrototypedTuple(prototype, values));
+		return new SourcedTuple.Wrapper(name, new PrototypedArrayTuple(prototype, values));
 	}
 
 	public boolean hasNext() {return (length < 0 || count < length);}

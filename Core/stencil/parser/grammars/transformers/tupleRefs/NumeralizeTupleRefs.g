@@ -16,53 +16,77 @@ options {
   import stencil.parser.tree.*;
   import stencil.module.*;
   import stencil.tuple.prototype.TuplePrototype;
-  import stencil.parser.string.util.EnvironmentProxy;
-  import static stencil.parser.string.util.EnvironmentProxy.initialEnv;
-  import static stencil.parser.string.util.EnvironmentProxy.extend;
+  import stencil.parser.string.util.EnvironmentUtil;
+  import stencil.parser.string.util.GlobalsTuple;
+  import stencil.util.collections.ArrayUtil;
+  import stencil.interpreter.tree.Freezer;
+  import stencil.interpreter.tree.MultiPartName;
+  import stencil.module.util.OperatorData;
+
+  import static stencil.interpreter.Environment.*;
 }
 
 @members {
-  public static StencilTree apply (StencilTree t, ModuleCache modules) {
-     return (StencilTree) TreeRewriteSequence.apply(t, modules);
+  private static final class NumeralizationException extends RuntimeException {
+      public NumeralizationException(StencilTree node) {
+         super("Error numeralizing " + node.toStringTree() + " at " + node.getToken().getLine());
+      }
+  }
+
+  public static StencilTree apply (StencilTree t) {
+     return (StencilTree) TreeRewriteSequence.apply(t);
+  }
+    
+  //What will the frame offset be at runtime?
+  private int frameNumber(StencilTree frameRef) {
+      if (frameRef.getType() == NUMBER) {return Integer.parseInt(frameRef.getText());}
+      
+      StencilTree func = frameRef.getAncestor(FUNCTION);
+      while (func != null) {
+          StencilTree yield = func.find(DIRECT_YIELD);
+          if (yield.getText().equals(frameRef.getText())) {
+            return DEFAULT_SIZE+EnvironmentUtil.countPriorFuncs(yield);
+          } else {
+              func = func.getAncestor(FUNCTION);
+          }
+          
+      }
+      int idx = ArrayUtil.indexOf(frameRef.getText(), DEFAULT_FRAME_NAMES);
+      if (idx <0) {throw new NumeralizationException(frameRef);}
+      return idx;
+  }
+
+  private int fieldNumber(StencilTree oldRef, int frame, StencilTree ref) {
+     if (ref.getType() == NUMBER) {return Integer.parseInt(ref.getText());}
+     
+     TuplePrototype proto = EnvironmentUtil.framePrototypeFor(oldRef, frame);
+     int idx = proto.indexOf(ref.getText());
+     if (idx <0) {throw new NumeralizationException(oldRef);}
+     return idx;
+  }  
+  
+  public StencilTree numeralize(StencilTree oldRef) {
+      StencilTree newRef = (StencilTree) adaptor.create(TUPLE_REF, "TUPLE_REF");
+      
+      //Numeralize the frame
+      int frameNum = frameNumber(oldRef.getChild(0));
+      adaptor.addChild(newRef, (StencilTree) adaptor.create(NUMBER, Integer.toString(frameNum))); 
+
+      if (oldRef.getChildCount() ==1) {return newRef;} //Stop if we have a frame-ref
+
+      //Numeralize the first value ref      
+      int valNum = fieldNumber(oldRef, frameNum, oldRef.getChild(1));
+      adaptor.addChild(newRef, (StencilTree) adaptor.create(NUMBER, Integer.toString(valNum)));
+      
+      //Copy other refs blindly...hope they are all NUMBER
+      //TODO: Numeralize sub-refs... (and fold prior value-ref numeralize in; requires typing of values to get sub-tuple types
+      for (int i=2; i<oldRef.getChildCount(); i++) {
+         StencilTree ref = oldRef.getChild(i);
+         adaptor.addChild(newRef, adaptor.dupTree(ref));
+      }
+      return newRef;
   }
   
-  protected void setup(Object... args) {modules = (ModuleCache) args[0];}
-
-  private static ModuleCache modules;  
 }
 
-//In a more ideal world (where environment-proxy-like entity construction coud be efficienlty implemented as a few methods)
-//Maybe if we tucked reutnr prototypes into the invokeables or something.  That would take care of all chains, then only predicates and special frames would need extra work
-//topdown
-//  : ^(TARGET .*) -> ^(TARGET .*)  //Skip all tuple refs in targets
-//  | ^(r=TUPLE_REF id=ID topdown?) -> ^(TUPLE_REF numeralize($id) topdown?)
-//  | ^(TUPLE_REF r=NUMBER topdown) //No change needed
-//  | ^(TUPLE_REF NUMBER);  //No change needed
-
-
-topdown
-	: ^(p=PREDICATE valueE[initialEnv($p, modules)] op=. valueE[initialEnv($p, modules)])
-  | ^(c=CALL_CHAIN callTarget[initialEnv($c, modules)] .)
-  | ^(CONSUMES (options {greedy=false;} :.)* ^(DYNAMIC_REDUCER ^(p=PACK valueE[initialEnv($p, modules)]*))); 
-
-callTarget[EnvironmentProxy env]
-  : ^(f=FUNCTION . . ^(LIST_ARGS valueE[env]*) y=. callTarget[extend(env, $y, $f, modules)])
-  | ^(PACK valueE[env]*);    
-      
-      
-valueE[EnvironmentProxy env]
-  : ^(t=TUPLE_REF r=ID valueP[env.get(env.getFrameIndex($r.text))]?)
-      -> ^(TUPLE_REF NUMBER[Integer.toString(env.getFrameIndex($r.text))] valueP?)
-  | (STRING | NUMBER); //Literals don't have tuple refs, just match and continue
-    catch[Exception e] {throw new RuntimeException(String.format("Error numeralizing \%1\$s.\n\%2\$s.", $t.toStringTree(), e.toString()));}
-  
-      
-//TODO:Unify envProxy and TuplePrototype (will eliminated the valueE and valueNP variants, requires a way to get a prototype from a prototype...)
-valueP[TuplePrototype p]
-  : r=ID value? -> NUMBER[Integer.toString(p.indexOf($r.text))] value?
-  | r=NUMBER value?;
-    catch[Exception e] {throw new RuntimeException("Error numeralizing " + $r.getAncestor(TUPLE_REF).toStringTree());}
-
-value
-  : ID {throw new RuntimeException("Numeralize can only handle one level names in nesting");}
-  | NUMBER value?;
+topdown: ^(r=TUPLE_REF .+) -> {numeralize($r)};

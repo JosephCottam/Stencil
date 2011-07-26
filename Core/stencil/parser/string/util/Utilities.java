@@ -1,7 +1,5 @@
 package stencil.parser.string.util;
 
-
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,9 +10,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 
 import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.AstInvokeable;
-import stencil.parser.tree.util.MultiPartName;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
-import static stencil.parser.ParserConstants.QUERY_FACET;
 import static stencil.parser.ParserConstants.STATE_ID_FACET;
 
 
@@ -28,10 +24,6 @@ public class Utilities {
 		return "#" + name + "_" + gsCounter++;
 	}
 	
-	
-	/**Given a facet call, what is the equivalent query facet call?*/
-	public static String queryName(String name) {return new MultiPartName(name).modSuffix(QUERY_FACET).toString();}
-
 	public static List<AstInvokeable> gatherInvokeables(Tree root) {
 		List<AstInvokeable> results = new LinkedList();
 		

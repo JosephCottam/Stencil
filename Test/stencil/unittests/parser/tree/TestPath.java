@@ -2,7 +2,6 @@ package stencil.unittests.parser.tree;
 
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
-import stencil.parser.tree.util.Path;
 import stencil.testUtilities.StringUtils;
 import junit.framework.TestCase;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
