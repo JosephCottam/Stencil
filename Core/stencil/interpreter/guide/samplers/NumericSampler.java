@@ -13,12 +13,19 @@ import stencil.types.Converter;
 
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
+
+/** TODO: Add log sampling
+ * 		Take the sample time in as a construction argument
+ * 		Get a base from the specializer
+ *  	Find next the largest number an even power of the base
+ *		Move through the powers in linear succession
+ */
 public class NumericSampler implements SampleOperator {
 	/**Should values be rounded in sampling?*/
 	public static final String SAMPLE_INTEGERS = "round";
 	
 	/**How many samples should be produced?
-	 * This is mutally exclusive with indicating the sample stride.
+	 * This is mutually exclusive with indicating the sample stride.
 	 */
 	public static final String SAMPLE_COUNT = "count";
 	
@@ -58,10 +65,10 @@ public class NumericSampler implements SampleOperator {
 
 	private static List<Number> buildRange(double max, double min, int tickCount, boolean useIntegers) {
 		float range = niceNum(max-min, false);							//'Nice' range
-		float spacing = niceNum(range/(tickCount-1), true);			//'Nice' spacing;
+		float spacing = niceNum(range/(tickCount-1), true);				//'Nice' spacing;
 		if (spacing < Double.MIN_NORMAL) {spacing =1;}					//Ensure some spacing occurs
-		float graphMin = (float) Math.floor(min/spacing) * spacing;			//Smallest value on the graph
-		float graphMax = (float) Math.ceil(max/spacing) * spacing;				//Largest value on the graph
+		float graphMin = (float) Math.floor(min/spacing) * spacing;		//Smallest value on the graph
+		float graphMax = (float) Math.ceil(max/spacing) * spacing;		//Largest value on the graph
 		SortedSet<Number> nums = new TreeSet();
 		
 		for (float v=graphMin; nums.size() == 0 || nums.last().doubleValue() < graphMax; v+=spacing) {
