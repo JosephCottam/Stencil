@@ -20,7 +20,7 @@ from Stocks
    X: TimeStep(Date)
    Y: Open  
    PEN: @Stroke{1}
-   COLOR: @Color{BLUE}
+   PEN_COLOR: @Color{BLUE}
 
 layer Averages["POLY_POINT"]
 from Stocks
@@ -30,7 +30,7 @@ from Stocks
    X: TimeStep(Date)
    Y: Range["-30..n"](@Mean, Open)	    /*Average the most recent 30 values.*/
    PEN: @Stroke{1}
-   COLOR: @Color{LIME,150}
+   PEN_COLOR: @Color{LIME,150}
 from Stocks
    ID: Ids()
    GROUP: "Google_ALL"
@@ -38,7 +38,7 @@ from Stocks
    X: TimeStep(Date)
    Y: Range[ALL](@Mean, Open)		    /*Average all values.*/
    PEN: @Stroke{1}
-   COLOR: @Color{CRIMSON,150}
+   PEN_COLOR: @Color{CRIMSON,150}
 from Stocks
    ID: Ids()
    GROUP: "Google_20"
@@ -46,7 +46,7 @@ from Stocks
    X: TimeStep(Date)
    Y: Range["-30 .. -10"](@Mean, Open) /*Average that lags by 10 and includes 20 values.*/
    PEN: @Stroke{1}
-   COLOR: @Color{ORANGE,150}
+   PEN_COLOR: @Color{ORANGE,150}
 
 operator Ids : Count
 

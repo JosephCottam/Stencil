@@ -46,6 +46,7 @@ public class Legend extends Guide2D {
 	
 	private final float spacing;	
 	private final boolean autoPlace;
+	private boolean lineGuide = false;
 	
 	private final TupleSorter sorter;
 	private final int label_idx;
@@ -75,16 +76,22 @@ public class Legend extends Guide2D {
 		assert label_idx >=0 : "Input field not found for labeling in results prototype";
 		sorter = new TupleSorter(label_idx);
 
-		data = makeTable(guideDef);
+		data = makeTable();
 		PrototypedTuple defaultValues = Tuples.delete(DEFAULT_SPECIALIZER, SPEC_NON_VALUES); 
 		updateMask = Tuples.merge(data.updateMaskTuple(), defaultValues);		
 		renderer = new CompoundRenderer(data.prototype());
 		
 	}
 	
-	private static CompoundTable makeTable(Guide guideDef) {
+	/**Creates the data tables for the guide.
+	 * These will be empty and conform to schema elements defined in the guide def.
+	 * **/
+	private CompoundTable makeTable() {
 		String identifier = guideDef.identifier();
-		String exampleType = guideDef.specializer().containsKey(GEOM_TAG) ? Converter.toString(guideDef.specializer().get(GEOM_TAG)) : "SHAPE";
+		String exampleType = Converter.toString(guideDef.specializer().get(GEOM_TAG));
+		
+		if (exampleType.equals("ARC") || exampleType.startsWith("POLY")) {exampleType = "LINE"; lineGuide = true;}
+		else {lineGuide = false;}
 
 		Table labels = LayerTypeRegistry.makeTable(LABEL_PROPERTY_TAG, "TEXT");
 		Table elements = LayerTypeRegistry.makeTable(GUIDE_ELEMENT_TAG , exampleType);
@@ -97,7 +104,7 @@ public class Legend extends Guide2D {
 			y = -parentBounds.getMinY();
 		}
 				
-		data = makeTable(guideDef);
+		data = makeTable();
 
 		Collections.sort(elements, sorter);
 		
@@ -143,13 +150,21 @@ public class Legend extends Guide2D {
 	private static final float hSpacing = 2f;
 	private PrototypedTuple createLabeledItem(int idx, PrototypedTuple contents, double x, double y) {
 		double indexOffset = y-(idx * exampleHeight) - (idx * vSpacing);  
+
 		
 		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.REGISTRATION", "label.ID", "ID"};
 		Object[] labelValues = new Object[]{x+hSpacing, indexOffset, contents.get(label_idx), "LEFT", idx, idx};
 		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
-				
-		String[] exampleFields = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID"};
-		Object[] exampleValues = new Object[]{x-hSpacing, indexOffset, "RIGHT", idx};
+		
+		String[] exampleFields;
+		Object[] exampleValues;
+		if (!lineGuide) {
+			exampleFields = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID"};
+			exampleValues = new Object[]{x-hSpacing, indexOffset, "RIGHT", idx};
+		} else {
+			exampleFields = new String[]{"ele.X1", "ele.Y1", "ele.X2", "ele.Y2", "ele.ID"};
+			exampleValues = new Object[]{x-10*hSpacing, indexOffset, x-hSpacing, indexOffset, idx};			
+		}
 		PrototypedTuple example = new PrototypedArrayTuple(exampleFields, exampleValues);
 		
 		return Tuples.merge(label,example, Tuples.delete(contents, label_idx));

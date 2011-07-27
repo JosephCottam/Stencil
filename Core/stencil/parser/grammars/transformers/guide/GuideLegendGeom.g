@@ -29,7 +29,6 @@ options {
       Object entry = adaptor.create(MAP_ENTRY, GEOM_TAG);
       
       type=type.toUpperCase();
-      if (type.contains("LINE") || type.contains("ARC")) {type="LINE";}
       
       adaptor.addChild(entry, adaptor.create(STRING, type));
       adaptor.addChild(spec, entry);

@@ -31,7 +31,7 @@ public class MutableModule implements Module {
 	}
 
 	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
-		throw new UnsupportedOperationException(String.format("Higher order instantation not supported (requested for %1$s).", name));
+		return operators.get(name);
 	}
 
 	

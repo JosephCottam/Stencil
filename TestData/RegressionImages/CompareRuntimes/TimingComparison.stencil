@@ -1,6 +1,6 @@
 STREAM: File
 NAME: times
-HEADER: elapse, size, refs, perm, type, i
+TUPLE_SIZE: 6
 SEPARATOR: \s*,\s*
 SOURCE: ./StateVsFlowRuntimes.csv
 SKIP: 1
@@ -10,17 +10,18 @@ import BrewerPalettes
 
 stream times(elapse, size, refs, perm, type, i)
 
-layer Runtimes["POLY_LINE"]
+layer Runtimes["POLY_POINT"]
 guide
-  axis Linear from YS
-  axis Linear from XS
+  axis Linear from Y
+  axis Linear from X
   legend from PEN_COLOR
 from times
   local(name):  Concatenate(refs, perm, type)
-  ID: name
-  IDX: Index(size)
-  XS: Mult(size,2)
-  YS: Split[1](@Avg, name, size, elapse) -#> Log(2,_) -> Mult(_, -100)
-  PEN_COLOR: BrewerColors(name)
+  ID: Count()
+  GROUP: local.name
+  ORDER: Index(size)
+  X: Mult(size,2)
+  Y: Split[1](@Avg, local.name, size, elapse) -#> Log(2,_) -> Mult(_, 100)
+  PEN_COLOR: BrewerColors(local.name)
 
 operator Avg: Range[ALL](@Mean)

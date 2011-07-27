@@ -28,6 +28,7 @@ options {
   import stencil.parser.tree.*;
   import stencil.module.*;
   import stencil.interpreter.guide.MonitorOperator;
+  import stencil.parser.ProgramCompileException;
   
   import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.INVOKEABLE;
@@ -35,7 +36,7 @@ options {
 }
 
 @members{
-  public static class AutoGuideException extends RuntimeException {public AutoGuideException(String message) {super(message);}}
+  public static class AutoGuideException extends ProgramCompileException {public AutoGuideException(String message) {super(message);}}
 
   public static StencilTree apply (Tree t, ModuleCache modules) {
      return (StencilTree) TreeRewriteSequence.apply(t, modules);

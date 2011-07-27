@@ -29,6 +29,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.prototype.TuplePrototype;
 
+//TODO: Support filled poly
 public class PolyRenderer implements Renderer<TableView> {
 	/**Basic expected table schema.**/
 	public static final TuplePrototype<SchemaFieldDef> SCHEMA = new TuplePrototype(
@@ -39,7 +40,7 @@ public class PolyRenderer implements Renderer<TableView> {
 				new SchemaFieldDef("ORDER", null, Object.class),	//What relative order in this group is this entry
 				new SchemaFieldDef("CONNECT", false),
 				new SchemaFieldDef("SEGMENT", false),
-				FILL_COLOR.rename("COLOR"),
+				OPAQUE_PEN_COLOR,
 				PEN,
 				VISIBLE,
 				IMPLANT,
@@ -48,7 +49,7 @@ public class PolyRenderer implements Renderer<TableView> {
 	
 
 	
-    private final Colorer filler;
+    private final Colorer lineColor;
     private final Stroker stroker;
     private final Connector connector;
     private final Implanter implanter;
@@ -71,8 +72,8 @@ public class PolyRenderer implements Renderer<TableView> {
 		segmentedIdx = schema.indexOf("SEGMENT");
 
 		
-		filler = Colorer.Util.instance(schema, schema.indexOf("COLOR"));
-		stroker = Stroker.Util.instance(schema, schema.indexOf(PEN), schema.indexOf("COLOR"));
+		lineColor = Colorer.Util.instance(schema, schema.indexOf(OPAQUE_PEN_COLOR));
+		stroker = Stroker.Util.instance(schema, schema.indexOf(PEN), schema.indexOf(PEN_COLOR));
 		implanter = Implanter.Util.instance(schema, schema.indexOf(IMPLANT));
 		connector = new Connector(xIdx, yIdx);
 		orderSorter = new TupleSorter(orderIdx);
@@ -147,7 +148,8 @@ public class PolyRenderer implements Renderer<TableView> {
 		
 		//Render the path
 		Stroke orig = g.getStroke();
-		filler.setColor(g, start);
+		g.setStroke(stroker.getStroke(start));
+		lineColor.setColor(g, start);
 		g.draw(s);
 		g.setStroke(orig);
 		g.setTransform(viewTransform);
@@ -164,7 +166,7 @@ public class PolyRenderer implements Renderer<TableView> {
 			if (endIdx == 0 && !((Boolean) end.get(connectedIdx))) {continue;}
 	
 			g.setStroke(stroker.getStroke(start));
-			filler.setColor(g, start);
+			lineColor.setColor(g, start);
 			Shape line = connector.line(start, end);
 			line = LineRenderer.implantLine(implanter, viewTransform, line, start, g);
 			g.draw(line);
