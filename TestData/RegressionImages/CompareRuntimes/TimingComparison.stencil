@@ -12,7 +12,7 @@ stream times(elapse, size, refs, perm, type, i)
 
 layer Runtimes["POLY_POINT"]
 guide
-  axis Linear from Y
+  axis Log from Y
   axis Linear from X
   legend from PEN_COLOR
 from times
@@ -20,8 +20,8 @@ from times
   ID: Count()
   GROUP: local.name
   ORDER: Index(size)
-  X: Mult(size,2)
-  Y: Split[1](@Avg, local.name, size, elapse) -#> Log(2,_) -> Mult(_, 100)
+  X: Mult(size,2) -> Scale[0,100](_)
+  Y: Split[1](@Avg, local.name, size, elapse) -#> Log(2,_) -> Scale[min:0, max:100](_)
   PEN_COLOR: BrewerColors(local.name)
 
 operator Avg: Range[ALL](@Mean)

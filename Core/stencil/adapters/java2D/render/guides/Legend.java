@@ -35,10 +35,11 @@ public class Legend extends Guide2D {
 	public static final String GEOM_TAG = "#geom";
 	protected static final String LABEL_PROPERTY_TAG = "label";
 	protected static final String SPACING_TAG = "spacing";
+	protected static final String EXAMPLE_WIDTH_TAG = "exampleWidth";
 
 	public static final Specializer DEFAULT_SPECIALIZER;
-	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", spacing: .25]";
-	protected static final String[] SPEC_NON_VALUES = new String[]{"spacing"};	//Things that will be deleted from the specializer when constructing the default values
+	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", spacing: .25, exampleWidth: 10]";
+	protected static final String[] SPEC_NON_VALUES = new String[]{SPACING_TAG, EXAMPLE_WIDTH_TAG};	//Things that will be deleted from the specializer when constructing the default values
 	static {
 		try {DEFAULT_SPECIALIZER = ParseStencil.specializer(defaultValues);}
 		 catch (Exception e) {throw new Error("Error parsing Lend configuration.", e);}
@@ -55,6 +56,7 @@ public class Legend extends Guide2D {
 	private CompoundTable data;
 	private final CompoundRenderer renderer;
 	private final PrototypedTuple updateMask;
+	private final double exampleWidth;
 	
 	private double x,y;
 	
@@ -65,6 +67,7 @@ public class Legend extends Guide2D {
 		autoPlace = !(spec.containsKey(Renderer.X.name()) || spec.containsKey(Renderer.Y.name()));
 		guideLabel = Converter.toString(spec.get(GUIDE_LABEL));
 		spacing = Converter.toFloat(spec.get(SPACING_TAG));
+		exampleWidth = Converter.toFloat(spec.get(EXAMPLE_WIDTH_TAG));
 		
 		if (!autoPlace) {
 			x = spec.containsKey("X") ? Converter.toDouble(spec.get("X")) : 0;
@@ -100,7 +103,7 @@ public class Legend extends Guide2D {
 
 	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
 		if (autoPlace) {
-			x = parentBounds.getMaxX() + parentBounds.getWidth();
+			x = parentBounds.getMaxX();
 			y = -parentBounds.getMinY();
 		}
 				
@@ -152,20 +155,22 @@ public class Legend extends Guide2D {
 		double indexOffset = y-(idx * exampleHeight) - (idx * vSpacing);  
 
 		
-		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.REGISTRATION", "label.ID", "ID"};
-		Object[] labelValues = new Object[]{x+hSpacing, indexOffset, contents.get(label_idx), "LEFT", idx, idx};
-		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
-		
 		String[] exampleFields;
 		Object[] exampleValues;
 		if (!lineGuide) {
 			exampleFields = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID"};
-			exampleValues = new Object[]{x-hSpacing, indexOffset, "RIGHT", idx};
+			exampleValues = new Object[]{x+hSpacing, indexOffset, "LEFT", idx};
 		} else {
 			exampleFields = new String[]{"ele.X1", "ele.Y1", "ele.X2", "ele.Y2", "ele.ID"};
-			exampleValues = new Object[]{x-10*hSpacing, indexOffset, x-hSpacing, indexOffset, idx};			
+			exampleValues = new Object[]{x+hSpacing, indexOffset, x+exampleWidth, indexOffset, idx};			
 		}
 		PrototypedTuple example = new PrototypedArrayTuple(exampleFields, exampleValues);
+
+		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.REGISTRATION", "label.ID", "ID"};
+		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, contents.get(label_idx), "LEFT", idx, idx};
+		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
+		
+
 		
 		return Tuples.merge(label,example, Tuples.delete(contents, label_idx));
 	}	
