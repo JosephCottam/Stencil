@@ -14,12 +14,6 @@ import stencil.types.Converter;
 import static stencil.parser.ParserConstants.FALSE_STRING;
 
 
-/** TODO: Add log sampling
- * 		Take the sample time in as a construction argument
- * 		Get a base from the specializer
- *  	Find next the largest number an even power of the base
- *		Move through the powers in linear succession
- */
 public class NumericSampler implements SampleOperator {
 	/**Should values be rounded in sampling?*/
 	public static final String SAMPLE_INTEGERS = "round";
