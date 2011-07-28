@@ -7,6 +7,8 @@ import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 
 
+/**Sample operators do everything a regular operator does, as well as produce a sample.
+ */
 public interface SampleOperator {
 	public static final String SAMPLE_PREFIX = "#Sample";
 

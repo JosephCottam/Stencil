@@ -34,6 +34,15 @@ public class NumericSampler implements SampleOperator {
 	 */
 	public static final String SAMPLE_STRIDE = "stride";
 
+	/**For log samples, what should the log base be? (Default is 10.)**/
+	public static final String SAMPLE_BASE = "base";
+
+	private final boolean log;
+	
+	public NumericSampler(String type) {
+		log = type.toUpperCase().equals("LOG");
+	}
+
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Iterable source;
 		int sourceSize;
@@ -54,16 +63,36 @@ public class NumericSampler implements SampleOperator {
 			tickCount =  Converter.toInteger(spec.get(SAMPLE_COUNT));
 		}
 		
-		source = buildRange(max, min, tickCount, useIntegers);
-		sourceSize = ((List) source).size();
-
+		if (!log) {
+			source = linearSample(max, min, tickCount, useIntegers);
+		} else {
+			double base = spec.containsKey("base") ? Converter.toDouble(spec.get("base")) : 10;
+			source = logSample(max, min, tickCount, base); 
+		}
+		
+		sourceSize = ((List) source).size();		
 		List<Tuple> sample = new ArrayList(sourceSize);
 		for (Object sv: source) {sample.add(Converter.toTuple(sv));}
 		return sample;
 
 	}
 
-	private static List<Number> buildRange(double max, double min, int tickCount, boolean useIntegers) {
+	private static List<Number> logSample(double max, double min, int tickCount, double base) {
+		if (base == 0) {throw new IllegalArgumentException("Attempt to use base of 0 in sampling.");}
+
+		List<Number> values = new ArrayList();
+		double raiseTo = Math.log(max+1)/Math.log(base);
+		int maxPow = (int) Math.ceil(raiseTo);
+		
+		
+		for (int i=0; i < maxPow; i++) {
+			double v = Math.pow(base, i);
+			values.add(v);
+		}
+		return values;
+	}
+	
+	private static List<Number> linearSample(double max, double min, int tickCount, boolean useIntegers) {
 		float range = niceNum(max-min, false);							//'Nice' range
 		float spacing = niceNum(range/(tickCount-1), true);				//'Nice' spacing;
 		if (spacing < Double.MIN_NORMAL) {spacing =1;}					//Ensure some spacing occurs

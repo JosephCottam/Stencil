@@ -8,8 +8,13 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 
 public class FlexSampler implements SampleOperator {
-	private final StringSampler string = new StringSampler();	//TODO: Add the ability to switch to different categorical types
-	private final NumericSampler numeric = new NumericSampler();
+	private final StringSampler string;	
+	private final NumericSampler numeric;
+	
+	public FlexSampler(String type) {
+		string = new StringSampler(type); //TODO: Add the ability to switch to different categorical types
+		numeric = new NumericSampler(type);
+	}
 	
 	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {

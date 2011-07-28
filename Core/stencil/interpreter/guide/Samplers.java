@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class Samplers {
-	public static final String SAMPLE_KEY = "sample";
+	public static final String SAMPLE_KEY = "#sample";
 	public static enum Monitor {CATEGORICAL, CONTINUOUS, FLEX, NONE, NOP}
 	
 	private Samplers() {}
@@ -31,8 +31,13 @@ public final class Samplers {
 	
 	
 	public static Monitor monitor(String type) {return monitors.get(type.toUpperCase());}
-	public static SampleOperator get(String type, Object... args) {
-		assert type != null : "Must specify a class.";
+	/**Get a sampler based on the passed arguments.
+	 * The raw type should be passed as the first value.
+	 * All arguments will be passed on to the selected sampler for further refinement.
+	 */
+	public static SampleOperator get(Object... args) {
+		assert args.length != 0 : "Must specify a sample type as the first argument.";
+		String type = (String) args[0];
 		type = type.toUpperCase();
 		
 		Class<? extends SampleOperator> opClass = samplers.get(type);
