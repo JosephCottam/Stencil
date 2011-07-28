@@ -120,6 +120,10 @@ public class Axis extends Guide2D  {
 	
 	@Override
 	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
+		//TOOD: Get the Y-zero point and the X-zero point
+		//		If the other axis is present and numeric, use the zero point to determine the position
+		//		Add a specializer option to change this
+		
 		data = makeTables(guideDef);		//Clear the old stuff
 		if (elements.size() ==0) {return;}
 		
