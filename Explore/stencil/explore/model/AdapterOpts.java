@@ -26,7 +26,7 @@ public final class AdapterOpts {
 	public static String defaultRenderQuality = "HIGH";
 
 	public AdapterOpts() {
-		if (adapterMap.keySet().size() >0) {adapterName = adapterMap.keySet().iterator().next();}//First item in the set
+		if (adapterMap != null && adapterMap.keySet().size() >0) {adapterName = adapterMap.keySet().iterator().next();}//First item in the set
 		else {adapterName = "No Adapters Specified.";}
 
 		debug = null;

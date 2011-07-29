@@ -9,12 +9,11 @@ import java.util.List;
 import java.util.Set;
 
 public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
-	private final int hashCode;
+	private Integer hashCode;
 	private final List<T> fields;
 	
 	public TuplePrototype() {
 		fields = Collections.unmodifiableList(new ArrayList());
-		hashCode = calcCode();
 	}
 
 	public TuplePrototype(String... names) {this(names, TuplePrototypes.defaultTypes(names.length));}
@@ -33,19 +32,16 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 		}
 		this.fields = Collections.unmodifiableList(fields);
 		assert validateNames() : "Name validation ended in exception.";
-		hashCode = calcCode();
 	}
 	
 	public TuplePrototype(T... defs) {
 		fields = Collections.unmodifiableList(Arrays.asList(defs));
-		hashCode = calcCode();
 	}
 	
 	protected TuplePrototype (TuplePrototype<T> base) {
 		ArrayList fields = new ArrayList();
 		fields.addAll(base.fields);
 		this.fields = Collections.unmodifiableList(fields);
-		hashCode = calcCode();
 	}
 
 	/**Ensure there are no duplicate names.*/
@@ -81,11 +77,14 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 	}
 	
 	
-	public int hashCode() {return hashCode;}
-	private final int calcCode() {
-		int code =1;
-		for (TupleFieldDef def: fields) {code = code*def.hashCode();}
-		return code;
+	public int hashCode() {
+		if (hashCode == null) {
+			int code =1;
+			for (TupleFieldDef def: fields) {code = code*def.hashCode();}
+			return code;
+			
+		}		
+		return hashCode;
 	}
 	
 	public int size() {return fields.size();}

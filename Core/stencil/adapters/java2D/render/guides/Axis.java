@@ -12,12 +12,16 @@ import stencil.adapters.java2D.LayerTypeRegistry;
 import stencil.adapters.java2D.columnStore.CompoundTable;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.CompoundRenderer;
+import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Guide;
+import stencil.interpreter.tree.Rule;
 import stencil.interpreter.tree.Specializer;
 import stencil.parser.ParseStencil;
 import stencil.tuple.PrototypedTuple;
+import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.PrototypedArrayTuple;
+import stencil.tuple.instances.Singleton;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
@@ -29,14 +33,29 @@ import static stencil.parser.ParserConstants.GUIDE_LABEL;
 //TODO: Pull more of this out to actual stencil code (like the calculation of tick/label positions and setting default values)
 public class Axis extends Guide2D  {
 	public static enum AXIS {X,Y}
+	
+	/**Different ways positioning can be handled:
+	 * 		LOW: Lowest edge of the bounds (bottom or left)
+	 *  	HIGH: Highest edge of the bounds (top or right)
+	 *  	LEAST: Least of lowest  bound or Zero-point on alternate axis
+	 *      MOST:  Greater of highest edge or zero-point on alternate axis
+	 *      ZERO: Zero point on the alternate axis
+	 *      AUTO: Determine which above
+	 *      MANUAL: An exact value was directly specified
+	 * Except for MANUAL, these are selected by name in the specializer.  
+	 * MANUAL is inferred when the value in the specializer is a number. 
+	 */
+	public static enum POSITION {LOW, HIGH, LEAST, MOST, ZERO, AUTO, MANUAL}
+	
 
 	private static final String TICK_SIZE_KEY = "tickSize";	//TODO: Move into being just another part of the default rules 
 	private static final String TEXT_OFFSET_KEY = "textOffset";	
 	private static final String GUIDE_LABEL_GAP_KEY = "guideLabel.Gap";
 	private static final String GUIDE_LABEL_SIZE_KEY = "guideLabel.Size";
+	private static final String BASELINE_KEY = "baseline";
 	
-	private static final String DEFAULT_SPECIALIZER_SOURCE = "[label.FONT: 4, label.COLOR: \"BLACK\", tick.PEN: .4, tick.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, guideLabel.Gap:2, guideLabel.Size:1.25]";
-	private static final String[] DEFAULTS_KNOCKOUT = new String[]{"guideLabel.Gap", "guideLabel.Size","tickSize","textOffset"};
+	private static final String DEFAULT_SPECIALIZER_SOURCE = "[label.FONT: 4, label.COLOR: \"BLACK\", tick.PEN: .4, tick.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, guideLabel.Gap:2, guideLabel.Size:1.25, baseline: \"AUTO\"]";
+	private static final String[] DEFAULTS_KNOCKOUT = new String[]{GUIDE_LABEL_GAP_KEY, GUIDE_LABEL_SIZE_KEY,"tickSize","textOffset", BASELINE_KEY};
 	
 	public static final Specializer DEFAULT_SPECIALIZER;
 	static {
@@ -58,19 +77,19 @@ public class Axis extends Guide2D  {
 	 * False - Only display for the range of values provided.*/
 	protected boolean connect = false;
 	
+	/**How is baseline positioning handled?*/
+	private final POSITION position;
+
 	/**Where should the axis be rendered?*/
 	private Double baseline = null;
 	
-	/**What is the specified position (influence the baseline).
-	 * null means auto position
-	 * Any other value is the literal location of the axis line.*/
-	private final Double position;
-
 	private final PrototypedTuple axisLabel;
+	private final Rule alterZero;	//Call chain to get the zero-position on the alter axis
 	
-	public Axis(Guide guideDef) {
+	public Axis(Guide guideDef, Rule alterZero) {
 		super(guideDef);
 		Specializer spec = guideDef.specializer();
+		this.alterZero = alterZero;
 		
 		data = makeTables(guideDef);
 		updateMask = Tuples.merge(data.updateMaskTuple(), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));		
@@ -88,10 +107,14 @@ public class Axis extends Guide2D  {
 		//Update the schema per the guide def...
 		
 		//Get position info based on axis orientation
-		if (axis == AXIS.X) {position = (spec.containsKey("Y") ? Converter.toDouble(spec.get("Y")) : null);}
-		else if (axis == AXIS.Y) {position = (spec.containsKey("X") ? Converter.toDouble(spec.get("X")) : null);}
-		else {position = null;}
-		baseline = position;
+		Object pos = spec.get(BASELINE_KEY);
+		if (pos instanceof Number) {
+			position = POSITION.MANUAL;
+			baseline = ((Number) pos).doubleValue();
+		} else {
+			position = (POSITION) Converter.convert(pos, POSITION.AUTO.getClass(), POSITION.AUTO);
+			//Baseline placement deferred until render time
+		}
 		
 		
 		String label = (String) spec.get(GUIDE_LABEL);
@@ -120,17 +143,10 @@ public class Axis extends Guide2D  {
 	
 	@Override
 	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
-		//TOOD: Get the Y-zero point and the X-zero point
-		//		If the other axis is present and numeric, use the zero point to determine the position
-		//		Add a specializer option to change this
-		
 		data = makeTables(guideDef);		//Clear the old stuff
 		if (elements.size() ==0) {return;}
 		
-		if (position == null) {
-			if (axis == AXIS.X) {baseline = -parentBounds.getMaxY();}
-			if (axis == AXIS.Y) {baseline = parentBounds.getMinX();}
-		} 
+		baseline = baseline(position, axis, parentBounds, baseline);
 		
 		//Reconstruct and store the updates
 		List<PrototypedTuple> tickUpdates = labeledTicks(elements); 
@@ -149,6 +165,53 @@ public class Axis extends Guide2D  {
 		t = Tuples.merge(updateMask, t);
 		t = Tuples.restructure(t,"tick", "label");
 		data.update(t);
+	}
+
+	
+	/**Where should the baseline be placed, returns value in y-up/positive convention**/
+	private static final Tuple ZERO = Singleton.from(0d);
+	private static final Tuple ONE = Singleton.from(1d);
+	@SuppressWarnings("null")
+	private double baseline(POSITION position, AXIS axis, Rectangle2D parentBounds, Double baseline) {
+		
+		Double zeroPoint;
+		try {
+			zeroPoint = Converter.toDouble(Interpreter.processTuple(ZERO, alterZero).get(0));	//TOOD: may not be .get(0), what is it in general?
+			if (Double.isInfinite(zeroPoint)) {
+				zeroPoint = Converter.toDouble(Interpreter.processTuple(ONE, alterZero).get(0));	//TOOD: may not be .get(0), what is it in general?
+			}
+		} catch (Exception e) {zeroPoint = null;}
+
+		
+		if (position == POSITION.AUTO) {
+			if(zeroPoint == null) {position = POSITION.LEAST;}
+			else {position = POSITION.ZERO;}
+		}
+		
+		if (position == POSITION.LEAST && zeroPoint == null) {position = POSITION.LOW;}
+		if (position == POSITION.MOST && zeroPoint == null) {position = POSITION.HIGH;}
+		
+		switch(position) {
+		case MANUAL: return baseline;
+		case ZERO:	
+			if (zeroPoint == null) {return 0;}
+			else {return zeroPoint;}
+		case LOW:
+			if (axis == AXIS.X) {return -parentBounds.getMaxY();}
+			else {return parentBounds.getMinX();}
+		case HIGH:
+			if (axis == AXIS.X) {return -parentBounds.getMinY();}
+			else {return parentBounds.getMaxX();}
+		case LEAST:
+			if (axis == AXIS.X) {return -Math.max(parentBounds.getMinY(), -zeroPoint);}
+			else {return Math.min(parentBounds.getMaxX(), zeroPoint);}
+		case MOST: 
+			if (axis == AXIS.X) {return -Math.min(parentBounds.getMinY(), -zeroPoint);}
+			else {return Math.max(parentBounds.getMaxX(), zeroPoint);}
+		
+		}
+	
+		throw new Error("Valid position passed, but not handled in baseline calculation:" + position);
 	}
 	
 

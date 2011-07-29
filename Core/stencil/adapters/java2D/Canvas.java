@@ -59,7 +59,7 @@ public final class Canvas extends DisplayCanvas {
 	}
 	
 	public DisplayGuide getGuide(String identifier) {return guides.get(identifier);}
-	public void addGuide(String identifier, Guide2D guide) {guides.put(identifier, guide);}
+	public void addGuide(Guide2D guide) {guides.put(guide.identifier(), guide);}
 	public boolean hasGuide(String identifier) {return guides.containsKey(identifier);}
 	public Collection<Guide2D> getGuides() {return guides.values();}
 	

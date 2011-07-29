@@ -121,7 +121,7 @@ public final class MultiThreadPainter {
 				guideDef.render(g, base);
 				return buffer;
 			}
-			public String toString() {return "Guide Painter for " + guideDef.getIdentifier();}
+			public String toString() {return "Guide Painter for " + guideDef.identifier();}
 		}
 		
 		//Factory methods....

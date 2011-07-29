@@ -2,13 +2,17 @@ STREAM: File
 NAME: times
 TUPLE_SIZE: 6
 SEPARATOR: \s*,\s*
-SOURCE: ./StateVsFlowRuntimes.csv
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/StateVsFlowRuntimes.csv
 SKIP: 1
 STRICT: true
 
 import BrewerPalettes
 
 stream times(elapse, size, refs, perm, type, i)
+
+view
+from #Render
+  (X,Y,WIDTH,HEIGHT): (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
 
 layer Runtimes["POLY_POINT"]
 guide
@@ -20,8 +24,9 @@ from times
   ID: Count()
   GROUP: local.name
   ORDER: Index(size)
-  X: Mult(size,2) -> Scale[0,100](_)
-  Y: Split[1](@Avg, local.name, size, elapse) -#> Log(2,_) -> Scale[min:0, max:100](_)
-  PEN_COLOR: BrewerColors(local.name)
+  X:* Mult(size,2) -> Scale[0,100](_)
+  Y:* Split[2](@FullMax, local.name, size, elapse) -#> Log[2](_) -> Scale[min:0, max:100](_)
+  PEN_COLOR:* BrewerColors(local.name)
 
+operator FullMax: Range[ALL](@Max)
 operator Avg: Range[ALL](@Mean)

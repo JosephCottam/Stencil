@@ -41,7 +41,6 @@ public class CrossLegend extends Guide2D {
 	private final CompoundRenderer renderer;
 	private final PrototypedTuple updateMask;
 
-	private final float spacing;	
 	private final boolean autoPlace;
 	private final String guideLabel;
 	private final int[] label_idx;
@@ -56,7 +55,6 @@ public class CrossLegend extends Guide2D {
 		Specializer spec = guideDef.specializer();
 		autoPlace = !(spec.containsKey(Renderer.X.name()) || spec.containsKey(Renderer.Y.name()));
 		guideLabel = Converter.toString(spec.get(GUIDE_LABEL));
-		spacing = Converter.toFloat(spec.get(SPACING_TAG));
 
 		if (!autoPlace) {
 			legendX = spec.containsKey("X") ? Converter.toDouble(spec.get("X")) : 0;

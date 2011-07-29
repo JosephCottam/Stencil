@@ -24,8 +24,8 @@ public class Interpreter {
 		this.program = panel.getProgram();
 	}
 	
-	public static Tuple processTuple(Tuple streamTuple, Rule rule) throws RuleAbortException {
-		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, streamTuple);
+	public static Tuple processTuple(Tuple tuple, Rule rule) throws RuleAbortException {
+		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);
 		return processEnv(env, rule);
 	}
 	

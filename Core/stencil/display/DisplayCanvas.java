@@ -21,7 +21,7 @@ public abstract class DisplayCanvas extends JComponent {
 	public final Object tableCaptureLock = new Object(); 
 	
 	public abstract DisplayGuide getGuide(String identifier);
-	public abstract void addGuide(String identifier, Guide2D guide);
+	public abstract void addGuide(Guide2D guide);
 	public abstract boolean hasGuide(String identifier);
 	public abstract Collection<Guide2D> getGuides();
 	

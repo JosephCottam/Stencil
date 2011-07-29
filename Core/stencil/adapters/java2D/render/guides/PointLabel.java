@@ -33,7 +33,7 @@ public class PointLabel extends Guide2D {
 	private static final String[] FIELDS = new String[]{"ID"};
 	private static final Object[] VALUES = new Object[FIELDS.length];	
 	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D bounds) {
-		data = LayerTypeRegistry.makeTable(getIdentifier(), "TEXT");
+		data = LayerTypeRegistry.makeTable(identifier(), "TEXT");
 		
 		int i=0;
 		for (PrototypedTuple t: elements) {

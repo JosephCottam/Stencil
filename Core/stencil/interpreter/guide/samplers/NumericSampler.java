@@ -31,11 +31,14 @@ public class NumericSampler implements SampleOperator {
 	/**For log samples, what should the log base be? (Default is 10.)**/
 	public static final String SAMPLE_BASE = "base";
 
+	/**Should the sample make sure it contains the zero point?
+	 * If this key is present (regardless of value), the zero point will be ignored.
+	 */
+	public static final String TIGHT = "tight";
+
 	private final boolean log;
 	
-	public NumericSampler(String type) {
-		log = type.toUpperCase().equals("LOG");
-	}
+	public NumericSampler(String type) {log = type.toUpperCase().equals("LOG");}
 
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Iterable source;
@@ -46,6 +49,13 @@ public class NumericSampler implements SampleOperator {
 		
 		double min = ((Number) seed.get(0)).doubleValue();
 		double max = ((Number) seed.get(1)).doubleValue();
+		
+		//Include the zero point if the sample is not intended to be 'tight'
+		if (!spec.containsKey(TIGHT)) {
+			if (min > 0 &&  max> 0) {min =0;}
+			if (max < 0 && min <0) {max =0;}
+		}
+		
 		
 		int tickCount = 10;
 		boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));

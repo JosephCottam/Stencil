@@ -8,6 +8,7 @@ import java.util.regex.*;
 
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.stream.InvalidTupleException;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
@@ -90,6 +91,7 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 			ended = true;
 			return null;
 		}
+		catch (InvalidTupleException ex) {throw ex;}
 		catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 	
 		return new SourcedTuple.Wrapper(name, new ArrayTuple(values));

@@ -12,6 +12,7 @@ import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.guide.samplers.LayerSampler;
+import stencil.interpreter.guide.samplers.NumericSampler;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -52,6 +53,15 @@ public class Guide implements UpdateableComposite<Guide> {
 	public String identifier() {return identifier;}
 	public Specializer specializer() {return spec;}
 	public Rule rule() {return rule;}
+	public Rule[] generators() {return generators;}
+	
+	public boolean isNumeric() {
+		boolean numeric = true;
+		for (SampleOperator op: sampleOps) {
+			numeric = numeric && op instanceof NumericSampler;
+		}
+		return numeric;
+	}
 	
 	public void update(DisplayGuide guide, Rectangle2D bounds) {
 		assert guide != null : "Null guide passed.";

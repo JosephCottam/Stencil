@@ -184,6 +184,7 @@ public class BinaryTupleStream {
 		String stencilFile = args[0];
 		String targetStream = args[1];
 		String targetFile = args[2];
+		
 		Model model = new Model();
 		StencilIO.load(stencilFile, model);
 		StreamSource ss = model.getSourcesMap().get(targetStream);

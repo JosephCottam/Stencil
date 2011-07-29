@@ -20,7 +20,7 @@ public abstract class Guide2D implements DisplayGuide {
 	}
 	
 	/**What is this guide for?*/
-	public String getIdentifier() {return identifier;}
+	public String identifier() {return identifier;}
 	
 	
 	/**Get the bounding box of the glyph.  The bounding box returned from

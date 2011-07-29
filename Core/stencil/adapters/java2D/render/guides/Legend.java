@@ -34,18 +34,16 @@ import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 public class Legend extends Guide2D {
 	public static final String GEOM_TAG = "#geom";
 	protected static final String LABEL_PROPERTY_TAG = "label";
-	protected static final String SPACING_TAG = "spacing";
 	protected static final String EXAMPLE_WIDTH_TAG = "exampleWidth";
 
 	public static final Specializer DEFAULT_SPECIALIZER;
-	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", spacing: .25, exampleWidth: 10]";
-	protected static final String[] SPEC_NON_VALUES = new String[]{SPACING_TAG, EXAMPLE_WIDTH_TAG};	//Things that will be deleted from the specializer when constructing the default values
+	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", exampleWidth: 10]";
+	protected static final String[] SPEC_NON_VALUES = new String[]{EXAMPLE_WIDTH_TAG};	//Things that will be deleted from the specializer when constructing the default values
 	static {
 		try {DEFAULT_SPECIALIZER = ParseStencil.specializer(defaultValues);}
 		 catch (Exception e) {throw new Error("Error parsing Lend configuration.", e);}
 	}
 	
-	private final float spacing;	
 	private final boolean autoPlace;
 	private boolean lineGuide = false;
 	
@@ -66,7 +64,6 @@ public class Legend extends Guide2D {
 		Specializer spec = guideDef.specializer();
 		autoPlace = !(spec.containsKey(Renderer.X.name()) || spec.containsKey(Renderer.Y.name()));
 		guideLabel = Converter.toString(spec.get(GUIDE_LABEL));
-		spacing = Converter.toFloat(spec.get(SPACING_TAG));
 		exampleWidth = Converter.toFloat(spec.get(EXAMPLE_WIDTH_TAG));
 		
 		if (!autoPlace) {

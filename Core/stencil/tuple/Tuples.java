@@ -271,6 +271,7 @@ public final class Tuples {
 		final int[] idxs = new int[fields.length];
 		for (int i=0; i< idxs.length; i++) {
 			idxs[i] = t.prototype().indexOf(fields[i]);
+			assert idxs[i] >=0 : "Attempt to delete element " + fields[i] + " not present in the tuple.";
 		}
 		return delete(t, idxs);
 	}

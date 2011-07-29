@@ -12,7 +12,6 @@ import stencil.interpreter.tree.Specializer;
 import stencil.adapters.java2D.interaction.CanvasAsStore;
 import stencil.adapters.java2D.interaction.ViewAsStore;
 import stencil.adapters.java2D.interaction.ZoomPanHandler;
-import stencil.adapters.java2D.render.guides.Guide2D;
 import stencil.adapters.java2D.render.guides.*;
 import stencil.adapters.java2D.render.Renderer;
 import stencil.adapters.java2D.util.MultiThreadPainter;
@@ -75,25 +74,41 @@ public final class Adapter implements stencil.adapters.Adapter {
 	private void constructGuides(Canvas canvas, Program program) {
 		int legendCount = 0;//How many side-bars have been created?
 		
+
+		Guide xAxis =null,yAxis=null;
 		for (Guide guideDef : program.allGuides()) {
 			if (guideDef.type().equals("axis")) {
-				Guide2D guide = new Axis(guideDef);
-				canvas.addGuide(guideDef.identifier(), guide);
+				if (guideDef.identifier().contains("X")) {xAxis = guideDef;}
+				if (guideDef.identifier().contains("Y")) {yAxis = guideDef;}
 			} else if (guideDef.type().equals("legend")) {
-				Guide2D guide = new Legend(guideDef, legendCount++);
-				canvas.addGuide(guideDef.identifier(), guide);
+				canvas.addGuide(new Legend(guideDef, legendCount++));
 			} else if (guideDef.type().equals("pointLabels")) {
-				Guide2D guide = new PointLabel(guideDef);
-				canvas.addGuide(guideDef.identifier(), guide);
+				canvas.addGuide(new PointLabel(guideDef));
 			} else if (guideDef.type().equals("trend")) {
-				Guide2D guide = new TrendLine(guideDef);
-				canvas.addGuide(guideDef.identifier(), guide);
+				canvas.addGuide(new TrendLine(guideDef));
 			} else if (guideDef.type().equals("crossLegend")) {
-				Guide2D guide = new CrossLegend(guideDef, legendCount++);
-				canvas.addGuide(guideDef.identifier(), guide);
+				canvas.addGuide(new CrossLegend(guideDef, legendCount++));
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " + guideDef.type());
 			}
+		}
+		
+		
+		if (xAxis != null && yAxis != null) {
+			if (yAxis.isNumeric()) {
+				canvas.addGuide(new Axis(xAxis, yAxis.generators()[0]));
+			} else {
+				canvas.addGuide(new Axis(xAxis, null));
+			}
+			if (xAxis.isNumeric()) {
+				canvas.addGuide(new Axis(yAxis, xAxis.generators()[0]));
+			} else {
+				canvas.addGuide(new Axis(yAxis, null));				
+			}
+		} else if (xAxis != null) {
+			canvas.addGuide(new Axis(xAxis, null));			
+		} else if (yAxis != null) {
+			canvas.addGuide(new Axis(yAxis, null));			
 		}
 	}
 
