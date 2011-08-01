@@ -35,6 +35,7 @@ public class Legend extends Guide2D {
 	public static final String GEOM_TAG = "#geom";
 	protected static final String LABEL_PROPERTY_TAG = "label";
 	protected static final String EXAMPLE_WIDTH_TAG = "exampleWidth";
+	private static final String IMPLANT_KEY = "implant";
 
 	public static final Specializer DEFAULT_SPECIALIZER;
 	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", exampleWidth: 10]";
@@ -78,7 +79,12 @@ public class Legend extends Guide2D {
 
 		data = makeTable();
 		PrototypedTuple defaultValues = Tuples.delete(DEFAULT_SPECIALIZER, SPEC_NON_VALUES); 
-		updateMask = Tuples.merge(data.updateMaskTuple(), defaultValues);		
+		PrototypedTuple updateMask = Tuples.merge(data.updateMaskTuple(), defaultValues);
+		if (spec.containsKey(IMPLANT_KEY)) {
+			updateMask = GuideUtil.fullImplant(updateMask, Converter.toString(spec.get(IMPLANT_KEY)));
+		}
+		this.updateMask = updateMask;
+
 		renderer = new CompoundRenderer(data.prototype());
 		
 	}
