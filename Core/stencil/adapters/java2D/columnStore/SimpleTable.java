@@ -9,6 +9,7 @@ import org.pcollections.PMap;
 import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.SchemaFieldDef;
+import stencil.interpreter.tree.Freezer;
 import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuples;
@@ -97,8 +98,8 @@ public final class SimpleTable implements Table {
 		
 		synchronized(tableLock){
 			if (update.containsKey(id)) {
-				PrototypedTuple prior = update.get(id);
-				updates = Tuples.merge(prior, updates);
+				PrototypedTuple prior = update.get(id);				
+				updates = Tuples.merge(prior, updates, Freezer.NO_UPDATE);
 			} 
 			update = update.plus(id, updates);
 			stateID++;

@@ -92,7 +92,7 @@ public interface Renderer<T extends LayerView<? extends Glyph>> {
 			
 			
 			
-			g.setPaint(ColorUtils.lighten(DEBUG_COLOR, .9));
+			g.setPaint(ColorUtils.lighten(DEBUG_COLOR, .5));
 			g.draw(layer.getBoundsReference());
 		}
 	}

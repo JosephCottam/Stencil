@@ -143,6 +143,7 @@ public class PolyRenderer implements Renderer<TableView> {
 				path.lineTo((Double) start.get(xIdx), -((Double) start.get(yIdx)));
 			}
 		}
+		System.out.println();
 		
 		Shape s = LineRenderer.implantLine(implanter, viewTransform, path, start, g);
 		

@@ -25,10 +25,10 @@ public final class Freezer {
 	/**Indicates when extending that the original or default value should be used, not the one present in the update values.
 	 * This is used to enable consumes blocks with different results prototypes in the same layer.
 	 */
-	public static final Object NO_UPDATE = new Object();
+	public static final Object NO_UPDATE = new Object() {public String toString() {return "**VALUE: NO UPDATE**";}};
 	
 	/**A value to indicate that the default value should be used instead.**/
-	public static final Object VALUE_DEFAULT = new Object();
+	public static final Object VALUE_DEFAULT = new Object() {public String toString() {return "**VALUE: DEFAULT**";}};;
 	
 	private Freezer() {}
 

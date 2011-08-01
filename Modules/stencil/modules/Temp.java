@@ -15,6 +15,10 @@ import stencil.types.Converter;
 @Module
 public class Temp extends BasicModule {
 	
+	@Operator(spec="[]")
+	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
+	public static Number toNumber(Object v) {return Converter.toNumber(v);}
+	
 	/**Perform a linear interpolation.*/
 	@Operator(spec="[]")
 	public static final class LinearInterp extends AbstractOperator {

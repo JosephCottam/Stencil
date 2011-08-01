@@ -259,6 +259,7 @@ public abstract class ParseStencil {
 			OperatorPrefilter.apply(p);
 			LimitDynamicBind.apply(p);
 			StoreValidator.apply(p);
+			OrderValidator.apply(p);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {System.err.println(e.getMessage());}

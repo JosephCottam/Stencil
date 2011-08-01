@@ -30,7 +30,7 @@ public final class ColorCache {
 
 	public static ColorTuple get(java.awt.Color color) {return toTuple(color.getRGB());}
 	public static ColorTuple get(String arg) {
-		String[] args = arg.split("[" + ParserConstants.SEPARATOR + ":\\s)]+");
+		String[] args = arg.trim().split("[" + ParserConstants.SEPARATOR + ":\\s)]+");
 		int color;
 		try {
 			if (args.length <=2) {

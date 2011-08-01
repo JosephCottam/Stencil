@@ -20,12 +20,18 @@ options {
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.Specializer;
   import stencil.interpreter.tree.MultiPartName;
+  import stencil.parser.ProgramCompileException;
   
   import static stencil.tuple.Tuples.EMPTY_TUPLE;
   import static stencil.parser.ParserConstants.INVOKEABLE;
 }
 
 @members {
+	public static final class ConstantOpError extends ProgramCompileException {
+	   public ConstantOpError(String message) {super(message);}
+	   public ConstantOpError(String message, Exception cause) {super(message, cause);}
+	}
+
    public static StencilTree apply (StencilTree t, ModuleCache modules) {
      return (StencilTree) TreeRewriteSequence.apply(t, modules);
    }
@@ -65,7 +71,7 @@ options {
     		FacetData fd=od.getFacet(name.facet());
     		return fd.getMemUse() == FacetData.MemoryUse.FUNCTION;
    		} catch (Exception e) {
-   			throw new RuntimeException("Error getting module information for operator " + name, e);
+   			throw new ConstantOpError("Error getting module information for operator " + name, e);
    	  }
 		}
 
@@ -74,7 +80,7 @@ options {
         try {
           Object[] args = Freezer.valueList(f.find(LIST_ARGS));
           return f.find(INVOKEABLE).invoke(args);}
-        catch (Exception e) {throw new RuntimeException("Error evaluating constant operator durring constant propagation; " + f.toStringTree(), e);}
+        catch (Exception e) {throw new ConstantOpError("Error evaluating constant operator during constant propagation; " + f.toStringTree(), e);}
     }
   
   private static final Environment defaultEnvironment(StencilTree chain) {

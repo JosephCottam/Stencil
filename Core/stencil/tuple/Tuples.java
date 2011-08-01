@@ -178,6 +178,14 @@ public final class Tuples {
 		return target;
 	}
 	
+	//Internal flag to indicate that there is no skip value provided
+	private static final Object NO_SKIP = new Object();
+
+	/**Complete merge, no skip value.**/
+	public static PrototypedTuple merge(PrototypedTuple source1, PrototypedTuple source2) throws IllegalArgumentException {
+		return merge(source1, source2, NO_SKIP);
+	}
+
 	/**Create a new tuple with fields representing a union of the
 	 * fields of the two source tuples.  Values will be taken from
 	 * source1 first, then source2 (so last-write wins on shared fields).
@@ -191,11 +199,12 @@ public final class Tuples {
 	 * and any fields of tuple2 not in tuple1 are appended to the end in the order they appear in tuple2.
 	 *
 	 * @param sourceName Where should the resulting tuple indicate it is from?
-	 * @param source1
-	 * @param source2
+	 * @param source1 Initial tuple 
+	 * @param source2 New tuple 
+	 * @param skipValue Value in source2 that indicates the value of source1 should be retained
 	 * @return
 	 */
-	public static PrototypedTuple merge(PrototypedTuple source1, PrototypedTuple source2) throws IllegalArgumentException {
+	public static PrototypedTuple merge(PrototypedTuple source1, PrototypedTuple source2, Object skipValue) throws IllegalArgumentException {
 		if (source1 == null && source2 ==null) {throw new IllegalArgumentException("At least one source to merge must not be null.");}
 
 		if (source1 == null || source1 == EMPTY_TUPLE) {return source2;}
@@ -213,6 +222,7 @@ public final class Tuples {
 		for (Object f: source2.prototype()) {
 			TupleFieldDef field = (TupleFieldDef) f;
 			Object value = source2.get(field.name());
+			if (skipValue.equals(value)) {continue;}
 			int idx = defs.indexOf(field.name());
 			if  (idx <0) {
 				defs.add(field.name());
@@ -284,7 +294,6 @@ public final class Tuples {
 	 * Behavior is undefined if the same index is listed multiple times,
 	 * it is expected that the idx list only has unique values before this method is called.
 	 */
-	@SuppressWarnings("null")
 	public static Tuple delete(Tuple t, int... idxs) {
 		TuplePrototype proto = null;
 		List<TupleFieldDef> defs = null;
