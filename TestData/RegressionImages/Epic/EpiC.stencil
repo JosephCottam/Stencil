@@ -2,21 +2,21 @@ STREAM: File
 NAME: Visibility
 TUPLE_SIZE: 2
 SEPARATOR: \s*,\s*
-SOURCE: Visibliity.txt
+SOURCE: ./Visibliity.txt
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: LineColor
 TUPLE_SIZE: 2
 SEPARATOR: \s*,\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Epic/LineColor.txt
+SOURCE: ./LineColor.txt
 SKIP: 1
 STRICT: true
 STREAM: File
 NAME: Data
 TUPLE_SIZE: 3
-SEPARATOR: \s*,\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Epic/synthData.txt
+SEPARATOR: \s+
+SOURCE: ./synthData.txt
 SKIP: 1
 STRICT: true
 
