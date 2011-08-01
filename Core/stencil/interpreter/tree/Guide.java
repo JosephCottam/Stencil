@@ -1,6 +1,7 @@
 package stencil.interpreter.tree;
 
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class Guide implements UpdateableComposite<Guide> {
 		return numeric;
 	}
 	
-	public void update(DisplayGuide guide, Rectangle2D bounds) {
+	public void update(DisplayGuide guide, Rectangle2D bounds, AffineTransform viewTransform) {
 		assert guide != null : "Null guide passed.";
 		
 		List<? extends Tuple> projection;
@@ -86,7 +87,7 @@ public class Guide implements UpdateableComposite<Guide> {
 		try {results = processAll(projection, rule);}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 
-		guide.setElements(results, bounds);
+		guide.setElements(results, bounds, viewTransform);
 	}
 
 	private static List<PrototypedTuple> processAll(List<? extends Tuple> sources, Rule rule) throws Exception {

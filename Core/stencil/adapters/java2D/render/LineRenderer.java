@@ -87,18 +87,13 @@ public class LineRenderer implements Renderer<TableView> {
 			g.setStroke(stroker.getStroke(glyph));
 			pen.setColor(g, glyph);
 			Shape line = liner.line(glyph);
-
 			
-			Shape finalLine = implantLine(implanter, viewTransform, line, glyph, g);
+			LineTransPair lineTrans= implantLine(implanter, viewTransform, line, glyph);
+			g.setTransform(lineTrans.trans);
 			
-			if (leftCap instanceof Capper.None && rightCap instanceof Capper.None) {
-				g.draw(finalLine);
-			} else {
-				//TODO: Something so the cap/line overlap is draw twice (causes problems with transparency)
-				g.draw(finalLine);
-				if (!(leftCap instanceof Capper.None)) {g.fill(leftCap.getCap(glyph, line));}
-				if (!(rightCap instanceof Capper.None)) {g.fill(rightCap.getCap(glyph, line));}
-			}
+			g.draw(lineTrans.line);
+			if (!(leftCap instanceof Capper.None)) {g.fill(leftCap.getCap(glyph, line));}
+			if (!(rightCap instanceof Capper.None)) {g.fill(rightCap.getCap(glyph, line));}
 			
 		}
 		
@@ -108,7 +103,7 @@ public class LineRenderer implements Renderer<TableView> {
 	}
 
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
 
@@ -126,18 +121,28 @@ public class LineRenderer implements Renderer<TableView> {
 		share.setBounds(fullBounds);
 	}
 	
-	
 	/**Transform the line and the graphics object to handle the requested implantation relative to the view transform.**/
-	public static Shape implantLine(Implanter implanter, AffineTransform viewTransform, Shape line, Glyph glyph, Graphics2D g) {
+	public static LineTransPair implantLine(Implanter implanter, AffineTransform viewTransform, Shape line, Glyph glyph) {
+		AffineTransform trans = viewTransform;
 		if (!(implanter instanceof Implanter.Area)) {
-			AffineTransform trans = implanter.implant(new AffineTransform(), viewTransform, glyph);
+			trans = implanter.implant(new AffineTransform(), viewTransform, glyph);
 			try {
 				line = trans.createInverse().createTransformedShape(line);
 				trans.preConcatenate(viewTransform);
-				g.setTransform(trans);
 			} catch (NoninvertibleTransformException e) {e.printStackTrace();}//Report and move on
 		}
-		return line;
+		return new LineTransPair(line, trans);
+	}
+	
+	/**Return values for the implantLine method*/
+	public static final class LineTransPair {
+		final Shape line;
+		final AffineTransform trans;
+		public LineTransPair(Shape line, AffineTransform trans) {
+			this.line = line;
+			this.trans = trans;
+		}
 	}
 
+	
 }

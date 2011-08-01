@@ -30,8 +30,6 @@ import stencil.types.font.FontTuple;
 import stencil.util.DoubleDimension;
 
 public class TextRenderer implements Renderer<TableView> {
-	private static final SchemaFieldDef LAYOUT_CACHE = new SchemaFieldDef("#LAYOUT_CACHE", null, GeneralPath.class);
-	
 	/**Basic expected table schema.**/
 	public static final TuplePrototype<SchemaFieldDef> SCHEMA = new TuplePrototype(
 				ID,
@@ -48,8 +46,7 @@ public class TextRenderer implements Renderer<TableView> {
 				VISIBLE,
 				REGISTRATION,
 				Z,
-				BOUNDS,
-				LAYOUT_CACHE);
+				BOUNDS);
 	
 	/**Basic expected table schema.**/
 	
@@ -62,7 +59,6 @@ public class TextRenderer implements Renderer<TableView> {
     private final LayoutEngine layout;
     
     private final int boundsIdx;
-    private final int layoutCacheIdx;
     
     public TextRenderer(TuplePrototype<SchemaFieldDef> schema) {
   	    filler  = Colorer.Util.instance(schema, schema.indexOf("COLOR"));
@@ -73,53 +69,51 @@ public class TextRenderer implements Renderer<TableView> {
 	    layout = new LayoutEngine(schema.indexOf("TEXT"), schema.indexOf("FONT"), schema.indexOf("JUSTIFY"));
 	
 	   	boundsIdx = schema.indexOf(BOUNDS);
-	   	layoutCacheIdx = schema.indexOf(LAYOUT_CACHE);
     }
     
-    private GeneralPath layout(Glyph glyph, AffineTransform view) {
-		GeneralPath p = layout.layout(glyph);
-		
-		AffineTransform trans = new AffineTransform();
-		trans = rotater.rotate(trans, glyph);
-		trans = reg.register(trans, glyph, p.getBounds2D());
-		trans = placer.place(trans, glyph);
-		trans = implanter.implant(trans, view, glyph);
-		p.transform(trans);
-		return p;
-    }
 
 	@Override
 	public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
+
 		for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(),  true)) {
 			if (!glyph.isVisible()) {continue;}
-			GeneralPath p = (GeneralPath) glyph.get(layoutCacheIdx);			
-
+			GeneralPath p = layout.layout(glyph);			
+			AffineTransform trans = new AffineTransform();
+			trans = implanter.implant(trans, viewTransform, glyph);
+			trans = rotater.rotate(trans, glyph);
+			trans = reg.register(trans, glyph, p.getBounds2D());
+			trans = placer.place(trans, glyph);
+			g.transform(trans);
 			filler.setColor(g, glyph);
 			g.fill(p);
+			g.setTransform(viewTransform);
 		}
 		Renderer.Util.debugRender(layer, g);
 		g.setTransform(viewTransform);
 	}
 	
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
-		GeneralPath[] layouts = new GeneralPath[share.size()];
 		
 		for(StoreTuple glyph: new TupleIterator(share, true)) {
-			GeneralPath p = layout(glyph, null);
+			GeneralPath p = layout.layout(glyph);
+			
+			AffineTransform trans = new AffineTransform();
+			trans = implanter.implant(trans, viewTransform, glyph);
+			trans = rotater.rotate(trans, glyph);
+			trans = reg.register(trans, glyph, p.getBounds2D());
+			trans = placer.place(trans, glyph);
+			p.transform(trans);
+
 			Rectangle2D b = p.getBounds2D(); 
 			bounds[glyph.row()] = b;
-			layouts[glyph.row()] = p;
 			ShapeUtils.add(fullBounds, b);
 		}
 
 		Column newBounds = share.columns()[boundsIdx].replaceAll(bounds);
 		share.setColumn(boundsIdx, newBounds);
-
-		Column newLayouts = share.columns()[layoutCacheIdx].replaceAll(layouts);
-		share.setColumn(layoutCacheIdx, newLayouts);
 		
 		share.setBounds(fullBounds);
 	}

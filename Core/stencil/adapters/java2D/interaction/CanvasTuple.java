@@ -14,7 +14,7 @@ public class CanvasTuple extends stencil.display.CanvasTuple {
 	
 	public Canvas getComponent() {return canvas;}
 
-	protected Rectangle getBounds() {return canvas.getContentBounds(true);}
+	protected Rectangle getBounds() {return canvas.contentBounds(true);}
 
 	public void set(String field, Object value) {
 		if (BACKGROUND_COLOR.equals(field)) {

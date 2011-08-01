@@ -189,7 +189,7 @@ public class Numerics extends BasicModule {
 
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(double quotient)", alias={"map","query"})	
-	public static long div(double d1, double d2) {return Math.round(d1)/Math.round(d2);}
+	public static double div(double d1, double d2) {return Math.round(d1)/Math.round(d2);}
 
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(double quotient)", alias={"map","query"})	

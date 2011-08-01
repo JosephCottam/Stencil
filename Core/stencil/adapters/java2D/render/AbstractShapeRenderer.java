@@ -45,12 +45,12 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
     
 
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
 		for (StoreTuple g: new TupleIterator(share, true)) {
 			Shape shape = shaper.shape(g);	//Used as a reference for the basic shape to (potentially) optimize rendering
-			AffineTransform trans = makeTrans(shape, g, null);
+			AffineTransform trans = makeTrans(shape, g, viewTransform);
 			Rectangle2D b = trans.createTransformedShape(shape.getBounds2D()).getBounds2D();
 			bounds[g.row()] = b;
 			ShapeUtils.add(fullBounds, b);
@@ -65,8 +65,8 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 	   if (!(rotater instanceof Rotater.None && 
 			   reg instanceof Registerer.None &&
 			   implanter instanceof Implanter.Area)) {
-		   trans = rotater.rotate(trans, glyph);
 		   trans = implanter.implant(trans, viewTransform, glyph);
+		   trans = rotater.rotate(trans, glyph);
 		   trans = reg.register(trans, glyph, shape.getBounds2D());
 	   }
 	   
@@ -96,7 +96,7 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 		   }
 	   }
 	   Renderer.Util.debugRender(layer, g);
-		g.setTransform(viewTransform);
+	   g.setTransform(viewTransform);
    }
    
    /**Based on Prefuse's GraphicsLib....**/

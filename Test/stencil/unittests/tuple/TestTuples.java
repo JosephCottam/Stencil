@@ -98,7 +98,7 @@ public class TestTuples extends StencilTestCase {
 		
 		
 		//Check ordering constraint
-		PrototypedTuple m5 = Tuples.merge(t4,t3,t2,t1);
+		PrototypedTuple m5 = Tuples.mergeAll(t4,t3,t2,t1);
 		assertEquals(0, m5.prototype().indexOf("V4"));
 		assertEquals(1, m5.prototype().indexOf("V3"));
 		assertEquals(2, m5.prototype().indexOf("V2"));

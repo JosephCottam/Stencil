@@ -58,8 +58,37 @@ public class ImageRenderer implements Renderer<TableView> {
 		for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(), true)) {
 		   if (!glyph.isVisible()) {continue;}		   
 		   
-		   AffineTransform trans = new AffineTransform();
 		   BufferedImage img  = imager.image(glyph, viewTransform);
+		   AffineTransform trans = trans(img, glyph, viewTransform);
+		   g.drawRenderedImage(img, trans);
+		}
+		g.setTransform(viewTransform);
+		Renderer.Util.debugRender(layer, g);
+	}
+	
+
+	private static final AffineTransform IDENTITY = new AffineTransform();
+	@Override
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
+		Rectangle2D[] bounds = new Rectangle2D[share.size()];
+		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
+
+		for (StoreTuple glyph: new TupleIterator(share, true)) {			
+		   BufferedImage img  = imager.image(glyph, IDENTITY);
+		   Rectangle2D bound = new Rectangle2D.Double((Double) glyph.get(xIdx), -((Double) glyph.get(yIdx)), img.getWidth(), img.getHeight());
+		   
+		   AffineTransform trans = trans(img, glyph, viewTransform);		   
+		   Rectangle2D b = trans.createTransformedShape(bound).getBounds2D(); 
+		   bounds[glyph.row()] = b;
+		   ShapeUtils.add(fullBounds, b);
+		}
+		Column newCol = share.columns()[boundsIdx].replaceAll(bounds);
+		share.setColumn(boundsIdx, newCol);
+		share.setBounds(fullBounds);
+	}
+	
+    private AffineTransform trans(BufferedImage img, Glyph glyph, AffineTransform viewTransform) {
+		   AffineTransform trans = new AffineTransform();
 		   Rectangle2D actualBounds = new Rectangle2D.Double(0,0, img.getWidth(), img.getHeight());
 		   Rectangle2D logicalBounds = (Rectangle2D) glyph.get(boundsIdx);
 		   trans.scale(logicalBounds.getWidth()/actualBounds.getWidth(), logicalBounds.getHeight()/actualBounds.getHeight());
@@ -72,38 +101,9 @@ public class ImageRenderer implements Renderer<TableView> {
 			   trans = implanter.implant(trans, viewTransform, glyph);
 		   }
 		   
-		   trans = placer.place(trans, glyph);		
-		   g.drawRenderedImage(img, trans);
-		}
-		g.setTransform(viewTransform);
-		Renderer.Util.debugRender(layer, g);
-	}
-	
-	@Override
-	public void calcFields(TableShare share) {
-		Rectangle2D[] bounds = new Rectangle2D[share.size()];
-		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
-		AffineTransform identity =  new AffineTransform();
-		for (StoreTuple glyph: new TupleIterator(share, true)) {
-		   BufferedImage img  = imager.image(glyph, identity);
-		   Rectangle2D bound = new Rectangle2D.Double((Double) glyph.get(xIdx), -((Double) glyph.get(yIdx)), img.getWidth(), img.getHeight());
-		   
-		   AffineTransform trans = new AffineTransform();
-		   if (!(rotater instanceof Rotater.None 
-				   && implanter instanceof Implanter.Area
-				   && reg instanceof Registerer.None)) {
-			   trans = rotater.rotate(trans, glyph);
-			   trans = reg.register(trans, glyph, bound);
-		   }
-		   
-		   Rectangle2D b = trans.createTransformedShape(bound).getBounds2D(); 
-		   bounds[glyph.row()] = b;
-		   ShapeUtils.add(fullBounds, b);
-		}
-		Column newCol = share.columns()[boundsIdx].replaceAll(bounds);
-		share.setColumn(boundsIdx, newCol);
-		share.setBounds(fullBounds);
-	}
-
+		   trans = placer.place(trans, glyph);
+		   return trans;
+ }
+ 
 	
 }

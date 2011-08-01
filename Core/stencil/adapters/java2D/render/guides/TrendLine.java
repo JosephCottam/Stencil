@@ -62,7 +62,7 @@ public class TrendLine extends Guide2D {
 	}
 	
 	@Override
-	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
+	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		PrototypedTuple mark;
 		switch (sampleType) {
 			case SIMPLE: mark = firstAndFinal(elements); break; 
@@ -71,7 +71,7 @@ public class TrendLine extends Guide2D {
 		}
 		
 		data.update(Tuples.merge(updateMask, mark));		
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 	}
 
 

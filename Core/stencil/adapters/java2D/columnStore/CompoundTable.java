@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.columnStore;
 
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -189,22 +190,22 @@ public class CompoundTable implements Table {
 	}
 	
 	/**Perform the full generation change and merge loop for a compound table and all its children.**/
-	static void fullGenChange(CompoundTable table, CompoundRenderer renderer) {
+	static void fullGenChange(CompoundTable table, CompoundRenderer renderer, AffineTransform viewTransform) {
 		for (Table t: table.children) {
 			if (t instanceof CompoundTable) {
-				fullGenChange((CompoundTable) t, (CompoundRenderer) renderer.rendererFor(t.name()));
+				fullGenChange((CompoundTable) t, (CompoundRenderer) renderer.rendererFor(t.name()), viewTransform);
 			} else {
 				t.changeGenerations();
 				TableShare share = t.viewpoint();
 				share.simpleUpdate();		//TODO: Dynamic bindings ever in the axis?  Probably yes...but badness right now
-				renderer.rendererFor(t.name()).calcFields(share);
+				renderer.rendererFor(t.name()).calcFields(share, viewTransform);
 				t.merge(share);
 			}
 		}
 
 		TableShare share = table.root.viewpoint();
 		share.simpleUpdate();
-		renderer.calcFields(share);
+		renderer.calcFields(share, viewTransform);
 		table.root.merge(share);
 	}
 } 

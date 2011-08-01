@@ -20,6 +20,7 @@ import stencil.adapters.java2D.columnStore.TableView;
 import stencil.adapters.java2D.columnStore.column.Column;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
+import stencil.adapters.java2D.render.LineRenderer.LineTransPair;
 import stencil.adapters.java2D.render.mixins.Colorer;
 import stencil.adapters.java2D.render.mixins.Implanter;
 import stencil.adapters.java2D.render.mixins.Stroker;
@@ -113,7 +114,7 @@ public class PolyRenderer implements Renderer<TableView> {
 	
 
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
 		for(StoreTuple glyph: new TupleIterator(share, true)) {
@@ -145,13 +146,14 @@ public class PolyRenderer implements Renderer<TableView> {
 		}
 		System.out.println();
 		
-		Shape s = LineRenderer.implantLine(implanter, viewTransform, path, start, g);
+		LineTransPair ltp = LineRenderer.implantLine(implanter, viewTransform, path, start);
+		g.setTransform(ltp.trans);
 		
 		//Render the path
 		Stroke orig = g.getStroke();
 		g.setStroke(stroker.getStroke(start));
 		lineColor.setColor(g, start);
-		g.draw(s);
+		g.draw(ltp.line);
 		g.setStroke(orig);
 		g.setTransform(viewTransform);
 	}
@@ -169,8 +171,9 @@ public class PolyRenderer implements Renderer<TableView> {
 			g.setStroke(stroker.getStroke(start));
 			lineColor.setColor(g, start);
 			Shape line = connector.line(start, end);
-			line = LineRenderer.implantLine(implanter, viewTransform, line, start, g);
-			g.draw(line);
+			LineTransPair ltp = LineRenderer.implantLine(implanter, viewTransform, line, start);
+			g.setTransform(ltp.trans);
+			g.draw(ltp.line);
 			g.setTransform(viewTransform);
 		}
 		g.setStroke(orig);

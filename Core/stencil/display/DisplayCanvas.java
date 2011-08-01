@@ -1,5 +1,6 @@
 package stencil.display;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.Collection;
 
@@ -26,10 +27,13 @@ public abstract class DisplayCanvas extends JComponent {
 	public abstract Collection<Guide2D> getGuides();
 	
 	/**Get the bounds of all entities on this canvas.
-	 * TODO: How should this address view-guides
 	 * 
 	 * @param includeGuides  Should this include canvas-level guides?
 	 * @return
 	 */
-	public abstract Rectangle2D getContentBounds(boolean includeGuides);
+	public abstract Rectangle2D contentBounds(boolean includeGuides);
+
+
+	public abstract AffineTransform viewTransform();
+
 }

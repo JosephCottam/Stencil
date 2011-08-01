@@ -79,24 +79,26 @@ public class PrerenderTasks {
 		
 		executeAll(simpleUpdaters);
 		executeAll(dynamicUpdaters.values());
-		for (Table layer: layers) {layer.viewpoint().dynamicComplete();}		//TODO: One parallel task per per-table?
+		for (Table layer: layers) {layer.viewpoint().dynamicComplete();}		//TODO: One parallel task per per-table?   (Must happen after because of 'find' in dynamic bindings)
 		for (int i=0; i<layers.length; i++) {
 			Table layer = layers[i];
-			if (layer.viewpoint().unchanged()) {continue;}	//skip if there were no changes
+			if (layer.viewpoint().unchanged()) {continue;}	//TODO: skip if there were no changes, BUT don't skip if there are viewTransform changes...  
 
 			//Renderer-based field updates
 			Renderer renderer = renderers[i];
-			renderer.calcFields(layer.viewpoint());
+			renderer.calcFields(layer.viewpoint(), panel.getCanvas().getComponent().viewTransform());
 		}
 		synchronized(panel.getCanvas().getComponent().tableCaptureLock) {
 			for (Table layer: layers) {layer.merge(layer.viewpoint());}		//TODO: One (parallel) task per per-table? 
 		}
-		
+
 		executeAll(guideUpdaters);
 		
 		if (Display.canvas != null && Display.view != null) {
 			panel.processTuple(RENDER_TUPLE);
 		}
+
+		
 	}
 	
 	/**Replacement method for a thread-pool invokeAll when using an update task.

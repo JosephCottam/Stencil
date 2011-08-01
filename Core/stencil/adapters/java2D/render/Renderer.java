@@ -55,6 +55,13 @@ public interface Renderer<T extends LayerView<? extends Glyph>> {
 	
 	/**Draw each element of the layer on the given graphics object
 	 * Assume that calcFields has been run on the contents of the layer passed.
+	 * 
+	 * The two transforms must be passed because some elements modify their properties based on the rendering conditions.
+	 * The viewTransform is how the graphics are logically modified.  It is the transform that was used to calculate bounds.
+	 * 
+	 * The viewTransform is required because some glyph properties depend on the conditions of their rendering.
+	 * (For example, size depends on rendering conditions when implantation is not "area".)
+	 * 
 	 * **/   
 	public void render(T layer, Graphics2D g, AffineTransform viewTransform);
 	   
@@ -62,7 +69,7 @@ public interface Renderer<T extends LayerView<? extends Glyph>> {
 	 * This should be performed after all dynamic bindings are complete.
 	 * Bounds is the most common field, but interesting anchor points or pre-rendered items are also possible.
 	 ***/
-	public void calcFields(TableShare share);
+	public void calcFields(TableShare share, AffineTransform viewTransform);
 	
 	public static final class Util {
 		public static Color DEBUG_COLOR = null;

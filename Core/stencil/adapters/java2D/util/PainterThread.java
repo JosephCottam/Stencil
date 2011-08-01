@@ -58,7 +58,7 @@ public final class PainterThread implements Runnable {
 	}
 	
 	private boolean requiresUpdate() {
-		AffineTransform trans = target.getViewTransformRef();
+		AffineTransform trans = target.viewTransformRef();
 		boolean requires = painter.requiresUpdate(trans);
 		return requires;
 	}
@@ -84,7 +84,7 @@ public final class PainterThread implements Runnable {
 
 		size = target.getBounds();
 		background = target.getBackground();
-		viewTransform = target.getViewTransform();			
+		viewTransform = target.viewTransform();			
 		
 		if (size.width <=0 || size.height <=0) {size = DEFAULT_SIZE;}
 			

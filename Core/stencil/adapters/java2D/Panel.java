@@ -81,9 +81,9 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 
 	private void exportPNG(String filename, Integer width, Integer height) throws Exception {
 		if (width <1 && height <1) {exportPNG(filename, StencilPanel.ABSTRACT_SCREEN_RESOLUTION); return;}
-		Rectangle contentBounds = canvas.getContentBounds(true);
+		Rectangle contentBounds = canvas.contentBounds(true);
 		
-		AffineTransform viewTransform = canvas.getViewTransformRef(); 
+		AffineTransform viewTransform = canvas.viewTransformRef(); 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);		
 		
 		float contentWidth = canvas.getWidth();		//Using float to force floating point arithmetic later
@@ -126,11 +126,11 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 		long width = (int) Math.round(Math.ceil(scale * canvas.getWidth()));
 		long height = (int) Math.round(Math.ceil(scale * canvas.getHeight()));
 
-		AffineTransform viewTransform = canvas.getViewTransformRef(); 
+		AffineTransform viewTransform = canvas.viewTransformRef(); 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);
 		
 		if (width == 0 || height == 0) { //If nothing will display, then just show everything (usually batch mode)
-			Rectangle contentBounds = canvas.getContentBounds(true);
+			Rectangle contentBounds = canvas.contentBounds(true);
 			width = (int) Math.round(Math.ceil(scale * contentBounds.width));
 			height = (int) Math.round(Math.ceil(scale * contentBounds.height));
 			topLeft = contentBounds.getLocation();

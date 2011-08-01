@@ -98,22 +98,22 @@ public class Legend extends Guide2D {
 		return new CompoundTable(identifier, labels, elements);
 	}
 
-	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
+	@Override
+	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		if (autoPlace) {
 			x = parentBounds.getMaxX();
 			y = -parentBounds.getMinY();
-		}
-				
+		}				
 		data = makeTable();
 
 		Collections.sort(elements, sorter);
 		
 		Collection<PrototypedTuple> items = createLabeledItems(elements,x,y); 
 		for (PrototypedTuple item:items) {data.update(item);}
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 		
 		data.update(createGuideLabel(data.getBoundsReference()));
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 	}
 	
 
@@ -169,7 +169,7 @@ public class Legend extends Guide2D {
 		
 
 		
-		return Tuples.merge(label,example, Tuples.delete(contents, label_idx));
+		return Tuples.mergeAll(label,example, Tuples.delete(contents, label_idx));
 	}	
 
 	public Rectangle2D getBoundsReference() {return data.getBoundsReference();}

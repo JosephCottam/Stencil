@@ -32,18 +32,20 @@ public class PointLabel extends Guide2D {
 
 	private static final String[] FIELDS = new String[]{"ID"};
 	private static final Object[] VALUES = new Object[FIELDS.length];	
-	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D bounds) {
+	
+	@Override
+	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D bounds, AffineTransform viewTransform) {
 		data = LayerTypeRegistry.makeTable(identifier(), "TEXT");
 		
 		int i=0;
 		for (PrototypedTuple t: elements) {
 			VALUES[0] = i++;
 			PrototypedTuple u = new PrototypedArrayTuple(FIELDS, VALUES);
-			PrototypedTuple m = Tuples.merge(updateMask, t,u);
+			PrototypedTuple m = Tuples.mergeAll(updateMask, t,u);
 			data.update(m);
 		}
 		
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 	}
 
 	public Rectangle2D getBoundsReference() {return data.getBoundsReference();}

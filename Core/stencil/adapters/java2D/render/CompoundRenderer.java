@@ -118,7 +118,7 @@ public class CompoundRenderer implements Renderer<TableView> {
 	 * TODO: Is there a way to JUST update the bounds (skip the whole share-thing and just do an update to all bounds...)
 	 */
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 //		for (RenderColPair entry: subs.values()) {
 //			Renderer rend = entry.renderer;
 //			Column col = share.columns()[entry.idx];

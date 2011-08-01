@@ -85,7 +85,7 @@ public class CrossLegend extends Guide2D {
 	}
 
 	@Override
-	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
+	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		data = makeTable(guideDef);
 		List<SortedSet> labels = labels(elements);
 		List<List<PrototypedTuple>> splitElements = split(elements, labels);
@@ -95,10 +95,10 @@ public class CrossLegend extends Guide2D {
 		for (PrototypedTuple item:exampleTuples) {data.update(item);}	
 		for (PrototypedTuple item:labelTuples) {data.update(item);}
 		
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 		
 		data.update(createGuideLabel(data.getBoundsReference()));
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 	}
 
 		
@@ -146,7 +146,7 @@ public class CrossLegend extends Guide2D {
 		
 		Object[] values = new Object[]{place.x(), place.y(), "CENTER", idCounter++, idCounter++};
 		PrototypedTuple example = new PrototypedArrayTuple(EXAMPLE_FIELDS , values); 
-		example = Tuples.merge(updateMask, example, contents);
+		example = Tuples.mergeAll(updateMask, example, contents);
 		example = Tuples.restructure(example, "ele", "label");
 		example = Tuples.delete(example, "Input", "Input1");
 		example = Tuples.merge(example, NO_LABEL);

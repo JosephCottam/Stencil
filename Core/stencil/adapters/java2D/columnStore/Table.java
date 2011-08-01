@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.columnStore;
 
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
@@ -50,16 +51,16 @@ public interface Table extends DisplayLayer<StoreTuple> {
 	};
 	
 	public static final class Util {
-		public static final void genChange(Table table, Renderer renderer) {
+		public static final void genChange(Table table, Renderer renderer, AffineTransform viewTransform) {
 			if (table instanceof CompoundTable && renderer instanceof CompoundRenderer) {
-				CompoundTable.fullGenChange((CompoundTable) table, (CompoundRenderer)renderer);
+				CompoundTable.fullGenChange((CompoundTable) table, (CompoundRenderer)renderer, viewTransform);
 			} else if (table instanceof CompoundTable && renderer instanceof CompoundRenderer) {
 				throw new IllegalArgumentException("Mismatch between tabel and renderer.");
 			} else {
 				table.changeGenerations();
 				TableShare share = table.viewpoint();
 				share.simpleUpdate();
-				renderer.calcFields(share);
+				renderer.calcFields(share, viewTransform);
 				table.merge(share);		
 			}
 		}

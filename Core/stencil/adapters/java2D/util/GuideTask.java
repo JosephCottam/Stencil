@@ -1,8 +1,10 @@
 
 package stencil.adapters.java2D.util;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
+import stencil.display.Display;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
 import stencil.interpreter.tree.Guide;
@@ -14,6 +16,7 @@ public class GuideTask extends UpdateTask<Guide> {
 	private final DisplayCanvas canvas;
 	private final String identifier;
 	private final Rectangle2D canvasBounds = new Rectangle2D.Double();
+	private final AffineTransform viewTransform = new AffineTransform();
 	
 	public GuideTask(Guide guideDef, DisplayCanvas canvas) {
 		super(guideDef, guideDef.identifier());
@@ -23,10 +26,11 @@ public class GuideTask extends UpdateTask<Guide> {
 
 	public boolean needsUpdate() {
 		boolean analysisState = super.needsUpdate();
-		Rectangle2D bounds = canvas.getContentBounds(false);
-		
-		if (!canvasBounds.equals(bounds)) {
+		Rectangle2D bounds = canvas.contentBounds(false);
+		AffineTransform viewTrans  = Display.canvas.getComponent().viewTransform();
+		if (!canvasBounds.equals(bounds) || !viewTransform.equals(viewTrans)) {
 			canvasBounds.setRect(bounds);
+			viewTransform.setTransform(viewTrans);
 			return true;
 		} else {
 			return analysisState;
@@ -35,7 +39,7 @@ public class GuideTask extends UpdateTask<Guide> {
 	
 	public Finisher update() {
 		DisplayGuide guide = canvas.getGuide(identifier);
-		viewpointFragment.update(guide, canvas.getContentBounds(false));
+		viewpointFragment.update(guide, canvas.contentBounds(false), canvas.viewTransform());
 		return UpdateTask.NO_WORK;
 	}
 	

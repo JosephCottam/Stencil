@@ -73,8 +73,8 @@ public class PieRenderer implements Renderer<TableView> {
 	}
 
 	@Override
-	public void calcFields(TableShare share) {
-		field.calcFields(share);
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
+		field.calcFields(share, viewTransform);
 		double[] percents = new double[share.size()];		
 		for (StoreTuple t: new TupleIterator(share, true)) {
 			double field = (Double) t.get(fieldIdx);

@@ -53,6 +53,7 @@ public class Axis extends Guide2D  {
 	private static final String GUIDE_LABEL_GAP_KEY = "guideLabel.Gap";
 	private static final String GUIDE_LABEL_SIZE_KEY = "guideLabel.Size";
 	private static final String BASELINE_KEY = "baseline";
+	private static final String IMPLANT_KEY = "implant";
 	
 	private static final String DEFAULT_SPECIALIZER_SOURCE = "[label.FONT: 4, label.COLOR: \"BLACK\", tick.PEN: .4, tick.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, guideLabel.Gap:2, guideLabel.Size:1.25, baseline: \"AUTO\"]";
 	private static final String[] DEFAULTS_KNOCKOUT = new String[]{GUIDE_LABEL_GAP_KEY, GUIDE_LABEL_SIZE_KEY,"tickSize","textOffset", BASELINE_KEY};
@@ -92,7 +93,12 @@ public class Axis extends Guide2D  {
 		this.alterZero = alterZero;
 		
 		data = makeTables(guideDef);
-		updateMask = Tuples.merge(data.updateMaskTuple(), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));		
+		PrototypedTuple updateMask = Tuples.merge(data.updateMaskTuple(), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));
+		if (spec.containsKey(IMPLANT_KEY)) {
+			updateMask = GuideUtil.fullImplant(updateMask, Converter.toString(spec.get(IMPLANT_KEY)));
+		}
+		this.updateMask = updateMask;
+		
 		renderer = new CompoundRenderer(data.prototype());
 		
 		//Which axis is this?
@@ -126,7 +132,10 @@ public class Axis extends Guide2D  {
 		font = font.deriveFont(font.getSize2D() * guideLabelSize);
 		
 		String[] axisLabelFields = new String[]{"label.TEXT", "label.REGISTRATION", "label.FONT", "label.ROTATION", "label.ID"};
-		axisLabel = new PrototypedArrayTuple(axisLabelFields, new Object[]{label, registration, font, rotation, -1d});	
+		PrototypedTuple axisLabel = new PrototypedArrayTuple(axisLabelFields, new Object[]{label, registration, font, rotation, -1d});
+		axisLabel = Tuples.merge(updateMask, axisLabel);
+		axisLabel = Tuples.delete(axisLabel, "tick");
+		this.axisLabel = axisLabel;
 	}
 
 	private static CompoundTable makeTables(Guide guideDef) {
@@ -142,7 +151,7 @@ public class Axis extends Guide2D  {
 	public void render(Graphics2D g, AffineTransform viewTransform) {renderer.render(data.tenured(), g, viewTransform);}
 	
 	@Override
-	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds) {
+	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		data = makeTables(guideDef);		//Clear the old stuff
 		if (elements.size() ==0) {return;}
 		
@@ -153,12 +162,12 @@ public class Axis extends Guide2D  {
 		for (PrototypedTuple t: tickUpdates) {addToData(t);}
 		
 		//Commit the updates
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 
 		Rectangle2D b = ShapeUtils.union(data.getBoundsReference(), parentBounds);
 		PrototypedTuple axisLine = axisLine(b);
 		addToData(axisLine);
-		Table.Util.genChange(data, renderer);
+		Table.Util.genChange(data, renderer, viewTransform);
 	}
 
 	private void addToData(PrototypedTuple t) {

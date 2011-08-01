@@ -68,7 +68,7 @@ public final class Canvas extends DisplayCanvas {
 	 * 
 	 * @return
 	 */
-	public Rectangle getContentBounds(boolean includeGuides) {
+	public Rectangle contentBounds(boolean includeGuides) {
 		if (layers.length == 0) {return new Rectangle(0,0,0,0);}
 		final Rectangle2D bounds = new Rectangle(0,0,-1,-1);
 		for (Table l: layers) {
@@ -197,7 +197,7 @@ public final class Canvas extends DisplayCanvas {
 	public Point2D getPanAbs(Point2D target) {
 		if (target == null) {target = new Point2D.Double();}
 		
-		Rectangle2D viewBounds = getInverseViewTransform().createTransformedShape(getBounds()).getBounds2D();
+		Rectangle2D viewBounds = inverseViewTransform().createTransformedShape(getBounds()).getBounds2D();
 
 		target.setLocation(viewBounds.getCenterX(), viewBounds.getCenterY());
 		return target; 
@@ -214,12 +214,12 @@ public final class Canvas extends DisplayCanvas {
     /**Use this transform to convert values from the absolute system
      * to the screen system.
      */
-	public synchronized AffineTransform getViewTransform() {return new AffineTransform(viewTransform);}
-	public synchronized AffineTransform getViewTransformRef() {return viewTransform;}
+	public synchronized AffineTransform viewTransform() {return new AffineTransform(viewTransform);}
+	public synchronized AffineTransform viewTransformRef() {return viewTransform;}
 	
 	/**Use this transform to convert screen values to the absolute/canvas
 	 * values.
 	 */
-	public synchronized AffineTransform getInverseViewTransform() {return new AffineTransform(inverseViewTransform);}
-	public synchronized AffineTransform getInverseViewTransformRef() {return inverseViewTransform;}
+	public synchronized AffineTransform inverseViewTransform() {return new AffineTransform(inverseViewTransform);}
+	public synchronized AffineTransform inverseViewTransformRef() {return inverseViewTransform;}
 }

@@ -51,8 +51,9 @@ public class SliceRenderer extends AbstractShapeRenderer {
     	outerIdx = schema.indexOf("OUTER");
     }
     
+    //TODO: properly handle viewTransform in bounds calculation
 	@Override
-	public void calcFields(TableShare share) {
+	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		PointTuple[] points = new PointTuple[share.size()];
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);

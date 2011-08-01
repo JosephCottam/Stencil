@@ -23,7 +23,7 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 	@SuppressWarnings("incomplete-switch")
 	public void set(String name, Object value) {
 		if (PROTOTYPE.contains(name)) {
-			AffineTransform t = canvas.getViewTransform();
+			AffineTransform t = canvas.viewTransform();
 			double scaleY = t.getScaleY();
 			double scaleX = t.getScaleX();
 
@@ -77,7 +77,7 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 
 	public Object get(String name) throws InvalidNameException {
 		if (PROTOTYPE.contains(name)) {
-			AffineTransform t = canvas.getInverseViewTransform();
+			AffineTransform t = canvas.inverseViewTransform();
 		
 			if (name.equals("ZOOM")) {return canvas.getScale();}
 			if (name.equals("X")){ return getX();}
@@ -99,33 +99,33 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 	}
 	
 	private double getX() {
-		AffineTransform t = canvas.getViewTransform();
+		AffineTransform t = canvas.viewTransform();
 		return -t.getTranslateX()/t.getScaleX();
 	}
 	
 	private double getY() {
-		AffineTransform t = canvas.getViewTransform();
+		AffineTransform t = canvas.viewTransform();
 		return -t.getTranslateY()/t.getScaleY();	
 	}
 	
 	public Point2D canvasToView(Point2D p) {
-		return canvas.getViewTransform().transform(p, p);
+		return canvas.viewTransform().transform(p, p);
 	}
 	
 	public Dimension2D canvasToView(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
-		canvas.getViewTransform().deltaTransform(p, p);
+		canvas.viewTransform().deltaTransform(p, p);
 		d.setSize(p.getX(), p.getY());
 		return d;
 	}
 	
 	public Point2D viewToCanvas(Point2D p) {
-		return canvas.getInverseViewTransform().transform(p, p);
+		return canvas.inverseViewTransform().transform(p, p);
 	}
 	
 	public Dimension2D viewToCanvas(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
-		p = canvas.getInverseViewTransform().deltaTransform(p, p);
+		p = canvas.inverseViewTransform().deltaTransform(p, p);
 		return new DoubleDimension(p.getX(), p.getY());
 	}
 }

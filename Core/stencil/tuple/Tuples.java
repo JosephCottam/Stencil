@@ -169,15 +169,6 @@ public final class Tuples {
 		}
 	}
 	
-	public static PrototypedTuple merge(PrototypedTuple... tuples) {
-		if (tuples.length ==0) {return null;}
-		PrototypedTuple target = tuples[0];
-		for (int i=1; i< tuples.length; i++) {
-			target = merge(target, tuples[i]);
-		}
-		return target;
-	}
-	
 	//Internal flag to indicate that there is no skip value provided
 	private static final Object NO_SKIP = new Object();
 
@@ -186,6 +177,16 @@ public final class Tuples {
 		return merge(source1, source2, NO_SKIP);
 	}
 
+
+	public static PrototypedTuple mergeAll(PrototypedTuple... tuples) {
+		if (tuples.length ==0) {return null;}
+		PrototypedTuple target = tuples[0];
+		for (int i=1; i< tuples.length; i++) {
+			target = merge(target, tuples[i]);
+		}
+		return target;
+	}
+	
 	/**Create a new tuple with fields representing a union of the
 	 * fields of the two source tuples.  Values will be taken from
 	 * source1 first, then source2 (so last-write wins on shared fields).
@@ -294,6 +295,7 @@ public final class Tuples {
 	 * Behavior is undefined if the same index is listed multiple times,
 	 * it is expected that the idx list only has unique values before this method is called.
 	 */
+	@SuppressWarnings("null")
 	public static Tuple delete(Tuple t, int... idxs) {
 		TuplePrototype proto = null;
 		List<TupleFieldDef> defs = null;
