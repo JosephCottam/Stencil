@@ -126,7 +126,5 @@
  	<target name="Test" depends="Stencil"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
-	<target name="Report" depends=""> 
-        <ant antfile="./build/Test.xml" inheritRefs="true" target="JUnit-Report"/>
-    </target>
+
  </project>

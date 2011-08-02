@@ -6,6 +6,7 @@
 ./RegressionImages/AutoGuide/ -open Legend.stencil -txt legend.txt -png2 1000 -1 legend.png
 ./RegressionImages/AutoGuide/ -open Nightingale.stencil -txt nightingale.txt -png2 1000 -1 nightingale.png
 ./RegressionImages/AutoGuide/ -open TweetCountLocal.stencil -txt tweetCount.txt -png2 1000 -1 tweetCount.png
+./RegressionImages/Epic/ -open EpiC.stencil -txt EpiC.txt -png2 1000 -1 EpiC.png
 ./RegressionImages/NodeLink/ -open JungTree.stencil -txt jungTree.txt -png2 1000 -1 jungTree.png
 ./RegressionImages/NodeLink/ -open NodeLink.stencil -txt nodeLink.txt -png2 1000 -1 nodeLink.png
 ./RegressionImages/NodeLink/ -open RadialTree.stencil -txt radialTree.txt -png2 1000 -1 radialTree.png

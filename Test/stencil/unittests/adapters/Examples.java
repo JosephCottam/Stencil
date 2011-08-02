@@ -47,6 +47,10 @@ public abstract class Examples extends TestCase {
 	public void testVSM2Text() throws Throwable {new VSM(configs).testTXT();}
 	public void testVSM2Image() throws Throwable {new VSM(configs).testPNG();}
 
+	public void testEpiCImage() throws Throwable {new EpiC(configs).testPNG();}
+	public void testEpiCText() throws Throwable {new EpiC(configs).testTXT();}
+
+	
 	public void testFlowersImage() throws Throwable {new AutoGuide_Flowers(configs).testPNG();}
 	public void testFlowersText() throws Throwable {new AutoGuide_Flowers(configs).testTXT();}
 

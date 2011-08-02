@@ -26,7 +26,7 @@ stream Data(Timestep, Line, Value)
 stream Visibility(Line, Visible)
 stream LineColor(Line, Color)
 
-order (Data | Visiblity | LineColor)
+order (Data | Visibility | LineColor)
 
 view
 from #Render
