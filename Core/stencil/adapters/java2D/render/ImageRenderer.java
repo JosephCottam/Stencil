@@ -75,7 +75,7 @@ public class ImageRenderer implements Renderer<TableView> {
 
 		for (StoreTuple glyph: new TupleIterator(share, true)) {			
 		   BufferedImage img  = imager.image(glyph, IDENTITY);
-		   Rectangle2D bound = new Rectangle2D.Double((Double) glyph.get(xIdx), -((Double) glyph.get(yIdx)), img.getWidth(), img.getHeight());
+		   Rectangle2D bound = new Rectangle2D.Double(0, 0, img.getWidth(), img.getHeight());
 		   
 		   AffineTransform trans = trans(img, glyph, viewTransform);		   
 		   Rectangle2D b = trans.createTransformedShape(bound).getBounds2D(); 
@@ -91,6 +91,7 @@ public class ImageRenderer implements Renderer<TableView> {
 		   AffineTransform trans = new AffineTransform();
 		   Rectangle2D actualBounds = new Rectangle2D.Double(0,0, img.getWidth(), img.getHeight());
 		   Rectangle2D logicalBounds = (Rectangle2D) glyph.get(boundsIdx);
+		   if (logicalBounds == null) {logicalBounds = actualBounds;}
 		   trans.scale(logicalBounds.getWidth()/actualBounds.getWidth(), logicalBounds.getHeight()/actualBounds.getHeight());
 
 		   if (!(rotater instanceof Rotater.None 

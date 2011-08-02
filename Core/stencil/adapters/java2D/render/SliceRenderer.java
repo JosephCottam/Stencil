@@ -21,11 +21,11 @@ public class SliceRenderer extends AbstractShapeRenderer {
 	/**Basic expected table schema.**/
 	public static final TuplePrototype<SchemaFieldDef> SCHEMA = new TuplePrototype(
 				ID,
-				new SchemaFieldDef(SIZE.name(), -1d),	//-1 is the sentinel value that says use width and height instead
+				new SchemaFieldDef(SIZE.name(), 10d),
 				X,
 				Y,
-				new SchemaFieldDef("START", 0d),
-				new SchemaFieldDef("END", 0d),
+				new SchemaFieldDef("START", 0d),		//Measured in degrees
+				new SchemaFieldDef("END", 45d),			//Measured in degrees
 				IMPLANT,
 				FILL_COLOR,
 				PEN_COLOR,

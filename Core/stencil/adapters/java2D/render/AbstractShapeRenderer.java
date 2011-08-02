@@ -41,6 +41,8 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
     	this.reg = reg;
     	
     	this.boundsIdx = boundsIdx;
+    	
+    	assert boundsIdx > 1;
     }
     
 

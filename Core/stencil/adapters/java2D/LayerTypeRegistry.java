@@ -81,7 +81,7 @@ public class LayerTypeRegistry {
 	/**Get a display layer for this adapter of the given type.**/
 	public static Table makeTable(String name, String type) {
 		LayerPair pair = types.get(type);
-		if (pair == null) {throw new RuntimeException(String.format("Error constructing table %1$s, type %2$s not known.", name, type));}
+		if (pair == null) {throw new RuntimeException(String.format("Error constructing table '%1$s', type %2$s not known.", name, type));}
 		
 		return new SimpleTable(name, pair.schema);
 	}

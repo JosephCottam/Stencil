@@ -161,19 +161,17 @@ public class Legend extends Guide2D {
 		String[] exampleFields;
 		Object[] exampleValues;
 		if (!lineGuide) {
-			exampleFields = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID"};
-			exampleValues = new Object[]{x+hSpacing, indexOffset, "LEFT", idx};
+			exampleFields = new String[]{"ele.X", "ele.Y", "ele.ID"};
+			exampleValues = new Object[]{x+hSpacing, indexOffset, idx};
 		} else {
 			exampleFields = new String[]{"ele.X1", "ele.Y1", "ele.X2", "ele.Y2", "ele.ID"};
 			exampleValues = new Object[]{x+hSpacing, indexOffset, x+exampleWidth, indexOffset, idx};			
 		}
 		PrototypedTuple example = new PrototypedArrayTuple(exampleFields, exampleValues);
 
-		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.REGISTRATION", "label.ID", "ID"};
-		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, contents.get(label_idx), "LEFT", idx, idx};
+		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.ID", "ID"};
+		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, contents.get(label_idx), idx, idx};
 		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
-		
-
 		
 		return Tuples.mergeAll(label,example, Tuples.delete(contents, label_idx));
 	}	
