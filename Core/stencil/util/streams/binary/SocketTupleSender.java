@@ -18,15 +18,17 @@ import stencil.util.streams.txt.DelimitedParser;
  *
  */
 public class SocketTupleSender implements Runnable {
-	TupleStream source;
-	Socket output;
-	SocketAddress endpoint;
+	final TupleStream source;
+	final Socket output;
+	final SocketAddress endpoint;
+	final char[] types;
 
-	public SocketTupleSender(TupleStream source, SocketAddress endpoint) throws UnknownHostException, IOException {
+	public SocketTupleSender(TupleStream source, char[] types, SocketAddress endpoint) throws UnknownHostException, IOException {
 		this.source = source;
 		output = new Socket();	
 		output.bind(null);
 		this.endpoint = endpoint;
+		this.types = types;
 	}
 	
 	public void run() {
@@ -38,11 +40,11 @@ public class SocketTupleSender implements Runnable {
 				Tuple t = source.next().getValues();
 				byte[] bytes;
 				if (sendHeader) {
-					bytes = BinaryTupleStream.Writer.makeHeader(t);
+					bytes = BinaryTupleStream.Writer.makeHeader(types);
 					out.write(bytes);
 					sendHeader = false;
 				}
-				bytes = BinaryTupleStream.Writer.asBinary(t);
+				bytes = BinaryTupleStream.Writer.asBinary(t, types);
 				out.write(bytes);
 			}
 			output.close();
@@ -56,6 +58,7 @@ public class SocketTupleSender implements Runnable {
 		final String endAddr = args[0];
 		final String filename = args[1];
 		final String format = args[2];
+		final char[] types = args[3].toCharArray();
 		final TupleStream stream;
 		
 		final String[] parts = endAddr.split(":");
@@ -70,7 +73,7 @@ public class SocketTupleSender implements Runnable {
 			stream = new DelimitedParser("none", filename, delimiter, Converter.toInteger(fields), true, 0);
 		}
 		
-		SocketTupleSender sender = new SocketTupleSender(stream, endpoint);
+		SocketTupleSender sender = new SocketTupleSender(stream, types, endpoint);
 		sender.run();
 		
 	}

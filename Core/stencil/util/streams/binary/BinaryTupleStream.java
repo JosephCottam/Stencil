@@ -13,86 +13,109 @@ import stencil.util.streams.QueuedStream;
 import java.nio.*;
 import java.nio.channels.*;
 import java.io.*;
-import java.util.*;
 
 /**Takes stream source and constructs a file caching the stream values as binary.
  * Loading format is thus:
  *  
  *  File Prefix---
  *  int: # of fields per line (n)
+ *  Char+: Field encoding marker; i/d/s for int,double, string; one per field 
  *  
- *  Each Entry---
- *  int: # of data bytes in entry (does not include this size int and does not include the break points)
- *  n ints: break points in entry for each field, field breaks are character positions in the decoded data
- *  Remaining bytes are entry data (interpreted as strings). 
+ *  Entries ---
+ *  value   -OR- int data
+ *      If it is a fixed-lenght value, the value itself is present (the types reveal this case)
+ *      For variable length data, the int indicates how many MORE bytes to read for the field 
+ *  
+ *  Since the header encodes how many fields there are per tuple, that many points are read and constructed into a tuple.
  **/
 public class BinaryTupleStream {
 	private static final int INT_BYTES = 4;
-	
+	private static final int DOUBLE_BYTES = 8;
+
 	/**Means of producing a file that can be read by the Reader**/
 	public static final class Writer {
 		private final TupleStream source;
 		
-		public Writer(TupleStream source) {this.source = source;}
+		public Writer(TupleStream source) {
+			this.source = source;
+		}
 		
-		public static byte[] makeHeader(Tuple sample) {
-			assert sample != null;
+		public static byte[] makeHeader(char[] types) {
+			assert types != null;
+			assert types.length != 0;
+			for (char c: types) {
+				if (c != 's' && c== 'i' && c == 'd') {throw new IllegalArgumentException("Invalid type marker; only i,s,d allowed, found  '" + c + "'");}
+			}
+						
+			byte[] size = intBytes(types.length);
+			byte[] encoding = charBytes(types);	
+			byte[] rslt = new byte[encoding.length+size.length] ;
 			
-			byte[] size = intBytes(sample.size());
-
-			byte[] rslt = new byte[INT_BYTES];
 			System.arraycopy(size, 0, rslt, 0, size.length);
+			System.arraycopy(encoding, 0, rslt, size.length, encoding.length);
 			return rslt;
 		}
 		
-		private static byte[] intBytes(int i ){
-			 return ByteBuffer.allocate(INT_BYTES).putInt(i).array();
+		private static byte[] charBytes(char... c) {return String.valueOf(c).getBytes();}
+		private static byte[] intBytes(int i ){return ByteBuffer.allocate(INT_BYTES).putInt(i).array();}
+		private static byte[] doubleBytes(double d) {return ByteBuffer.allocate(DOUBLE_BYTES).putDouble(d).array();}
+		
+		
+		/**Get a byte array of a single data value
+		 * **/
+		public static byte[] asBinary(Object value, char type) {
+			byte[] bytes;
+			
+			switch (type) {
+				case 's' :
+					String v = Converter.toString(value);
+					bytes = charBytes(v.toCharArray());
+					ByteBuffer buff = ByteBuffer.allocate(INT_BYTES + bytes.length );
+					buff.put(intBytes(bytes.length));
+					buff.put(bytes);
+					return buff.array();
+				case 'i' :
+					return intBytes(Converter.toInteger(value));
+				case 'd' :
+					return doubleBytes(Converter.toDouble(value));
+				default: throw new IllegalArgumentException("Unknown type: " + type);
+			}			
 		}
 		
-		/**Get a byte array of the next line.
-		 * Assumes that the value of Converter.toString(t.get(i)) will be sufficient to recover the data on reload
-		 * **/
-		public static byte[] asBinary(Tuple t) {
-			final int[] lengths = new int[t.size()];
-			ArrayList<Byte> linebytes = new ArrayList();
-			int prior =0;
-			for (int i=0; i< lengths.length; i++) {
-				String v = Converter.toString(t.get(i));
-				lengths[i] = v.length()+prior;
-				prior = lengths[i];
-				byte[] bytes = v.getBytes();				//TODO: Use an explicit encoder
-				for (byte b: bytes) {
-					linebytes.add(b);
-				}
+		public static byte[] asBinary(Tuple t, char[] types) {
+			byte[][] entries= new byte[t.size()][];
+			int total=0;
+			for (int i=0;i<t.size();i++) {
+				entries[i] = asBinary(t.get(i), types[i]);
+				total = entries.length;
 			}
-
-			int total = INT_BYTES + (lengths.length * INT_BYTES) + linebytes.size();
-			ByteBuffer buff = ByteBuffer.allocate(total);
-
-			buff.put(intBytes(linebytes.size()));				//Write data length
-			for (int len:lengths) {buff.put(intBytes(len));}	//Write splits
-			for (byte b: linebytes) {buff.put(b);}				//Write data
 			
-			return buff.array();
+			int offset=0;
+			byte[] full = new byte[total];
+			for (byte[] entry: entries) { 
+				System.arraycopy(entry, 0, full, offset, entry.length);
+				offset += entry.length;
+			}
+			return full;
 		}
 
 		/**Write all of the tuples in the stream to the file.
 		 * @return the number of tuples written
 		 * **/
-		public void writeStream(String filename) throws Exception {
+		public void writeStream(String filename, char[] types) throws Exception {
 			FileOutputStream file = new FileOutputStream(filename);
 			try {
-				boolean doHeader = true;
+				byte[] header = makeHeader(types); 
+				file.write(header);
+
 				while(source.hasNext()) {
-					SourcedTuple sourced= source.next();
+					SourcedTuple sourced = source.next();
 					if (sourced == null) {continue;}
 					Tuple t = sourced.getValues();
-					if (doHeader) {
-						byte[] header = makeHeader(t); doHeader=false;
-						file.write(header);
+					for (int i=0;i<t.size();i++) {
+						byte[] entry = asBinary(t.get(i), types[i]);
+						file.write(entry);						
 					}
-					byte[] nextline = asBinary(t);
-					file.write(nextline);
 				}
 			} finally {file.close();}
 		}
@@ -110,10 +133,7 @@ public class BinaryTupleStream {
 		
 		/**Number of value fields per tuple**/
 		private final int tupleSize;
-
-		///Per-line buffers
-		/**Buffer for loading the prefix.*/
-		private final int[] offsets;
+		private final char[] types;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
 			FileChannel input = new FileInputStream(sourcefile).getChannel();
@@ -123,8 +143,11 @@ public class BinaryTupleStream {
 			
 			this.name = streamName;
 			tupleSize = mainBuffer.getInt();
+			types = new char[tupleSize];
 			
-			offsets = new int[tupleSize];
+			for (int i=0; i<tupleSize; i++) {
+				types[i] = (char) mainBuffer.get();
+			}
 		}
 
 		
@@ -135,16 +158,29 @@ public class BinaryTupleStream {
 					&& mainBuffer.hasRemaining();
 		}
 
-
+		
 		@Override
 		public SourcedTuple next() {
 			try {
-				int dataLength = mainBuffer.getInt();
-				for (int i=0; i< offsets.length; i++) {offsets[i] =mainBuffer.getInt();}
-				byte[] bytes = new byte[dataLength];
-				mainBuffer.get(bytes);
-
-				return thaw(name, bytes, offsets);
+				Object[] values = new Object[tupleSize];
+				for (int i=0; i<tupleSize; i++) {
+					switch (types[i]) {
+						case 'i' :
+							values[i] = mainBuffer.getInt();
+							break;
+						case 'd' :
+							values[i] = mainBuffer.getDouble();
+							break;
+						case 's' : 
+							int size = mainBuffer.getInt();
+							byte[] binary = new byte[size];
+							mainBuffer.get(binary);
+							values[i] = new String(binary);
+							break;
+						default: throw new IllegalArgumentException("Could not unpack item of type '" + types[i] + "'");
+					}					
+				}
+				return new SourcedTuple.Wrapper(name, new ArrayTuple(values));
 			} catch (Exception e) {
 				throw new RuntimeException("Error reading line from file.", e);
 			}
@@ -154,19 +190,6 @@ public class BinaryTupleStream {
 		@Override
 		public void remove() {throw new UnsupportedOperationException();}
 	
-	}
-	
-	public static final SourcedTuple thaw(String name, byte[] bytes, final int[] offsets) {
-		String base = new String(bytes);
-		
-		Object[] values = new String[offsets.length];				//Split it up into values
-		for (int i=0, prior=0; i< offsets.length; prior=offsets[i++]) {
-			values[i] = base.substring(prior, offsets[i]);
-		}
-
-		Tuple contents = new ArrayTuple(values);
-		SourcedTuple sourced = new SourcedTuple.Wrapper(name, contents);
-		return sourced;
 	}
 	
 	/**Intentionally left empty, use Reader or Writer instances instead.**/
@@ -184,13 +207,14 @@ public class BinaryTupleStream {
 		String stencilFile = args[0];
 		String targetStream = args[1];
 		String targetFile = args[2];
-		
+		String types = args[3];
+
 		Model model = new Model();
 		StencilIO.load(stencilFile, model);
 		StreamSource ss = model.getSourcesMap().get(targetStream);
 		TupleStream stream = ss.getStream(model);
 		
 		Writer w = new Writer(stream);
-		w.writeStream(targetFile);
+		w.writeStream(targetFile, types.toCharArray());
 	}
 }

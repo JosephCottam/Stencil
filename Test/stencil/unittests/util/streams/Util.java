@@ -10,6 +10,8 @@ public class Util {
 	
 	public static final String TROVES_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/project_troves.tuples";
 	public static final String COORD_TUPLES_FILE = "./TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.tuples";
+	public static final String COORD_TYPES = "sdd";
+	public static final String TROVES_TYPES = "ss";
 
 	public static DelimitedParser coordStream() throws Exception {
 		return new DelimitedParser("CoordFile", COORD_FILE, "\\s+", 3, true,1);

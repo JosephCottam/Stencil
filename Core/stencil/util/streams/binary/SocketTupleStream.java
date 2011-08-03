@@ -64,10 +64,9 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 		try {
 			int dataLength = stream.readInt();
 			for (int i=0; i<offsets.length; i++) {offsets[i] = stream.readInt();}
-			byte[] bytes = new byte[dataLength];
-			stream.readFully(bytes);
+			Object[] values = new Object[tupleSize];
 			
-			lookahead = BinaryTupleStream.thaw(name, bytes, offsets);
+			lookahead = BinaryTupleStream.Reader.
 		} catch (EOFException e) {
 			return;
 		} catch (Exception e) {

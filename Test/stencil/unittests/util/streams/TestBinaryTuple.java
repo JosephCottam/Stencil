@@ -4,18 +4,19 @@ import java.io.File;
 
 import stencil.tuple.Tuple;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
+import stencil.unittests.StencilTestCase;
 import stencil.util.streams.QueuedStream;
 import stencil.util.streams.binary.BinaryTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
-import junit.framework.TestCase;
 
 import static stencil.unittests.util.streams.Util.*;
 
-public class TestBinaryTuple extends TestCase {
+public class TestBinaryTuple extends StencilTestCase {
 	
 	public void testEncodeDecode() throws Exception {
 		DelimitedParser source = coordStream();
-		prepBinary(source, COORD_TUPLES_FILE);
+		prepBinary(source, COORD_TUPLES_FILE, COORD_TYPES);
 		source.close();
 
 		DelimitedParser oldTuples = coordStream();
@@ -30,7 +31,7 @@ public class TestBinaryTuple extends TestCase {
 				
 				assertEquals("Unequal size on tuple " +i, oldT.size(), newT.size());
 				for (int field=0; field<oldT.size(); field++) {
-					assertEquals("Uneqaul value on field " + field + " of tuple " + i, oldT.get(field), newT.get(field));
+					assertEquals("Uneqaul value on field " + field + " of tuple " + i, Converter.convert(oldT.get(field), newT.get(field).getClass()), newT.get(field));
 				}			
 				i++;
 			} catch (Exception e) {throw new Exception("Error examining tuple " + i, e);}
@@ -46,7 +47,7 @@ public class TestBinaryTuple extends TestCase {
 	
 	public void testTrovesSpeed() throws Exception {
 		DelimitedParser source = trovesStream();		
-		prepBinary(source, TROVES_TUPLES_FILE);
+		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
 		source.close();		
 		source = trovesStream();
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE);
@@ -57,7 +58,7 @@ public class TestBinaryTuple extends TestCase {
 		final int QUEUE_SIZE = 300;
 		
 		DelimitedParser source = trovesStream();		
-		prepBinary(source, TROVES_TUPLES_FILE);
+		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
 		source.close();
 		
 		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
@@ -68,7 +69,7 @@ public class TestBinaryTuple extends TestCase {
 	
 	public void testCoordSpeed() throws Exception {
 		DelimitedParser reSource = coordStream();
-		prepBinary(reSource, COORD_TUPLES_FILE);
+		prepBinary(reSource, COORD_TUPLES_FILE, COORD_TYPES);
 		reSource.close();
 		
 		reSource = coordStream();
@@ -95,18 +96,18 @@ public class TestBinaryTuple extends TestCase {
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		//System.out.printf("\nBinary parsing is %1$f of regexp parsing (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples);
-		assertEquals("Unequal tuple count.", reTuples, binTuples);
+		//System.out.printf("\nBinary parsing is %1$s percent of regexp parsing for %5$s (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples, tag);
 		assertTrue("No advantage to binary.", binTime < reTime);
+		assertEquals("Unequal tuple count.", reTuples, binTuples);
 	}
 	
-	public static void prepBinary(TupleStream source, String targetFile) throws Exception {
+	public static void prepBinary(TupleStream source, String targetFile, String types) throws Exception {
 		//remove old output (if any)
 		File f = new File(targetFile);
 		if (f.exists()) {f.delete();}
 
 		//Push old stream through encoder
 		BinaryTupleStream.Writer writer = new BinaryTupleStream.Writer(source);
-		writer.writeStream(targetFile);
+		writer.writeStream(targetFile, types.toCharArray());
 	}
 }
