@@ -1,0 +1,31 @@
+STREAM: File
+NAME: times
+TUPLE_SIZE: 6
+SEPARATOR: \s*,\s*
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/CompareRuntimes/1iters_1Mc.csv
+SKIP: 1
+STRICT: true
+
+import BrewerPalettes
+
+stream times(elapse, size, refs, perm, type, i)
+
+
+layer Runtimes["POLY_POINT"]
+guide
+  axis Linear from Y
+  axis Linear from X
+  legend from PEN_COLOR
+from times
+  filter(type =~ "Stencil.*")
+  local(name):  Concatenate(type , " (", perm, ")")
+  ID: Concatenate(local.name, size)
+  GROUP: local.name
+  ORDER: ToNumber(size)
+  X:* Mult(size,2) -> Scale[0,100](_)
+  Y:* Split[2](@Avg, local.name, size, elapse) -#> Scale[min:0, max:100](_)
+  PEN_COLOR:* BrewerColors[palette:"set3"](local.name)
+
+
+operator FullMax: Range[ALL](@Max)
+operator Avg: Range[ALL](@Mean)
