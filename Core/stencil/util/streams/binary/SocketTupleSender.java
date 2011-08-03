@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.UnknownHostException;
 
+import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
@@ -36,8 +37,12 @@ public class SocketTupleSender implements Runnable {
 		try {	
 			output.connect(endpoint);
 			OutputStream out =output.getOutputStream(); 
-			while(source.hasNext()) {	 // -1 is end-of-stream
-				Tuple t = source.next().getValues();
+			while(source.hasNext()) {
+				SourcedTuple sourced= source.next();
+				if (sourced == null) {continue;}
+				
+				Tuple t = sourced.getValues();
+				
 				byte[] bytes;
 				if (sendHeader) {
 					bytes = BinaryTupleStream.Writer.makeHeader(types);

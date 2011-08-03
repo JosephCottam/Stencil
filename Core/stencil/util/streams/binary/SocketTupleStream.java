@@ -6,9 +6,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import stencil.tuple.SourcedTuple;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.QueuedStream;
 
+//TODO: Use nio instead of DataInputStream, then pass the stream in as the buffer to the binary reader.
 public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 	/**File channel contents are loaded from**/
 	private ServerSocket serverSocket;
@@ -18,13 +20,12 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 	/**Name of the stream**/
 	private final String name;
 	
-	/**Number of value fields per tuple**/
-	private int tupleSize;
-
-	///Per-line buffers
-	/**Buffer for loading the prefix.*/
-	private int[] offsets;
+	/**Encoding types for each field**/
+	private char[] types;
 	
+	/**Number of fields in the tuple.**/
+	private int tupleSize;
+			
 	private SourcedTuple lookahead;
 
 	/**Establish a connection on the given port as the 
@@ -43,7 +44,10 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 		socket = serverSocket.accept();
 		stream = new DataInputStream(socket.getInputStream());
 		tupleSize = stream.readInt();
-		offsets = new int[tupleSize];
+		types = new char[tupleSize];
+		for (int i=0; i<tupleSize; i++) {
+			types[i] = (char) stream.readByte();
+		}
 	}
 	
 	@Override
@@ -62,11 +66,20 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 	
 	private void cache() {
 		try {
-			int dataLength = stream.readInt();
-			for (int i=0; i<offsets.length; i++) {offsets[i] = stream.readInt();}
 			Object[] values = new Object[tupleSize];
-			
-			lookahead = BinaryTupleStream.Reader.
+			for (int i=0;i<tupleSize;i++) {
+				Object value;
+				if (types[i] == 'i') {value = stream.readInt();}
+				else if (types[i] == 'd') {value = stream.readDouble();}
+				else {
+					int dataLength = stream.readInt();
+					byte[] bytes = new byte[dataLength];		
+					stream.readFully(bytes);
+					value = new String(bytes);
+				}
+				values[i] = value;
+			}
+			lookahead = new SourcedTuple.Wrapper(name, new ArrayTuple(values));
 		} catch (EOFException e) {
 			return;
 		} catch (Exception e) {

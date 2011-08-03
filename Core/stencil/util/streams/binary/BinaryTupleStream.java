@@ -29,8 +29,8 @@ import java.io.*;
  *  Since the header encodes how many fields there are per tuple, that many points are read and constructed into a tuple.
  **/
 public class BinaryTupleStream {
-	private static final int INT_BYTES = 4;
-	private static final int DOUBLE_BYTES = 8;
+	public static final int INT_BYTES = 4;
+	public static final int DOUBLE_BYTES = 8;
 
 	/**Means of producing a file that can be read by the Reader**/
 	public static final class Writer {
@@ -70,7 +70,7 @@ public class BinaryTupleStream {
 				case 's' :
 					String v = Converter.toString(value);
 					bytes = charBytes(v.toCharArray());
-					ByteBuffer buff = ByteBuffer.allocate(INT_BYTES + bytes.length );
+					ByteBuffer buff = ByteBuffer.allocate(INT_BYTES + bytes.length);
 					buff.put(intBytes(bytes.length));
 					buff.put(bytes);
 					return buff.array();
@@ -87,7 +87,7 @@ public class BinaryTupleStream {
 			int total=0;
 			for (int i=0;i<t.size();i++) {
 				entries[i] = asBinary(t.get(i), types[i]);
-				total = entries.length;
+				total += entries[i].length;
 			}
 			
 			int offset=0;
