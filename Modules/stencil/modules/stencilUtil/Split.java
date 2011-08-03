@@ -3,16 +3,6 @@ package stencil.modules.stencilUtil;
 import stencil.parser.string.ValidationException;
 
 /**Class to capture the split sub-concept of specialization.
- * Grammar is: count,pre/post,ord
- *    Delimited by commas
- *    Whitespace is ignored
- *    Any prefix set may be supplied.
- *    
- *    Examples: 
- *        3,pre
- *        1,post, ord
- *        2,pre, unord   (anything otehr than 'ord' indicats unordered, but 'unord' is suggested)
- *        0,pre, ord	(with 0 in field count, will not do any splitting)
  * */
 public class Split {	
 	private final boolean ordered;	//Is it an ordered split (incoming values are guaranteed to be in order, default is false)?
@@ -31,7 +21,7 @@ public class Split {
 	/**No split action required.*/
 	public boolean isVoid() {return fields ==0;}
 	
-	public int getFields() {return fields;}
+	public int size() {return fields;}
 
 	
 	

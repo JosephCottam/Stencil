@@ -31,8 +31,8 @@ public abstract class SplitHelper implements StencilOperator {
 		public UnorderedHelper(Split split, StencilOperator operator) {super(split, operator);}
 		
 		public Object doSplit(String facet, Object[] args) {
-			Object key = getKey(args);
-			Object[] newArgs = getArgs(args);
+			Object key = getKey(split.size(), args);
+			Object[] newArgs = getArgs(split.size(), args);
 			StencilOperator op = getOp(key);
 			Invokeable inv = op.getFacet(facet);
 			
@@ -41,6 +41,7 @@ public abstract class SplitHelper implements StencilOperator {
 			int oldID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
 
 			Object rv = inv.invoke(newArgs);
+			System.out.println(key + ":" + facet + ":" + rv);
 			
 			int newID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
 				if (newID != oldID) {stateID++;}
@@ -83,8 +84,8 @@ public abstract class SplitHelper implements StencilOperator {
 		}
 				
 		public Object doSplit(String facet, Object[] args) {
-			Object key = getKey(args);
-			Object[] newArgs = getArgs(args);
+			Object key = getKey(split.size(), args);
+			Object[] newArgs = getArgs(split.size(), args);
 			if (!key.equals(oldKey)) {
 				try {operator = operator.duplicate();}
 				catch (Exception e) {throw new Error("Error creating new split operator instance.", e);}
@@ -170,17 +171,26 @@ public abstract class SplitHelper implements StencilOperator {
 	/**Removes the first item from the arguments array.
 	 * The first argument is assumed to be the split key.*/
 	//final because it is a utility method
-	protected static final Object[] getArgs(Object...args) {
-		Object[] newArgs = new Object[args.length-1];
-		System.arraycopy(args, 1, newArgs, 0, newArgs.length);
+	protected static final Object[] getArgs(int splitSize, Object...args) {
+		Object[] newArgs = new Object[args.length-splitSize];
+		System.arraycopy(args, splitSize, newArgs, 0, newArgs.length);
 		return newArgs;
 	}
 	
 	protected abstract Object doSplit(String key, Object[] args);
 	
 	/**Returns the first item from the list.  This is assumed to be the split key.*/
-	//final because it is a utility method
-	protected static final Object getKey(Object... args) {return args[0];}
+//	private static final String DIVIDER = new String(new char[]{'\0','\0','\0','\0','\0'});
+	private static final String DIVIDER = "//";
+	protected static final Object getKey(final int size, final Object... args) {
+		if (size ==0 ) {return args[0];}
+		StringBuilder b = new StringBuilder();
+		for (int i=0; i< size; i++) {
+			b.append(args[i]);
+			b.append(DIVIDER);
+		}
+		return b.toString();
+	}
 	
 	//final because it is a utility method
 	public static final StencilOperator makeOperator(Specializer spec, StencilOperator operator) {
@@ -191,7 +201,7 @@ public abstract class SplitHelper implements StencilOperator {
 	}
 	
 	private static final StencilOperator makeOperator(Split split, StencilOperator operator) {
- 		if (split.getFields() ==0) {return operator;}
+ 		if (split.size() ==0) {return operator;}
 		if (AbstractOperator.isFunction(operator)) {throw new RuntimeException("Attempt to wrap pure function in Split.");}
 		if (split.isOrdered()) {return new OrderedHelper(split, operator);}
 		return new UnorderedHelper(split, operator);

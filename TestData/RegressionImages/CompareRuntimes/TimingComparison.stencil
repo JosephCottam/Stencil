@@ -2,7 +2,7 @@ STREAM: File
 NAME: times
 TUPLE_SIZE: 6
 SEPARATOR: \s*,\s*
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/StateVsFlowRuntimes.csv
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/1iters_1Mc.csv
 SKIP: 1
 STRICT: true
 
@@ -10,9 +10,6 @@ import BrewerPalettes
 
 stream times(elapse, size, refs, perm, type, i)
 
-view
-from #Render
-  (X,Y,WIDTH,HEIGHT): (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
 
 layer Runtimes["POLY_POINT"]
 guide
@@ -20,13 +17,15 @@ guide
   axis Linear from X
   legend from PEN_COLOR
 from times
-  local(name):  Concatenate(refs, perm, type)
-  ID: Count()
+  local(name):  Concatenate(type , " (", perm, ")")
+  ID: Concatenate(local.name, size)
   GROUP: local.name
-  ORDER: Index(size)
+  ORDER: ToNumber(size)
+  IMPLANT: "LINE"
   X:* Mult(size,2) -> Scale[0,100](_)
   Y:* Split[2](@FullMax, local.name, size, elapse) -#> Log[2](_) -> Scale[min:0, max:100](_)
-  PEN_COLOR:* BrewerColors(local.name)
+  PEN_COLOR:* BrewerColors[palette:"set3"](local.name)
+
 
 operator FullMax: Range[ALL](@Max)
 operator Avg: Range[ALL](@Mean)

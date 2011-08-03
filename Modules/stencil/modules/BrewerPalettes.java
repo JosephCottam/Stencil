@@ -67,7 +67,9 @@ public class BrewerPalettes  extends BasicModule {
 				size++;
 			} while (pallet == null && size < MAX_PALLET_SIZE);
 			
-			if (pallet == null) {throw new RuntimeException("No brewer pallet " + rootPallet + " of size " + seen.size() + " or larger found.");}
+			if (pallet == null) {
+				throw new RuntimeException("No brewer pallet " + rootPallet + " of size " + seen.size() + " or larger found.");
+			}
 
 			try {return (Color[]) pallet.get(null);}
 			catch (Exception e) {throw new RuntimeException("Error getting value for pallet " + pallet.getName());}
