@@ -87,8 +87,7 @@ public class ColumnUtils {
 				final int length = values.length;
 				for (int i=0; i< length; i++) {
 					Object val = values[i];
-					if (val == Freezer.VALUE_DEFAULT) {Array.set(array, mask[i], defVal);}
-					else if (val != Freezer.NO_UPDATE) {Array.set(array, mask[i], val);}
+					Array.set(array, mask[i], val);
 				}
 			}
 			return array;

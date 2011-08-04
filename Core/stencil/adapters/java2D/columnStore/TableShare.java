@@ -136,17 +136,18 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					try {targetCol = columns[targetColIdx];}
 					catch (ArrayIndexOutOfBoundsException ex) {throw new InvalidNameException(source.name(), fieldName, source.tenured().schema);}
 
-					Object rawValue = singleUpdate.get(field);
-					Object updateValue = 
-							rawValue == Freezer.NO_UPDATE 
-								? Freezer.NO_UPDATE 
-								: Converter.convert(rawValue, targetCol.type(), targetCol.getDefaultValue());
-
-					if (updateValue == Freezer.NO_UPDATE && target > source.tenured().size()) {updateValue = Freezer.VALUE_DEFAULT;}
+					Object updateValue = singleUpdate.get(field);;
+					if (updateValue == Freezer.NO_UPDATE && target > source.tenured().size()) {
+						updateValue = targetCol.getDefaultValue();						
+					} else if (updateValue == Freezer.NO_UPDATE) {
+						updateValue = targetCol.get(target);
+					} else { 
+						updateValue = Converter.convert(updateValue, targetCol.type(), targetCol.getDefaultValue());
+					}
 					
 					if (values[targetColIdx] == null) {
 						values[targetColIdx] = new Object[updates.size()];  
-						Arrays.fill(values[targetColIdx], Freezer.VALUE_DEFAULT);	//TODO: Can this fill be skipped after FillCoColumns has been added?
+						Arrays.fill(values[targetColIdx], targetCol.getDefaultValue());
 					}
 					
 					values[targetColIdx][i] = updateValue;
