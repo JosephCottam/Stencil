@@ -15,8 +15,8 @@ STRICT: true
 STREAM: File
 NAME: Data
 TUPLE_SIZE: 3
-SEPARATOR: \s+
-SOURCE: ./synthData.txt
+SEPARATOR: \s*,\s*
+SOURCE: ./EpicSampleData.csv
 SKIP: 1
 STRICT: true
 
