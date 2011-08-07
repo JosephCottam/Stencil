@@ -141,12 +141,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					if (updateValue == Freezer.NO_UPDATE && target >= source.tenured().size()) {
 						updateValue = targetCol.getDefaultValue();						
 					} else if (updateValue == Freezer.NO_UPDATE) {
-						try {updateValue = targetCol.get(target);}
-						catch (IllegalArgumentException e) {
-							System.err.println("Error in update-----------------");
-							ColumnUtils.printTable(source);
-							throw e;
-						}
+						updateValue = targetCol.get(target);
 					} else { 
 						updateValue = Converter.convert(updateValue, targetCol.type(), targetCol.getDefaultValue());
 					}

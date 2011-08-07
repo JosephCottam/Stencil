@@ -90,7 +90,6 @@ public final class SimpleTable implements Table {
     
 	@Override
 	public void update(PrototypedTuple updates) {
-		System.err.println("Adding: " + updates.toString());
 		Object idu = updates.get(ParserConstants.IDENTIFIER_FIELD);
 		if (idu == null || !(idu instanceof Comparable)) {
 			throw new IDException(idu, tenured.name);
