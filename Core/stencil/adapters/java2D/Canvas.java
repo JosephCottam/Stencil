@@ -45,17 +45,20 @@ public final class Canvas extends DisplayCanvas {
 		for (int i=0;i< layers.length;i++) {
 			this.layers[i] = (Table) layers[i].implementation();
 		}
-		setDoubleBuffered(false);	//TODO: Use the BufferStrategy instead of manually double buffering
 		setOpaque(true);
 	}
 	
 	public void paintComponent(Graphics g) {
-		g.drawImage(buffer, 0, 0, null);
+		synchronized(this) {
+			g.drawImage(buffer, 0, 0, null);
+		}
 	}
 	
 	public void setBackBuffer(BufferedImage i) {
-		this.buffer = i;
-		this.repaint();
+		synchronized(this) {
+			this.buffer = i;
+			this.repaint();
+		}
 	}
 	
 	public DisplayGuide getGuide(String identifier) {return guides.get(identifier);}
