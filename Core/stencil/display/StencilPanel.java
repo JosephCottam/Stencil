@@ -166,6 +166,9 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * guaranteed to preserve consistency.
 	 */
 	public final void processTuple(SourcedTuple source) throws Exception {
+		if (!source.getSource().equals("#Render")) {
+			System.err.println("Processing: " + source.toString());
+		}
 		synchronized(canvas.visLock) {interpreter.processTuple(source);}
 	}
 	

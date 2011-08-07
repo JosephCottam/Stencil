@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import stencil.adapters.java2D.columnStore.column.Column;
+import stencil.adapters.java2D.columnStore.column.ColumnUtils;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
 import stencil.display.DynamicBindSource;
@@ -137,10 +138,15 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					catch (ArrayIndexOutOfBoundsException ex) {throw new InvalidNameException(source.name(), fieldName, source.tenured().schema);}
 
 					Object updateValue = singleUpdate.get(field);;
-					if (updateValue == Freezer.NO_UPDATE && target > source.tenured().size()) {
+					if (updateValue == Freezer.NO_UPDATE && target >= source.tenured().size()) {
 						updateValue = targetCol.getDefaultValue();						
 					} else if (updateValue == Freezer.NO_UPDATE) {
-						updateValue = targetCol.get(target);
+						try {updateValue = targetCol.get(target);}
+						catch (IllegalArgumentException e) {
+							System.err.println("Error in update-----------------");
+							ColumnUtils.printTable(source);
+							throw e;
+						}
 					} else { 
 						updateValue = Converter.convert(updateValue, targetCol.type(), targetCol.getDefaultValue());
 					}

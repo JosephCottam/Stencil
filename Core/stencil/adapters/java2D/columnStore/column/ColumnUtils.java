@@ -2,6 +2,7 @@ package stencil.adapters.java2D.columnStore.column;
 
 import java.lang.reflect.Array;
 
+import stencil.adapters.java2D.columnStore.Table;
 import stencil.interpreter.tree.Freezer;
 import static stencil.adapters.java2D.render.Renderer.CHILDREN;
 
@@ -92,5 +93,29 @@ public class ColumnUtils {
 			}
 			return array;
 		} catch (Exception e) {throw new Error("Error extending column", e);}
+    }
+    
+    public static String toString(String name, Column c) {
+    	if (c instanceof ConstantColumn) {
+    		return name + " (const): " + c.getDefaultValue();
+    	} else {
+    		StringBuilder b = new StringBuilder();
+    		b.append(name);
+    		b.append(": ");
+    		for (int i=0;i < c.size(); i++) {
+    			b.append(c.get(i));
+    		}
+    		b.deleteCharAt(b.length()-1);
+    		return b.toString();
+    	}
+    }
+    
+    public static void printTable(Table source) {
+		System.err.println("Size reported: " + source.tenured().size());
+		for (int col=0;col<source.tenured().columns().length;col++) {
+			String name = source.prototype().get(col).name();
+			Column column = source.tenured().columns()[col];
+			System.err.println(ColumnUtils.toString(name, column));
+		}
     }
 }
