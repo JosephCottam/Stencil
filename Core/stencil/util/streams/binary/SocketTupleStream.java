@@ -71,6 +71,7 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 				Object value;
 				if (types[i] == 'i') {value = stream.readInt();}
 				else if (types[i] == 'd') {value = stream.readDouble();}
+				else if (types[i] == 'l') {value = stream.readLong();}
 				else {
 					int dataLength = stream.readInt();
 					byte[] bytes = new byte[dataLength];		

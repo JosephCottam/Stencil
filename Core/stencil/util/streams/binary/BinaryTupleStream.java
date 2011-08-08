@@ -31,6 +31,7 @@ import java.io.*;
 public class BinaryTupleStream {
 	public static final int INT_BYTES = 4;
 	public static final int DOUBLE_BYTES = 8;
+	public static final int LONG_BYTES = 8;
 
 	/**Means of producing a file that can be read by the Reader**/
 	public static final class Writer {
@@ -44,7 +45,7 @@ public class BinaryTupleStream {
 			assert types != null;
 			assert types.length != 0;
 			for (char c: types) {
-				if (c != 's' && c== 'i' && c == 'd') {throw new IllegalArgumentException("Invalid type marker; only i,s,d allowed, found  '" + c + "'");}
+				if (c != 's' && c != 'i' && c != 'd' && c != 'l') {throw new IllegalArgumentException("Invalid type marker; only i,s,d allowed, found  '" + c + "'");}
 			}
 						
 			byte[] size = intBytes(types.length);
@@ -59,6 +60,7 @@ public class BinaryTupleStream {
 		private static byte[] charBytes(char... c) {return String.valueOf(c).getBytes();}
 		private static byte[] intBytes(int i ){return ByteBuffer.allocate(INT_BYTES).putInt(i).array();}
 		private static byte[] doubleBytes(double d) {return ByteBuffer.allocate(DOUBLE_BYTES).putDouble(d).array();}
+		private static byte[] longBytes(long d) {return ByteBuffer.allocate(LONG_BYTES).putLong(d).array();}
 		
 		
 		/**Get a byte array of a single data value
@@ -78,6 +80,8 @@ public class BinaryTupleStream {
 					return intBytes(Converter.toInteger(value));
 				case 'd' :
 					return doubleBytes(Converter.toDouble(value));
+				case 'l' :
+					return longBytes(Converter.toLong(value));
 				default: throw new IllegalArgumentException("Unknown type: " + type);
 			}			
 		}
@@ -170,6 +174,9 @@ public class BinaryTupleStream {
 							break;
 						case 'd' :
 							values[i] = mainBuffer.getDouble();
+							break;
+						case 'l' :
+							values[i] = mainBuffer.getLong();
 							break;
 						case 's' : 
 							int size = mainBuffer.getInt();

@@ -7,6 +7,9 @@ import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
 import stencil.interpreter.tree.Specializer;
+import stencil.tuple.Tuple;
+import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.MapMergeTuple;
 import stencil.types.Converter;
 
 /**
@@ -100,6 +103,36 @@ public class Temp extends BasicModule {
 		}
 	}
 
+	@Description("Esseentially the inverse of a crosstab, for a single tuple. The first n arguments (set by the share parameter) are set in each result.  The remaning n are placed one-per tuple.")
+	public static class Group extends AbstractOperator {
+		public static final String SHARE_KEY= "share";
+		
+		final int share;
+		protected Group(OperatorData opData, Specializer spec) {
+			super(setProto(opData, spec));
+			share = Converter.toInteger(spec.get(SHARE_KEY));
+		}
+		private static final OperatorData setProto(OperatorData opData, Specializer spec) {
+			return opData;
+		}
+		
+		@Facet(memUse="FUNCTION", alias="map,query")	//Prototype set by "fields"
+		public MapMergeTuple query(Object... values) {
+			int extra = values.length - share;
+			
+			Object[] base = new Object[share+1];
+			Tuple[] tuples = new Tuple[extra];
+			
+			for (int i=0; i<tuples.length; i++) {
+				Object[] result = Arrays.copyOf(base, base.length);
+				result[share+1] = values[share+i];
+				tuples[i] = new ArrayTuple(result);
+			}
+			return new MapMergeTuple(tuples);
+		}
+		
+	}
+	
 	@Operator(spec="[style: \"CIRCLE\", states: 2]")
 	public static class Oscillate extends AbstractOperator.Statefull {
 		public static enum STYLE {CIRCLE, SINE, SINE2}

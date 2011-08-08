@@ -25,11 +25,9 @@ options {
    import stencil.interpreter.tree.Specializer;
    import stencil.interpreter.tree.MultiPartName;
    import stencil.interpreter.guide.Samplers;
-   import stencil.parser.ParserConstants;
       
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.MAP_FACET;
-   import static stencil.interpreter.guide.Samplers.Monitor;
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
@@ -84,7 +82,7 @@ options {
       StencilTree r = chain.getAncestor(RULE);
       if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
       String type = requestedGuides.get(key(r)).find(SAMPLE_TYPE).getText();
-      String operatorName = operatorName(type);
+      String operatorName = Samplers.monitor(type);
       StencilTree call = chain.find(FUNCTION, PACK);
       while(call.getType() == FUNCTION) {
         MultiPartName name = Freezer.multiName(call.find(OP_NAME));
@@ -92,20 +90,6 @@ options {
         call = call.find(FUNCTION, PACK);
       }
       return true;
-    }
-    
-    //TODO: This sems to duplicate information in the `Samplers.samplers' map...can this be removed?
-    private static final String operatorName(String type) {
-      Monitor mon = Samplers.monitor(type);
-      String operatorName;
-      switch (mon) {
-        case FLEX : return "MonitorFlex";  
-        case CATEGORICAL : return "MonitorCategorical";    
-        case CONTINUOUS : return "MonitorContinuous";  
-        case NOP : return "Nop";
-        case NONE : throw new RuntimeException("Attempt to acquire `NONE' monitor for direct guide.");
-        default : throw new Error(String.format("Monitor type \%2\$s not handled (requested for sample type \%1\$s)", mon, type));
-      }
     }
  
     /**Construct the arguments section of an echo call block.
@@ -134,10 +118,10 @@ options {
 
       StencilTree request = requestedGuides.get(key(layer.getText(), field));
       if (request == null && !compactForm) {throw new RuntimeException("Error construction guide: Request for guide does not correspond to a property with rules.");}
-      else if (request == null) {return operatorName("NOP");}
+      else if (request == null) {return Samplers.monitor("NOP");}
       else {
           String type = request.find(SAMPLE_TYPE).getText();
-          return operatorName(type);
+          return Samplers.monitor(type);
       }
     }
     

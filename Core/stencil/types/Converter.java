@@ -85,6 +85,7 @@ public final class Converter {
 	public static Float toFloat(Object value) {return NumericWrapper.toFloat(value);}
 	public static Integer toInteger(Object value) {return NumericWrapper.toInteger(value);}
 	public static Number toNumber(Object value) {return NumericWrapper.toNumber(value);}
+	public static Long toLong(Object value) {return NumericWrapper.toLong(value);}
 	public static Boolean toBoolean(Object value) {return Boolean.valueOf(value.toString());}
 	
 	/**Tries to convert values from the current class to

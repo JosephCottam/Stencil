@@ -73,10 +73,7 @@ public final class SimpleTable implements Table {
     		}
     	}
     	currentShare = null;
-    }
-        
-    /**What is ready to render, right now?**/
-    public TableView renderSet() {return tenured;}  
+    } 
 
     @Override
     public TableShare viewpoint() {
