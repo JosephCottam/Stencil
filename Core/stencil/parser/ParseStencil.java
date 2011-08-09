@@ -100,7 +100,13 @@ public abstract class ParseStencil {
    //Create a Stencil rule object that binds like to : from
    //Actually performs the parsing so a tree is returned
    public static final StencilTree ruleTree(String to, String from) {
-      String input = to + BIND_OPERATOR + STREAM_FRAME + NAME_SEPARATOR + from;
+	   String input; 
+	   if (from != null) {
+		   input = to + BIND_OPERATOR + STREAM_FRAME + NAME_SEPARATOR + from;
+	   } else {
+		   input = to + BIND_OPERATOR + STREAM_FRAME;
+	   }
+	   
       ANTLRStringStream input1 = new ANTLRStringStream(input);
       StencilLexer lexer = new StencilLexer(input1);
       CommonTokenStream tokens = new CommonTokenStream(lexer);

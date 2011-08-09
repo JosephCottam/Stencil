@@ -70,12 +70,7 @@ options {
           }
        }
        
-       for (StencilTree s: g.find(LIST_GUIDE_MONITORS)) {
-           String inputField = INPUT_FIELD + (s.getChildIndex() > 0 ? s.getChildIndex() : "");
-            if (!names.contains(inputField)) {
-               adaptor.addChild(rules, ParseStencil.ruleTree(inputField, inputField));  //Make the sample inputs accessible
-            }
-       }
+       adaptor.addChild(rules, ParseStencil.ruleTree(INPUT_FIELD, INPUT_FIELD));  //Make the sample input tuple accessible
      }
      
      //TODO: Add sequence field so, for example, legend layouts can be computed in rules

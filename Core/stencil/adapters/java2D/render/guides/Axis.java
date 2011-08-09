@@ -22,10 +22,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.instances.Singleton;
-import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
-import stencil.util.collections.ArrayUtil;
 import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 import static stencil.parser.ParserConstants.GUIDE_LABEL;
@@ -66,8 +63,6 @@ public class Axis extends Guide2D  {
 		}
 		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
 	}	
-	protected final int labelIdx;
-	protected final int offsetIdx;
 	
 	private CompoundTable data;
 	private final CompoundRenderer renderer;
@@ -106,13 +101,7 @@ public class Axis extends Guide2D  {
 		final String axisTag = guideDef.identifier().substring(guideDef.identifier().indexOf(":")+2); 
 		axis = AXIS.valueOf(axisTag);
 		
-		//How will basic info show up?
-		TuplePrototype p = guideDef.rule().prototype();
-		labelIdx = p.indexOf(INPUT_FIELD);
-		offsetIdx = p.indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag);
-
 		//Update the schema per the guide def...
-		
 		//Get position info based on axis orientation
 		Object pos = spec.get(BASELINE_KEY);
 		if (pos instanceof Number) {
@@ -236,7 +225,7 @@ public class Axis extends Guide2D  {
 
 		double idCounter=1;	//Start at 1 so the axis line gets 0
 		for (PrototypedTuple t: elements) {
-			String labelText = Converter.toString(t.get(label_idx));
+			String labelText = Converter.toString(((Tuple) t.get(label_idx)).get(0));
 			double location = Converter.toDouble(t.get(offset_idx));
 			
 			PrototypedTuple tickParts = makeTick(location, tickSize, idCounter++);

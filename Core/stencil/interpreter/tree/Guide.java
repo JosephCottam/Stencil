@@ -67,11 +67,11 @@ public class Guide implements UpdateableComposite<Guide> {
 	public void update(DisplayGuide guide, Rectangle2D bounds, AffineTransform viewTransform) {
 		assert guide != null : "Null guide passed.";
 		
-		List<? extends Tuple> projection;
+		List<? extends Tuple> sampleInputs;
 		List<PrototypedTuple> results;
 
 		if (monitorOps[0] instanceof LayerSampler.MonitorOperator) {
-			projection = sampleOps[0].sample(null, spec);
+			sampleInputs = sampleOps[0].sample(null, spec);
 		} else {
 			List<PrototypedTuple>[] projections = new List[monitorOps.length];
 			for (int i=0; i<monitorOps.length; i++) {
@@ -81,19 +81,20 @@ public class Guide implements UpdateableComposite<Guide> {
 				catch (Exception e) {throw new RuntimeException("Error creating guide sample.", e);}
 
 			}
-			projection = cross(projections);			
+			sampleInputs = cross(projections);			
 		}
 
-		try {results = processAll(projection, rule);}
+		try {results = processAll(sampleInputs, rule);}
 		catch (Exception e) {throw new RuntimeException("Error formatting guide results.", e);}
 
 		guide.setElements(results, bounds, viewTransform);
 	}
 
-	private static List<PrototypedTuple> processAll(List<? extends Tuple> sources, Rule rule) throws Exception {
+	private static List<PrototypedTuple> processAll(List<? extends Tuple> samples, Rule rule) throws Exception {
 		List<PrototypedTuple> results = new ArrayList();
-		for (Tuple source: sources) {
-			results.add((PrototypedTuple) Interpreter.processTuple(source, rule));
+		for (Tuple sample: samples) {
+			PrototypedTuple result = (PrototypedTuple) Interpreter.processTuple(sample, rule);
+			results.add(result);
 		}
 		return results;
 	}

@@ -25,7 +25,6 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.instances.Singleton;
-import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.types.geometry.PointTuple;
 import stencil.util.collections.ListSet;
@@ -44,7 +43,7 @@ public class CrossLegend extends Guide2D {
 
 	private final boolean autoPlace;
 	private final String guideLabel;
-	private final int[] label_idx;
+	private final int label_idx;
 
 	private double legendX, legendY;
 	private int idCounter =0;
@@ -67,13 +66,7 @@ public class CrossLegend extends Guide2D {
 		updateMask = Tuples.merge(data.updateMaskTuple(), Tuples.delete(DEFAULT_SPECIALIZER, SPEC_NON_VALUES));
 		renderer = new CompoundRenderer(data.prototype());
 		
-		TuplePrototype p = guideDef.rule().prototype();
-		ArrayList<Integer> idxs = new ArrayList();
-		for (int i=0; i< p.size(); i++) {if (p.get(i).name().startsWith(INPUT_FIELD)) {idxs.add(i);}}
-		label_idx = new int[idxs.size()];
-		for (int i=0; i<idxs.size(); i++) {label_idx[i] =idxs.get(i);}
-		
-		assert label_idx.length == 2 : "Can only cross on two elements";
+		label_idx = guideDef.rule().prototype().indexOf(INPUT_FIELD);
 	}
 	
 	private static CompoundTable makeTable(Guide guideDef) {
@@ -88,6 +81,8 @@ public class CrossLegend extends Guide2D {
 	@Override
 	public void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		data = makeTable(guideDef);
+		if (elements.size() == 0) {return;}
+		
 		List<SortedSet> labels = labels(elements);
 		List<List<PrototypedTuple>> splitElements = split(elements, labels);
 	
@@ -141,15 +136,16 @@ public class CrossLegend extends Guide2D {
 	private static final float hSpacing = 2f;
 	private static final String[] EXAMPLE_FIELDS = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID", "ID"};
 	private PrototypedTuple createExample(List<SortedSet> labels, PrototypedTuple contents) {
-		int row = labels.get(0).headSet(contents.get(INPUT_FIELD)).size() +2;	//+2 accounts for labels
-		int col = labels.get(1).headSet(contents.get(INPUT_FIELD + "1")).size() +2;
+		Tuple input = ((Tuple) contents.get(INPUT_FIELD));
+		int row = labels.get(0).headSet(Converter.toString(input.get(0))).size() +2;	//+2 accounts for labels
+		int col = labels.get(1).headSet(Converter.toString(input.get(1))).size() +2;
 		PointTuple place = layout(row, col);
 		
 		Object[] values = new Object[]{place.x(), place.y(), "CENTER", idCounter++, idCounter++};
 		PrototypedTuple example = new PrototypedArrayTuple(EXAMPLE_FIELDS , values); 
 		example = Tuples.mergeAll(updateMask, example, contents);
 		example = Tuples.restructure(example, "ele", "label");
-		example = Tuples.delete(example, INPUT_FIELD, INPUT_FIELD + "1");
+		example = Tuples.delete(example, INPUT_FIELD);
 		example = Tuples.merge(example, NO_LABEL);
 		
 		return example;
@@ -166,11 +162,16 @@ public class CrossLegend extends Guide2D {
 	/**Determine the unique row and column labels for the matrix.*/
 	private List<SortedSet> labels(List<? extends Tuple> elements) {
 		List<SortedSet> labelss = new ArrayList();
-		for (int i=0; i< label_idx.length; i++) {labelss.add(new TreeSet());}
+		Tuple example = elements.get(0);
+		Tuple inputExample = (Tuple) example.get(label_idx);
+		assert inputExample.size() == 2 : "Can only cross on two inputs";
+
+		for (int i=0; i< inputExample.size(); i++) {labelss.add(new TreeSet());}
 		for (Tuple t: elements) {
-			for (int i=0; i< label_idx.length; i++) {
+			for (int i=0; i< inputExample.size(); i++) {
 				SortedSet labels = labelss.get(i);
-				labels.add(t.get(label_idx[i]));
+				String label = Converter.toString(((Tuple) t.get(label_idx)).get(i));
+				labels.add(label);
 			}
 		}		
 		return labelss;
@@ -181,7 +182,7 @@ public class CrossLegend extends Guide2D {
 		List<List<PrototypedTuple>> split = new ArrayList();
 		for (int i=0; i<labels.get(0).size(); i++) {split.add(new ArrayList());}
 		for (PrototypedTuple t: elements) {
-			String key = Converter.toString(t.get(label_idx[0]));
+			String key = Converter.toString(((Tuple) t.get(label_idx)).get(0));
 			int set = labels.get(0).tailSet(key).size()-1;
 			split.get(set).add(t);
 		}

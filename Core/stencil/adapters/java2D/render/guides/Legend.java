@@ -20,14 +20,13 @@ import stencil.parser.ParseStencil;
 import stencil.interpreter.tree.Guide;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
+import stencil.tuple.Tuple;
 import stencil.tuple.TupleSorter;
 import stencil.tuple.Tuples;
 import stencil.types.Converter;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.instances.Singleton;
 import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
-import stencil.util.collections.ArrayUtil;
 import stencil.util.collections.ListSet;
 
 import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
@@ -171,7 +170,8 @@ public class Legend extends Guide2D {
 		PrototypedTuple example = new PrototypedArrayTuple(exampleFields, exampleValues);
 
 		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.ID", "ID"};
-		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, contents.get(label_idx), idx, idx};
+		Object labelText = ((Tuple) contents.get(label_idx)).get(0);
+		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, labelText, idx, idx};
 		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
 		
 		return Tuples.mergeAll(label,example, Tuples.delete(contents, label_idx));

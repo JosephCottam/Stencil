@@ -43,7 +43,7 @@ options {
   
   /**Return true if a frame name should be replaced with a reference to the generated sample.
    *  In the simple world, this will only need to replace the references to the stream.
-   *  However, with -#> sampler placement, this is more copmlicated.
+   *  However, with -#> sampler placement, this is more complicated.
    *
    *  TODO: When runtime constants are added, do not replace elements in the runtime global frame  
   */
@@ -98,12 +98,6 @@ options {
       adaptor.addChild(list, gen);
       adaptor.addChild(gen, rules.find(RULE));
       return list;
-  }
-  
-  private static String index(StencilTree t) {
-     int idx = t.getAncestor(GUIDE_GENERATOR).getChildIndex();
-     String index =(idx==0 ? "" : Integer.toString(idx));  
-     return index;
   }
 }
 
@@ -186,15 +180,15 @@ repackGeneratorRule
 
 retarget
   : ^(t=TARGET ^(TARGET_TUPLE p+=.+))
-      -> ^(TARGET ^(TARGET_TUPLE $p* ^(TUPLE_FIELD ID[INPUT_FIELD + index($t)])));
+      -> ^(TARGET ^(TARGET_TUPLE $p* ^(TUPLE_FIELD ID[INPUT_FIELD])));
 
 //Add sample output to the result prototpye      
 repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)
-  | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"]));
+  | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME]));
 
 //Have the generator use the sample frame where it used to use the stream frame--------------------
-rename: ^(TUPLE_REF fr=ID fi=. r+=.*)
-  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
+rename: ^(tr=TUPLE_REF fr=ID fi=. r+=.*)
+  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText()) && tr.getParent().getType() != PACK}? 
       -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*);
         
