@@ -3,6 +3,8 @@ package stencil.interpreter.guide;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import stencil.util.collections.ArrayUtil;
 import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 
 /**Report from the echo operator for the guide system.
@@ -10,7 +12,7 @@ import static stencil.interpreter.guide.SampleSeed.SeedType.*;
  * sample descriptor.
  **/
 public class SampleSeed<T> implements Iterable<T> {
-	public enum SeedType {CATEGORICAL, CONTINUOUS, MIXED}
+	public enum SeedType {CATEGORICAL, CONTINUOUS, MIXED, SEGMENTS}
 	
 	private final SeedType seedType;
 	private final List<T> elements;
@@ -33,6 +35,7 @@ public class SampleSeed<T> implements Iterable<T> {
 	public boolean isMixed() {return seedType == MIXED;}
 	public boolean isCategorical() {return seedType == CATEGORICAL;}	
 	public boolean isContinuous() {return seedType == CONTINUOUS;}
+	public boolean isSegments() {return seedType == SEGMENTS;}
 	
 	public SampleSeed getCategorical() throws UnsupportedOperationException {
 		if (seedType == CATEGORICAL){return this;}
@@ -48,4 +51,12 @@ public class SampleSeed<T> implements Iterable<T> {
 	
 	public T get(int i) {return elements.get(i);}
 	public Iterator<T> iterator() {return elements.iterator();}
+	
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(seedType);
+		sb.append(": ");		
+		sb.append(ArrayUtil.prettyString(elements.toArray()));
+		return sb.toString();
+	}
 }

@@ -11,7 +11,7 @@ options {
 /** Determines the names of fields being used to create a guide
  *  and transfers them to the label attribute (if one was not already supplied).
  *  
- *  Guide declarations are identified; all those without a `gLabel' parameter have one added that includes
+ *  Guide declarations are identified; all those without a `guideLabel' parameter have one added that includes
  *  the names of variables passed to the Monitor operator.
  * 
  **/

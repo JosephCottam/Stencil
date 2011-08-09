@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import stencil.adapters.java2D.render.guides.Guide2D;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
-
-import static stencil.parser.ParserConstants.FALSE_STRING;
 
 
 public class NumericSampler implements SampleOperator {
@@ -36,17 +35,16 @@ public class NumericSampler implements SampleOperator {
 	 */
 	public static final String TIGHT = "tight";
 
-	private final boolean log;
-	
-	public NumericSampler(String type) {log = type.toUpperCase().equals("LOG");}
-
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Iterable source;
 		int sourceSize;
 		
+		
 		if (!seed.isContinuous()) {throw new RuntimeException("Can only use numeric sample on continuous ranges.");}
 		if (seed.size() ==0) {return new ArrayList();}//No seed -> No sample
-		
+
+		boolean log = spec.get(Guide2D.SAMPLE_KEY).equals("LOG");
+
 		double min = ((Number) seed.get(0)).doubleValue();
 		double max = ((Number) seed.get(1)).doubleValue();
 		
@@ -58,7 +56,7 @@ public class NumericSampler implements SampleOperator {
 		
 		
 		int tickCount = 10;
-		boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !spec.get(SAMPLE_INTEGERS).toString().toUpperCase().equals(FALSE_STRING));
+		boolean useIntegers = (spec.containsKey(SAMPLE_INTEGERS) && !Converter.toBoolean(spec.get(SAMPLE_INTEGERS)));
 
 		if (spec.containsKey(SAMPLE_STRIDE) && spec.get(SAMPLE_STRIDE) != null) {
 			double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));

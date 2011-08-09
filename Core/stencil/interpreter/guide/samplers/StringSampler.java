@@ -11,8 +11,6 @@ import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.Singleton;
 
 public class StringSampler implements SampleOperator {
-	public StringSampler(String type) {}
-	
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		if (seed.isContinuous()) {throw new IllegalArgumentException("Can only do cateogrical string samples.");}
 		

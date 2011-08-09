@@ -9,9 +9,7 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
 
-public class ColorSampler implements SampleOperator {
-	public ColorSampler(String type) {}
-	
+public class ColorSampler implements SampleOperator {	
 	/**Categorical: Echos colors given in the descriptor
 	 * Continuous: Samples a path through HSV space that connects all colors listed
 	 * 

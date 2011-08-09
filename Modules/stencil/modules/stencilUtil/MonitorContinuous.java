@@ -1,6 +1,5 @@
 package stencil.modules.stencilUtil;
 
-import static stencil.parser.ParserConstants.FALSE_STRING;
 import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 		
 		if (spec.containsKey(MAX_KEY)) {max = Converter.toDouble(spec.get(MAX_KEY));}
 		if (spec.containsKey(MIN_KEY)) {min = Converter.toDouble(spec.get(MIN_KEY));}
-		rangeLock = spec.containsKey(LOCK_KEY) && spec.get(LOCK_KEY).equals(FALSE_STRING);
+		rangeLock = spec.containsKey(LOCK_KEY) && !Converter.toBoolean(spec.get(LOCK_KEY));
 	}
 	
 	@Override
@@ -53,7 +52,7 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 	@Facet(memUse="OPAQUE", prototype="()")
 	public Tuple map(Object... args) {
 		assert args.length == 1;
-		double value = Converter.toNumber(args[0]).doubleValue();
+		double value = Converter.toDouble(args[0]);
 		
 		if (!rangeLock) {
 		

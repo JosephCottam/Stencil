@@ -184,7 +184,8 @@ public abstract class ParseStencil {
 //		BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		p = GuideDefaultSelector.apply(p); 
 		p = GuideInsertMonitorOp.apply(p, modules);		//Ensure that auto-guide requirements are met
-		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
+		p = GuideSampleInSpec.apply(p);
+		p = DefaultSpecializers.apply(p, modules, adapter, true); 		
 		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
 													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
 		

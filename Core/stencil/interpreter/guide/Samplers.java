@@ -3,7 +3,6 @@ package stencil.interpreter.guide;
 import stencil.interpreter.guide.samplers.*;
 import stencil.modules.stencilUtil.StencilUtil;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +25,8 @@ public final class Samplers {
 		add("COLOR", "MonitorCategorical", ColorSampler.class);
 		add("LAYER", null, LayerSampler.class);
 		add("NOP", "Nop", StencilUtil.Nop.class);
+		add("GAP", "MonitorSegments", SegmentSampler.class);
+		add("SEGMENT", "MonitorSegments", SegmentSampler.class);
 		
 	}
 	
@@ -41,18 +42,13 @@ public final class Samplers {
 	 * The raw type should be passed as the first value.
 	 * All arguments will be passed on to the selected sampler for further refinement.
 	 */
-	public static SampleOperator get(Object... args) {
-		assert args.length != 0 : "Must specify a sample type as the first argument.";
-		String type = (String) args[0];
+	public static SampleOperator get(String type) {
 		type = type.toUpperCase();
 		
 		Class<? extends SampleOperator> opClass = samplers.get(type);
 		
-		Class[] argTypes = new Class[args.length];
-		for (int i=0; i< args.length; i++) {argTypes[i] = args[i].getClass();}
-
-		try {return opClass.getConstructor(argTypes).newInstance(args);}
-		catch (Exception e) {throw new RuntimeException(String.format("Error creating sample operator for %1$s with args %2$s ", type, Arrays.deepToString(args)), e);}
+		try {return opClass.getConstructor().newInstance();}
+		catch (Exception e) {throw new RuntimeException(String.format("Error creating sample operator for %1$s", type), e);}
 	}
 	
 	/**Register a sampler.

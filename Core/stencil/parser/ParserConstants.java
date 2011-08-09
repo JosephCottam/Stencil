@@ -74,9 +74,6 @@ public abstract class ParserConstants {
 	
 	public static final String BIND_OPERATOR = ":";
 	
-	public static final String TRUE_STRING = "TRUE";
-	public static final String FALSE_STRING = "FALSE";
-	
 	
 	public static final StencilTree DEFAULT_CANVAS_SPECIALIZER;
 	public static final StencilTree DEFAULT_VIEW_SPECIALIZER;
