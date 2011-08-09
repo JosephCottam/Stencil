@@ -13,15 +13,19 @@ import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.Renderer;
 import stencil.display.SchemaFieldDef;
 import stencil.interpreter.tree.Guide;
+import stencil.interpreter.tree.Specializer;
+import stencil.parser.ParseStencil;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.PrototypedArrayTuple;
+import stencil.tuple.instances.Singleton;
 import stencil.types.Converter;
 
 
 /**Show a set of lines in the body of the plot.**/
 public class Gridlines extends Guide2D {
 	public static enum AXIS {X,Y}
+	private static final String IMPLANT_KEY = "implant";
 	
 	private Table data;
 	private final Renderer renderer;
@@ -29,6 +33,15 @@ public class Gridlines extends Guide2D {
 
 	protected final AXIS axis;
 	protected final String axisTag;
+	
+	private static final String DEFAULT_SPECIALIZER_SOURCE = "[PEN_COLOR: \"GRAY60\"]";
+	private static final String[] DEFAULTS_KNOCKOUT = new String[]{};
+	public static final Specializer DEFAULT_SPECIALIZER;
+	static {
+		try {DEFAULT_SPECIALIZER = ParseStencil.specializer(DEFAULT_SPECIALIZER_SOURCE);}
+		catch (Exception e) {throw new Error("Error parsing default axis arguments.", e);}
+	}	
+
 
 	public Gridlines(Guide guideDef) {
 		super(guideDef);
@@ -39,7 +52,12 @@ public class Gridlines extends Guide2D {
 		
 		data = LayerTypeRegistry.makeTable(guideDef.identifier(), "LINE");
 		renderer = LayerTypeRegistry.makeRenderer(data.prototype());
-		updateMask = SchemaFieldDef.asTuple(data.prototype());
+
+		PrototypedTuple updateMask = Tuples.merge(SchemaFieldDef.asTuple(data.prototype()), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));
+		if (guideDef.specializer().containsKey(IMPLANT_KEY)) {
+			updateMask = Tuples.merge(updateMask, Singleton.from("IMPLANT", Converter.toString(guideDef.specializer().get(IMPLANT_KEY))));
+		}
+		this.updateMask = updateMask;
 	}
 	
 	@Override
@@ -48,6 +66,7 @@ public class Gridlines extends Guide2D {
 		if (elements.size() ==0) {return;}
 		
 		int offset_idx = elements.get(0).prototype().indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag);
+		int input_idx  = elements.get(0).prototype().indexOf("Input");
 
 		int idCounter=1;	//Start at 1 so the axis line gets 0
 		double lineSize = axis == AXIS.X ? parentBounds.getHeight() : parentBounds.getWidth();
@@ -56,7 +75,7 @@ public class Gridlines extends Guide2D {
 			double location = Converter.toDouble(t.get(offset_idx));
 			
 			PrototypedTuple tickParts = makeLine(location, floor, lineSize, idCounter++);
-			PrototypedTuple merged = Tuples.merge(updateMask, tickParts, Tuples.delete(t, offset_idx));
+			PrototypedTuple merged = Tuples.mergeAll(updateMask, tickParts, Tuples.delete(t, offset_idx, input_idx));
 			
 			data.update(merged);
 		}

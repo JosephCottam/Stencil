@@ -242,7 +242,7 @@ public class Axis extends Guide2D  {
 			PrototypedTuple labelParts = makeLabel(labelText, location, textOffset, idCounter++);
 
 			PrototypedTuple merged = Tuples.delete(t, label_idx, offset_idx);
-			merged = Tuples.merge(tickParts, labelParts, merged);			
+			merged = Tuples.mergeAll(tickParts, labelParts, merged);			
 			updates.add(merged);
 		}
 		
