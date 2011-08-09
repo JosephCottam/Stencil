@@ -35,8 +35,8 @@ public class PrerenderTasks {
 	
 	private final ExecutorService updatePool = Executors.newFixedThreadPool(Configure.threadPoolSize, new StencilThreadFactory("update", Thread.MAX_PRIORITY));
 	private final Map<DynamicRule, DynamicUpdateTask> dynamicUpdaters = new HashMap();
-	private final List<UpdateTask> guideUpdaters = new ArrayList();
-	private final List<SimpleUpdateTask> simpleUpdaters = new ArrayList();
+	private final List<UpdateTask> guideUpdaters = new ArrayList(0);
+	private final List<SimpleUpdateTask> simpleUpdaters = new ArrayList(0);
 
 	private final Panel panel;
 	private final Table[] layers;

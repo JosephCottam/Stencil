@@ -21,6 +21,8 @@ options {
   
   private String flatten(StencilTree root) {
      StringBuilder b = new StringBuilder(root.getAncestor(LAYER).getText());
+     b.append(" ");
+     b.append(root.getAncestor(GUIDE).find(ID).getText());
      b.append(": ");
      for(StencilTree sel: root) {       
         b.append(sel.getText());

@@ -8,7 +8,7 @@ public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Ca
 	public static final Finisher NO_WORK = new Finisher() {public void finish() {}};
 
 	/**How should this task be identified in string form?*/
-	protected final String identifier;
+	protected final String taskID;
 
 	/**The transient viewpoint fragment. 
 	 * This should correspond to the original fragment in some meaningful way
@@ -21,7 +21,7 @@ public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Ca
 	
 	protected UpdateTask(T original, String identifier) {
 		this.original = original;
-		this.identifier = this.getClass().getName() + ":" + identifier;
+		this.taskID = this.getClass().getName() + ":" + identifier;
 	}
 	
 	
@@ -55,5 +55,5 @@ public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Ca
 		return NO_WORK;
 	}
 	
-	public String toString() {return identifier;}
+	public String toString() {return taskID;}
 }
