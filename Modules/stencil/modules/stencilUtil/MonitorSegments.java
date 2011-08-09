@@ -77,7 +77,8 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 	public SampleSeed getSeed() {
 		ArrayList segs;
 		synchronized(this) {segs = new ArrayList(segments);}
-		return new SampleSeed(SEGMENTS, segs);
+		SampleSeed seed = new SampleSeed(SEGMENTS, segs);
+		return seed;
 	}
 	
 	@Facet(memUse="OPAQUE", prototype="()", alias={"map","query"})

@@ -55,7 +55,9 @@ public class SampleSeed<T> implements Iterable<T> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(seedType);
-		sb.append(": ");		
+		sb.append(" (");	
+		sb.append(elements.size());
+		sb.append(" elements): ");
 		sb.append(ArrayUtil.prettyString(elements.toArray()));
 		return sb.toString();
 	}

@@ -9,6 +9,7 @@ import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.tree.Specializer;
 import stencil.modules.stencilUtil.MonitorSegments;
 import stencil.tuple.Tuple;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
 
 /**Produces a set of samples from a given set of segments.
@@ -52,8 +53,8 @@ public class SegmentSampler implements SampleOperator {
 		if (seed.size() <2 ) {return sample;}//Insufficient seed -> No sample
 
 		for (MonitorSegments.Segment s: seed) {
-			sample.add(Converter.toTuple(s.start));
-			sample.add(Converter.toTuple(s.end));
+			sample.add(ArrayTuple.from(s.start, "start"));
+			sample.add(ArrayTuple.from(s.end, "end"));
 		}
 		return sample;
 	}

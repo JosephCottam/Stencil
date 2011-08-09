@@ -20,7 +20,7 @@ options {
 
 @members {
   //TODO: Get the list of direct types from the adaptor
-  public static List<String> DIRECT_TYPES = Arrays.asList("axis", "legend");
+  public static List<String> DIRECT_TYPES = Arrays.asList("axis", "legend","gridlines");
 
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     

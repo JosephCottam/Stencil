@@ -88,6 +88,8 @@ public final class Adapter implements stencil.adapters.Adapter {
 				canvas.addGuide(new TrendLine(guideDef));
 			} else if (guideDef.type().equals("crossLegend")) {
 				canvas.addGuide(new CrossLegend(guideDef, legendCount++));
+			} else if (guideDef.type().equals("gridlines")) {
+				canvas.addGuide(new Gridlines(guideDef));
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " + guideDef.type());
 			}

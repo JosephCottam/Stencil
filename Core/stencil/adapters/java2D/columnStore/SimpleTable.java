@@ -54,8 +54,8 @@ public final class SimpleTable implements Table {
      * @param update
      */
     public void merge(TableShare share) {
-    	if (share.source() != this) {throw new IllegalArgumentException("Can only merge with shares made from the target table.");}
-    	if (share.creationID() != tenured.stateID) {throw new IllegalArgumentException("Can only merge with most recent share.");}
+    	if (share.source() != this) {throw new TableMergeException(tenured.name, "Can only merge with shares made from the target table.");}
+    	if (share.creationID() != tenured.stateID) {throw new TableMergeException(tenured.name, "Can only merge with most recent share.");}
     	share.dynamicComplete();	//Wait for dynamic bindings to complete before merging
     	
     	if (!share.unchanged()) {

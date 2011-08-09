@@ -61,8 +61,10 @@ public final class ArrayUtil {
 			b.append(entry.toString());
 			b.append(", ");
 		}
-		b.deleteCharAt(b.length()-1);
-		b.deleteCharAt(b.length()-1);
+		if (b.length() >0) {
+			b.deleteCharAt(b.length()-1);
+			b.deleteCharAt(b.length()-1);
+		}
 		return b.toString();
 	}
 	

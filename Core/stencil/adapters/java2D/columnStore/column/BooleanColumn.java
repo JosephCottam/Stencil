@@ -3,8 +3,6 @@ package stencil.adapters.java2D.columnStore.column;
 import java.lang.reflect.Array;
 import java.util.BitSet;
 
-import stencil.interpreter.tree.Freezer;
-
 /**
  * Column implementation storing boolean values. Uses a BitSet representation
  * for space efficient storage.
@@ -90,10 +88,7 @@ public class BooleanColumn extends AbstractColumn<Boolean> {
 		} else {			//The bistset is the same size or grew
 			bits.or(m_bits);
 			for (int i=0; i< vals.length; i++) {
-				if (vals[i] == Freezer.VALUE_DEFAULT) {bits.set(targets[i], m_defaultValue);}
-				else if (vals[i] != Freezer.NO_UPDATE) {
-					bits.set(targets[i], (Boolean) vals[i]);
-				}
+				bits.set(targets[i], (Boolean) vals[i]);
 			}
 		}
 

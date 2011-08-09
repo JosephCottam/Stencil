@@ -3,7 +3,6 @@ package stencil.adapters.java2D.columnStore.column;
 import java.lang.reflect.Array;
 
 import stencil.adapters.java2D.columnStore.Table;
-import stencil.interpreter.tree.Freezer;
 import static stencil.adapters.java2D.render.Renderer.CHILDREN;
 
 /** Utilities for  working with columns.*/

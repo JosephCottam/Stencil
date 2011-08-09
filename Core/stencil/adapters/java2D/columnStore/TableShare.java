@@ -12,7 +12,6 @@ import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import stencil.adapters.java2D.columnStore.column.Column;
-import stencil.adapters.java2D.columnStore.column.ColumnUtils;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
 import stencil.display.DynamicBindSource;
@@ -112,6 +111,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 		//Determine updates at specific locations
 		final int[] targets = new int[updates.size()];
 		final Object[][] values = new Object[source.tenured().columns.length][];
+		final int tenuredSize = source.tenured().size();
 		
 		int i=0;
 		for (Map.Entry<Comparable, PrototypedTuple> entry: updates.entrySet()) {
@@ -123,7 +123,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 				Integer target = source.tenured().index.get(id);
 				if (target == null) {
 					if (extend < 0) {target = deletes.remove(0);}
-					else {target = source.tenured().size() + extend;}
+					else {target = tenuredSize + extend;}
 					extend++;
 				} 
 				targets[i] = target;
@@ -137,8 +137,8 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					try {targetCol = columns[targetColIdx];}
 					catch (ArrayIndexOutOfBoundsException ex) {throw new InvalidNameException(source.name(), fieldName, source.tenured().schema);}
 
-					Object updateValue = singleUpdate.get(field);;
-					if (updateValue == Freezer.NO_UPDATE && target >= source.tenured().size()) {
+					Object updateValue = singleUpdate.get(field);
+					if (updateValue == Freezer.NO_UPDATE && target >= tenuredSize) {
 						updateValue = targetCol.getDefaultValue();						
 					} else if (updateValue == Freezer.NO_UPDATE) {
 						updateValue = targetCol.get(target);

@@ -25,7 +25,7 @@ options {
   public static Object typeNotCovered(String type) {throw new ValidationException("Must supply an attribute selector for guides of type: " + type);}
 
   public static boolean isValidCombo(String type, String att) {
-    if (type.equals("axis")) {return att.startsWith("X") || att.startsWith("Y");}
+    if (type.equals("axis") || type.equals("gridlines")) {return att.startsWith("X") || att.startsWith("Y");}
     if (!GuideDistinguish.DIRECT_TYPES.contains(type)) {return att.equals(IDENTIFIER_FIELD);}
     return !att.equals(IDENTIFIER_FIELD) && !att.equals("X") && !att.equals("Y");
   }
