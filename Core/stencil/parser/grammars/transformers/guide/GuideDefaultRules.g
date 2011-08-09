@@ -8,9 +8,8 @@ options {
 }
 
 @header {
-  /**Ensures that an Input and Output rule exist in the guide declaration.
-   * If either is missing, one is inserted which copies the source values
-   * to the results.
+  /**Ensures that an appropriate output rule exists in the guide declaration.
+   * Also ensures that the sample tuples are copied directly to a field named `sample'.
    */
 
    package stencil.parser.string;

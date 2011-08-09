@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import static stencil.tuple.prototype.TuplePrototypes.EMPTY_PROTOTYPE;
 import static stencil.parser.string.StencilParser.*;
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 /**The environment proxy is used during compilation to mimic the shape of, 
  * but not the content of, runtime environment.
@@ -88,7 +89,7 @@ public final class EnvironmentUtil {
 			//Get the generic streams when there is no more detailed info 
 			if (anc.guide.findAllDescendants(MONITOR_OPERATOR).size() ==0) {
 				if (anc.guide.getAncestor(GUIDE_DIRECT) != null) {
-					return new TuplePrototype("INPUT", "OUTPUT");
+					return new TuplePrototype(INPUT_FIELD, "OUTPUT");
 				} else {
 					return layerPrototype(anc.layer);
 				}

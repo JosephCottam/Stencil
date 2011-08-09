@@ -2,6 +2,7 @@ package stencil.adapters.java2D.render.guides;
 
 import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -66,7 +67,7 @@ public class Gridlines extends Guide2D {
 		if (elements.size() ==0) {return;}
 		
 		int offset_idx = elements.get(0).prototype().indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag);
-		int input_idx  = elements.get(0).prototype().indexOf("Input");
+		int input_idx  = elements.get(0).prototype().indexOf(INPUT_FIELD);
 
 		int idCounter=1;	//Start at 1 so the axis line gets 0
 		double lineSize = axis == AXIS.X ? parentBounds.getHeight() : parentBounds.getWidth();

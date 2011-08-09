@@ -29,6 +29,7 @@ import stencil.util.collections.ArrayUtil;
 import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 import static stencil.parser.ParserConstants.NAME_SEPARATOR;
 import static stencil.parser.ParserConstants.GUIDE_LABEL;
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 //TODO: Pull more of this out to actual stencil code (like the calculation of tick/label positions and setting default values)
 public class Axis extends Guide2D  {
@@ -107,8 +108,8 @@ public class Axis extends Guide2D  {
 		
 		//How will basic info show up?
 		TuplePrototype p = guideDef.rule().prototype();
-		labelIdx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
-		offsetIdx = ArrayUtil.indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag, TuplePrototypes.getNames(p));
+		labelIdx = p.indexOf(INPUT_FIELD);
+		offsetIdx = p.indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag);
 
 		//Update the schema per the guide def...
 		
@@ -227,7 +228,7 @@ public class Axis extends Guide2D  {
 	private List<PrototypedTuple> labeledTicks(List<PrototypedTuple> elements) {
 		List<PrototypedTuple> updates = new ArrayList(elements.size());
 		String axisTag = guideDef.selectors().keySet().iterator().next();
-		int label_idx = elements.get(0).prototype().indexOf("Input");
+		int label_idx = elements.get(0).prototype().indexOf(INPUT_FIELD);
 		int offset_idx = elements.get(0).prototype().indexOf(GUIDE_ELEMENT_TAG + NAME_SEPARATOR + axisTag);
 
 		double tickSize = Converter.toDouble(guideDef.specializer().get(TICK_SIZE_KEY));

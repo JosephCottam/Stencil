@@ -2,6 +2,7 @@ package stencil.adapters.java2D.render.guides;
 
 import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 import static stencil.parser.ParserConstants.GUIDE_LABEL;
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -68,7 +69,7 @@ public class CrossLegend extends Guide2D {
 		
 		TuplePrototype p = guideDef.rule().prototype();
 		ArrayList<Integer> idxs = new ArrayList();
-		for (int i=0; i< p.size(); i++) {if (p.get(i).name().startsWith("Input")) {idxs.add(i);}}
+		for (int i=0; i< p.size(); i++) {if (p.get(i).name().startsWith(INPUT_FIELD)) {idxs.add(i);}}
 		label_idx = new int[idxs.size()];
 		for (int i=0; i<idxs.size(); i++) {label_idx[i] =idxs.get(i);}
 		
@@ -140,15 +141,15 @@ public class CrossLegend extends Guide2D {
 	private static final float hSpacing = 2f;
 	private static final String[] EXAMPLE_FIELDS = new String[]{"ele.X", "ele.Y", "ele.REGISTRATION", "ele.ID", "ID"};
 	private PrototypedTuple createExample(List<SortedSet> labels, PrototypedTuple contents) {
-		int row = labels.get(0).headSet(contents.get("Input")).size() +2;	//+2 accounts for labels
-		int col = labels.get(1).headSet(contents.get("Input1")).size() +2;
+		int row = labels.get(0).headSet(contents.get(INPUT_FIELD)).size() +2;	//+2 accounts for labels
+		int col = labels.get(1).headSet(contents.get(INPUT_FIELD + "1")).size() +2;
 		PointTuple place = layout(row, col);
 		
 		Object[] values = new Object[]{place.x(), place.y(), "CENTER", idCounter++, idCounter++};
 		PrototypedTuple example = new PrototypedArrayTuple(EXAMPLE_FIELDS , values); 
 		example = Tuples.mergeAll(updateMask, example, contents);
 		example = Tuples.restructure(example, "ele", "label");
-		example = Tuples.delete(example, "Input", "Input1");
+		example = Tuples.delete(example, INPUT_FIELD, INPUT_FIELD + "1");
 		example = Tuples.merge(example, NO_LABEL);
 		
 		return example;

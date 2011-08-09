@@ -21,6 +21,7 @@ options {
   import stencil.interpreter.guide.samplers.LayerSampler;
   import stencil.display.DisplayLayer;
   import static stencil.parser.ParserConstants.INVOKEABLE;
+  import static stencil.parser.ParserConstants.INPUT_FIELD;
 }
 
 @members {
@@ -185,7 +186,7 @@ repackGeneratorRule
 
 retarget
   : ^(t=TARGET ^(TARGET_TUPLE p+=.+))
-      -> ^(TARGET ^(TARGET_TUPLE $p* ^(TUPLE_FIELD ID["Input" + index($t)])));
+      -> ^(TARGET ^(TARGET_TUPLE $p* ^(TUPLE_FIELD ID[INPUT_FIELD + index($t)])));
 
 //Add sample output to the result prototpye      
 repack

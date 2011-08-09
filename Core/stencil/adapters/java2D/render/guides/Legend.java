@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.render.guides;
 
 import  static stencil.parser.ParserConstants.GUIDE_LABEL;
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -73,7 +74,7 @@ public class Legend extends Guide2D {
 		}
 		
 		TuplePrototype p = guideDef.rule().prototype();
-		label_idx = ArrayUtil.indexOf("Input", TuplePrototypes.getNames(p));
+		label_idx = p.indexOf(INPUT_FIELD);
 		assert label_idx >=0 : "Input field not found for labeling in results prototype";
 		sorter = new TupleSorter(label_idx);
 
