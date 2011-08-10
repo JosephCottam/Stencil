@@ -64,7 +64,7 @@ public class TestFragments extends TestCase {
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
-		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
+		p = DefaultSpecializers.apply(p, modules, adapter); 			//Add default specializers where required
 		p = DefaultPack.apply(p);				//Add default packs where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
 		p = OperatorInstantiateTemplates.apply(p);		//Remove all operator references

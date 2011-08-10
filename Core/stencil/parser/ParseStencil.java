@@ -172,7 +172,7 @@ public abstract class ParseStencil {
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
-		p = DefaultSpecializers.apply(p, modules, adapter, true); 			//Add default specializers where required
+		p = DefaultSpecializers.apply(p, modules, adapter); 			//Add default specializers where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
 		p = OperatorInstantiateTemplates.apply(p);		//Remove all template references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
@@ -191,7 +191,7 @@ public abstract class ParseStencil {
 		p = GuideDefaultSelector.apply(p); 
 		p = GuideInsertMonitorOp.apply(p, modules);		//Ensure that auto-guide requirements are met
 		p = GuideSampleInSpec.apply(p);
-		p = DefaultSpecializers.apply(p, modules, adapter, true); 		
+		p = DefaultSpecializers.apply(p, modules, adapter); 		
 		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
 													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
 		
@@ -201,7 +201,7 @@ public abstract class ParseStencil {
 		p = GuideAutoLabel.apply(p);
 		p = GuideLegendGeom.apply(p);
 
-		p = DefaultSpecializers.apply(p, modules, adapter, false); 
+		p = DefaultSpecializers.apply(p, modules, adapter); 
 		p = SetOperators.apply(p, modules);
 
 		p = GuideSampleOp.apply(p);
@@ -216,7 +216,7 @@ public abstract class ParseStencil {
 	    p = DynamicCompleteRules.apply(p);
 	    p = DynamicReducer.apply(p);
 	    p = DynamicStoreSource.apply(p);
-		p = DefaultSpecializers.apply(p, modules, adapter, false); 		
+		p = DefaultSpecializers.apply(p, modules, adapter); 		
 		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
 
 		p = OperatorStateQuery.apply(p);

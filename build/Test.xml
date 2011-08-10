@@ -25,6 +25,7 @@
                 <pathelement path="${java.class.path}"/>
                 <pathelement path="."/>
                 <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+                <fileset dir="${runtimeLibrary}/JUNG/" includes="*.jar"/>
             </classpath>
             
             <batchtest todir="${results}">

@@ -34,19 +34,17 @@ options {
 }
 
 @members{
-  public static StencilTree apply (Tree t, ModuleCache modules, Adapter adapter, boolean blend) {
-     return (StencilTree) TreeRewriteSequence.apply(t, modules, adapter, blend);
+  public static StencilTree apply (Tree t, ModuleCache modules, Adapter adapter) {
+     return (StencilTree) TreeRewriteSequence.apply(t, modules, adapter);
   }
 
   protected void setup(Object... args) {
      modules = (ModuleCache) args[0];
      adapter = (Adapter) args[1];
-     blend = (Boolean) args[2];
   }
   
   protected ModuleCache modules;
   protected Adapter adapter;  
-  protected boolean blend;
   
 
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
@@ -164,7 +162,6 @@ options {
 }
 
 topdown
-  options{backtrack=true;}
-  : ^(s=SPECIALIZER DEFAULT)          -> {getDefault(s)}
-  |{blend}?  ^(s=SPECIALIZER .*)      -> {blendWithDefault(s)}
-  |{blend}?  s=SPECIALIZER            -> {blendWithDefault(s)};
+  : ^(s=SPECIALIZER DEFAULT)          -> {getDefault($s)}
+  | ^(s=SPECIALIZER .*)      -> {blendWithDefault($s)}
+  |   s=SPECIALIZER            -> {blendWithDefault($s)};
