@@ -17,6 +17,10 @@ import stencil.interpreter.guide.samplers.NumericSampler;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.PrototypedArrayTuple;
+
+import static stencil.parser.ParserConstants.INPUT_FIELD;
 
 public class Guide implements UpdateableComposite<Guide> {
 	private final String identifier;
@@ -114,7 +118,13 @@ public class Guide implements UpdateableComposite<Guide> {
 		List<PrototypedTuple> sample = new ArrayList();
 		for (PrototypedTuple t1: samples[0]) {
 			for (PrototypedTuple t2: samples[1]) {
-				sample.add(Tuples.merge(t1,t2));
+				Tuple i1 = (Tuple) t1.get(1);
+				Tuple i2 = (Tuple) t2.get(1);
+				Tuple inputs = ArrayTuple.from(i1.get(0), i2.get(0));
+				PrototypedTuple combined = 
+						new PrototypedArrayTuple(new String[]{t1.prototype().get(0).name(), INPUT_FIELD, t2.prototype().get(0).name()}, 
+												new Object[]{t1.get(0), inputs, t2.get(0)});
+				sample.add(combined);
 			}
 		}
 		return sample;
