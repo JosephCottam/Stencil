@@ -1,5 +1,3 @@
-<!--Should be run from the command line with "-lib ../Library/:../Library/JUNG/" /-->
-    
  <project name="Stencil" default="Stencil" basedir="..">
    <taskdef resource="net/sf/antcontrib/antlib.xml">
      <classpath><pathelement location="Library/ant-contrib-1.0b3.jar"/></classpath>
