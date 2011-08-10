@@ -1,9 +1,12 @@
 <!--Should be run from the command line with "-lib ../Library/:../Library/JUNG/" /-->
     
  <project name="Stencil" default="Stencil" basedir="..">
-   <taskdef resource="net/sf/antcontrib/antlib.xml"/>
-   <taskdef resource="org/apache/tools/ant/antlr/antlib.xml"/>
-
+   <taskdef resource="net/sf/antcontrib/antlib.xml">
+     <classpath><pathelement location="Library/ant-contrib-1.0b3.jar"/></classpath>
+   </taskdef>
+   <taskdef resource="org/apache/tools/ant/antlr/antlib.xml">
+     <classpath><pathelement location="Library/antlr3-ant.jar"/></classpath>
+   </taskdef>
    
    <property name="core" location="Core" />
    <property name="modules" location="Modules" />
@@ -53,6 +56,8 @@
       <antlr3
 	 target="${grammars}/Stencil.g"
 	 outputdirectory="${parser}"
+	 depend="true"
+	 dir="${runtimeLibrary}"
 	 />
     </target>
 
@@ -85,6 +90,8 @@
             target="${file}"
             outputdirectory="${antlrTarget}"
             libdirectory="${parser}"
+	   depend="true"
+	   dir="${runtimeLibrary}"
         />          
     </target>
  	
