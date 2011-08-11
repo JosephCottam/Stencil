@@ -22,7 +22,7 @@ public class TestViewpoint extends stencil.unittests.StencilTestCase {
 	}
 	
 	public void testStateQuery() throws Exception {
-		Program p = ParseStencil.program(StringUtils.getContents("./TestData/RegressionImages/AutoGuide/Flowers.stencil"), ADAPTER);
+		Program p = ParseStencil.program(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 		StateQuery sq = p.allGuides()[0].stateQuery();
 		StateQuery vp = sq.viewpoint();
 		

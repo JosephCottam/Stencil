@@ -1,12 +1,12 @@
 ./RegressionImages/AutoGuide/ -open Axis.stencil -txt axis.txt -png2 1000 -1 axis.png
-./RegressionImages/AutoGuide/ -open BarleyCell.stencil -txt barleyCell.txt -png2 1000 -1 barleyCell.png
-./RegressionImages/AutoGuide/ -open Flowers.stencil -txt flowers.txt -png2 1000 -1 flowers.png
-./RegressionImages/AutoGuide/ -open Flowers_Multi.stencil -txt flowers_multi.txt -png2 1000 -1 flowers_multi.png
-./RegressionImages/AutoGuide/ -open Flowers_Cross.stencil -txt flowers_cross.txt -png2 1000 -1 flowers_cross.png
 ./RegressionImages/AutoGuide/ -open Legend.stencil -txt legend.txt -png2 1000 -1 legend.png
-./RegressionImages/AutoGuide/ -open Nightingale.stencil -txt nightingale.txt -png2 1000 -1 nightingale.png
 ./RegressionImages/AutoGuide/ -open TweetCountLocal.stencil -txt tweetCount.txt -png2 1000 -1 tweetCount.png
+./RegressionImages/Barley/ -open BarleyCell.stencil -txt barleyCell.txt -png2 1000 -1 barleyCell.png
 ./RegressionImages/Epic/ -open EpiC.stencil -txt EpiC.txt -png2 1000 -1 EpiC.png
+./RegressionImages/Flowers/ -open AndersonFlowers.stencil -txt flowers.txt -png2 1000 -1 flowers.png
+./RegressionImages/Flowers/ -open AndersonFlowers_Multi.stencil -txt flowers_multi.txt -png2 1000 -1 flowers_multi.png
+./RegressionImages/Flowers/ -open AndersonFlowers_Cross.stencil -txt flowers_cross.txt -png2 1000 -1 flowers_cross.png
+./RegressionImages/Nightingale/ -open Nightingale.stencil -txt nightingale.txt -png2 1000 -1 nightingale.png
 ./RegressionImages/NodeLink/ -open JungTree.stencil -txt jungTree.txt -png2 1000 -1 jungTree.png
 ./RegressionImages/NodeLink/ -open NodeLink.stencil -txt nodeLink.txt -png2 1000 -1 nodeLink.png
 ./RegressionImages/NodeLink/ -open RadialTree.stencil -txt radialTree.txt -png2 1000 -1 radialTree.png

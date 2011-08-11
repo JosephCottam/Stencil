@@ -2,8 +2,8 @@ package stencil.unittests.adapters.examples;
 
 public class AutoGuide_FlowersCross extends ImageTest {
 	public AutoGuide_FlowersCross(String[] configs) {
-		super(new TestRecord("./TestData/RegressionImages/AutoGuide/",
-				  "Flowers_Cross.stencil",
+		super(new TestRecord("./TestData/RegressionImages/Flowers/",
+				  "AndersonFlowers-cross.stencil",
 				  null,
 				  null,
 				  "flowers_cross.txt",

@@ -2,11 +2,11 @@ package stencil.unittests.adapters.examples;
 
 public class AutoGuide_FlowersMulti extends ImageTest {
 	public AutoGuide_FlowersMulti(String[] configs) {
-		super(new TestRecord("./TestData/RegressionImages/AutoGuide/",
-				  "Flowers_Multi.stencil",
+		super(new TestRecord("./TestData/RegressionImages/Flowers/",
+				  "AndersonFlowers-co.stencil",
 				  null,
 				  null,
-				  "flowers_multi.txt",
-				  "flowers_multi.png", configs));
+				  "flowers-co.txt",
+				  "flowers-co.png", configs));
 	}
 }

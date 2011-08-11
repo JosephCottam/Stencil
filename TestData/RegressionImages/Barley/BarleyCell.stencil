@@ -1,0 +1,31 @@
+STREAM: File
+NAME: Barley
+HEADER: year, site, yield, variety
+SEPARATOR: \s*,\s+
+SOURCE: ./BeckersBarley.csv
+SKIP: 1
+STRICT: true
+
+import BrewerPalettes
+stream Barley(year, site, yield, variety)               /*@\label{barley:streamDecl}@*/
+
+const MAX: 100
+const MIN: 10
+
+layer BarleySite                                        /*@\label{barley:layerDef}@*/
+guide							/*@\label{barley:guideBegin}@*/
+  axis[guideLabel: "Variety", X:0] from Y	                     	
+  axis[guideLabel: "Yield", round: "T", 
+	seed.min: MIN, seed.max: MAX]			/*@\label{barley:badCopy}@*/
+    Linear from X
+  legend[X:75, Y:-60] from PEN_COLOR   			/*@\label{barley:sidebarPosition}@*/
+      							/*@\label{barley:guideEnd}@*/
+from Barley	           	           	        /*@\label{barley:fromBlock}@*/
+    filter(site =~ "University Farm")                   /*@\label{barley:filterDef}@*/
+    ID: Concatenate(variety,year)                       /*@\label{barley:binding}@*/
+    PEN_COLOR: BrewerColors["PuRd","BLACK"](year)
+    X:* Scale[min: 0, max:100, 
+		inMin: MIN, inMax: MAX](yield) 		/*@\label{barley:dynamicBind}@*/
+    Y:* Rank(variety) -> Mult(7,_) -> Add(-5,_)         /*@\label{barley:composition}@*/
+    REGISTRATION: "CENTER"
+    FILL_COLOR: @Color{CLEAR}                           /*@\label{barley:customArg}@*/

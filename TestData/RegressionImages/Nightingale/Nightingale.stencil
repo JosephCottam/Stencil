@@ -10,8 +10,7 @@ stream Deaths(date, type, count)
 
 layer Rose["SLICE"]
 guide
-  legend[X: -75, Y:50] from FILL_COLOR
-
+  legend[X: -75, Y: 50] from FILL_COLOR
   pointLabels from ID
     TEXT: MakeLabel(ID)         /*@\label{rose:postProcessStart}@*/
     (X,Y): MinRadius.query(50, X, Y, OUTER.0, OUTER.1)
@@ -33,6 +32,22 @@ operator ColorBy (t) -> (C)
    (t=~"wounds") => C:@Color{LightPink}
    (t=~"other") => C:@Color{DarkGray}
    (t=~"disease") => C:@Color{LightBlue}
+
+java MinRadius {	/*@\label{rose:javaStart}@*/
+   public MinRadius(OperatorData od) {super(od);}
+   @Facet(memUse="FUNCTION", prototype="(double X, double Y)")
+   public double[] query(double Min, double X1, double Y1, double X, double Y) {
+       double rise = Y-Y1;
+       double run = X-X1;
+       double radius = Math.sqrt(Math.pow(rise,2) + Math.pow(run,2));
+       double ratio = radius >0 ? Min/radius : 1;
+       if (ratio > 1) {
+          Y = Y1 + (ratio * rise);
+          X = X1 + (ratio * run);
+       }
+       return new double[]{X,Y};
+   }
+}
 
 operator ParseDate (d) -> (m,y)
    default => (m,y): [s] IndexOf(d, "/") -> 
@@ -63,22 +78,3 @@ operator MonthAbr (n) -> (month)
    (n=11) => month: "Nov"
    (n=12) => month: "Dec"
    default => month: "ERROR"
-
-
-java MinRadius {	/*@\label{rose:javaStart}@*/
-   public MinRadius(OperatorData od) {super(od);}
-
-   @Facet(memUse="FUNCTION", prototype="(double X, double Y)")
-   public double[] query(double Min, double X1, double Y1, double X, double Y) {
-       double rise = Y-Y1;
-       double run = X-X1;
-       double radius = Math.sqrt(Math.pow(rise,2) + Math.pow(run,2));
-       double ratio = radius >0 ? Min/radius : 1;
-       if (ratio > 1) {
-          Y = Y1 + (ratio * rise);
-          X = X1 + (ratio * run);
-       }
-       return new double[]{X,Y};
-   }
-}
-

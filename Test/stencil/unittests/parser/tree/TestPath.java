@@ -12,8 +12,8 @@ public class TestPath extends TestCase {
 	
 	public void setUp() throws Exception {
 		stencil.Configure.loadProperties("./TestData/Stencil.properties");
-		tree1 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/AutoGuide/Flowers.stencil"), ADAPTER);
-		tree2 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/AutoGuide/Flowers.stencil"), ADAPTER);
+		tree1 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
+		tree2 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 	}
 	
 	public void tearDown() {
