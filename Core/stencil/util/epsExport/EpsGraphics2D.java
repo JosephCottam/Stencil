@@ -410,7 +410,6 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 			PathIterator it = s.getPathIterator(null);
 			float x0 = 0;
 			float y0 = 0;
-			int count = 0;
 			
 			while(!it.isDone())
 			{
@@ -425,13 +424,11 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 				if(type == PathIterator.SEG_CLOSE)
 				{
 					append("closepath");
-					count++;
 				}
 				else
 					if(type == PathIterator.SEG_CUBICTO)
 					{
 						append(x1 + " " + y1 + " " + x2 + " " + y2 + " " + x3 + " " + y3 + " curveto");
-						count++;
 						x0 = x3;
 						y0 = y3;
 					}
@@ -439,7 +436,6 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 						if(type == PathIterator.SEG_LINETO)
 						{
 							append(x1 + " " + y1 + " lineto");
-							count++;
 							x0 = x1;
 							y0 = y1;
 						}
@@ -447,7 +443,6 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 							if(type == PathIterator.SEG_MOVETO)
 							{
 								append(x1 + " " + y1 + " moveto");
-								count++;
 								x0 = x1;
 								y0 = y1;
 							}
@@ -462,7 +457,6 @@ public class EpsGraphics2D extends java.awt.Graphics2D
 									float _x3 = x2;
 									float _y3 = y2;
 									append(_x1 + " " + _y1 + " " + _x2 + " " + _y2 + " " + _x3 + " " + _y3 + " curveto");
-									count++;
 									x0 = _x3;
 									y0 = _y3;
 								}

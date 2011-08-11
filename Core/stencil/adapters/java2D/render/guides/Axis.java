@@ -170,7 +170,6 @@ public class Axis extends Guide2D  {
 	/**Where should the baseline be placed, returns value in y-up/positive convention**/
 	private static final Tuple ZERO = Singleton.from(0d);
 	private static final Tuple ONE = Singleton.from(1d);
-	@SuppressWarnings("null")
 	private double baseline(POSITION position, AXIS axis, Rectangle2D parentBounds, Double baseline) {
 		
 		Double zeroPoint;

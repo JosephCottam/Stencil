@@ -40,10 +40,8 @@ public class Headless {
 	}
 
 	private static StreamSource findSource(String name, Collection<StreamSource> sources) {
-		int i=0;
 		for (StreamSource s: sources) {
 			if (name.equals(s.name())) {return s;}
-			i++;
 		}
 		return null;
 	}

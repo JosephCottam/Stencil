@@ -3,6 +3,8 @@ package stencil.explorations.microbenchmarks;
 import java.lang.reflect.*;
 
 public class ReflectiveInvoke {
+
+	@SuppressWarnings("unused")
 	private static class TestObject {
 		public int sum=0;
 		public void add() {sum++;}

@@ -12,6 +12,7 @@ import junit.framework.TestCase;
 import static stencil.unittests.util.streams.Util.*;
 
 public class TestSocketStream extends StencilTestCase {
+	@SuppressWarnings("deprecation")
 	public void testEncodeDecode() throws Exception {
 		DelimitedParser oldTuples = coordStream();
 		SocketTupleStream newTuples = new SocketTupleStream(oldTuples.getName(), null);

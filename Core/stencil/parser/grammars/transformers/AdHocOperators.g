@@ -1,4 +1,4 @@
-  tree grammar AdHocOperators;
+tree grammar AdHocOperators;
 options {
 	tokenVocab = Stencil;
 	ASTLabelType = StencilTree;
