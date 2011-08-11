@@ -1,5 +1,8 @@
 package stencil.modules;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 import stencil.module.SpecializationException;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
@@ -13,6 +16,45 @@ import org.pcollections.*;
 
 @Module
 public class PersistentData extends BasicModule {
+	
+	@Operator(name="Queue")
+	@Description("A FIFO queue (with peek).  Not suitable for dynamic binding (no map/query pair).")
+	public static class QueueIt extends AbstractOperator {
+		private final Queue queue=new ArrayDeque();
+		
+		public QueueIt(OperatorData opData) {
+			super(opData);
+		}
+
+		@Facet(memUse="READER", prototype="()")
+		public Object peek(Object def) {
+			if (queue.size() ==0) {return def;}
+			else {return queue.peek();}
+		}
+		
+		@Facet(memUse="WRITER", prototype="(size)", alias="map, push")
+		public Object push(Object value) {
+			queue.add(value);
+			return queue.size();
+		}
+
+		
+		@Facet(memUse="READER", prototype="()")
+		public Object pop(Object def) {
+			if (queue.size() == 0) {return def;}
+			else {return queue.poll();}
+		}
+		
+		@Override
+		public QueueIt viewpoint() {
+			QueueIt other = new QueueIt(operatorData);
+			other.queue.addAll(queue);
+			return other;
+		}
+		
+		@Override
+		public QueueIt duplicate() {return new QueueIt(operatorData);}
+	}
 	
 	/**Given a static list of values, returns the value based on the input.*/
 	@Operator()
