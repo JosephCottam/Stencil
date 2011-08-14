@@ -38,7 +38,6 @@ public class Interpreter {
 		try {
 			try {result = rule.apply(env);}
 			catch (NoOutput.Signal s) {result=NoOutput.TUPLE;}
-			catch (RuleAbortException ra) {throw ra;}
 			catch (Exception e) {throw new RuleAbortException(rule, e);}
 		} catch (RuleAbortException ra) {
 			System.out.println("Rule aborted...");
@@ -80,7 +79,7 @@ public class Interpreter {
 						PrototypedTuple nt = (PrototypedTuple) mmt.getTuple(i);
 						if (target.canStore(nt)) {target.store(nt);}
 					}
-				} else if (result != null && target.canStore(result)) {
+				} else if (result != null && result != NoOutput.TUPLE && target.canStore(result)) {
 					target.store((PrototypedTuple) result);
 				}
 

@@ -21,6 +21,12 @@ public class Temp extends BasicModule {
 	@Operator(spec="[]")
 	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
 	public static Number toNumber(Object v) {return Converter.toNumber(v);}
+
+	@Operator(spec="[]")
+	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
+	public static Long toLong(Object v) {return Converter.toLong(v);}
+
+	
 	
 	/**Perform a linear interpolation.*/
 	@Operator(spec="[]")

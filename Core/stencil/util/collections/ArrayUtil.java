@@ -1,6 +1,7 @@
 package stencil.util.collections;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 public final class ArrayUtil {
@@ -54,8 +55,7 @@ public final class ArrayUtil {
 		return b.toString();
 	}
 	
-	/**String formatted for error messages.**/
-	public static final String prettyString(Object[] entries) {
+	public static final String prettyString(Iterable entries) {
 		StringBuilder b = new StringBuilder();
 		for (Object entry: entries) {
 			b.append(entry.toString());
@@ -67,6 +67,9 @@ public final class ArrayUtil {
 		}
 		return b.toString();
 	}
+	
+	/**String formatted for error messages.**/
+	public static final String prettyString(Object[] entries) {return prettyString(Arrays.asList(entries));}
 	
 	public static int[] intArray(List<Integer> values) {
 		final int[] ints = new int[values.size()];

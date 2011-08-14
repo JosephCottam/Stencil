@@ -66,7 +66,7 @@ options {
     for (StencilTree r2: c.find(RULES_RESULT)) {
        if (Freezer.targetTuple(r2.find(TARGET).find(TARGET_TUPLE)).contains(att)) {r=r2; break;}
     }
-    assert r != null : "Guide path did not match any rule.";
+    if (r==null) {throw new SelectorException("Guide request did not match any (non-constant) rule.");}
            
     StencilTree t = r.find(CALL_CHAIN).find(FUNCTION, PACK);
     AstInvokeable target=null;
@@ -84,6 +84,7 @@ options {
    
    
     StencilTree tupleRef = t.find(LIST_ARGS).find(TUPLE_REF);
+    if (tupleRef==null) {throw new SelectorException("Guide request for location with no tuple references.");}
     StencilTree fieldRef = tupleRef.getChild(0);
     
     if (tupleRef.getChildCount() >1) {

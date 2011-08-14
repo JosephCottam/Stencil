@@ -16,7 +16,6 @@ import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.interpreter.guide.samplers.NumericSampler;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 

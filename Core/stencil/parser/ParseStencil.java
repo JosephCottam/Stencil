@@ -248,7 +248,7 @@ public abstract class ParseStencil {
 	//Validations to run right after a checkParse
 	private static void parseValidate(Tree p) {
 		try {
-			TargetMatchesPack.apply(p);
+//			TargetMatchesPack.apply(p);
 			StreamDeclarationValidator.apply(p);
 			ViewCanvasSingleDef.apply(p);
 		} catch (RuntimeException e) {

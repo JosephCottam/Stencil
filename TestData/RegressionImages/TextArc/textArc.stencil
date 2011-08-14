@@ -62,7 +62,7 @@ operator LineIndex : Dict[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   default =>
-    (X,Y): LineIndex.query(word) -> [Points] Map. query(LineIndex.0 , @Layout) 
+    (X,Y): LineIndex.query(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
             -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
             -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
             -> (X,Y)

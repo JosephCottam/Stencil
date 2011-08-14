@@ -25,15 +25,15 @@ public final class NoOutput {
 	/**Indicate that No output is to be produced, 
 	 * but that evaluation should continue (thus, it is a signal, not an exception); 
 	 */
-	
 	public static final class Signal extends RuntimeException {}
 	
 	/**Tuple that will generate a NoOutput.Signal anytime it is accessed.*/
 	public static final stencil.tuple.Tuple TUPLE = new stencil.tuple.PrototypedTuple() {
-		public Object get(String name) throws InvalidNameException {throw new Signal();}
-		public Object get(int idx) throws TupleBoundsException {throw new Signal();}
-		public TuplePrototype prototype() {throw new Signal();}
-		public int size() {throw new Signal();}		
+		private final Signal SIG = new Signal();
+		public Object get(String name) throws InvalidNameException {throw SIG;}
+		public Object get(int idx) throws TupleBoundsException {throw SIG;}
+		public TuplePrototype prototype() {throw SIG;}
+		public int size() {throw SIG;}		
 	};
 
 }

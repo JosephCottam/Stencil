@@ -11,6 +11,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
+import stencil.util.collections.ArrayUtil;
 
 @Module
 @Description("Encoding of the color palette found at ColorBrewer.org (by Cynthia A. Brewer, Penn State).")
@@ -68,7 +69,7 @@ public class BrewerPalettes  extends BasicModule {
 			} while (pallet == null && size < MAX_PALLET_SIZE);
 			
 			if (pallet == null) {
-				throw new RuntimeException("No brewer pallet " + rootPallet + " of size " + seen.size() + " or larger found.");
+				throw new RuntimeException(String.format("No brewer pallet %1$s of size %2$s or larger found (keys: %3$s).", rootPallet, seen.size(), ArrayUtil.prettyString(seen)));
 			}
 
 			try {return (Color[]) pallet.get(null);}
@@ -456,14 +457,14 @@ public class BrewerPalettes  extends BasicModule {
 
 
 		// qual pallet of 3 elements
-		public static final Color[] DARK23 = new Color[]{
+		public static final Color[] DARK3 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) };
 
 
 		// qual pallet of 4 elements
-		public static final Color[] DARK24 = new Color[]{
+		public static final Color[] DARK4 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) ,
@@ -471,7 +472,7 @@ public class BrewerPalettes  extends BasicModule {
 
 
 		// qual pallet of 5 elements
-		public static final Color[] DARK25 = new Color[]{
+		public static final Color[] DARK5 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) ,
@@ -480,7 +481,7 @@ public class BrewerPalettes  extends BasicModule {
 
 
 		// qual pallet of 6 elements
-		public static final Color[] DARK26 = new Color[]{
+		public static final Color[] DARK6 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) ,
@@ -490,7 +491,7 @@ public class BrewerPalettes  extends BasicModule {
 
 
 		// qual pallet of 7 elements
-		public static final Color[] DARK27 = new Color[]{
+		public static final Color[] DARK7 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) ,
@@ -501,7 +502,7 @@ public class BrewerPalettes  extends BasicModule {
 
 
 		// qual pallet of 8 elements
-		public static final Color[] DARK28 = new Color[]{
+		public static final Color[] DARK8 = new Color[]{
 			new Color(27, 158, 119) ,
 			new Color(217, 95, 2) ,
 			new Color(117, 112, 179) ,

@@ -33,14 +33,14 @@ public class PersistentData extends BasicModule {
 		}
 		
 		@Facet(memUse="WRITER", prototype="(size)", alias="map, push")
-		public Object push(Object value) {
+		public Object offer(Object value) {
 			queue.add(value);
 			return queue.size();
 		}
 
 		
 		@Facet(memUse="READER", prototype="()")
-		public Object pop(Object def) {
+		public Object poll(Object def) {
 			if (queue.size() == 0) {return def;}
 			else {return queue.poll();}
 		}
@@ -157,6 +157,11 @@ public class PersistentData extends BasicModule {
 			Object result = dict.get(key);
 			if (result == null) {return null;}
 			else {return (Object[]) result;}
+		}
+		
+		@Facet(memUse="READER", prototype="(contains)")
+		public boolean contains(Object key) {
+			return dict.containsKey(key);
 		}
 
 		@Override

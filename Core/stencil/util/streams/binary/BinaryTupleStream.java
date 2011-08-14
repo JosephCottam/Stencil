@@ -1,14 +1,12 @@
 package stencil.util.streams.binary;
 
-import stencil.explore.model.Model;
-import stencil.explore.model.sources.StreamSource;
-import stencil.explore.util.StencilIO;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
 import stencil.util.streams.QueuedStream;
+import stencil.util.streams.txt.DelimitedParser;
 
 import java.nio.*;
 import java.nio.channels.*;
@@ -111,7 +109,8 @@ public class BinaryTupleStream {
 			try {
 				byte[] header = makeHeader(types); 
 				file.write(header);
-
+				
+				int tuplesWritten=0;
 				while(source.hasNext()) {
 					SourcedTuple sourced = source.next();
 					if (sourced == null) {continue;}
@@ -120,6 +119,8 @@ public class BinaryTupleStream {
 						byte[] entry = asBinary(t.get(i), types[i]);
 						file.write(entry);						
 					}
+					tuplesWritten++;
+					if (tuplesWritten - (tuplesWritten %1000000)==0) {System.out.printf("%1$s tuples written.\n", tuplesWritten);}
 				}
 			} finally {file.close();}
 		}
@@ -203,23 +204,18 @@ public class BinaryTupleStream {
 	private BinaryTupleStream() {}
 	
 	
-	/**Indicate a stencil an a stream, will load up the stream
-	 * and create a new file of it that can be loaded as a FastStream.
-	 * 
-	 * The stream indicated must be finite
-	 * TODO: Disentangle from the Explore application Model class
+	/**Indicate a delimited file to turn into a binary stream.
 	 * @param args: stencil file, stream to load, file to save in
 	 */
 	public static void main(String[] args) throws Exception {
-		String stencilFile = args[0];
-		String targetStream = args[1];
-		String targetFile = args[2];
-		String types = args[3];
+		String input = args[0];
+		int size = Integer.parseInt(args[1]);
+		String delimiter = args[2];
+		int skip = Integer.parseInt(args[3]);
+		String types = args[4];
+		String targetFile = args[5];
 
-		Model model = new Model();
-		StencilIO.load(stencilFile, model);
-		StreamSource ss = model.getSourcesMap().get(targetStream);
-		TupleStream stream = ss.getStream(model);
+		TupleStream stream = new DelimitedParser("", input, delimiter, size, false, skip);
 		
 		Writer w = new Writer(stream);
 		w.writeStream(targetFile, types.toCharArray());

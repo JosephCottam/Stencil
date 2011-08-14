@@ -56,7 +56,6 @@ public class NumericWrapper implements TypeWrapper {
 	public static Long toLong(Object value) {
 		if (value instanceof Long) {return (Long) value;}
 		if (value instanceof Number) {return ((Number) value).longValue();}
-		if (value instanceof Number) {return ((Number) value).longValue();}
 		if (value instanceof StencilTree && ((StencilTree) value).getType() == NUMBER) {
 			return Long.valueOf(((StencilTree) value).getText());
 		}
