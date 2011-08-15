@@ -1,5 +1,6 @@
 package stencil.modules;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import stencil.module.operator.util.DirectOperator;
@@ -93,7 +94,7 @@ public class Filters extends BasicModule {
 	@Operator(name="RE")
 	public static class RegExp extends DirectOperator {
 		private static final String PATTERN_KEY = "pattern";
-		private final Pattern patternCache; 
+		private final Matcher matcherCache; 
 		private final boolean negated;
 
 		public RegExp(OperatorData opData, Specializer specializer) {
@@ -103,20 +104,20 @@ public class Filters extends BasicModule {
 		protected RegExp(OperatorData opData, Specializer specializer, boolean negated) {
 			super(opData);
 			String pattern = (String) specializer.get(PATTERN_KEY);
-			patternCache = pattern == null ? null : Pattern.compile(pattern);
+			matcherCache = pattern == null ? null : Pattern.compile(pattern).matcher("");
 			this.negated = negated;
 		}
 		
 		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean query(String value, String pattern) {			
-			Pattern matcher = patternCache != null ? patternCache : Pattern.compile(pattern);
-			return !negated == matcher.matcher(value).matches();
+			Matcher matcher = matcherCache != null ? matcherCache : Pattern.compile(pattern).matcher(value);
+			return !negated == matcher.reset(value).matches();
 		}
 		
 		@Facet(memUse="FUNCTION", prototype="(boolean V)")
 		public boolean match(String value) {
-			assert patternCache != null;
-			return !negated == patternCache.matcher(value).matches();
+			assert matcherCache != null;
+			return !negated == matcherCache.reset(value).matches();
 		}
 
 		public Boolean invoke(Object[] arguments) {

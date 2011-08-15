@@ -94,8 +94,8 @@ public final class SimpleTable implements Table {
 			throw new IDException(idu, tenured.name);
 		}
 		Comparable id = (Comparable) idu;
-		
-		synchronized(tableLock){
+
+		synchronized(tableLock){		//TODO: This synchronization is a bottleneck (sometimes 60% of runtime); can it be removed???
 			if (update.containsKey(id)) {
 				PrototypedTuple prior = update.get(id);				
 				updates = Tuples.merge(prior, updates, Freezer.NO_UPDATE);
@@ -104,6 +104,7 @@ public final class SimpleTable implements Table {
 			stateID++;
 		}
 	}
+		
 	
 	@Override
 	public void remove(Comparable ID) {
