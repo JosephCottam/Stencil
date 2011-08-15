@@ -234,6 +234,7 @@ public abstract class ParseStencil {
 		p = LiftLayerConstants.apply(p);					//Move constant property assignments to the defaults section so they are only applied once.
 		p = GuideAdoptLayerDefaults.apply(p);				//Take identified layer constants, apply them to the guides
 		p = OperatorAlign.apply(p);
+		p = LayerAlign.apply(p);
 		p = CombineRules.apply(p);
 		
 		validate(p);

@@ -35,7 +35,6 @@ public class Layer implements TupleStore {
 	public boolean canStore(Tuple t) {
 		return
 			t != null
-			&& t instanceof PrototypedTuple
-			&& ((PrototypedArrayTuple) t).prototype().contains(ParserConstants.IDENTIFIER_FIELD);	//TODO: Remove this check after ID is always position zero
+			&& t instanceof PrototypedTuple;
 	}
 }

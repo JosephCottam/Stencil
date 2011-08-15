@@ -87,7 +87,9 @@ public final class SimpleTable implements Table {
     
 	@Override
 	public void update(PrototypedTuple updates) {
-		Object idu = updates.get(ParserConstants.IDENTIFIER_FIELD);	//TODO: Move ID to position 0 in the parser, ENSURE that there is an ID in all layer stores
+		assert updates.prototype().indexOf(ParserConstants.IDENTIFIER_FIELD) ==0 : "Passed tuple without ID in position 0"; 
+		
+		Object idu = updates.get(0);	//Assumed to be the identifier (enforced in grammar)
 		if (idu == null || !(idu instanceof Comparable)) {
 			throw new IDException(idu, tenured.name);
 		}

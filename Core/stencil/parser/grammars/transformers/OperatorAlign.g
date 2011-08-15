@@ -62,6 +62,8 @@ options {
      return chain; 
   }
   
+  
+  
   /**Shuffles the children of source the thing at index i is pulled from source[permute[i]].**/
   private StencilTree shuffle(int[] permute, StencilTree source) {
       StencilTree root = (StencilTree) adaptor.dupNode(source);
@@ -74,5 +76,6 @@ options {
   
 }
 
-topdown:  ^(RULE t=. cc=. d=.) {$t.getAncestor(RULES_OPERATOR)!=null}? ->  ^(RULE {reorder($t)} {reorder($t, $cc)} $d);
+topdown:  ^(RULE t=. cc=. d=.) 
+	{$t.getAncestor(RULES_OPERATOR)!=null}? ->  ^(RULE {reorder($t)} {reorder($t, $cc)} $d);
                  
