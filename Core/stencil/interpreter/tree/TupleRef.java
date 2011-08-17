@@ -24,7 +24,7 @@ public class TupleRef 	{
 	 * In this case, resolution is not attempted, only type conversion.
 	 */
 	public static final Object[] resolveAll(Object[] candidates, Tuple valueSource) {
-		Object[] formals = new Object[candidates.length];	//TODO: Can this array be beneficially cached, maybe taken as argument and cached at the call location?
+		Object[] formals = new Object[candidates.length];
 		for (int i=0; i< formals.length; i++) {
 			if (candidates[i] instanceof TupleRef) {
 				formals[i] = ((TupleRef) candidates[i]).resolve(valueSource);

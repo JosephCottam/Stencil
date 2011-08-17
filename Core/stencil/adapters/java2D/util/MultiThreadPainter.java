@@ -101,7 +101,7 @@ public final class MultiThreadPainter {
 				renderer.render(view, g, base);
 				stateID = view.stateID();
 				forceUpdate = false;
-				
+				view = null;
 				return buffer;
 			}
 			
