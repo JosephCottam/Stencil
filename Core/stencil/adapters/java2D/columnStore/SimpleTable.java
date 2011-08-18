@@ -2,9 +2,8 @@ package stencil.adapters.java2D.columnStore;
 
 
 import java.awt.geom.Rectangle2D;
-
-import org.pcollections.Empty;
-import org.pcollections.PMap;
+import java.util.ArrayList;
+import java.util.List;
 
 import stencil.display.Glyph;
 import stencil.display.IDException;
@@ -20,7 +19,8 @@ public final class SimpleTable implements Table {
 	private final Object tableLock = new Object();
 	
 	private TableView tenured;
-	private PMap<Comparable, PrototypedTuple> update = Empty.map();
+	private List<PrototypedTuple> updates = new ArrayList();
+	private List<PrototypedTuple> transfer = new ArrayList();
 	private TableShare currentShare;
 	
 	private int stateID;
@@ -42,7 +42,11 @@ public final class SimpleTable implements Table {
      * Any early created view or share can still be read, but no merge-back is possible.
      */
     public TableShare changeGenerations() {
-    	synchronized(tableLock) {currentShare = new TableShare(this, update);}
+    	synchronized(tableLock) {
+    		transfer = updates;
+    		updates = new ArrayList();
+    		currentShare = new TableShare(this, transfer);
+    	}
     	return currentShare;
     }
     
@@ -63,13 +67,8 @@ public final class SimpleTable implements Table {
 
     		synchronized(tableLock) {
 	    		stateID++;
-		    	for (Comparable id: share.updates.keySet()) {
-		    		if (update.get(id).equals(share.updates.get(id))) {
-		    			update = update.minus(id);
-		    		}
-		    	}
-		    	
 		    	tenured = newTenured;
+		    	transfer = null;
     		}
     	}
     	currentShare = null;
@@ -86,21 +85,16 @@ public final class SimpleTable implements Table {
     
     
 	@Override
-	public void update(PrototypedTuple updates) {
-		assert updates.prototype().indexOf(ParserConstants.IDENTIFIER_FIELD) ==0 : "Passed tuple without ID in position 0"; 
+	public void update(PrototypedTuple update) {
+		assert update.prototype().indexOf(ParserConstants.IDENTIFIER_FIELD) ==0 : "Passed tuple without ID in position 0"; 
 		
-		Object idu = updates.get(0);	//Assumed to be the identifier (enforced in grammar)
+		Object idu = update.get(0);	//Assumed to be the identifier (enforced in grammar)
 		if (idu == null || !(idu instanceof Comparable)) {
 			throw new IDException(idu, tenured.name);
 		}
-		Comparable id = (Comparable) idu;
 
-		synchronized(tableLock){		//TODO: This synchronization is a bottleneck (sometimes 60% of runtime); can it be removed???
-			if (update.containsKey(id)) {
-				PrototypedTuple prior = update.get(id);				
-				updates = Tuples.merge(prior, updates, Freezer.NO_UPDATE);
-			} 
-			update = update.plus(id, updates);
+		synchronized(tableLock){		
+			updates.add(update);
 			stateID++;
 		}
 	}
@@ -109,26 +103,39 @@ public final class SimpleTable implements Table {
 	@Override
 	public void remove(Comparable ID) {
 		synchronized (tableLock) {
-			update = update.plus(ID, DELETE);
+			updates.add(DeleteTuple.with(ID));
 			stateID++;
 		}
 	}	
 
 	@Override
 	public boolean contains(Comparable ID) {
-		if (update.containsKey(ID)) {return update.get(ID) != DELETE;}
+		for (int i=updates.size(); i>=0;i--) {		//Work backwards in case a new add came in after a delete.
+			PrototypedTuple t = updates.get(i);
+			if (t.get(0).equals(ID)) {return t instanceof  DeleteTuple;}
+		}
 		return tenured.contains(ID);
 	}
 
 	@Override
 	public Glyph find(Comparable ID) {
-		if (update.containsKey(ID)) {
-			PrototypedTuple values = update.get(ID);
-			if (values == DELETE) {
-				return null;
-			}else {
-				return ColumnStore.Util.fillAndGlyph(values, tenured.schema, tenured.idColumn, tenured.visibleColumn);
+		
+		//Gather update parts (stop if any are delete)
+		List<PrototypedTuple> components = new ArrayList();
+		for (PrototypedTuple t: updates) {
+			if (t.get(0).equals(ID)) {
+				if (t instanceof DeleteTuple) {components.clear(); continue;}	//Nothing before the delete matters
+				components.add(t);
 			}
+		}
+
+		//Return the composite of any found values
+		if (components.size() > 0) {
+			PrototypedTuple pt = components.get(0); 
+			for (int i=1; i< components.size(); i++) {
+				Tuples.merge(pt, components.get(i), Freezer.NO_UPDATE);
+			}
+			return ColumnStore.Util.fillAndGlyph(pt, tenured.schema, tenured.idColumn, tenured.visibleColumn);
 		} else {
 			return tenured.find(ID);
 		}
@@ -152,7 +159,7 @@ public final class SimpleTable implements Table {
 	}
 	
 	@Override
-	public int size() {return tenured.size() + update.size();}
+	public int size() {return tenured.size() + transfer.size() + updates.size();}	//TODO: Does not factor in deletes...
 
 
 	@Override

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import stencil.adapters.java2D.columnStore.Table.DeleteTuple;
 import stencil.adapters.java2D.columnStore.column.Column;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
@@ -21,6 +22,7 @@ import stencil.interpreter.tree.Freezer;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
@@ -33,12 +35,15 @@ import stencil.types.Converter;
  *
  */
 public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<StoreTuple>, LayerView<StoreTuple> {
+	private static final PrototypedTuple DELETE = DeleteTuple.with(null);
+	
 	protected final Table source;
 	protected final Column[] columns;
-	protected final Map<Comparable, PrototypedTuple> updates;
+	protected final List<PrototypedTuple> updateList;
 	protected final int creationID;
 	protected Map<Object, Integer> index;
 
+	protected Map<Comparable, PrototypedTuple> updates = new TreeMap();
 	protected boolean locked = false;
 	protected int stateID =0;
 	protected final int idColumn;
@@ -46,11 +51,11 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 	
 	private TableView viewpoint; 	//After all updates are done, store the values here.
 	
-	public TableShare(final Table source, Map<Comparable, PrototypedTuple> update) {
+	public TableShare(final Table source, List<PrototypedTuple> updates) {
 		this.source = source;
 		this.index = source.tenured().index;
-		this.updates = update;
 		this.idColumn = source.tenured().idColumn;
+		this.updateList = updates;
 		creationID = source.tenured().stateID;		
 		columns = Arrays.copyOf(source.tenured().columns, source.tenured().columns.length);
 	}
@@ -72,7 +77,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 	 * This must be run before dynamic bindings are executed.
 	 */
 	public synchronized void simpleUpdate() {
-		if (updates.size() ==0) {simpleComplete(); return;}	//No updates implies no work in the simple update (dynamic bindings may still need to run)
+		if (updateList.size() ==0) {simpleComplete(); return;}	//No updates implies no work in the simple update (dynamic bindings may still need to run)
 		UpdateSet updateSet = calcUpdateSet();
 		
 		
@@ -97,9 +102,23 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 		final List<Integer> deletes = new ArrayList();
 		int extend=0;
 		
+		//Merge list of updates into list of tuples for update
+		for (PrototypedTuple t: updateList) {
+			Comparable id = (Comparable) t.get(0);	//Assumes that ID is at 0, enforced by grammar and checked to be valid at table.update
+			if (t instanceof DeleteTuple) {
+				updates.put(id, DELETE);
+			} else {
+				PrototypedTuple value = updates.get(id);
+				if (value == DELETE || value == null) {value = t;}
+				else {value = Tuples.merge(value, t, Freezer.NO_UPDATE);}
+				updates.put(id, t);
+			}
+		}
+		
+		
 		//Create list of delete locations from the tenured store
 		for (Map.Entry<Comparable, PrototypedTuple> update: updates.entrySet()) {
-			if (update.getValue() == Table.DELETE) {
+			if (update.getValue() == DELETE) {
 				Integer target = source.tenured().index.get(update.getKey());
 				if (target != null) {
 					extend--;
@@ -118,7 +137,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 			final PrototypedTuple singleUpdate = entry.getValue();
 			final Comparable id = entry.getKey();
 			
-			if (singleUpdate != Table.DELETE) {
+			if (singleUpdate != DELETE) {
 				//Determine where to put the values 
 				Integer target = source.tenured().index.get(id);
 				if (target == null) {
@@ -192,10 +211,12 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 
 	@Override
 	public int size() {
+		if (updates == null) {calcUpdateSet();}
+		
 		int more =0;
 		if (!simpleUpdateComplete.get()) {
 			for (Object val: updates.values()) {
-				if (val == Table.DELETE) {more--;}
+				if (val == DELETE) {more--;}
 				else {more++;}
 			}
 		}
@@ -265,7 +286,9 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 	public Collection<Integer> renderOrder() {throw new UnsupportedOperationException();}
 	
 	public boolean contains(Comparable ID) {
-		if (updates.containsKey(ID)) {return updates.get(ID) != Table.DELETE;}
+		if (updates == null) {calcUpdateSet();}
+		
+		if (updates.containsKey(ID)) {return updates.get(ID) != DELETE;}
 		return source.tenured().contains(ID);
 	}
 	
