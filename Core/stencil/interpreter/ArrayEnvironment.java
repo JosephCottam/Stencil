@@ -2,14 +2,10 @@ package stencil.interpreter;
 
 import java.util.Arrays;
 
-import stencil.tuple.InvalidNameException;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.tuple.prototype.TuplePrototype;
-import stencil.tuple.prototype.TuplePrototypes;
 
 final class ArrayEnvironment extends Environment {
-	private static final String FRAME_PREFIX = "Frame";
 	private final Tuple[] frames;
 	private int filledSize = 0;
 	
@@ -19,10 +15,12 @@ final class ArrayEnvironment extends Environment {
 		Arrays.fill(frames, Tuples.EMPTY_TUPLE);
 	}
 	
+	@Override	
 	public void setFrame(int frame, Tuple t) {
 		frames[frame]=t;
 	}
 	
+	@Override
 	public ArrayEnvironment extend(Tuple t) {
 		if (filledSize >= frames.length) {throw new RuntimeException("Attempt to over-extend environment (max env size of " + frames.length + ")." );}
 		
@@ -31,29 +29,22 @@ final class ArrayEnvironment extends Environment {
 		return this;
 	}
 
+	@Override
 	public Tuple get(int idx) {
 		try {return frames[idx];}
 		catch (Exception e) {throw new RuntimeException("Error de-referencing environment of size " + frames.length, e);}
 	}
 
-	public TuplePrototype prototype() {return new TuplePrototype(TuplePrototypes.defaultNames(frames.length,FRAME_PREFIX));}
-	public Object get(String name) throws InvalidNameException {
-		String part = name.substring(FRAME_PREFIX.length());
-		int i;
-		if (part.equals("")) {i=0;}
-		else {i = Integer.parseInt(part);}
-		
-		return frames[i];
-	}
-	
-	public boolean hasField(String name) {throw new UnsupportedOperationException();}
+	@Override
 	public String toString() {return Tuples.toString(this);}
+
+	@Override
 	public int size() {return filledSize;}
-	/* (non-Javadoc)
-	 * @see stencil.parser.tree.util.Environment#capacity()
-	 */
+
+	@Override
 	public int capacity() {return frames.length;}
 
+	@Override
 	public ArrayEnvironment ensureCapacity(int capacity) {
 		if (capacity <= frames.length) {return this;}
 		
@@ -62,9 +53,8 @@ final class ArrayEnvironment extends Environment {
 		env.filledSize = this.filledSize;
 		return env;
 	}
-	
-	public boolean isDefault(String name, Object value) {return false;}
 
+	@Override
 	public ArrayEnvironment clone() {
 		ArrayEnvironment result = new ArrayEnvironment(frames.length);
 		System.arraycopy(frames, 0, result.frames, 0, filledSize);
