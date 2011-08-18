@@ -1,10 +1,13 @@
 package stencil.interpreter;
 
+import java.util.Arrays;
+
 import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.util.collections.ArrayUtil;
 
-public abstract class Environment implements Tuple, Cloneable {
+public class Environment implements Tuple, Cloneable {
 	/**The default frame names.  
 	 * The element "**stream**" is logically replaced by the name 
 	 * of the stream in any frame instance.*/
@@ -14,29 +17,74 @@ public abstract class Environment implements Tuple, Cloneable {
 	public static final int STREAM_FRAME = ArrayUtil.indexOf(ParserConstants.STREAM_FRAME, DEFAULT_FRAME_NAMES);
 	public static final int PREFILTER_FRAME = ArrayUtil.indexOf(ParserConstants.PREFILTER_FRAME, DEFAULT_FRAME_NAMES);
 	public static final int LOCAL_FRAME = ArrayUtil.indexOf(ParserConstants.LOCAL_FRAME, DEFAULT_FRAME_NAMES);
-
-	/**Explicitly set a frame to a particular value.*/
-	public abstract void setFrame(int frame, Tuple t);
-
-	public abstract Environment extend(Tuple t);
-
-	public abstract int capacity();
+	private final Tuple[] frames;
+	private int filledSize = 0;
 	
-	public abstract Tuple get(int idx);
+	
+	private Environment(int capacity) {
+		frames = new Tuple[capacity];
+		Arrays.fill(frames, Tuples.EMPTY_TUPLE);		//TODO: Remove, will require better handling of null in tuple-refs and call chain return values though
+	}
+	
+	public void setFrame(int frame, Tuple t) {
+		frames[frame]=t;
+	}
+	
+	public Environment extend(Tuple t) {
+		if (filledSize >= frames.length) {throw new RuntimeException("Attempt to over-extend environment (max env size of " + frames.length + ")." );}
+		
+		frames[filledSize] = t;
+		filledSize++;
+		return this;
+	}
 
-	public abstract Environment clone();
+	@Override
+	public Tuple get(int idx) {
+		try {return frames[idx];}
+		catch (Exception e) {throw new RuntimeException("Error de-referencing environment of size " + frames.length, e);}
+	}
 
-	/**Returns an environment with the same contents but potentially different
-	 * capacity than the original.  If the requested capacity is the
-	 * same or less than the current capacity, the environment will be returned;
-	 * 
-	 * Otherwise, a new environment with at least the requested capacity is returned.
-	 * 
-	 * The environment size should not change, but the capacity does.
+	@Override
+	public String toString() {return Tuples.toString(this);}
+
+	@Override
+	public int size() {return filledSize;}
+
+	public int capacity() {return frames.length;}
+
+	public Environment ensureCapacity(int capacity) {
+		if (capacity <= frames.length) {return this;}
+		
+		Environment env = new Environment(capacity);
+		System.arraycopy(frames, 0, env.frames, 0, filledSize);
+		env.filledSize = this.filledSize;
+		return env;
+	}
+
+	public Environment clone() {
+		Environment result = new Environment(frames.length);
+		System.arraycopy(frames, 0, result.frames, 0, filledSize);
+		result.filledSize = filledSize;
+		return result;
+	}
+	
+	/**Order of the frames:
+	 * 	Canvas
+	 *  View
+	 *  Stream
+	 *  Prefilter
+	 *  Local
+	 *  
+	 *  If any frame is missing or not applicable, its place should be held by an empty tuple in the array.
+	 *  If not enough frames are supplied, empty tuples will be added.
+	 *  If more than the standard frames are supplied, the extras will still be put in the environment.
+	 *  Regardless of the frames passed, the result will have at least unfilled empty frames at the end.
 	 */
-	public abstract Environment ensureCapacity(int capacity);
-	
 	public static Environment getDefault(Tuple... tuples) {
-		return ArrayEnvironment.makeDefault(tuples);
+		int size = Math.max(DEFAULT_SIZE, tuples.length);
+		Environment e = new Environment(size);
+		System.arraycopy(tuples, 0, e.frames, 0, tuples.length);
+		e.filledSize = DEFAULT_SIZE;
+		return e;
 	}
 }
