@@ -104,12 +104,11 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 					} else {
 						varArgs = validateTypeSlow(arguments[0], type);
 					}
-					
 				} else {
 					Class type = paramTypes[paramTypes.length-1];
 					Object[] remainingArguments = new Object[arguments.length-expectedNumArgs+1];
 					System.arraycopy(arguments, expectedNumArgs-1, remainingArguments, 0, remainingArguments.length);
-					varArgs = validateTypeFast(remainingArguments, type);
+					varArgs = validateTypeSlow(remainingArguments, type);
 				}
 				args[args.length-1] = varArgs;
 			} else {
@@ -153,10 +152,10 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 	 * @param arguments  An array object of the arguments to convert
 	 * @param type The type to convert into
 	 */
-	private Object[] validateTypeSlow(Object arguments, Class type) {
-		Object[] varArgs = new Object[Array.getLength(arguments)];
+	private Object validateTypeSlow(Object arguments, Class type) {
+		Object varArgs = Array.newInstance(type, Array.getLength(arguments));
 		for (int i=0; i< Array.getLength(varArgs); i++) {
-			varArgs[i] = Converter.convert(Array.get(arguments, i), type);
+			Array.set(varArgs, i, Converter.convert(Array.get(arguments, i), type));
 		}
 		return varArgs;
 	}
