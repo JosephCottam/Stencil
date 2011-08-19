@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.awt.Color;
@@ -140,6 +141,60 @@ public class Projection extends BasicModule {
 		}
 
 		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot, throwExceptions);} 
+	}
+	
+	
+	/**Projects a range of numbers onto a red/white scale.*/
+	@Description("Use a rainbow of colors (categorical counterpart to heatscale).")
+	@Operator(spec="[reserve: BLACK, throw: \"TRUE\"]")
+	public static final class RainbowScale extends AbstractOperator.Statefull {
+		private final List seen = new ArrayList();
+		private final Color reserve;
+		private final boolean throwExceptions;
+		
+		public RainbowScale(OperatorData opData, Specializer spec) {
+			super(opData);
+			reserve = ColorCache.get(spec.get("reserve").toString());
+			throwExceptions = (Boolean) Converter.convert(spec.get("throw"), Boolean.class);
+		}
+		
+		private RainbowScale(OperatorData opData, Color reserve, boolean throwException) {
+			super(opData);
+			this.reserve = reserve;
+			this.throwExceptions = throwException;
+		}
+		
+		@Facet(memUse="WRITER", prototype="(Color VALUE)")
+		public Color map(Object value) {
+			int idx = Collections.binarySearch(seen, value);
+			if (idx < 0) {
+				idx = -(idx+1);
+				seen.add(idx, value);
+			} 
+			return colorFor(idx, seen.size());
+		}
+
+		@Facet(memUse="READER", prototype="(Color VALUE)")
+		public Color query(Object value) {
+			int idx = Collections.binarySearch(seen, value);
+			return colorFor(idx, seen.size());
+		}
+
+		public Color colorFor(int idx, float total) {
+			if (idx <0) {return reserve;}
+			float arc = 360-(360/total);
+			float offset = idx/total * arc;
+			
+			return ColorCache.get(new java.awt.Color(Color.HSBtoRGB(offset, .8f, idx/total)));
+		}
+		
+		public RainbowScale viewpoint() {
+			RainbowScale s = (RainbowScale) super.viewpoint();
+			s.seen.addAll(seen);
+			return s;
+		}
+		
+		public RainbowScale duplicate() {return new RainbowScale(operatorData, reserve, throwExceptions);} 
 	}
 	
 	/**Projects a set of values onto their presentation order.
