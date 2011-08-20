@@ -79,9 +79,9 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
    public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
 	   for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(), true)) {
 		   if (!glyph.isVisible()) {continue;}
-		   
+
 		   Rectangle2D bounds = glyph.getBoundsReference();
-		   if (!(g.hitClip((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth(), (int) bounds.getHeight()))) {continue;}
+		   if (!(g.hitClip((int) bounds.getX(), (int) bounds.getY(), (int) bounds.getWidth()+1, (int) bounds.getHeight()+1))) {continue;}	//+1 in case the size get rounded down to zero
 		   
 		   Shape shape = shaper.shape(glyph);	//Used as a reference for the basic shape to (potentially) optimize rendering
 		   AffineTransform trans = makeTrans(shape, glyph, viewTransform);
