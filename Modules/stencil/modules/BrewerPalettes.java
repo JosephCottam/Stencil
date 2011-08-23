@@ -33,7 +33,7 @@ public class BrewerPalettes  extends BasicModule {
 		}
 
 		@Facet(memUse="WRITER", prototype="(Color color)")
-		public Tuple map(Object value) {
+		public Tuple map(String value) {
 			int idx = Collections.binarySearch(seen, value);
 			if (idx<0) {
 		    	seen = new ArrayList(seen);  //Yeah, copy on write!
@@ -49,7 +49,7 @@ public class BrewerPalettes  extends BasicModule {
 		public int stateID() {return seen.size();}
 
 		@Facet(memUse="READER", prototype="(Color color)")
-		public Tuple query(Object value) {
+		public Tuple query(String value) {
 			int idx = Collections.binarySearch(seen, value);
 
 			if (idx < 0) {

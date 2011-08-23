@@ -16,6 +16,8 @@ public final class ProgramParseException extends Exception {
 		super(message, e);
 	}
 	
+	public ProgramParseException(String message) {super(message);}
+	
 	/**Error message includes the standard message, plus a listing of all included errors.*/
 	public String getMessage() {
 		StringBuilder m = new StringBuilder(super.getMessage());

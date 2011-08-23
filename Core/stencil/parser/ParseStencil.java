@@ -6,6 +6,8 @@ import org.antlr.runtime.tree.CommonTreeNodeStream;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeNodeStream;
 
+import org.antlr.runtime.Token;
+
 import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.Program;
 import stencil.interpreter.tree.Specializer;
@@ -143,7 +145,12 @@ public abstract class ParseStencil {
 		
 		if (parser.getErrors().size() >0) {
 			throw new ProgramParseException("Error(s) parsing Stencil program.", parser.getErrors());
+		} else if (tokens.index() != tokens.size()-1) {	// -1 because of EOF
+			Token lastToken = tokens.get(tokens.index()-1);
+			throw new ProgramParseException("Error parsing Stencil program; no input consumed after line " + lastToken.getLine());
 		}
+		
+		
 
 		p = DefaultPack.apply(p);				//Add default packs where required
 
