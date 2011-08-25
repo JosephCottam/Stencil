@@ -1,8 +1,13 @@
 package stencil.modules;
 
+import java.util.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+
 import stencil.module.util.BasicModule;
 import stencil.module.util.ann.*;
 import stencil.util.collections.ArrayUtil;
+
 
 @Description("Simple date support")
 @Module
@@ -49,10 +54,19 @@ public class Dates extends BasicModule {
 		}
 		throw new RuntimeException("Input does not correspond to an abbreviation:" + abr);
 	}
-
+	
 	private static final String nice(String s) {
 		s = s.trim().toLowerCase();
 		if (s.length() >0) {s = s.substring(0,1).toUpperCase() + s.substring(1);}
 		return s;
+	}
+	
+
+	@Operator()
+	@Facet(memUse="FUNCTION", prototype="(long days)", alias={"map", "query"})
+	public static long epochDays(Object v, String format) throws ParseException {
+		SimpleDateFormat f = new SimpleDateFormat(format);
+		Date d = f.parse(v.toString());
+		return (int)(d.getTime()/ (1000 * 60 * 60 * 24));
 	}
 }

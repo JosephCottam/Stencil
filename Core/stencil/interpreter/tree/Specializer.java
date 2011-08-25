@@ -22,4 +22,6 @@ public final class Specializer extends PrototypedArrayTuple {
 	public StencilTree getSource() {return source;}
 	
 	public String toString() {return "Specializer -- " + Tuples.toString(this);}
+
+	public Object get(String key, Object defVal) {return this.containsKey(key) ? get(key) : defVal;}
 }
