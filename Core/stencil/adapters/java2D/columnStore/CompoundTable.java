@@ -195,8 +195,7 @@ public class CompoundTable implements Table {
 			if (t instanceof CompoundTable) {
 				fullGenChange((CompoundTable) t, (CompoundRenderer) renderer.rendererFor(t.name()), viewTransform);
 			} else {
-				t.changeGenerations();
-				TableShare share = t.viewpoint();
+				TableShare share = t.changeGenerations();
 				share.simpleUpdate();		//TODO: Dynamic bindings ever in the axis?  Probably yes...but badness right now
 				renderer.rendererFor(t.name()).calcFields(share, viewTransform);
 				t.merge(share);

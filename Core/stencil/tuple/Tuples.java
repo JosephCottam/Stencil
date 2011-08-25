@@ -143,7 +143,10 @@ public final class Tuples {
 		StringBuilder rv = new StringBuilder("(");
 		
 		for (String name: fields){
-			Object value =t.get(name);
+			Object value;
+			try {value =t.get(name);} 
+			catch (Exception e) {value = "ERROR: " + e.getMessage();}
+			
 			if (value instanceof Number && ((Number) value).doubleValue() ==-0) {value =0.0d;}//Prevent negative zeros
 
 			value = formatValue(t, value);

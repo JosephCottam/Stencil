@@ -2,6 +2,7 @@ package stencil.adapters.java2D.render.guides;
 
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
@@ -53,8 +54,8 @@ public class Axis extends Guide2D  {
 	private static final String BASELINE_KEY = "baseline";
 	private static final String IMPLANT_KEY = "implant";
 	
-	private static final String DEFAULT_SPECIALIZER_SOURCE = "[label.FONT: 4, label.COLOR: \"BLACK\", tick.PEN: .4, tick.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, guideLabel.Gap:2, guideLabel.Size:1.25, baseline: \"AUTO\"]";
-	private static final String[] DEFAULTS_KNOCKOUT = new String[]{GUIDE_LABEL_GAP_KEY, GUIDE_LABEL_SIZE_KEY,"tickSize","textOffset", BASELINE_KEY};
+	private static final String DEFAULT_SPECIALIZER_SOURCE = "[label.FONT: 4, label.COLOR: \"BLACK\", tick.PEN: .4, tick.PEN_COLOR: \"GRAY60\", textOffset: 1, tickSize: .75, guideLabel.Gap:2, guideLabel.Size:1.25, baseline: \"AUTO\", line.PEN_COLOR: \"GRAY60\", line.VISIBLE: true, line.CAP1: \"NONE\", line.CAP2: \"NONE\"]";
+	private static final String[] DEFAULTS_KNOCKOUT = new String[]{GUIDE_LABEL_GAP_KEY, GUIDE_LABEL_SIZE_KEY,"tickSize","textOffset", BASELINE_KEY, "line.VISIBLE", "line.PEN_COLOR", "line.CAP1","line.CAP2"};
 	
 	public static final Specializer DEFAULT_SPECIALIZER;
 	static {
@@ -121,10 +122,16 @@ public class Axis extends Guide2D  {
 		Font font = ((Font) Converter.convert(spec.get("label.FONT"), Font.class));
 		font = font.deriveFont(font.getSize2D() * guideLabelSize);
 		
-		String[] axisLabelFields = new String[]{"label.TEXT", "label.REGISTRATION", "label.FONT", "label.ROTATION", "label.ID"};
-		PrototypedTuple axisLabel = new PrototypedArrayTuple(axisLabelFields, new Object[]{label, registration, font, rotation, -1d});
+		Object lineColor = Converter.convert(spec.get("line.PEN_COLOR"), Paint.class);
+		Object lineVisible = Converter.toBoolean(spec.get("line.VISIBLE"));
+		Object lineCap1 = Converter.toString(spec.get("line.CAP1"));
+		Object lineCap2 = Converter.toString(spec.get("line.CAP2"));
+		
+		String[] axisLabelFields = new String[]{"ID", "label.ID", "tick.ID", "label.TEXT", "label.REGISTRATION", "label.FONT", "label.ROTATION", "tick.PEN_COLOR", "tick.VISIBLE", "tick.CAP1","tick.CAP2"};
+		PrototypedTuple axisLabel = new PrototypedArrayTuple(axisLabelFields, new Object[]{-1d, -1d, -1d, label, registration, font, rotation, lineColor, lineVisible, lineCap1, lineCap2});
 		axisLabel = Tuples.merge(updateMask, axisLabel);
 		axisLabel = Tuples.delete(axisLabel, "tick");
+		axisLabel = Tuples.delete(axisLabel, "label");
 		this.axisLabel = axisLabel;
 	}
 
@@ -170,6 +177,8 @@ public class Axis extends Guide2D  {
 	/**Where should the baseline be placed, returns value in y-up/positive convention**/
 	private static final Tuple ZERO = Singleton.from(0d);
 	private static final Tuple ONE = Singleton.from(1d);
+
+	@SuppressWarnings("null")
 	private double baseline(POSITION position, AXIS axis, Rectangle2D parentBounds, Double baseline) {
 		
 		Double zeroPoint;
@@ -206,7 +215,6 @@ public class Axis extends Guide2D  {
 		case MOST: 
 			if (axis == AXIS.X) {return -Math.min(parentBounds.getMinY(), -zeroPoint);}
 			else {return Math.max(parentBounds.getMaxX(), zeroPoint);}
-		
 		}
 	
 		throw new Error("Valid position passed, but not handled in baseline calculation:" + position);
@@ -281,12 +289,10 @@ public class Axis extends Guide2D  {
 		return new PrototypedArrayTuple(LABEL_FIELDS, values);
 	}
 	
-	private static final String[] SPINE_FIELDS =  new String[]{"tick.X1", "tick.Y1", "tick.X2", "tick.Y2", "label.X", "label.Y", "ID", "tick.ID"};
+	private static final String[] SPINE_FIELDS =  new String[]{"tick.X1", "tick.Y1", "tick.X2", "tick.Y2", "label.X", "label.Y"};
 	private PrototypedTuple axisLine(Rectangle2D bounds) {
 		double guideLabelGap = Converter.toDouble(guideDef.specializer().get(GUIDE_LABEL_GAP_KEY));
 		Object[] values = new Object[SPINE_FIELDS.length];
-		values[SPINE_FIELDS.length-1] = -1d;
-		values[SPINE_FIELDS.length-2] = -1d;
 
 		if (axis == AXIS.X) {
 			values[0] = bounds.getMinX();		//Line x1
