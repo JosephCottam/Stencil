@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 
 import stencil.module.util.BasicModule;
 import stencil.module.util.ann.*;
+import stencil.types.Converter;
 import stencil.util.collections.ArrayUtil;
 
 
@@ -62,11 +63,22 @@ public class Dates extends BasicModule {
 	}
 	
 
+	private static final long DAY_MILLIS = 1000 * 60 * 60 * 24;
+	
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(long days)", alias={"map", "query"})
 	public static long epochDays(Object v, String format) throws ParseException {
 		SimpleDateFormat f = new SimpleDateFormat(format);
 		Date d = f.parse(v.toString());
-		return (int)(d.getTime()/ (1000 * 60 * 60 * 24));
+		return (int)(d.getTime()/ DAY_MILLIS);
 	}
+
+	@Operator()
+	@Facet(memUse="FUNCTION", prototype="(long date)", alias={"map", "query"})
+	public static String dayString(Object v, String format) throws ParseException {
+		SimpleDateFormat f = new SimpleDateFormat(format);
+		Date d = new Date(Converter.toInteger(v) * DAY_MILLIS);
+		return f.format(d);
+	}
+
 }

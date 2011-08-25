@@ -30,36 +30,22 @@ public class DateSampler implements SampleOperator {
 	public static final String PARSE_KEY = "parse";
 	private static final String DEFAULT_PARSE = "dd-MMM-yy";
 
-	public static final String FORMAT_KEY = "format";
-
 	
-	private static enum Unit {
-		DAY ("dd-MMM-yyyy"), 
-		WEEK ("dd-MMM-yyyy"), 
-		MONTH ("MMM-yyyy"), 
-		YEAR ("yyyy"), 
-		DECADE ("yyyy"), 
-		CENTURY ("yyyy");		
-	
-		public final String format;
-		private Unit(String format) {this.format = format;}
-	}
+	private static enum Unit {DAY, WEEK, MONTH, YEAR, DECADE, CENTURY;}	
 	
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Unit unit = (Unit) Converter.convert(spec.get(UNIT_KEY, Unit.YEAR), Unit.class);
-		String format = (String) Converter.convert(spec.get(PARSE_KEY, DEFAULT_PARSE), String.class);
 		int stride = (Integer) Converter.convert(spec.get(STRIDE_KEY, 1), Integer.class);
-		SimpleDateFormat formatter = new SimpleDateFormat(format);
+		String format = (String) Converter.convert(spec.get(PARSE_KEY, DEFAULT_PARSE), String.class);
+		Parser parser = new Parser(format);
 
-		String outFormat = (String) Converter.convert(spec.get(FORMAT_KEY, unit.format), String.class);
-		
 		List<Date> dates = new ArrayList();
 		
 		seed = seed.getCategorical();
 		for (Object v: seed) {
 			try {
 				if (v.getClass().isArray()) {v = Array.get(v, 0);}
-				dates.add(formatter.parse(v.toString()));
+				dates.add(parser.in(v.toString()));
 			} catch (ParseException e) {throw new RuntimeException("Error parsing date `" + v + "' with format `" + format + "'", e);}
 		}
 		
@@ -81,9 +67,8 @@ public class DateSampler implements SampleOperator {
 		}
 		
 		List<Tuple> sample = new ArrayList();
-		formatter = new SimpleDateFormat(outFormat);
 		for (Date d: dates) {
-			String s = formatter.format(d);
+			Object s = parser.out(d);
 			sample.add(Converter.toTuple(s));
 		}
 		return sample;		
@@ -142,6 +127,37 @@ public class DateSampler implements SampleOperator {
 		}
 		return dates;				
 	}
+	
+	
+	private static class Parser {
+		private static final long DAY_MILLIS = 1000 * 60 * 60 * 24;
+		
+		private final SimpleDateFormat formatter;
+		
+		public Parser(String format) {
+			if (format.toUpperCase().equals("EPOCHDAYS")) {
+				formatter = null;
+			} else {
+				formatter = new SimpleDateFormat(format);
+			}
+		}
+		
+		public Date in(Object v) throws ParseException {
+			if (formatter != null) {return formatter.parse(v.toString());}
+			else {
+				Long i = Converter.toLong(v);
+				return new Date(i*DAY_MILLIS); 
+			}
+		}
+		
+		public Object out(Date d) {
+			if (formatter != null) {return formatter.format(d);}
+			else {
+				return d.getTime()/DAY_MILLIS ;
+			}
+		}
+	}
+
 	
 	private static interface Predicate {public boolean is(Calendar c);}
 
