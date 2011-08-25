@@ -12,6 +12,8 @@ public class FontWrapper implements TypeWrapper {
 	public Class[] appliesTo() {return ACCEPTS;}
 
 	public Object convert(Object v, Class c) {
+		if (c.isAssignableFrom(v.getClass())) {return v;}
+		
 		if (v instanceof Font && c.equals(String.class)) {
 			return new FontTuple((Font) v).toString();
 		}
