@@ -215,6 +215,8 @@ public class Axis extends Guide2D  {
 		case MOST: 
 			if (axis == AXIS.X) {return -Math.min(parentBounds.getMinY(), -zeroPoint);}
 			else {return Math.max(parentBounds.getMaxX(), zeroPoint);}
+		case AUTO:
+			throw new Error("Missed case in init.");//Auto should never make it into the switch
 		}
 	
 		throw new Error("Valid position passed, but not handled in baseline calculation:" + position);

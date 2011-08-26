@@ -10,6 +10,7 @@ import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 
 public class DateTuple extends Date implements PrototypedTuple {
+	
 	private static String SELF = "self";
 	private static String DAY = "day";
 	private static String MONTH= "month";
@@ -24,7 +25,10 @@ public class DateTuple extends Date implements PrototypedTuple {
 	private static int _YEAR = PROTO.indexOf(YEAR);
 	private static int _WEEKDAY = PROTO.indexOf(WEEKDAY);
 	private static int _MILLIS = PROTO.indexOf(MILLIS);
-		
+
+	public static final String PROTOTYPE="(DateTuple self, int day, int month, int year, String weekday, long millis)";
+
+	
 	private final Calendar cal;
 	
 	public DateTuple(Date d) {

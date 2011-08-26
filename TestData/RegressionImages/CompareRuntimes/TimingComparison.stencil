@@ -2,7 +2,7 @@ STREAM: File
 NAME: times
 TUPLE_SIZE: 6
 SEPARATOR: \s*,\s*
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/1iters_1Mc.csv
+SOURCE: ./1iters_1Mc.csv
 SKIP: 1
 STRICT: true
 

@@ -50,7 +50,7 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 		for (TupleFieldDef def: fields) {
 			String name = def.name();
 			if (!fieldNames.add(name)) {
-				String names = Arrays.deepToString(TuplePrototypes.getNames((TuplePrototype) this));
+				String names = Arrays.deepToString(TuplePrototypes.getNames(this));
 				String message = String.format("Attempt to add %1$s, a duplicate name (all names: %2$s).", name, names);
 				throw new IllegalArgumentException(message);
 			}
@@ -106,4 +106,15 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 
 	@Override
 	public Iterator<T> iterator() {return fields.iterator();}
+	
+	public String toString() {
+		StringBuilder b = new StringBuilder();
+		b.append("(");
+		for (T f: fields) {
+			b.append(f.toString());
+			b.append(",");
+		}
+		b.replace(b.length()-1, b.length(), ")");
+		return b.toString();
+	}
 }
