@@ -27,7 +27,7 @@ public final class Samplers {
 		add("NOP", "Nop", StencilUtil.Nop.class);
 		add("GAP", "MonitorSegments", SegmentSampler.class);
 		add("SEGMENT", "MonitorSegments", SegmentSampler.class);
-		add("DATE", "MonitorCategorical", DateSampler.class);
+		add("DATE", "MonitorDate", DateSampler.class);
 		
 	}
 	

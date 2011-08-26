@@ -81,6 +81,25 @@ public final class Converter {
 		return value.toString();
 	}
 	
+	private static String[] PREFIXES = new String[]{"","java.lang.", "java.util."};
+	public static Class toClass(Object value) {
+		if (value == null || value instanceof Class) {return (Class) value;}
+		String name = value.toString();
+
+		for (String prefix: PREFIXES) {
+			String tryName = prefix + name;
+			Class c = tryName(tryName);
+			if (c != null) {return c;}
+		}
+		throw new IllegalArgumentException("Could not find a class `" + value + "'");
+	}
+	
+	private static Class tryName(String name) {
+		try {return Class.forName(name);}
+		catch (Exception e) {return null;}
+	}
+	
+	
 	public static Double toDouble(Object value) {return NumericWrapper.toDouble(value);}
 	public static Float toFloat(Object value) {return NumericWrapper.toFloat(value);}
 	public static Integer toInteger(Object value) {return NumericWrapper.toInteger(value);}
@@ -129,7 +148,7 @@ public final class Converter {
 			}
 			
 			if (target.isEnum()) {return Enum.valueOf(target, value.toString());}
-
+			if (target.equals(Class.class)) {return toClass(value);}
 			
 		} catch (Exception e) {
 			throw new ConversionException(value, target, e);

@@ -207,14 +207,6 @@ public class Numerics extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(double mod)", alias={"map","query"})	
 	public static double mod(double d1, double d2) {return Math.round(d1)%Math.round(d2);}
 
-	@Operator(tags=StencilUtil.RANGE_FLATTEN_TAG)
-	@Facet(memUse="FUNCTION", prototype="(double max)", alias={"map","query"})	
-	public static double max(double... ds) {return FullMax.max(ds);}
-
-	@Operator(tags=StencilUtil.RANGE_FLATTEN_TAG)
-	@Facet(memUse="FUNCTION", prototype="(double min)", alias={"map","query"})	
-	public static double min(double... ds) {return FullMin.min(ds);}
-	
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(double diff)", alias={"map","query"})
 	public static double sub(double d, double d2) {return d-d2;}

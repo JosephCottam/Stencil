@@ -40,8 +40,8 @@ public class NumericSampler implements SampleOperator {
 		int sourceSize;
 		
 		
-		if (!seed.isContinuous()) {throw new RuntimeException("Can only use numeric sample on continuous ranges.");}
-		if (seed.size() ==0) {return new ArrayList();}//No seed -> No sample
+		if (!seed.isContinuous()) {throw new RuntimeException("Can only use continuous seed for numeric samples.");}
+		if (seed.size() <=1) {return new ArrayList();}//No seed -> No sample
 
 		boolean log = spec.get(Guide2D.SAMPLE_KEY).equals("LOG");
 

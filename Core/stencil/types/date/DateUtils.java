@@ -111,22 +111,23 @@ public class DateUtils extends BasicModule {
 
 	}
 	
+	@Description("Number of units between two dates (reports whole unit increments).\n  Valid units are MILLIS, SECS, MINS, HOURS, DAYS, WEEKS, MONTHS, YEARS.")
 	@Operator()
 	@Facet(prototype="(double diff)", alias={"map","query"})
 	public static long dateDiff(String field, Date early, Date late) {
 		long millisDiff = late.getTime()-early.getTime();
 		field = field.toUpperCase();
-		if (field.equals("MILLI")) {
+		if (field.equals("MILLIS")) {
 			return millisDiff;
-		} else if (field.equals("SEC")) {
+		} else if (field.equals("SECS")) {
 			return millisDiff/1000;
-		} else if (field.equals("MIN")) {
+		} else if (field.equals("MINS")) {
 			return millisDiff / (1000*60);
-		} else if (field.equals("HOUR")) {
+		} else if (field.equals("HOURS")) {
 			return millisDiff / (1000*60*60);
-		} else if (field.equals("DAY")) {
+		} else if (field.equals("DAYS")) {
 			return millisDiff / (1000*60*60*24);
-		} else if (field.equals("WEEK")) {
+		} else if (field.equals("WEEKS")) {
 			return millisDiff / (1000*60*60*24*7);
 		} 
 		
@@ -135,11 +136,11 @@ public class DateUtils extends BasicModule {
 		Calendar later = Calendar.getInstance();
 		later.setTime(late);
 
-		if (field.equals("MONTH")) {
+		if (field.equals("MONTHS")) {
 			int years = 12*(later.get(Calendar.YEAR) - earlier.get(Calendar.YEAR));
 			int monthShift = later.get(Calendar.MONTH) - earlier.get(Calendar.MONTH); 
 			return years ==0 ? monthShift : years-monthShift;
-		} else if (field.equals("YEAR")) {
+		} else if (field.equals("YEARS")) {
 			return (later.get(Calendar.YEAR) - earlier.get(Calendar.YEAR));
 		}
 		

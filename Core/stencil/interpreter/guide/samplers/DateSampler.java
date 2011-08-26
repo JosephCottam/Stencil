@@ -2,11 +2,8 @@ package stencil.interpreter.guide.samplers;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.lang.reflect.Array;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 import stencil.interpreter.guide.SampleOperator;
@@ -34,28 +31,18 @@ public class DateSampler implements SampleOperator {
 	private static enum Unit {DAY, WEEK, MONTH, YEAR, DECADE, CENTURY;}	
 	
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
+		if (!seed.isContinuous()) {throw new RuntimeException("Can only use continuous sample for dates.");}
+		if (seed.size() <=1) {return new ArrayList();}//No seed -> No sample
+		
 		Unit unit = (Unit) Converter.convert(spec.get(UNIT_KEY, Unit.YEAR), Unit.class);
 		int stride = (Integer) Converter.convert(spec.get(STRIDE_KEY, 1), Integer.class);
 		String format = (String) Converter.convert(spec.get(PARSE_KEY, DEFAULT_PARSE), String.class);
 		Parser parser = new Parser(format);
 
 		List<Date> dates = new ArrayList();
-		
-		seed = seed.getCategorical();
-		for (Object v: seed) {
-			try {
-				if (v.getClass().isArray()) {v = Array.get(v, 0);}
-				dates.add(parser.in(v.toString()));
-			} catch (ParseException e) {throw new RuntimeException("Error parsing date `" + v + "' with format `" + format + "'", e);}
-		}
-		
-		if (dates.size() < 1) {return new ArrayList();}
-		
-		Collections.sort(dates);
-		
 
-		Date start = dates.get(0);
-		Date end = dates.get(dates.size()-1);
+		Date start = (Date) seed.get(0);
+		Date end = (Date) seed.get(1);
 		
 		switch(unit) {
 			case DAY: dates = days(start, end, stride); break;
@@ -68,8 +55,7 @@ public class DateSampler implements SampleOperator {
 		
 		List<Tuple> sample = new ArrayList();
 		for (Date d: dates) {
-			Object s = parser.out(d);
-			sample.add(Converter.toTuple(s));
+			sample.add(Converter.toTuple(d));
 		}
 		return sample;		
 	}
@@ -139,14 +125,6 @@ public class DateSampler implements SampleOperator {
 				formatter = null;
 			} else {
 				formatter = new SimpleDateFormat(format);
-			}
-		}
-		
-		public Date in(Object v) throws ParseException {
-			if (formatter != null) {return formatter.parse(v.toString());}
-			else {
-				Long i = Converter.toLong(v);
-				return new Date(i*DAY_MILLIS); 
 			}
 		}
 		
