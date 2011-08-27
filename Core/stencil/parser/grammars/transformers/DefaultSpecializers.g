@@ -50,7 +50,7 @@ options {
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private StencilTree getDefault(StencilTree spec) {
     try {
-	   StencilTree f = spec.getAncestor(FUNCTION, OP_AS_ARG);
+	   StencilTree f = spec.getAncestor(OP_AS_ARG, FUNCTION);
 	   if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.find(OP_NAME)));}
 	     
 	   StencilTree g = spec.getAncestor(GUIDE);
@@ -162,6 +162,6 @@ options {
 }
 
 topdown
-  : ^(s=SPECIALIZER DEFAULT)          -> {getDefault($s)}
+  : ^(s=SPECIALIZER DEFAULT) -> {getDefault($s)}
   | ^(s=SPECIALIZER .*)      -> {blendWithDefault($s)}
-  |   s=SPECIALIZER            -> {blendWithDefault($s)};
+  |   s=SPECIALIZER          -> {blendWithDefault($s)};
