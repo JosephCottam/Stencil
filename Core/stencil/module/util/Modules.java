@@ -3,9 +3,11 @@ package stencil.module.util;
 import static stencil.parser.ParserConstants.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
@@ -31,6 +33,7 @@ public final class Modules {
 	 * as its only argument.  If a public static method is found, an Invokeable
 	 * is created and a wrapping operator is returned.  The wrapping operator
 	 * will use the given target for all methods of the operator.
+	 * @throws SpecializationException 
 	 **/
 	public static StencilOperator instance(Class source, OperatorData operatorData, Object...args) {
 		String module = operatorData.getModule();
@@ -54,6 +57,9 @@ public final class Modules {
 				return tryConstruct(c, fullArgs);
 			}
 			catch (Exception e) {
+				if (e instanceof InvocationTargetException
+						&& (e.getCause() instanceof SpecializationException)) {throw (SpecializationException) e.getCause();}
+
 				//Try #2: Remove specializer (if provided)
 				if (args.length >0 && args[0] instanceof Specializer) {
 					try {

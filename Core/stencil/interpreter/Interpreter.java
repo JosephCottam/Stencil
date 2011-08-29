@@ -80,7 +80,7 @@ public class Interpreter {
 						if (target.canStore(nt)) {target.store(nt);}
 					}
 				} else if (result != null && result != NoOutput.TUPLE && target.canStore(result)) {
-					target.store((PrototypedTuple) result);
+					target.store(result);
 				}
 
 			}
@@ -118,13 +118,13 @@ public class Interpreter {
 		
 		for(Consumes group:program.view().getGroups()) {
 			if (!group.getStream().equals(source.getSource())) {continue;}
-			process(source, (TupleStore) program.view(), group);
+			process(source, program.view(), group);
 			actionsTaken = true;
 		}
 		
 		for(Consumes group:program.canvas().getGroups()) {
 			if (!group.getStream().equals(source.getSource())) {continue;}
-			process(source, (TupleStore) program.canvas(), group);
+			process(source, program.canvas(), group);
 			actionsTaken = true;
 		}
 

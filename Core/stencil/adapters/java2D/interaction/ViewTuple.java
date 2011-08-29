@@ -20,7 +20,6 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		canvas = view.getCanvas().getComponent();
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	public void set(String name, Object value) {
 		if (PROTOTYPE.contains(name)) {
 			AffineTransform t = canvas.viewTransform();

@@ -27,7 +27,7 @@ public final class Path {
 	public StencilTree apply(StencilTree root) {
 		List<Integer> turns = new ArrayList(this.turns);
 		while (turns.size() >0) {
-			root = (StencilTree) root.getChild(turns.get(0));
+			root = root.getChild(turns.get(0));
 			turns.remove(0);
 		}
 		return root;

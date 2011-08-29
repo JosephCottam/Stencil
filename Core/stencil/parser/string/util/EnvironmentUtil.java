@@ -50,7 +50,7 @@ public final class EnvironmentUtil {
 			guide = t.getAncestor(GUIDE);
 			layer = t.getAncestor(LAYER);
 
-			StencilTree r= (StencilTree) t.getAncestor(RULE);
+			StencilTree r= t.getAncestor(RULE);
 			inDynamicRule = (r == null || consumes == null) ? false : r.getAncestor(DYNAMIC_RULE) != null;
 			inGuideGenerator = t.getAncestor(LIST_GUIDE_GENERATORS) != null;
 

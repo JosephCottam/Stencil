@@ -7,10 +7,11 @@ public class TestNumeralize extends stencil.unittests.StencilTestCase {
 
 	private final String POINT_LABEL = 
 			  "stream Data(value)\n"
-			+ "canvas Main\n"
-			+ "  guide pointLabels from Display ID\n"
-			+ "    TEXT: ID\n"
-			+ "layer Display from Data ID: value\n";
+			+ "layer Display\n"
+			+ "  guide pointLabels from ID\n"
+			+ "from Data " +
+			"      ID: value"
+			+ "    X: value\n";
 	    
 
 	public void testPointLabels() throws Exception {

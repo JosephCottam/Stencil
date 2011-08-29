@@ -52,7 +52,7 @@ options {
     try {
 	   StencilTree f = spec.getAncestor(OP_AS_ARG, FUNCTION);
 	   if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.find(OP_NAME)));}
-	     
+
 	   StencilTree g = spec.getAncestor(GUIDE);
        if (g != null) {return (StencilTree) adaptor.dupTree(getGuideDefault(g.find(ID).getText()));}
 	     
@@ -68,9 +68,10 @@ options {
 
        StencilTree layer = spec.getAncestor(LAYER);
        if (layer != null) {return (StencilTree) adaptor.dupTree(DEFAULT_LAYER_SPECIALIZER);}
-	     
-    } catch (Exception e) {return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);}  //HACK: Is removing the default really the right thing?
-	  throw new ProgramCompileException("Specializer encountered in unexpected context: " + spec.getParent().getToken());
+    } catch (Exception e) {
+	    return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);	//Empty because some contexts don't have defaults
+    }
+	throw new ProgramCompileException("Specializer encountered in unexpected context",spec.getParent());
   }
   
   /**Work with the graphics adapter to get the default
@@ -142,6 +143,7 @@ options {
     List<Object> values = new ArrayList();
     for (int i=0; i<updatez.size(); i++) {
       if (updatez.prototype().get(i).name().equals(POSITIONAL_ARG)) {
+        if (defaultz.size() < i) {throw new ProgramCompileException("Specializer with insufficient defaults for positional specializer arguments.", updates);}
         keys.add(defaultz.prototype().get(i).name());
       } else {
         keys.add(updatez.prototype().get(i).name());        

@@ -82,7 +82,7 @@ public interface Capper {
 			} else if (typeDef.isConstant() && strokeDef.isConstant()) {
 				Stroke s = strokeDef.defaultValue();
 				double weight = ((BasicStroke) s).getLineWidth();
-				return new Const((String) typeDef.defaultValue(), weight, left);
+				return new Const(typeDef.defaultValue(), weight, left);
 			} else {
 				return new Variable(typeIdx, strokeIdx, left);
 			}

@@ -42,7 +42,7 @@ public class PrototypedArrayTuple<T extends TupleFieldDef> implements Prototyped
 		assert names.length == values.length : "Value and name list not of the same length." + Arrays.deepToString(names) + " vs. " + Arrays.deepToString(values);
 		assert findDuplicateName(names) ==  null : "Duplicate name found in names list: " + findDuplicateName(names);
 
-		this.prototype = (TuplePrototype<T>) new TuplePrototype(names, types);
+		this.prototype = new TuplePrototype(names, types);
 		this.values = validate(types, values);
 	}
 	

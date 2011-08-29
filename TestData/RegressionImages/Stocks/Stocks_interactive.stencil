@@ -2,28 +2,31 @@ STREAM: File
 NAME: Stocks
 TUPLE_SIZE: 6
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/Papers/dissertation/figures/stencilExamples/Stocks/google_stocks.csv
+SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: true
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: -2147483648
 
-import Dates
+import Dates 
 
 stream Stocks(Date, Open)
-
+stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT)
 
 stream AlignedStocks(Date, Open)
 from Stocks
-  Date : Parse[f:"dd-MMM-yy"](Date)
+  Date : Parse[f:"dd-MMM-yy"](Date)     /*@\label{stocks:parseDate}@*/
   Open : Open
 
 layer Ticker["POLY_POINT"]		/*Poly-piont is a group of groups of line segments.*/
 guide
    axis Linear from Y
    axis[unit: "MONTH"] Date from X
-     label.TEXT: Parse.format[f:"MMM yy"](Input)
+      label.TEXT: Parse.format["MMM yy"](Input)    /*@\label{stocks:monthSample}@*/
 
 from AlignedStocks
-   ID: TimeStep(Date) 
+   ID: TimeStep(Date)
    GROUP: "Google"
    ORDER: Count()
    X: TimeStep(Date)
@@ -31,7 +34,7 @@ from AlignedStocks
    PEN: @Stroke{1}
    PEN_COLOR: @Color{BLUE}
 
-layer Averages["POLY_POINT"] 
+layer Averages["POLY_POINT"]
 from AlignedStocks
    ID: Ids()
    GROUP: "Google_30"
@@ -57,7 +60,28 @@ from AlignedStocks
    PEN: @Stroke{1}
    PEN_COLOR: @Color{ORANGE,150}
 
-operator Ids : Count 
+
+layer Selected["TEXT"]			/*@\label{stocks:beginInteractive}@*/
+from Mouse
+  local(point) : Nearest(X,3)
+  ID : "Selected"
+  TEXT: local.point
+  REGISTRATION: "LEFT"
+  IMPLANT: "POINT"
+  (X, Y) :[FullMax] Add(canvas.X, canvas.WIDTH) 
+           -> Max(canvas.X, local.point) -> Min(FullMax, _) 
+           -> Ticker.find(_) -> Add(50, Ticker.Y) -> (Ticker.X, _)
+
+layer Highlight["LINE"]
+from Mouse
+  ID : "Highlight"
+  (X1, X2) : Nearest(X, 3) -> (_, _)
+  Y1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
+  Y2 : Add(canvas.Y, 3)
+  PEN : @Stroke{3}
+  PEN_COLOR: @Color{BLUE, 100}		/*@\label{stocks:endInteractive}@*/
+
+operator Ids : Count
 
 operator TimeStep (T) -> (S)
 default => (S) : Range[ALL](@DateMin, T) 

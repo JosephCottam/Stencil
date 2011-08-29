@@ -241,7 +241,7 @@ public final class CharSequenceCompiler<T> {
 	@SuppressWarnings("unchecked")
 	private static Class loadClass(final ClassLoader classLoader, final String qualifiedClassName)
 	throws ClassNotFoundException {
-		return (Class) classLoader.loadClass(qualifiedClassName);
+		return classLoader.loadClass(qualifiedClassName);
 	}
 
 	/**

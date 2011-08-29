@@ -91,6 +91,12 @@ public final class Converter {
 			Class c = tryName(tryName);
 			if (c != null) {return c;}
 		}
+		
+		if (name.equals("int")) {return int.class;}
+		if (name.equals("double")) {return double.class;}
+		if (name.equals("float")) {return float.class;}
+		if (name.equals("long")) {return long.class;}
+		
 		throw new IllegalArgumentException("Could not find a class `" + value + "'");
 	}
 	

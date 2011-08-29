@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.text.SimpleDateFormat;
 
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
@@ -25,7 +24,6 @@ public class DateSampler implements SampleOperator {
 	 * Outputs may be modified, based on the selected unit.
 	 */
 	public static final String PARSE_KEY = "parse";
-	private static final String DEFAULT_PARSE = "dd-MMM-yy";
 
 	
 	private static enum Unit {DAY, WEEK, MONTH, YEAR, DECADE, CENTURY;}	
@@ -36,8 +34,6 @@ public class DateSampler implements SampleOperator {
 		
 		Unit unit = (Unit) Converter.convert(spec.get(UNIT_KEY, Unit.YEAR), Unit.class);
 		int stride = (Integer) Converter.convert(spec.get(STRIDE_KEY, 1), Integer.class);
-		String format = (String) Converter.convert(spec.get(PARSE_KEY, DEFAULT_PARSE), String.class);
-		Parser parser = new Parser(format);
 
 		List<Date> dates = new ArrayList();
 
@@ -113,29 +109,6 @@ public class DateSampler implements SampleOperator {
 		}
 		return dates;				
 	}
-	
-	
-	private static class Parser {
-		private static final long DAY_MILLIS = 1000 * 60 * 60 * 24;
-		
-		private final SimpleDateFormat formatter;
-		
-		public Parser(String format) {
-			if (format.toUpperCase().equals("EPOCHDAYS")) {
-				formatter = null;
-			} else {
-				formatter = new SimpleDateFormat(format);
-			}
-		}
-		
-		public Object out(Date d) {
-			if (formatter != null) {return formatter.format(d);}
-			else {
-				return d.getTime()/DAY_MILLIS ;
-			}
-		}
-	}
-
 	
 	private static interface Predicate {public boolean is(Calendar c);}
 

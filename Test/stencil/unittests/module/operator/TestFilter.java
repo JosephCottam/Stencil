@@ -47,7 +47,7 @@ public class TestFilter extends StencilTestCase {
 		StencilOperator gte = filters.instance(opName, null, ParserConstants.EMPTY_SPECIALIZER);
 		Invokeable inv = gte.getFacet("map");
 		for (int i=0; i< expected.length; i++) {
-			assertEquals("Error on comparison " + i, (Boolean) expected[i], (Boolean) inv.invoke(TESTS[i]));
+			assertEquals("Error on comparison " + i, expected[i], inv.invoke(TESTS[i]));
 		}
 	}
 

@@ -26,7 +26,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		
 		protected Statefull(OperatorData opData) {super(opData);}
 
-		//TODO: When considering multi-threaded analysis, does stateID need to be volatile?  What about object state?  What about just requiring all methods to be synchronized?
+		//TODO: When considering multi-threaded analysis, does stateID need to be volatile?  What about object state?  
 		/**Return the current stateID.
 		 *This annotation must be placed on any overriding method because, in Java 5, annotations are not inherited (with some exceptions).*/
 		@Facet(memUse="READER", prototype="(int VALUE)")

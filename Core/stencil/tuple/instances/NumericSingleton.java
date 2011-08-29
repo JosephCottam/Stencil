@@ -13,7 +13,7 @@ public final class NumericSingleton extends Number implements Tuple {
 	public NumericSingleton(int i) {this((long) i);}
 
 	public NumericSingleton(long l) {
-		dv = (double) l;
+		dv = l;
 		lv = l;
 		preferLong = true;
 	}

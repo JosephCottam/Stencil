@@ -14,7 +14,7 @@ public final class Context {
      
      public int maxArgCount() {return maxArgCount;}
      public void update(int argCount) {
-    	 maxArgCount = (int) Math.max(argCount, maxArgCount);
+    	 maxArgCount = Math.max(argCount, maxArgCount);
      }
      public String target() {return target;}
      

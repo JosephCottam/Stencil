@@ -32,9 +32,9 @@ options {
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
   public StencilTree downup(Object t) {
-    downup(t, this, "highOrderArgs");          //Pull out higher-order arguments, make them explicit
-    downup(t, this, "operatorApplication");    //Pull out the higher-order ops and make them explicit
-    downup(t, this, "simpleArgs");    		   //Remove operator references from argument lists
+    downup(t, this, "highOrderArgs");          
+    downup(t, this, "operatorApplication");    
+    downup(t, this, "simpleArgs");    		   
     return (StencilTree) t;  
   }
   
@@ -124,9 +124,11 @@ options {
    
 }
 
+//Pull out higher-order arguments, make them explicit
 highOrderArgs
    : ^(OP_AS_ARG ^(on=OP_NAME space=. op=. facet=.) .) 
-        -> ^(OP_AS_ARG ^(OP_NAME $space ID[cover($on)] $facet));
+        -> ^(OP_AS_ARG ^(OP_NAME DEFAULT ID[cover($on)] $facet));
+
 
 operatorApplication
    : ^(f=FUNCTION ^(on=OP_NAME space=. op=. facet=.) spec=. rest+=.*)  
@@ -134,5 +136,6 @@ operatorApplication
    | ^(OPERATOR_REFERENCE base=. spec=. args=.)
    		-> ^(OPERATOR_REFERENCE ^(OPERATOR_BASE {adaptor.dupTree(base.getChild(0))} ID[cover($base)]) $spec);
    
+//Remove operator references from argument lists
 simpleArgs: ^(l=LIST_ARGS .*) -> {filterOpArgs($l)};
         

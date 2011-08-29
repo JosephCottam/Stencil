@@ -2,28 +2,32 @@ STREAM: File
 NAME: Deaths
 TUPLE_SIZE: 3
 SEPARATOR: \s*,\s*
-SOURCE: ./NightingaleCrimeaSplit.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Nightingale/NightingaleCrimeaSplit.csv
 SKIP: 1
 STRICT: true
+
+import Dates
 
 stream Deaths(date, type, count)
 
 layer Rose["SLICE"]
 guide
   legend[X: -75, Y: 50] from FILL_COLOR
+    label.REGISTRATION: "BOTTOM_LEFT"
   pointLabels from ID
-    TEXT: MakeLabel(ID)         /*@\label{rose:postProcessStart}@*/
-    (X,Y): MinRadius.query(50, X, Y, OUTER.0, OUTER.1)
+    TEXT: ParseLabel(ID) -> Parse.reformat(_, "M", "MMM")         /*@\label{rose:postProcessStart}@*/
+    (X,Y): ParseLabel(ID)-> MonthMin(_,0) -> MinRadius.query(50, X, Y, OUTER.0, OUTER.1)
     REGISTRATION: "CENTER"
     FONT: @Font{4}          /*@\label{rose:postProcessEnd}@*/
 
 from Deaths
-   local(month, year) : ParseDate(date)
-   ID: Concatenate(type, ":", local.month)
+   local(month, year) : Parse[f:"M/yyyy"](date) -> (Parse.month, Parse.year)
+   ID: Concatenate(type, ":", local.month)	
    FILL_COLOR: ColorBy(type)
    PEN: @Stroke{.5}
    PEN_COLOR: @Color{Gray70}
-   SIZE:* Scale[min:0, max:250](count)
+   SIZE:* MonthMin(local.month, count) 
+				-> Scale[min:0, max:250](count)
    Z: Mult(-1, count)
    (X,Y): (0,0)
    (START, END): Sub1(local.month) -> Partition(_)  
@@ -32,6 +36,17 @@ operator ColorBy (t) -> (C)
    (t=~"wounds") => C:@Color{LightPink}
    (t=~"other") => C:@Color{DarkGray}
    (t=~"disease") => C:@Color{LightBlue}
+
+operator MonthMin : Split[1](@FullMin["Integer"])
+
+operator ParseLabel(id) -> (text)
+   (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) 
+   default => text: ""
+
+operator Partition(n) -> (start, end)
+   default => (start, end): Sub(12, n) -> [n] Sub(_,4) -> 
+                          [end] Mult(30, n) ->
+                          Add1(n) -> Mult(30,_) -> (_,end)
 
 java MinRadius {	/*@\label{rose:javaStart}@*/
    public MinRadius(OperatorData od) {super(od);}
@@ -48,33 +63,3 @@ java MinRadius {	/*@\label{rose:javaStart}@*/
        return new double[]{X,Y};
    }
 }
-
-operator ParseDate (d) -> (m,y)
-   default => (m,y): [s] IndexOf(d, "/") -> 
-                     [m] Substring(d, 0, s) ->
-                     Add1(s) -> Substring(d, _, -1) -> (m, _) 
-
-operator MakeLabel(id) -> (text)
-   (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) -> MonthAbr(_)
-   default => text: ""
-
-operator Partition(n) -> (start, end)
-   default => (start, end): Sub(12, n) -> [n] Sub(_,4) -> 
-                          [end] Mult(30, n) ->
-                          Add1(n) -> Mult(30,_) -> (_,end)
-
-
-operator MonthAbr (n) -> (month) 
-   (n=1) => month: "Jan"
-   (n=2) => month: "Feb"
-   (n=3) => month: "Mar"
-   (n=4) => month: "Apr"
-   (n=5) => month: "May"
-   (n=6) => month: "Jun"
-   (n=7) => month: "Jul"
-   (n=8) => month: "Aug"
-   (n=9) => month: "Sep"
-   (n=10) => month: "Oct"
-   (n=11) => month: "Nov"
-   (n=12) => month: "Dec"
-   default => month: "ERROR"

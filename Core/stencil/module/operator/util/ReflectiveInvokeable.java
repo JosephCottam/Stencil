@@ -159,17 +159,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		}
 		return varArgs;
 	}
-
-	//Faster case, when the input is known to be an Object[]
-	private Object[] validateTypeFast(Object[] arguments, Class type) {
-		Object[] varArgs = new Object[Array.getLength(arguments)];
-		for (int i=0; i< Array.getLength(varArgs); i++) {
-			varArgs[i] = Converter.convert(arguments[i], type);
-		}
-		return varArgs;
-	}
-
-
 	
 	public int hashCode() {return method.hashCode();}
 	

@@ -5,7 +5,6 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
 public @interface Facet {
 	String memUse() default "FUNCTION";		//Text representations of the values found in FacetData.MemoryUse (case insensitive)
 	String prototype() default "(value)";	//Must conform to tuple prototype grammar

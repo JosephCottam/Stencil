@@ -85,7 +85,7 @@ public class ModuleDataParser {
 		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.tags());
 		
 		for (Method m: c.getMethods()) {
-			Facet f = (Facet) m.getAnnotation(Facet.class);
+			Facet f = m.getAnnotation(Facet.class);
 			if (f== null) {continue;}
 			FacetData[] fds = makeFacetData(f, m.getName());
 			for (FacetData fd:fds) {od.addFacet(fd);}

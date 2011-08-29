@@ -430,23 +430,19 @@ public final class Freezer {
 	
 	public static Specializer specializer(StencilTree spec) {
 		assert verifyType(spec, SPECIALIZER);
-		assert spec instanceof StencilTree;
+
 		String[] keys = new String[spec.getChildCount()];
 		Object[] vals = new Object[spec.getChildCount()];
 		
 		try {
 			for (int i=0; i< keys.length; i++) {
-				StencilTree entry = (StencilTree) spec.getChild(i);
+				StencilTree entry = spec.getChild(i);
 				assert verifyType(entry, MAP_ENTRY);
 				assert entry.getChildCount() == 1 : "Malformed MAP_ENTRY found" + entry.toStringTree();
 				keys[i] = entry.getText();
 				vals[i] = freezeValue(entry.getChild(0));
 			}
-			if (spec instanceof StencilTree) {
-				return new Specializer(keys, vals, (StencilTree) spec);
-			} else {
-				return new Specializer(keys, vals);
-			}
+			return new Specializer(keys, vals, spec);
 		} catch (Exception e) {throw new FreezeException(spec, e);}
 	}
 }

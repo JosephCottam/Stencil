@@ -7,7 +7,7 @@ import stencil.tuple.Tuple;
  * an operator chain.  This should ONLY be used by the interpreter.
  */
 public class MapMergeTuple extends ArrayTuple {
-	public MapMergeTuple(Tuple... values) {super((Object[]) values);}
+	public MapMergeTuple(Tuple... values) {super(values);}
 	
 	public Tuple getTuple(int i) {return (Tuple) super.get(i);}
 }

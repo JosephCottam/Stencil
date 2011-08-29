@@ -4,7 +4,6 @@ import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.modules.stencilUtil.Range;
-import stencil.modules.stencilUtil.StencilUtil;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
 import stencil.interpreter.tree.Freezer;
@@ -98,82 +97,6 @@ public class Numerics extends BasicModule {
 
  		public FullSum duplicate() {return new FullSum(operatorData);}
 	}
-
-	/**Minimum of full range of values.
-	 * TODO: Modify to handle fixed-start range
-	 */
-	@Suppress
-	@Operator(name="Min", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
-	public static final class FullMin extends AbstractOperator.Statefull {
- 		private double min = Double.MAX_VALUE;
-
- 		public FullMin(OperatorData opData) {super(opData);}
-
- 		
- 		protected static double min(double... values) {
-			double min = Double.MAX_VALUE;
- 			for (double v: values) {
-				min = Math.min(min, v);
-			}
-			return min;
- 		}
- 		
- 		@Facet(memUse="WRITER", prototype="(double min)")
- 		public double map(double... values) {
- 			double newMin = Math.min(min, min(values));
- 			if (newMin != min) {
- 				stateID++;
- 				min = newMin;
- 			}
-			return min;
-		}
-
-		/**Arguments are ignored.*/
- 		@Facet(memUse="READER", prototype="(double min)")
-		public double query(Object... args) {
-			return min;
-		}
-
-		public FullMin duplicate() {return new FullMin(operatorData);}
-	}
-
-	/**Maximum of full range of values.
-	 * TODO: Modify to handle fixed-start range
-	 */
-	@Suppress
-	@Operator(name="Max", tags=StencilUtil.RANGE_OPTIMIZED_TAG)
-	public static class FullMax extends AbstractOperator.Statefull {
- 		private double max = -Double.MAX_VALUE;	
-
- 		public FullMax(OperatorData opData) {super(opData);}
- 		
- 		protected static double max(double... values) {
- 			double max = -Double.MAX_VALUE;
- 			for (double v: values) {
-				max = Math.max(max, v);
-			}
-			return max;
- 		}
-
- 		@Facet(memUse="WRITER", prototype="(double max)")
-		public double map(double... values) {
- 			double newMax = Math.max(max, max(values));
- 			if (newMax != max) {
- 				max = newMax;
- 				stateID++;
- 			}
- 			return max;
-		}
-		
-		/**Arguments are ignored.*/
- 		@Facet(memUse="READER", prototype="(double max)")
-		public double query(Object... args) {
-			return max;
-		}
-		
-		public FullMax duplicate() {return new FullMax(operatorData);}
-	}
-	
 
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(double abs)", alias={"map","query"})
@@ -363,8 +286,6 @@ public class Numerics extends BasicModule {
 			
 			if (range.isFullRange()) {
 				if (name.equals("Sum")) {return new FullSum(operatorData(FullSum.class, getName()));}
-				if (name.equals("Max")) {return new FullMax(operatorData(FullMax.class, getName()));}
-				if (name.equals("Min")) {return new FullMin(operatorData(FullMin.class, getName()));}
 			} 
 
 

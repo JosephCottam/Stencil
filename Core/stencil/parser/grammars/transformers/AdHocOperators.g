@@ -126,6 +126,7 @@ options {
       return p;
   }
   
+  //Instantiates an operator from AdHoc
   private StencilOperator findBase(StencilTree ref) {
       Specializer spec = Freezer.specializer(ref.find(SPECIALIZER));
       MultiPartName baseName = Freezer.multiName(ref.find(OPERATOR_BASE));
@@ -144,13 +145,34 @@ options {
       return op;
   }
   
+  /**Check to see if the base is a reference to an stencil-defined operator (may be synthetic or a reference).
+   *  If it is AND that op is not yet instantiated THEN return false.
+   **/
+  private boolean stencilOpReady(StencilTree opName) {
+  	  MultiPartName baseName = Freezer.multiName(opName);
+  	  StencilTree ref = opName.getAncestor(OPERATOR_REFERENCE);
+  	  if (baseName.prefix() != "") {return true;}//Operator has a prefix, can't be ad-hoc...must be ready or non-existant
+  	  
+  	  StencilTree ops = ref.getAncestor(LIST_OPERATORS);
+  	  for (StencilTree op: ops) {
+  	     if (ref != op && baseName.name().equals(op.getText())) {
+  	        return op.getType() == OPERATOR_PROXY
+  	        		|| op.getType() == OPERATOR;
+  	     }
+  	  }
+  	  return true;		//Time to look into the other modules, won't hurt
+  }
+  
   /**Are the operators arguments ready for higher-order ops?**/
   private boolean argsReady(StencilTree ref) {
     List<StencilTree> ops = ref.findAllDescendants(OP_AS_ARG);
     for(StencilTree op: ops) {
        MultiPartName name = Freezer.multiName(op.find(OP_NAME));
-       try {modules.findModuleForOperator(name);}
-       catch (IllegalArgumentException e) {return false;}
+       try {
+          if (stencilOpReady(op.find(OP_NAME))) {
+	          modules.findModuleForOperator(name);
+	      } else {return false;}
+       } catch (IllegalArgumentException e) {return false;}
     }
     return true;
   }
@@ -165,6 +187,6 @@ simple
   ;
   
 proxies
- : ^(r=OPERATOR_REFERENCE .*) {argsReady($r) && findBase($r) != null}? -> {transferProxy($r)}
+ : ^(r=OPERATOR_REFERENCE .*) {stencilOpReady($r.find(OPERATOR_BASE)) && argsReady($r)}? -> {transferProxy($r)}
  ;
 	

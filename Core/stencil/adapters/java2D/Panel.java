@@ -104,9 +104,9 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 		double yScale = height/contentHeight;
 		double scale = Math.max(xScale, yScale);
 
-		BufferedImage buffer = (BufferedImage) canvas.createImage((int) width, (int) height);
+		BufferedImage buffer = (BufferedImage) canvas.createImage(width, height);
 		if (buffer == null) { //Happens in headless mode
-			buffer = new BufferedImage((int) width,  (int) height, BufferedImage.TYPE_INT_ARGB);
+			buffer = new BufferedImage(width,  height, BufferedImage.TYPE_INT_ARGB);
 		}		
 		
 		AffineTransform exportViewTransform = AffineTransform.getTranslateInstance(scale* topLeft.getX(), scale*topLeft.getY());

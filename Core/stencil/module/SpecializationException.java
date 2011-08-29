@@ -7,7 +7,7 @@ import stencil.interpreter.tree.Specializer;
  * The error message indicates the method name and the attempted specialization
  * and may include further details in nested exceptions.
  */
-public class SpecializationException extends Exception {
+public class SpecializationException extends RuntimeException {
 	public SpecializationException(ModuleData module, String operator, Specializer specializer) {this(module.getName(), operator, specializer, "", null);}
 
 	public SpecializationException(String module, String operator, Specializer specializer) {this(module, operator, specializer, "", null);}

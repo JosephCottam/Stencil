@@ -2,10 +2,8 @@ package stencil.interpreter.tree;
 
 import stencil.display.DisplayLayer;
 import stencil.interpreter.TupleStore;
-import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.PrototypedArrayTuple;
 
 //TODO: Merge with StreamDef
 public class Layer implements TupleStore {

@@ -54,15 +54,15 @@ public final class ColorUtils extends BasicModule {
 	}
 
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple darker(Object o) {return Singleton.from(validate(o).darker());}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple brighter(Object o) {return Singleton.from(validate(o).brighter());}
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	@Description("Move the color towards white by the passed factor (e.g. .5 will move it half-way to white from where it is now).")
 	public static ColorTuple lighten(Object o, double factor) {
@@ -74,45 +74,45 @@ public final class ColorUtils extends BasicModule {
 	}
 
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(int blue)", alias={"map","query"})
 	public static int getBlue(Object v) {return validate(v).getBlue();}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setBlue(Object v, Object o) {return mod(o, ColorTuple.BLUE, v, "SetBlue");}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(int red)", alias={"map","query"})
 	public static Tuple getRed(Object v) {return Singleton.from(validate(v).getRed());}
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setRed(Object v, Object o) {return mod(o, ColorTuple.RED, v, "SetRed");}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(int green)", alias={"map","query"})
 	public static Tuple getGreen(Object v) {return Singleton.from(validate(v).getGreen());}
 
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setGreen(Object v, Object o) {return mod(o, ColorTuple.GREEN, v, "setGreen");}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(int alpha)", alias={"map","query"})
 	public static Tuple getAlpha(Object v) {return Singleton.from(validate(v).getAlpha());}
 	
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple setAlpha(Object v, Object o) {return mod(o, ColorTuple.ALPHA, v, "setAlpha");}
 	
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	@Facet(memUse="FUNCTION", prototype="(Color color)", alias={"map","query"})
 	public static Tuple opaque(Object o) {return mod(o, ColorTuple.ALPHA, DIR.full, "Opque");}
 
-	@Operator(spec="[range: ALL, split:0]")
+	@Operator()
 	public static class Color extends AbstractOperator {
 		public Color(OperatorData opData) {super(opData);}
 

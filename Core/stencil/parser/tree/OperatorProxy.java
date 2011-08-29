@@ -19,7 +19,7 @@ public class OperatorProxy extends StencilTree {
 		if (!operatorData.getName().equals(getName())) {
 			this.operatorData = new OperatorData(operatorData);
 			this.operatorData.setModule(ModuleCache.AD_HOC_NAME);
-			((OperatorData)this.operatorData).setName(getName());
+			this.operatorData.setName(getName());
 		} else {
 			this.operatorData =operatorData; 
 		}

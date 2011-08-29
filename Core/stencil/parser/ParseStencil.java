@@ -179,7 +179,7 @@ public abstract class ParseStencil {
 		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
-		p = DefaultSpecializers.apply(p, modules, adapter); 			//Add default specializers where required
+		p = DefaultSpecializers.apply(p, modules, adapter); 	//Add default specializers where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
 		p = OperatorInstantiateTemplates.apply(p);		//Remove all template references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references

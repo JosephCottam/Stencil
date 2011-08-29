@@ -103,7 +103,7 @@ public class CompoundTable implements Table {
 
 		//Modify the root update to have references to child update IDs
 		PrototypedTuple rootUpdate = update;
-		rootUpdate = (PrototypedTuple) Tuples.delete(update, ArrayUtil.intArray(childUpdateIdxs));		//Delete references to children
+		rootUpdate = Tuples.delete(update, ArrayUtil.intArray(childUpdateIdxs));		//Delete references to children
 		Map<String, List<Comparable>> changedChildren = changedChildren(childUpdates); 	//Make a list of child Ids
 		rootUpdate = Tuples.merge(rootUpdate, new PrototypedArrayTuple(changedChildren.keySet(), changedChildren.values()));	//Place the child ids in to the tuple
 		
