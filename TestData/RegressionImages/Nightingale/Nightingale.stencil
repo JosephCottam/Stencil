@@ -2,11 +2,12 @@ STREAM: File
 NAME: Deaths
 TUPLE_SIZE: 3
 SEPARATOR: \s*,\s*
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Nightingale/NightingaleCrimeaSplit.csv
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/Nightingale/NightingaleCrimeaSplit.csv
 SKIP: 1
 STRICT: true
 
 import Dates
+import Geometry
 
 stream Deaths(date, type, count)
 
@@ -15,10 +16,10 @@ guide
   legend[X: -75, Y: 50] from FILL_COLOR
     label.REGISTRATION: "BOTTOM_LEFT"
   pointLabels from ID
-    TEXT: ParseLabel(ID) -> Parse.reformat(_, "M", "MMM")         /*@\label{rose:postProcessStart}@*/
-    (X,Y): ParseLabel(ID)-> MonthMin(_,0) -> MinRadius.query(50, X, Y, OUTER.0, OUTER.1)
+    TEXT: ParseLabel(ID) 		/*@\label{rose:postProcessStart}@*/
+    (X,Y): LabelLayout(ID, OUTER) 
     REGISTRATION: "CENTER"
-    FONT: @Font{4}          /*@\label{rose:postProcessEnd}@*/
+    FONT: @Font{4}          	/*@\label{rose:postProcessEnd}@*/
 
 from Deaths
    local(month, year) : Parse[f:"M/yyyy"](date) -> (Parse.month, Parse.year)
@@ -40,7 +41,9 @@ operator ColorBy (t) -> (C)
 operator MonthMin : Split[1](@FullMin["Integer"])
 
 operator ParseLabel(id) -> (text)
-   (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) -> Substring(id, _, -1) 
+   (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) 
+									-> Substring(id, _, -1) 
+									-> Parse.reformat(_, "M", "MMM")         
    default => text: ""
 
 operator Partition(n) -> (start, end)
@@ -48,18 +51,11 @@ operator Partition(n) -> (start, end)
                           [end] Mult(30, n) ->
                           Add1(n) -> Mult(30,_) -> (_,end)
 
-java MinRadius {	/*@\label{rose:javaStart}@*/
-   public MinRadius(OperatorData od) {super(od);}
-   @Facet(memUse="FUNCTION", prototype="(double X, double Y)")
-   public double[] query(double Min, double X1, double Y1, double X, double Y) {
-       double rise = Y-Y1;
-       double run = X-X1;
-       double radius = Math.sqrt(Math.pow(rise,2) + Math.pow(run,2));
-       double ratio = radius >0 ? Min/radius : 1;
-       if (ratio > 1) {
-          Y = Y1 + (ratio * rise);
-          X = X1 + (ratio * run);
-       }
-       return new double[]{X,Y};
-   }
-}
+operator LabelLayout(id, outer) -> (X,Y)
+  (id =~ "") => (X,Y) : (0,0)
+  default => (X,Y) :  [origin] Point(0,0) 
+							 -> ParseLabel(id) 
+							 -> MonthMin(_, 0) 
+							 -> Distance(origin.*, outer)
+							 -> Max(50.0, _) 
+							 -> ProjectAlong(origin.*, outer, _) 

@@ -41,7 +41,7 @@ public abstract class SplitHelper implements StencilOperator {
 			int oldID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
 
 			Object rv = inv.invoke(newArgs);
-			System.out.println(key + ":" + facet + ":" + rv);
+			//System.out.println(key + ":" + facet + ":" + rv);
 			
 			int newID = Converter.toInteger(stateIDFacet.invoke(new Object[0]));
 				if (newID != oldID) {stateID++;}

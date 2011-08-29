@@ -17,6 +17,8 @@ import stencil.parser.string.util.Context;
 @Description("Summarization of groups of things (currently just max and min).")
 @Module()
 public class Summary extends BasicModule {
+	
+	
 
 	private static abstract class Extreme<T extends StencilOperator> extends AbstractOperator.Statefull<T> {
  		protected final Class targetClass;
