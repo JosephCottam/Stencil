@@ -69,7 +69,7 @@ public class TreeMap extends Layout {
 	public Rectangle2D query(final Object id) {
 		Mappable layoutNode = layoutFor(id); 
 		Rect r = layoutNode.getBounds();
-		Rectangle2D result = new Rectangle2D.Double(r.x, (r.y+r.h), r.w, r.h);
+		Rectangle2D result = new Rectangle2D.Double(r.x, r.y, r.w, r.h);
 		return result;
 	}
 	

@@ -1,0 +1,21 @@
+STREAM: File
+NAME: survey
+TUPLE_SIZE: 1
+SEPARATOR: $^
+SOURCE: ./Fruits.txt
+SKIP: 0
+STRICT: true
+
+stream survey(fruit)
+
+layer plot
+guide
+  axis from X							/*@\label{fruit:Xguide}@*/
+from survey
+   ID: Count()
+   X:* Rank(fruit) -> Mult(5, Rank)				/*@\label{fruit:XRank}@*/
+/* X:* Index(fruit) -> Mult(5, index)*/				/*@\label{fruit:XIndex}@*/
+/* X:* Index(fruit) -> Mult(10, index)*/			/*@\label{fruit:XIndex10}@*/
+   Y: Count(fruit) -> Mult(5, Count)
+   REGISTRATION: "CENTER"
+   FILL_COLOR: @Color{150,150,255}

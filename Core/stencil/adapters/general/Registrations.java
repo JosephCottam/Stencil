@@ -65,7 +65,7 @@ public final class Registrations {
 	 * give the relative point indicated by registration.
 	 */
 	public static Point2D topLeftToRegistration(Registration registration, Point2D source, double w, double h) {
-		Rectangle2D r = new Rectangle2D.Double(source.getX(), source.getY(), h,w);
+		Rectangle2D r = new Rectangle2D.Double(source.getX(), source.getY(), w,h);
 		return topLeftToRegistration(registration, r);
 	}
 
@@ -73,7 +73,7 @@ public final class Registrations {
 	 * give the relative point indicated by registration.
 	 */
 	public static Point2D topLeftToRegistration(Registration registration, double x, double y, double w, double h) {
-		Rectangle2D r = new Rectangle2D.Double(x, y, h,w);
+		Rectangle2D r = new Rectangle2D.Double(x, y, w,h);
 		return topLeftToRegistration(registration, r);
 	}
 

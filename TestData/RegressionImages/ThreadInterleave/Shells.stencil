@@ -1,0 +1,34 @@
+STREAM: File
+NAME: Entities
+HEADER: ID
+SEPARATOR: $^
+SOURCE: ./count_50000.txt
+SKIP: 0
+STRICT: true
+
+
+/*Layout for turning a linear sequence into a square.
+  Each number is assigned a "shell" based on the square root of the value.
+  Shells are filled top-down, the right-to-left.
+*/
+stream Entities(ID)
+
+
+layer Nodes
+from Entities
+	ID: ID
+	(X,Y) :* Range[ALL](@Max, ID) -> Sub(_, ID)  -> Layout(_)
+/*	(X,Y) : Layout(ID)*/
+	FILL_COLOR:* HeatScale(ID)
+
+operator Layout (i) -> (X,Y) 
+	ALL => (X,Y): Sqrt(i) -> 
+	         [shell] Floor(_) ->
+				[n] Add1(_) -> Pow(n[_],2) -> 
+				[center] Sub(_, n[_]) -> 
+				ByOdds(i,shell[_],center[_]) 
+
+operator ByOdds (i,shell,center) -> (x,y)
+	(i < center) => (x,y) : Pow(shell,2) -> Sub(i, _) -> (shell,_)
+	(i > center) => (x,y) : Sub(i, center) -> Sub(shell, _) -> (_,shell)
+	(ALL) => (x,y) : (shell,shell)

@@ -1,15 +1,19 @@
 package stencil.modules;
 
+import java.awt.geom.Point2D;
 import java.util.*;
 
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
+import stencil.adapters.general.Registrations;
 import stencil.interpreter.tree.Specializer;
+import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.prototype.TupleFieldDef;
 import stencil.types.Converter;
 
 /**
@@ -122,7 +126,7 @@ public class Temp extends BasicModule {
 			return opData;
 		}
 		
-		@Facet(memUse="FUNCTION", alias="map,query")	//Prototype set by "fields"
+		@Facet(memUse="FUNCTION", alias={"map","query"})	//Prototype set by "fields"
 		public MapMergeTuple query(Object... values) {
 			int extra = values.length - share;
 			
@@ -138,6 +142,31 @@ public class Temp extends BasicModule {
 		}
 		
 	}
+	
+	@Operator(spec="[reg:\"CENTER\"]")
+	public static class Reg extends AbstractOperator {
+		public static final String REG_KEY="reg";
+		private static Registrations.Registration reg;
+		
+		public Reg(OperatorData opData, Specializer spec) {
+			super(opData);
+			reg = Registrations.Registration.valueOf(Converter.toString(spec.get(REG_KEY)));
+		}
+		
+		@Facet(memUse="FUNCTION", alias={"map","query"}, prototype="(double X, double Y)")
+		public Point2D query(PrototypedTuple<TupleFieldDef> t) {
+			Registrations.Registration now = (Registrations.Registration) Converter.convert(t.get("REGISTRATION"), Registrations.Registration.class);
+			double x = Converter.toDouble(t.get("X"));
+			double y = Converter.toDouble(t.get("Y"));
+			double w = Converter.toDouble(t.get("WIDTH"));
+			double h = Converter.toDouble(t.get("HEIGHT"));
+			Point2D topLeft = Registrations.registrationToTopLeft(now, x, y, w,h);
+			
+			return Registrations.topLeftToRegistration(reg, topLeft, w, h);
+		}
+
+	}
+	
 	
 	@Operator(spec="[style: \"CIRCLE\", states: 2]")
 	public static class Oscillate extends AbstractOperator.Statefull {

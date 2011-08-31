@@ -1,0 +1,48 @@
+STREAM: File
+NAME: MethodCalls
+TUPLE_SIZE: 3
+SEPARATOR: \s*:\s*
+SOURCE: ./Viewpoint_5000.btrace
+SKIP: 0
+STRICT: true
+
+import BrewerPalettes
+import LongMath
+
+const width : 8
+
+stream MethodCalls(Method, Dir, Time)
+
+stream Priors ()
+from MethodCalls
+   filter(Dir =~ "Entry")  
+   () : Entry.map(Method, Time)
+
+stream MethodSpans (Method, Start, Stop)
+from MethodCalls
+   filter(Dir =~ "Return")
+   local(Start) : Entry.query(Method)
+   local(Stop) : Entry.query(Method) -> EnsureTime(_, Time)
+   Method : Method
+   Start: Range[ALL](@Min[c:"Long"], local.Start) -> Sub(local.Start, _)
+   Stop: Range[ALL](@Min[c:"Long"], local.Stop) -> Sub(local.Stop, _)
+
+operator EnsureTime (start, stop) -> (stop)
+ prefilter(span) : Sub(stop, start)
+ (prefilter.span =0) => stop : Add1(stop) 
+ default =>     stop : stop
+
+operator Entry : Dict[fields: "start"]
+
+layer Renders["LINE"]
+guide
+   axis[axisLabel: "Activity"] from Y1
+   axis[sample: "linear", stride: 50, axisLabel: "Elapsed Milliseconds"] from X1
+from MethodSpans
+	ID: Count()
+	PEN: @Stroke{{width}::BUTT}
+	PEN_COLOR:* BrewerColors[pallette: "ACCENT"](Method) -> SetAlpha(100, _)
+	X1: Start
+	X2: Stop
+	Y1:* Rank(Method) -> Mult(width,_)
+	Y2:* Rank(Method) -> Mult(width,_)

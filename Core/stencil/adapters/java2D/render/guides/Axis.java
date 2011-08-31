@@ -100,7 +100,7 @@ public class Axis extends Guide2D  {
 		
 		//Which axis is this?
 		final String axisTag = guideDef.identifier().substring(guideDef.identifier().indexOf(":")+2); 
-		axis = AXIS.valueOf(axisTag);
+		axis = AXIS.valueOf(axisTag.substring(0,1));
 		
 		//Update the schema per the guide def...
 		//Get position info based on axis orientation
