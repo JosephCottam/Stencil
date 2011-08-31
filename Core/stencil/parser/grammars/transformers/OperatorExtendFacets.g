@@ -27,6 +27,12 @@ options {
     downup(t, this, "toQuery");
     return t;
   }
+  
+  //TODO: Add counterpart meta-data to the operator metadata
+  public String counterPart(StencilTree facet) {
+     if (facet.getText().equals("map")) {return QUERY_FACET;}
+     else {return facet.getText();}
+  } 
 }
 
 //Extend the operator definition to include the required facets 
@@ -42,4 +48,4 @@ toQuery: ^(f=FUNCTION ^(OP_NAME pre=. base=. facet=.) rest+=.*)
           {$f.getAncestor(PREDICATE)  == null                                   //No predicate specified 
             && $f.getAncestor(OPERATOR_FACET) != null                           //Face is specified
             && $f.getAncestor(OPERATOR_FACET).getText().equals(QUERY_FACET)}? ->    //And the facet group being transformed is a query THEN...
-          ^(FUNCTION ^(OP_NAME $pre $base ID[QUERY_FACET])  $rest*);
+          ^(FUNCTION ^(OP_NAME $pre $base ID[counterPart($facet)])  $rest*);

@@ -1,0 +1,43 @@
+STREAM: File
+NAME: HotelStays
+TUPLE_SIZE: 3
+SEPARATOR: \s*,\s*
+SOURCE: ./BertinHotel.csv
+SKIP: 1
+STRICT: true
+
+import Dates
+
+stream HotelStays(count, type, month)
+
+layer Chart
+guide
+   axis[line.VISIBLE: false]  from X
+      label.TEXT : Substring(Input.0, 0,1)
+		label.ROTATION: 0
+		label.REGISTRATION: "TOP"
+		tick.PEN_COLOR : @Color{CLEAR}
+		tick.VISIBLE : false
+   axis[line.VISIBLE: false]  from Y
+      label.REGISTRATION: "BOTTOM_RIGHT"
+		tick.PEN_COLOR : @Color{CLEAR}
+		tick.VISIBLE : false
+from HotelStays
+   ID: Count()
+   X: Parse.reformat(month, "MMM", "M") -> Mult(MonthNum,5)
+   Y: Permute(type) -> Mult(12,_)
+   HEIGHT: Split[1](@Scale[min: 1, max:10], type, count)		/*@\label{hotel:height}@*/
+   FILL_COLOR:* Split[1](@Avg, type, count) -> FillBy(_, count)		/*@\label{hotel:color}@*/
+   PEN_COLOR: @Color{BLACK}
+   PEN: @Stroke{.5}
+   (SHAPE, REGISTRATION): ("RECTANGLE", "BOTTOM")
+
+operator Avg :Range[ALL](@Mean)
+
+operator FillBy(mean, count) -> (c)
+   (mean > count) => c: @Color{WHITE}
+   default          => c: @Color{BLACK}
+
+operator Permute(label) -> (index)
+   default => index: IndexOf(label, ".") -> Substring(label, 0,_)
+                    -> StaticList[vals: "ERROR,10,11,17,5,18,16,12,3,13,14,4,6,7,9,19,8,15,1,0,2"](_)

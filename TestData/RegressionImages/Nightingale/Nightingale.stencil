@@ -2,7 +2,7 @@ STREAM: File
 NAME: Deaths
 TUPLE_SIZE: 3
 SEPARATOR: \s*,\s*
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/Nightingale/NightingaleCrimeaSplit.csv
+SOURCE: ./NightingaleCrimeaSplit.csv
 SKIP: 1
 STRICT: true
 
@@ -42,8 +42,8 @@ operator MonthMin : Split[1](@FullMin["Integer"])
 
 operator ParseLabel(id) -> (text)
    (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) 
-									-> Substring(id, _, -1) 
-									-> Parse.reformat(_, "M", "MMM")         
+                                 -> Substring(id, _, -1) 
+                                 -> Parse.reformat(_, "M", "MMM")         
    default => text: ""
 
 operator Partition(n) -> (start, end)
