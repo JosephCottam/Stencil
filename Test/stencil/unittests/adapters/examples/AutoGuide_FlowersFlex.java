@@ -9,7 +9,8 @@ package stencil.unittests.adapters.examples;
 public class AutoGuide_FlowersFlex extends ImageTest {
 	public AutoGuide_FlowersFlex(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/Flowers/",
-				  "AndersonFlowers-Flex.stencil",
+				resultSpace("Flowers"),
+				"AndersonFlowers-Flex.stencil",
 				  null,
 				  null,
 				  "Andersonflowers.txt",

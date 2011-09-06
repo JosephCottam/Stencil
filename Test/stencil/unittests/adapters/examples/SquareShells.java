@@ -3,7 +3,8 @@ package stencil.unittests.adapters.examples;
 public class SquareShells extends ImageTest {
 	public SquareShells(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/SquareShells/",
-									  "SquareShells.stencil",
+				resultSpace("SquareShells"),
+				"SquareShells.stencil",
 									  null,
 									  null,
 									  "SquareShells.txt",

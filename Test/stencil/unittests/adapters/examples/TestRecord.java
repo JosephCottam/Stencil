@@ -3,21 +3,25 @@ package stencil.unittests.adapters.examples;
 import static stencil.explore.Application.OPEN_FLAG;
 import static stencil.explore.Application.SOURCE_FLAG;
 
+import java.io.File;
+
 public final class TestRecord {
 	static final String TEST_PREFIX = "TEST_";
 	static final String DELTA_PREFIX = "DELTA_";
 
-	String[] configs;
-	String prefix;  //Directory prefix
-	String stencil; //Stencil name
-	String[] names; //Stream names to use with the sources
-	String[] inputs;//Stream source inputs
-	String TXT;     //Text file to output
-	String PNG;     //PNG file to output
+	final String[] configs;
+	final String inputDir; 	//Test input info (stencil, data, ref image, etc)
+	final String outputDir;	//Where should the results go?	ABSOLUATE PATH!!!
+	final String stencil; //Stencil name
+	final String[] names; //Stream names to use with the sources
+	final String[] inputs;//Stream source inputs
+	final String TXT;     //Text file to output
+	final String PNG;     //PNG file to output
 
-	public TestRecord(String prefix, String stencil, String sourceNames, String inputs, String TXT, String PNG, String[] configs) {
+	public TestRecord(String inputDir, String outputDir, String stencil, String sourceNames, String inputs, String TXT, String PNG, String[] configs) {
 		this.configs = configs;
-		this.prefix = prefix;
+		this.inputDir = inputDir;
+		this.outputDir = outputDir;
 		this.stencil = stencil;
 		this.names = sourceNames == null? new String[0] : sourceNames.split(" ");
 		this.inputs = inputs == null? new String[0] :inputs.split(" ");
@@ -29,7 +33,7 @@ public final class TestRecord {
 		StringBuilder b = new StringBuilder();
 		b.append(getProfileCommand());
 
-		b.append("-txt " + getBaseTestTXT());
+		b.append("-txt " + getTestTXT());
 		return b.toString();
 	}
 	
@@ -37,7 +41,7 @@ public final class TestRecord {
 		StringBuilder b = new StringBuilder();
 		b.append(getProfileCommand());
 
-		b.append("-png2 1000 -1 " + getBaseTestPNG());
+		b.append("-png2 1000 -1 " + getTestPNG());
 		return b.toString();			
 	}
 			
@@ -45,7 +49,7 @@ public final class TestRecord {
 		StringBuilder b = new StringBuilder();
 
 		
-		b.append(prefix);
+		b.append(inputDir);
 
 		for (String file: configs) {
 			b.append(" -settings ");
@@ -69,14 +73,10 @@ public final class TestRecord {
 		return b.toString();
 	}
 
-	private String getBaseTestTXT() {return TEST_PREFIX + TXT;}
-	private String getBaseTestPNG() {return TEST_PREFIX + PNG;}
-	private String getBaseDelta() {return TEST_PREFIX + DELTA_PREFIX + PNG;}
+	public String getTestTXT() {return outputDir + File.separator + TEST_PREFIX + TXT;}
+	public String getTestPNG() {return outputDir + File.separator + TEST_PREFIX + PNG;}
+	public String getDeltaPNG() {return outputDir + File.separator + DELTA_PREFIX + PNG;}
 
-	public String getTestTXT() {return prefix + getBaseTestTXT();}
-	public String getTestPNG() {return prefix + getBaseTestPNG();}
-	public String getDeltaPNG() {return prefix + getBaseDelta();}
-
-	public String getTXT() {return prefix + TXT;}
-	public String getPNG() {return prefix + PNG;}
+	public String getTXT() {return inputDir + TXT;}
+	public String getPNG() {return inputDir + PNG;}
 }

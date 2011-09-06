@@ -8,7 +8,8 @@ import java.lang.management.MemoryUsage;
 public class LowProcessing extends ImageTest {
 	public LowProcessing(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/Misc/",
-									  "LowProcessing.stencil",
+				resultSpace("Misc"),
+				"LowProcessing.stencil",
 									  null,
 									  null,
 									  "LowProcessing.txt",

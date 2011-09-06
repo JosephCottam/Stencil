@@ -39,7 +39,7 @@
     </target>
     
     <target name="JUnit" depends="CleanUpTests,MakeJar">
-        <tstamp><format property="now" pattern="ddMMMyyyy HH:mm"/></tstamp>
+        <tstamp><format property="now" pattern="mmHH_ddMMMyyyy"/></tstamp>
         <property name="base" location="./testResults/${now}" />
         <property name="results" location="${base}/raw" />
         <property name="report" location="${base}" />
@@ -53,6 +53,7 @@
         
         <junit fork="yes" dir="./">
             <formatter type="xml"/>
+        	<jvmarg value="-DtestDir=${base}"/>
 
             <classpath>
                 <pathelement location="./TestData/Stencil.jar"/>
