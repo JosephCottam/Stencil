@@ -37,15 +37,22 @@ public interface Implanter {
 	 */
 	public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t);
 	
+	/**Should this glyph be counted in the bounds calculation?
+	 * Screen-based glyphs are not.
+	 */
+	public boolean inBounds(Tuple t);
+	
 	/**Identity implanter, provided separately for optimization opportunities.**/
 	public final class Area implements Implanter {
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {return base;}
+		public boolean inBounds(Tuple t) {return true;}
 	}
 	
 	public final class Const implements Implanter {
 		private final ImplantBy implant;
 		private Const(ImplantBy implant) {this.implant =implant;}
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {return Util.implant(implant, base, view);}
+		public boolean inBounds(Tuple t) {return implant != ImplantBy.SCREEN;}
 	}
 
 	public static final class Variable implements Implanter {
@@ -55,6 +62,7 @@ public interface Implanter {
 			ImplantBy implant = (ImplantBy) Converter.convert(t.get(implantIdx), ImplantBy.class);
 			return Util.implant(implant, base, view);
 		}
+		public boolean inBounds(Tuple t) {return t.get(implantIdx) != ImplantBy.SCREEN;}
 	}
 	
 	public static final class Util {

@@ -18,6 +18,7 @@ import stencil.adapters.java2D.columnStore.column.ReferenceColumn;
 import stencil.adapters.java2D.columnStore.util.ReferenceFieldDef;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
+import stencil.adapters.java2D.render.mixins.Implanter;
 import stencil.adapters.java2D.render.mixins.Placer;
 import stencil.display.SchemaFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
@@ -57,7 +58,7 @@ public class CompoundRenderer implements Renderer<TableView> {
 	 * It should always be extended with additional table fields.
 	 * Table fields must include the table definition as the default value.
 	 */
-	public static final TuplePrototype<SchemaFieldDef> SCHEMA_BASIS = new TuplePrototype(ID,X,Y,VISIBLE,Z,BOUNDS);
+	public static final TuplePrototype<SchemaFieldDef> SCHEMA_BASIS = new TuplePrototype(ID,X,Y,IMPLANT,VISIBLE,Z,BOUNDS);
 	
 	protected final Map<String, RenderColPair> subs = new HashMap();	//Which schema fields need which renderers?
 	private static final class RenderColPair {
@@ -72,6 +73,7 @@ public class CompoundRenderer implements Renderer<TableView> {
 
 	private final int boundsIdx;
 	private final Placer placer;
+	private final Implanter implanter;
 	
 	public CompoundRenderer(TuplePrototype<SchemaFieldDef> schema) {
 		final int[] subSchemas = siftSubSchemas(schema);
@@ -84,6 +86,7 @@ public class CompoundRenderer implements Renderer<TableView> {
 		}
 		
 		placer  = Placer.Util.instance(schema, schema.indexOf(X), schema.indexOf(Y));
+		implanter = Implanter.Util.instance(schema, schema.indexOf(IMPLANT));
 		boundsIdx = schema.indexOf(BOUNDS.name());
 	}
 	
@@ -142,7 +145,9 @@ public class CompoundRenderer implements Renderer<TableView> {
 			AffineTransform trans = placer.place(new AffineTransform(), glyph);
 			Rectangle2D b =trans.createTransformedShape(bound).getBounds2D();
 			bounds[glyph.row()] = b;
-			ShapeUtils.add(fullBounds, b);
+			if (implanter.inBounds(glyph)) {
+				ShapeUtils.add(fullBounds, b);
+			}
 		}
 		
 		Column newCol = share.columns()[boundsIdx].replaceAll(bounds);

@@ -94,15 +94,15 @@ public class ImageRenderer implements Renderer<TableView> {
 		   if (logicalBounds == null) {logicalBounds = actualBounds;}
 		   trans.scale(logicalBounds.getWidth()/actualBounds.getWidth(), logicalBounds.getHeight()/actualBounds.getHeight());
 
+		   trans = placer.place(trans, glyph);
 		   if (!(rotater instanceof Rotater.None 
 				   && implanter instanceof Implanter.Area
 				   && reg instanceof Registerer.None)) {
-			   trans = rotater.rotate(trans, glyph);
 			   trans = reg.register(trans, glyph, logicalBounds);
+			   trans = rotater.rotate(trans, glyph);
 			   trans = implanter.implant(trans, viewTransform, glyph);
 		   }
 		   
-		   trans = placer.place(trans, glyph);
 		   return trans;
  }
  

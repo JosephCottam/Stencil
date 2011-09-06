@@ -15,10 +15,12 @@ import stencil.adapters.general.Shapes.StandardShape;
 import stencil.adapters.java2D.columnStore.TableShare;
 import stencil.adapters.java2D.columnStore.util.ReferenceFieldDef;
 import stencil.adapters.java2D.render.mixins.Implanter;
+import stencil.adapters.java2D.render.mixins.Implanter.ImplantBy;
 import stencil.display.Glyph;
 import stencil.display.LayerView;
 import stencil.display.SchemaFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.types.Converter;
 import stencil.types.color.ColorCache;
 import stencil.types.color.ColorUtils;
 import stencil.types.stroke.StrokeTuple;
@@ -93,7 +95,10 @@ public interface Renderer<T extends LayerView<? extends Glyph>> {
 					double x = (Double) glyph.get(X.name());
 					double y = -(Double) glyph.get(Y.name());
 					Shape cross = Shapes.getShape(StandardShape.CROSS, x-scale/2, y-scale/2, scale, scale);
-					g.fill(cross);
+					ImplantBy implant = ImplantBy.AREA;
+					try {implant = (ImplantBy) Converter.convert(glyph.get(IMPLANT.name()), ImplantBy.class);}
+					catch (Exception e) {/*Ignored*/}
+					if (!implant.name().startsWith("SCREEN")) {g.fill(cross);}
 				} catch  (Exception e) {/*Exception ignored, its just debug code.*/}
 			}
 			

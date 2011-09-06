@@ -79,10 +79,10 @@ public class TextRenderer implements Renderer<TableView> {
 			if (!glyph.isVisible()) {continue;}
 			GeneralPath p = layout.layout(glyph);			
 			AffineTransform trans = new AffineTransform();
-			trans = implanter.implant(trans, viewTransform, glyph);
-			trans = rotater.rotate(trans, glyph);
-			trans = reg.register(trans, glyph, p.getBounds2D());
 			trans = placer.place(trans, glyph);
+			trans = implanter.implant(trans, viewTransform, glyph);
+			trans = reg.register(trans, glyph, p.getBounds2D());
+			trans = rotater.rotate(trans, glyph);
 			g.transform(trans);
 			filler.setColor(g, glyph);
 			g.fill(p);
@@ -103,14 +103,15 @@ public class TextRenderer implements Renderer<TableView> {
 			AffineTransform trans = new AffineTransform();
 			trans = placer.place(trans, glyph);
 			trans = implanter.implant(trans, viewTransform, glyph);
-			trans = rotater.rotate(trans, glyph);
 			trans = reg.register(trans, glyph, p.getBounds2D());
+			trans = rotater.rotate(trans, glyph);
 
 			p.transform(trans);
 
 			Rectangle2D b = p.getBounds2D(); 
 			bounds[glyph.row()] = b;
-			ShapeUtils.add(fullBounds, b);
+			
+			if (implanter.inBounds(glyph)) {ShapeUtils.add(fullBounds, b);}
 		}
 
 		Column newBounds = share.columns()[boundsIdx].replaceAll(bounds);

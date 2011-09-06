@@ -55,7 +55,7 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 			AffineTransform trans = makeTrans(shape, g, viewTransform);
 			Rectangle2D b = trans.createTransformedShape(shape.getBounds2D()).getBounds2D();
 			bounds[g.row()] = b;
-			ShapeUtils.add(fullBounds, b);
+			if (implanter.inBounds(g)) {ShapeUtils.add(fullBounds, b);}
 		}
 		Column newCol = share.columns()[boundsIdx].replaceAll(bounds);
 		share.setColumn(boundsIdx, newCol);
@@ -64,15 +64,17 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 
    private AffineTransform makeTrans(Shape shape, Glyph glyph, AffineTransform viewTransform) {
 	   AffineTransform trans = new AffineTransform();
+
+	   trans = placer.place(trans, glyph);
+
 	   if (!(rotater instanceof Rotater.None && 
 			   reg instanceof Registerer.None &&
 			   implanter instanceof Implanter.Area)) {
-		   trans = implanter.implant(trans, viewTransform, glyph);
 		   trans = rotater.rotate(trans, glyph);
+		   trans = implanter.implant(trans, viewTransform, glyph);
 		   trans = reg.register(trans, glyph, shape.getBounds2D());
 	   }
 	   
-	   trans = placer.place(trans, glyph);
 	   return trans;
    }
 
