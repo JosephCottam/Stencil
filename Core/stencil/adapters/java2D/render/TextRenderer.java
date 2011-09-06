@@ -101,10 +101,11 @@ public class TextRenderer implements Renderer<TableView> {
 			GeneralPath p = layout.layout(glyph);
 			
 			AffineTransform trans = new AffineTransform();
+			trans = placer.place(trans, glyph);
 			trans = implanter.implant(trans, viewTransform, glyph);
 			trans = rotater.rotate(trans, glyph);
 			trans = reg.register(trans, glyph, p.getBounds2D());
-			trans = placer.place(trans, glyph);
+
 			p.transform(trans);
 
 			Rectangle2D b = p.getBounds2D(); 

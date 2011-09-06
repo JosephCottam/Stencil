@@ -20,7 +20,7 @@ public interface Placer {
 		public AffineTransform place(AffineTransform base, Tuple t) {
 			double tx = (Double) t.get(xIdx);
 			double ty = (Double) t.get(yIdx);
-			base.preConcatenate(AffineTransform.getTranslateInstance(tx, -ty));
+			base.translate(tx,-ty);
 			return base;
 		}
 	}

@@ -1,6 +1,7 @@
 package stencil.adapters.java2D.render.mixins;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 
 import stencil.display.SchemaFieldDef;
 import stencil.tuple.Tuple;
@@ -22,7 +23,7 @@ import stencil.types.Converter;
  * TODO: Add "largest" and "smallest"
  */
 public interface Implanter {
-	public static enum ImplantBy {AREA, POINT, LINE, X,Y, LARGEST, SMALLEST}
+	public static enum ImplantBy {AREA, POINT, LINE, X,Y, LARGEST, SMALLEST, SCREEN}
 
 	/**What transform should be used to correct for implantation?  
 	 * This returns a transform that should be concatenated with the view transform, not replace it.
@@ -36,7 +37,6 @@ public interface Implanter {
 	 */
 	public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t);
 	
-
 	/**Identity implanter, provided separately for optimization opportunities.**/
 	public final class Area implements Implanter {
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {return base;}
@@ -67,6 +67,9 @@ public interface Implanter {
 			
 			switch (implant) {
 				case AREA: return base;
+				case SCREEN: 
+					try {return view.createInverse();}
+					catch (NoninvertibleTransformException e) {return base;}
 				case POINT: factor = 1d; break;
 				case LINE: factor = 1d; break;
 				case X: factor = view.getScaleX(); break;
@@ -82,7 +85,8 @@ public interface Implanter {
 
 			base.scale(sx, sy);
 			return base;
-		}
+		}		
+		
 
 		public static final Implanter instance(TuplePrototype<SchemaFieldDef> schema, int implantIdx) {
 			SchemaFieldDef<ImplantBy> implantDef = schema.get(implantIdx);
