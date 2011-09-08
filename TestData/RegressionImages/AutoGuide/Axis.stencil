@@ -11,18 +11,18 @@ stream Values(Category)
 layer Chart
 guide
    axis[count: 5, round: "T", tickSize: 5, textOffset: 6] Linear from Y
-      label.FONT: @Font{10}
-      line.PEN: @Stroke{1}
+      label.FONT: Font{10}
+      line.PEN: Stroke{1}
 
    axis[tickSize: 5, textOffset: 6] Categorical from X
-      label.FONT: @Font{10}
-      line.PEN: @Stroke{1} 
+      label.FONT: Font{10}
+      line.PEN: Stroke{1} 
 
 from Values
   ID : Count()
   X : Index(Category) -> Add(Index, 1) -> Mult(Add, 11)
   Y : Count(Category) -#> Mult(Count, 11)
-  FILL_COLOR: @Color{BLUE}
+  FILL_COLOR: Color{BLUE}
   SIZE: 10
   REGISTRATION: "CENTER"
 

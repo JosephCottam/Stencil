@@ -29,7 +29,7 @@ from VertexPair
    ID : Concatenate(ID1, ID2) 
    X : Ordering(ID1)
    Y : Ordering(ID2)
-   FILL_COLOR: @Color{RED}
+   FILL_COLOR: Color{RED}
    (SIZE, SHAPE) : (1, "RECTANGLE")
  
 stream Prime()

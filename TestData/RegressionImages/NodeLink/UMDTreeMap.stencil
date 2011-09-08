@@ -18,8 +18,8 @@ layer Nodes
 from VertexList 
    ID: child
    (X,Y,WIDTH,HEIGHT):* Layout.query(child)
-   FILL_COLOR:  @Color{CLEAR}
-   PEN_COLOR: @Color{BLUE}
+   FILL_COLOR:  Color{CLEAR}
+   PEN_COLOR: Color{BLUE}
    SHAPE : "RECTANGLE"
 	 
 operator Layout : TreeMap

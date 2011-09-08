@@ -33,9 +33,9 @@ from Mouse
     (X,Y) : (X,Y)
     FILL_COLOR: Colorize(META)
     SIZE: 10
-    PEN_COLOR : @Color{CLEAR}
+    PEN_COLOR : Color{CLEAR}
 
 
 operator Colorize(Meta) -> C
-    (Meta !~ "true") => C: @Color{WHITE}
-    (Meta =~ "true") => C: @Color{GREEN}
+    (Meta !~ "true") => C: Color{WHITE}
+    (Meta =~ "true") => C: Color{GREEN}

@@ -19,14 +19,14 @@ guide
     TEXT: ParseLabel(ID) 		/*@\label{rose:postProcessStart}@*/
     (X,Y): LabelLayout(ID, OUTER) 
     REGISTRATION: "CENTER"
-    FONT: @Font{4}          	/*@\label{rose:postProcessEnd}@*/
+    FONT: Font{4}          	    /*@\label{rose:postProcessEnd}@*/
 
 from Deaths
    local(month, year) : Parse[f:"M/yyyy"](date) -> (Parse.month, Parse.year)
    ID: Concatenate(type, ":", local.month)	
    FILL_COLOR: ColorBy(type)
-   PEN: @Stroke{.5}
-   PEN_COLOR: @Color{Gray70}
+   PEN: Stroke{.5}
+   PEN_COLOR: Color{Gray70}
    SIZE:* MonthMin(local.month, count) 
 				-> Scale[min:0, max:250](count)
    Z: Mult(-1, count)
@@ -34,9 +34,9 @@ from Deaths
    (START, END): Sub1(local.month) -> Partition(_)  
     
 operator ColorBy (t) -> (C)
-   (t=~"wounds") => C:@Color{LightPink}
-   (t=~"other") => C:@Color{DarkGray}
-   (t=~"disease") => C:@Color{LightBlue}
+   (t=~"wounds") => C:Color{LightPink}
+   (t=~"other") => C:Color{DarkGray}
+   (t=~"disease") => C:Color{LightBlue}
 
 operator MonthMin : Split[1](@FullMin["Integer"])
 

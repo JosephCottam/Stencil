@@ -39,7 +39,7 @@
     </target>
     
     <target name="JUnit" depends="CleanUpTests,MakeJar">
-        <tstamp><format property="now" pattern="mmHH_ddMMMyyyy"/></tstamp>
+        <tstamp><format property="now" pattern="yyyyMMMdd_HH_mm"/></tstamp>
         <property name="base" location="./testResults/${now}" />
         <property name="results" location="${base}/raw" />
         <property name="report" location="${base}" />

@@ -14,8 +14,8 @@ from LineSource
     Y1: 5
     Y2: 10
     ARC_HEIGHT: 20
-    PEN_COLOR: @Color{GRAY80}
-    PEN: @Stroke{3}
+    PEN_COLOR: Color{GRAY80}
+    PEN: Stroke{3}
 
 layer Horizontal["ARC"]
 from LineSource
@@ -25,8 +25,8 @@ from LineSource
     X1: -5
     X2: 10
     ARC_HEIGHT: 50
-    PEN_COLOR: @Color{GRAY80}
-    PEN: @Stroke{3}
+    PEN_COLOR: Color{GRAY80}
+    PEN: Stroke{3}
 
 
 layer Diagonal["ARC"]
@@ -36,8 +36,8 @@ from LineSource
     X2: Spacing(count)  -> Mult(Spacing, 2)
     Y1: 40
     Y2: 50
-    PEN_COLOR: @Color{GRAY80}
-    PEN: @Stroke{3}
+    PEN_COLOR: Color{GRAY80}
+    PEN: Stroke{3}
 
 operator Spacing (ID) -> (V) 
     default => V : Index(ID) -> Mult(Index, 100)

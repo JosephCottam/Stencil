@@ -28,4 +28,4 @@ from Barley	           	           	        				/*@\label{barley:fromBlock}@*/
 		inMin: MIN, inMax: MAX](yield) 						/*@\label{barley:dynamicBind}@*/
     Y:* Rank(variety) -> Mult(7,_) -> Add(-5,_)       /*@\label{barley:composition}@*/
     REGISTRATION: "CENTER"
-    FILL_COLOR: @Color{CLEAR}                         /*@\label{barley:customArg}@*/
+    FILL_COLOR: Color{CLEAR}                         /*@\label{barley:customArg}@*/

@@ -18,7 +18,7 @@ layer Nodes
 from VertexList 
     ID: child
     REGISTRATION : "CENTER"
-    FILL_COLOR:  @Color{BLUE}
+    FILL_COLOR:  Color{BLUE}
     (SHAPE, SIZE) : ("ELLIPSE", 5)
     (X,Y) :* Layout.query(child) -> (Layout.X, Layout.Y)
      
@@ -27,15 +27,15 @@ from VertexList
     ID: Concatenate(parent, child)
     (X1, Y1):* Nodes.find(parent) -> (Nodes.X, Nodes.Y)
     (X2, Y2):* Nodes.find(child) ->  (Nodes.X, Nodes.Y)
-    PEN_COLOR: @Color{GRAY30,80}
+    PEN_COLOR: Color{GRAY30,80}
 
 layer Labels["TEXT"]
 from VertexList
     ID : child
     (X,Y):* Nodes.find(child) -> (Nodes.X,Nodes.Y)
     TEXT: child
-    FONT: @Font{10}
-    COLOR: @Color{GRAY60}
+    FONT: Font{10}
+    COLOR: Color{GRAY60}
 
 
 operator Layout : RadialLayout

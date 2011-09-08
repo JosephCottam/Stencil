@@ -14,14 +14,14 @@ from Elements
 	ID: Concatenate(Name, "TL")
 	SHAPE: "CROSS"
 	X : XLayout(Name) -> Get(*, 0) -> Mult(40, _)
-   FILL_COLOR: @Color{RED,128}
+   FILL_COLOR: Color{RED,128}
 
 layer Shape
 from Elements
 	ID: Concatenate(Name, "TL")
 	SHAPE: "CROSS"
 	X : XLayout(Name) -> Mult(40, _)
-   FILL_COLOR: @Color{GREEN, 128}
+   FILL_COLOR: Color{GREEN, 128}
 
 operator XLayout(Name) -> (VALUE) 
 	default => VALUE : Index(Name)

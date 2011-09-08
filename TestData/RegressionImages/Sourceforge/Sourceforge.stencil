@@ -24,7 +24,7 @@ from NodePositions
     (X,Y) : (X,Y)
     SIZE: 3
     SHAPE: "RECTANGLE"
-    FILL_COLOR: @Color{GRAY}
+    FILL_COLOR: Color{GRAY}
 
 layer Overlay
 from Attributes
@@ -39,6 +39,6 @@ from Attributes
     FILL_COLOR: Coloring(ATT)
 
 operator Coloring(ATT) -> (C)
-    (ATT =~ "Python") => C : @Color{30,100,50}
-    (ATT =~ "Java")   => C : @Color{65,70,135}
-    (ATT =~ "C")      => C : @Color{120,40,80}
+    (ATT =~ "Python") => C : Color{30,100,50}
+    (ATT =~ "Java")   => C : Color{65,70,135}
+    (ATT =~ "C")      => C : Color{120,40,80}

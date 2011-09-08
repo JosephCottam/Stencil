@@ -22,7 +22,7 @@ layer Nodes
 from BFS 
     ID: ID
     REGISTRATION : "CENTER"
-    FILL_COLOR:  @Color{BLUE}
+    FILL_COLOR:  Color{BLUE}
     (SHAPE, SIZE) : ("ELLIPSE", 10)
     (X,Y) : Ordering(ID) -> Triangular(Ordering)
      
@@ -32,15 +32,15 @@ from BFS
     ID : ID
     (X,Y): Nodes.find(ID) -> (Nodes.X,Nodes.Y)
     TEXT: ID
-    FONT: @Font{10}
-    COLOR: @Color{GRAY60}
+    FONT: Font{10}
+    COLOR: Color{GRAY60}
 
 layer Edges["LINE"]
 from VertexList 
     ID: Concatenate(ID1,ID2)
     (X1, Y1): Nodes.find(ID1) -> (Nodes.X,Nodes.Y)
     (X2, Y2): Nodes.find(ID2) ->  (Nodes.X,Nodes.Y)
-    PEN_COLOR: @Color{GRAY30,80}
+    PEN_COLOR: Color{GRAY30,80}
 
 
 operator Ordering (ID)->(VALUE)  

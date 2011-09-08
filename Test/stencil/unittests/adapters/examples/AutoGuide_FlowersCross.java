@@ -7,7 +7,7 @@ public class AutoGuide_FlowersCross extends ImageTest {
 				"AndersonFlowers-cross.stencil",
 				  null,
 				  null,
-				  "flowers_cross.txt",
-				  "flowers_cross.png", configs));
+				  "AndersonFlowers-cross.txt",
+				  "AndersonFlowers-cross.png", configs));
 	}
 }

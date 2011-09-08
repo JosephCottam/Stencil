@@ -24,7 +24,7 @@ from Elements
     X : Count(Name) -> Mult(40, Count) 
     Y : 40
     SIZE: 30
-    FILL_COLOR: @Color{RED}
+    FILL_COLOR: Color{RED}
 
 layer Center
 from Elements
@@ -35,7 +35,7 @@ from Elements
     X : Count(Name) -> Mult(40, _) -> Add(15,_)
     Y : 100
     SIZE: 30
-    FILL_COLOR: @Color{BLUE}
+    FILL_COLOR: Color{BLUE}
 
 
 

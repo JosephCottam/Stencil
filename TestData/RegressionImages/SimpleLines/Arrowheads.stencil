@@ -52,9 +52,9 @@ operator IDS : Count
 
 operator ColorBy(Deg) -> (C)
   prefilter(quad) : Div(Deg, 90)
-  (prefilter.quad = 0) => C: @Color{BLACK}
-  (prefilter.quad = 1) => C: @Color{GREEN}
-  (prefilter.quad = 2) => C: @Color{BLUE}
-  (prefilter.quad = 3) => C: @Color{PURPLE}
-  default    => C: @Color{RED, 100}
+  (prefilter.quad = 0) => C: Color{BLACK}
+  (prefilter.quad = 1) => C: Color{GREEN}
+  (prefilter.quad = 2) => C: Color{BLUE}
+  (prefilter.quad = 3) => C: Color{PURPLE}
+  default   => C: Color{RED, 100}
 

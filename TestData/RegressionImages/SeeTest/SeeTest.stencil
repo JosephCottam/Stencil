@@ -47,12 +47,12 @@ from MTTSource
     ID : Concatenate(axis1A, axis1B, axis2A, axis2B, suite_name)
     (X,Y): Layout.suite(axis1A, axis1B, axis2A, axis2B, suite_name)
     SIZE: 13
-    PEN: @Stroke{3}
+    PEN: Stroke{3}
     PEN_COLOR: RelativeFails(fail, pass)
     SLICE: fail
     FIELD: pass
     SLICE_COLOR: Palette("FAIL")
-    FIELD_COLOR: @Color{WHITE}
+    FIELD_COLOR: Color{WHITE}
 
 
 layer SubLabels["TEXT"]
@@ -62,11 +62,11 @@ from MTTSource
     ID: local.ID
     (X,Y): Others.find(local.ID) -> (Others.X, Others.Y)
     TEXT: suite_name
-    FONT: @Font{5}
+    FONT: Font{5}
     ROTATION: -45
     REGISTRATION: "CENTER"
     FONT_STYLE: "BOLD"
-    COLOR: @Color{0,0,0,166}
+    COLOR: Color{0,0,0,166}
 
 layer YLabels["TEXT"]
 from MTTSource
@@ -133,16 +133,16 @@ operator BasicFails(fails) -> (C)
     (fails > 0) => C: Palette("FAIL") -> SetAlpha(102, Palette.C)
 
 operator RelativeFails(fails, passes) -> (C)
-    (passes= 0) => C: @Color{BLACK}
+    (passes= 0) => C: Color{BLACK}
     (fails = 0) => C: Palette("PASS")
     (fails > 0) => C: Palette("FAIL")
 
 operator Palette(Name) -> (C)
-    (Name =~"FAIL")    => C: @Color{200,30,30}
-    (Name =~"PASS")    => C: @Color{0,180,0}
-    (Name =~"MISSING") => C: @Color{WHITE}
-    (Name =~"N/A")     => C: @Color{GRAY90}
-    (Name =~"GRID")    => C: @Color{GRAY80}
+    (Name =~"FAIL")    => C: Color{200,30,30}
+    (Name =~"PASS")    => C: Color{0,180,0}
+    (Name =~"MISSING") => C: Color{WHITE}
+    (Name =~"N/A")     => C: Color{GRAY90}
+    (Name =~"GRID")    => C: Color{GRAY80}
 
 java Break
 {

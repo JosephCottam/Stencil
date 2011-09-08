@@ -24,7 +24,7 @@ public class StrokeTuple implements PrototypedTuple {
 	static final float DEFAULT_WIDTH = 1f;
 	static final Join DEFAULT_JOIN = Join.ROUND;
 	static final Cap DEFAULT_CAP  = Cap.ROUND;
-	static final float[] DEFAULT_PATTERN = Pattern.SOLD.mask;
+	static final float[] DEFAULT_PATTERN = Pattern.SOLID.mask;
 	static final float DEFAULT_LIMIT = 15f;
 	static final float DEFAULT_PHASE  = 0f;
 	
@@ -59,7 +59,7 @@ public class StrokeTuple implements PrototypedTuple {
 	}
 	
 	public enum Pattern {	
-		SOLD     (null),
+		SOLID     (null),
 		DOT      (1f, 2f),
 		DASH5    (5f),
 		DASH10   (10f),

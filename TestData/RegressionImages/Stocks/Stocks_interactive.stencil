@@ -23,7 +23,7 @@ layer Ticker["POLY_POINT"]		/*Poly-piont is a group of groups of line segments.*
 guide
    axis Linear from Y
    axis[unit: "MONTH"] Date from X
-      label.TEXT: Parse.format["MMM yy"](Input)    /*@\label{stocks:monthSample}@*/
+     label.TEXT: Parse.format[f:"MMM yy"](Input)    /*@\label{stocks:monthSample}@*/
 
 from AlignedStocks
    ID: TimeStep(Date)
@@ -31,8 +31,8 @@ from AlignedStocks
    ORDER: Count()
    X: TimeStep(Date)
    Y: Open  
-   PEN: @Stroke{1}
-   PEN_COLOR: @Color{BLUE}
+   PEN: Stroke{1}
+   PEN_COLOR: Color{BLUE}
 
 layer Averages["POLY_POINT"]
 from AlignedStocks
@@ -41,24 +41,24 @@ from AlignedStocks
    ORDER: Count()
    X: TimeStep(Date)
    Y: Range["-30..n"](@Mean, Open)	    /*Average the most recent 30 values.*/
-   PEN: @Stroke{1}
-   PEN_COLOR: @Color{LIME,150}
+   PEN: Stroke{1}
+   PEN_COLOR: Color{LIME,150}
 from AlignedStocks
    ID: Ids()
    GROUP: "Google_ALL"
    ORDER: Count()
    X: TimeStep(Date)
    Y: Range[ALL](@Mean, Open)		    /*Average all values.*/
-   PEN: @Stroke{1}
-   PEN_COLOR: @Color{CRIMSON,150}
+   PEN: Stroke{1}
+   PEN_COLOR: Color{CRIMSON,150}
 from AlignedStocks
    ID: Ids()
    GROUP: "Google_20"
    ORDER: Count()
    X: TimeStep(Date)
    Y: Range["-30 .. -10"](@Mean, Open) /*Average that lags by 10 and includes 20 values.*/
-   PEN: @Stroke{1}
-   PEN_COLOR: @Color{ORANGE,150}
+   PEN: Stroke{1}
+   PEN_COLOR: Color{ORANGE,150}
 
 
 layer Selected["TEXT"]			/*@\label{stocks:beginInteractive}@*/
@@ -78,8 +78,8 @@ from Mouse
   (X1, X2) : Nearest(X, 3) -> (_, _)
   Y1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
   Y2 : Add(canvas.Y, 3)
-  PEN : @Stroke{3}
-  PEN_COLOR: @Color{BLUE, 100}		/*@\label{stocks:endInteractive}@*/
+  PEN : Stroke{3}
+  PEN_COLOR: Color{BLUE, 100}		/*@\label{stocks:endInteractive}@*/
 
 operator Ids : Count
 

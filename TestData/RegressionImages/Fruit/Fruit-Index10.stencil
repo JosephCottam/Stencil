@@ -16,4 +16,4 @@ from survey
    X:* Index(fruit) -> Mult(10, Index)
    Y: Count(fruit) -> Mult(5, Count)
    REGISTRATION: "CENTER"
-   FILL_COLOR: @Color{150,150,255}
+   FILL_COLOR: Color{150,150,255}

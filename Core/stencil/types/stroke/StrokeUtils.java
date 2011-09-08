@@ -39,7 +39,7 @@ public final class StrokeUtils extends BasicModule {
 	@Operator
 	@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
 	public static final java.awt.Stroke Pattern(BasicStroke s, Object... input) {
-		float[] pattern = Pattern.SOLD.mask;
+		float[] pattern = Pattern.SOLID.mask;
 		
 		if (input.length ==1 && input[0] instanceof String) {
 			pattern = Pattern.valueOf((String) input[0]).mask;
@@ -57,11 +57,8 @@ public final class StrokeUtils extends BasicModule {
 	public static class Stroke extends AbstractOperator {
 		public Stroke(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)")
-		public BasicStroke argumentParser(String arg) {return parse(arg);}
-
-		@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map","query"})
-		public StrokeTuple query(double width) {return new StrokeTuple(new BasicStroke((float) width));}
+		@Facet(memUse="FUNCTION", prototype="(self, width, join, cap, pattern, phase, limit)", alias={"map", "query"})
+		public BasicStroke query(String arg) {return parse(arg);}
 		
 		public static BasicStroke parse(String arg) { 
 			String[] parts = arg.split(":");
@@ -69,7 +66,7 @@ public final class StrokeUtils extends BasicModule {
 			float weight = Converter.toFloat(parts[0]);
 			
 			//Parse a pattern, if provided
-			float[] pattern = Pattern.SOLD.mask;
+			float[] pattern = Pattern.SOLID.mask;
 			if (parts.length >1 && !parts[1].trim().equals("")) {
 				String[] patternParts = parts[1].split("\\s*,\\s*");
 				if (patternParts .length ==1) {					

@@ -40,7 +40,7 @@ guide
    axis[sample: "linear", stride: 50, axisLabel: "Elapsed Milliseconds"] from X1
 from MethodSpans
 	ID: Count()
-	PEN: @Stroke{{width}::BUTT}
+	PEN: Stroke{{width}::BUTT}
 	PEN_COLOR:* BrewerColors[pallette: "ACCENT"](Method) -> SetAlpha(100, _)
 	X1: Start
 	X2: Stop

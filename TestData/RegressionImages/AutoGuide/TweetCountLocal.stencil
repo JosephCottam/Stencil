@@ -17,8 +17,8 @@ from Tweets
 
 layer Counts
 guide axis[tickSize: 5, textOffset: 6] Categorical from X
-   label.FONT: @Font{10}
-   line.PEN: @Stroke{1} 
+   label.FONT: Font{10}
+   line.PEN: Stroke{1} 
    label.REGISTRATION: "LEFT"
 
 from Tweets

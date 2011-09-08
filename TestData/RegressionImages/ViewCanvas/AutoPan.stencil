@@ -48,8 +48,8 @@ from Stocks
     GROUP : "Google"   
     X: TimeStep(Date) 
     Y: Open
-    PEN: @Stroke{1}
-    PEN_COLOR: @Color{BLUE}
+    PEN: Stroke{1}
+    PEN_COLOR: Color{BLUE}
 
 operator TimeStep (Date) -> (VALUE)
     default => VALUE : Index(Date) -> Mult(3, Index)

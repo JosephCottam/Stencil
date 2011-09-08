@@ -332,10 +332,8 @@ functionCall returns [String baseName]
      -> callName specializer ^(LIST_ARGS valueList)
   | callName specializer emptySet
      -> callName specializer ^(LIST_ARGS)
-  | t=TAGGED_ID ISLAND_BLOCK
-     -> ^(OP_NAME DEFAULT ID[$t.text.substring(1)] ID[CUSTOM_PARSER_FACET]) ^(SPECIALIZER DEFAULT) ISLAND_BLOCK
-  | ID NAMESPACE t=TAGGED_ID ISLAND_BLOCK
-     -> ^(OP_NAME ID ID[$t.text.substring(1)] ID[CUSTOM_PARSER_FACET]) ^(SPECIALIZER DEFAULT) ISLAND_BLOCK;  
+  | t=callName specializer ISLAND_BLOCK
+     -> callName specializer ISLAND_BLOCK;
 
 callName
   : ID NAMESPACE ID        -> ^(OP_NAME ID ID ID[MAP_FACET])

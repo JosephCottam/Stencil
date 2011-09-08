@@ -54,7 +54,7 @@ from Words
         [count] WordCount.query(word) -> Range[ALL](@Max, _) -> 
         [freq]  Divide(count, _) -> 
         [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq) ->
-                Scale[min: 50, max:1000](freq) -> @Font{{_}} -> (color, _)
+                Scale[min: 50, max:1000](freq) -> Font{{_}} -> (color, _)
 
 operator WordCount : Count
 

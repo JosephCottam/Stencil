@@ -27,7 +27,7 @@ from ranks
 	TEXT: label
 	X: -10
 	Y: Layout(rank)
-	COLOR: @Color{GRAY70}
+	COLOR: Color{GRAY70}
 	REGISTRATION: "RIGHT"
 from overheads
 	filter (start > prefilter.margin)
@@ -37,7 +37,7 @@ from overheads
 	TEXT: start
 	X: Timescale(skewedStart)
 	Y: -10    
-	COLOR: @Color{GRAY70}
+	COLOR: Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
 	() : Spacer.map(start)
@@ -49,7 +49,7 @@ from overheads
 	TEXT: end
 	X: Timescale(skewedEnd)
 	Y: -10    
-	COLOR: @Color{GRAY70}
+	COLOR: Color{GRAY70}
 	REGISTRATION: "LEFT"
 	ROTATION: "VERTICAL"
 	() : Spacer.map(end)
@@ -62,12 +62,12 @@ layer baseline["LINE"]
 from overheads
 	ID: rank
 	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
-	PEN_COLOR: @Color{Gray90}
+	PEN_COLOR: Color{Gray90}
 	(Y1, Y2): Layout(rank) -> (_,_)
 from trans
 	ID: source
 	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
-	PEN_COLOR: @Color{Gray90}
+	PEN_COLOR: Color{Gray90}
 	(Y1,Y2): Layout(source) ->(_,_)
 
 
@@ -77,7 +77,7 @@ from overheads
 	ID: Count()
 	Y: Layout(rank) 
 	X: Timescale(skewedStart)
-	FILL_COLOR : @Color{Purple}
+	FILL_COLOR : Color{Purple}
 	SIZE: 15
 	REGISTRATION: "CENTER"
 	
@@ -103,16 +103,16 @@ from trans
 	CAP2: "ARROW"
 
 operator ColorByOp(op) -> (C)
-	(op =~ "osend") => C: @Color{SlateBlue}
-	(op =~ "orecv") => C: @Color{MediumSlateBlue}
-	(op =~ "transmission") => C: @Color{FireBrick}
-	default => C: @Color{BLACK, .5}
+	(op =~ "osend") => C: Color{SlateBlue}
+	(op =~ "orecv") => C: Color{MediumSlateBlue}
+	(op =~ "transmission") => C: Color{FireBrick}
+	default => C: Color{BLACK, .5}
 
 operator WeightByOp(op) -> (W)
-	(op =~ "osend") => W : @Stroke{1}
- 	(op =~ "orecv") => W : @Stroke{1}
-	(op =~ "transmission") => W: @Stroke{5}
-	default => W: @Stroke{2}
+	(op =~ "osend") => W : Stroke{1}
+ 	(op =~ "orecv") => W : Stroke{1}
+	(op =~ "transmission") => W: Stroke{5}
+	default => W: Stroke{2}
    
 	
 operator Layout (rank)->(Y)

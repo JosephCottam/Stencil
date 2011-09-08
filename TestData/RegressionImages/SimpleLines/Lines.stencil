@@ -15,8 +15,8 @@ from LineSource
     X2: Spacing(count)
     Y1: 5
     Y2: -10
-    PEN_COLOR: @Color{GRAY80}
-    PEN: @Stroke{3}
+    PEN_COLOR: Color{GRAY80}
+    PEN: Stroke{3}
 
 operator Spacing (ID) -> (X) 
     default => X : Index(ID) -> Mult(Index, 5)

@@ -16,11 +16,11 @@ guide
       label.TEXT : Substring(Input.0, 0,1)
 		label.ROTATION: 0
 		label.REGISTRATION: "TOP"
-		tick.PEN_COLOR : @Color{CLEAR}
+		tick.PEN_COLOR : Color{CLEAR}
 		tick.VISIBLE : false
    axis[line.VISIBLE: false]  from Y
       label.REGISTRATION: "BOTTOM_RIGHT"
-		tick.PEN_COLOR : @Color{CLEAR}
+		tick.PEN_COLOR : Color{CLEAR}
 		tick.VISIBLE : false
 from HotelStays
    ID: Count()
@@ -28,8 +28,8 @@ from HotelStays
    Y: Permute(type) -> Mult(12,_)
    HEIGHT: Split[1](@Scale[min: 1, max:10], type, count)		/*@\label{hotel:height}@*/
    FILL_COLOR:* Split[1](@Avg, type, count) -> FillBy(_, count)		/*@\label{hotel:color}@*/
-   PEN_COLOR: @Color{BLACK}
-   PEN: @Stroke{.5}
+   PEN_COLOR: Color{BLACK}
+   PEN: Stroke{.5}
    (SHAPE, REGISTRATION): ("RECTANGLE", "BOTTOM")
 
 operator Avg :Range[ALL](@Mean)
@@ -38,8 +38,8 @@ operator MonthNum (mmmm) -> (m)
    default => m:Parse.reformat(mmmm, "MMM", "M")
 
 operator FillBy(mean, count) -> (c)
-   (mean > count) => c: @Color{WHITE}
-   default          => c: @Color{BLACK}
+   (mean > count) => c: Color{WHITE}
+   default        => c: Color{BLACK}
 
 operator Permute(label) -> (index)
    default => index: IndexOf(label, ".") -> Substring(label, 0,_)

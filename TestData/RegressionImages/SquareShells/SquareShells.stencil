@@ -16,7 +16,7 @@ from Layout
     (X,Y) :* Range[ALL](@Max, ID) -> Sub(_, ID)  -> Layout(ID)
     FILL_COLOR:* HeatScale[](ID)
 /*  (X,Y) : Layout(ID) 
-    FILL_COLOR: @Color{RED} */
+    FILL_COLOR: Color{RED} */
     SIZE: 1
 
 operator Layout (i) -> (X,Y) 

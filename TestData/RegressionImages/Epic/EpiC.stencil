@@ -40,14 +40,14 @@ layer Lines["POLY_POINT"]
 guide
 	axis[tickCount: 10,  tickSize: 5, textOffset: 6, axisOffset: 10] Linear from X
        label.IMPLANT: "POINT"
-       label.FONT: @Font{10}
-	    label.REGISTRATION: "LEFT"
-       line.PEN: @Stroke{1}
+       label.FONT: Font{10}
+       label.REGISTRATION: "LEFT"
+       line.PEN: Stroke{1}
 	axis[tickCount: 10, tickSize: 5, textOffset: 6, axisOffset: 10] Linear from Y
        label.IMPLANT: "POINT"
-       label.FONT: @Font{10}
+       label.FONT: Font{10}
 	    label.REGISTRATION: "RIGHT"
-       line.PEN: @Stroke{1}
+       line.PEN: Stroke{1}
 
 from Data
 	ID : Count(Line) -> Concatenate(Line, _)
@@ -56,7 +56,7 @@ from Data
 	X : Index(Timestep) -#> Mult(_, 300)
 	Y: Value 
    IMPLANT: "POINT"
-	PEN: @Stroke{1.5}
+	PEN: Stroke{1.5}
 from Visibility
 	ID : Concatenate(Line,1)
 	VISIBLE : Visible

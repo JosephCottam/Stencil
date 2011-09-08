@@ -31,7 +31,7 @@ from Reg
    ID : Name
    X: Count(Name) 
    Y: 10
-   FILL_COLOR: @Color{RED}
+   FILL_COLOR: Color{RED}
    REGISTRATION:  Name
    SIZE: 4
 
@@ -41,7 +41,7 @@ from Reg2
    SIZE: 3
    (X,Y): Points.find(Name) -> (Points.X, Points.Y)
    SHAPE: "CROSS"
-   FILL_COLOR: @Color{RED}
+   FILL_COLOR: Color{RED}
    REGISTRATION: "CENTER"
 
 layer Text["TEXT"]
