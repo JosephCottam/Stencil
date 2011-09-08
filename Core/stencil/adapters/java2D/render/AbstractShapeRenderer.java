@@ -70,8 +70,8 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 	   if (!(rotater instanceof Rotater.None && 
 			   reg instanceof Registerer.None &&
 			   implanter instanceof Implanter.Area)) {
-		   trans = rotater.rotate(trans, glyph);
 		   trans = implanter.implant(trans, viewTransform, glyph);
+		   trans = rotater.rotate(trans, glyph);
 		   trans = reg.register(trans, glyph, shape.getBounds2D());
 	   }
 	   

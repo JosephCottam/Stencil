@@ -71,19 +71,26 @@ public class TextRenderer implements Renderer<TableView> {
 	   	boundsIdx = schema.indexOf(BOUNDS);
     }
     
+    
+    private AffineTransform makeTransform(Glyph glyph, AffineTransform viewTransform, Rectangle2D bounds) {
+		AffineTransform trans = new AffineTransform();
+		trans = placer.place(trans, glyph);
+		trans = implanter.implant(trans, viewTransform, glyph);
+		trans = rotater.rotate(trans, glyph);
+		trans = reg.register(trans, glyph, bounds);
+		return trans;
+    }
 
 	@Override
 	public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
 
 		for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(),  true)) {
 			if (!glyph.isVisible()) {continue;}
-			GeneralPath p = layout.layout(glyph);			
-			AffineTransform trans = new AffineTransform();
-			trans = placer.place(trans, glyph);
-			trans = implanter.implant(trans, viewTransform, glyph);
-			trans = reg.register(trans, glyph, p.getBounds2D());
-			trans = rotater.rotate(trans, glyph);
+			GeneralPath p = layout.layout(glyph);
+
+			AffineTransform trans = makeTransform(glyph, viewTransform, p.getBounds2D());
 			g.transform(trans);
+
 			filler.setColor(g, glyph);
 			g.fill(p);
 			g.setTransform(viewTransform);
@@ -99,13 +106,7 @@ public class TextRenderer implements Renderer<TableView> {
 		
 		for(StoreTuple glyph: new TupleIterator(share, true)) {
 			GeneralPath p = layout.layout(glyph);
-			
-			AffineTransform trans = new AffineTransform();
-			trans = placer.place(trans, glyph);
-			trans = implanter.implant(trans, viewTransform, glyph);
-			trans = reg.register(trans, glyph, p.getBounds2D());
-			trans = rotater.rotate(trans, glyph);
-
+			AffineTransform trans = makeTransform(glyph, viewTransform, p.getBounds2D());
 			p.transform(trans);
 
 			Rectangle2D b = p.getBounds2D(); 
