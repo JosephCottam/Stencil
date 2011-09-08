@@ -89,12 +89,13 @@ public class ImageRenderer implements Renderer<TableView> {
 	
     private AffineTransform trans(BufferedImage img, Glyph glyph, AffineTransform viewTransform) {
 		   AffineTransform trans = new AffineTransform();
+		   trans = placer.place(trans, glyph);
+
 		   Rectangle2D actualBounds = new Rectangle2D.Double(0,0, img.getWidth(), img.getHeight());
 		   Rectangle2D logicalBounds = (Rectangle2D) glyph.get(boundsIdx);
 		   if (logicalBounds == null) {logicalBounds = actualBounds;}
 		   trans.scale(logicalBounds.getWidth()/actualBounds.getWidth(), logicalBounds.getHeight()/actualBounds.getHeight());
 
-		   trans = placer.place(trans, glyph);
 		   if (!(rotater instanceof Rotater.None 
 				   && implanter instanceof Implanter.Area
 				   && reg instanceof Registerer.None)) {
