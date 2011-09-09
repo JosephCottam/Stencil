@@ -5,10 +5,12 @@ import static stencil.adapters.Adapter.REFERENCE_GRAPHICS;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.regex.Pattern;
 
@@ -30,6 +32,8 @@ import stencil.types.font.FontTuple;
 import stencil.util.DoubleDimension;
 
 public class TextRenderer implements Renderer<TableView> {
+	private static final String LAYOUT = "#Layout";
+	
 	/**Basic expected table schema.**/
 	public static final TuplePrototype<SchemaFieldDef> SCHEMA = new TuplePrototype(
 				ID,
@@ -46,7 +50,8 @@ public class TextRenderer implements Renderer<TableView> {
 				VISIBLE,
 				REGISTRATION,
 				Z,
-				BOUNDS);
+				BOUNDS,
+				new SchemaFieldDef(LAYOUT, null, RenderDescription.class));
 	
 	/**Basic expected table schema.**/
 	
@@ -56,9 +61,10 @@ public class TextRenderer implements Renderer<TableView> {
     private final Registerer reg;
     private final Implanter implanter;
     private final Rotater rotater;
-    private final LayoutEngine layout;
+    private final LayoutEngine layoutEngine;
     
     private final int boundsIdx;
+    private final int layoutIdx;
     
     public TextRenderer(TuplePrototype<SchemaFieldDef> schema) {
   	    filler  = Colorer.Util.instance(schema, schema.indexOf("COLOR"));
@@ -66,9 +72,10 @@ public class TextRenderer implements Renderer<TableView> {
 	    reg = Registerer.Util.instance(schema, schema.indexOf(REGISTRATION));
 	    implanter = Implanter.Util.instance(schema, schema.indexOf(IMPLANT));
 	    rotater  = Rotater.Util.instance(schema, schema.indexOf(ROTATION));
-	    layout = new LayoutEngine(schema.indexOf("TEXT"), schema.indexOf("FONT"), schema.indexOf("JUSTIFY"));
+	    layoutEngine = new LayoutEngine(schema.indexOf("TEXT"), schema.indexOf("FONT"), schema.indexOf("JUSTIFY"));
 	
 	   	boundsIdx = schema.indexOf(BOUNDS);
+	   	layoutIdx = schema.indexOf(LAYOUT);
     }
     
     
@@ -83,16 +90,23 @@ public class TextRenderer implements Renderer<TableView> {
 
 	@Override
 	public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
-
 		for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(),  true)) {
-			if (!glyph.isVisible()) {continue;}
-			GeneralPath p = layout.layout(glyph);
+			Rectangle2D bounds = (Rectangle2D) glyph.get(boundsIdx);
+			Rectangle clipBounds = bounds.getBounds();
+			if (!glyph.isVisible() || !g.hitClip(clipBounds.x, clipBounds.y, clipBounds.width, clipBounds.height)) {continue;}
 
-			AffineTransform trans = makeTransform(glyph, viewTransform, p.getBounds2D());
-			g.transform(trans);
-
+			RenderDescription layout = (RenderDescription) glyph.get(layoutIdx);
 			filler.setColor(g, glyph);
-			g.fill(p);
+
+			
+			AffineTransform trans = makeTransform(glyph, viewTransform, layout.bounds);
+			trans.translate(-layout.bounds.getX(), -layout.bounds.getY());		//baseline correction
+			g.transform(trans);
+			for (int i=0 ;i< layout.lines.length; i++) {
+				Point2D.Float p = layout.positions[i];
+				GlyphVector v = layout.lines[i];
+				g.drawGlyphVector(v, p.x, p.y);
+			}
 			g.setTransform(viewTransform);
 		}
 		Renderer.Util.debugRender(layer, g);
@@ -103,26 +117,48 @@ public class TextRenderer implements Renderer<TableView> {
 	public void calcFields(TableShare share, AffineTransform viewTransform) {
 		Rectangle2D fullBounds = new Rectangle2D.Double(0,0,-1,-1);
 		Rectangle2D[] bounds = new Rectangle2D[share.size()];
+		RenderDescription[] layouts = new RenderDescription[share.size()];
 		
 		for(StoreTuple glyph: new TupleIterator(share, true)) {
-			GeneralPath p = layout.layout(glyph);
-			AffineTransform trans = makeTransform(glyph, viewTransform, p.getBounds2D());
-			p.transform(trans);
+			RenderDescription layout = layoutEngine.layoutLines(glyph);
+			Rectangle2D b = layout.bounds;
 
-			Rectangle2D b = p.getBounds2D(); 
+			AffineTransform trans = makeTransform(glyph, viewTransform, b);
+			trans.translate(-b.getX(), -b.getY());		//baseline correction
+			b = trans.createTransformedShape(b).getBounds2D();
 			bounds[glyph.row()] = b;
+			layouts[glyph.row()] = layout;
 			
 			if (implanter.inBounds(glyph)) {ShapeUtils.add(fullBounds, b);}
 		}
 
 		Column newBounds = share.columns()[boundsIdx].replaceAll(bounds);
 		share.setColumn(boundsIdx, newBounds);
-		
+		share.setColumn(layoutIdx, share.columns()[layoutIdx].replaceAll(layouts));
 		share.setBounds(fullBounds);
 	}
 
+	/**Results of performing a layout.  Includes the per-line glyph vector and positioning info, as well as global bounds.*/
+	private static final class RenderDescription {
+		final GlyphVector[] lines;
+		final Point2D.Float[] positions;
+		final Rectangle2D bounds;
+		
+		public RenderDescription(GlyphVector[] lines, Point2D.Float[] positions) {
+			this.lines = lines;
+			this.positions = positions;
+			GeneralPath compound = new GeneralPath();
+			for (int i=0; i< lines.length; i++) {
+				Point2D.Float p = positions[i];
+				compound.append(lines[i].getOutline(p.x, p.y), false);
+			}
+			bounds = compound.getBounds2D();
+		}
+	}
+
+	
 	/**Class for layout of text.**/
-	public static final class LayoutEngine {
+	private static final class LayoutEngine {
 		/**Describes the valid justifications**/
 		public static enum Justification {LEFT, RIGHT, CENTER}
 		
@@ -135,26 +171,26 @@ public class TextRenderer implements Renderer<TableView> {
 			this.fontField = fontField;
 			this.justifyField = justifyField;
 		}
-		
-		public GeneralPath layout(Glyph glyph) {
+				
+		public RenderDescription layoutLines(Glyph glyph) {
 			String text = (String) glyph.get(textField);
 			Font font = (Font) glyph.get(fontField);
 			LayoutEngine.Justification justify = (LayoutEngine.Justification) glyph.get(justifyField);
 			
 			LayoutEngine.LayoutDescription ld = LayoutEngine.computeLayout(text, font);
-			GeneralPath renderedText = LayoutEngine.layoutText(text, ld, font, justify);
-			Rectangle2D bounds = renderedText.getBounds2D();
-			renderedText.transform(AffineTransform.getTranslateInstance(-bounds.getX(), -bounds.getY()));  //Undo the shift caused by baselining
-			return renderedText;
+			
+			return staticLines(text, ld, font, justify);
 		}
+		
 	
-		private static GeneralPath layoutText(String text, LayoutDescription ld, Font font, Justification justify) {
+		private static RenderDescription staticLines(String text, LayoutDescription ld, Font font, Justification justify) {
 			Graphics2D g = REFERENCE_GRAPHICS;
 			FontRenderContext context = g.getFontRenderContext();
 			FontMetrics fm = g.getFontMetrics(font);
 			final String[] lines =SPLITTER.split(text);
 	
-			GeneralPath compound = new GeneralPath();
+			GlyphVector[] vectors = new GlyphVector[lines.length];
+			Point2D.Float[] points = new Point2D.Float[lines.length];
 			
 			for (int i=0; i< lines.length; i++) {
 				final DoubleDimension dim = ld.dims[i];
@@ -162,13 +198,12 @@ public class TextRenderer implements Renderer<TableView> {
 				
 				double x = horizontalOffset(dim.width, ld.fullWidth, justify);
 				double y = dim.height * i + fm.getAscent();
+				points[i] = new Point2D.Float((float) x, (float) y);
 				
 				int flags = Font.LAYOUT_LEFT_TO_RIGHT + Font.LAYOUT_NO_LIMIT_CONTEXT + Font.LAYOUT_NO_START_CONTEXT;
-				GlyphVector v = font.layoutGlyphVector(context, line.toCharArray(), 0, line.length(), flags);
-				compound.append(v.getOutline((float) x, (float) y), false);
+				vectors[i] = font.layoutGlyphVector(context, line.toCharArray(), 0, line.length(), flags); 
 			}
-	
-			return compound;
+			return new RenderDescription(vectors, points);
 		}
 		
 		/**Get the appropriate metrics for the layout of the requested text.
@@ -206,10 +241,8 @@ public class TextRenderer implements Renderer<TableView> {
 			}
 		}
 		
-		
-		
 		/**Results of computing a layout.*/
-		public static final class LayoutDescription {
+		private static final class LayoutDescription {
 			/**Individual lines of text to render.*/
 			String[] lines;
 			
