@@ -7,7 +7,6 @@ import stencil.unittests.StencilTestCase;
 import stencil.util.streams.binary.SocketTupleSender;
 import stencil.util.streams.binary.SocketTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
-import junit.framework.TestCase;
 
 import static stencil.unittests.util.streams.Util.*;
 

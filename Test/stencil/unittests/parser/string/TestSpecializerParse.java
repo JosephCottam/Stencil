@@ -119,7 +119,7 @@ public class TestSpecializerParse extends TestCase {
 	
 	public void testNullValue() throws Exception {
 		StencilTree spec = ParseStencil.specializerTree("[value: NULL]");
-		StencilTree valueToken = (StencilTree) spec.getChild(0).getChild(0);
+		StencilTree valueToken = spec.getChild(0).getChild(0);
 		assertEquals("Unexpected token type: " + StencilTree.typeName(valueToken.getType()), StencilParser.NULL, valueToken.getType());
 	}
 	

@@ -113,7 +113,7 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 		
 		public void setLayout(Layout layout) {
 			this.layout = (IterativeContext) layout;	
-			super.setLayout((Layout) layout);
+			super.setLayout(layout);
 		}
 		
 		public Point2D query(String id) {

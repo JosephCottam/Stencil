@@ -36,7 +36,7 @@ public class TestParseStencil extends StencilTestCase {
 	 **/
 	private static StencilTree findChild(StencilTree node, int type, String content) {
 		for (int i=0; i < node.getChildCount(); i++) {
-			StencilTree t = (StencilTree) node.getChild(i);
+			StencilTree t = node.getChild(i);
 			if (t.getType() == type 
 				&& (content == null || content.equals(t.getText()))) {
 				return t;
