@@ -8,7 +8,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Operator;
 import stencil.tuple.Tuple;
-import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.types.Converter;
 
 @Operator(name="Map", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
@@ -41,7 +41,7 @@ public class MapWrapper implements StencilOperator {
 				
 				results[i] = inv.tupleInvoke(innerArgs);
 			}
-			return new MapMergeTuple(results);
+			return new MultiResultTuple(results);
 		}
 
 		public Tuple tupleInvoke(Object[] arguments) throws MethodInvokeFailedException {

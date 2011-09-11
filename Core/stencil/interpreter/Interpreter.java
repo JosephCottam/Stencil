@@ -12,7 +12,7 @@ import stencil.tuple.PrototypedTuple;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
-import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import static stencil.interpreter.tree.Rule.EMPTY_RULE;
 
 public class Interpreter {
@@ -73,8 +73,8 @@ public class Interpreter {
 			env.setFrame(Environment.LOCAL_FRAME, local);
 			try {
 				result = processEnv(env, group.getResultRule());				
-				if (result != null && result instanceof MapMergeTuple) {
-					MapMergeTuple mmt = (MapMergeTuple) result;
+				if (result != null && result instanceof MultiResultTuple) {
+					MultiResultTuple mmt = (MultiResultTuple) result;
 					for (int i=0; i< mmt.size(); i++) {
 						PrototypedTuple nt = (PrototypedTuple) mmt.getTuple(i);
 						if (target.canStore(nt)) {target.store(nt);}

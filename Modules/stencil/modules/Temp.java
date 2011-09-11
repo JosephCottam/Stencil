@@ -12,7 +12,7 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
-import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.tuple.prototype.TupleFieldDef;
 import stencil.types.Converter;
 
@@ -127,7 +127,7 @@ public class Temp extends BasicModule {
 		}
 		
 		@Facet(memUse="FUNCTION", alias={"map","query"})	//Prototype set by "fields"
-		public MapMergeTuple query(Object... values) {
+		public MultiResultTuple query(Object... values) {
 			int extra = values.length - share;
 			
 			Object[] base = new Object[share+1];
@@ -138,7 +138,7 @@ public class Temp extends BasicModule {
 				result[share+1] = values[share+i];
 				tuples[i] = new ArrayTuple(result);
 			}
-			return new MapMergeTuple(tuples);
+			return new MultiResultTuple(tuples);
 		}
 		
 	}

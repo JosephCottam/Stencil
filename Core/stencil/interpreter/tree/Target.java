@@ -5,7 +5,7 @@ import java.util.*;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
-import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 
@@ -27,11 +27,11 @@ public class Target {
 		
 		//HACK: Horrible, horrible!!!  Why do all this work EVERY TIME on the CHANCE that there is a merge???
 		for (int i=0; i< source.size(); i++) {
-			if (source.get(i) instanceof MapMergeTuple) {
+			if (source.get(i) instanceof MultiResultTuple) {
 				if ((maxSize > 0 && source.size() != maxSize)) {
 					throw new RuntimeException("Cannot finalize tuple results with multiple inconsistent lengths greater than 1.  Data: " + Arrays.deepToString(Tuples.toArray(source)));
 				}
-				maxSize = Math.max(maxSize, ((MapMergeTuple) source.get(i)).size());
+				maxSize = Math.max(maxSize, ((MultiResultTuple) source.get(i)).size());
 			}
 		} 
 		if (maxSize != -1) {return finalizeAll(source, maxSize);}
@@ -53,7 +53,7 @@ public class Target {
 
 		for (int field=0; field< sources.size(); field++) {
 			Object value = sources.get(field);
-			if (value instanceof MapMergeTuple) {
+			if (value instanceof MultiResultTuple) {
 				Tuple source = ((Tuple) value);
 				for (int result=0; result<values.length; result++) {
 					Object[] resultValues = Tuples.toArray((Tuple) source.get(result));
@@ -71,6 +71,6 @@ public class Target {
 			Object[] vals = values[i].toArray(new Object[values[i].size()]);
 			results[i] = finalizeOne(new ArrayTuple(vals));
 		}
-		return new MapMergeTuple(results);
+		return new MultiResultTuple(results);
 	}
 }

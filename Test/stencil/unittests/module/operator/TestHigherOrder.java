@@ -6,7 +6,7 @@ import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
-import stencil.tuple.instances.MapMergeTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.unittests.StencilTestCase;
 import static stencil.parser.string.StencilParser.*;
 import static stencil.module.operator.StencilOperator.*;
@@ -81,9 +81,9 @@ public class TestHigherOrder extends StencilTestCase {
 		assertEquals(mapTuple("A","1", "B", "2"), iMap.invoke(new Object[]{values}));
 	}
 	
-	private MapMergeTuple mapTuple(Object... values) {
+	private MultiResultTuple mapTuple(Object... values) {
 		Tuple[] ts = new Tuple[values.length];
 		for (int i=0; i< values.length; i++) {ts[i] = new ArrayTuple(values[i]);}
-		return new MapMergeTuple(ts);
+		return new MultiResultTuple(ts);
 	}
 }
