@@ -28,10 +28,11 @@ public class Target {
 		//HACK: Horrible, horrible!!!  Why do all this work EVERY TIME on the CHANCE that there is a merge???
 		for (int i=0; i< source.size(); i++) {
 			if (source.get(i) instanceof MultiResultTuple) {
-				if ((maxSize > 0 && source.size() != maxSize)) {
+				MultiResultTuple result = (MultiResultTuple) source.get(i);
+				if ((maxSize > 0 && result.size() != maxSize)) {
 					throw new RuntimeException("Cannot finalize tuple results with multiple inconsistent lengths greater than 1.  Data: " + Arrays.deepToString(Tuples.toArray(source)));
 				}
-				maxSize = Math.max(maxSize, ((MultiResultTuple) source.get(i)).size());
+				maxSize = Math.max(maxSize, result.size());
 			}
 		} 
 		if (maxSize != -1) {return finalizeAll(source, maxSize);}

@@ -3,11 +3,16 @@ package stencil.modules;
 import java.awt.geom.Point2D;
 import java.util.*;
 
+import stencil.module.MethodInstanceException;
+import stencil.module.ModuleCache;
+import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
+import stencil.parser.string.util.Context;
 import stencil.adapters.general.Registrations;
+import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
@@ -16,11 +21,18 @@ import stencil.tuple.instances.MultiResultTuple;
 import stencil.tuple.prototype.TupleFieldDef;
 import stencil.types.Converter;
 
+import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
+import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
+
 /**
  * A module of misc utilities that I haven't figured out where they really belong yet.
  */
 @Module
 public class Temp extends BasicModule {
+	
+	@Operator(spec="[]")
+	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
+	public static Object[] echo(Object... vs) {return vs;}
 	
 	@Operator(spec="[]")
 	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
@@ -30,6 +42,31 @@ public class Temp extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
 	public static Long toLong(Object v) {return Converter.toLong(v);}
 
+	
+
+	@Description("Applies multiple functions to the values passed.  Each function is invoked once, taking all values at once.\n"
+					+ "So MapApply(@Sum, @Mult, 1 2 3 4) results in applciations of Sum(1,2,3,4) and Mult(1,2,3,4) producing the tuple\n"
+					+ "(9,24)")
+	@Operator(spec="[]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
+	public static class MapApply extends AbstractOperator {
+		final StencilOperator[] ops;
+		
+		protected MapApply(OperatorData opData, Specializer spec, List<StencilOperator> opArgs) {
+			super(opData);
+			ops = opArgs.toArray(new StencilOperator[opArgs.size()]);
+		}
+		
+		//TODO: Inherit statefullness from specializer (any look at facet applications)
+		@Facet(memUse="OPAQUE", prototype="()", alias={"map","query"})
+		public MultiResultTuple map(Object... values) {
+			Tuple[] results = new Tuple[ops.length];
+			for (int i=0; i<ops.length; i++) {
+				results[i] = ops[i].getFacet("map").tupleInvoke(values);
+			}
+			return new MultiResultTuple(results);
+		}
+		
+	}
 	
 	
 	/**Perform a linear interpolation.*/
@@ -258,5 +295,29 @@ public class Temp extends BasicModule {
 			return nop;
 		}
 		
+	}
+
+
+	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
+		List<StencilOperator> opArgs = new ArrayList();
+
+		
+		//TODO: This is a horrible way to resolve things, have the operator as value in a CONST in the specializer instead of the name
+		for (String key: specializer.keySet()) {
+			if (key.startsWith(OP_ARG_PREFIX)) {
+				StencilOperator op;
+				try {
+					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);
+					opArgs.add(op);
+				} catch (MethodInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
+			}
+		}
+		
+		
+		if (name.equals("MapApply")) {
+			return new MapApply(getOperatorData(name, specializer), specializer, opArgs);
+		} else {
+			return super.instance(name, context, specializer, modules);
+		}
 	}
 }

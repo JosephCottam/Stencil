@@ -27,6 +27,7 @@ import stencil.types.Converter;
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.util.ModuleDataParser.moduleData;
 import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
+import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 
 
 /**Operators used in various stencil transformations.*/
@@ -151,7 +152,7 @@ public final class StencilUtil extends BasicModule {
 		
 		//TODO: This is a horrible way to resolve things, have the operator as value in a CONST in the specializer instead of the name
 		for (String key: specializer.keySet()) {
-			if (key.startsWith("Op")) {
+			if (key.startsWith(OP_ARG_PREFIX)) {
 				StencilOperator op;
 				try {
 					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);

@@ -17,6 +17,7 @@ import stencil.interpreter.guide.samplers.NumericSampler;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 
 import static stencil.parser.ParserConstants.INPUT_FIELD;
@@ -96,8 +97,15 @@ public class Guide implements UpdateableComposite<Guide> {
 	private static List<PrototypedTuple> processAll(List<? extends Tuple> samples, Rule rule) throws Exception {
 		List<PrototypedTuple> results = new ArrayList();
 		for (Tuple sample: samples) {
-			PrototypedTuple result = (PrototypedTuple) Interpreter.processTuple(sample, rule);
-			results.add(result);
+			Tuple result = Interpreter.processTuple(sample, rule);
+			if (result instanceof MultiResultTuple) {
+				MultiResultTuple mr = (MultiResultTuple) result;
+				for (int i=0; i<result.size(); i++) {
+					results.add((PrototypedTuple) mr.getTuple(i));
+				}
+			} else if (result instanceof PrototypedTuple) {
+				results.add((PrototypedTuple) result);				
+			}
 		}
 		return results;
 	}

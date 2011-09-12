@@ -23,9 +23,9 @@ guide
 		tick.PEN_COLOR : Color{CLEAR}
 		tick.VISIBLE : false
 from HotelStays
-   ID: Count()
-   X: MonthNum(month) -> Mult(MonthNum,5)
-   Y: Permute(type) -> Mult(12,_)
+   ID: Count() -> Mult(2,_) -> Add(1,_) -> MultiResult(Mult, Add) ->*
+   X: MonthNum(month) -> Mult(MonthNum,5) -> Add(_,60) -> MultiResult(Mult, Add) -> *
+   Y: Permute(type) -> Mult(12,_) 
    HEIGHT: Split[1](@Scale[min: 1, max:10], type, count)		/*@\label{hotel:height}@*/
    FILL_COLOR:* Split[1](@Avg, type, count) -> FillBy(_, count)		/*@\label{hotel:color}@*/
    PEN_COLOR: Color{BLACK}

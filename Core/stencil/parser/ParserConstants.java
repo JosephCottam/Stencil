@@ -74,6 +74,8 @@ public abstract class ParserConstants {
 	
 	public static final String BIND_OPERATOR = ":";
 	
+	public static final String OP_ARG_PREFIX = "Op";
+	
 	
 	public static final StencilTree DEFAULT_CANVAS_SPECIALIZER;
 	public static final StencilTree DEFAULT_VIEW_SPECIALIZER;

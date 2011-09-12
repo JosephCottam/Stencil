@@ -26,6 +26,7 @@ options {
   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
   import static stencil.parser.ParserConstants.MAP_FACET;
+  import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 }
 
 @members {
@@ -94,7 +95,7 @@ options {
       assert spec != null;
   
       for (int i=0; i<ops.size(); i++) {
-         Object key = adaptor.create(MAP_ENTRY, "Op" + i);
+         Object key = adaptor.create(MAP_ENTRY, OP_ARG_PREFIX + i);
          adaptor.addChild(key, adaptor.dupTree(ops.get(i)));
          adaptor.addChild(spec, key); 
       }

@@ -144,9 +144,9 @@ options {
 //Replace constant operations in call chains with CONST entities holding the return tuple
 replaceOps
   @after{
-    Const c=((Const) $replaceOps.tree);
-    c.setValue(evaluate($f));
-    changed=true;
+	  Const c=((Const) $replaceOps.tree);
+	  c.setValue(evaluate($f));
+      changed=true;
   }
   : ^(f=FUNCTION inv=. name=. spec=. args=. yield=. target=.)
         {isConstant($f) && f.getAncestor(CALL_CHAIN) != null}? -> ^(CONST["CONST"] $yield $target);

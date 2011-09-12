@@ -12,6 +12,8 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.instances.MultiResultTuple;
+import stencil.tuple.instances.Singleton;
 import stencil.types.Converter;
 
 
@@ -66,6 +68,21 @@ public class TupleUtil extends BasicModule {
 			return values;
 		}
 	}
+    
+    @Description("Create a multi-result tuple from the passed values (each value becomes a tuple); roughly equivalent to mapping the echo operator")
+    @Operator()
+    public static final class MultiResult extends AbstractOperator {
+		public MultiResult(OperatorData opData) {super(opData);}
+    	
+	    @Facet(memUse="FUNCTION", prototype="()", alias={"map", "query"})
+		public MultiResultTuple query(Object... values) {
+	    	Tuple[] ts = new Tuple[values.length];
+	    	for (int i=0; i<values.length;i++) {
+	    		ts[i] = Singleton.from(values[i]);
+	    	}
+	    	return new MultiResultTuple(ts);
+		}
+    }
     
     
     

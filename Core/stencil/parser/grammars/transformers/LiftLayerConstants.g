@@ -27,7 +27,7 @@ options {
   import stencil.tuple.PrototypedTuple;
   import stencil.tuple.Tuples;
   import stencil.tuple.prototype.TuplePrototype;
-  import stencil.tuple.prototype.TuplePrototype;
+  import stencil.tuple.instances.MultiResultTuple;
   import stencil.interpreter.Interpreter;
   import stencil.interpreter.tree.*;
   import stencil.parser.tree.StencilTree;
@@ -115,8 +115,10 @@ options {
 	         if (value.getType() == TUPLE_REF) {continue;}
 	         
 	         String name = ((StencilTree) target.getChild(resultID)).getChild(0).getText();
-           if (identifierRule(name)) {continue;}
-           consts.add(new Pair(name, value));
+             if (identifierRule(name)) {continue;}
+             if (value.getType() == CONST && ((Const) value).getValue() instanceof MultiResultTuple) {continue;}
+             
+             consts.add(new Pair(name, value));
 	      }
 	   } 
      return consts;
@@ -154,7 +156,7 @@ options {
 	private Object augmentDefaults(StencilTree defaults, StencilTree consumes) {
 		Collection<Pair> sharedConstants = sharedConstants(consumes);
 		for (Pair constant: sharedConstants) {
-      adaptor.addChild(defaults,constant.asRule(adaptor));
+           adaptor.addChild(defaults,constant.asRule(adaptor));
 		}
 		return defaults;
 	}
