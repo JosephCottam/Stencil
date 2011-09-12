@@ -14,6 +14,7 @@ import org.pcollections.*;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
+import stencil.module.operator.util.ViewpointCache;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.Modules;
@@ -404,6 +405,7 @@ public class Projection extends BasicModule {
 		private static final CompoundCompare COMPARE = new CompoundCompare();
 		
 		private final SortedSet set = new TreeSet(COMPARE);
+		private final ViewpointCache<Rank> viewpoint = new ViewpointCache();
 	
 		public Rank(OperatorData opData, Specializer spec) {super(opData);}
 		private Rank(OperatorData opData, SortedSet values) {
@@ -443,7 +445,11 @@ public class Projection extends BasicModule {
 		
 		@Override
 		public Rank viewpoint() {
-			return new Rank(super.operatorData, set);
+			if (!viewpoint.useCached(stateID())) {
+				Rank r = new Rank(super.operatorData, set);
+				viewpoint.cache(r);
+			}
+			return viewpoint.cached();
 		}
 	}
 
