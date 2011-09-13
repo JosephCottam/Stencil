@@ -18,6 +18,7 @@ import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MultiResultTuple;
+import stencil.tuple.instances.NumericSingleton;
 import stencil.tuple.prototype.TupleFieldDef;
 import stencil.types.Converter;
 
@@ -29,7 +30,7 @@ import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
  */
 @Module
 public class Temp extends BasicModule {
-	
+		
 	@Operator(spec="[]")
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	public static Object[] echo(Object... vs) {return vs;}
@@ -42,6 +43,30 @@ public class Temp extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
 	public static Long toLong(Object v) {return Converter.toLong(v);}
 
+	
+	@Operator(spec="[]")
+	public static final class AutoID extends AbstractOperator.Statefull {
+		private int id=0;
+		
+		public AutoID(OperatorData opData) {super(opData);}
+		
+		@Facet(memUse="WRITER", prototype="(Integer id)")
+		public MultiResultTuple map(int count) {
+			MultiResultTuple  rs = query(count);
+			id += count;
+			return rs;
+		}
+		
+		@Facet(memUse="READER", prototype="(Integer id)")
+		public MultiResultTuple query(int count) {
+			if (count <1) {throw new IllegalArgumentException("Invalid argument for auto id, must be a positive value.");}
+			Tuple[] rs = new  Tuple[count];
+			for (int i=0; i<count; i++) {
+				rs[i] = new NumericSingleton(id+i);	//Don't increment id: this is the query facet
+			}
+			return new MultiResultTuple(rs);
+		}
+	}
 	
 
 	@Description("Applies multiple functions to the values passed.  Each function is invoked once, taking all values at once.\n"

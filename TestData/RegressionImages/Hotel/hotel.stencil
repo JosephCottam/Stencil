@@ -23,7 +23,7 @@ guide
 		tick.PEN_COLOR : Color{CLEAR}
 		tick.VISIBLE : false
 from HotelStays
-   ID: Count() -> Mult(2,_) -> Add(1,_) -> MultiResult(Mult, Add) ->*
+   ID: AutoID(2) -> *
    X: MonthNum(month) -> Mult(MonthNum,5) -> Add(_,60) -> MultiResult(Mult, Add) -> *
    Y: Permute(type) -> Mult(12,_) 
    HEIGHT: Split[1](@Scale[min: 1, max:10], type, count)		/*@\label{hotel:height}@*/
