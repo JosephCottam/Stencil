@@ -26,7 +26,7 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
 				this.target = target;
 				this.method = target.getClass().getMethod(name);
 			} catch (Exception e) {
-				throw new Error("Incorrectly specified tree operation in a sequence: " + name);
+				throw new Error("Incorrectly specified tree operation in a sequence: " + name, e);
 			}
 		}
 		

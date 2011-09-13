@@ -188,7 +188,11 @@ repack
   | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME]));
 
 //Have the generator use the sample frame where it used to use the stream frame--------------------
-rename: ^(TUPLE_REF fr=ID fi=. r+=.*)
-  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText()) && fr.getParent().getChildCount() > 1}? 
-      -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*);
+rename 
+   : ^(TUPLE_REF fr=ID fi=. r+=.*)
+  	  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
+        -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*)
+   | ^(TUPLE_REF fr=ID)
+  	  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
+        -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"]);
         
