@@ -22,6 +22,10 @@ options {
   import stencil.display.DisplayLayer;
   import static stencil.parser.ParserConstants.INVOKEABLE;
   import static stencil.parser.ParserConstants.INPUT_FIELD;
+  import static stencil.parser.ParserConstants.GLOBALS_FRAME;
+  import static stencil.parser.ParserConstants.VIEW_FRAME;
+  import static stencil.parser.ParserConstants.CANVAS_FRAME;
+  import static stencil.parser.ParserConstants.STREAM_FRAME;
 }
 
 @members {
@@ -48,9 +52,9 @@ options {
    *  TODO: When runtime constants are added, do not replace elements in the runtime global frame  
   */
   public static boolean replace(StencilTree ref, String frame) {
-     if (frame.equals(ParserConstants.GLOBALS_FRAME) 
-         || frame.equals(ParserConstants.VIEW_FRAME) 
-         || frame.equals(ParserConstants.CANVAS_FRAME)) {return false;}
+     if (frame.equals(GLOBALS_FRAME) 
+         || frame.equals(VIEW_FRAME) 
+         || frame.equals(CANVAS_FRAME)) {return false;}
      
      StencilTree f = ref.getAncestor(FUNCTION);
      if (f == null) {return true;}
@@ -185,14 +189,13 @@ retarget
 //Add sample output to the result prototpye      
 repack
   : ^(FUNCTION (options {greedy=false;} :.)* repack)
-  | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME]));
+  | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[STREAM_FRAME]));
 
 //Have the generator use the sample frame where it used to use the stream frame--------------------
 rename 
    : ^(TUPLE_REF fr=ID fi=. r+=.*)
-  	  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
-        -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"] $r*)
+      {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
+        -> ^(TUPLE_REF ID[STREAM_FRAME] ID["#Sample"] $r*)
    | ^(TUPLE_REF fr=ID)
-  	  {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
-        -> ^(TUPLE_REF ID[ParserConstants.STREAM_FRAME] ID["#Sample"]);
-        
+      {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText()) && !$fr.getText().equals(STREAM_FRAME)}? 
+        -> ^(TUPLE_REF ID[STREAM_FRAME] ID["#Sample"]);

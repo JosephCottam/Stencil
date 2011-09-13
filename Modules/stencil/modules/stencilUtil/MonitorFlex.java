@@ -6,6 +6,7 @@ import stencil.module.SpecializationException;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.tuple.Tuple;
+import stencil.util.ConversionException;
 
 /**Can monitor a continuous mixed with a discrete space.
  * All numeric values are assumed to be part of the same continuous space,
@@ -36,9 +37,9 @@ public class MonitorFlex extends MonitorBase<MonitorFlex> {
 	public Tuple map(Object... args) {
 		try {
 			return cont.map(args);
-		} catch (NumberFormatException e) {
-			return cat.map(args);
-		}
+		} 
+		catch (NumberFormatException e) {return cat.map(args);}
+		catch (ConversionException e) {return cat.map(args);}
 	}
 	
 	@Override 

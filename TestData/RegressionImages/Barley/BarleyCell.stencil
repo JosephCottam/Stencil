@@ -2,7 +2,7 @@ STREAM: File
 NAME: Barley
 TUPLE_SIZE: 4
 SEPARATOR: \s*,\s+
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/Barley/BeckersBarley.csv
+SOURCE: ./BeckersBarley.csv
 SKIP: 1
 STRICT: true
 
@@ -14,7 +14,7 @@ const MIN: 10
 
 layer BarleySite                                      /*@\label{barley:layerDef}@*/
 guide																	/*@\label{barley:guideBegin}@*/
-  axis[guideLabel: "Variety", X:0] from Y	                     	
+  axis[guideLabel: "Variety", X:0] from Y	            /*@\label{barley:flexSample}@*/
   axis[guideLabel: "Yield", round: "T", 
 	seed.min: MIN, seed.max: MAX]								/*@\label{barley:badCopy}@*/
     Linear from X

@@ -61,8 +61,8 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 				double oldMin = min;
 				
 				synchronized(this) {
-					max = Math.max(value, max);
-					min = Math.min(value, min);
+					max = Double.isNaN(value) ? max : Math.max(value, max);
+					min = Double.isNaN(value) ? min : Math.min(value, min);
 				}
 				if ((max != oldMax) || (min != oldMin)) {
 					stateID++;
