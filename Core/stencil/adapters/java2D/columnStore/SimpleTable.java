@@ -55,14 +55,14 @@ public final class SimpleTable implements Table {
      */
     public void merge(TableShare share) {
     	if (share.source() != this) {throw new TableMergeException(tenured.name, "Can only merge with shares made from the target table.");}
-    	if (share.creationID() != tenured.stateID) {throw new TableMergeException(tenured.name, "Can only merge with most recent share.");}
+    	if (share != currentShare) {throw new TableMergeException(tenured.name, "Can only merge with most recent share.");}
     	share.dynamicComplete();	//Wait for dynamic bindings to complete before merging
     	
     	if (!share.unchanged()) {
     		TableView newTenured = share.viewpoint();
 
     		synchronized(tableLock) {
-	    		stateID++;
+	    		stateID = Math.max(newTenured.stateID, stateID);
 		    	for (Comparable id: share.updates.keySet()) {
 		    		if (update.get(id).equals(share.updates.get(id))) {
 		    			update = update.minus(id);

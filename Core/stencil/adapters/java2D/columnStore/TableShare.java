@@ -51,7 +51,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 		this.index = source.tenured().index;
 		this.updates = update;
 		this.idColumn = source.tenured().idColumn;
-		creationID = source.tenured().stateID;		
+		creationID = source.stateID();		
 		columns = Arrays.copyOf(source.tenured().columns, source.tenured().columns.length);
 	}
 	

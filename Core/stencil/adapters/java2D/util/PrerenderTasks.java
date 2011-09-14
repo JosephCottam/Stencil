@@ -88,6 +88,7 @@ public class PrerenderTasks {
 			Renderer renderer = renderers[i];
 			renderer.calcFields(layer.viewpoint(), panel.getCanvas().getComponent().viewTransform());
 		}
+		
 		synchronized(panel.getCanvas().getComponent().tableCaptureLock) {
 			for (Table layer: layers) {layer.merge(layer.viewpoint());}		//TODO: One (parallel) task per per-table? 
 		}

@@ -49,6 +49,11 @@ public final class PainterThread implements Runnable {
 	public void run() {
 		while(keepRunning) {
 			if (requiresUpdate()) {runOnce();}
+			else {
+				try {Thread.sleep(33);}
+				catch (InterruptedException e) {throw new RuntimeException("Error sleeping on low paint activity.", e);}				
+			}
+			
 			if (DELAY == 0) {Thread.yield();}
 			else if (DELAY >0) {
 				try {Thread.sleep(DELAY);}
