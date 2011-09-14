@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 TUPLE_SIZE: 6
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
+SOURCE: ./google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -65,7 +65,7 @@ layer Selected["TEXT"]			/*@\label{stocks:beginInteractive}@*/
 from Mouse
   local(point) : Nearest(X,3)
   ID : "Selected"
-  TEXT: local.point
+  TEXT: Ticker.find(local.point) -> Ticker.Y
   REGISTRATION: "LEFT"
   IMPLANT: "POINT"
   (X, Y) :[FullMax] Add(canvas.X, canvas.WIDTH) 
