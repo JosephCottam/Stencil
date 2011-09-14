@@ -31,12 +31,14 @@ public class ConcurrentStream implements TupleStream {
 
 	public SourcedTuple next() {
 		SourcedTuple nv = null;
-
+		int startOffset = offset;
+		
 		//TODO: This is busy waiting...we should go with a listener architecture.
-		while (nv== null) {
+		do {
 			nv = streams.get(offset).next();	
 			incrimentOffset();
-		}
+		} while (nv==null && offset != startOffset);
+		
 		return nv;
 	}
 
