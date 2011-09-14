@@ -14,6 +14,7 @@ import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.types.geometry.RectangleTuple;
 
 /**Wraps a layer as an operator. 
  * Exposes find, makeOrFind, make and remove.
@@ -24,16 +25,12 @@ import stencil.tuple.prototype.TuplePrototype;
 
 //Marked final because it is immutable (however, it has mutable components....)
 public final class LayerOperator implements StencilOperator<StencilOperator> {
-	public static final String FIND_FACET = "find";
-	private static final String FIND_METHOD = "find";
-	
-	public static final String REMOVE_FACET = "remove";
-	private static final String REMOVE_METHOD = "remove";
-	
-	private static final String CONTAINS_FACET = "contains";
-	private static final String CONTAINS_METHOD = "contains";
-
-	private static final String STATE_ID_METHOD = "stateID";
+	private static final String FIND = "find";
+	private static final String NEAR = "nearest";
+	private static final String BOUNDS = "bounds";
+	private static final String REMOVE= "remove";
+	private static final String CONTAINS = "contains";
+	private static final String STATE_ID = "stateID";
 	
 	protected final DisplayLayer layer;
 	protected final OperatorData operatorData;
@@ -43,39 +40,38 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 
 		TuplePrototype prototype = layer.prototype();
 		operatorData = Modules.basicOperatorData(module, getName());
-		operatorData.addFacet(new FacetData(FIND_FACET, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(FIND, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(NEAR, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
 		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, prototype));
 		operatorData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, prototype));
-		operatorData.addFacet(new FacetData(REMOVE_FACET, MemoryUse.WRITER, prototype));
-		operatorData.addFacet(new FacetData(CONTAINS_FACET, MemoryUse.READER, prototype));
-		operatorData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+		operatorData.addFacet(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
+		operatorData.addFacet(new FacetData(CONTAINS, MemoryUse.READER, prototype));
+		operatorData.addFacet(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
 	}
 	
 	public String getName() {return layer.name();}
 
 	public Invokeable getFacet(String facet) {
 		if (StencilOperator.MAP_FACET.equals(facet) 
-			|| StencilOperator.QUERY_FACET.equals(facet)
-			|| FIND_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(FIND_METHOD, layer);
-		} else if (CONTAINS_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(CONTAINS_METHOD, layer);
-		} else if (REMOVE_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(REMOVE_METHOD, layer);
-		} else if (STATE_ID_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(STATE_ID_METHOD, layer);
-		}
+			|| StencilOperator.QUERY_FACET.equals(facet)) {
+			return new ReflectiveInvokeable(FIND, layer);
+		} else if (operatorData.hasFacet(facet)) {
+			return new ReflectiveInvokeable(facet, layer);
+		} 
 		throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
-	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.viewpoint());}
+	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.viewpoint(), this.operatorData);}
 	
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 	
 	private static class LayerViewOperator implements StencilOperator<LayerViewOperator> {
 		final LayerView view;
-		public LayerViewOperator(LayerView view) {this.view = view;}
+		final OperatorData operatorData;
+		
+		public LayerViewOperator(LayerView view, OperatorData od) {this.view = view; operatorData=od;}
 		public StencilOperator duplicate() throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
@@ -83,10 +79,11 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 		@Override
 		public Invokeable getFacet(String facet) throws UnknownFacetException {
 			if (StencilOperator.MAP_FACET.equals(facet) 
-					|| StencilOperator.QUERY_FACET.equals(facet)
-					|| FIND_FACET.equals(facet)) {
-					return new ReflectiveInvokeable(FIND_METHOD, view);
-			} 
+					|| StencilOperator.QUERY_FACET.equals(facet)) {
+					return new ReflectiveInvokeable(FIND, view);
+			} else if (operatorData.hasFacet(facet)) {
+				return new ReflectiveInvokeable(facet, view);
+			}
 			throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 		}
 
@@ -96,6 +93,6 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 			throw new UnsupportedOperationException();
 		}
 
-		public LayerViewOperator viewpoint() {throw new UnsupportedOperationException();}
+		public LayerViewOperator viewpoint() {return this;}
 	}
 }

@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 TUPLE_SIZE: 6
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/Stocks/google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -76,8 +76,8 @@ layer Highlight["LINE"]
 from Mouse
   ID : "Highlight"
   (X1, X2) : Nearest(X, 3) -> (_, _)
-  Y1 : Add(canvas.Y, canvas.HEIGHT) -> Sub(_, 3)
-  Y2 : Add(canvas.Y, 3)
+  Y1 : Ticker.bounds() -> Sub(Ticker.Y, Ticker.H) 
+  Y2 : Ticker.bounds() -> Ticker.Y
   PEN : Stroke{3}
   PEN_COLOR: Color{BLUE, 100}		/*@\label{stocks:endInteractive}@*/
 

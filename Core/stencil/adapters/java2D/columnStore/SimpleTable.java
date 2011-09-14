@@ -1,11 +1,13 @@
 package stencil.adapters.java2D.columnStore;
 
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
+import stencil.adapters.general.ShapeUtils;
 import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.SchemaFieldDef;
@@ -14,6 +16,7 @@ import stencil.parser.ParserConstants;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.types.geometry.RectangleTuple;
 
 /**Leaf nodes in a scene graph are always of the type simple table.**/
 public final class SimpleTable implements Table {    
@@ -157,4 +160,21 @@ public final class SimpleTable implements Table {
 
 	@Override
 	public Rectangle2D getBoundsReference() {return tenured.getBoundsReference();}
+	public RectangleTuple bounds() {
+		return new RectangleTuple(tenured.getBoundsReference().getBounds2D());
+	}
+	
+	public Glyph nearest(double x, double y) {
+		Glyph nearest=null;
+		double distance = Double.POSITIVE_INFINITY;
+		Point2D p = new Point2D.Double(x,y);
+		
+		for (Glyph g: tenured) {
+			Rectangle2D b = g.getBoundsReference();
+			double dist = ShapeUtils.distance(p, b);
+			if (dist < distance) {nearest = g; distance=dist;}
+		}
+		
+		return nearest;
+	}
 } // end of class Table

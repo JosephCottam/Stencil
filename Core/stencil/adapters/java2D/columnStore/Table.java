@@ -37,9 +37,12 @@ public interface Table extends DisplayLayer<StoreTuple> {
     @Override
     public TableShare viewpoint();
     
-    /**What screen bounds of the components of this table?*/
+    /**What screen bounds of the components of this table?  
+     * This is a reference to the internally held bounds it IS NOT safe to modify or pass outside of the rendering framework.
+     * Use bounds if safety may be an issue.
+     * */
     public Rectangle2D getBoundsReference();
-
+    
     /**Sentinel value used to indicate a value has been deleted in an 
 	 * update, though it still exists in the full store.
 	 */

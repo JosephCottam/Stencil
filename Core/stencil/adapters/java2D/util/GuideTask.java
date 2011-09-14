@@ -15,7 +15,7 @@ import stencil.interpreter.tree.Guide;
 public class GuideTask extends UpdateTask<Guide> {
 	private final DisplayCanvas canvas;
 	private final String identifier;
-	private final Rectangle2D canvasBounds = new Rectangle2D.Double();
+	private final Rectangle2D canvasBounds = new Rectangle2D.Double(); //TODO: Replace with associated layer bounds
 	private final AffineTransform viewTransform = new AffineTransform();
 	
 	public GuideTask(Guide guideDef, DisplayCanvas canvas) {

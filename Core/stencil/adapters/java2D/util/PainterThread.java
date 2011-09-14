@@ -50,7 +50,7 @@ public final class PainterThread implements Runnable {
 		while(keepRunning) {
 			if (requiresUpdate()) {runOnce();}
 			else {
-				try {Thread.sleep(33);}
+				try {Thread.sleep(33);} //HACK: Keeps from busy waiting...but a condition variable is better
 				catch (InterruptedException e) {throw new RuntimeException("Error sleeping on low paint activity.", e);}				
 			}
 			

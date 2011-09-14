@@ -60,7 +60,7 @@ public class TupleLoader implements Runnable {
 	public void load() throws Exception {
 		state = STATE.RUNNING;
 
-		while(input.hasNext() && keepRunning) {
+		while(keepRunning() && input.hasNext()) {
 			SourcedTuple tuple;
 			tuple = input.next();
 
@@ -84,11 +84,11 @@ public class TupleLoader implements Runnable {
 	/**Find out how many records have been read by this loader*/
 	public long getRecordsLoaded() {return recordsLoaded;}
 
+	private synchronized boolean keepRunning() {return keepRunning;}
+	
 	/**Used to signal the loader to stop, even if it has not reached the end of the stream.
-	 * Passing a false will cause it to stop next time it iterates the loading loop, regardless of the 'hasNext' value
-	 * on the source stream.
-	 *
+	 * Stop will actually occur after the current tuple (if any) has finished processing.
 	 * @param value
 	 */
-	public void signalStop() {keepRunning = false;}
+	public synchronized void signalStop() {keepRunning = false;}
 }

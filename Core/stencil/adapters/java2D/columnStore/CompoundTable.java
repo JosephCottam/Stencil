@@ -2,6 +2,7 @@ package stencil.adapters.java2D.columnStore;
 
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import stencil.adapters.general.ShapeUtils;
 import stencil.adapters.java2D.columnStore.column.ReferenceColumn;
 import stencil.adapters.java2D.render.CompoundRenderer;
 import stencil.adapters.java2D.render.Renderer;
@@ -24,6 +26,7 @@ import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.types.Converter;
+import stencil.types.geometry.RectangleTuple;
 import stencil.util.collections.ArrayUtil;
 import stencil.util.collections.ListSet;
 import stencil.util.collections.SingletonList;
@@ -35,9 +38,9 @@ import stencil.util.collections.SingletonList;
  *  The reference lists contain IDs for entities in the child tables
  * */ 
 public class CompoundTable implements Table {    
-	protected final List<Table> children ;
-	protected final List<Table> components;
-	protected SimpleTable root;
+	protected SimpleTable root;				//Root to the compound table graph
+	protected final List<Table> children ; 	//Tables referred to by root
+	protected final List<Table> components;	//Children+root; used when iterating over everything
 
 	
     public CompoundTable(String name, Table... children) {this(name, Arrays.asList(children));}
@@ -175,6 +178,9 @@ public class CompoundTable implements Table {
 	public List<Table> components() {return components;}
 
 	public Rectangle2D getBoundsReference() {return root.getBoundsReference();}
+	public RectangleTuple bounds() {
+		return new RectangleTuple(root.getBoundsReference().getBounds2D());
+	}
 	
 	/**Create a tuple that can be the first argument to a merge, after which all non-constant fields will be properly set.**/ 
 	public PrototypedTuple updateMaskTuple() {
@@ -206,5 +212,19 @@ public class CompoundTable implements Table {
 		share.simpleUpdate();
 		renderer.calcFields(share, viewTransform);
 		table.root.merge(share);
+	}
+	
+	public Glyph nearest(double x, double y) {
+		Glyph nearest=null;
+		double distance = Double.POSITIVE_INFINITY;
+		Point2D p = new Point2D.Double(x,y);
+		
+		for (Glyph g: root.tenured()) {
+			Rectangle2D b = g.getBoundsReference();
+			double dist = ShapeUtils.distance(p, b);
+			if (dist < distance) {nearest = g; distance=dist;}
+		}
+		
+		return nearest;
 	}
 } 

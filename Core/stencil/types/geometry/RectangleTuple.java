@@ -17,7 +17,7 @@ import stencil.tuple.prototype.TuplePrototype;
  *
  */
 public final class RectangleTuple implements PrototypedTuple {
-	private static final TuplePrototype PROTO = new TuplePrototype(new String[]{"X","Y","W","H"}, new Class[]{double.class, double.class, double.class, double.class});
+	public static final TuplePrototype PROTO = new TuplePrototype(new String[]{"X","Y","W","H"}, new Class[]{double.class, double.class, double.class, double.class});
 	private final Rectangle2D basis;
 	
 	public RectangleTuple(Rectangle2D basis) {this.basis = basis;}

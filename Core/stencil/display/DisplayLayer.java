@@ -3,6 +3,7 @@ package stencil.display;
 import stencil.interpreter.Viewpoint;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
+import stencil.types.geometry.RectangleTuple;
 
 public interface DisplayLayer<T extends Glyph> extends Viewpoint<LayerView<T>> {
 	/**Specializer key for signaling what type a layer should have.**/
@@ -50,4 +51,8 @@ public interface DisplayLayer<T extends Glyph> extends Viewpoint<LayerView<T>> {
 	
 	/**How many data points are in this layer**/
 	public int size();	
+	
+	//TODO: Extend nearest to handle multiple return values
+	public Glyph nearest(double x, double y);
+	public RectangleTuple bounds();
 }

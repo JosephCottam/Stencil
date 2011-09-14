@@ -127,12 +127,11 @@ public final class StencilRunner extends Thread {
 		try {Thread.sleep(500);}
 		catch (Exception e) {/*Left empty, all cases are handled in finally.*/}
 		finally {
-			if (isAlive()) {
-				try {stop();}	//When working with Jython, you can write infinite loops that are outside of the normal thread control flow.
+			if (this.isAlive()) {
+				try {stop();}	//You can write infinite loops for the interpreter...
 							//When that happens, you can't just signal a stop.  If we signaled and waited half of a second and the thread did
 							//not stop, we kill it.  This is only safe to do because the Stencil environment is independent of the 
-							//explore environment (except the display surface).
-			
+							//explore environment (except the display surface).			
 				catch (Exception ex) {throw new AbnormalTerminiationException("Abnormal termination of Stencil program (may not have stopped).", ex);}
 				throw new AbnormalTerminiationException("Abnormal termination of Stencil program: Program did not respond to stop signal.");
 			}

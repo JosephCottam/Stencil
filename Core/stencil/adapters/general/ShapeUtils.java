@@ -1,5 +1,6 @@
 package stencil.adapters.general;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 public final class ShapeUtils {
@@ -32,6 +33,11 @@ public final class ShapeUtils {
 		add(r, r1);
 		add(r, r2);
 		return r;
+	}
+	
+	public static double distance(Point2D p, Rectangle2D r) {
+		if (r.contains(p)) {return 0;}
+		return Math.abs(p.distance(new Point2D.Double(r.getCenterX(), r.getCenterY())));
 	}
 
 }

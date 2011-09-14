@@ -29,4 +29,7 @@ public final class DoubleDimension extends Dimension2D {
 		this.width = width;
 		this.height = height;
 	}
+
+	/**What is the overall length of this dimension?**/
+	public double getLength() {return Math.sqrt(Math.pow(width, 2) + Math.pow(height, 2));}
 }
