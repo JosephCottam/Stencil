@@ -32,8 +32,6 @@ public abstract class MonitorBase<T extends MonitorBase> extends AbstractOperato
 		return od;
 	}
 
-	public abstract Tuple map(Object... args);
-	
 	@Facet(memUse="OPAQUE", prototype="(VALUE)")
 	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 

@@ -5,7 +5,6 @@ import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.tree.Specializer;
 import stencil.module.SpecializationException;
@@ -83,43 +82,39 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 	}
 	
 	@Facet(memUse="OPAQUE", prototype="()", alias={"map","query"})
-	public Tuple map(Object... args) {
-		Double[] values = MonitorOperator.Util.values(args[0], Double.class);
-		
-		for (double value: values) {
-			int index;
-			Segment oldSegment=null;
-			for (index=0; index<segments.size(); index++) {
-				Segment s = segments.get(index);
-				if (s.contains(value, gapSize)) {oldSegment = s; break;}
-				if (s.follows(value)) {break;}
-			}
+	public Tuple map(double value) {
+		int index;
+		Segment oldSegment=null;
+		for (index=0; index<segments.size(); index++) {
+			Segment s = segments.get(index);
+			if (s.contains(value, gapSize)) {oldSegment = s; break;}
+			if (s.follows(value)) {break;}
+		}
+
+		synchronized (this) {
+			if (oldSegment != null) {				//Fell within the tollerance of an existing range
+				Segment newSegment = oldSegment.extend(value);
+				if (newSegment != oldSegment) {
+					stateID++;
+					segments.set(index, newSegment);
 	
-			synchronized (this) {
-				if (oldSegment != null) {				//Fell within the tollerance of an existing range
-					Segment newSegment = oldSegment.extend(value);
-					if (newSegment != oldSegment) {
-						stateID++;
-						segments.set(index, newSegment);
-		
-						//Cleanup list, merging overlapping neighbors
-						for (int i=0; i< segments.size()-1; i++) {
-							Segment s1 = segments.get(i);
-							Segment s2 = segments.get(i+1);
-							if (Segment.shouldMerge(s1,s2, gapSize)) {
-								Segment ss = s1.merge(s2);
-								segments.set(i, ss);
-								segments.remove(i+1);
-							}
+					//Cleanup list, merging overlapping neighbors
+					for (int i=0; i< segments.size()-1; i++) {
+						Segment s1 = segments.get(i);
+						Segment s2 = segments.get(i+1);
+						if (Segment.shouldMerge(s1,s2, gapSize)) {
+							Segment ss = s1.merge(s2);
+							segments.set(i, ss);
+							segments.remove(i+1);
 						}
 					}
-					
-				} else if (index >=0) { //New value after all prior values
-					segments.add(index, new Segment(value, value));
-					stateID++;
-				} else {
-					throw new Error(String.format("Unhandled case in gaps monitor -- index: %1$s, segments: %2$s, oldSegment: %3$s: ", index, segments.size(), oldSegment));
 				}
+				
+			} else if (index >=0) { //New value after all prior values
+				segments.add(index, new Segment(value, value));
+				stateID++;
+			} else {
+				throw new Error(String.format("Unhandled case in gaps monitor -- index: %1$s, segments: %2$s, oldSegment: %3$s: ", index, segments.size(), oldSegment));
 			}
 		}
 		return Tuples.EMPTY_TUPLE;

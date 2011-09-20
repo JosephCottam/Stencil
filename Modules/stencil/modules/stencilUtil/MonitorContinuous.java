@@ -5,7 +5,6 @@ import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.tree.Specializer;
 import stencil.module.SpecializationException;
@@ -51,22 +50,17 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 	}
 	
 	@Facet(memUse="OPAQUE", prototype="()")
-	public Tuple map(Object... args) {
-		assert args.length == 1;
-		Double[] values = MonitorOperator.Util.values(args[0], Double.class);
-
-		for (double value: values) {
-			if (!rangeLock) {
-				double oldMax = max;
-				double oldMin = min;
-				
-				synchronized(this) {
-					max = Double.isNaN(value) ? max : Math.max(value, max);
-					min = Double.isNaN(value) ? min : Math.min(value, min);
-				}
-				if ((max != oldMax) || (min != oldMin)) {
-					stateID++;
-				}
+	public Tuple map(double value) {
+		if (!rangeLock) {
+			double oldMax = max;
+			double oldMin = min;
+			
+			synchronized(this) {
+				max = Double.isNaN(value) ? max : Math.max(value, max);
+				min = Double.isNaN(value) ? min : Math.min(value, min);
+			}
+			if ((max != oldMax) || (min != oldMin)) {
+				stateID++;
 			}
 		}
 		

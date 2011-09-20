@@ -1,13 +1,12 @@
 package stencil.module.operator.wrappers;
 
-import java.util.Arrays;
-
 import stencil.interpreter.Environment;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Freezer;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.UnknownFacetException;
 import stencil.module.operator.util.Invokeable;
+import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
@@ -26,6 +25,43 @@ import static stencil.parser.string.StencilParser.*;
 
 /**Operator defined through a stencil definition.**/
 public class SyntheticOperator implements StencilOperator {
+	private static final class SynthInvokeable implements Invokeable {
+		private final SyntheticOperator op;
+		private final boolean map;
+		public SynthInvokeable(SyntheticOperator op, boolean map) {
+			this.op =op;
+			this.map = map;
+		}
+		
+		@Override
+		public Tuple tupleInvoke(Object[] arguments)
+				throws MethodInvokeFailedException {
+			return invoke(arguments);
+		}
+
+		@Override
+		public Tuple invoke(Object[] arguments)
+				throws MethodInvokeFailedException {
+			OperatorFacet facet = map ? op.getMap() : op.getQuery();
+			if (facet.getArguments().size() != arguments.length) {
+				int expected = facet.getArguments().size();
+				throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, arguments.length));
+			}
+			ArrayTuple t = new ArrayTuple(arguments);
+			return op.process(facet, t);
+		}
+
+		@Override
+		public String targetIdentifier() {return op.operatorData.getName();}
+
+		@Override
+		public Invokeable viewpoint() {
+			return new SynthInvokeable(op.viewpoint(), false);
+		}
+		
+	}
+	
+	
 	/**Exception to indicate that no rule matches the parameters passed to the given synthetic operator.*/
 	public static class NoMatchException extends RuntimeException {
 		public NoMatchException(String message) {super(message);}
@@ -79,9 +115,11 @@ public class SyntheticOperator implements StencilOperator {
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {
 		try {
-			if (name.equals(StencilOperator.MAP_FACET) 
-				|| name.equals(StencilOperator.QUERY_FACET)
-			    || name.equals(StencilOperator.STATE_ID_FACET)) {
+			if (name.equals(StencilOperator.MAP_FACET)) {
+				return new SynthInvokeable(this, true);
+			} else if (name.equals(StencilOperator.QUERY_FACET)) {
+				return new SynthInvokeable(this, true);				
+			} else if (name.equals(StencilOperator.STATE_ID_FACET)) {
 				return new ReflectiveInvokeable(name, this);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
@@ -91,13 +129,11 @@ public class SyntheticOperator implements StencilOperator {
 	public String getName() {return operatorData.getName();}
 	public OperatorData getOperatorData() {return operatorData;}
 	
-	public Tuple query(Object... values) {return process(getQuery(), values);}
 	private OperatorFacet getQuery() {
 		if (query == null) {query = Freezer.operatorFacet(operatorData.getName(), findFacet(QUERY_FACET));}
 		return query;
 	}
 
-	public Tuple map(Object... values) {return process(getMap(), values);}
 	private OperatorFacet getMap() {
 		if (map == null) {map = Freezer.operatorFacet(operatorData.getName(), findFacet(MAP_FACET));}
 		return map;
@@ -119,13 +155,8 @@ public class SyntheticOperator implements StencilOperator {
 		return rv;
 	}
 
-	private Tuple process(OperatorFacet facet, Object... values) {
-		if (facet.getArguments().size() != values.length) {
-			int expected = facet.getArguments().size();
-			throw new IllegalArgumentException(String.format("Incorrect number of arguments passed to synthetic operator.  Expected %1$s.  Recieved %2$d arguments.", expected, values.length));
-		}
+	private Tuple process(OperatorFacet facet, Tuple tuple) {
 		Tuple prefilter;
-		Tuple tuple = new ArrayTuple(values);
 		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		
 		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
@@ -142,7 +173,7 @@ public class SyntheticOperator implements StencilOperator {
 			}
 		}
 		
-		throw new NoMatchException("No rule to match " + Arrays.deepToString(values));
+		throw new NoMatchException("No rule to match " + tuple.toString());
 	}		
 			
 	/**Find the action that matches the given tuple.  If none does, return null.*/

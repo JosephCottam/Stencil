@@ -333,7 +333,7 @@ public class Projection extends BasicModule {
 		 * @param add Should this set of values be added to the set if it is not already there?
 		 * @param values What set of values needs ranking?
 		 */
-		private synchronized int rank(boolean add, Comparable value) {
+		private int rank(boolean add, Comparable value) {
 			int rank = Collections.binarySearch(list, value);
 			if (rank >=0) {return rank;}
 			else if (add) {
@@ -424,7 +424,7 @@ public class Projection extends BasicModule {
 		 * @param add Should this set of values be added to the set if it is not already there?
 		 * @param values What set of values needs ranking?
 		 */
-		private synchronized int rank(boolean add, Object... values) {
+		private int rank(boolean add, Object... values) {
 			int rank;
 			if (add && !set.contains(values)) {
 				set.add(values);								//TODO: Investigate pcollection alternatives

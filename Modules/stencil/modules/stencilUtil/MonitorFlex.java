@@ -6,6 +6,7 @@ import stencil.module.SpecializationException;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.tuple.Tuple;
+import stencil.types.Converter;
 import stencil.util.ConversionException;
 
 /**Can monitor a continuous mixed with a discrete space.
@@ -36,7 +37,7 @@ public class MonitorFlex extends MonitorBase<MonitorFlex> {
 	@Facet(memUse="OPAQUE", prototype="()")
 	public Tuple map(Object... args) {
 		try {
-			return cont.map(args);
+			return cont.map(Converter.toDouble(args[0]));
 		} 
 		catch (NumberFormatException e) {return cat.map(args);}
 		catch (ConversionException e) {return cat.map(args);}

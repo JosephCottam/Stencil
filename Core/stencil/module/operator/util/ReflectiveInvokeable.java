@@ -86,7 +86,6 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 		try {
 			if (isVarArgs) {
-
 				if (!(arguments.length >= expectedNumArgs-1)) {
 					throw new MethodInvokeFailedException(String.format("Incorrect number of arguments for method specified invoking varArgs method %1$s (expected at least %2$s; received: %3$s).", method.getName(), expectedNumArgs-1, arguments.length));
 				}
@@ -96,7 +95,10 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 
 				//Prepare variable argument for last position of arguments array
 				Object varArgs;
-				if (arguments.length > 0 && arguments[0] != null && arguments[0].getClass().isArray()) {
+				if (paramTypes.length == 1 && Object.class.equals(paramTypes[0])) {
+					//If you need to pass over an Object[] and nothing else, then jus use the arguments array you already ahve.
+					varArgs = arguments;
+				} else  if (arguments.length > 0 && arguments[0] != null && arguments[0].getClass().isArray()) {
 					Class type = paramTypes[paramTypes.length-1];
 					 //Interesting case:  arguments contains a pre-packed var-args array
 					if (arguments[0].getClass().isAssignableFrom(type)) {
