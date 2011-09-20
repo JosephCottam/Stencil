@@ -43,15 +43,25 @@ public interface Table extends DisplayLayer<StoreTuple> {
      * */
     public Rectangle2D getBoundsReference();
     
-    /**Sentinel value used to indicate a value has been deleted in an 
-	 * update, though it still exists in the full store.
-	 */
-	public static final PrototypedTuple DELETE = new PrototypedTuple() {
+    /**Special tuple that indicates a value should be deleted on the next round.**/
+	public static final class DeleteTuple implements PrototypedTuple {
+		private final Comparable id;
+
+		private DeleteTuple(Comparable id) {this.id = id;}
+
+		public Object get(int idx) throws TupleBoundsException {
+			if (idx ==0) {return id;}
+			throw new UnsupportedOperationException();
+		}
+
 		public Object get(String name) throws InvalidNameException {throw new UnsupportedOperationException();}
-		public Object get(int idx) throws TupleBoundsException {throw new UnsupportedOperationException();}
 		public TuplePrototype prototype() {throw new UnsupportedOperationException();}
-		public int size() {throw new UnsupportedOperationException();}		
-	};
+		public int size() {throw new UnsupportedOperationException();}
+		
+
+		public static final DeleteTuple with(Comparable id) {return new DeleteTuple(id);}
+	}
+
 	
 	public static final class Util {
 		public static final void genChange(Table table, Renderer renderer, AffineTransform viewTransform) {
