@@ -1,5 +1,7 @@
 package stencil.display;
 
+import java.awt.geom.Point2D;
+
 import stencil.interpreter.Viewpoint;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.prototype.TuplePrototype;
@@ -53,6 +55,6 @@ public interface DisplayLayer<T extends Glyph> extends Viewpoint<LayerView<T>> {
 	public int size();	
 	
 	//TODO: Extend nearest to handle multiple return values
-	public Glyph nearest(double x, double y);
+	public Glyph nearest(Point2D p);
 	public RectangleTuple bounds();
 }

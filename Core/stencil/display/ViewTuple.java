@@ -1,5 +1,6 @@
 package stencil.display;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Dimension2D;
 
@@ -76,5 +77,8 @@ public abstract class ViewTuple implements PrototypedTuple {
 
 	/**Given a distance in the canvas, what is the corresponding distance in the view?*/
 	public abstract Dimension2D canvasToView(Dimension2D p);
+	
+	/**What is the current view transform?*/
+	public abstract AffineTransform viewTransform();
 
 }

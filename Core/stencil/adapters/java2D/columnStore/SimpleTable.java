@@ -7,7 +7,6 @@ import java.awt.geom.Rectangle2D;
 import java.util.List;
 import java.util.ArrayList;
 
-import stencil.adapters.general.ShapeUtils;
 import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.SchemaFieldDef;
@@ -169,17 +168,6 @@ public final class SimpleTable implements Table {
 		return new RectangleTuple(tenured.getBoundsReference().getBounds2D());
 	}
 	
-	public Glyph nearest(double x, double y) {
-		Glyph nearest=null;
-		double distance = Double.POSITIVE_INFINITY;
-		Point2D p = new Point2D.Double(x,y);
-		
-		for (Glyph g: tenured) {
-			Rectangle2D b = g.getBoundsReference();
-			double dist = ShapeUtils.distance(p, b);
-			if (dist < distance) {nearest = g; distance=dist;}
-		}
-		
-		return nearest;
-	}
+	@Override
+	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, tenured);}
 } // end of class Table

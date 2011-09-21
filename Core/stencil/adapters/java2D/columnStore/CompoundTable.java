@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import stencil.adapters.general.ShapeUtils;
 import stencil.adapters.java2D.columnStore.column.ReferenceColumn;
 import stencil.adapters.java2D.render.CompoundRenderer;
 import stencil.adapters.java2D.render.Renderer;
@@ -214,17 +213,7 @@ public class CompoundTable implements Table {
 		table.root.merge(share);
 	}
 	
-	public Glyph nearest(double x, double y) {
-		Glyph nearest=null;
-		double distance = Double.POSITIVE_INFINITY;
-		Point2D p = new Point2D.Double(x,y);
-		
-		for (Glyph g: root.tenured()) {
-			Rectangle2D b = g.getBoundsReference();
-			double dist = ShapeUtils.distance(p, b);
-			if (dist < distance) {nearest = g; distance=dist;}
-		}
-		
-		return nearest;
-	}
+	@Override
+	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, root.tenured());}
+
 } 

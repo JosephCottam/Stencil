@@ -127,4 +127,6 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		p = canvas.inverseViewTransform().deltaTransform(p, p);
 		return new DoubleDimension(p.getX(), p.getY());
 	}
+	
+	public AffineTransform viewTransform() {return canvas.viewTransform();}
 }

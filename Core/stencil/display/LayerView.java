@@ -1,5 +1,6 @@
 package stencil.display;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.Iterator;
 
@@ -36,4 +37,6 @@ public interface LayerView<T extends Glyph> extends Iterable<T> {
 	public int stateID();
 	
 	public T find(Comparable id);
+	
+	public Glyph nearest(Point2D p);
 }

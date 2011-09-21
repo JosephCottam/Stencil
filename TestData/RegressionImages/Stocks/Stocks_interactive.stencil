@@ -63,14 +63,19 @@ from AlignedStocks
 
 layer Selected["TEXT"]			/*@\label{stocks:beginInteractive}@*/
 from Mouse
-  local(point) : Nearest(X,3)
+  filter(prefilter.X != NULL)
+  prefilter(X,Y) : Nearest(X,3) -> Ticker.find(_) -> (Ticker.X, Ticker.Y) 
   ID : "Selected"
-  TEXT: Ticker.find(local.point) -> Ticker.Y
+  TEXT: prefilter.Y
   REGISTRATION: "LEFT"
   IMPLANT: "POINT"
-  (X, Y) :[FullMax] Add(canvas.X, canvas.WIDTH) 
-           -> Max(canvas.X, local.point) -> Min(FullMax, _) 
-           -> Ticker.find(_) -> Add(50, Ticker.Y) -> (Ticker.X, _)
+  X: prefilter.X
+  Y: Nearest(X,3) -> Ticker.find(_) -> Add(50, prefilter.Y)
+from Mouse
+  filter(prefilter.X = NULL)
+  prefilter(X,Y) : Nearest(X,3) -> Ticker.find(_) -> Print(Ticker.X, Ticker.Y) -> (Ticker.X, Ticker.Y) 
+  ID : "Selected"
+  TEXT: "---"
 
 layer Highlight["LINE"]
 from Mouse

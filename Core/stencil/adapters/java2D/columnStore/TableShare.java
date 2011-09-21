@@ -1,5 +1,6 @@
 package stencil.adapters.java2D.columnStore;
 
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +17,7 @@ import stencil.adapters.java2D.columnStore.column.Column;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
 import stencil.display.DynamicBindSource;
+import stencil.display.Glyph;
 import stencil.display.LayerView;
 import stencil.display.SchemaFieldDef;
 import stencil.interpreter.tree.Freezer;
@@ -289,4 +291,6 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 	
     /**Change the screen bounds of the table.**/
     public void setBounds(Rectangle2D fullBounds) {this.fullBounds = fullBounds;}
+    
+	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, this);}
 }

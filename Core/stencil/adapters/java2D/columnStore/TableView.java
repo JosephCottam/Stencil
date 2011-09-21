@@ -6,6 +6,7 @@ import static stencil.parser.ParserConstants.BOUNDS_FIELD;
 import static stencil.parser.ParserConstants.RENDER_ORDER_FIELD;
 
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import stencil.adapters.java2D.columnStore.column.ColumnUtils;
 import stencil.adapters.java2D.columnStore.util.SimpleSequence;
 import stencil.adapters.java2D.columnStore.util.StoreTuple;
 import stencil.adapters.java2D.columnStore.util.TupleIterator;
+import stencil.display.Glyph;
 import stencil.display.LayerView;
 import stencil.display.SchemaFieldDef;
 import stencil.tuple.TupleSorter;
@@ -160,5 +162,5 @@ public class TableView implements LayerView<StoreTuple>, ColumnStore<StoreTuple>
 		return new TableView(basis.name, basis.columns, index, basis.schema, basis.stateID, basis.bounds);
 	}
 	
-
+	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, this);}
 }

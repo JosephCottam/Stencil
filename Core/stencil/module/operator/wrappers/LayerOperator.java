@@ -2,7 +2,11 @@ package stencil.module.operator.wrappers;
 
 import static java.lang.String.format;
 
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
+
+import stencil.display.Display;
 import stencil.display.DisplayLayer;
 import stencil.display.LayerView;
 import stencil.module.operator.StencilOperator;
@@ -13,6 +17,7 @@ import stencil.module.util.FacetData;
 import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
+import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.geometry.RectangleTuple;
 
@@ -56,6 +61,8 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 		if (StencilOperator.MAP_FACET.equals(facet) 
 			|| StencilOperator.QUERY_FACET.equals(facet)) {
 			return new ReflectiveInvokeable(FIND, layer);
+		} else if (NEAR.equals(facet)) {
+			return new ReflectiveInvokeable(facet, this);
 		} else if (operatorData.hasFacet(facet)) {
 			return new ReflectiveInvokeable(facet, layer);
 		} 
@@ -67,11 +74,19 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 	
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 	
-	private static class LayerViewOperator implements StencilOperator<LayerViewOperator> {
-		final LayerView view;
+	public Tuple nearest(double x, double y) {
+		AffineTransform t = Display.view.viewTransform();
+		Point2D p = new Point2D.Double(x,y);
+		t.transform(p, p);
+		return layer.nearest(p);
+	}
+	
+	
+	protected static class LayerViewOperator implements StencilOperator<LayerViewOperator> {
+		final LayerView layer;
 		final OperatorData operatorData;
 		
-		public LayerViewOperator(LayerView view, OperatorData od) {this.view = view; operatorData=od;}
+		public LayerViewOperator(LayerView view, OperatorData od) {this.layer = view; operatorData=od;}
 		public StencilOperator duplicate() throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
@@ -80,14 +95,23 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 		public Invokeable getFacet(String facet) throws UnknownFacetException {
 			if (StencilOperator.MAP_FACET.equals(facet) 
 					|| StencilOperator.QUERY_FACET.equals(facet)) {
-					return new ReflectiveInvokeable(FIND, view);
+					return new ReflectiveInvokeable(FIND, layer);
+			} else if (NEAR.equals(facet)) {
+				return new ReflectiveInvokeable(facet, this);
 			} else if (operatorData.hasFacet(facet)) {
-				return new ReflectiveInvokeable(facet, view);
+				return new ReflectiveInvokeable(facet, layer);
 			}
 			throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
 		}
+		
+		public Tuple nearest(double x, double y) {
+			AffineTransform t = Display.view.viewTransform();
+			Point2D p = new Point2D.Double(x,y);
+			t.transform(p, p);
+			return layer.nearest(p);
+		}
 
-		public String getName() {return view.getName();}
+		public String getName() {return layer.getName();}
 
 		public OperatorData getOperatorData() {
 			throw new UnsupportedOperationException();
