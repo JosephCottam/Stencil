@@ -62,6 +62,7 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 		DisplayLayer<? extends Glyph> layer = panel.getLayer("GridLines");
 		assertNotNull(layer);
 		TableShare share = ((Table) layer).changeGenerations();
+		share.simpleUpdate();
 		assertEquals(6, share.size());
 
 		for (PrototypedTuple t: layer.viewpoint()) {
