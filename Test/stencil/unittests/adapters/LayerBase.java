@@ -35,7 +35,7 @@ public abstract class LayerBase extends junit.framework.TestCase {
 				PrototypedTuple values = new PrototypedArrayTuple(new String[]{"ID", "X","Y","Z"}, new Object[]{Integer.toString(i), i,i,i});
 				layer.update(values);
 			}
-			((Table) layer).changeGenerations();
+			Table.Util.genChange(((Table) layer), null, null);
 		}
 		return layer;
 	}
@@ -85,15 +85,26 @@ public abstract class LayerBase extends junit.framework.TestCase {
 		synchronized(panel.getCanvas().getComponent().visLock) {
 			for (int i=0; i< TUPLE_COUNT; i++) {
 				Glyph source = layer.find(Integer.toString(i));
+				assertNotNull(source);
+				assertEquals(source.get(0).toString(), Integer.toString(i));
 				try {
 					layer.remove((String) source.get("ID"));
-					share = ((Table) layer).changeGenerations();
 					expectedSize = expectedSize -1;
 				} catch (Exception e) {
 					fail("Exception on element " + i + ": " + e.getMessage());
 				}
+				
+				Table.Util.genChange(((Table) layer), null, null);
 	
 				assertEquals("Remove did not appear to delete existing tuple", expectedSize, layer.size());
+				source = layer.find(Integer.toString(i));
+				assertNull("Item " + i + " not deleted when expected.", source);
+				
+				
+				for (int j=i+1; j<TUPLE_COUNT; j++) {
+					Glyph alt = layer.find(Integer.toString(j));
+					assertNotNull("Premature delete of item " + j + "; gone after delete of " + i, alt);
+				}
 			}
 		}
 	}
