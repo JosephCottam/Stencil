@@ -159,7 +159,11 @@ public final class SimpleTable implements Table {
 	}
 	
 	@Override
-	public int size() {return tenured.size() + transfer.size() + updates.size();}	//HACK: This is an upper-bound, not necessarily the actual size;  TODO: Remove from all but tenured...
+	public int size() {
+		int ts = transfer == null ? 0 : transfer.size();
+		int us = updates == null  ? 0 : updates.size();
+		
+		return tenured.size() + ts + us;}	//HACK: This is an upper-bound, not necessarily the actual size;  TODO: Remove from all but tenured...
 
 
 	@Override

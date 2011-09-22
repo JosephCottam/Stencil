@@ -84,13 +84,13 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 		
 		
 		for (int i=0; i< columns.length; i++) {
-			if (!columns[i].readOnly() && updateSet.values[i] != null) {
+			if (!columns[i].readOnly()) {
 				columns[i] = columns[i].update(updateSet.values[i], updateSet.targets, updateSet.extend);
 			}
 		}
 		
 		final Column ids = columns[idColumn];
-		index = new TreeMap();
+		index = new TreeMap();					//Rebuild the index
 		for (int i=0; i<ids.size(); i++) {
 			index.put(ids.get(i), i);
 		}
@@ -173,11 +173,16 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					
 					values[targetColIdx][i] = updateValue;
 				}
+				i++;
 			}
-			
-			i++;
 		}
 		
+		while (deletes.size() > 0) {
+			targets[i] = deletes.get(0);
+			deletes.remove(0);
+			i++;
+		}
+				
 		return new UpdateSet(values, targets, extend);
 	}
 	
@@ -214,6 +219,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 	public int size() {
 		int more =0;
 		if (!simpleUpdateComplete.get()) {
+			calcUpdateSet();
 			for (Object val: updates.values()) {
 				if (val == DELETE) {more--;}
 				else {more++;}

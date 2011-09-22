@@ -25,7 +25,7 @@ public class Target {
 	public final Tuple finalize(Tuple source) {
 		int maxSize =-1;
 		
-		//HACK: Horrible, horrible!!!  Why do all this work EVERY TIME on the CHANCE that there is a merge???
+		//HACK: Horrible, horrible!!!  Why do all this work EVERY TIME on the CHANCE that there is a merge??? TODO: When there is a better type system, add multi-result tuple to it
 		for (int i=0; i< source.size(); i++) {
 			if (source.get(i) instanceof MultiResultTuple) {
 				MultiResultTuple result = (MultiResultTuple) source.get(i);

@@ -82,16 +82,26 @@ public class ColumnUtils {
 			System.arraycopy(basis, 0, array, 0, Math.min(Array.getLength(basis), Array.getLength(array)));				//Copy old values
 			
 			if (extend < 0) { //There were deletes, more than there were updates!
-				throw new Error("Can't do big deletes yet!");							//TODO: Implement deletes so that it copies tailing items over deleted items (needs to munge the index elsewhere after that though)
-			} else {			//The array is the same size or grew
+				while (extend <0) {
+					Object oldVal = Array.get(basis, Array.getLength(basis)+extend);
+					int target = mask[mask.length+extend];
+					if (target < Array.getLength(array)) {	//Target value may be off the end of the array
+						Array.set(array,  target, oldVal);
+					}
+					extend++;
+				}
+			} 
+			
+			if (values != null) {//If there are any value updates, put them in 
 				final int length = values.length;
 				for (int i=0; i< length; i++) {
 					Object val = values[i];
 					Array.set(array, mask[i], val);
 				}
 			}
+			
 			return array;
-		} catch (Exception e) {throw new Error("Error extending column", e);}
+		} catch (Exception e) {throw new Error("Error updating column", e);}
     }
     
     public static String toString(String name, Column c) {

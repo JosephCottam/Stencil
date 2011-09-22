@@ -73,10 +73,9 @@ public interface Table extends DisplayLayer<StoreTuple> {
 			} else if (table instanceof CompoundTable && renderer instanceof CompoundRenderer) {
 				throw new IllegalArgumentException("Mismatch between tabel and renderer.");
 			} else {
-				table.changeGenerations();
-				TableShare share = table.viewpoint();
+				TableShare share = table.changeGenerations();
 				share.simpleUpdate();
-				renderer.calcFields(share, viewTransform);
+				if (renderer != null) {renderer.calcFields(share, viewTransform);}
 				table.merge(share);		
 			}
 		}
