@@ -4,7 +4,6 @@ import stencil.adapters.Adapter;
 import stencil.interpreter.tree.Program;
 import stencil.module.operator.*;
 import stencil.module.operator.util.Invokeable;
-import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.wrappers.SyntheticOperator;
 import stencil.module.operator.wrappers.SyntheticOperator.NoMatchException;
 import stencil.module.util.FacetData;
@@ -48,10 +47,7 @@ public class TestSyntheticOperator extends TestCase {
 		
 		boolean error = false;
 		try {map.invoke(new Object[]{null, "2","3"});}
-		catch (MethodInvokeFailedException ex) {
-			if (ex.getCause().getCause() instanceof NoMatchException) {error = true;}
-			else {throw ex;}
-		}
+		catch (NoMatchException ex) {error = true;}
 		assertTrue("NoMatchException not thrown when expected.", error);
 
 		rv = (Tuple) map.invoke(new Object[]{"0", "1", "2"});
@@ -71,10 +67,7 @@ public class TestSyntheticOperator extends TestCase {
 		boolean error = false;
 		try {
 			map.invoke(new Object[]{null, null, null,null,null,null,null});
-		} catch (MethodInvokeFailedException ex) {
-			if (ex.getCause().getCause() instanceof NoMatchException) {error = true;}
-			else {throw ex;}
-		}
+		} catch (NoMatchException ex) {error = true;}
 		assertTrue("NoMatchException not thrown when expected.", error);
 	}
 
