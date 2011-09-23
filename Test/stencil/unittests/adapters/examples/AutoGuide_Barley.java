@@ -7,7 +7,6 @@ public class AutoGuide_Barley extends ImageTest {
 				  "BarleyCell.stencil",
 				  null,
 				  null,
-				  "barleyCell.txt",
 				  "barleyCell.png", configs));
 	}
 }

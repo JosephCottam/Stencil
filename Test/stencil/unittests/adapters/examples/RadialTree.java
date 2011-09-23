@@ -7,7 +7,6 @@ public class RadialTree extends ImageTest {
 				"RadialTree.stencil",
 				  null,
 				  null,
-				  "radialTree.txt",
 				  "radialTree.png", configs));
 	}
 }

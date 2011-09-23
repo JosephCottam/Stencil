@@ -14,7 +14,7 @@ stream flowers(sepalL, petalW, sepalW,
 layer FlowerPlot					/*@\label{flowers:layerDef}@*/
 guide
   trend from ID                         		/*@\label{flowers:guideBegin}@*/
-  legend[X:20,Y:90] from FILL_COLOR
+  legend[X: 0, Y: 100] from FILL_COLOR
   axis[guideLabel: "Petal Length"] Linear from Y
   axis[guideLabel: "Petal Width"] Linear from X		/*@\label{flowers:guideX}@*/
 		                             		/*@\label{flowers:guideEnd}@*/

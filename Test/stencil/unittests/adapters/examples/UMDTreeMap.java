@@ -7,7 +7,6 @@ public class UMDTreeMap extends ImageTest {
 				"UMDTreeMap.stencil",
 				  null,
 				  null,
-				  "UMDTreeMap.txt",
 				  "UMDTreeMap.png", configs));
 	}
 }

@@ -5,9 +5,8 @@ public class Registration extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/Registration/",
 				resultSpace("Registration"),
 				"Registration.stencil",
-									  null,
-									  null,
-									  "registration.txt",
-									  "registration.png", configs));
+				  null,
+				  null,
+				  "registration.png", configs));
 	}
 }

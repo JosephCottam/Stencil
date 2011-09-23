@@ -79,6 +79,7 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 	}
 	
 
+	//TODO: Does not work if there is a #RENDER consumption on a view....
 	private void exportPNG(String filename, Integer width, Integer height) throws Exception {
 		if (width <1 && height <1) {exportPNG(filename, StencilPanel.ABSTRACT_SCREEN_RESOLUTION); return;}
 		Rectangle contentBounds = canvas.contentBounds(true);
@@ -86,11 +87,11 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 		AffineTransform viewTransform = canvas.viewTransformRef(); 
 		Point2D topLeft = viewTransform.transform(canvas.getBounds().getLocation(), null);		
 		
-		float contentWidth = canvas.getWidth();		//Using float to force floating point arithmetic later
-		float contentHeight = canvas.getHeight();
+		double contentWidth = canvas.getWidth();		//Using double to force floating point arithmetic later
+		double contentHeight = canvas.getHeight();
 		if (contentWidth == 0 || contentHeight == 0) { //If nothing will display, then just show everything (happens in batch mode)
-			contentWidth = (int) Math.ceil(contentBounds.getWidth());
-			contentHeight = (int) Math.ceil(contentBounds.getHeight());
+			contentWidth = contentBounds.getWidth();
+			contentHeight = contentBounds.getHeight();
 			topLeft = contentBounds.getLocation();
 			topLeft = new Point2D.Double(-topLeft.getX(), -topLeft.getY());
 		}

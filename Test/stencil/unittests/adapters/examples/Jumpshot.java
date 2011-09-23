@@ -7,10 +7,9 @@ public class Jumpshot extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/MPICommViz/",
 				resultSpace("MPICommViz"),
 				"JumpShot.stencil",
-									  null,
-									  null,
-									  "JumpShot.txt",
-									  "JumpShot.png", 
-									  configs));
+				  null,
+				  null,
+				  "JumpShot.png", 
+				  configs));
 	}
 }

@@ -5,9 +5,8 @@ public class Stocks extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/Stocks/",
 				resultSpace("Stocks"),
 				"Stocks.stencil",
-									  null,
-									  null,
-									  "stocks.txt",
-									  "stocks.png", configs));
+				  null,
+				  null,
+				  "stocks.png", configs));
 	}
 }

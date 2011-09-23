@@ -5,9 +5,8 @@ public class SeeTest extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/SeeTest/",
 				resultSpace("SeeTest"),
 				"SeeTest.stencil",
-									  null,
-									  null,
-									  "SeeTest.txt",
-									  "SeeTest.png", configs));
+				  null,
+				  null,
+				  "SeeTest.png", configs));
 	}
 }

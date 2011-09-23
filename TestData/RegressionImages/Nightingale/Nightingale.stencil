@@ -13,7 +13,7 @@ stream Deaths(date, type, count)
 
 layer Rose["SLICE"]
 guide
-  legend[X: -75, Y: 50] from FILL_COLOR
+  legend[X: -75, Y: 65] from FILL_COLOR
     label.REGISTRATION: "BOTTOM_LEFT"
   pointLabels from ID
     TEXT: ParseLabel(ID) 		/*@\label{rose:postProcessStart}@*/

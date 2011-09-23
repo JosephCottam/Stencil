@@ -1,25 +1,26 @@
-./RegressionImages/AutoGuide/ -open Axis.stencil -txt axis.txt -png2 1000 -1 axis.png
-./RegressionImages/AutoGuide/ -open Legend.stencil -txt legend.txt -png2 1000 -1 legend.png
-./RegressionImages/AutoGuide/ -open TweetCountLocal.stencil -txt tweetCount.txt -png2 1000 -1 tweetCount.png
-./RegressionImages/Barley/ -open BarleyCell.stencil -txt barleyCell.txt -png2 1000 -1 barleyCell.png
-./RegressionImages/Epic/ -open EpiC.stencil -txt EpiC.txt -png2 1000 -1 EpiC.png
-./RegressionImages/Flowers/ -open AndersonFlowers.stencil -txt flowers.txt -png2 1000 -1 flowers.png
-./RegressionImages/Flowers/ -open AndersonFlowers_Multi.stencil -txt flowers_multi.txt -png2 1000 -1 flowers_multi.png
-./RegressionImages/Flowers/ -open AndersonFlowers_Cross.stencil -txt flowers_cross.txt -png2 1000 -1 flowers_cross.png
-./RegressionImages/Nightingale/ -open Nightingale.stencil -txt nightingale.txt -png2 1000 -1 nightingale.png
-./RegressionImages/NodeLink/ -open JungTree.stencil -txt jungTree.txt -png2 1000 -1 jungTree.png
-./RegressionImages/NodeLink/ -open NodeLink.stencil -txt nodeLink.txt -png2 1000 -1 nodeLink.png
-./RegressionImages/NodeLink/ -open RadialTree.stencil -txt radialTree.txt -png2 1000 -1 radialTree.png
-./RegressionImages/NodeLink/ -open UMDTreeMap.stencil -txt UMDTreeMap.txt -png2 1000 -1 UMDTreeMap.png
-./RegressionImages/Registration/ -open Registration.stencil -txt registration.txt -png2 1000 -1 registration.png
-./RegressionImages/Rotation/ -open Rotation.stencil -txt rotation.txt -png2 1000 -1 rotation.png
-./RegressionImages/SeeTest/ -open SeeTest.stencil -txt SeeTest.txt -png2 1000 -1 SeeTest.png
-./RegressionImages/SimpleLines/ -open Arcs.stencil -txt arcs.txt -png2 1000 -1 arcs.png
-./RegressionImages/SimpleLines/ -open Arrowheads.stencil -txt arrowheads.txt -png2 1000 -1 arrowheads.png
-./RegressionImages/SimpleLines/ -open Lines.stencil -txt lines.txt -png2 1000 -1 lines.png
-./RegressionImages/Sourceforge/ -open Sourceforge.stencil -txt Sourceforge.txt -png2 1000 -1 Sourceforge.png
-./RegressionImages/SquareShells/ -open SquareShells.stencil -txt squareShells.txt -png2 1000 -1 squareShells.png
-./RegressionImages/Stocks/ -open Stocks.stencil -txt stocks.txt -png2 1000 -1 stocks.png
-./RegressionImages/TextArc -open textArc.stencil -txt TextArcAlice.txt -png2 1000 -1 TextArcAlice.png
-./RegressionImages/VSM/ -open VSM.stencil -source VertexList ws_400_12_0.1.adj BFS ws_400_12_0.1.bfs -txt VSM.txt -png2 1000 -1 VSM.png
-./RegressionImages/VSM/ -open VSM.stencil -source VertexList fillGrid.adj -source BFS fillGrid.bfs -txt fillGrid.txt -png2 1000 -1 fillGrid.png
+./RegressionImages/AutoGuide/ -open Axis.stencil -png2 1000 -1 axis.png
+./RegressionImages/AutoGuide/ -open Legend.stencil -png2 1000 -1 legend.png
+./RegressionImages/AutoGuide/ -open TweetCountLocal.stencil -png2 1000 -1 tweetCount.png
+./RegressionImages/Barley/ -open BarleyCell.stencil -png2 1000 -1 barleyCell.png
+./RegressionImages/Epic/ -open EpiC.stencil -png2 1000 -1 EpiC.png
+./RegressionImages/Flowers/ -open AndersonFlowers.stencil -png2 1000 -1 andersonFlowers.png
+./RegressionImages/Flowers/ -open AndersonFlowers-cross.stencil -png2 1000 -1 andersonFlowers-cross.png
+./RegressionImages/Flowers/ -open AndersonFlowers-co.stencil -png2 1000 -1 andersonFlowers-co.png
+./RegressionImages/Flowers/ -open AndersonFlowers-flex.stencil -png2 1000 -1 andersonFlowers-flex.png
+./RegressionImages/Nightingale/ -open Nightingale.stencil -png2 1000 -1 nightingale.png
+./RegressionImages/NodeLink/ -open JungTree.stencil -png2 1000 -1 jungTree.png
+./RegressionImages/NodeLink/ -open NodeLink.stencil -png2 1000 -1 nodeLink.png
+./RegressionImages/NodeLink/ -open RadialTree.stencil -png2 1000 -1 radialTree.png
+./RegressionImages/NodeLink/ -open UMDTreeMap.stencil -png2 1000 -1 UMDTreeMap.png
+./RegressionImages/Registration/ -open Registration.stencil -png2 1000 -1 registration.png
+./RegressionImages/Rotation/ -open Rotation.stencil -png2 1000 -1 rotation.png
+./RegressionImages/SeeTest/ -open SeeTest.stencil -png2 1000 -1 SeeTest.png
+./RegressionImages/SimpleLines/ -open Arcs.stencil -png2 1000 -1 arcs.png
+./RegressionImages/SimpleLines/ -open Arrowheads.stencil -png2 1000 -1 arrowheads.png
+./RegressionImages/SimpleLines/ -open Lines.stencil -png2 1000 -1 lines.png
+./RegressionImages/Sourceforge/ -open Sourceforge.stencil -png2 1000 -1 Sourceforge.png
+./RegressionImages/SquareShells/ -open SquareShells.stencil -png2 1000 -1 squareShells.png
+./RegressionImages/Stocks/ -open Stocks.stencil -png2 1000 -1 stocks.png
+./RegressionImages/TextArc -open textArc.stencil -png2 1000 -1 TextArcAlice.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList ws_400_12_0.1.adj BFS ws_400_12_0.1.bfs -png2 1000 -1 VSM.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList fillGrid.adj -source BFS fillGrid.bfs -png2 1000 -1 fillGrid.png

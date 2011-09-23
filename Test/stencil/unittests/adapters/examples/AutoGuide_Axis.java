@@ -8,7 +8,6 @@ public class AutoGuide_Axis extends ImageTest {
 				  "Axis.stencil",
 				  null,
 				  null,
-				  "axis.txt",
 				  "axis.png", configs));
 	}
 }

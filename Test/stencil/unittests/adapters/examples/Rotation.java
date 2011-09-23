@@ -5,9 +5,8 @@ public class Rotation extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/Rotation/",
 				resultSpace("Rotation"),
 				"Rotation.stencil",
-									  null,
-									  null,
-									  "rotation.txt",
-									  "rotation.png", configs));
+				  null,
+				  null,
+				  "rotation.png", configs));
 	}
 }

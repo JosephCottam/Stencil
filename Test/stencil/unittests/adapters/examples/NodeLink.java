@@ -7,7 +7,6 @@ public class NodeLink extends ImageTest {
 				"NodeLink.stencil",
 				  null,
 				  null,
-				  "nodeLink.txt",
 				  "nodeLink.png", configs));
 	}
 }

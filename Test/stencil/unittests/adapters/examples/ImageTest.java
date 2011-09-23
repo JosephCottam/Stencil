@@ -3,11 +3,6 @@ package stencil.unittests.adapters.examples;
 import static junit.framework.Assert.*;
 
 import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import javax.imageio.*;
 
@@ -17,14 +12,12 @@ public abstract class ImageTest {
 	private TestRecord record;
 	File testPNG;
 	File deltaPNG;
-	File testTXT;
 	
 	public ImageTest(TestRecord record) {
 		this.record =record;
 		
 		testPNG = new File(record.getTestPNG());
 		deltaPNG = new File(record.getDeltaPNG());
-		testTXT = new File(record.getTestTXT());
 	}
 	
 	public void setUp() throws Exception {
@@ -58,47 +51,6 @@ public abstract class ImageTest {
 		stencil.explore.ui.Batch.batchInvoke(imgCommand);
 		
 		diffImage(record.getPNG(), record.getTestPNG(), record.getDeltaPNG());
-	}
-	
-	public void testTXT() throws Exception {
-		setUp();
-		if (testTXT.exists()) {testTXT.delete();}
-
-		stencil.explore.ui.Batch.batchInvoke(record.getTextCommand());
-		
-		diffString(record.getTXT(), record.getTestTXT(), 0, "Comparing TXT files");
-	}
-	
-	public void diffString(String original, String testResult, int skip, String message) throws Exception {
-		File f1 = new File(original);
-		File f2 = new File(testResult);
-
-		assertTrue("Original file could not be found: " + original, f1.exists());
-		assertTrue("Test result file could not be found: " + testResult, f2.exists());
-
-		BufferedReader file1 = new BufferedReader(new FileReader(f1));
-		BufferedReader file2 = new BufferedReader(new FileReader(f2));
-
-		int counter=1;
-		while (skip >0) {
-			file1.readLine();
-			file2.readLine();
-			skip--;
-			counter++;
-		}
-
-		List<String> differences = new ArrayList<String>();
-		while (file1.ready() && file2.ready()) {
-			String line1 = file1.readLine();
-			String line2 = file2.readLine();
-			if (!line1.equals(line2)) {differences.add(Integer.toString(counter));}
-			counter++;
-		}
-		if (file1.ready() && !file2.ready()) {differences.add("Original has more lines than test result");}
-		if (file2.ready() && !file1.ready()) {differences.add("Test result has more lines than original");}
-		
-		if (differences.size()>0) {fail("Differences on lines "+ Arrays.deepToString(differences.toArray()));}
-
 	}
 
 	public void diffImage(String original, String testResult, String deltaFile) throws Exception {

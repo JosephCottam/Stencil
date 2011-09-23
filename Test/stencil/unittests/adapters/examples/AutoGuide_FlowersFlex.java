@@ -13,7 +13,6 @@ public class AutoGuide_FlowersFlex extends ImageTest {
 				"AndersonFlowers-Flex.stencil",
 				  null,
 				  null,
-				  "Andersonflowers.txt",
-				  "Andersonflowers.png", configs));
+				  "Andersonflowers-flex.png", configs));
 	}
 }

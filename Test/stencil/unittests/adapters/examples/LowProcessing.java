@@ -10,11 +10,10 @@ public class LowProcessing extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/Misc/",
 				resultSpace("Misc"),
 				"LowProcessing.stencil",
-									  null,
-									  null,
-									  "LowProcessing.txt",
-									  "LowProcessing.png", 
-									  configs));
+				  null,
+				  null,
+				  "LowProcessing.png", 
+				  configs));
 	}
 	
 	public void setUp() throws Exception {

@@ -7,7 +7,6 @@ public class AutoGuide_TweetCount extends ImageTest {
 				"TweetCountLocal.stencil",
 				  null,
 				  null,
-				  "tweetCount.txt",
 				  "tweetCount.png", configs));
 	}
 }

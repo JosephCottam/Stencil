@@ -7,7 +7,6 @@ public class VSM_FillGrid extends ImageTest {
 				"VSM.stencil",
 				  "BFS VertexList",
 				  "fillGrid.bfs fillGrid.adj",
-				  "fillGrid.txt",
 				  "fillGrid.png", configs));
 	}
 }

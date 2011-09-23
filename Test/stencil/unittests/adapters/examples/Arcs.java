@@ -7,7 +7,6 @@ public class Arcs extends ImageTest {
 				  "Arcs.stencil",
 				  null,
 				  null,
-				  "arcs.txt",
 				  "arcs.png", configs));
 	}
 }

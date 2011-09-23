@@ -14,7 +14,7 @@ stream flowers(sepalL, petalW, sepalW,
 layer FlowerPlot
 guide
  trend[sample: "SIMPLE"] from ID 
- legend[X: 15, Y: 90] from FILL_COLOR
+ legend[X: 0, Y: 100] from FILL_COLOR
  axis[guideLabel: "Petal Length"] from Y
  axis[guideLabel: "Petal Width"] from X
 

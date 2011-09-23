@@ -7,7 +7,6 @@ public class JungTree extends ImageTest {
 				"JungTree.stencil",
 				  null,
 				  null,
-				  "jungTree.txt",
 				  "jungTree.png", configs));
 	}
 }

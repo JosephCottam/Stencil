@@ -5,10 +5,9 @@ public class SquareShells extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/SquareShells/",
 				resultSpace("SquareShells"),
 				"SquareShells.stencil",
-									  null,
-									  null,
-									  "SquareShells.txt",
-									  "SquareShells.png", 
-									  configs));
+				  null,
+				  null,
+				  "SquareShells.png", 
+				  configs));
 	}	
 }

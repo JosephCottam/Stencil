@@ -7,7 +7,6 @@ public class SimpleLines extends ImageTest {
 				"Lines.stencil",
 				  null,
 				  null,
-				  "lines.txt",
 				  "lines.png", configs));
 	}
 }

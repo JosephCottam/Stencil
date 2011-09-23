@@ -5,9 +5,8 @@ public class EpiC extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/Epic/",
 				resultSpace("Epic"),
 				"EpiC.stencil",
-									  null,
-									  null,
-									  "EpiC.txt",
-									  "EpiC.png", configs));
+				  null,
+				  null,
+				  "EpiC.png", configs));
 	}
 }

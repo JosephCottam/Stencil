@@ -8,7 +8,6 @@ public class Arrowheads extends ImageTest {
 				  "Arrowheads.stencil",
 				  null,
 				  null,
-				  "arrowheads.txt",
 				  "arrowheads.png", configs));
 	}
 }

@@ -5,9 +5,8 @@ public class TextArc extends ImageTest {
 		super(new TestRecord("./TestData/RegressionImages/TextArc/",
 				resultSpace("TextArc"),
 				"textArc.stencil",
-									  null,
-									  null,
-									  "TextArcAlice.txt",
-									  "TextArcAlice.png", configs));
+			  null,
+			  null,
+			  "TextArcAlice.png", configs));
 	}
 }

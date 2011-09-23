@@ -7,7 +7,6 @@ public class AutoGuide_Rose extends ImageTest {
 				"Nightingale.stencil",
 				  null,
 				  null,
-				  "nightingale.txt",
 				  "nightingale.png", configs));
 	}
 }

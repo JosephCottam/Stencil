@@ -14,7 +14,7 @@ stream flowers(sepalL, petalW, sepalW,
 layer FlowerPlot
 guide
  trend[sample: "SIMPLE"] from ID 
- legend[X: 15, Y: 90] Categorical from FILL_COLOR, from PEN_COLOR	/*@\label{flowers:co-guide}@*/
+ legend[X: 0, Y: 100] Categorical from FILL_COLOR, from PEN_COLOR	/*@\label{flowers:co-guide}@*/
  axis[guideLabel: "Petal Length"] Linear from Y
  axis[guideLabel: "Petal Width"] Linear from X
 

@@ -8,7 +8,6 @@ public class AutoGuide_Legend extends ImageTest {
 				  "Legend.stencil",
 				  null,
 				  null,
-				  "legend.txt",
 				  "legend.png", configs));
 	}
 

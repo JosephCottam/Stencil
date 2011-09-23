@@ -7,7 +7,6 @@ public class AutoGuide_Flowers extends ImageTest {
 				"AndersonFlowers.stencil",
 				  null,
 				  null,
-				  "AndersonFlowers.txt",
 				  "AndersonFlowers.png", configs));
 	}
 }
