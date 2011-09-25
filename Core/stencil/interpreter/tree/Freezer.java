@@ -256,11 +256,12 @@ public final class Freezer {
 	
 	public static DynamicRule dynamicRule(StencilTree dynamic) {
 		assert verifyType(dynamic, DYNAMIC_RULE);
-		Rule rule = Freezer.rule(dynamic.find(RULE));
+		CallChain chain = Freezer.chain(dynamic.find(RULE).find(CALL_CHAIN));
+		Target target = Freezer.target(dynamic.find(RULE).find(TARGET));
 		StateQuery stateQuery = Freezer.stateQuery(dynamic.find(STATE_QUERY));
 		int groupID = dynamic.getAncestor(CONSUMES).getChildIndex();
 		String layer = dynamic.getAncestor(LAYER).getText();
-		return new DynamicRule(layer, groupID, rule, stateQuery);
+		return new DynamicRule(layer, groupID, target, chain, stateQuery);
 	}
 	
 	public static OperatorFacet operatorFacet(String opName, StencilTree facet) {

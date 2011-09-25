@@ -20,14 +20,14 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 	private final int[] targets;
 	public DynamicUpdateTask(Table table, DynamicRule rule) {
 		//TODO: Re-arrange when dynamic rule is frozen
-		super(rule, rule.action().prototype().toString());
+		super(rule, rule.target().prototype().toString());
 		this.table = table;
 		
 		TuplePrototype schema = table.prototype();
-		TuplePrototype resultProto = rule.action().prototype();
+		TuplePrototype resultProto = rule.target().prototype();
 		targets = new int[resultProto.size()];
 		for (int i=0; i<resultProto.size(); i++) {
-			String field = rule.action().prototype().get(i).name();
+			String field = rule.target().prototype().get(i).name();
 			targets[i] = schema.indexOf(field);
 			if (targets[i] <0) {throw new IllegalArgumentException("Dynamic binding requested for field not found in table: " + field);}
 		}

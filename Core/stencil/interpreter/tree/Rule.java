@@ -25,13 +25,21 @@ public class Rule implements Viewpoint<Rule> {
 	
 	/**Execute the action and return a tuple with fields
 	 * corresponding to the prototype and values from the action.
+	 * 
+	 * Execution occurs data-flow style.
 	 *
 	 * @param source
 	 * @return
 	 */
 	public Tuple apply(Environment env) throws Exception {
-		Environment ruleEnv = env.ensureCapacity(env.size() + chain.depth());
-		Tuple t = chain.apply(ruleEnv);
+		env = env.ensureCapacity(env.size() + chain.depth());
+		final int depth = chain.depth();
+		for (int target=0; target< depth; target++) {
+			Tuple result = chain.applyStep(target, env);
+			env.extend(result);
+		}
+		Tuple t= chain.pack(env);
+
 		if (t == null) {throw new RuleAbortException(this);}
 		return target.finalize(t);
 	}
