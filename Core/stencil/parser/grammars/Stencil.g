@@ -27,7 +27,6 @@ tokens {
   LIST_GUIDE_SAMPLERS;
   LIST_GLOBALS;
   LIST_IMPORTS;
-  LIST_JAVAS;
   LIST_LAYERS;
   LIST_OPERATORS;
   LIST_PREDICATES;
@@ -103,7 +102,6 @@ tokens {
   OPERATOR= 'operator';
   ORDER = 'order';
   PREFILTER = 'prefilter'; //Target to indicate actions that occure before filters
-  JAVA  = 'java';
   TEMPLATE= 'template';
   STREAM  = 'stream';
   VIEW  = 'view';
@@ -191,7 +189,7 @@ tokens {
   }  
 }
 
-program : imports* (globalValue | externalStream)* order  (canvasLayer | viewLayer | elementDef | layerDef | operatorDef | operatorTemplate | streamDef | javaDef)*
+program : imports* (globalValue | externalStream)* order  (canvasLayer | viewLayer | elementDef | layerDef | operatorDef | operatorTemplate | streamDef)*
     -> ^(PROGRAM  
           ^(LIST_IMPORTS imports*) 
           ^(LIST_GLOBALS globalValue*)
@@ -201,8 +199,7 @@ program : imports* (globalValue | externalStream)* order  (canvasLayer | viewLay
           ^(LIST_VIEW viewLayer*)
           ^(LIST_STREAM_DEFS streamDef*) 
           ^(LIST_LAYERS layerDef* elementDef*) 
-          ^(LIST_OPERATORS operatorDef* operatorTemplate*) 
-          ^(LIST_JAVAS javaDef*));
+          ^(LIST_OPERATORS operatorDef* operatorTemplate*));
 
 
 
@@ -355,14 +352,6 @@ targetTuple
 
 longName : ID (DOT ID)* -> ^(TUPLE_FIELD ID*);
 
-//////////////////////////////////////////// JAVA ///////////////////////////
-
-javaDef 
-  : JAVA n=ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$ID.text] ID[DEFAULT_JAVA_SUPER] $i $b)
-  | JAVA n=ID b=ISLAND_BLOCK -> ^(JAVA[$ID.text] ID[DEFAULT_JAVA_SUPER] ISLAND_BLOCK["{}"] $b)
-  | JAVA n=ID DEFINE s=ID b=ISLAND_BLOCK -> ^(JAVA[$n.text] $s ISLAND_BLOCK["{}"] $b)
-  | JAVA n=ID DEFINE s=ID i=ISLAND_BLOCK b=ISLAND_BLOCK-> ^(JAVA[$n.text] $s $i $b);
-
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 predicate
   : DEFAULT
@@ -464,24 +453,30 @@ ID    : ('a'..'z' | 'A'..'Z' | '_')  ('a'..'z' | 'A'..'Z' | '_' | '0'..'9')*;
 DIGITS  : '0'..'9'+;
 
 
-ISLAND_BLOCK
-    : NESTED_BLOCK; //Strip braces
+ISLAND_BLOCK: NESTED_BLOCK; //Strip braces
 
 fragment 
 NESTED_BLOCK
     : '{' (options {greedy=false;k=2;}: NESTED_BLOCK | .)* '}';
 
-//TODO: Differentialte the multi-line from the non-multi-line  
 STRING          
 @init{StringBuilder lBuf = new StringBuilder();}
     :   
            '"' 
            ( escaped= ESCAPE_SEQUENCE {lBuf.append(getText());} | 
-             normal=~('"'|'\\')     {lBuf.appendCodePoint(normal);} )*
-//             normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 		//Single line strings variant
+             normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 		//Single line strings variant
            '"'     
            {setText(lBuf.toString());}
-    ;
+    |
+       '@"' 
+       (escaped= LONG_ESCAPE {lBuf.append(getText());} | 
+         normal=~('@')     {lBuf.appendCodePoint(normal);} )*
+       '"@'
+       {setText(lBuf.toString());}
+    ;    
+
+fragment LONG_ESCAPE : '\\@' {setText("@");};
+
 
 fragment
 ESCAPE_SEQUENCE

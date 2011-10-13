@@ -72,7 +72,7 @@ public class ModuleCache {
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(MultiPartName name, Context context, Specializer specializer, boolean higherOrder) throws MethodInstanceException {		
+	public StencilOperator instance(MultiPartName name, Context context, Specializer specializer, boolean higherOrder) throws OperatorInstanceException {		
 		try {
 			Module module = findModuleForOperator(name);
 			String operatorName = name.name();
@@ -86,7 +86,7 @@ public class ModuleCache {
 			
 			return operator;
 		}
-		catch (Exception e) {throw new MethodInstanceException(name.toString(), true, e);}		
+		catch (Exception e) {throw new OperatorInstanceException(name.toString(), true, e);}		
 	}
 		
 	/** @param name operator name to find (should not include facet). Must be prefixed if corresponding module was imported prefixed. 

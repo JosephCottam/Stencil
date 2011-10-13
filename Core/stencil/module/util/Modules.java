@@ -56,10 +56,12 @@ public final class Modules {
 				fullArgs[0] = operatorData;
 				return tryConstruct(c, fullArgs);
 			}
-			catch (Exception e) {
-				if (e instanceof InvocationTargetException
-						&& (e.getCause() instanceof SpecializationException)) {throw (SpecializationException) e.getCause();}
-
+			catch (InvocationTargetException ite) {
+				if (ite.getCause() instanceof SpecializationException) {throw (SpecializationException) ite.getCause();}
+				if (ite.getCause() instanceof RuntimeException) {throw (RuntimeException) ite.getCause();}
+				else {throw new RuntimeException(ite);}
+			}
+			catch (NoSuchMethodException e) {
 				//Try #2: Remove specializer (if provided)
 				if (args.length >0 && args[0] instanceof Specializer) {
 					try {
@@ -67,7 +69,10 @@ public final class Modules {
 						System.arraycopy(args, 1, fullArgs, 1, args.length-1);
 						fullArgs[0] = operatorData;
 						return tryConstruct(c, fullArgs);
-					} catch (Exception e2) {/*Ignore, must not be the right thing if it can't be instantiated!*/}
+					} catch (Exception e2) {
+						if (e2 instanceof RuntimeException) {throw (RuntimeException) e2;}
+						else {throw new RuntimeException(e2);}
+					}
 				}
 			}
 		}
@@ -87,11 +92,15 @@ public final class Modules {
 		throw new IllegalArgumentException(String.format("Operator %1$s not found in module %2$s.", name, module));
 	}
 	
-	private static final StencilOperator tryConstruct(Class c, Object[] args) throws Exception {
+	private static final StencilOperator tryConstruct(Class c, Object[] args) throws NoSuchMethodException, InvocationTargetException  {
 		Class[] argTypes = new Class[args.length];
 		for (int i=0; i< args.length; i++) {argTypes[i] = args[i].getClass();}
 		Constructor constr = c.getConstructor(argTypes);
-		return (StencilOperator) constr.newInstance(args);
+		try {
+			return (StencilOperator) constr.newInstance(args);
+		} 
+		catch (InstantiationException e) {throw new RuntimeException(e);}
+		catch (IllegalAccessException e) {throw new RuntimeException(e);}
 	}
 	
 	/**Return a meta-data object with the default facets and specializer.

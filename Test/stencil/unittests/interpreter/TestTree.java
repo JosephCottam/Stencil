@@ -6,14 +6,13 @@ import stencil.interpreter.tree.Specializer;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
 import stencil.parser.string.DefaultSpecializers;
-import stencil.parser.tree.StencilTree;
 import stencil.util.collections.ArrayUtil;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
 
 public class TestTree extends junit.framework.TestCase{
 	public void testSpecializerBlend() throws ProgramParseException {
-		StencilTree spec1 = ParseStencil.specializerTree("[one:1, two:2, three:3]");
-		StencilTree spec2 = ParseStencil.specializerTree("[one:11, four:4, five:5]");
+		Specializer spec1 = ParseStencil.specializer("[one:1, two:2, three:3]");
+		Specializer spec2 = ParseStencil.specializer("[one:11, four:4, five:5]");
 		Specializer blended = DefaultSpecializers.blend(spec1, spec2);
 		
 		String[] newKeys = new String[blended.size()];

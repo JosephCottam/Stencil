@@ -443,7 +443,7 @@ public final class Freezer {
 				keys[i] = entry.getText();
 				vals[i] = freezeValue(entry.getChild(0));
 			}
-			return new Specializer(keys, vals, spec);
+			return new Specializer(keys, vals);
 		} catch (Exception e) {throw new FreezeException(spec, e);}
 	}
 }

@@ -5,6 +5,8 @@ SEPARATOR: ,
 SOURCE: ./er_100_0.005.adj
 CHECKHEADER: true
 
+import JavaC
+
 stream Edges (ID1, ID2)
 
 
@@ -34,17 +36,18 @@ from Edges
 operator Ordering (ID)->(index)  
 	default => index : Index(ID)
 
-java Circular {
-    int max=0;
+
+operator Circular : JavaC
+    [@"int max=0;
     
-    @Facet(memUse="WRITER", prototype="(double X, double Y)")
-    public double[] map(int seq) {
-        if (seq+1 > max){ max=seq+1;}
-        return query(seq);
-    }
+     \@Facet(memUse="WRITER", prototype="(double X, double Y)")
+     public double[] map(int seq) {
+         if (seq+1 > max){ max=seq+1;}
+         return query(seq);
+     }
     
-    @Facet(memUse="READER", prototype="(sdouble X, double Y)")
-    public double[] query(int seq) {
+     \@Facet(memUse="READER", prototype="(double X, double Y)")
+     public double[] query(int seq) {
         seq = seq+1;
         double radius = Math.sqrt(max)+ max/100 * 20;
         double offset = Math.toRadians(seq/max*360);
@@ -52,5 +55,4 @@ java Circular {
         double X = radius * Math.cos(offset);
         double Y = radius * Math.sin(offset);
         return new double[]{X,Y}; 
-    }
-}
+     }"@]

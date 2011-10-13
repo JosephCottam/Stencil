@@ -13,6 +13,8 @@ SOURCE: ./er_100_0.005.bfs
 SKIP: 1
 STRICT: true
 
+import JavaC
+
 stream BFS (ID) 
 stream VertexList (ID1, ID2)
 
@@ -47,12 +49,12 @@ operator Ordering (ID)->(VALUE)
     default => VALUE : Index(ID)
 
 
-operator Triangular : Java
-	["@Facet(memUse=\"FUNCTION\", prototype=\"(X,Y)\", alias={\"map\",\"query\"})
+operator Triangular : JavaC
+    [@"\@Facet(memUse="FUNCTION", prototype="(X,Y)", alias={"map","query"})
       public double[] query(int seq) {
         seq = seq+1;
         int base = (int) Math.ceil(Math.sqrt(seq));
         int X = (seq/base) * 10 *base;
         int Y = (seq%base) * 10 *base;
         return new double[]{X,Y};
-      }"]
+      }"@]

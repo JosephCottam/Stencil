@@ -14,6 +14,7 @@ SKIP: 1
 STRICT: true
 
 import PatternUtils
+import JavaC
 
 stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
 stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
@@ -144,20 +145,21 @@ operator Palette(Name) -> (C)
     (Name =~"N/A")     => C: Color{GRAY90}
     (Name =~"GRID")    => C: Color{GRAY80}
 
-java Break
-{
-   @Facet(memUse="FUNCTION", prototype="(Label)", alias={"map","query"})
+
+operator Break : JavaC
+   [@"
+   \@Facet(memUse="FUNCTION", prototype="(Label)", alias={"map","query"})
    public String query(String original) {
       return original
-                .replace("Absoft: Absoft ", "")
-                .replace("Absoft: ", "")
-                .replace(",", "\n");
-   }
-}
+               .replace("Absoft: Absoft ", "")
+               .replace("Absoft: ", "")
+               .replace(",", "\n");
+   }"@]
 
-java Layout 
-{import java.util.*;}
-{
+
+operator Layout : JavaC
+    [header: "import java.util.*;",
+     body: @"
    static final List<String> suites = Arrays.asList("ibm", "imb", "intel", "mpicxx");
    static final double majorOffset = 50;
    static final int border = 15;
@@ -165,7 +167,7 @@ java Layout
    static final List<String> XIndex = new ArrayList();
    static final List<String> YIndex = new ArrayList();
    
-   @Facet(memUse="WRITER", prototype="(double X, double Y)")
+   \@Facet(memUse="WRITER", prototype="(double X, double Y)")
    public double[] suite(String X1, String X2, String Y1, String Y2, String suite) {
       double[] base = map(X1,X2,Y1,Y2);
       if (suites.indexOf(suite) <0) {throw new IllegalArgumentException("Unknown suite: " + suite);}
@@ -175,7 +177,7 @@ java Layout
       return new double[]{x,y};
    }
    
-   @Facet(memUse="WRITER", prototype="(double X, double Y)")
+   \@Facet(memUse="WRITER", prototype="(double X, double Y)")
    public double[] map(String X1, String X2, String Y1, String Y2) {
         String XBase = X1+X2;
         String YBase = Y1+Y2;
@@ -186,7 +188,7 @@ java Layout
         return new double[]{X,Y};
    }
 
-   @Facet(memUse="READER", prototype="(double X, double Y)")
+   \@Facet(memUse="READER", prototype="(double X, double Y)")
    public double[] query(String X1, String X2, String Y1, String Y2) {
         String XBase = X1+X2;
         String YBase = Y1+Y2;
@@ -195,6 +197,5 @@ java Layout
         double X = XIndex.indexOf(XBase) * majorOffset;
         double Y = -(YIndex.indexOf(YBase) * majorOffset);
         return new double[]{X,Y};
-   }
-}
+   }"@]
 

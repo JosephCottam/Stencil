@@ -48,6 +48,6 @@ topdown:  ^(o=OPERATOR rest+=.*) {newName=genSym($o.text);}
                  ^(OPERATOR_TEMPLATE[newName] $rest*));
                  
 bottomup:
-    ^(PROGRAM i=. g=. s=. o=. cd=. vd=. sd=. l=. ops=. j=.)
-        -> ^(PROGRAM $i $g $s $o $cd $vd $sd $l {nonTemplates(ops)} $j {templates(ops)});
+    ^(PROGRAM i=. g=. s=. o=. cd=. vd=. sd=. l=. ops=.)
+        -> ^(PROGRAM $i $g $s $o $cd $vd $sd $l {nonTemplates(ops)} {templates(ops)});
                  

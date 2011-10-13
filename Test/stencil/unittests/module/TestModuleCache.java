@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.util.Properties;
 
 import stencil.interpreter.tree.MultiPartName;
-import stencil.module.MethodInstanceException;
+import stencil.module.OperatorInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
 import stencil.unittests.StencilTestCase;
@@ -42,11 +42,11 @@ public class TestModuleCache extends StencilTestCase {
 		StencilOperator l= null;
 
 		try {l=m.instance(new MultiPartName("", "NoMethod"), null, EMPTY_SPECIALIZER, false);}
-		catch (MethodInstanceException e) {/*Exception expected, tested below.*/}
+		catch (OperatorInstanceException e) {/*Exception expected, tested below.*/}
 		assertNull("Method found when not expected.",l);
 
 		try {m.instance(new MultiPartName("", "Concatenate"), null, EMPTY_SPECIALIZER, false);}
-		catch (MethodInstanceException e) {fail("Method not found when expected.");}
+		catch (OperatorInstanceException e) {fail("Method not found when expected.");}
 		catch (Exception e) {fail("Unexpected error looking for method.");}
 	}
 }

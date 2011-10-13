@@ -74,7 +74,7 @@ public class TestFragments extends TestCase {
 		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
 		Module m = modules.getAdHoc();
-		int expected = p.find(LIST_OPERATORS).getChildCount() + p.find(LIST_JAVAS).getChildCount() + p.find(LIST_LAYERS).getChildCount();
+		int expected = p.find(LIST_OPERATORS).getChildCount() + p.find(LIST_LAYERS).getChildCount();
 		assertEquals("Ad-hoc operators size incorrect.", expected, m.getModuleData().getOperators().size());
 	}
 	

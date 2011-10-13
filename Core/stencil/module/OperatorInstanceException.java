@@ -1,15 +1,15 @@
 package stencil.module;
 
 /**Indicates there was an error creating an instance of a method.*/
-public class MethodInstanceException extends Exception {
+public class OperatorInstanceException extends Exception {
 	protected boolean found;
 
-	public MethodInstanceException(String name, boolean found, Exception e) {
+	public OperatorInstanceException(String name, boolean found, Exception e) {
 		super(String.format("Error creating instance of method `%1$s`.", name), e);
 		this.found = found;
 	}
 	
-	public MethodInstanceException(String name, boolean found) {this(name, found, null);}
+	public OperatorInstanceException(String name, boolean found) {this(name, found, null);}
 	
 	/**Was the exception caused by specialization?*/
 	public boolean specialization() {return !found;}

@@ -3,7 +3,7 @@ package stencil.modules.stencilUtil;
 
 import java.util.*;
 
-import stencil.module.MethodInstanceException;
+import stencil.module.OperatorInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
@@ -157,7 +157,7 @@ public final class StencilUtil extends BasicModule {
 				try {
 					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);
 					opArgs.add(op);
-				} catch (MethodInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
+				} catch (OperatorInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
 			}
 		}
 		

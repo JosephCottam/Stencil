@@ -48,28 +48,28 @@ options {
   
 
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
-  private StencilTree getDefault(StencilTree spec) {
+  private Specializer getDefault(StencilTree spec) {
     try {
 	   StencilTree f = spec.getAncestor(OP_AS_ARG, FUNCTION);
-	   if (f != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(f.find(OP_NAME)));}
+	   if (f != null) {return getOperatorDefault(f.find(OP_NAME));}
 
 	   StencilTree g = spec.getAncestor(GUIDE);
-       if (g != null) {return (StencilTree) adaptor.dupTree(getGuideDefault(g.find(ID).getText()));}
+       if (g != null) {return getGuideDefault(g.find(ID).getText());}
 	     
        StencilTree c = spec.getAncestor(CANVAS);
-	   if (c != null) {return (StencilTree) adaptor.dupTree(DEFAULT_CANVAS_SPECIALIZER);}
+	   if (c != null) {return Freezer.specializer(DEFAULT_CANVAS_SPECIALIZER);}
 
        StencilTree v = spec.getAncestor(VIEW);
-       if (v != null) {return (StencilTree) adaptor.dupTree(DEFAULT_VIEW_SPECIALIZER);}
+       if (v != null) {return Freezer.specializer(DEFAULT_VIEW_SPECIALIZER);}
 
 	     	     	     
 	   StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
-	   if (ref != null) {return (StencilTree) adaptor.dupTree(getOperatorDefault(ref.find(OPERATOR_BASE)));}
+	   if (ref != null) {return getOperatorDefault(ref.find(OPERATOR_BASE));}
 
        StencilTree layer = spec.getAncestor(LAYER);
-       if (layer != null) {return (StencilTree) adaptor.dupTree(DEFAULT_LAYER_SPECIALIZER);}
+       if (layer != null) {return Freezer.specializer(DEFAULT_LAYER_SPECIALIZER);}
     } catch (Exception e) {
-	    return (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);	//Empty because some contexts don't have defaults
+	    return Freezer.specializer(EMPTY_SPECIALIZER_TREE);	//Empty because some contexts don't have defaults
     }
 	throw new ProgramCompileException("Specializer encountered in unexpected context",spec.getParent());
   }
@@ -77,23 +77,23 @@ options {
   /**Work with the graphics adapter to get the default
     * specializer for a given guide type.
     **/
-  private StencilTree getGuideDefault(String guideType) {
+  private Specializer getGuideDefault(String guideType) {
     Class clss = adapter.getGuideClass(guideType);
-    StencilTree defaultSpec;
+    Specializer defaultSpec;
     
     try {
       Field f = clss.getField("DEFAULT_SPECIALIZER");
-      defaultSpec = ((Specializer) f.get(null)).getSource();
+      defaultSpec = ((Specializer) f.get(null));
     } catch (Exception e) {
-      defaultSpec = (StencilTree) adaptor.dupTree(EMPTY_SPECIALIZER_TREE);
+      defaultSpec = Freezer.specializer(EMPTY_SPECIALIZER_TREE);
     }     
       
     assert defaultSpec != null;
-    return  defaultSpec;
+    return defaultSpec;
   }
 
   /**Get the default guide for a named operator.*/
-  public StencilTree getOperatorDefault(StencilTree opRef) {
+  public Specializer getOperatorDefault(StencilTree opRef) {
     MultiPartName name= Freezer.multiName(opRef);
     ModuleData md;
     
@@ -105,65 +105,67 @@ options {
     }
     
     try {
-        StencilTree source = md.getDefaultSpecializer(name.name()).getSource();
-        assert source != null;
-        return  source;
+        Specializer spec = md.getDefaultSpecializer(name.name());
+        assert spec != null;
+        return  spec;
       } catch (Exception e) {
-        throw new RuntimeException("Error finding default specializer for " + name.toString(), e);
+        throw new ProgramCompileException("Error finding default specializer for " + name.toString(), opRef, e);
       } 
   }
   
   /**Combine a given specializer with the appropriate default.*/
   private StencilTree blendWithDefault(StencilTree spec) {
-    Specializer specializer = blend(spec, getDefault(spec));
-    StencilTree root = (StencilTree) adaptor.create(spec.getToken());
-
-    for (String key: specializer.keySet()) {
-     Object value = specializer.get(key);
-     StencilTree entry = (StencilTree) adaptor.create(MAP_ENTRY, key);
-     Const valNode = (Const) adaptor.create(CONST, value == null? null:value.toString());
-     valNode.setValue(value);
-     
-     adaptor.addChild(entry, valNode);
-     adaptor.addChild(root, entry);
-    }
-    return root;
+    Specializer defaults = getDefault(spec);
+    Specializer specializer;
+    try {specializer= blend(Freezer.specializer(spec), defaults);}
+    catch(ProgramCompileException e) {throw new ProgramCompileException(e.getMessage(), spec);}
+    return toTree(specializer, spec);
   }
+  
+  private StencilTree toTree(Specializer specializer, StencilTree replacing) {
+     StencilTree root = (StencilTree) adaptor.create(replacing.getToken());
+
+     for (String key: specializer.keySet()) {
+       Object value = specializer.get(key);
+       StencilTree entry = (StencilTree) adaptor.create(MAP_ENTRY, key);
+       Const valNode = (Const) adaptor.create(CONST, value == null? null:value.toString());
+       valNode.setValue(value);
+     
+       adaptor.addChild(entry, valNode);
+       adaptor.addChild(root, entry);
+     }
+     return root;
+   }
 
   /**Blend the update with the defaults.  
    * The update values take precedence over the default values.*/
-  public static Specializer blend(StencilTree updates, StencilTree defaults) {
-    assert updates.getType() == SPECIALIZER;
-    assert defaults.getType() == SPECIALIZER;
-  
-    Specializer updatez = Freezer.specializer(updates);
-    Specializer defaultz = Freezer.specializer(defaults);
-    
+  public static Specializer blend(Specializer updates, Specializer defaults) {
+    assert updates != null;
+    assert defaults != null;
+
     List<String> keys =new ArrayList();
     List<Object> values = new ArrayList();
-    for (int i=0; i<updatez.size(); i++) {
-      if (updatez.prototype().get(i).name().equals(POSITIONAL_ARG)) {
-        if (defaultz.size() < i) {throw new ProgramCompileException("Specializer with insufficient defaults for positional specializer arguments.", updates);}
-        keys.add(defaultz.prototype().get(i).name());
+    for (int i=0; i<updates.size(); i++) {
+      if (updates.prototype().get(i).name().equals(POSITIONAL_ARG)) {
+        if (defaults.size() < i) {throw new ProgramCompileException("Specializer with insufficient defaults for positional specializer arguments.");}
+        keys.add(defaults.prototype().get(i).name());
       } else {
-        keys.add(updatez.prototype().get(i).name());        
+        keys.add(updates.prototype().get(i).name());        
       }
-      values.add(updatez.get(i));
+      values.add(updates.get(i));
     }
 
     
-    for (String key: defaultz.keySet()) {
+    for (String key: defaults.keySet()) {
       if (keys.contains(key)) {continue;}
       keys.add(key);
-      values.add(defaultz.get(key));
+      values.add(defaults.get(key));
     }
-    return new Specializer(keys.toArray(new String[keys.size()]), values.toArray(), updates);
+    return new Specializer(keys.toArray(new String[keys.size()]), values.toArray());
   }
-  
-
 }
 
 topdown
-  : ^(s=SPECIALIZER DEFAULT) -> {getDefault($s)}
+  : ^(s=SPECIALIZER DEFAULT) -> {toTree(getDefault($s), $s)}
   | ^(s=SPECIALIZER .*)      -> {blendWithDefault($s)}
   |   s=SPECIALIZER          -> {blendWithDefault($s)};
