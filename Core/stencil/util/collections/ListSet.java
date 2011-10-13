@@ -27,6 +27,12 @@ public class ListSet<T> extends ArrayList<T> implements Set<T> {
 		return super.add(element);
 	}
 
+	public boolean addAll(Iterable<? extends T> c) {
+		boolean changed = false;
+		for (T g:c) {validateItem(g); changed = super.add(g) || changed;}
+		return changed;
+	}
+
 	public boolean addAll(Collection<? extends T> c) {
 		for (T g:c) {validateItem(g);}
 		return super.addAll(c);

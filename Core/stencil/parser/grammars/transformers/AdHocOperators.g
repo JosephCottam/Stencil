@@ -8,7 +8,7 @@ options {
 }
 
 @header {
-/** Ensures that stencil native and java operators are defined in the ad-hoc module.  
+/** Ensures that stencil native and implicit operators are defined in the ad-hoc module.  
  **/
 
   package stencil.parser.string;
@@ -23,7 +23,6 @@ options {
   import stencil.parser.tree.*;
   import stencil.parser.string.util.Context;
   import stencil.interpreter.tree.MultiPartName;
-  import stencil.parser.string.util.JavaCompiler;
   import stencil.parser.ProgramCompileException;
 }
 
@@ -83,14 +82,6 @@ options {
 		return c;
 	}
 	
-	private void makeJava(StencilTree java) {
-     String name = java.getText();
-     String superClass = java.getChild(0).getText();
-     String header = java.getChild(1).getText();
-     String body = java.getChild(2).getText();
-     
-     adHoc.addOperator(JavaCompiler.compile(name, superClass, header, body));
-  }
 	
 	
 	
@@ -181,7 +172,6 @@ options {
 simple
 	: ^(s=OPERATOR .*) {makeOperator($s);}
 	| ^(s=LAYER rest+=.*) -> ^(LAYER $rest* {makeLayer($s)})
-	| ^(s=JAVA .*) {makeJava($s);}
 	| ^(s=VIEW rest+=.*) -> ^(VIEW $rest* {makeView($s)})
 	| ^(s=CANVAS rest+=.*) -> ^(CANVAS $rest* {makeCanvas($s)})
   ;

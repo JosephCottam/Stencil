@@ -471,12 +471,14 @@ fragment
 NESTED_BLOCK
     : '{' (options {greedy=false;k=2;}: NESTED_BLOCK | .)* '}';
 
+//TODO: Differentialte the multi-line from the non-multi-line  
 STRING          
 @init{StringBuilder lBuf = new StringBuilder();}
     :   
            '"' 
            ( escaped= ESCAPE_SEQUENCE {lBuf.append(getText());} | 
-             normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 
+             normal=~('"'|'\\')     {lBuf.appendCodePoint(normal);} )*
+//             normal=~('"'|'\\'|'\n'|'\r')     {lBuf.appendCodePoint(normal);} )* 		//Single line strings variant
            '"'     
            {setText(lBuf.toString());}
     ;

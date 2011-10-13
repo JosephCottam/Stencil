@@ -15,6 +15,7 @@ import stencil.module.util.ann.Operator;
 import stencil.module.util.ann.Module;
 import stencil.parser.string.util.CharSequenceCompiler;
 import stencil.types.Converter;
+import stencil.util.collections.ListSet;
 import stencil.interpreter.tree.Specializer;
 
 /**Module for java compiler**/
@@ -26,8 +27,9 @@ public class JavaC extends BasicModule {
 	
 	@Operator(name="Java", spec="[ body:\"\", header:\"import static java.util.Math.*;\"]")
 	@Description("Compile a java operator without state.")
-	public static class Function extends AbstractOperator<Function> {
-		final StencilOperator operator;
+	public static final class Function extends AbstractOperator<Function> {
+		private final StencilOperator operator;
+		private final OperatorData opData;
 		
 		public Function(OperatorData opData, Specializer spec) {
 			super(opData);
@@ -35,19 +37,21 @@ public class JavaC extends BasicModule {
 			String header = Converter.toString(spec.get(HEADER_KEY));
 
 			String[] parts = code.split("=>");
-			operator = JavaCompiler.compileFunc(header, parts[0].trim(), parts[1].trim());			
+			operator = JavaCompiler.compileFunc(header, parts[0].trim(), parts[1].trim());
+			this.opData = blendOpData(operator.getOperatorData(), super.operatorData);
 		}
 
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
-		public OperatorData getOperatorData() {return operator.getOperatorData();}
+		public OperatorData getOperatorData() {return opData;}
 	}
 	
 	
-	@Operator(name="JavaC", spec="[body:\"\", header:\"\", class:\"\"]")
+	@Operator(name="JavaC", spec="[body:\"\", header:\"\", class:\"AbstractOperator.Statefull\"]")
 	@Description("Compile a java operator.  Expects full method declarations.")
-	public static class Stateful extends AbstractOperator.Statefull<Stateful> {
-		StencilOperator operator;
-		
+	public static final class Stateful extends AbstractOperator.Statefull<Stateful> {
+		private final StencilOperator operator;
+		private final OperatorData opData;
+
 		public Stateful(OperatorData opData, Specializer spec) {
 			super(opData);
 			
@@ -55,12 +59,37 @@ public class JavaC extends BasicModule {
 			String header = (String) spec.get(HEADER_KEY);
 			String clss = (String) spec.get(CLASS_KEY);				
 			operator = JavaCompiler.compileOp(header, clss, body);
+			this.opData = blendOpData(operator.getOperatorData(), super.operatorData);
+
 		}		
 		
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
-		public OperatorData getOperatorData() {return operator.getOperatorData();}
+		public OperatorData getOperatorData() {return opData;}
 	}
 
+	
+	private static OperatorData blendOpData(OperatorData custom, OperatorData defaults) {
+		ListSet<String> keys = new ListSet();
+		Specializer customSpec = custom.getDefaultSpecializer();
+		Specializer defSpec = defaults.getDefaultSpecializer();
+		keys.addAll(customSpec.keySet());
+		keys.addAll(defSpec.keySet());
+		
+		final Object[] values = new Object[keys.size()];
+		for (int i=0; i<values.length;i++) {
+			String key = keys.get(i);
+			Object value;
+			if (customSpec.containsKey(key)) {value = customSpec.get(key);}
+			else {value = defSpec.get(key);}
+			
+			values[i] = value;
+		}
+		
+		
+		OperatorData copy = new OperatorData(custom);
+		copy.setDefaultSpecializer(new Specializer(keys.toArray(new String[keys.size()]), values));
+		return copy;
+	}
 	
 	
 	/**Compiler infrastructure shared between all of the compiled methods.**/
@@ -74,6 +103,7 @@ public class JavaC extends BasicModule {
 			"package " + PACKAGE + ";\n" 
 			+ "import stencil.module.util.OperatorData;\n"	//Meta-data classes
 			+ "import stencil.module.util.ann.*;\n"			//Meta-data annotations
+			+ "import stencil.module.operator.util.AbstractOperator;"
 			+ "%1$s\n"										//For user-specified imports
 			+ "@Operator\n"									//Operator tag
 			+ "public class %2$s extends %3$s {\n %4$s %5$s}";

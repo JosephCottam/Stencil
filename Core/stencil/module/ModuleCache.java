@@ -105,7 +105,7 @@ public class ModuleCache {
 				}
 			}
 		}
-		throw new IllegalArgumentException("Could not find module for operator named " + name);
+		throw new IllegalArgumentException("Could not find module for operator named " + name.name());
 	}
 	
 	/**Import a given Module into the method index so its members
