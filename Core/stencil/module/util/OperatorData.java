@@ -78,8 +78,7 @@ public final class OperatorData {
 		return target != null
 			   && spec != null 
 		       && name != null 
-		       && module != null
-		       && facets.size() >0;
+		       && module != null;
 	}
 
 	/**Apply default values to any fields still unset.**/
