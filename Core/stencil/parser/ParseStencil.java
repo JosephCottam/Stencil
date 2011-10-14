@@ -171,7 +171,7 @@ public abstract class ParseStencil {
 		p = SimplifyViewCanvas.apply(p);
 		p = LiftStreamPrototypes.apply(p);		//Create prototype definitions for internally defined streams
 		p = ElementToLayer.apply(p);			//Convert "element" statements into layers
-		p = SeparateRules.apply(p);				//Group the operator chains, switch everythign to "Target"
+		p = SeparateRules.apply(p);				//Group the operator chains, switch everything to "Target"
 		p = EnsureOrders.apply(p);				//Ensure the proper order blocks
 
 		ModuleCache modules = Imports.apply(p);	//Do module imports
@@ -217,6 +217,9 @@ public abstract class ParseStencil {
 		p = GuideClean.apply(p);
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 
+		//ANIMATED BINDINGS --------------------------------------------------------------------------------
+		p = AnimatedBinding.apply(p);
+		
 		//DYNAMIC BINDING ----------------------------------------------------------------------------------
 		p = DynamicSeparateRules.apply(p);
 		p = DynamicToSimple.apply(p);

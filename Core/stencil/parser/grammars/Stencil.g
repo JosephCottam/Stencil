@@ -299,8 +299,8 @@ operatorRule
     -> ^(OPERATOR_RULE predicate ^(LIST_RULES["Rules"] rule+));
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
-rule[int defaultTarget]  : target[defaultTarget] (DEFINE | DYNAMIC) callChain
-    -> ^(RULE target callChain DEFINE? DYNAMIC?);
+rule[int defaultTarget]  : target[defaultTarget] (DEFINE | DYNAMIC | ANIMATED | ANIMATED_DYNAMIC) callChain
+    -> ^(RULE target callChain DEFINE? DYNAMIC? ANIMATED? ANIMATED_DYNAMIC?);
 
 callChain: callChainMember -> ^(CALL_CHAIN callChainMember);
 

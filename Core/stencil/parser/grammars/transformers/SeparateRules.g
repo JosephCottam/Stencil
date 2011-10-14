@@ -20,21 +20,21 @@ options {
 @members {
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-   private StencilTree siftRules(StencilTree rules, int type, int listType) {return siftRules(adaptor, rules, type, listType, -1);}
+   private StencilTree siftRules(StencilTree rules, int targetType, int listType) {return siftRules(adaptor, rules, targetType, listType, -1);}
  
    //TODO: This binding check will be a problem when animated bindings come into play
    /**Create a new collection of rules from an old collection of rules.
-    * If a rule's binding is of the given type, 
-    *    AND its binding is less than zero or of the given type 
-    *    THEN a new rule is made.  
+    * If a rule's target is of the given type, 
+    *    AND the binding is of the target binding type (or the binding type is -1) 
+    *    THEN a the rule is copied into a new list of rules with the list type.  
     * All newly create rules are made part of a list of type listType.
     * This new list is the return value.
     **/  
-   public static StencilTree siftRules(TreeAdaptor adaptor, StencilTree rules, int type, int listType, int binding) {
+   public static StencilTree siftRules(TreeAdaptor adaptor, StencilTree rules, int targetType, int listType, int binding) {
       StencilTree list = (StencilTree) adaptor.create(listType, StencilTree.typeName(listType));
       
       for(StencilTree rule: rules) {
-         if(rule.find(type) != null) {
+         if(rule.find(targetType) != null) {
             if (binding < 0 || rule.find(DEFINE, DYNAMIC, ANIMATED,ANIMATED_DYNAMIC).getType() == binding) {
               adaptor.addChild(list, adaptor.dupTree(rule));
             }
