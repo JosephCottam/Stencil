@@ -22,7 +22,7 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 	public static final String MARGIN_KEY = "margin";
 	
 	/**Encapsulation of a segment.**/
-	public static final class Segment  {
+	public static class Segment  {
 		/**The smaller value of the segment.**/
 		public final double start;
 		/**The larger value of the segment.**/
@@ -34,29 +34,32 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 		}
 		
 		
-		Segment extend(double value) {
+		public Segment extend(double value) {
 			if (value < start) {return new Segment(value, end);}
 			if (value > end) {return new Segment(start, value);}
 			return this;
 		}
 		
 		
-		Segment merge(Segment other) {return new Segment(Math.min(start, other.start), Math.max(end, other.end));}
+		public Segment merge(Segment other) {return new Segment(Math.min(start, other.start), Math.max(end, other.end));}
 
 		/**Should the these two segments be merged?
 		 * Assumes s1 comes before s2
 		 */
-		static boolean shouldMerge(Segment s1, Segment s2, double tollerance) {
+		public static boolean shouldMerge(Segment s1, Segment s2, double tollerance) {
+			assert s1.start <= s2.start;
+			
+			if (s1 == null || s2 == null || s1 == s2) {return false;}
 			return  s1.end + tollerance >= s2.start;
 		}
 		
-		boolean contains(double value, double tollerance) {
+		public boolean contains(double value, double tollerance) {
 			return (value <= (end + tollerance))
 				&& (value >= (start - tollerance));
 		}
 		
 		/**Does this segment follow the given value? (This does not take tollerance into account.)**/
-		boolean follows(double value) {return value < start;}
+		public boolean follows(double value) {return value < start;}
 		
 		public String toString() {return start +  "->" + end;}
 	}

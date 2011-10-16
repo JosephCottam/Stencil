@@ -10,6 +10,8 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
+import stencil.modules.stencilUtil.MonitorSegments;
+import stencil.modules.stencilUtil.MonitorSegments.Segment;
 import stencil.parser.string.util.Context;
 import stencil.adapters.general.Registrations;
 import stencil.interpreter.tree.MultiPartName;
@@ -43,6 +45,91 @@ public class Temp extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(Number abs)", alias={"map","query"})
 	public static Long toLong(Object v) {return Converter.toLong(v);}
 
+	@Operator(spec="[margin:1]")
+	public static final class DiscreteMetricRank extends AbstractOperator.Statefull {
+		public static final String MARGIN_KEY = "margin";
+		private final List<Segment> segments = new ArrayList();
+		private final double gapSize;
+
+		public DiscreteMetricRank(OperatorData opData, double gapSize) {super(opData); this.gapSize = gapSize;}
+		public DiscreteMetricRank(OperatorData opData, Specializer spec) throws SpecializationException {
+			super(opData);
+			gapSize = Converter.toDouble(spec.get(MARGIN_KEY));
+		}
+
+		@Override
+		public MonitorSegments duplicate() {return new MonitorSegments(operatorData, gapSize);}
+
+		@Facet(memUse="WRITER", prototype="(int rank)")
+		public long map(long value) {return rank(true, value);} 
+		
+		@Facet(memUse="READER", prototype="(int rank)")
+		public long query(long value) {return rank(false, value);}
+		
+		@Override
+		public DiscreteMetricRank viewpoint() {
+			DiscreteMetricRank dmRank = new DiscreteMetricRank(operatorData, gapSize);
+			dmRank.segments.addAll(segments);
+			return dmRank;
+		}
+		
+		private long rank(boolean add, long value) {
+			int index;
+			Segment inSegment=null;
+			for (index=0; index<segments.size(); index++) {
+				Segment s = segments.get(index);
+				if (s.contains(value, gapSize)) {inSegment = s; break;}
+				if (s.follows(value)) {break;}
+			}
+
+			if (add) {
+				if (inSegment != null) {				//Fell within the tolerance of an existing range
+					Segment newSegment = inSegment.extend(value);
+					if (newSegment != inSegment) {
+						stateID++;
+						segments.set(index, newSegment);
+						inSegment = newSegment;
+						
+						//Cleanup list, merging overlapping neighbors
+						int segmentIdx = segments.indexOf(inSegment);
+						Segment before = segmentIdx < 1 ? null : segments.get(segmentIdx-1);
+						Segment after = segmentIdx > segments.size() -2 ? null : segments.get(segmentIdx+1);
+						if (Segment.shouldMerge(inSegment, after, gapSize)) {
+							inSegment = inSegment.merge(after);
+							segments.set(segmentIdx, inSegment);
+							segments.remove(segmentIdx+1);
+						}
+						if (Segment.shouldMerge(before, inSegment, gapSize)) {
+							inSegment = inSegment.merge(before);
+							segments.set(segmentIdx-1, inSegment);
+							segments.remove(segmentIdx);
+						}
+					}
+					
+				} else if (index >=0) { //New value after all prior values
+					inSegment = new Segment(value, value);
+					segments.add(index, inSegment);
+					stateID++;
+				} else {
+					throw new Error(String.format("Unhandled case in discrete metric rank-- index: %1$s, segments: %2$s, oldSegment: %3$s: ", index, segments.size(), inSegment));
+				}
+			}
+			
+			if (inSegment ==null) {return -1;}
+			else {
+				long rank=-1;
+				for (Segment s: segments) {
+					rank++;
+					if (s==inSegment) {rank = rank + (value - (long) s.start); break;}
+					rank = rank + (long) (s.end-s.start);
+				}
+				return rank;
+			}
+			
+		}
+		
+	}
+	
 	
 	@Operator(spec="[]")
 	public static final class AutoID extends AbstractOperator.Statefull {

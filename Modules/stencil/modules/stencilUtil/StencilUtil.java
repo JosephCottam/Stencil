@@ -30,9 +30,8 @@ import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 
 
-/**Operators used in various stencil transformations.*/
 @Module
-@Description("Utilities to manipulate the tuple data representation.")
+@Description("Operators used in various stencil transformations.")
 public final class StencilUtil extends BasicModule {
 	/**Some modules provide optimizations for some range sets.  
 	 * If an operator instance is range optimized, it must include this tag in its operator data to indicate
