@@ -85,8 +85,8 @@ options {
   
   private static final Environment defaultEnvironment(StencilTree chain) {
      int depth = chain.findAllDescendants(FUNCTION).size() + chain.findAllDescendants(CONST).size();
-     Environment env = Environment.getDefault();
-     return env.ensureCapacity(env.size() + depth);
+     Environment env = Environment.getDefault(true);
+     return env.ensureCapacity(true, env.size() + depth);
   }
   
   private static final Object NO_RESOLUTION = new Object();
