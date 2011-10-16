@@ -47,14 +47,36 @@ public class Temp extends BasicModule {
 
 	@Operator(spec="[margin:1]")
 	public static final class DiscreteMetricRank extends AbstractOperator.Statefull {
+		private final class SegmentComparator implements Comparator<Segment> {
+			private final double gapSize;
+			public SegmentComparator(double gapSize) {this.gapSize = gapSize;}
+			
+			@Override
+			public int compare(Segment s1, Segment s2) {				
+				if (s1.start <= s2.start) {//s1 starts first, or they're  both the same; must do this for shouldMerge to work properly...
+					if (Segment.shouldMerge(s1, s2, gapSize)) {return 0;}
+					else {return -1;}
+				} else {
+					if (Segment.shouldMerge(s2, s1, gapSize)) {return 0;}
+					else {return 1;}
+				}
+			}
+		}
+
+		
 		public static final String MARGIN_KEY = "margin";
 		private final List<Segment> segments = new ArrayList();
 		private final double gapSize;
-
-		public DiscreteMetricRank(OperatorData opData, double gapSize) {super(opData); this.gapSize = gapSize;}
+		private final SegmentComparator segmentComparator;
+		
+		
 		public DiscreteMetricRank(OperatorData opData, Specializer spec) throws SpecializationException {
+			this(opData, Converter.toDouble(spec.get(MARGIN_KEY)));
+		}
+		public DiscreteMetricRank(OperatorData opData, double gapSize) { 
 			super(opData);
-			gapSize = Converter.toDouble(spec.get(MARGIN_KEY));
+			this.gapSize = gapSize;
+			segmentComparator = new SegmentComparator(gapSize);
 		}
 
 		@Override
@@ -74,13 +96,11 @@ public class Temp extends BasicModule {
 		}
 		
 		private long rank(boolean add, long value) {
-			int index;
 			Segment inSegment=null;
-			for (index=0; index<segments.size(); index++) {
-				Segment s = segments.get(index);
-				if (s.contains(value, gapSize)) {inSegment = s; break;}
-				if (s.follows(value)) {break;}
-			}
+
+			int index = Collections.binarySearch(segments, new Segment(value, value), segmentComparator);
+			if (index >= 0) {inSegment = segments.get(index);}
+			else {index = -index-1;}
 
 			if (add) {
 				if (inSegment != null) {				//Fell within the tolerance of an existing range
@@ -91,18 +111,17 @@ public class Temp extends BasicModule {
 						inSegment = newSegment;
 						
 						//Cleanup list, merging overlapping neighbors
-						int segmentIdx = segments.indexOf(inSegment);
-						Segment before = segmentIdx < 1 ? null : segments.get(segmentIdx-1);
-						Segment after = segmentIdx > segments.size() -2 ? null : segments.get(segmentIdx+1);
+						Segment before = index < 1 ? null : segments.get(index-1);
+						Segment after = index > segments.size() -2 ? null : segments.get(index+1);
 						if (Segment.shouldMerge(inSegment, after, gapSize)) {
 							inSegment = inSegment.merge(after);
-							segments.set(segmentIdx, inSegment);
-							segments.remove(segmentIdx+1);
+							segments.set(index, inSegment);
+							segments.remove(index+1);
 						}
 						if (Segment.shouldMerge(before, inSegment, gapSize)) {
 							inSegment = inSegment.merge(before);
-							segments.set(segmentIdx-1, inSegment);
-							segments.remove(segmentIdx);
+							segments.set(index-1, inSegment);
+							segments.remove(index);
 						}
 					}
 					
@@ -118,7 +137,8 @@ public class Temp extends BasicModule {
 			if (inSegment ==null) {return -1;}
 			else {
 				long rank=-1;
-				for (Segment s: segments) {
+				for (int i=0; i<=index; i++) {
+					Segment s= segments.get(i);
 					rank++;
 					if (s==inSegment) {rank = rank + (value - (long) s.start); break;}
 					rank = rank + (long) (s.end-s.start);
