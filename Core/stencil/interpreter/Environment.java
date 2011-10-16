@@ -7,7 +7,7 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.util.collections.ArrayUtil;
 
-public class Environment implements Tuple, Cloneable {
+public class Environment implements Tuple {
 	/**The default frame names.  
 	 * The element "**stream**" is logically replaced by the name 
 	 * of the stream in any frame instance.*/
@@ -21,9 +21,9 @@ public class Environment implements Tuple, Cloneable {
 	private int filledSize = 0;
 	
 	
-	private Environment(int capacity) {
+	private Environment(boolean fill, int capacity) {
 		frames = new Tuple[capacity];
-		Arrays.fill(frames, Tuples.EMPTY_TUPLE);		//TODO: Remove, will require better handling of null in tuple-refs and call chain return values though
+		if (fill) {Arrays.fill(frames, Tuples.EMPTY_TUPLE);}
 	}
 	
 	public void setFrame(int frame, Tuple t) {
@@ -52,21 +52,15 @@ public class Environment implements Tuple, Cloneable {
 
 	public int capacity() {return frames.length;}
 
-	public Environment ensureCapacity(int capacity) {
+	public Environment ensureCapacity(boolean fill, int capacity) {
 		if (capacity <= frames.length) {return this;}
 		
-		Environment env = new Environment(capacity);
+		Environment env = new Environment(fill, capacity);
 		System.arraycopy(frames, 0, env.frames, 0, filledSize);
 		env.filledSize = this.filledSize;
 		return env;
 	}
 
-	public Environment clone() {
-		Environment result = new Environment(frames.length);
-		System.arraycopy(frames, 0, result.frames, 0, filledSize);
-		result.filledSize = filledSize;
-		return result;
-	}
 	
 	/**Order of the frames:
 	 * 	Canvas
@@ -80,9 +74,9 @@ public class Environment implements Tuple, Cloneable {
 	 *  If more than the standard frames are supplied, the extras will still be put in the environment.
 	 *  Regardless of the frames passed, the result will have at least unfilled empty frames at the end.
 	 */
-	public static Environment getDefault(Tuple... tuples) {
+	public static Environment getDefault(boolean fill, Tuple... tuples) {
 		int size = Math.max(DEFAULT_SIZE, tuples.length);
-		Environment e = new Environment(size);
+		Environment e = new Environment(fill, size);
 		System.arraycopy(tuples, 0, e.frames, 0, tuples.length);
 		e.filledSize = DEFAULT_SIZE;
 		return e;

@@ -49,8 +49,8 @@ public class DynamicRule implements UpdateableComposite<DynamicRule> {
 		List<Environment> envs = new ArrayList(view.size());
 		for (Glyph glyph: view) {
 			Tuple source = sourceData.get(glyph.getID());		//Get associated source data
-			Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, source);
-			envs.add(env.ensureCapacity(env.size() + depth));
+			Environment env = Environment.getDefault(false, Tuples.EMPTY_TUPLE, source);
+			envs.add(env.ensureCapacity(false, env.size() + depth));
 		}
 		
 		for (int target=0; target< depth; target++) {

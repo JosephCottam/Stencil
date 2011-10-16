@@ -218,7 +218,7 @@ public abstract class ParseStencil {
 		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 
 		//ANIMATED BINDINGS --------------------------------------------------------------------------------
-		p = AnimatedBinding.apply(p);
+//		p = AnimatedBinding.apply(p);
 		
 		//DYNAMIC BINDING ----------------------------------------------------------------------------------
 		p = DynamicSeparateRules.apply(p);

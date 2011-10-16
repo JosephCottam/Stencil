@@ -25,7 +25,7 @@ public class Interpreter {
 	}
 	
 	public static Tuple processTuple(Tuple tuple, Rule rule) throws RuleAbortException {
-		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);
+		Environment env = Environment.getDefault(false, Tuples.EMPTY_TUPLE, tuple);
 		return processEnv(env, rule);
 	}
 	
@@ -59,7 +59,7 @@ public class Interpreter {
 		Tuple result = null;
 		
 		//TODO: replace EMPTY_TUPLE with globals tuple when runtime globals are added (be sure to look for other "getDefault" and fix them up too
-		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, source.getValues());
+		Environment env = Environment.getDefault(false, Tuples.EMPTY_TUPLE, source.getValues());
 		
 		prefilter = processEnv(env, group.getPrefilterRule());
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);

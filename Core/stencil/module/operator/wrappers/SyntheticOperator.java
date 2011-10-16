@@ -157,7 +157,7 @@ public class SyntheticOperator implements StencilOperator {
 
 	private Tuple process(OperatorFacet facet, Tuple tuple) {
 		Tuple prefilter;
-		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
+		Environment env = Environment.getDefault(false, Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		
 		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
 		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.getName(), facet.getName(), tuple.toString()));}
