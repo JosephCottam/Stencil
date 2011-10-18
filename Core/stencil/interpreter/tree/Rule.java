@@ -32,7 +32,7 @@ public class Rule implements Viewpoint<Rule> {
 	 * @return
 	 */
 	public Tuple apply(Environment env) throws Exception {
-		env = env.ensureCapacity(false, env.size() + chain.depth());
+		env = env.ensureCapacity(env.size() + chain.depth());
 		final int depth = chain.depth();
 		for (int target=0; target< depth; target++) {
 			Tuple result = chain.applyStep(target, env);

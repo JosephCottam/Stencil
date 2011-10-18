@@ -1,7 +1,5 @@
 package stencil.interpreter;
 
-import java.util.Arrays;
-
 import stencil.parser.ParserConstants;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -21,10 +19,7 @@ public class Environment implements Tuple {
 	private int filledSize = 0;
 	
 	
-	private Environment(boolean fill, int capacity) {
-		frames = new Tuple[capacity];
-		if (fill) {Arrays.fill(frames, Tuples.EMPTY_TUPLE);}
-	}
+	private Environment(int capacity) {frames = new Tuple[capacity];}
 	
 	public void setFrame(int frame, Tuple t) {
 		frames[frame]=t;
@@ -52,10 +47,10 @@ public class Environment implements Tuple {
 
 	public int capacity() {return frames.length;}
 
-	public Environment ensureCapacity(boolean fill, int capacity) {
+	public Environment ensureCapacity(int capacity) {
 		if (capacity <= frames.length) {return this;}
 		
-		Environment env = new Environment(fill, capacity);
+		Environment env = new Environment(capacity);
 		System.arraycopy(frames, 0, env.frames, 0, filledSize);
 		env.filledSize = this.filledSize;
 		return env;
@@ -74,9 +69,9 @@ public class Environment implements Tuple {
 	 *  If more than the standard frames are supplied, the extras will still be put in the environment.
 	 *  Regardless of the frames passed, the result will have at least unfilled empty frames at the end.
 	 */
-	public static Environment getDefault(boolean fill, Tuple... tuples) {
+	public static Environment getDefault(Tuple... tuples) {
 		int size = Math.max(DEFAULT_SIZE, tuples.length);
-		Environment e = new Environment(fill, size);
+		Environment e = new Environment(size);
 		System.arraycopy(tuples, 0, e.frames, 0, tuples.length);
 		e.filledSize = DEFAULT_SIZE;
 		return e;
