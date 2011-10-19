@@ -93,7 +93,8 @@ public final class StencilUtil extends BasicModule {
 		md.addOperator(operatorData(MonitorFlex.class, MODULE_NAME));
 		md.addOperator(operatorData(MonitorSegments.class, MODULE_NAME));
 		md.addOperator(operatorData(MonitorDate.class, MODULE_NAME));
-
+		md.addOperator(operatorData(MonitorConst.class, MODULE_NAME));
+		
 		md.addOperator(operatorData(MapWrapper.class, MODULE_NAME));
 		md.addOperator(operatorData(RangeHelper.class, MODULE_NAME));
 		md.addOperator(operatorData(SplitHelper.class, MODULE_NAME));
@@ -136,6 +137,8 @@ public final class StencilUtil extends BasicModule {
 			return new MonitorSegments(operatorData, specializer);			
 		} else if (name.equals("MonitorDate")) {
 			return new MonitorDate(operatorData);			
+		} else if (name.equals("MonitorConst")) {
+			return new MonitorConst(operatorData);
 		} else if (name.equals("view")) {
 			return new SpecialTuples.View(operatorData);
 		} else if (name.equals("canvas")) {

@@ -25,6 +25,8 @@ options {
    import stencil.interpreter.tree.Specializer;
    import stencil.interpreter.tree.MultiPartName;
    import stencil.interpreter.guide.Samplers;
+   import stencil.parser.ProgramCompileException;
+   
       
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.MAP_FACET;
@@ -83,6 +85,9 @@ options {
       if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
       String type = requestedGuides.get(key(r)).find(SAMPLE_TYPE).getText();
       String operatorName = Samplers.monitor(type);
+      if (operatorName == null) {throw new ProgramCompileException("Unknown sample type requested: " + type, chain);}
+      
+      
       StencilTree call = chain.find(FUNCTION, PACK);
       while(call.getType() == FUNCTION) {
         MultiPartName name = Freezer.multiName(call.find(OP_NAME));
@@ -96,12 +101,14 @@ options {
      * 
      * @param t Call target that will follow the new echo operator.
      */
-    private StencilTree echoArgs(StencilTree target) {
+    private StencilTree echoArgs(StencilTree target, boolean refs) {
        StencilTree newArgs = (StencilTree) adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
           
        StencilTree args = (target.getType() == PACK) ? target : target.find(LIST_ARGS);
        for (StencilTree v: args) {
-          if (v.getType() == TUPLE_REF) {
+          if (v.getType() == TUPLE_REF && refs) {
+            adaptor.addChild(newArgs, adaptor.dupTree(v));
+          } else if (v.getType() != TUPLE_REF && !refs) {
             adaptor.addChild(newArgs, adaptor.dupTree(v));
           }
        }

@@ -13,6 +13,7 @@ import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Operator;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.MultiResultTuple;
 import stencil.types.Converter;
 
 /**Returns what was passed in, but records the range of elements
@@ -50,7 +51,23 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 	}
 	
 	@Facet(memUse="OPAQUE", prototype="()")
-	public Tuple map(double value) {
+	public Tuple map(Object value) {
+		if (value instanceof MultiResultTuple) {
+			mapAll((MultiResultTuple) value);
+		} else {
+			mapOne(Converter.toDouble(value));
+		}
+		return Tuples.EMPTY_TUPLE;
+
+	}
+	private void mapAll(final MultiResultTuple values) {
+		for (int i=0; i< values.size(); i++) {
+			Tuple v = values.getTuple(i);
+			mapOne(Converter.toDouble(v.get(0)));	//HACK: Relies on only needing the first field...
+		}
+	}
+	
+	private void mapOne(double value) {
 		if (!rangeLock) {
 			double oldMax = max;
 			double oldMin = min;
@@ -63,7 +80,6 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 				stateID++;
 			}
 		}
-		
-		return Tuples.EMPTY_TUPLE;
 	}
+	
 }

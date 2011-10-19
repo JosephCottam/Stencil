@@ -23,6 +23,7 @@ public final class Samplers {
 		add("LOG", "MonitorContinuous", NumericSampler.class);
 		add("CATEGORICAL", "MonitorCategorical", StringSampler.class);
 		add("COLOR", "MonitorCategorical", ColorSampler.class);
+		add("CONST", "MonitorConst", StringSampler.class);
 		add("LAYER", null, LayerSampler.class);
 		add("NOP", "Nop", StencilUtil.Nop.class);
 		add("GAP", "MonitorSegments", SegmentSampler.class);

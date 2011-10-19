@@ -59,22 +59,22 @@ options {
   }
   
   private static String getSource(StencilTree program, String layerName, String att) {
-    StencilTree l = program.find(LIST_LAYERS).find(LAYER, layerName);
-    StencilTree c = l.find(LIST_CONSUMES).getChild(0); //HACK: The zero-reference is a hack...Should I restrict layers to only one consumes block?
+    StencilTree layer = program.find(LIST_LAYERS).find(LAYER, layerName);
+    StencilTree consumes = layer.find(LIST_CONSUMES).getChild(0); //HACK: The zero-reference is a hack...Should I restrict layers to only one consumes block?
                
-    StencilTree r= null;
-    for (StencilTree r2: c.find(RULES_RESULT)) {
-       if (Freezer.targetTuple(r2.find(TARGET).find(TARGET_TUPLE)).contains(att)) {r=r2; break;}
+    StencilTree rule= null;
+    for (StencilTree r2: consumes.find(RULES_RESULT)) {
+       if (Freezer.targetTuple(r2.find(TARGET).find(TARGET_TUPLE)).contains(att)) {rule=r2; break;}
     }
-    if (r==null) {throw new SelectorException("Guide request did not match any (non-constant) rule.");}
+    if (rule==null) {throw new SelectorException("Guide request did not match any (non-constant) rule.");}
            
-    StencilTree t = r.find(CALL_CHAIN).find(FUNCTION, PACK);
+    StencilTree tail = rule.find(CALL_CHAIN).find(FUNCTION, PACK);
     AstInvokeable target=null;
     
-    while (t.getType() == FUNCTION) {
-      target = t.find(INVOKEABLE);
+    while (tail.getType() == FUNCTION) {
+      target = tail.find(INVOKEABLE);
       if (target != null && target.getOperator() instanceof MonitorOperator) {break;}
-      t = t.find(FUNCTION, PACK);
+      tail = tail.find(FUNCTION, PACK);
     }
 
 
@@ -83,21 +83,26 @@ options {
     }
    
    
-    StencilTree tupleRef = t.find(LIST_ARGS).find(TUPLE_REF);
-    if (tupleRef==null) {throw new SelectorException("Guide request for location with no tuple references.");}
-    StencilTree fieldRef = tupleRef.getChild(0);
-    
-    if (tupleRef.getChildCount() >1) {
-        fieldRef = tupleRef.getChild(1);
-    }
-    
-    if (fieldRef.getType() ==ID) {
-        return fieldRef.getText();
-    } else {
-       int fieldIdx = Integer.parseInt(fieldRef.getText());                              //If it is a number, resolve it
-       TuplePrototype proto = EnvironmentUtil.framePrototypeFor(tupleRef);
-       return proto.get(fieldIdx).name();
-    }
+    StencilTree tupleRef = target.find(LIST_ARGS).find(TUPLE_REF);
+    StencilTree targetRef = rule.find(TARGET_TUPLE).find(TUPLE_FIELD);
+    if (tupleRef!=null) {
+        StencilTree fieldRef = tupleRef.getChild(0);
+        
+        if (tupleRef.getChildCount() >1) {
+            fieldRef = tupleRef.getChild(1);
+        }
+        
+        if (fieldRef.getType() ==ID) {
+            return fieldRef.getText();
+        } else {
+           int fieldIdx = Integer.parseInt(fieldRef.getText());                              //If it is a number, resolve it
+           TuplePrototype proto = EnvironmentUtil.framePrototypeFor(tupleRef);
+           return proto.get(fieldIdx).name();
+        }
+     } else {   //Constants guide
+        if (targetRef == null) {throw new SelectorException("Guide path did not lead to a valid data or constant location.");}
+        return targetRef.getText();
+     } 
   }
   
   private boolean needsLabel(StencilTree spec) {
