@@ -170,7 +170,7 @@ public class Legend extends Guide2D {
 		PrototypedTuple example = new PrototypedArrayTuple(exampleFields, exampleValues);
 
 		String[] labelFields = new String[]{"label.X","label.Y","label.TEXT", "label.ID", "ID"};
-		Object labelText = ((Tuple) contents.get(label_idx)).get(0);
+		Object labelText = contents.get(label_idx) instanceof Tuple ? ((Tuple) contents.get(label_idx)).get(0) : contents.get(label_idx);
 		Object[] labelValues = new Object[]{x+exampleWidth+hSpacing, indexOffset, labelText, idx, idx};
 		PrototypedTuple label = new PrototypedArrayTuple(labelFields, labelValues);
 		

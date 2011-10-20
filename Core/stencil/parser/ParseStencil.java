@@ -215,7 +215,7 @@ public abstract class ParseStencil {
 		p = GuideExtendQuery.apply(p);
 		p = GuideSetID.apply(p);
 		p = GuideClean.apply(p);
-		//END GUIDE SYSTEM----------------------------------------------------------------------------------
+//		//END GUIDE SYSTEM----------------------------------------------------------------------------------
 
 		//ANIMATED BINDINGS --------------------------------------------------------------------------------
 //		p = AnimatedBinding.apply(p);

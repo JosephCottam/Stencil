@@ -57,8 +57,13 @@ public class Target {
 			if (value instanceof MultiResultTuple) {
 				Tuple source = ((Tuple) value);
 				for (int result=0; result<values.length; result++) {
-					Object[] resultValues = Tuples.toArray((Tuple) source.get(result));
-					values[result].addAll(Arrays.asList(resultValues));
+					Tuple singleResult = (Tuple) source.get(result);
+					if (singleResult.get(0).equals(singleResult)) {//HACK: If self is the first thing, then just add the whole thing, don't break it up; I REALLY want a type system...
+						values[result].add(singleResult);
+					} else {
+						Object[] resultValues = Tuples.toArray(singleResult);
+						values[result].addAll(Arrays.asList(resultValues));
+					}
 				}
 			} else {
 				for (int result=0; result<values.length; result++) {

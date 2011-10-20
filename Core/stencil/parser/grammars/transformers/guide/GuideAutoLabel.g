@@ -83,8 +83,8 @@ options {
     }
    
    
-    StencilTree tupleRef = target.find(LIST_ARGS).find(TUPLE_REF);
-    StencilTree targetRef = rule.find(TARGET_TUPLE).find(TUPLE_FIELD);
+    StencilTree tupleRef = tail.find(LIST_ARGS).find(TUPLE_REF);
+    StencilTree targetRef = rule.findDescendant(TARGET_TUPLE).find(TUPLE_FIELD);
     if (tupleRef!=null) {
         StencilTree fieldRef = tupleRef.getChild(0);
         

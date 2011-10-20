@@ -11,6 +11,8 @@ import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Operator;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.MultiResultTuple;
+import stencil.tuple.instances.Singleton;
 
 import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 
@@ -20,7 +22,7 @@ import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 public final class MonitorConst extends MonitorBase<MonitorConst> {
 	public static final String NAME = MonitorConst.class.getSimpleName();
 	
-	private final List<Object[]> seen = new ArrayList();
+	private final List seen = new ArrayList();
 			
 	public MonitorConst(OperatorData opData) {super(opData);}
 	public MonitorConst(OperatorData opData, Specializer s) throws SpecializationException {super(opData);}
@@ -35,9 +37,11 @@ public final class MonitorConst extends MonitorBase<MonitorConst> {
 	}
 	
 	private void addAll(Object... args) {
+		Tuple[] ts = new Tuple[args.length];
 		for (int i=0; i<args.length; i++) {
-			seen.add(new Object[]{args[i]});
+			ts[i] = Singleton.from(args[i]);
 		}
+		seen.add(new MultiResultTuple(ts));
 	}
 	
 	@Facet(memUse="READER", prototype="(int VALUE)")		

@@ -79,6 +79,15 @@ options {
     
 	private String key(String layer, String att) {return layer + BIND_OPERATOR + att;}
     
+    /**If there is a guide associated, 
+    	does the monitor need the constants or the the tuple refs as its inputs?**/ 
+    private boolean constArgs(StencilTree chain) {
+      StencilTree r = chain.getAncestor(RULE);
+      if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
+      String type = requestedGuides.get(key(r)).find(SAMPLE_TYPE).getText();
+      return type.toUpperCase().equals("CONST");
+    }
+    
     /**Does the given call group already have the appropriate sampling operator?**/ 
     private boolean requiresChanges(StencilTree chain) {
       StencilTree r = chain.getAncestor(RULE);
@@ -101,14 +110,13 @@ options {
      * 
      * @param t Call target that will follow the new echo operator.
      */
-    private StencilTree echoArgs(StencilTree target, boolean refs) {
+    private StencilTree echoArgs(StencilTree target, boolean consts) {
        StencilTree newArgs = (StencilTree) adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
-          
        StencilTree args = (target.getType() == PACK) ? target : target.find(LIST_ARGS);
        for (StencilTree v: args) {
-          if (v.getType() == TUPLE_REF && refs) {
+          if (v.getType() == TUPLE_REF && !consts) {
             adaptor.addChild(newArgs, adaptor.dupTree(v));
-          } else if (v.getType() != TUPLE_REF && !refs) {
+          } else if (v.getType() != TUPLE_REF && consts) {
             adaptor.addChild(newArgs, adaptor.dupTree(v));
           }
        }
@@ -167,7 +175,7 @@ replaceCompactForm:
 		      ^(FUNCTION 
 		          ^(OP_NAME DEFAULT ID[selectOperator($t, true)] ID[MAP_FACET]) 
 		          {spec($t, true)} 
-		          {echoArgs($t)} 
+		          {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
 		          DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
 		          $t));  
 		
@@ -178,6 +186,6 @@ ensure:
 		       ^(FUNCTION
 		          ^(OP_NAME DEFAULT ID[selectOperator($t, false)] ID[MAP_FACET]) 
                   {spec($t, true)} 
-                  {echoArgs($t)} 
+                  {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
                   DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
                   $t));
