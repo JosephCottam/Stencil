@@ -42,9 +42,11 @@ options {
       if (frameRef.getType() == NUMBER) {return Integer.parseInt(frameRef.getText());}
       
       StencilTree func = frameRef.getAncestor(FUNCTION);
+      if (frameRef.getAncestor(PACK) == null) {func = func.getParent();}//Get the parent, otherwise Mult(..) -> Mult(F) will cause the F to find its own Frame to ref when it needs the earlier mult
+
       while (func != null) {
           StencilTree yield = func.find(DIRECT_YIELD);
-          if (yield.getText().equals(frameRef.getText())) {
+          if (yield != null && yield.getText().equals(frameRef.getText())) {
             return DEFAULT_SIZE+EnvironmentUtil.countPriorFuncs(yield);
           } else {
               func = func.getAncestor(FUNCTION);
