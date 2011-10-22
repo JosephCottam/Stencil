@@ -2,7 +2,7 @@ STREAM: File
 NAME: MethodCalls
 TUPLE_SIZE: 3
 SEPARATOR: \s*:\s*
-SOURCE: ./Viewpoint_5000.btrace
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/ThreadInterleave/Viewpoint_5000.btrace
 SKIP: 0
 STRICT: true
 
@@ -41,8 +41,13 @@ guide
 from MethodSpans
 	ID: Count()
 	PEN: Stroke{{width}::BUTT}
-	PEN_COLOR:* BrewerColors[pallette: "ACCENT"](Method) -> SetAlpha(100, _)
+	PEN_COLOR: color(Method)
 	X1: Start
 	X2: Stop
-	Y1:* Rank(Method) -> Mult(width,_)
-	Y2:* Rank(Method) -> Mult(width,_)
+	Y1:* Rank(Method) -> Mult(width,_) -> Mult(-1,_)
+	Y2:* Rank(Method) -> Mult(width,_) -> Mult(-1,_)
+
+operator color(m) -> (c)
+  (m=~"U.*") => c: Color{GREEN,100}
+  (m=~"R.*") => c: Color{BLUE,100}
+  (m=~"L.*") => c: Color{RED,20}

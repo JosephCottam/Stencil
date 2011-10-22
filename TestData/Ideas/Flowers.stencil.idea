@@ -8,12 +8,16 @@ STRICT: true
 
 import BrewerPalettes
 
-stream flowers(sepalL, petalW, sepalW, petalL, species, obs)
+const WIDTH: 110
+const HEIGHT: 110
 
-group ScatterPlot
+canvas ScatterPlot
   stream data(obs, dep, ind, cat)
-  guide Bounds[color: "Gray30"] from ScatterPlot
 
+  layer Plot
+    guide Bounds[color: "Gray30"] from ScatterPlot
+          axis form X
+          axis from Y
   from data
      ID: obs
      X:* Scale[min: 0, max:100](dep)
@@ -21,33 +25,32 @@ group ScatterPlot
      FILL_COLOR: BrewerColors(cat) -> SetAlpha(50,_)
      REGISTRATION: "CENTER"
 
-j                                                                                                                                               `11E72666666666536.-+
-
-
-
-
-
-layer Trellis[ScatterPlot]
-from flowers
-  ID: "sl/sw"
-  obs: obs
-  dep: sepalL
-  ind: sepalW
-  cat: species
 
 
 canvas Main
-  guide trend[sample: "SIMPLE"] from FlowerPlot ID 
-  guide sidebar[X: 15, Y: -90] from FlowerPlot FILL_COLOR
-  guide axis[sample: "Linear", axisLabel: "Petal Length"] 
-    from FlowerPlot Y
-  guide axis[sample: "Linear", axisLabel: "Petal Width"] 
-     from FlowerPlot X
+  stream flowers(sepalL, petalW, sepalW, petalL, species, obs)
 
-layer FlowerPlot
-from flowers
-   ID: obs
-   X:* Scale[min: 0, max:100](petalL)
-   Y:* Scale[min: 0, max:100](petalW) -> Mult(_,-1)
-   FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
-   REGISTRATION: "CENTER"
+  layer Scatters[ScatterPlot]
+     axis from Y
+       X: XSort(Input) -> Mult(_, WIDTH)
+  from flowers
+     local (dID, iID, dep, ind) : PCross(flowers.*)
+     ID: Concatenate(local.dID, local.iID)
+     (dep, ind): (local.dep, local.ind) 
+     obs: obs
+     cat: species
+     X:* XSort(local.dep) -> Mult(_, WIDTH)
+     Y:* YSort(local.ind) -> Mult(_, HEIGHT)
+     guide.X.Visible: XSort(local.dep) -> Alternate(_) -> Zero(_)
+     guide.Y.Visible: XSort(local.dep) -> Alternate(_) -> Zero(_)
+
+operator XSort : Sort
+operator YSort : Sort
+
+Requires a prototyped-cross operator PCross:
+   (tuple, nameÉ) -> MultiResultTuple : (ID, V1,V2)
+   Each possible ID pair will appear as an ID AND the corresponding values
+  
+
+If you want different instances  of ops for different instances of the sub-schema, split on Parent.ID
+	//Requires a parent tuple in the default env; will be empty for the main canvas

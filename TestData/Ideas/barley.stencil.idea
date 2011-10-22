@@ -1,30 +1,26 @@
 import BrewerPalettes
 
-stream Barley(year, site, yield, variety)
-const(CELL_HEIGHT : 100, LABEL_HEIGHT: 10)
-
+const CELL_HEIGHT : 100
+const LABEL_HEIGHT: 10
 
 canvas Main
-  guide 
-    axis[axisLabel: "Yield", sample: "LINEAR", seed.min: 0, seed.max: 100] 
-    from BarleySite X
-
-  guide 
+   stream Barley(year, site, yield, variety)
+   layer Barley[BarleySite]
+   guide 
+     axis[axisLabel: "Yield", sample: "LINEAR", seed.min: 0, seed.max: 100]
+        from BarleySite X
     sidebar[X: 75, Y: -60] 
-    from BarleySite STROKE_COLOR
-      example.FILL_COLOR: @Color{GRAY90}
+       from BarleySite STROKE_COLOR
+
+   from Barley
+     ID: site
+     Y: Sum(CELL_HEIGHT, LABEL_HEIGHT) -> Sort(site) -> Mult(Sum, Sort)
+     (year, yield, variety): (year, yield, variety)
 
 
-layer Barley[BarleySite]
-from Barley
-  ID: site
-   Y: Sort(site) -> Mult(CELL_HEIGHT)
-   (year, yield, variety): (year, yield, variety)
-
-
-layer BarleySite
+canvas BarleySite
   stream SiteValues(year, yield, variety)
-  guide axis[axisLabel: "Variety"] from SiteValues Y
+
   guide title[height: LABEL_HEIGHT, fill: "bisque"] from ID
   
   element Border[SHAPE]
@@ -32,6 +28,7 @@ layer BarleySite
   	  (X,Y,HEIGHT, WIDTH): Values[X], Values[Y], Values[HEIGHT], Values[WIDTH]
 
   layer Values
+  guide axis[axisLabel: "Variety"] from SiteValues Y
   from SiteValues
     ID: Concatenate(variety,year)
     PEN_COLOR: BrewerColors[palette: "PuRd"](year)
