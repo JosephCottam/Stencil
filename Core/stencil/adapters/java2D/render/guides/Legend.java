@@ -141,9 +141,9 @@ public class Legend extends Guide2D {
 		for (int i=0; i< elements.size(); i++) {
 			PrototypedTuple t = elements.get(i);
 			t = createLabeledItem(i+1, t,x ,y);	//i+1 because of the guide label	
-			t = Tuples.merge(updateMask, t);
-			t = Tuples.restructure(t, GUIDE_ELEMENT_TAG, LABEL_PROPERTY_TAG);
-			marks.add(t);
+			PrototypedTuple merged = Tuples.merge(updateMask, t);
+			PrototypedTuple restructured = Tuples.restructure(merged, GUIDE_ELEMENT_TAG, LABEL_PROPERTY_TAG);
+			marks.add(restructured);
 		}
 		
 		return marks;

@@ -14,6 +14,9 @@ import stencil.interpreter.tree.Guide;
 public abstract class Guide2D implements DisplayGuide {
 	/**Key to hold the sample type in the specializer.**/
 	public static final String SAMPLE_KEY = "#samples";
+	public static final String FIELDS_KEY = "#fields";
+	
+
 	
 	protected final String identifier;
 	protected final Guide guideDef;

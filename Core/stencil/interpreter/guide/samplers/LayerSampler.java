@@ -16,7 +16,7 @@ import stencil.tuple.prototype.TuplePrototype;
 
 
 /**Iterates the tuples of a layer as the sample.*/
-public final class LayerSampler implements SampleOperator {
+public class LayerSampler implements SampleOperator {
 	/**Special seed operator to accompany this sampler type.*/
 	public static final class MonitorOperator implements stencil.interpreter.guide.MonitorOperator {
 		private final DisplayLayer layer;
@@ -36,7 +36,7 @@ public final class LayerSampler implements SampleOperator {
 		}
 	}
 	
-	private final DisplayLayer layer;
+	protected final DisplayLayer layer;
 	
 	public LayerSampler(DisplayLayer layer) {this.layer = layer;}
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
@@ -45,5 +45,6 @@ public final class LayerSampler implements SampleOperator {
 		for (Glyph t: view) {l.add(t);}
 		return l;
 	}
-	public final DisplayLayer<Glyph> getDisplayLayer() {return layer;}
+	
+	public TuplePrototype prototype() {return layer.prototype();}
 }

@@ -19,7 +19,7 @@ from Stocks
   Date : Parse[f:"dd-MMM-yy"](Date)     /*@\label{stocks:parseDate}@*/
   Open : Open
 
-layer Ticker["POLY_POINT"]		/*Poly-piont is a group of groups of line segments.*/
+layer Ticker["POLY_POINT"]		/*Poly-point is a group of groups of line segments.*/
 guide
    axis Linear from Y
    axis[unit: "MONTH"] Date from X

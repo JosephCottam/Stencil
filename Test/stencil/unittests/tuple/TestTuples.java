@@ -3,8 +3,11 @@ package stencil.unittests.tuple;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.instances.Singleton;
+import stencil.tuple.prototype.TupleFieldDef;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 import stencil.unittests.StencilTestCase;
 import stencil.unittests.util.TestBasicTuple;
@@ -12,7 +15,6 @@ import junit.framework.Assert;
 
 
 public class TestTuples extends StencilTestCase {
-
 	public void testConvert() throws Exception {
 		testOneConversion("1", Integer.class, new Integer(1));
 		testOneConversion("42395", Integer.class, new Integer(42395));
@@ -53,6 +55,46 @@ public class TestTuples extends StencilTestCase {
 		Assert.assertTrue(value.contains("DoubleField"));
 		Assert.assertTrue(value.contains("Field4"));
 		Assert.assertTrue(value.contains("Value4"));
+	}
+	
+	public void testReduce() {
+		TuplePrototype<TupleFieldDef> proto = new TuplePrototype("one", "two", "three", "four");
+		PrototypedTuple<TupleFieldDef> t = new PrototypedArrayTuple(new String[]{"zero", "one", "one-point-five", "two","five"}, new Object[]{0,1,1.5,2,5});
+		
+		PrototypedTuple<TupleFieldDef> t2 = Tuples.reduce(proto, t);
+		assertFalse(Tuples.equals(t, t2));
+		for (TupleFieldDef def: t2.prototype()) {
+			String name = def.name();
+			assertTrue("Found illegal field after reduce: " + name, proto.contains(name));
+		}
+	}
+	
+	public void testEquals() {
+		Tuple t1 = Singleton.from("V1", 1);
+		Tuple t2 = Singleton.from("V1", 1);
+		Tuple t3 = Singleton.from("V2", 2);
+		Tuple t4 = Singleton.from("V2", 3);
+		Tuple t5 = Singleton.from(5);
+		Tuple t6 = Singleton.from(1);
+		Tuple t7 = new ArrayTuple(new String[]{"one", "two", "three"});
+		
+		assertTrue(Tuples.equals(t1,t1));
+		assertTrue(Tuples.equals(t3,t3));
+		assertTrue(Tuples.equals(t1,t2));
+		assertTrue(Tuples.equals(t2,t1));
+		assertTrue(Tuples.equals(t1,t6));
+		assertTrue(Tuples.equals(t6,t1));
+		
+		assertEquals("Hashcode does not match for 'equal' tuples: t1/t2", t1.hashCode(), t2.hashCode());
+		assertEquals("Hashcode does not match for 'equal' tuples: t1/t6", t1.hashCode(), t6.hashCode());
+
+		assertFalse(Tuples.equals(t1,t3));
+		assertFalse(Tuples.equals(t3,t4));
+		assertFalse(Tuples.equals(t3,t4));
+		assertFalse(Tuples.equals(t4,t5));
+		assertFalse(Tuples.equals(t1,t5));
+		assertFalse(Tuples.equals(t1,t7));
+		assertFalse(Tuples.equals(t7,t1));
 	}
 	
 	public void testMerge() {

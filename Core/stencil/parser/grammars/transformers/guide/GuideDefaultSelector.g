@@ -24,10 +24,11 @@ options {
   
   public static Object typeNotCovered(String type) {throw new ValidationException("Must supply an attribute selector for guides of type: " + type);}
 
+  //TODO: HACK, this is tied to the available guide types...which is determined by the adaptor...
   public static boolean isValidCombo(String type, String att) {
     if (type.equals("axis") || type.equals("gridlines")) {return att.startsWith("X") || att.startsWith("Y");}
-    if (!GuideDistinguish.DIRECT_TYPES.contains(type)) {return att.equals(IDENTIFIER_FIELD);}
-    return !att.equals(IDENTIFIER_FIELD) && !att.equals("X") && !att.equals("Y");
+    if (GuideDistinguish.DIRECT_TYPES.contains(type) && att.equals(IDENTIFIER_FIELD)) {return false;}
+    return !att.equals("X") && !att.equals("Y");
   }
 }
 

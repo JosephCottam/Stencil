@@ -92,7 +92,9 @@ public class PrototypedArrayTuple<T extends TupleFieldDef> implements Prototyped
 		return null;
 	}
 	
-
+	public boolean equals(Object other) {return Tuples.equals(this, other);}
+	public int hashCode() {return Tuples.hashCode(this);}
+	
 	/**Returns a string as-per the static toString() method.**/
 	public String toString() {return Tuples.toString(this);}
 

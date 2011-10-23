@@ -96,8 +96,8 @@ public final class EnvironmentUtil {
 			}
 
 			if (anc.inRuleList && (((Const) (anc.guide.findAllDescendants(SAMPLE_OPERATOR).get(0).getChild(0))).getValue() instanceof LayerSampler)) {
-				SampleOperator sampler = (SampleOperator) ((Const) (anc.guide.findDescendant(SAMPLE_OPERATOR).getChild(0))).getValue();
-				return ((LayerSampler) sampler).getDisplayLayer().prototype();
+				LayerSampler sampler = (LayerSampler) ((Const) (anc.guide.findDescendant(SAMPLE_OPERATOR).getChild(0))).getValue();
+				return sampler.prototype();
 			} else if (anc.inGuideGenerator) {
 				return SampleOperator.Util.prototype(anc.guide.find(LIST_GUIDE_SAMPLERS).getChildCount());
 			} else if (anc.inRuleList) {

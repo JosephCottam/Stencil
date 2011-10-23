@@ -16,7 +16,7 @@ options {
 	
   import stencil.parser.tree.*;
   import stencil.interpreter.guide.Samplers;
-  import stencil.interpreter.guide.samplers.LayerSampler;
+  import stencil.interpreter.guide.samplers.*;
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.Specializer;
   import stencil.display.DisplayLayer;
@@ -26,27 +26,20 @@ options {
 @members {
   public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
-   //TODO: Move the semantic checks somewhere... 
-   //Throws an exception if summarization guides are mal-formed    
-   public DisplayLayer verifySummary(StencilTree g) {
-      StencilTree selectors = g.find(LIST_SELECTORS);
-      if (selectors.getChildCount() != 1) {throw new RuntimeException("Can only use one attribute on summarization guides.");}
-
-      StencilTree sel = selectors.getChild(0);     
-      String att = sel.getText(); //The data source on the only indicated attribute, must be ID
-      if (!att.equals(IDENTIFIER_FIELD)) {throw new RuntimeException("Can only used ID as the attribute for summarization guides.");}
-      return (DisplayLayer) ((Const) g.getAncestor(LAYER).find(CONST)).getValue(); 
-   }
-
    public StencilTree samplers(StencilTree g) {
       StencilTree samples = (StencilTree) adaptor.create(LIST_GUIDE_SAMPLERS, "LIST_GUIDE_SAMPLES");
       if (g.getAncestor(GUIDE_SUMMARIZATION) !=null) {
-          DisplayLayer l = verifySummary(g);
+          DisplayLayer l = (DisplayLayer) ((Const) g.getAncestor(LAYER).find(CONST)).getValue();
           Const cnst = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
-          cnst.setValue(new LayerSampler(l));
-          //HACK:  Java type-based constructor matching only does exact matching.  
-          //        This fails my use case because the constructor is declared w.r.t an interface but l will always be an instance of some class
-
+          
+          if (g.findAllDescendants(SAMPLE_TYPE).size() ==1) {
+	          cnst.setValue(new LayerSampler(l));
+          } else {
+ 			  cnst.setValue(new LayerCrossSampler(l, Freezer.specializer(g.find(SPECIALIZER))));
+ 	      }         
+ 	      //TODO: Add case to do group sampling...(Group sampler does multi-result tuple and guide types handle that appropriately)
+ 	      
+          
           StencilTree sample = (StencilTree) adaptor.create(SAMPLE_OPERATOR, "SAMPLE_OPERATOR");
           sample.addChild(cnst);
           samples.addChild(sample);

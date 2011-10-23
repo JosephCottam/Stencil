@@ -96,7 +96,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				//Prepare variable argument for last position of arguments array
 				Object varArgs;
 				if (paramTypes.length == 1 && Object.class.equals(paramTypes[0])) {
-					//If you need to pass over an Object[] and nothing else, then jus use the arguments array you already ahve.
+					//If you need to pass over an Object[] and nothing else, then just use the arguments array you already have.
 					varArgs = arguments;
 				} else  if (arguments.length > 0 && arguments[0] != null && arguments[0].getClass().isArray()) {
 					Class type = paramTypes[paramTypes.length-1];
@@ -124,9 +124,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			throw new MethodInvokeFailedException(format("Exception thrown peparing arguments: %1$s.", deepToString(arguments)),method, target, e);
 		}
 			
-		try {
-			return (R) method.invoke(target, args);
-		} 
+		try {return (R) method.invoke(target, args);} 
 		catch (Exception ex) {
 			throw new MethodInvokeFailedException(String.format("Exception with arguments %1$s.", deepToString(arguments)),method, target, ex);
 		}
@@ -198,5 +196,4 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		for (int i=0; i< types.length ;i++) {newTypes[i] = types[i].isArray() ? types[i].getComponentType() : types[i];}
 		return newTypes;
 	}
-
 }

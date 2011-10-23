@@ -265,7 +265,7 @@ public final class Tuples {
 	}	
 	
 	/**Generic pair-wise value equality.
-	 * Does not check names/prototypes.
+	 * Does NOT check names/prototypes or other supplemental information.
 	 ***/
 	public static boolean equals(Tuple t1, Object other) {
 		if (!(other instanceof Tuple)) {return false;}
@@ -277,7 +277,32 @@ public final class Tuples {
 			if (t1.get(i) == null && t2.get(i) != null
 					|| !t1.get(i).equals(t2.get(i))) {return false;}
 		}
+		
 		return true;
+	}
+
+
+	
+	/**Calculates a hash code based on the field has codes (not based on any supplemental properties).
+	 * This hashCode method is consistent with Tuples.equals(tuple, object).
+	 */
+	public static int hashCode(Tuple t) {
+		int hashCode = 1;
+		for (int i=0; i<t.size(); i++) {
+			int baseCode = t.get(i).hashCode();
+			hashCode = hashCode * baseCode << i;	//TODO: Is this bit-shift w/wrap?
+		}
+		return hashCode;
+	}
+	
+	/**Removes all fields from a tuple that are not in the prototype.*/
+	public static PrototypedTuple reduce(TuplePrototype proto, PrototypedTuple t) {
+		List<String> remove = new ArrayList();
+		for (TupleFieldDef def: ((Iterable<TupleFieldDef>) t.prototype())) {
+			String name = def.name();
+			if (!proto.contains(name)) {remove.add(name);}
+		}
+		return delete(t, remove.toArray(new String[remove.size()]));
 	}
 	
 	

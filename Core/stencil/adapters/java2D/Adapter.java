@@ -46,6 +46,7 @@ public final class Adapter implements stencil.adapters.Adapter {
 		else if (name.equals("legend")) {return Legend.class;}
 		else if (name.equals("trend")) {return TrendLine.class;}
 		else if (name.equals("pointLabels")) {return PointLabel.class;}
+		else if (name.equals("sumLegend")) {return Legend.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
@@ -82,6 +83,8 @@ public final class Adapter implements stencil.adapters.Adapter {
 				if (guideDef.identifier().contains("Y")) {yAxis = guideDef;}
 			} else if (guideDef.type().equals("legend")) {
 				canvas.addGuide(new Legend(guideDef, legendCount++));
+			} else if (guideDef.type().equals("sumLegend")) {
+					canvas.addGuide(new Legend(guideDef, legendCount++));				
 			} else if (guideDef.type().equals("pointLabels")) {
 				canvas.addGuide(new PointLabel(guideDef));
 			} else if (guideDef.type().equals("trend")) {

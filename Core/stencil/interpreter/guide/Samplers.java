@@ -23,13 +23,12 @@ public final class Samplers {
 		add("LOG", "MonitorContinuous", NumericSampler.class);
 		add("CATEGORICAL", "MonitorCategorical", StringSampler.class);
 		add("COLOR", "MonitorCategorical", ColorSampler.class);
-		add("CONST", "MonitorConst", ConstSampler.class);
 		add("LAYER", null, LayerSampler.class);
+		add("LAYER_CROSS", null, LayerCrossSampler.class);
 		add("NOP", "Nop", StencilUtil.Nop.class);
 		add("GAP", "MonitorSegments", SegmentSampler.class);
 		add("SEGMENT", "MonitorSegments", SegmentSampler.class);
-		add("DATE", "MonitorDate", DateSampler.class);
-		
+		add("DATE", "MonitorDate", DateSampler.class);		
 	}
 	
 	/**Given the guide type, what is the required monitor operator?

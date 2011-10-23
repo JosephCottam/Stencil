@@ -30,6 +30,9 @@ public class Singleton {
 		public int size() {return 1;}
 		
 		public String toString() {return Tuples.toString(this);}
+		
+		public boolean equals(Object other) {return Tuples.equals(this, other);}
+		public int hashCode() {return Tuples.hashCode(this);}
 	}
 	
 	
@@ -47,6 +50,10 @@ public class Singleton {
 			if (name.equals(name)) {return value;}
 			throw new InvalidNameException(name, this.prototype());
 		}
+		
 		public int size() {return 1;}
+		
+		public boolean equals(Object other) {return Tuples.equals(this, other);}
+		public int hashCode() {return Tuples.hashCode(this);}
 	}
 }

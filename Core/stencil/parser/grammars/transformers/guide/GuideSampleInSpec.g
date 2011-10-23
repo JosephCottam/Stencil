@@ -8,12 +8,13 @@ options {
 }
 
 @header {
-  /**Adds the sample type to the specializer.*/
+  /**Adds the sample type(s) and source field(s) to the specializer.*/
   
   package stencil.parser.string; 
   
   import stencil.parser.tree.*;
   import static stencil.adapters.java2D.render.guides.Guide2D.SAMPLE_KEY;
+  import static stencil.adapters.java2D.render.guides.Guide2D.FIELDS_KEY;
   import stencil.util.collections.ArrayUtil;
   
 }
@@ -21,20 +22,28 @@ options {
 @members {
    public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
    
-   public Object augment(StencilTree specializer, StencilTree selectors) {
-      String[] sels = new String[selectors.getChildCount()];
+   public StencilTree augment(StencilTree specializer, StencilTree selectors) {
+      String[] samples = new String[selectors.getChildCount()];
+      String[] sources = new String[selectors.getChildCount()];
+      
       for (int i=0; i< selectors.getChildCount(); i++) {
-         sels[i] = selectors.getChild(i).findDescendant(SAMPLE_TYPE).getText();
+         samples[i] = selectors.getChild(i).findDescendant(SAMPLE_TYPE).getText();
+         sources[i] = selectors.getChild(i).getText();
       } 
       
-      Object rv = adaptor.dupTree(specializer);     
-      Object entry = adaptor.create(MAP_ENTRY, SAMPLE_KEY);
-      Const val  = (Const) adaptor.create(CONST, "");
-      val.setValue(ArrayUtil.prettyString(sels));
-      adaptor.addChild(entry, val);
-      adaptor.addChild(rv, entry);
+      StencilTree rv = (StencilTree) adaptor.dupTree(specializer);     
+      adaptor.addChild(rv, entry(SAMPLE_KEY, samples));
+      adaptor.addChild(rv, entry(FIELDS_KEY, sources));
       return rv;
    } 
+   
+   private StencilTree entry(String key, String[] vals) {
+      StencilTree entry = (StencilTree) adaptor.create(MAP_ENTRY, key);
+      Const val  = (Const) adaptor.create(CONST, "");
+      val.setValue(ArrayUtil.prettyString(vals));
+      adaptor.addChild(entry, val);
+      return entry;
+   }
  }
      
      

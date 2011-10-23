@@ -21,7 +21,6 @@ import stencil.display.Glyph;
 import stencil.display.LayerView;
 import stencil.display.SchemaFieldDef;
 import stencil.interpreter.tree.Freezer;
-import stencil.tuple.InvalidNameException;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
@@ -152,10 +151,12 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 				for (int field=0; field<singleUpdate.size(); field++) {
 					String fieldName = singleUpdate.prototype().get(field).name();
 					int targetColIdx = source.tenured().schema.indexOf(fieldName);
+					if (targetColIdx <0 || targetColIdx > columns.length) {
+						continue;	//HACK: Ignores extra fields, this makes some guide generation more convenient, but is not preferable in the long run (compiler should make sure this is not even attempted, but requires better type information)
+//						throw new InvalidNameException(source.name(), fieldName, source.tenured().schema);
+					}
 					
-					Column targetCol;
-					try {targetCol = columns[targetColIdx];}
-					catch (ArrayIndexOutOfBoundsException ex) {throw new InvalidNameException(source.name(), fieldName, source.tenured().schema);}
+					Column targetCol = columns[targetColIdx];
 
 					Object updateValue = singleUpdate.get(field);
 					if (updateValue == Freezer.NO_UPDATE && target >= tenuredSize) {

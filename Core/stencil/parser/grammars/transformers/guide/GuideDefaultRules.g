@@ -42,8 +42,9 @@ options {
      StencilTree rules = g.find(LIST_RULES);
      TuplePrototype p = EnvironmentUtil.calcPrototype(rules);
      List<String> names = Arrays.asList(TuplePrototypes.getNames(p));
-
      String guideType = g.find(ID).getText();
+     
+     //TODO: Add default rules to the guide declaration in the graphics adaptor, instead of hard coded here in the grammar (possibly have the adaptor provide methods that return the rules) 
      if (guideType.equals("pointLabels")) {
         if (!names.contains(X_FIELD)) { 
            adaptor.addChild(rules, ParseStencil.ruleTree(X_FIELD, X_FIELD));
@@ -60,7 +61,7 @@ options {
         }
         if (!names.contains(Y_FIELD)) {
            adaptor.addChild(rules, ParseStencil.ruleTree(Y_FIELD, Y_FIELD));
-        }        
+        }
      } else {          
        for (StencilTree s: g.find(LIST_SELECTORS)) {
           String boundField = s.getText();

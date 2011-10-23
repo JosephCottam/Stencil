@@ -33,7 +33,8 @@
     </target>
  		
     <target name="Compile">
-      <javac destdir="${target}" includeantruntime="false" source="1.5">
+        <mkdir dir="${target}"/> 
+	<javac destdir="${target}" includeantruntime="false" source="1.5">
 	<src>
 	  <pathelement path="${core}"/>
 	  <pathelement path="${modules}"/>

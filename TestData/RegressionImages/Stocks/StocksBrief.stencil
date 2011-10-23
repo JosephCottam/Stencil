@@ -15,10 +15,11 @@ from Stocks
   Date : Parse[f:"dd-MMM-yy"](Date)
   Open : Open
 
-layer Ticker["POLY_POINT"]		/*Poly-piont is a group of groups of line segments.*/
+layer Ticker["POLY_POINT"]		/*Poly-point is a group of groups of line segments.*/
 guide
-   axis Linear from Y
-   axis[unit: "MONTH"] Date from X
+   sumLegend from PEN_COLOR, from GROUP
+   axis[implant:"POINT"] Linear from Y
+   axis[unit: "MONTH", implant:"POINT"] Date from X
      label.TEXT: Parse.format[f:"MMM yy"](Input)
 
 from AlignedStocks
@@ -44,4 +45,4 @@ default => (S) : Range[ALL](@DateMin, T)
                    -> DateDiff("DAYS", Range, T) 
                    -> Mult(_, 3)
 
-operator DateMin : Min[c:"Date"]  
+operator DateMin : Min[c:"Date"]

@@ -47,9 +47,8 @@ options {
     for (StencilTree sel: selectors) {
        String att;
        try {att= getSource(program, layerName, sel.getText());}
-       catch (SelectorException e) {throw new ProgramCompileException(e.getMessage(), sel);}
+       catch (SelectorException e) {att = sel.getText();} 	//If there is no more info, just use the selected field
        
-       if (att==null) {continue;}
        if (!labels.contains(att)) {labels.add(att);}
     }
     
@@ -112,6 +111,6 @@ options {
 
 topdown:
      ^(s=SPECIALIZER entries+=.*)
-      -> {(s.getParent().getType() == GUIDE) && (s.getAncestor(GUIDE_DIRECT) != null) && needsLabel($s)}?  //Is this the guide specializer for a direct guide? 
+      -> {(s.getParent().getType() == GUIDE && needsLabel($s))}?   
             ^(SPECIALIZER ^(MAP_ENTRY[GUIDE_LABEL] STRING[buildLabel($s.getParent().find(LIST_SELECTORS))]) $entries*)
       -> ^(SPECIALIZER $entries*);   
