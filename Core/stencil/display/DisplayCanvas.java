@@ -6,7 +6,6 @@ import java.util.Collection;
 
 import javax.swing.JComponent;
 
-import stencil.adapters.java2D.render.guides.Guide2D;
 
 /**What should a canvas component be able to do?*/
 public abstract class DisplayCanvas extends JComponent {

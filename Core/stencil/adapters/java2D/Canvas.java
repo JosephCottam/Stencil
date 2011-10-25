@@ -14,10 +14,10 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import stencil.adapters.general.ShapeUtils;
 import stencil.adapters.java2D.columnStore.Table;
-import stencil.adapters.java2D.render.guides.Guide2D;
 import stencil.display.CanvasTuple;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
+import stencil.display.Guide2D;
 import stencil.interpreter.tree.*;
 
 

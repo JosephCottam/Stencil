@@ -19,8 +19,8 @@ import stencil.adapters.java2D.LayerTypeRegistry;
 import stencil.adapters.java2D.Panel;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.columnStore.TableView;
-import stencil.adapters.java2D.render.guides.Guide2D;
 import stencil.adapters.java2D.render.Renderer;
+import stencil.display.Guide2D;
 import stencil.interpreter.tree.Program;
 import stencil.util.StencilThreadFactory;
 

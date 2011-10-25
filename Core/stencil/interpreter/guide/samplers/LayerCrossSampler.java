@@ -15,7 +15,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
 import static stencil.parser.ParserConstants.INPUT_FIELD;
-import static stencil.adapters.java2D.render.guides.Guide2D.FIELDS_KEY;
+import static stencil.display.Guide2D.FIELDS_KEY;
 
 /**Iterates the tuples of a layer creating a cross between the label field and the value field.*/
 public final class LayerCrossSampler extends LayerSampler {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import stencil.adapters.java2D.render.guides.Guide2D;
+import stencil.display.Guide2D;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.tree.Specializer;

@@ -16,6 +16,7 @@ import stencil.adapters.java2D.columnStore.CompoundTable;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.CompoundRenderer;
 import stencil.adapters.java2D.render.Renderer;
+import stencil.display.Guide2D;
 import stencil.parser.ParseStencil;
 import stencil.interpreter.tree.Guide;
 import stencil.interpreter.tree.Specializer;

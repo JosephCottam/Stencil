@@ -1,0 +1,56 @@
+STREAM: File
+NAME: LineColor
+TUPLE_SIZE: 2
+SEPARATOR: \s*,\s*
+SOURCE: ./LineColor.txt
+SKIP: 1
+STRICT: true
+STREAM: File
+NAME: Data
+TUPLE_SIZE: 3
+SEPARATOR: \s*,\s*
+SOURCE: ./EpiCSampleData.csv
+SKIP: 1
+STRICT: true
+
+import ViewCanvas
+import Presentation
+
+stream Data(Timestep, Line, Value)
+stream LineColor(Line, Color)
+
+order (Data | LineColor)
+
+view
+from #Render
+	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60, 20)
+	WIDTH : Mult(canvas.WIDTH, 1.2)
+	HEIGHT : Mult(canvas.HEIGHT, 1.2)
+	X : Sub(canvas.X, local.WidthOffset)
+	Y : Mult(canvas.HEIGHT, -1) -> Sub(_, local.HeightOffset)
+
+layer Lines["POLY_POINT"]
+guide
+	axis[tickCount: 10,  tickSize: 5, textOffset: 6, axisOffset: 10] Linear from X
+       label.IMPLANT: "POINT"
+       label.FONT: Font{10}
+       label.REGISTRATION: "LEFT"
+       line.PEN: Stroke{1}
+	axis[tickCount: 10, tickSize: 5, textOffset: 6, axisOffset: 10] Linear from Y
+       label.IMPLANT: "POINT"
+       label.FONT: Font{10}
+	    label.REGISTRATION: "RIGHT"
+       line.PEN: Stroke{1}
+
+from Data
+   ID : Count(Line) -> Concatenate(Line, _)
+   GROUP: Line
+   ORDER: Count()
+   X : Index(Timestep) -#> Mult(_, 300)
+   Y: Value 
+   IMPLANT: "POINT"
+   PEN: Stroke{1.5}
+   VISIBLE :* SelectTrues["Visible"](Line)
+from LineColor
+   ID : Concatenate(Line,1)
+   PEN_COLOR: Color

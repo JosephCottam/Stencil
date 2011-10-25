@@ -13,6 +13,7 @@ import stencil.module.operator.util.Invokeable;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.AstInvokeable;
 import stencil.parser.tree.Const;
+import stencil.parser.tree.OperatorProxy;
 import stencil.parser.tree.StencilTree;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
@@ -95,7 +96,25 @@ public final class Freezer {
 		final Guide[] guides = new Guide[guideDefs.size()];
 		for (int i=0; i< guides.length;i++) {guides[i]=guide(guideDefs.get(i));}
 		
-		return new Program(view, canvas, layers, streams, order, dynamics, guides);
+		Object[] operators = operators(program);
+		
+		return new Program(view, canvas, layers, streams, order, dynamics, guides, operators);
+	}
+	
+	private static Object[] operators(StencilTree program) {
+		assert verifyType(program, PROGRAM);
+		
+		StencilTree opTrees = program.find(LIST_OPERATORS);
+		Object[] ops = new Object[opTrees.getChildCount()];
+		for (int i=0; i< ops.length; i++) {
+			StencilTree op = opTrees.getChild(i);
+			if (op.is(OPERATOR_PROXY)) {
+				ops[i] = ((OperatorProxy) op).getOperator();
+			} else {
+				ops[i] = null;	//TODO: Get the SyntheticOperator into the tree, this ops[] can be the basis for the operators tuple and reworking the higher-order ops 
+			}
+		}
+		return ops;
 	}
 	
 	public static Guide guide(StencilTree guide) {

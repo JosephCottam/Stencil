@@ -1,10 +1,9 @@
-package stencil.adapters.java2D.render.guides;
+package stencil.display;
 
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import stencil.display.DisplayGuide;
 import stencil.interpreter.tree.Guide;
 
 /**Conforming to this interface is required for guides used as automatic generation targets.

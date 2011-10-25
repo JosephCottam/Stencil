@@ -39,7 +39,7 @@ public abstract class ParserConstants {
 	/**Field a used to store data for dynamic bindings.
 	 * Must be included in any schema that supports dynamic binding. 
 	 */
-	public static final String DYNAMIC_STORE_FIELD = "#DYNAMIC_STORE";
+	public static final String DYNAMIC_STORE_FIELD = "DYNAMIC_STORE";
 	
 
 	//Block tags

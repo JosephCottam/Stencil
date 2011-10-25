@@ -13,6 +13,7 @@ import stencil.adapters.java2D.LayerTypeRegistry;
 import stencil.adapters.java2D.columnStore.CompoundTable;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.CompoundRenderer;
+import stencil.display.Guide2D;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Guide;
 import stencil.interpreter.tree.Rule;

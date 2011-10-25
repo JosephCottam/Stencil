@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 import stencil.WorkingDir;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
@@ -14,6 +17,7 @@ import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ConcurrentStream;
 import stencil.util.streams.QueuedStream;
 import stencil.interpreter.tree.Order;
+import stencil.interpreter.tree.Program;
 
 /**Thread to manage running a stencil run.
  *
@@ -48,11 +52,29 @@ public final class StencilRunner extends Thread {
 		try {
 			running = true;
 
+			JFrame windows = null;
 			Map<String, StreamSource> streamSources = model.getSourcesMap();
 			StencilPanel panel = model.getStencilPanel();
+			Program program = panel.getProgram();
 			panel.preRun();
-			Order order = panel.getProgram().order();
+			Order order = program.order();
 
+			List<JPanel> panels = new ArrayList();
+			for (Object op: program.operators()) {
+				if (op instanceof NeedsPanel) {
+					panels.add(((NeedsPanel) op).panel());
+				}
+			}
+			if (panels.size() >0) {
+				windows = new JFrame();
+				windows.getContentPane().setLayout(new ResizeLayout(windows.getContentPane(), ResizeLayout.Y_AXIS));
+				for(JPanel p: panels) {
+					windows.add(p);
+				}
+				windows.setVisible(true);
+			}
+			
+			
 			//TODO: Re-arrange this whole mess to use the dispatcher defined in the dissertation.
 			for (String[] group: order) {
 				if (!keepRunning) {break;}
@@ -83,6 +105,12 @@ public final class StencilRunner extends Thread {
 				reporter.addMessage("Finished load of %1$s (%2$,d tuples).", names, loader.getRecordsLoaded());
 				panel.repaint();
 			}
+			
+			if (windows != null) {
+				while(windows.isVisible()) {Thread.sleep(1000);}
+				windows.dispose();
+			}
+			
 		} catch (Throwable e) {
 			running = false;
 			throwable = e;

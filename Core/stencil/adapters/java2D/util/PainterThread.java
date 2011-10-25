@@ -63,6 +63,8 @@ public final class PainterThread implements Runnable {
 	}
 	
 	private boolean requiresUpdate() {
+		painter.doUpdates();
+
 		AffineTransform trans = target.viewTransformRef();
 		boolean requires = painter.requiresUpdate(trans);
 		return requires;
@@ -85,7 +87,6 @@ public final class PainterThread implements Runnable {
 
 		//synchronized(target.visLock) { 			//Enable and add matching parenthesis for render-state lock
 
-		painter.doUpdates();
 
 		size = target.getBounds();
 		background = target.getBackground();

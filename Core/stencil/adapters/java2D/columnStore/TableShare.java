@@ -112,9 +112,9 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 				PrototypedTuple value = updates.get(id);
 				if (value == DELETE || value == null) {value = t;}
 				else {value = Tuples.merge(value, t, Freezer.NO_UPDATE);}
-				updates.put(id, t);
+				updates.put(id, value);
 			}
-		}
+		}		
 		
 		//Create list of delete locations from the tenured store
 		for (Map.Entry<Comparable, PrototypedTuple> update: updates.entrySet()) {
@@ -157,21 +157,20 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 					}
 					
 					Column targetCol = columns[targetColIdx];
+					if (values[targetColIdx] == null) {
+						values[targetColIdx] = new Object[updates.size()];  
+						Arrays.fill(values[targetColIdx], targetCol.getDefaultValue());
+					}
 
 					Object updateValue = singleUpdate.get(field);
 					if (updateValue == Freezer.NO_UPDATE && target >= tenuredSize) {
-						updateValue = targetCol.getDefaultValue();						
+						updateValue = targetCol.getDefaultValue();
 					} else if (updateValue == Freezer.NO_UPDATE) {
 						updateValue = targetCol.get(target);
 					} else { 
 						updateValue = Converter.convert(updateValue, targetCol.type(), targetCol.getDefaultValue());
 					}
-					
-					if (values[targetColIdx] == null) {
-						values[targetColIdx] = new Object[updates.size()];  
-						Arrays.fill(values[targetColIdx], targetCol.getDefaultValue());
-					}
-					
+										
 					values[targetColIdx][i] = updateValue;
 				}
 				i++;

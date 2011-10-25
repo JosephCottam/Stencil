@@ -12,6 +12,7 @@ import java.util.List;
 import stencil.adapters.java2D.LayerTypeRegistry;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.Renderer;
+import stencil.display.Guide2D;
 import stencil.display.SchemaFieldDef;
 import stencil.interpreter.tree.Guide;
 import stencil.interpreter.tree.Specializer;
