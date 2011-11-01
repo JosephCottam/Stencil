@@ -17,9 +17,6 @@ import ViewCanvas
 import Presentation
 
 stream Data(Timestep, Line, Value)
-stream LineColor(Line, Color)
-
-order (Data | LineColor)
 
 view
 from #Render
@@ -51,6 +48,4 @@ from Data
    IMPLANT: "POINT"
    PEN: Stroke{1.5}
    VISIBLE :* SelectTrues["Visible"](Line)
-from LineColor
-   ID : Concatenate(Line,1)
-   PEN_COLOR: Color
+   PEN_COLOR:* SelectColors["Pen Colo"](Line)

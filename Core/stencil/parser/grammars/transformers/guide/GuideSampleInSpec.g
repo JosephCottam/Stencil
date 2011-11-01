@@ -13,8 +13,8 @@ options {
   package stencil.parser.string; 
   
   import stencil.parser.tree.*;
-  import static stencil.adapters.java2D.render.guides.Guide2D.SAMPLE_KEY;
-  import static stencil.adapters.java2D.render.guides.Guide2D.FIELDS_KEY;
+  import static stencil.display.Guide2D.SAMPLE_KEY;
+  import static stencil.display.Guide2D.FIELDS_KEY;
   import stencil.util.collections.ArrayUtil;
   
 }

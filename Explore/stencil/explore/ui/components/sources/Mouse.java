@@ -10,8 +10,9 @@ import javax.swing.JTextField;
 
 import stencil.explore.model.sources.MouseSource;
 import stencil.explore.model.sources.StreamSource;
-import stencil.tuple.prototype.TupleFieldDef;
+import stencil.tuple.prototype.TuplePrototypes;
 import stencil.util.streams.ui.MouseStream;
+import stencil.util.collections.ArrayUtil;
 
 public final class Mouse extends SourceEditor {
 	private static final long serialVersionUID = 2763272640758576637L;
@@ -24,13 +25,8 @@ public final class Mouse extends SourceEditor {
 
 	public Mouse(String name) {
 		super(name);
-		StringBuilder names = new StringBuilder();
-		for(TupleFieldDef def: MouseStream.PROTOTYPE) {
-			names.append(def.name());
-			names.append(",");
-		}
-		names.deleteCharAt(names.length()-1);
-		elements.setText(names.toString());
+		String names = ArrayUtil.prettyString(TuplePrototypes.getNames(MouseStream.PROTOTYPE));
+		elements.setText(names);
 		elements.setEditable(false);
 
 
