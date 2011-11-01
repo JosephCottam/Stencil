@@ -20,7 +20,7 @@ public class TwitterTuples implements TupleStream {
 	public static final TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS);
 	
 	private final String name;	//Name of the stream
-	private final TwitterStream generalStream;
+	private final TwitterStream twitter;
 	private final Queue<Status> queue = new ArrayDeque();
 
 	private final StatusListener listener = new StatusListenerImpl(queue);
@@ -41,30 +41,37 @@ public class TwitterTuples implements TupleStream {
 	}
 	
 	protected void finalize() {
-		generalStream.cleanUp();
+		twitter.shutdown();
+		twitter.cleanUp();
 	}
 	
-	public TwitterTuples(String name, String username, String password) throws TwitterException {
+	public TwitterTuples(String name, String topic) throws TwitterException {
 		this.name = name;
 		
 		ConfigurationBuilder builder = new ConfigurationBuilder();
-		builder.setUser(username)
-			   .setPassword(password)
-			   .setOAuthConsumerKey("M1COCjERiQlZHEpro5Aoxg")
+		builder.setOAuthConsumerKey("M1COCjERiQlZHEpro5Aoxg")
 			   .setOAuthConsumerSecret("XgVmCNShzpfKG1LhDUxwG5Z6nzzhO2xOHkRfqpwsnKc")
 			   .setOAuthAccessToken("18570099-nPaF5WO2h0XGRsvgeZSP6VPhXcKNUcSaIQkm4eM")
 			   .setOAuthAccessTokenSecret("Y8F3NcialrzXWou4OqAgrdYKvWMCnsS8WRd6INFuLtY");
 		Configuration config = builder.build();
 		
-		generalStream = new TwitterStreamFactory(config).getInstance();
-		generalStream.addListener(listener);
-		generalStream.sample();
+		twitter = new TwitterStreamFactory(config).getInstance();
+		twitter.addListener(listener);
+		if (topic.equals("")) {
+			twitter.sample();
+		} else {
+			FilterQuery query = new FilterQuery();
+			query.track(topic.split("\\s*,\\s*"));
+			twitter.filter(query);
+		}
 	}
 	
 	public SourcedTuple next() {		
 		Status s;
 		synchronized(queue) {s = queue.poll();}
 		if (s == null) {return null;}
+		
+		
 		
 		Object[] vals = new Object[PROTOTYPE.size()];
 		vals[0] =s.getText();

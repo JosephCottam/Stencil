@@ -10,15 +10,13 @@ import stencil.util.streams.twitter.TwitterTuples;
 
 public class TwitterSource extends StreamSource {
 	public static final String NAME = "Twitter";
-	private final String username;
-	private final String password;
+	private final String keywords;
 	
-	public TwitterSource(String name) {this(name, "","");}
+	public TwitterSource(String name) {this(name, "");}
 	
-	public TwitterSource(String name, String username, String password) {
+	public TwitterSource(String name, String keywords) {
 		super(name, TwitterTuples.PROTOTYPE.size());
-		this.username = username;
-		this.password = password;
+		this.keywords= keywords;
 	}
 
 	
@@ -27,7 +25,7 @@ public class TwitterSource extends StreamSource {
 
 	@Override
 	public TwitterTuples getStream(Model context) throws Exception {
-		return new TwitterTuples(name, username, password);
+		return new TwitterTuples(name, keywords);
 	}
 
 	public String header() {return "VALUE";}
@@ -38,21 +36,15 @@ public class TwitterSource extends StreamSource {
 	@Override
 	public TwitterSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new TwitterSource(name, username, password);
+		return new TwitterSource(name, keywords);
 	}
 
-	public String username() {return username;}
-	public TwitterSource username(String username) {
-		if (this.username.equals(username)) {return this;}
-		return new TwitterSource(name, username, password);
+	public String keywords() {return keywords;}
+	public TwitterSource keywords(String keywords) {
+		if (this.keywords.equals(keywords)) {return this;}
+		return new TwitterSource(name, keywords);
 	}
 
-	public String password() {return password;}
-	public TwitterSource password(String password) {
-		if (this.password.equals(password)) {return this;}
-		return new TwitterSource(name, username, password);
-	}
-	
 	@Override
 	public TwitterSource restore(BufferedReader input) throws IOException {
 		String line = input.readLine();
@@ -61,9 +53,9 @@ public class TwitterSource extends StreamSource {
 			if (line.startsWith("NAME")) {
 				String name = line.substring(line.indexOf(":") +2);
 				result = result.name(name);
-			} else if (line.startsWith("USERNAME")) {
-				String username = line.substring(line.indexOf(":") +2);
-				result = result.username(username);
+			} else if (line.startsWith("KEYWORDS")) {
+				String keywords = line.substring(line.indexOf(":") +2);
+				result = result.keywords(keywords);
 			}
 			input.mark(100);
 			line = input.readLine();
@@ -80,8 +72,8 @@ public class TwitterSource extends StreamSource {
 		b.append("NAME: ");
 		b.append(name);
 		b.append("\n");
-		b.append("USERNAME: ");
-		b.append(username);
+		b.append("KEYWORDS: ");
+		b.append(keywords);
 		b.append("\n");
 		return b.toString();
 

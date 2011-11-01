@@ -1,20 +1,16 @@
-STREAM: File
+STREAM: Twitter
 NAME: RawLines
-TUPLE_SIZE: 1
-SEPARATOR: $^
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
-SKIP: 0
-STRICT: true
+USERNAME: 
 
 import Layouts
 import Geometry : Geo
 
-stream RawLines(text)
+stream RawLines(message, user, date)
 
 stream Lines (line, text)
 from RawLines
    line: Count()
-   text: text
+   text: message
 
 stream RawWords (line, word)
 from Lines
