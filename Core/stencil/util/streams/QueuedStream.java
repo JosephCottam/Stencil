@@ -15,9 +15,15 @@ import stencil.tuple.stream.TupleStream;
  */
 public class QueuedStream implements TupleStream {
 	/**How large should the queue be at its maximum**/
-	public static int DEFAULT_QUEUE_SIZE = 50;		
+	public static int DEFAULT_QUEUE_SIZE = 50;
 	
-	/**Should queueing be done in a separate thread?**/
+	
+	/**To demo interactive features, it is useful to slow data streams down.
+	 * Most data streams are queued, so this delay factor is generally effective.
+	 * Interpreted in milliseconds.*/
+	public static int DELAY = 0;
+	
+	/**Should queuing be done in a separate thread?**/
 	public static boolean THREAD = false;			
 	
 	/**Tagging interface, indicates to the Stencil runtime that queuing is permitted.**/
@@ -68,6 +74,12 @@ public class QueuedStream implements TupleStream {
 
 	@Override
 	public SourcedTuple next() {
+		if (DELAY > 0) {
+			try {Thread.sleep(DELAY);}
+			catch (InterruptedException e) {/**Ignored**/}
+		}
+		
+		
 		if (loader == null && tupleCache.isEmpty()) {loadQueue();}
 		return tupleCache.poll();
 	}

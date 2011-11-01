@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 TUPLE_SIZE: 6
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/ViewCanvas/google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -10,16 +10,22 @@ NAME: Mouse
 FREQUENCY: -2147483648
 
 import ViewCanvas
+import Dates
 
 stream Stocks(Date, Open)
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
 order (Stocks | Mouse)
 
+stream AlignedStocks(Date, Open)
+from Stocks
+  Date : Parse[f:"dd-MMM-yy"](Date)
+  Open : Open
+
 view 
-from Stocks
+from AlignedStocks
     (HEIGHT, Y) : (canvas.HEIGHT, canvas.Y)
-from Stocks
+from AlignedStocks
     filter(prefilter.Margin < 50)
     filter(prefilter.TimeStep < prefilter.RIGHT)
     prefilter(TimeStep, Margin, RIGHT) : 
@@ -29,27 +35,24 @@ from Stocks
     X: Add(3, view.X)
 from Mouse
     filter(BUTTON = 1)
-    filter(SHIFT !~ "true")
     X : [dim] ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, dim.Width)
-from Mouse
-    filter(BUTTON = 1)
-    filter(SHIFT =~ "true")
-    Y: [dim] ScreenToCanvasDimension(0,DELTA_Y) -> Sub(dim.Height, view.Y)
-from Mouse
-    filter(CLICK_COUNT = 3)
-    filter(BUTTON = 1)
-    (X, Y, WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
-
 
 
 layer Ticker["POLY_POINT"]
-from Stocks
+guide axis[implant:"POINT"] Linear from Y
+         label.FONT: Font{20}
+      axis[unit: "MONTH", implant:"POINT"] Date from X
+		   label.TEXT: Parse.format[f:"MMM yy"](Input)
+         label.FONT: Font{20}
+from AlignedStocks
     ID: Count()
     GROUP : "Google"   
     X: TimeStep(Date) 
     Y: Open
     PEN: Stroke{1}
     PEN_COLOR: Color{BLUE}
+
+
 
 operator TimeStep (Date) -> (VALUE)
     default => VALUE : Index(Date) -> Mult(3, Index)
