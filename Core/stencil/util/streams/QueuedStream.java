@@ -59,6 +59,8 @@ public class QueuedStream implements TupleStream {
 		
 	}
 
+	@Override
+	public void stop() {source.stop();}
 	
 	@Override
 	public boolean hasNext() {

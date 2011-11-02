@@ -17,6 +17,7 @@ public class DelayStream implements TupleStream {
 		
 	public DelayStream(TupleStream source) {this.source=source;}
 	
+	
 	@Override
 	public boolean hasNext() {return source.hasNext();}
 
@@ -29,6 +30,9 @@ public class DelayStream implements TupleStream {
 		return source.next();
 	}
 
+	@Override
+	public void stop() {source.stop();}
+	
 	@Override
 	public void remove() {throw new UnsupportedOperationException();}
 }

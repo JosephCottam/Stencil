@@ -160,11 +160,14 @@ public class MouseStream implements TupleStream {
 		return prop == null  || !prop.toUpperCase().equals("TRUE");
 	}
 
-	public boolean ready() {
+	private boolean ready() {
 		synchronized (mouse) {
 			return hasNext() & !(frequency == ON_CHANGE && sequence == mouse.sequence || mouse.storedEvent == null);
 		}
 	}
+
+	@Override
+	public void stop() {source.removeMouseListener(mouse);}
 
 	/**Throws UnsupportedOpertaionException.*/
 	public void close() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}

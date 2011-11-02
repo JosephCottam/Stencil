@@ -100,11 +100,13 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	/**Close the tree stream.  The next operation will no longer work.
 	 * Has next will return false;
 	 */
-	public void close() throws Exception{
-		if (source != null && source.ready()) {
-			source.close();
-		}
-		source = null;
+	public void stop() {
+		try {
+			if (source != null && source.ready()) {
+				source.close();
+			}
+		} catch (Exception e) {}
+		finally {source = null;}
 	}
 
 	/**Returns true if the stream has been opened
@@ -114,7 +116,7 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	public boolean hasNext() {return source != null && !ended;}
 
 	public String getName() {return name;}
-
+	
 	/**Remove operation is not supported by the DelimitParser.
 	 * @exception UnsupportedOperationException is always thrown.*/
 	public void remove() {throw new UnsupportedOperationException("DelimitParser does not support remove operation.");}

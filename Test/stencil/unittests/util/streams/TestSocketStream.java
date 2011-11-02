@@ -42,8 +42,8 @@ public class TestSocketStream extends StencilTestCase {
 		assertFalse("New tuples not exhausted.", newTuples.hasNext());
 		assertFalse("Old tuples not exhausted.", oldTuples.hasNext() && oldTuples.next() != null);
 
-		oldTuples.close();
-		newTuples.close();
+		oldTuples.stop();
+		newTuples.stop();
 		
 		senderThread.stop();
 	}

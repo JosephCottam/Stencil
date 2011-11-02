@@ -46,5 +46,6 @@ public class RandomStream implements TupleStream {
 	public boolean hasNext() {return (length < 0 || count < length);}
 
 	public void remove() {throw new UnsupportedOperationException();}
+	public void stop() {}
 	public List<String> getFields() {return Arrays.asList(TuplePrototypes.getNames(prototype));}
 }

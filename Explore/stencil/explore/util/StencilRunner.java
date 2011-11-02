@@ -105,6 +105,7 @@ public final class StencilRunner extends Thread {
 
 				reporter.addMessage("Starting loading %1$s.", names);
 				loader.load();
+				input.stop();
 				reporter.addMessage("Finished load of %1$s (%2$,d tuples).", names, loader.getRecordsLoaded());
 				panel.repaint();
 			}

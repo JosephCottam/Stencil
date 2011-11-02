@@ -31,7 +31,7 @@ public final class TextSource extends StreamSource {
 			rows = text.split("\n");
 		}
 
-		public void close() throws Exception {closed = true;}
+		public void stop() {closed = true;}
 
 		public SourcedTuple next() {
 			if (!hasNext()) {throw new RuntimeException("Cannot call next when hasNext is false.");}

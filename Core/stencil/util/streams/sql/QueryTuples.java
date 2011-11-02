@@ -37,14 +37,12 @@ public class QueryTuples implements TupleStream, QueuedStream.Queable {
 	/**Closes connection.
 	 * Connection cannot be reset after this, it must be recreated.
 	 **/
-	public void close() throws Exception {
+	public void stop() {
 		try {
 			results.close();
 			statement.close();
 			connection.close();
-		} catch (Exception e) {
-			throw new Exception("Error closing SQL stream.", e);
-		}
+		} catch (Exception e) {}
 	}
 
 	public SourcedTuple next() {

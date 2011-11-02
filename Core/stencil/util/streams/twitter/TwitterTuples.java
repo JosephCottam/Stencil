@@ -40,8 +40,9 @@ public class TwitterTuples implements TupleStream {
 		}
 	}
 	
-	protected void finalize() {
-		twitter.shutdown();
+	protected void finalize() {stop();}
+
+	public void stop() {
 		twitter.cleanUp();
 	}
 	

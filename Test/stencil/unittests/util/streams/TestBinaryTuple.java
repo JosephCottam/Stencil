@@ -17,7 +17,7 @@ public class TestBinaryTuple extends StencilTestCase {
 	public void testEncodeDecode() throws Exception {
 		DelimitedParser source = coordStream();
 		prepBinary(source, COORD_TUPLES_FILE, COORD_TYPES);
-		source.close();
+		source.stop();
 
 		DelimitedParser oldTuples = coordStream();
 		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader(oldTuples.getName(), COORD_TUPLES_FILE);
@@ -40,15 +40,15 @@ public class TestBinaryTuple extends StencilTestCase {
 		assertTrue("Old tuples not exhausted.", !oldTuples.hasNext() || oldTuples.next() == null);
 		assertTrue("New tuples not exhausted.", !newTuples.hasNext() || newTuples.next() == null);
 
-		oldTuples.close();
-		newTuples.close();
+		oldTuples.stop();
+		newTuples.stop();
 	}
 
 	
 	public void testTrovesSpeed() throws Exception {
 		DelimitedParser source = trovesStream();		
 		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
-		source.close();		
+		source.stop();		
 		source = trovesStream();
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE);
 		testSpeed("trove unqueued", source, binSource);
@@ -59,7 +59,7 @@ public class TestBinaryTuple extends StencilTestCase {
 		
 		DelimitedParser source = trovesStream();		
 		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
-		source.close();
+		source.stop();
 		
 		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
 		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
@@ -70,7 +70,7 @@ public class TestBinaryTuple extends StencilTestCase {
 	public void testCoordSpeed() throws Exception {
 		DelimitedParser reSource = coordStream();
 		prepBinary(reSource, COORD_TUPLES_FILE, COORD_TYPES);
-		reSource.close();
+		reSource.stop();
 		
 		reSource = coordStream();
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(reSource.getName(), COORD_TUPLES_FILE);

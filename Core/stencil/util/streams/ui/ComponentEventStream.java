@@ -116,6 +116,6 @@ public final class ComponentEventStream implements TupleStream {
 	/**Throws UnsupportedOpertaionException.*/
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 
-	/**Throws UnsupportedOpertaionException.*/
-	public void close() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
+	@Override
+	public void stop() {}
 }

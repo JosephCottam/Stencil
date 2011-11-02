@@ -11,7 +11,6 @@ import stencil.tuple.stream.TupleStream;
 
 import java.io.DataInputStream;
 import java.io.InputStream;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -84,7 +83,12 @@ public abstract class KeyboardStream implements TupleStream {
 		}
 
 		public boolean hasNext() {return buffer != -1;}
-		public void close() throws IOException {stream.close(); buffer=(char)-1;}
+		public void stop() {
+			try {stream.close();}
+			catch(Exception e) {throw new RuntimeException("Error closing buffer.", e);}
+			finally {buffer=(char)-1;}
+		}
+		
 		public SourcedTuple next() {return new SourcedTuple.Wrapper(source, read());}
 	}
 
@@ -118,7 +122,7 @@ public abstract class KeyboardStream implements TupleStream {
 			return new SourcedTuple.Wrapper(source, t);
 		}
 
-		public void close() {
+		public void stop() {
 			control.removeKeyListener(this);
 			buffer.clear();
 		}
@@ -142,5 +146,5 @@ public abstract class KeyboardStream implements TupleStream {
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	
 	/**Close stream, disposing of relevant resources.*/
-	public abstract void close() throws Exception;
+	public abstract void stop();
 }

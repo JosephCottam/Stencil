@@ -40,6 +40,9 @@ public class ConvertingStream implements TupleStream {
 	}
 
 	@Override
+	public void stop() {source.stop();}
+	
+	@Override
 	public void remove() {throw new UnsupportedOperationException();}
 	
 	public TupleStream rootStream() {return source;}

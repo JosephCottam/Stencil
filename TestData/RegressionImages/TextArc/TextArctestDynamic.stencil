@@ -2,7 +2,7 @@ STREAM: File
 NAME: RawLines
 TUPLE_SIZE: 1
 SEPARATOR: $^
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
@@ -47,6 +47,7 @@ from Lines
    ID: line
    TEXT: text
    (X,Y):* Layout(line)
+   IMPLANT: "LARGEST"
 
 
 layer Center["TEXT"]
@@ -55,6 +56,7 @@ from Words
    TEXT: word
    (X,Y):* Centroid(word) -> Contract(Centroid.X, Centroid.Y) 
    REGISTRATION: "CENTER"
+   IMPLANT: "LARGEST"
    (COLOR, FONT):* 
         [count] WordCount.query(word) -> Range[ALL](@Max, _) 
         -> [freq]  Divide(count, _) 
@@ -75,6 +77,6 @@ operator Centroid (word) -> (X,Y)
             
 
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
-operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]
+operator Layout : CircularLayout[start: 0, size: 10]
 operator Contract : Geo::Scale[by: .94]
 operator LineCount : Count

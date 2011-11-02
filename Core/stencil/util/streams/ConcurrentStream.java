@@ -28,6 +28,9 @@ public class ConcurrentStream implements TupleStream {
 		this.streams=streams;
 		offset = 0;
 	}
+	
+	@Override
+	public void stop() {for (TupleStream stream: streams) {stream.stop();}}
 
 	public SourcedTuple next() {
 		SourcedTuple nv = null;

@@ -30,6 +30,6 @@ public class SequenceStream implements TupleStream {
 	}
 
 	public boolean hasNext() {return increment>0 ? current < stop : current > stop;}
-
+	public void stop() {}
 	public void remove() {throw new UnsupportedOperationException();}
 }

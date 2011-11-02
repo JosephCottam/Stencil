@@ -37,7 +37,7 @@ public class TestDelimitParser extends TestCase {
 		DelimitedParser p = coordStream();
 		Assert.assertTrue("HasNext false after creation", p.hasNext());
 		
-		p.close();
+		p.stop();
 		Assert.assertFalse("Hasnext true after close.", p.hasNext());
 		
 		int i=0;
@@ -57,7 +57,7 @@ public class TestDelimitParser extends TestCase {
 	public void testClose() throws Exception {
 		DelimitedParser p = coordStream();
 		Assert.assertTrue("Stream not ready after open.", p.hasNext());
-		p.close();
+		p.stop();
 		Assert.assertFalse("Stream did not close.", p.hasNext());
 		
 		try {

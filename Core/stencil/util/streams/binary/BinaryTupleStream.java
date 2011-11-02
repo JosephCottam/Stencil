@@ -194,7 +194,11 @@ public class BinaryTupleStream {
 			}
 		}
 
-		public void close() throws Exception {input.close();}
+		public void stop() {
+			try {input.close();}
+			catch (Exception e) {}
+		}
+		
 		@Override
 		public void remove() {throw new UnsupportedOperationException();}
 	

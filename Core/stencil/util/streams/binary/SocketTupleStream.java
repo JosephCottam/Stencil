@@ -84,13 +84,16 @@ public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
 		} catch (EOFException e) {
 			return;
 		} catch (Exception e) {
-			try {close();
+			try {stop();
 				throw e;}
 			catch (Exception ex) {throw new RuntimeException("Error closing socket", ex);}
 		}
 	}
 
-	public void close() throws Exception {socket.close();}
+	public void stop() {
+		try {socket.close();}
+		catch (Exception e) {}
+	}
 	
 	@Override
 	public void remove() {throw new UnsupportedOperationException();}

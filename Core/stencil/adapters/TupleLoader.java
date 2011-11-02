@@ -90,5 +90,7 @@ public class TupleLoader implements Runnable {
 	 * Stop will actually occur after the current tuple (if any) has finished processing.
 	 * @param value
 	 */
-	public synchronized void signalStop() {keepRunning = false;}
+	public synchronized void signalStop() {
+		keepRunning = false;
+	}
 }
