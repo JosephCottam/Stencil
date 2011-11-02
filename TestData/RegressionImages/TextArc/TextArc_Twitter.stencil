@@ -1,6 +1,6 @@
 STREAM: Twitter
 NAME: RawLines
-USERNAME: 
+KEYWORDS: Obama, Washington, Congress
 
 import Layouts
 import Geometry : Geo
@@ -9,7 +9,7 @@ stream RawLines(message, user, date)
 
 stream Lines (line, text)
 from RawLines
-   line: Count()
+   line: LineCount()
    text: message
 
 stream RawWords (line, word)
@@ -47,10 +47,11 @@ from Words
    (X,Y):* Centroid(word) -> Contract(Centroid.X, Centroid.Y) 
    REGISTRATION: "CENTER"
    (COLOR, FONT):* 
-        [count] WordCount.query(word) -> Range[ALL](@Max, _) -> 
-        [freq]  Divide(count, _) -> 
-        [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq) ->
-                Scale[min: 50, max:1000](freq) -> Font{{_}} -> (color, _)
+        [count] WordCount.query(word) -> Range[ALL](@Max, _) 
+        -> [freq]  Divide(count, _) 
+        -> [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq)
+                -> LineCount.query() -> Log(LineCount, count) -> Mult(LineCount, Log) 
+                -> DScale(freq,50,Mult) -> Font{{_}} -> (color, _)
 
 operator WordCount : Count
 
@@ -67,4 +68,5 @@ operator Centroid (word) -> (X,Y)
 /*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
 operator Layout : CircularLayout[start: 0, size: 10, ratio: .75]
 operator Contract : Geo::Scale[by: .94]
+operator LineCount: Count
 

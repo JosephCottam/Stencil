@@ -523,7 +523,67 @@ public class Projection extends BasicModule {
 		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
 	}
 	
+	/**Projects one range of values into another.
+	 * The target range is statically specified by the specializer.
+	 * The source range is constructed based upon input.
+	 * 
+	 * This operator only works with numbers, but using Rank to convert
+	 * arbitrary values to numbers can be used to scale arbitrary items. 
+	 * @author jcottam
+	 */
+	@Operator(spec="[min: 0, max: 1, inMin: NULL, inMax: NULL]")
+	public static final class DScale extends AbstractOperator.Statefull {
+		private static final String IN_MAX = "inMax";
+		private static final String IN_MIN = "inMin";
+		
+		double inMin = Double.MAX_VALUE;
+		double inMax = Double.MIN_VALUE;		
+		
+		public DScale(OperatorData od, Specializer spec) {
+			super(od);
+			
+			if (spec.containsKey(IN_MAX) && spec.get(IN_MAX) != null) {
+				inMax = Converter.toDouble(spec.get(IN_MAX));
+			} 
+			
+			if (spec.containsKey(IN_MIN) && spec.get(IN_MIN) != null) {
+				inMin = Converter.toDouble(spec.get(IN_MIN));
+			}
+		}
 
+		public DScale(OperatorData od) {super(od);}
+		
+		@Facet(memUse="WRITER", prototype="(double value)")
+		public double map(double dv, double outMin, double outMax) {
+			double newInMin = Math.min(dv, inMin);
+			double newInMax = Math.max(dv, inMax);
+			if (newInMin != inMin) {
+				inMin = newInMin;
+				stateID++;
+			}
+			
+			if (newInMax != inMax) {
+				inMax = newInMax;
+				stateID++;
+			}
+			
+			return query(dv, outMax, outMin);   
+		}
+
+		@Facet(memUse="READER", prototype="(double value)")
+		public double query(double v, double outMin, double outMax) {
+			double span = outMax-outMin;
+			double percent = (v-inMin)/inMax;
+			double value = span*percent + outMin;
+			
+			return value;
+		}
+		
+		
+		public DScale duplicate() {return new DScale(operatorData);}
+	}
+	
+	
 	/**Perform a linear interpolation between zero and one, returning the Percent, mIn and maX (thus PIX).*/
 	@Operator
 	public static final class PIX extends AbstractOperator.Statefull {
