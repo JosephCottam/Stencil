@@ -89,7 +89,7 @@ public final class Text extends stencil.explore.ui.components.sources.SourceEdit
 	}
 
 	public TextSource get() {
-		return new TextSource(name, Integer.parseInt(tupleSize.getText()), separator.getText(), data.getText());
+		return new TextSource(name, Integer.parseInt(tupleSize.getText()), separator.getText(), data.getText(), delay.isSelected());
 	}
 
 }

@@ -14,9 +14,9 @@ public final class BinarySource extends StreamSource {
 
 	private final String filename;
 	
-	public BinarySource(String name) {this(name, "");}
-	public BinarySource(String name,String filename) {
-		super(name, -1);
+	public BinarySource(String name) {this(name, "", false);}
+	public BinarySource(String name,String filename, boolean delay) {
+		super(name, -1, delay);
 		this.filename = filename;
 	}
 
@@ -71,12 +71,17 @@ public final class BinarySource extends StreamSource {
 
 	public BinarySource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new BinarySource(name, filename);
+		return new BinarySource(name, filename, delay);
+	}
+	
+	public BinarySource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new BinarySource(name, filename, delay);
 	}
 	
 	public String filename() {return filename;}
 	public BinarySource filename(String filename) {
 		if (this.filename.equals(filename)) {return this;}
-		return new BinarySource(name, filename);
+		return new BinarySource(name, filename, delay);
 	}
 }

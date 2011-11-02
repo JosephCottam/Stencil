@@ -44,7 +44,7 @@ public class Twitter extends SourceEditor {
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public TwitterSource get() {
-		return new TwitterSource(name, keywords.getText());
+		return new TwitterSource(name, keywords.getText(), delay.isSelected());
 	}
 
 	/**Set the current state to match the source passed.

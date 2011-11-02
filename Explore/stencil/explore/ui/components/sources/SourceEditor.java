@@ -1,6 +1,8 @@
 package stencil.explore.ui.components.sources;
 
 import java.awt.BorderLayout;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -22,12 +24,24 @@ import stencil.explore.model.sources.StreamSource;
 public abstract class SourceEditor extends JPanel {
 	protected String name;
 	
+	protected final JCheckBox delay = new JCheckBox();
+	
 	public SourceEditor(String name) {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.name =name;
+		this.add(labeledPanel("Delay: ", delay));
 	}
 	
-	protected void set(StreamSource source) {this.name = source.name();}
+	protected void set(StreamSource source) {
+		this.name = source.name();
+		delay.setSelected(source.delay());
+		
+		delay.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent arg0) {/*No action.*/}
+			public void focusLost(FocusEvent arg0) {saveValues();}
+		});
+
+	}
 	protected abstract StreamSource get();
 	
 	protected void saveValues() {

@@ -38,7 +38,7 @@ public class Random extends SourceEditor {
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public RandomSource get() {
-		return new RandomSource(name, Integer.parseInt(size.getText()), Long.parseLong(length.getText()));
+		return new RandomSource(name, Integer.parseInt(size.getText()), Long.parseLong(length.getText()), delay.isSelected());
 	}
 
 	/**Set the current state to match the source passed.

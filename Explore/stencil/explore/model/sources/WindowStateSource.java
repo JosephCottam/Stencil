@@ -24,9 +24,9 @@ public class WindowStateSource extends StreamSource {
 
 	private final boolean onChange;
 	
-	public WindowStateSource(String name) {this(name, false);}
-	public WindowStateSource(String name, boolean onChange) {
-		super(name, 0);
+	public WindowStateSource(String name) {this(name, false, false);}
+	public WindowStateSource(String name, boolean onChange, boolean delay) {
+		super(name, 0, delay);
 		this.onChange = onChange;
 	}
 	
@@ -35,14 +35,20 @@ public class WindowStateSource extends StreamSource {
 
 	public WindowStateSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new WindowStateSource(name, onChange);
+		return new WindowStateSource(name, onChange, delay);
 	}
 
 	public boolean onChange() {return onChange;}
 	public WindowStateSource onChange(boolean onChange) {
 		if (this.onChange == onChange) {return this;}
-		return new WindowStateSource(name, onChange);
+		return new WindowStateSource(name, onChange, delay);
 	}
+
+	public WindowStateSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new WindowStateSource(name, onChange, delay);
+	}
+
 	
 	
 	public TupleStream getStream(Model context) throws Exception {

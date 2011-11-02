@@ -42,6 +42,6 @@ public class WindowState extends SourceEditor {
 	}
 	
 	protected StreamSource get() {
-		return new WindowStateSource(name, onChange.isSelected());
+		return new WindowStateSource(name, onChange.isSelected(), delay.isSelected());
 	}
 }

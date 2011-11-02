@@ -12,10 +12,10 @@ public class TwitterSource extends StreamSource {
 	public static final String NAME = "Twitter";
 	private final String keywords;
 	
-	public TwitterSource(String name) {this(name, "");}
+	public TwitterSource(String name) {this(name, "", false);}
 	
-	public TwitterSource(String name, String keywords) {
-		super(name, TwitterTuples.PROTOTYPE.size());
+	public TwitterSource(String name, String keywords, boolean delay) {
+		super(name, TwitterTuples.PROTOTYPE.size(), delay);
 		this.keywords= keywords;
 	}
 
@@ -36,14 +36,20 @@ public class TwitterSource extends StreamSource {
 	@Override
 	public TwitterSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new TwitterSource(name, keywords);
+		return new TwitterSource(name, keywords, delay);
 	}
 
 	public String keywords() {return keywords;}
 	public TwitterSource keywords(String keywords) {
 		if (this.keywords.equals(keywords)) {return this;}
-		return new TwitterSource(name, keywords);
+		return new TwitterSource(name, keywords, delay);
 	}
+	
+	public TwitterSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new TwitterSource(name, keywords, delay);
+	}
+
 
 	@Override
 	public TwitterSource restore(BufferedReader input) throws IOException {

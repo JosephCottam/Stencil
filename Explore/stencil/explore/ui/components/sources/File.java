@@ -61,8 +61,6 @@ public class File extends SourceEditor {
 		this.add(labeledPanel("File: ", filename, fileList));
 		this.add(labeledPanel("Skip Lines: ", skip));
 		this.add(labeledPanel("Strict: ", strict));
-		
-
 
 		FocusListener fl = new FocusListener() {
 			public void focusGained(FocusEvent arg0) {/*No action.*/}
@@ -79,7 +77,7 @@ public class File extends SourceEditor {
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public FileSource get() {
-		return new FileSource(name, Integer.parseInt(size.getText()), filename.getText(), separator.getText(), Integer.parseInt(skip.getText()), strict.isSelected());
+		return new FileSource(name, Integer.parseInt(size.getText()), filename.getText(), separator.getText(), Integer.parseInt(skip.getText()), strict.isSelected(), delay.isSelected());
 	}
 
 	/**Set the current state to match the source passed.

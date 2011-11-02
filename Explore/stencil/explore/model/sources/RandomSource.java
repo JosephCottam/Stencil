@@ -13,10 +13,10 @@ public class RandomSource extends StreamSource {
 	public static final String NAME = "RandomNumbers";
 	private final long length;
 	
-	public RandomSource(String name) {this(name, 1, Integer.MIN_VALUE);}
+	public RandomSource(String name) {this(name, 1, Integer.MIN_VALUE, false);}
 	
-	public RandomSource(String name, int size, long length) {
-		super(name, size);
+	public RandomSource(String name, int size, long length, boolean delay) {
+		super(name, size, delay);
 		this.length = length;
 	}
 
@@ -52,20 +52,26 @@ public class RandomSource extends StreamSource {
 	@Override
 	public RandomSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new RandomSource(name, tupleSize, length);
+		return new RandomSource(name, tupleSize, length, delay);
 	}
 
 	public int size() {return tupleSize;}
 	public RandomSource tupleSize(int size) {
 		if (this.tupleSize == size) {return this;}
-		return new RandomSource(name, size, length);
+		return new RandomSource(name, size, length, delay);
 	}
 	
 	public long length() {return length;}
 	public RandomSource length(long length) {
 		if (this.length == length) {return this;}
-		return new RandomSource(name, tupleSize, length);
+		return new RandomSource(name, tupleSize, length, delay);
 	}
+	
+	public RandomSource delay(boolean delay) {
+		if (this.delay == delay) {return this;}
+		return new RandomSource(name, tupleSize, length, delay);
+	}
+
 	
 	@Override
 	public RandomSource restore(BufferedReader input) throws IOException {

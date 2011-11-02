@@ -13,7 +13,7 @@ import stencil.util.streams.ui.MouseStream;
 public class MouseSource extends StreamSource {
 	public static final String NAME = "Mouse";
 
-	public MouseSource(String name) {super(name, -1);}
+	public MouseSource(String name) {super(name, -1, false);}
 	public SourceEditor getEditor() {return new Mouse(name);}
 	public boolean isReady() {return true;}
 	public TupleStream getStream(Model context) {
@@ -24,6 +24,10 @@ public class MouseSource extends StreamSource {
 		if(this.name.equals(name)) {return this;}
 		return new MouseSource(name);
 	}
+
+	/**Ignores the parameter, no delay is applied.*/
+	public MouseSource delay(boolean delay) {return this;}
+
 
 	public String toString() {
 		StringBuilder b = new StringBuilder();

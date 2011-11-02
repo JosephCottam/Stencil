@@ -14,10 +14,10 @@ public class SequenceSource extends StreamSource {
 	private final double increment;
 	private final double stop;
 	
-	public SequenceSource(String name) {this(name, 0,1, Double.MAX_VALUE);}
+	public SequenceSource(String name) {this(name, 0,1, Double.MAX_VALUE, false);}
 	
-	public SequenceSource(String name, double start, double increment, double stop) {
-		super(name,1);
+	public SequenceSource(String name, double start, double increment, double stop, boolean delay) {
+		super(name,1, delay);
 		this.start= start;
 		this.increment = increment;
 		this.stop = stop;
@@ -40,26 +40,32 @@ public class SequenceSource extends StreamSource {
 	@Override
 	public SequenceSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new SequenceSource(name, start, increment, stop);
+		return new SequenceSource(name, start, increment, stop, delay);
 	}
 
 	public double start() {return start;}
 	public SequenceSource start(double start) {
 		if (this.start == start) {return this;}
-		return new SequenceSource(name, start, increment, stop);
+		return new SequenceSource(name, start, increment, stop, delay);
 	}
 
 	public double increment() {return increment;}
 	public SequenceSource increment(double increment) {
 		if (this.increment == increment) {return this;}
-		return new SequenceSource(name, start, increment, stop);
+		return new SequenceSource(name, start, increment, stop, delay);
 	}
 	
 	public double stop() {return stop;}
 	public SequenceSource stop(double stop) {
 		if (this.stop == stop) {return this;}
-		return new SequenceSource(name, start, increment, stop);
+		return new SequenceSource(name, start, increment, stop, delay);
 	}
+	
+	public SequenceSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new SequenceSource(name, start, increment, stop, delay);
+	}
+
 	
 	@Override
 	public SequenceSource restore(BufferedReader input) throws IOException {

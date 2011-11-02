@@ -40,7 +40,7 @@ public class Database extends SourceEditor {
 
 	/**Sets the passed file source. Sources cannot be null.*/
 	public DBSource get() {
-		DBSource s = new DBSource(name, Integer.parseInt(size.getText()), query.getText(), connect.getText(), driver.getText());
+		DBSource s = new DBSource(name, Integer.parseInt(size.getText()), query.getText(), connect.getText(), driver.getText(), delay.isSelected());
 		return s;
 	}
 

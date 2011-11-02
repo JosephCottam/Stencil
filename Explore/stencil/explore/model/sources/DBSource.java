@@ -16,10 +16,10 @@ public class DBSource extends StreamSource {
 	private final String connect;
 	private final String driver;
 
-	public DBSource(String name) {this(name, 0, "","","");}
+	public DBSource(String name) {this(name, 0, "","","", false);}
 	
-	public DBSource(String name, int size, String query, String connect, String driver) {
-		super(name, size);
+	public DBSource(String name, int size, String query, String connect, String driver, boolean delay) {
+		super(name, size, delay);
 		this.query = query;
 		this.connect = connect;
 		this.driver = driver;
@@ -39,33 +39,39 @@ public class DBSource extends StreamSource {
 
 	public DBSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new DBSource(name, tupleSize, query, connect, driver);
+		return new DBSource(name, tupleSize, query, connect, driver, delay);
 	}
 
 	public DBSource tupleSize(int size) {
 		if (size == this.tupleSize) {return this;}
-		return new DBSource(name, size, query, connect, driver);
+		return new DBSource(name, size, query, connect, driver, delay);
 	}
 
 	
 	public String query() {return query;}
 	public DBSource query(String query) {
 		if (this.query.equals(query)) {return this;}
-		return new DBSource(name, tupleSize, query, connect, driver);
+		return new DBSource(name, tupleSize, query, connect, driver, delay);
 	}
 
 	public String connect() {return connect;}
 	public DBSource connect(String connect) {
 		if (this.connect.equals(connect)) {return this;}
-		return new DBSource(name, tupleSize, query, connect, driver);
+		return new DBSource(name, tupleSize, query, connect, driver, delay);
 	}
 
 
 	public String driver() {return driver;}
 	public DBSource driver(String driver) {
 		if (this.driver.equals(driver)) {return this;}
-		return new DBSource(name, tupleSize, query, connect, driver);
+		return new DBSource(name, tupleSize, query, connect, driver, delay);
 	}
+	
+	public DBSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new DBSource(name, tupleSize, query, connect, driver, delay);
+	}
+
 
 
 	public String toString() {

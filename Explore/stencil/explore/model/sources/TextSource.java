@@ -60,9 +60,9 @@ public final class TextSource extends StreamSource {
 	private final String separator;
 	private final String text;
 
-	public TextSource(String name) {this(name, 0, null, null);}
-	public TextSource(String name, int size, String separator, String text) {
-		super(name, size);
+	public TextSource(String name) {this(name, 0, null, null, false);}
+	public TextSource(String name, int size, String separator, String text, boolean delay) {
+		super(name, size, delay);
 		this.separator = separator;
 		this.text = text;
 	}
@@ -73,25 +73,31 @@ public final class TextSource extends StreamSource {
 
 	public TextSource name(String name) {
 		if(this.name.equals(name)) {return this;}
-		return new TextSource(name, tupleSize, separator, text);		
+		return new TextSource(name, tupleSize, separator, text, delay);		
 	}
 	
 	public TextSource tupleSize(int size) {
 		if (this.tupleSize == size) {return this;}
-		return new TextSource(name, size, separator, text);
+		return new TextSource(name, size, separator, text, delay);
 	}
 
 	public String separator() {return separator;}
 	public TextSource separator(String separator) {
 		if(this.separator.equals(separator)) {return this;}
-		return new TextSource(name, tupleSize, separator, text);
+		return new TextSource(name, tupleSize, separator, text, delay);
 	}
 
 	public String text() {return text;}
 	public TextSource text(String text) {
 		if(this.text.equals(text)) {return this;}
-		return new TextSource(name, tupleSize, separator, text);
+		return new TextSource(name, tupleSize, separator, text, delay);
 	}
+	
+	public TextSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new TextSource(name, tupleSize, separator, text, delay);
+	}
+
 
 	public TupleStream getStream(Model context) throws Exception {return new TextStream(name, tupleSize, separator, text);}
 

@@ -15,6 +15,7 @@ import stencil.explore.model.Model;
 import stencil.explore.model.sources.*;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ConcurrentStream;
+import stencil.util.streams.DelayStream;
 import stencil.util.streams.QueuedStream;
 import stencil.interpreter.tree.Order;
 import stencil.interpreter.tree.Program;
@@ -92,6 +93,8 @@ public final class StencilRunner extends Thread {
 					if (stream instanceof BinarySource) {stream=resolvePaths(((BinarySource) stream));}
 					input = stream.getStream(model);
 					if (input instanceof QueuedStream.Queable) {input = new QueuedStream(input);}
+					if (stream.delay()) {input = new DelayStream(input);}
+							
 					streams.add(input);
 				}
 

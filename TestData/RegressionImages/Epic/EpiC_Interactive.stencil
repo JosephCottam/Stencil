@@ -1,11 +1,4 @@
 STREAM: File
-NAME: LineColor
-TUPLE_SIZE: 2
-SEPARATOR: \s*,\s*
-SOURCE: ./LineColor.txt
-SKIP: 1
-STRICT: true
-STREAM: File
 NAME: Data
 TUPLE_SIZE: 3
 SEPARATOR: \s*,\s*
@@ -48,4 +41,4 @@ from Data
    IMPLANT: "POINT"
    PEN: Stroke{1.5}
    VISIBLE :* SelectTrues["Visible"](Line)
-   PEN_COLOR:* SelectColors["Pen Colo"](Line)
+   PEN_COLOR:* SelectColors["Pen Color"](Line)

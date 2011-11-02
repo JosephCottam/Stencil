@@ -17,9 +17,9 @@ public final class FileSource extends StreamSource {
 	private final int skip;
 	private final boolean strict;
 	
-	public FileSource(String name) {this(name, 0,"","", 0, true);}
-	public FileSource(String name, int size, String filename, String separator, int skip, boolean strict) {
-		super(name, size);
+	public FileSource(String name) {this(name, 0,"","", 0, true, false);}
+	public FileSource(String name, int size, String filename, String separator, int skip, boolean strict, boolean delay) {
+		super(name, size, delay);
 		this.filename = filename;
 		this.separator = separator;
 		this.skip = skip;
@@ -103,35 +103,43 @@ public final class FileSource extends StreamSource {
 
 	public FileSource name(String name) {
 		if (this.name.equals(name)) {return this;}
-		return new FileSource(name, tupleSize, filename, separator, skip, strict);
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
 	}
 	
 	public String filename() {return filename;}
 	public FileSource filename(String filename) {
 		if (this.filename.equals(filename)) {return this;}
-		return new FileSource(name, tupleSize, filename, separator, skip, strict);
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
 	}
 
 	public FileSource tupleSize(int size) {
 		if (size == this.tupleSize) {return this;}
-		return new FileSource(name, size, filename, separator, skip, strict);
+		return new FileSource(name, size, filename, separator, skip, strict, delay);
 	}
 
 	public String separator() {return separator;}
 	public FileSource separator(String separator) {
 		if (this.separator.equals(separator)) {return this;}
-		return new FileSource(name, tupleSize, filename, separator, skip, strict);
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
 	}
 
 	public int skip() {return skip;}
 	public FileSource skip(int skip) {
 		if (this.skip == skip) {return this;}
-		return new FileSource(name, tupleSize, filename, separator, skip, strict);
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
 	}
 	
 	public boolean strict() {return strict;}
 	public FileSource strict(boolean strict) {
 		if (this.strict == strict) {return this;}
-		return new FileSource(name, tupleSize, filename, separator, skip, strict);
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
 	}
+
+	public FileSource delay(boolean delay) {
+		if (delay == this.delay) {return this;}
+		return new FileSource(name, tupleSize, filename, separator, skip, strict, delay);
+	}
+
 }
+
+

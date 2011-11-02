@@ -13,10 +13,12 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 
 	protected final String name;
 	protected final int tupleSize;
+	protected final boolean delay;
 
-	protected StreamSource(String name, int size) {
+	protected StreamSource(String name, int size, boolean delay) {
 		this.name = name;
 		this.tupleSize = size;
+		this.delay = delay;
 		SourceCache.put(this);
 	}
 
@@ -38,6 +40,9 @@ public abstract class StreamSource implements Comparable<StreamSource> {
 
 	public int size() {return tupleSize;}
 	public StreamSource tupleSize(int size) {throw new UnsupportedOperationException();}
+	
+	public boolean delay() {return delay;}
+	public abstract StreamSource delay(boolean delay);
 	
 	/**What type of stream is this?
 	 * Looks for a static field called "NAME", if not

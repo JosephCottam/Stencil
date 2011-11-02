@@ -65,7 +65,7 @@ public class Binary extends SourceEditor {
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public BinarySource get() {
-		return new BinarySource(name, filename.getText());
+		return new BinarySource(name, filename.getText(), delay.isSelected());
 	}
 
 	/**Set the current state to match the source passed.

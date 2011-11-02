@@ -22,7 +22,7 @@ public class Configure {
 
 	public static final String QUEUED_LOADER_SIZE_KEY = "queuedLoader_size";
 	public static final String QUEUED_LOADER_THREAD_KEY = "queuedLoader_thread";
-	public static final String QUEUED_LOADER_DELAY_KEY = "queuedLoader_delay";
+	public static final String STREAM_DELAY_KEY = "streamDelay";
 	
 	private Configure() {/*Utility, non-instantiable class.*/}
 
@@ -51,8 +51,8 @@ public class Configure {
 			stencil.util.streams.QueuedStream.THREAD=Boolean.parseBoolean(props.getProperty(QUEUED_LOADER_THREAD_KEY));
 		}
 		
-		if (props.containsKey(QUEUED_LOADER_DELAY_KEY)) {
-			stencil.util.streams.QueuedStream.DELAY=Integer.parseInt(props.getProperty(QUEUED_LOADER_DELAY_KEY));
+		if (props.containsKey(STREAM_DELAY_KEY)) {
+			stencil.util.streams.DelayStream.DELAY=Integer.parseInt(props.getProperty(STREAM_DELAY_KEY));
 		}		
 	}
 

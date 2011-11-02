@@ -42,7 +42,7 @@ public class Sequence extends SourceEditor {
 	/**Sets the passed file source.
 	 * If source is null, the save target will be returned.*/
 	public SequenceSource get() {
-		return new SequenceSource (name, Double.parseDouble(start.getText()), Double.parseDouble(increment.getText()), Double.parseDouble(stop.getText()));
+		return new SequenceSource (name, Double.parseDouble(start.getText()), Double.parseDouble(increment.getText()), Double.parseDouble(stop.getText()), delay.isSelected());
 	}
 
 	/**Set the current state to match the source passed.
