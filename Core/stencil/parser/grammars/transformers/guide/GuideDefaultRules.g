@@ -62,6 +62,8 @@ options {
         if (!names.contains(Y_FIELD)) {
            adaptor.addChild(rules, ParseStencil.ruleTree(Y_FIELD, Y_FIELD));
         }
+     } else if (guideType.equals("title")) {
+        //No rules!
      } else {          
        for (StencilTree s: g.find(LIST_SELECTORS)) {
           String boundField = s.getText();

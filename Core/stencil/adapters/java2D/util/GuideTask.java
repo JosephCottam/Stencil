@@ -7,6 +7,7 @@ import java.awt.geom.Rectangle2D;
 import stencil.display.Display;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
+import stencil.display.DisplayLayer;
 import stencil.interpreter.tree.Guide;
 
 /**Update a single guide's data.
@@ -38,9 +39,20 @@ public class GuideTask extends UpdateTask<Guide> {
 	}
 	
 	public Finisher update() {
+		DisplayLayer layer = layerFor(identifier);
+		
 		DisplayGuide guide = canvas.getGuide(identifier);
-		viewpointFragment.update(guide, canvas.contentBounds(false), canvas.viewTransform());
+		viewpointFragment.update(guide, layer.bounds().basis(), canvas.viewTransform());
 		return UpdateTask.NO_WORK;
+	}
+	
+	private DisplayLayer layerFor(String id) {
+		String layerId = id.substring(0, id.indexOf(" "));
+		DisplayLayer[] layers = ((stencil.adapters.java2D.Canvas) canvas).layers;
+		for (DisplayLayer layer:layers) {
+			if (layer.name().equals(layerId)) {return layer;}
+		}
+		throw new Error();
 	}
 	
 }

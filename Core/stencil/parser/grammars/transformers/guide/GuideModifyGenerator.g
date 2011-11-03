@@ -193,9 +193,9 @@ repack
 
 //Have the generator use the sample frame where it used to use the stream frame--------------------
 rename 
-   : ^(TUPLE_REF fr=ID fi=. r+=.*)
+   : ^(tr=TUPLE_REF fr=ID fi=. r+=.*)
       {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText())}? 
-        -> ^(TUPLE_REF ID[STREAM_FRAME] ID["#Sample"] $r*)
-   | ^(TUPLE_REF fr=ID)
+        -> ^(TUPLE_REF ID[STREAM_FRAME] NUMBER[Integer.toString($tr.getChildIndex())] $r*)
+   | ^(tr=TUPLE_REF fr=ID)
       {($fr.getAncestor(GUIDE_GENERATOR) != null) && replace($fr, $fr.getText()) && !$fr.getText().equals(STREAM_FRAME)}? 
-        -> ^(TUPLE_REF ID[STREAM_FRAME] ID["#Sample"]);
+        -> ^(TUPLE_REF ID[STREAM_FRAME] NUMBER[Integer.toString($tr.getChildIndex())]);

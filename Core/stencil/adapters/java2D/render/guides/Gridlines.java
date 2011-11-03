@@ -35,8 +35,12 @@ public class Gridlines extends Guide2D {
 
 	protected final AXIS axis;
 	protected final String axisTag;
+	protected final int inTab;	//How much extra to put on the line at its lower value
+	protected final int outTab; //How much extra to put on the line at its higher value
 	
-	private static final String DEFAULT_SPECIALIZER_SOURCE = "[PEN_COLOR: \"GRAY60\"]";
+	
+	
+	private static final String DEFAULT_SPECIALIZER_SOURCE = "[PEN_COLOR: \"GRAY80\", inTab:10, outTab:0]";
 	private static final String[] DEFAULTS_KNOCKOUT = new String[]{};
 	public static final Specializer DEFAULT_SPECIALIZER;
 	static {
@@ -47,6 +51,7 @@ public class Gridlines extends Guide2D {
 
 	public Gridlines(Guide guideDef) {
 		super(guideDef);
+		Specializer spec = guideDef.specializer();
 
 		//Which axis is this?
 		axisTag = guideDef.selectors().keySet().iterator().next(); 
@@ -54,10 +59,12 @@ public class Gridlines extends Guide2D {
 		
 		data = LayerTypeRegistry.makeTable(guideDef.identifier(), "LINE");
 		renderer = LayerTypeRegistry.makeRenderer(data.prototype());
-
+		inTab = Converter.toInteger(spec.get("inTab"));
+		outTab = Converter.toInteger(spec.get("outTab"));
+		
 		PrototypedTuple updateMask = Tuples.merge(SchemaFieldDef.asTuple(data.prototype()), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));
-		if (guideDef.specializer().containsKey(IMPLANT_KEY)) {
-			updateMask = Tuples.merge(updateMask, Singleton.from("IMPLANT", Converter.toString(guideDef.specializer().get(IMPLANT_KEY))));
+		if (spec.containsKey(IMPLANT_KEY)) {
+			updateMask = Tuples.merge(updateMask, Singleton.from("IMPLANT", Converter.toString(spec.get(IMPLANT_KEY))));
 		}
 		this.updateMask = updateMask;
 	}
@@ -91,13 +98,13 @@ public class Gridlines extends Guide2D {
 		
 		if (axis == AXIS.X) {
 			values[0] = location;
-			values[1] = -floor;
+			values[1] = -(floor-inTab);
 			values[2] = location;
-			values[3] = -(floor+size);
+			values[3] = -(floor+size+outTab);
 		} else {
-			values[0] = floor;
+			values[0] = floor-inTab;
 			values[1] = location;
-			values[2] = (floor+size);
+			values[2] = floor+size+outTab;
 			values[3] = location;			
 		}
 		return new PrototypedArrayTuple(fields, values);

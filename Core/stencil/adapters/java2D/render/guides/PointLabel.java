@@ -31,8 +31,8 @@ public class PointLabel extends Guide2D {
 	}
 		
 
-	private static final String[] FIELDS = new String[]{"ID"};
-	private static final Object[] VALUES = new Object[FIELDS.length];	
+	private final String[] FIELDS = new String[]{"ID"};
+	private final Object[] VALUES = new Object[FIELDS.length];	
 	
 	@Override
 	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D bounds, AffineTransform viewTransform) {
