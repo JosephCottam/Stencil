@@ -25,6 +25,12 @@ public final class Shapes {
 	public static Shape getShape(StandardShape shapeType, double x, double y, double width, double height) {		
 		Shape shape = null;
 
+		double[] niced = nice(x,y,width,height);
+		x = niced[0];
+		y = niced[1];
+		width = niced[2];
+		height = niced[3];
+		
 		Double minDimension = Math.min(width, height);
 
 		if (shapeType == null) {shapeType = DEFAULT_SHAPE;}
@@ -46,6 +52,21 @@ public final class Shapes {
 		}
 
 		return shape;
+	}
+	
+	/**Ensure that all width/heights are positive; modify x and y appropriately.**/
+	private static final double[] nice(double x, double y, double width, double height) {
+		if (width <0) {
+			x = x + width;
+			width = -width;
+		}
+		
+		if (height<0) {
+			y = y - height;
+			height = -height;
+		}
+		
+		return new double[]{x,y,width,height};
 	}
 
 

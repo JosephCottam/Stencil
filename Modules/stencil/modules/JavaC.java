@@ -52,7 +52,7 @@ public class JavaC extends BasicModule {
 	private static final String BODY_KEY = "body";
 	private static final String CLASS_KEY = "class";
 	
-	@Operator(name="Java", spec="[ body:\"\", header:\"import static java.util.Math.*;\"]")
+	@Operator(name="Java", spec="[ body:\"\", header:\"import static java.lang.Math.*;\"]")
 	@Description("Compile a java operator without state.")
 	public static final class Function extends AbstractOperator<Function> {
 		private final StencilOperator operator;

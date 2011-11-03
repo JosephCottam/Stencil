@@ -2,6 +2,8 @@
 package stencil.adapters.java2D;
 
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.parser.ParseStencil;
@@ -73,20 +75,33 @@ public final class Adapter implements stencil.adapters.Adapter {
 	}
 	
 	
+	private static final class AxisPair {
+		public Guide xAxis;
+		public Guide yAxis;
+	}
+	
 	//TODO: Lift out into a grammar pass...
 	private void constructGuides(Canvas canvas, Program program) {
 		int legendCount = 0;//How many side-bars have been created?
 		
-
-		Guide xAxis =null,yAxis=null;
+		Map<String, AxisPair> layerGuides =new HashMap();
+		
 		for (Guide guideDef : program.allGuides()) {
 			if (guideDef.type().equals("axis")) {
-				if (guideDef.identifier().contains("X")) {xAxis = guideDef;}
-				if (guideDef.identifier().contains("Y")) {yAxis = guideDef;}
+				String id = guideDef.identifier();		//HACK:  HORRIBLE, guides are with the layers now, divorce them from the canvas!
+				String layer = id.substring(0, id.indexOf(" "));
+				AxisPair pair = layerGuides.get(layer);
+				if (pair == null) {
+					pair = new AxisPair();
+					layerGuides.put(layer, pair);
+				}
+				
+				if (guideDef.identifier().contains("X")) {pair.xAxis = guideDef;}
+				if (guideDef.identifier().contains("Y")) {pair.yAxis = guideDef;}
 			} else if (guideDef.type().equals("legend")) {
 				canvas.addGuide(new Legend(guideDef, legendCount++));
 			} else if (guideDef.type().equals("sumLegend")) {
-					canvas.addGuide(new Legend(guideDef, legendCount++));				
+				canvas.addGuide(new Legend(guideDef, legendCount++));				
 			} else if (guideDef.type().equals("pointLabels")) {
 				canvas.addGuide(new PointLabel(guideDef));
 			} else if (guideDef.type().equals("trend")) {
@@ -103,21 +118,25 @@ public final class Adapter implements stencil.adapters.Adapter {
 		}
 		
 		
-		if (xAxis != null && yAxis != null) {
-			if (yAxis.isNumeric()) {
-				canvas.addGuide(new Axis(xAxis, yAxis.generators()[0]));
-			} else {
-				canvas.addGuide(new Axis(xAxis, null));
+		for (AxisPair pair: layerGuides.values()) {
+			Guide xAxis = pair.xAxis;
+			Guide yAxis = pair.yAxis;
+			if (xAxis != null && yAxis != null) {
+				if (yAxis.isNumeric()) {
+					canvas.addGuide(new Axis(xAxis, yAxis.generators()[0]));
+				} else {
+					canvas.addGuide(new Axis(xAxis, null));
+				}
+				if (xAxis.isNumeric()) {
+					canvas.addGuide(new Axis(yAxis, xAxis.generators()[0]));
+				} else {
+					canvas.addGuide(new Axis(yAxis, null));				
+				}
+			} else if (xAxis != null) {
+				canvas.addGuide(new Axis(xAxis, null));			
+			} else if (yAxis != null) {
+				canvas.addGuide(new Axis(yAxis, null));			
 			}
-			if (xAxis.isNumeric()) {
-				canvas.addGuide(new Axis(yAxis, xAxis.generators()[0]));
-			} else {
-				canvas.addGuide(new Axis(yAxis, null));				
-			}
-		} else if (xAxis != null) {
-			canvas.addGuide(new Axis(xAxis, null));			
-		} else if (yAxis != null) {
-			canvas.addGuide(new Axis(yAxis, null));			
 		}
 	}
 

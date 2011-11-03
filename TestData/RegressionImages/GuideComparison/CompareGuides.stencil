@@ -1,0 +1,69 @@
+STREAM: File
+NAME: TokenCounts
+TUPLE_SIZE: 4
+SEPARATOR: \s*,\s*
+SOURCE: ./tokenCounts.csv
+SKIP: 1
+STRICT: true
+
+import JavaC
+
+stream TokenCounts(chart, stencil, protovis, ggplot2)
+
+const WIDTH: 10
+
+stream ImplCounts(chart, impl, count)
+from TokenCounts
+  chart: chart
+  impl: MultiResult("Stencil", "Protovis", "ggplot2") -> *
+  count: MultiResult(stencil, protovis, ggplot2) -> *
+
+layer ChartMajor
+guide legend from FILL_COLOR
+      axis from Y
+      axis from X
+ 		title["Tokens Dedicated to Guides"] from ID
+from ImplCounts
+  ID: Concatenate(chart, impl)
+  X:* LayoutB(chart, impl)
+  Y: count
+  HEIGHT: Negate(count)
+  WIDTH: WIDTH
+  FILL_COLOR: ColorBy(impl)
+  REGISTRATION: "BOTTOM"
+  SHAPE: "RECTANGLE"
+
+layer ImplMajor
+guide axis from X
+      axis from Y
+from ImplCounts
+  ID: Concatenate(chart, impl)
+  X:* LayoutA(chart, impl)
+  Y: Sub(count, 150)
+  HEIGHT: Negate(count)
+  WIDTH: WIDTH
+  FILL_COLOR: ColorBy(impl)
+  REGISTRATION: "BOTTOM"
+  SHAPE: "RECTANGLE"
+
+operator LayoutA (minor, major) -> (X)
+   default => X: 
+         [minor] Rank(Stream.minor) 
+		-> [major] Rank(Stream.major) 
+		-> Distinct(Stream.minor) -> Distrubte(major,minor,Distinct,WIDTH)
+
+
+operator LayoutB (major, minor) -> (X)
+   default => X: 
+         [minor] Rank(Stream.minor) 
+		-> [major] Rank(Stream.major) 
+		-> Distinct(Stream.minor) -> Distrubte(major,minor,Distinct,WIDTH)
+
+
+operator Distrubte : Java[@"(int a, int i, int max, int WIDTH) 
+									=> (((max+1)*WIDTH)*a)+(WIDTH*i)"@]
+
+operator ColorBy(impl) -> (C)
+  (impl =~ "Stencil") => C: Color{Crimson}
+  (impl =~ "Protovis") => C: Color{LightBlue}
+  (impl =~ "ggplot2") => C: Color{DarkGreen}

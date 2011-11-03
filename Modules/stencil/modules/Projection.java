@@ -453,6 +453,43 @@ public class Projection extends BasicModule {
 		}
 	}
 
+	
+
+	/**Indicates how many distinct items have been seen.*/
+	@Operator(spec="[]")
+	public static class Distinct extends AbstractOperator.Statefull {
+		private final Rank rank;
+		
+		
+		public Distinct(OperatorData opData, Specializer spec) {
+			super(opData);
+			rank = new Rank(opData, spec);
+		}
+
+		private Distinct(OperatorData opData, Rank rank) {
+			super(opData);
+			this.rank = rank;
+		}
+	
+		@Facet(memUse="WRITER", prototype="(int count)")
+		public int map(Object... values) {
+			rank.map(values);
+			return rank.set.size();
+		}
+		
+		@Facet(memUse="READER", prototype="(int count)")
+		public int query(Object... values) {
+			return rank.set.size();
+		}
+	
+		@Override
+		public Distinct viewpoint() {
+			Rank r = rank.viewpoint();
+			return new Distinct(super.operatorData, r);
+		}
+	}
+
+
 	/**Projects one range of values into another.
 	 * The target range is statically specified by the specializer.
 	 * The source range is constructed based upon input.
