@@ -10,13 +10,14 @@ import twitter4j.*;
 import twitter4j.conf.*;
 
 import stencil.tuple.SourcedTuple;
+import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.tuple.stream.TupleStream;
 
 public class TwitterTuples implements TupleStream {
-	public static final String[] FIELDS = new String[]{"message", "user", "date"};
+	public static final String[] FIELDS = new String[]{"message", "user", "tags", "geo", "place", "date"};
 	public static final TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS);
 	
 	private final String name;	//Name of the stream
@@ -71,18 +72,33 @@ public class TwitterTuples implements TupleStream {
 		Status s;
 		synchronized(queue) {s = queue.poll();}
 		if (s == null) {return null;}
-		
-		
-		
+				
 		Object[] vals = new Object[PROTOTYPE.size()];
 		vals[0] =s.getText();
 		vals[1] =s.getUser().getName();
-		vals[2] =s.getCreatedAt();
+		vals[2] = new ArrayTuple(s.getHashtagEntities());
+		vals[3] = calcGeo(s);
+		vals[4] = s.getPlace() != null ? s.getPlace().getFullName() : null;
+		vals[5] =s.getCreatedAt();
 		
 		PrototypedArrayTuple t = new PrototypedArrayTuple(PROTOTYPE, vals);
 		return new SourcedTuple.Wrapper(name, t);
 	}
 
+	
+	private static String[] LOCATION_NAMES = new String[]{"lat", "lon"};
+	private PrototypedArrayTuple calcGeo(Status s) {
+		if (s.getGeoLocation() !=  null) {
+			return new PrototypedArrayTuple(LOCATION_NAMES, new Object[]{s.getGeoLocation().getLatitude(), s.getGeoLocation().getLongitude()});
+		} else if (s.getPlace() != null && s.getPlace().getBoundingBoxCoordinates() != null) {
+			GeoLocation[][] locs = s.getPlace().getBoundingBoxCoordinates();
+			return new PrototypedArrayTuple(LOCATION_NAMES, new Object[]{locs[0][0].getLatitude(), locs[0][0].getLongitude()});
+		} else {
+			return null;
+		}
+	}
+	
+	
 	public boolean hasNext() {return true;}
 
 	public void remove() {throw new UnsupportedOperationException();}
