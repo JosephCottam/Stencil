@@ -1,0 +1,25 @@
+STREAM: Twitter
+NAME: Tweets
+KEYWORDS: 
+
+import Layouts
+import Geometry : Geo
+
+stream Tweets(message, user, tags, geo, place, date)
+
+view
+from #Render
+  (X,Y,WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+
+
+layer Map
+from Tweets
+   filter (geo != NULL)
+   ID: Count()
+   (X,Y): (geo.1, geo.0) 
+   REGISTRATION: "CENTER"
+   SIZE: 10
+   IMPLANT: "POINT"
+   SHAPE: "RECTANGLE"
+   FILL_COLOR: Color{Purple, 20}
+ 
