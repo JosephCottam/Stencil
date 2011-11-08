@@ -28,7 +28,7 @@ public class TupleUtil extends BasicModule {
     @Description("How many fields in this tuple?")
     @Operator
     @Facet(memUse="FUNCTION", prototype="(Size)", alias={"map", "query"})
-	public static final int Size(Tuple t) {return t.size();}
+	public static final int TupleSize(Tuple t) {return t.size();}
 
     @Description("Tuple -> Tuple; The original tuple values are now each tuples in the new tuple.")
     @Operator

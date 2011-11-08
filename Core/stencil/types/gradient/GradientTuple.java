@@ -96,9 +96,10 @@ public class GradientTuple implements PrototypedTuple, Paint {
 	}
 
 
-	public int getTransparency() {throw new Error("Implements paint because of a Hack only!!!");}
+	public int getTransparency() {return Paint.TRANSLUCENT;}
 	public PaintContext createContext(ColorModel cm, Rectangle deviceBounds,
 			Rectangle2D userBounds, AffineTransform xform, RenderingHints hints) {
-		throw new Error("Implements paint because of a Hack only!!!");
+		Paint p = getPaint(new Point2D.Double(userBounds.getMinX(), userBounds.getMinY()), new Point2D.Double(userBounds.getMaxX(), userBounds.getMaxY()));
+		return p.createContext(cm, deviceBounds, userBounds, xform, hints);
 	}
 }

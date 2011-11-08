@@ -1,0 +1,112 @@
+STREAM: File
+NAME: Reader
+TUPLE_SIZE: 1
+SEPARATOR: $^
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SKIP: 0
+STRICT: true
+STREAM: File
+NAME: RawLines
+TUPLE_SIZE: 1
+SEPARATOR: $^
+SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SKIP: 0
+STRICT: true
+
+import Layouts
+import GradientUtils
+import Geometry : Geo
+
+stream RawLines(text)
+stream Reader(text)
+
+order RawLines > Reader
+
+view
+from #Render
+  (X,Y,WIDTH,HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+
+
+stream Lines (line, text)
+from RawLines
+   line: LineCount()
+   text: text
+
+stream RawWords (line, word)
+from Lines
+   line: line
+   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, *) -> *
+
+operator NormalizeWords(word) -> (word)
+  default => word: Strip(word) -> ToLower(_)
+
+   
+stream Words (line, word)
+from RawWords
+   filter(prefilter.stopWord !~ "true", word !~ "")
+   prefilter(stopWord) : StopWords(word)
+   line: line
+   word: word
+
+stream PrimeCenter ()
+from Words
+ () : LineIndex.query(word) -> ExtendTuple(LineIndex.0, line) -> LineIndex(word, ExtendTuple.*)
+ () : WordCount(word)
+
+layer Border["TEXT"]
+from Lines
+   ID: line
+   TEXT: text
+   (X,Y):* Layout(line)
+   IMPLANT: "LARGEST"
+
+
+layer Center["TEXT"]
+from Words
+   ID: word
+   TEXT: word
+   (X,Y):* Centroid(word) -> Contract(Centroid.X, Centroid.Y) 
+   REGISTRATION: "CENTER"
+   IMPLANT: "LARGEST"
+   (COLOR, FONT):* 
+        [count] WordCount.query(word) -> Range[ALL](@Max, _) 
+        -> [freq]  Divide(count, _) 
+        -> [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq)
+                -> LineCount.query() -> Log(LineCount, count) -> Mult(LineCount, Log) 
+                -> DScale(freq,50,Mult) -> Font{{_}} -> (color, _)
+
+layer Reading["POLY_POINT"]
+from Reader
+   filter(prefilter.words != NULL)
+   filter(prefilter.size > 0)
+   prefilter(words, size) : SplitOn(text, "\\s+") 
+			-> Map(@NormalizeWords, *) 
+			-> Select[field:0](*)
+			-> Filter(*, ".+") 
+			-> TupleSize(*) 
+			-> (Filter.*,_)
+   ID: Count() -> Mod(_, 10)
+   GROUP: "Reading"
+/*   (X,Y): [Points] Map(prefilter.words, @Centroid)
+			-> Select[field: 0](Points.*) -> Values(*) ->[X] Mean(_)
+         -> Select[field: 1](Points.*) -> Values(*) ->[Y] Mean(_)
+         -> (X,Y)*/
+   (): Print(prefilter.words, prefilter.size)
+   PEN_COLOR: Color{Red}
+
+operator WordCount : Count
+
+operator LineIndex : Dict[fields: "lines"]
+
+operator Centroid (word) -> (X,Y)
+  default =>
+    (X,Y): LineIndex.query(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
+            -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
+            -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
+            -> (X,Y)
+            
+
+/*TODO: Do two circular layouts of different radii and a linear interpolation between them as values move around the circle.*/            
+operator Layout : CircularLayout[start: 0, size: 10]
+operator Contract : Geo::Scale[by: .94]
+operator LineCount : Count

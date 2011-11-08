@@ -17,11 +17,6 @@ public class GradientUtils extends BasicModule {
 	public static class Gradient extends AbstractOperator {
 		public Gradient(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="FUNCTION", prototype="(self, start, end, length, absolute, cyclic)", alias={"map","query"})
-		public GradientTuple query(Color one, Color two, double len, boolean abs, boolean cyclic) {
-			return new GradientTuple(one, two, len, abs, cyclic);
-		}
-
 		/**Gradient format is <Color> -> <Color> : <len>,cycle, abs
 		 * The cycle/abs may appear in either order.
 		 * Len may be omitted, but if it appears it must be first after the colon. 
@@ -33,9 +28,8 @@ public class GradientUtils extends BasicModule {
 		 */
 		private static final Pattern SPLIT_PATTERN = Pattern.compile("(\\s*->\\s*)|(\\s*:\\s*)");
 		
-		
-		@Facet(memUse="FUNCTION", prototype="(self, start, end, length, absolute, cyclic)")
-		public GradientTuple argumentParser(String arg) {
+		@Facet(memUse="FUNCTION", prototype="(self, start, end, length, absolute, cyclic)", alias={"map","query"})
+		public GradientTuple query(String arg) {
 			String[] args = SPLIT_PATTERN.split(arg);
 			Color one = (Color) Converter.convert(args[0], Color.class);
 			Color two = (Color) Converter.convert(args[1], Color.class);
@@ -48,7 +42,7 @@ public class GradientUtils extends BasicModule {
 				catch (NumberFormatException e) {}//ignored...if the number doesn't parse just ignore it
 			}
 			
-			return query(one, two, len, abs, cyclic);
+			return new GradientTuple(one, two, len, abs, cyclic);
 		}
 	}
 }

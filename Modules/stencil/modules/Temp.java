@@ -34,6 +34,23 @@ import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 public class Temp extends BasicModule {
 		
 	@Operator(spec="[]")
+	public static final class Remember extends AbstractOperator.Statefull {
+		Object value;
+		public Remember(OperatorData opData) {super(opData);}
+		
+		@Facet(memUse="WRITER", prototype="(prior)")
+		public Object map(Object v) {
+			Object prior = value;
+			value = v;
+			stateID++;
+			return prior;
+		}
+		 
+		@Facet(memUse="READER", prototype="(prior)")
+		public Object Query(Object v) {return value;}
+	}
+	
+	@Operator(spec="[]")
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	public static Object[] echo(Object... vs) {return vs;}
 	
