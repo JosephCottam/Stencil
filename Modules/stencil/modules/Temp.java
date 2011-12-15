@@ -34,6 +34,13 @@ import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 public class Temp extends BasicModule {
 		
 	@Operator(spec="[]")
+	@Facet(memUse="OPAQUE", alias={"map","query"})
+	public static long pause(long ms)  throws Exception {
+		Thread.sleep(ms);
+		return ms;
+	}
+	
+	@Operator(spec="[]")
 	public static final class Remember extends AbstractOperator.Statefull {
 		Object value;
 		public Remember(OperatorData opData) {super(opData);}

@@ -93,6 +93,17 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 	}
 	
 	
+	@Override
+	public GraphOperator duplicate() {
+		GraphOperator l;
+		try {l = (GraphOperator ) this.clone();
+		} catch (CloneNotSupportedException e) {throw new UnsupportedOperationException();}
+		l.resetLayout();
+		return l;
+	}
+
+
+	
 	/**Utility class for layout operators that use step-wise refinement.
 	 * Supports retrieval of max-iterations, but may ignore it (depending on the layout's definition of 'done')
 	 * 
@@ -125,11 +136,11 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {
 			if (layout == null) {resetLayout();}
-			if (!layout.done()) {
-				layout.step();
-				stateID++;
-			}
-			return stateID;
+//			if (!layout.done()) {
+//				layout.step();
+//				stateID++;
+//			}
+			return stateID++;
 		}
 		
 		@Override

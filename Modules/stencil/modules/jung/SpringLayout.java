@@ -17,5 +17,4 @@ public final class SpringLayout extends GraphOperator.StepOperator {
 		l.initialize();
 		super.setLayout(l);
 	}
-	
 }

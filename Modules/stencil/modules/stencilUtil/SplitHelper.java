@@ -13,12 +13,15 @@ import stencil.tuple.Tuple;
 import stencil.types.Converter;
 import static stencil.module.operator.wrappers.Utilities.noFunctions;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
 @Operator(name= "Split", spec="[fields:0, ordered:\"#F\"]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
 @Description("Higher order operator for performing split/cross-tab summarization")
 public abstract class SplitHelper implements StencilOperator {
+	private static final Object[] EMPTY_ARGS = new Object[0];
+
 	/**Keys that compose a split descriptor in a specializer**/
 	public static final String SPLIT_KEY = "fields";
 	public static final String ORDERED_KEY = "ordered";
@@ -63,6 +66,17 @@ public abstract class SplitHelper implements StencilOperator {
 			return operators.get(key);
 		}
 
+		@Facet(memUse="READER", prototype="(int VALUE)")
+		public int stateID() {
+			Integer[] ids = new Integer[operators.size()];
+			int i=0;
+ 			for (StencilOperator op: operators.values()) {
+				ids[i] = ((Integer) op.getFacet(STATE_ID_FACET).invoke(EMPTY_ARGS));
+			}
+ 			return stateID + Arrays.deepHashCode(ids);
+		}
+
+		
 		public StencilOperator viewpoint() {
 			UnorderedHelper nop = new UnorderedHelper(split, operator);
 			for (Object key: operators.keySet()) {
@@ -90,6 +104,7 @@ public abstract class SplitHelper implements StencilOperator {
 				try {operator = operator.duplicate();}
 				catch (Exception e) {throw new Error("Error creating new split operator instance.", e);}
 				oldKey = key;
+				stateID++;
 			}
 			Invokeable inv = operator.getFacet(facet);
 			return inv.invoke(newArgs);
@@ -100,7 +115,10 @@ public abstract class SplitHelper implements StencilOperator {
 			nop.oldKey = this.oldKey;
 			return nop;
 		}
-	
+
+		@Facet(memUse="READER", prototype="(int VALUE)")
+		public int stateID() {return stateID + ((Integer) operator.getFacet(STATE_ID_FACET).invoke(EMPTY_ARGS));}
+
 	}
 	
 	private static class SplitTarget implements Invokeable {
@@ -131,7 +149,7 @@ public abstract class SplitHelper implements StencilOperator {
 	protected StencilOperator operator;
 	protected final Split split;
 	protected final OperatorData operatorData;
-	protected int stateID;					//State ID of the split operator
+	protected int stateID;
 	
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
@@ -139,9 +157,6 @@ public abstract class SplitHelper implements StencilOperator {
 		this.operatorData = noFunctions(operator.getOperatorData(), true);
 		this.operatorData.addFacet(STATE_ID_FD);
 	}
-	
-	@Facet(memUse="READER", prototype="(int VALUE)")
-	public int stateID() {return stateID;}
 	
 	public Invokeable getFacet(String facet) {
 		if (facet.equals(STATE_ID_FACET)) {

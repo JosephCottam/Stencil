@@ -551,7 +551,7 @@ public class Projection extends BasicModule {
 
 		@Facet(memUse="READER", prototype="(double value)")
 		public double query(double v) {
-			double percent = (v-inMin)/inMax;
+			double percent = (v-inMin)/(inMax-inMin);
 			double value = span*percent + outMin;
 			
 			return value;
