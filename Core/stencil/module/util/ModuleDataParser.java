@@ -54,14 +54,16 @@ public class ModuleDataParser {
 	/**Make the FacetData object from a facet annotation and information about its context.*/
 	private static final FacetData[] makeFacetData(Facet f, String target) throws Exception {
 		final String[] aliases = f.alias().length ==0 ? new String[]{target} : f.alias();
-
+		
 		final MemoryUse memUse = MemoryUse.valueOf(f.memUse().trim().toUpperCase());
+		
+		final String counterpart = f.counterpart().trim().length()==0 && memUse != MemoryUse.OPAQUE ? aliases[0] : f.counterpart().trim();
 		
 		final TuplePrototype proto = ParseStencil.prototype(f.prototype(), true);
 
 		FacetData[] results=new FacetData[aliases.length];
 		for (int i=0;i<aliases.length; i++) {
-			FacetData fd = new FacetData(aliases[i], target, memUse, proto);
+			FacetData fd = new FacetData(aliases[i], target, counterpart, memUse, proto);
 			results[i] = fd;
 		}
 		return results;

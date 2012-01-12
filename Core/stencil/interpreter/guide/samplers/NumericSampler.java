@@ -47,6 +47,8 @@ public class NumericSampler implements SampleOperator {
 
 		double min = ((Number) seed.get(0)).doubleValue();
 		double max = ((Number) seed.get(1)).doubleValue();
+		if (spec.containsKey("min")) {min = Converter.toDouble(spec.get("min"));}
+		if (spec.containsKey("max")) {max = Converter.toDouble(spec.get("max"));}
 		
 		//Include the zero point if the sample is not intended to be 'tight'
 		if (!spec.containsKey(TIGHT)) {

@@ -125,8 +125,8 @@ public final class Modules {
 	 */
 	public static OperatorData basicOperatorData(String module, String name, String...fields) {
 		OperatorData od = new OperatorData(module, name, EMPTY_SPECIALIZER, null);
-		od.addFacet(new FacetData(ParserConstants.MAP_FACET, MemoryUse.WRITER, fields));
-		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
+		od.addFacet(new FacetData(ParserConstants.MAP_FACET, ParserConstants.QUERY_FACET, MemoryUse.WRITER, fields));
+		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
 		return od;
 	}
 }

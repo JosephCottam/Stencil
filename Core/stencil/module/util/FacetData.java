@@ -9,19 +9,23 @@ public final class FacetData {
 	private MemoryUse memory;
 	private TuplePrototype prototype;
 	private String target;
-	private String roles;
+	private final String counterpart;
 	
-	public FacetData(String name, MemoryUse memory, String... fields) {this(name, memory, new TuplePrototype(fields));}
-	public FacetData(String name, MemoryUse memory, TuplePrototype prototype) {this(name, name, memory, prototype);}
-	public FacetData(String name, String target, MemoryUse memory, TuplePrototype prototype) {
+	public FacetData(String name, MemoryUse memory, String... fields) {this(name, name, name, memory, new TuplePrototype(fields));}
+	public FacetData(String name, String counterpart, MemoryUse memory, String... fields) {this(name, name, counterpart, memory, new TuplePrototype(fields));}
+	public FacetData(String name, MemoryUse memory, TuplePrototype prototype) {this(name, name, name, memory, prototype);}
+	public FacetData(String name, String target, String counterpart, MemoryUse memory, TuplePrototype prototype) {
 		this.name = name;
 		this.target = target;
+		this.counterpart = counterpart;
 		this.memory = memory;
 		this.prototype = prototype;
 	}
 	
 	public FacetData(FacetData source) {
 		this.name = source.name;
+		this.target = source.target;
+		this.counterpart = source.counterpart;
 		this.memory = source.memory;
 		this.prototype = source.prototype;
 	}
@@ -30,17 +34,15 @@ public final class FacetData {
 	public String getName() {return name;}
 	
 	public String getTarget() {return target!=null?target:name;}
-	
-	public String getRoles() {return roles;}
-	public void setRoles(String roles) {this.roles = roles;}
-	public boolean hasRole(String role) {return roles.indexOf(role) >=0;}
-	
+		
 	public void setMemory(String memUse) {memory = MemoryUse.valueOf(memUse);}
 	public MemoryUse getMemUse() {return memory;}
 	public void setMemUse(MemoryUse memUse) {memory = memUse;}
 	
 	public void setPrototype(TuplePrototype prototype) {this.prototype = prototype;}
 	public TuplePrototype getPrototype() {return prototype;}
+	
+	public String counterpart() {return counterpart;}	
 	
 	public boolean mutative() {
 		return memory == MemoryUse.WRITER || memory == MemoryUse.OPAQUE;
