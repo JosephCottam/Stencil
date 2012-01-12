@@ -1,0 +1,7 @@
+Core/stencil/parser/string/*.java
+Core/stencil/parser/string/*.tokens
+.metadata/.log
+.metadata/.lock
+.metadata/.plugins/*
+.metadata/version.ini
+bin/

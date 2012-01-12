@@ -21,12 +21,6 @@ import stencil.module.util.OperatorData;
  *
  */
 public interface StencilOperator<T extends StencilOperator> extends Viewpoint<T> {
-	/**Name of the facet used by default in contexts where mutation is permitted.*/
-	public static final String MAP_FACET ="map";
-
-	/**Name of the facet used by default in contexts where mutation is NOT permitted.*/
-	public static final String QUERY_FACET ="query";
-	
 	/**Facet used to get the ID of the current state.
 	 * This is used to determine if update operations are required.
 	 */

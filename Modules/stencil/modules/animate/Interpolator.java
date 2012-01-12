@@ -18,6 +18,7 @@ public interface Interpolator<T> {
 			} else if (o instanceof Number) {
 				return new DoubleInterpolator(a, b);
 			}
+			throw new RuntimeException("No know interpolator type: " + o.getClass().getSimpleName());
 		}
 	}
 	

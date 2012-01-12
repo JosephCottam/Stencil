@@ -78,9 +78,11 @@
 
  	
     <target name="Validators" depends="StencilGrammar">
+      <property name="tDir" value="${parser}/validators"/>
+      <mkdir dir="${tDir}"/> 
     	<foreach target="antlrBuild" param="file" inheritall="true">
     	   <fileset dir="${grammars}/validators" />
-           <param name="antlrTarget" value="${parser}/validators"/>
+           <param name="antlrTarget" value="${tDir}"/>
     	</foreach>
     </target>
 

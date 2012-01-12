@@ -137,7 +137,7 @@ public final class Converter {
 	public static final Object convert(Object value, Class target, Object nullVal) throws ConversionException {
 		try {
 			if (value == null) {return nullVal;}
-			if (value == null || target.equals(Object.class) || target.isInstance(value)) {return value;}
+			if (target.equals(Object.class) || target.isInstance(value)) {return value;}
 			if (value instanceof StencilTree) {
 				Object val = Freezer.freezeValue(((StencilTree) value));
 				return convert(val, target);

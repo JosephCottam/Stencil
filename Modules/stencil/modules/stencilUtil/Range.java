@@ -91,10 +91,9 @@ public class Range {
 	public String rangeString() {
 		if (isFullRange()) {return ALL;}
 		if (isSimple()) {return LAST;}
-		else {
-			String ev = (end==RANGE_END_INT ? RANGE_END : Integer.toString(end)); 
-			return String.format("%1$d .. %2$s", start, ev);
-		}
+
+		String ev = (end==RANGE_END_INT ? RANGE_END : Integer.toString(end)); 
+		return String.format("%1$d .. %2$s", start, ev);
 	}
 	
 	public int hashCode() {

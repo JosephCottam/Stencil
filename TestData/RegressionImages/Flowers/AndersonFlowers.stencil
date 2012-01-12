@@ -15,8 +15,8 @@ layer FlowerPlot					/*@\label{flowers:layerDef}@*/
 guide
   trend from ID                         		/*@\label{flowers:guideBegin}@*/
   legend[X: 0, Y: 100] from FILL_COLOR
-  axis[guideLabel: "Petal Length"] Linear from Y
-  axis[guideLabel: "Petal Width"] Linear from X		/*@\label{flowers:guideX}@*/
+  axis[guideLabel: "Petal Width"] Linear from Y
+  axis[guideLabel: "Petal Length"] Linear from X		/*@\label{flowers:guideX}@*/
 		                             		/*@\label{flowers:guideEnd}@*/
 from flowers						/*@\label{flowers:fromBlock}@*/	
    ID: obs						/*@\label{flowers:simpleRule}@*/

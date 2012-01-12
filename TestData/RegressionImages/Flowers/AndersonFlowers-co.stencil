@@ -15,8 +15,8 @@ layer FlowerPlot
 guide
  trend[sample: "SIMPLE"] from ID 
  legend[X: 0, Y: 100] Categorical from FILL_COLOR, from PEN_COLOR	/*@\label{flowers:co-guide}@*/
- axis[guideLabel: "Petal Length"] Linear from Y
- axis[guideLabel: "Petal Width"] Linear from X
+ axis[guideLabel: "Petal Width"] Linear from Y
+ axis[guideLabel: "Petal Length"] Linear from X
 
 from flowers
    ID: obs

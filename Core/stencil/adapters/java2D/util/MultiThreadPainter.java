@@ -213,7 +213,7 @@ public final class MultiThreadPainter {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (g !=null) {g.dispose();}
+			g.dispose();
 		}
 	}
 	

@@ -15,8 +15,8 @@ layer FlowerPlot
 guide
  trend[sample: "SIMPLE"] from ID 
  legend[X: 0, Y: 100] from FILL_COLOR
- axis[guideLabel: "Petal Length"] from Y
- axis[guideLabel: "Petal Width"] from X
+ axis[guideLabel: "Petal Width"] from Y
+ axis[guideLabel: "Petal Length"] from X
 
 from flowers
    ID: obs
