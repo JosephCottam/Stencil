@@ -69,7 +69,7 @@ options {
     		Module m = modules.findModuleForOperator(name);
             OperatorData od = m.getOperatorData(name.name(), spec);
     		FacetData fd=od.getFacet(name.facet());
-    		return fd.getMemUse() == FacetData.MemoryUse.FUNCTION;
+    		return fd.memUse() == FacetData.MemoryUse.FUNCTION;
    		} catch (Exception e) {
    			throw new ConstantOpError("Error getting module information for operator " + name, e);
    	  }

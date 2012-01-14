@@ -3,12 +3,13 @@ package stencil.module.util;
 import java.util.*;
 
 import stencil.interpreter.tree.Specializer;
+import stencil.module.operator.UnknownFacetException;
 
 public final class OperatorData {
 	public static final String HIGHER_ORDER_TAG = "HIGHER_ORDER";
 	
 	private Specializer spec;		 /**Default Specializer*/
-	private String name;			 /**Operator Name*/
+	private String name;			 /**Operator name*/
 	
 	//TODO: Make this a real class or method (not just a string pointing at one)
 	private String target;			 /**Method or class to use for the given operator (containing class is determined by the module).*/
@@ -16,6 +17,7 @@ public final class OperatorData {
 	private String description;   	 /**Text description of the operator.*/
 	private Set<String> tags = new HashSet(); /**Extra flags used in further optimization**/
 	private Map<String, FacetData> facets = new HashMap();
+	private String defaultFacet;
 	
 	public OperatorData() {}
 	
@@ -25,6 +27,7 @@ public final class OperatorData {
 		this.spec = specializer;
 		this.target = target;
 		this.tags.addAll(Arrays.asList(tags));
+		this.defaultFacet = "map";	//TODO: Takes as a paramter
 	}
 	
 	public OperatorData(OperatorData source) {
@@ -39,6 +42,10 @@ public final class OperatorData {
 		}
 	}
 	
+	
+	/**Return facet data for the default facet.*/
+	public FacetData defaultFacet() {return getFacet(defaultFacet);}
+	
 	public void setDefaultSpecializer(Specializer spec) {this.spec = spec;}
 	public Specializer getDefaultSpecializer() {return spec;}
 	
@@ -47,10 +54,10 @@ public final class OperatorData {
 	public void removeTag(String name) {tags.remove(name);}
 	
 	//TODO: Change addFacet to taken an array of FacetData objects
-	public void addFacet(FacetData facet) {facets.put(facet.getName(), facet);}
+	public void addFacet(FacetData facet) {facets.put(facet.name(), facet);}
 	public FacetData getFacet(String name) {
 		if (facets.containsKey(name)) {return facets.get(name);}
-		throw new IllegalArgumentException(String.format("Could not find facet '%1$s' in operator %2$s.", name, this.name));
+		throw new UnknownFacetException(this.name, name, getFacetNames());
 	}
 	
 	public boolean hasFacet(String name) {return getFacetNames().contains(name);}

@@ -1,6 +1,5 @@
 package stencil.module.util;
 
-import static stencil.parser.ParserConstants.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,8 +11,6 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.operator.wrappers.InvokeableOperator;
-import stencil.module.util.FacetData.MemoryUse;
-import stencil.parser.ParserConstants;
 import stencil.interpreter.tree.Specializer;
 
 /**A utility group for working with modules. Cannot be instantiated.*/
@@ -101,32 +98,5 @@ public final class Modules {
 		} 
 		catch (InstantiationException e) {throw new RuntimeException(e);}
 		catch (IllegalAccessException e) {throw new RuntimeException(e);}
-	}
-	
-	/**Return a meta-data object with the default facets and specializer.
-	 * 
-	 * Default type for facets is Categorize.
-	 * Default return prototype is singleton VALUE.
-	 * Default facet set is Map and Query.
-	 * 
-	 **/
-	public static OperatorData basicOperatorData(String module, String name) {
-		return basicOperatorData(module, name, "VALUE");
-	}
-	
-	/**Produce a mutable operator meta-data object with the names, op-type and operator fields
-	 * specified.  Will use the default face set.
-	 * 
-	 * @param module
-	 * @param name
-	 * @param type
-	 * @param fields
-	 * @return
-	 */
-	public static OperatorData basicOperatorData(String module, String name, String...fields) {
-		OperatorData od = new OperatorData(module, name, EMPTY_SPECIALIZER, null);
-		od.addFacet(new FacetData(ParserConstants.MAP_FACET, ParserConstants.QUERY_FACET, MemoryUse.WRITER, fields));
-		od.addFacet(new FacetData(ParserConstants.QUERY_FACET, ParserConstants.QUERY_FACET, MemoryUse.READER, fields));
-		return od;
 	}
 }

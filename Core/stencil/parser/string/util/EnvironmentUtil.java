@@ -194,7 +194,7 @@ public final class EnvironmentUtil {
 		MultiPartName op = Freezer.multiName(func.find(OP_NAME));		
 		AstInvokeable inv = (AstInvokeable) func.find(AST_INVOKEABLE);
 		assert inv != null;
-		return inv.getOperator().getOperatorData().getFacet(op.facet()).getPrototype();
+		return inv.getOperator().getOperatorData().getFacet(op.facet()).prototype();
 	}
 
 	/**How many function calls up from here to the root of a call chain?**/

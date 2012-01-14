@@ -43,8 +43,6 @@ public abstract class ParserConstants {
 	
 
 	//Block tags
-	public static final String MAP_FACET = StencilOperator.MAP_FACET;
-	public static final String QUERY_FACET = StencilOperator.QUERY_FACET;
 	public static final String STATE_ID_FACET = StencilOperator.STATE_ID_FACET;
 	public static final String CUSTOM_PARSER_FACET = "argumentParser";		//TODO: Eliminate CUSTOM_PARSER_FACET, just use Map
 	public static final String DEFAULT_JAVA_SUPER = "stencil.module.operator.util.AbstractOperator";

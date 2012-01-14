@@ -6,7 +6,6 @@ package stencil.modules.stencilUtil;
 import stencil.interpreter.guide.SampleSeed;
 import stencil.interpreter.guide.MonitorOperator;
 import stencil.interpreter.tree.Specializer;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
@@ -21,12 +20,12 @@ public abstract class MonitorBase<T extends MonitorBase> extends AbstractOperato
 	/**Complete the operator data, given the specializer.*/
 	protected static OperatorData complete(OperatorData base, Specializer spec) {
 		OperatorData od = new OperatorData(base);
-		FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-		fd = new FacetData(fd.getName(), MemoryUse.WRITER, new String[0]);
+		FacetData fd = od.getFacet("map");
+		fd = new FacetData(fd.name(), MemoryUse.WRITER, new String[0]);
 		od.addFacet(fd);
 		
-		fd = od.getFacet(StencilOperator.QUERY_FACET);
-		fd = new FacetData(fd.getName(), MemoryUse.WRITER, new String[0]);
+		fd = od.getFacet("query");
+		fd = new FacetData(fd.name(), MemoryUse.WRITER, new String[0]);
 		od.addFacet(fd);
 		
 		return od;

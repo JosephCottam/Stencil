@@ -1,6 +1,7 @@
 package stencil.module.operator.wrappers;
 
-import static java.lang.String.format;
+
+import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -14,7 +15,6 @@ import stencil.module.operator.UnknownFacetException;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
-import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.tuple.Tuple;
@@ -29,7 +29,7 @@ import stencil.types.geometry.RectangleTuple;
  */
 
 //Marked final because it is immutable (however, it has mutable components....)
-public final class LayerOperator implements StencilOperator<StencilOperator> {
+public class LayerOperator implements StencilOperator<StencilOperator> {
 	private static final String FIND = "find";
 	private static final String NEAR = "nearest";
 	private static final String BOUNDS = "bounds";
@@ -44,12 +44,10 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 		this.layer = layer;
 
 		TuplePrototype prototype = layer.prototype();
-		operatorData = Modules.basicOperatorData(module, getName());
+		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null);
 		operatorData.addFacet(new FacetData(FIND, MemoryUse.READER, prototype));
 		operatorData.addFacet(new FacetData(NEAR, MemoryUse.READER, prototype));
 		operatorData.addFacet(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
-		operatorData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, prototype));
-		operatorData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, prototype));
 		operatorData.addFacet(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
 		operatorData.addFacet(new FacetData(CONTAINS, MemoryUse.READER, prototype));
 		operatorData.addFacet(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
@@ -57,16 +55,9 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 	
 	public String getName() {return layer.name();}
 
-	public Invokeable getFacet(String facet) {
-		if (StencilOperator.MAP_FACET.equals(facet) 
-			|| StencilOperator.QUERY_FACET.equals(facet)) {
-			return new ReflectiveInvokeable(FIND, layer);
-		} else if (NEAR.equals(facet)) {
-			return new ReflectiveInvokeable(facet, this);
-		} else if (operatorData.hasFacet(facet)) {
-			return new ReflectiveInvokeable(facet, layer);
-		} 
-		throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
+	public Invokeable getFacet(String facet) throws UnknownFacetException {
+		FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
+		return new ReflectiveInvokeable(fd.target(), this);
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
@@ -91,18 +82,11 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 			throw new UnsupportedOperationException();
 		}
 
-		@Override
-		public Invokeable getFacet(String facet) throws UnknownFacetException {
-			if (StencilOperator.MAP_FACET.equals(facet) 
-					|| StencilOperator.QUERY_FACET.equals(facet)) {
-					return new ReflectiveInvokeable(FIND, layer);
-			} else if (NEAR.equals(facet)) {
-				return new ReflectiveInvokeable(facet, this);
-			} else if (operatorData.hasFacet(facet)) {
-				return new ReflectiveInvokeable(facet, layer);
-			}
-			throw new IllegalArgumentException(format("Could not create facet for requested name '%1$s'.", facet));
+		public Invokeable getFacet(String facet) throws IllegalArgumentException {
+			FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
+			return new ReflectiveInvokeable(fd.target(), this);
 		}
+
 		
 		public Tuple nearest(double x, double y) {
 			AffineTransform t = Display.view.viewTransform();
@@ -113,9 +97,7 @@ public final class LayerOperator implements StencilOperator<StencilOperator> {
 
 		public String getName() {return layer.getName();}
 
-		public OperatorData getOperatorData() {
-			throw new UnsupportedOperationException();
-		}
+		public OperatorData getOperatorData() {throw new UnsupportedOperationException();}
 
 		public LayerViewOperator viewpoint() {return this;}
 	}

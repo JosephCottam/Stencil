@@ -8,12 +8,14 @@ import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.operator.util.ReflectiveInvokeable;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
+import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
 import stencil.tuple.Tuple;
 import stencil.types.Converter;
-import static stencil.module.operator.wrappers.Utilities.noFunctions;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -154,7 +156,7 @@ public abstract class SplitHelper implements StencilOperator {
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
 		this.operator = operator;		
-		this.operatorData = noFunctions(operator.getOperatorData(), true);
+		this.operatorData = noFunctions(operator.getOperatorData());
 		this.operatorData.addFacet(STATE_ID_FD);
 	}
 	
@@ -227,4 +229,34 @@ public abstract class SplitHelper implements StencilOperator {
 		StencilOperator op = operator.duplicate();
 		return makeOperator(split, op);
 	}
+	
+	
+	/**Produce operator meta-data that indicates all facets in the operator data are not functions.*/
+	private static final OperatorData noFunctions(OperatorData od) {
+ 		List<FacetData> facets = new ArrayList();
+ 		
+ 		OperatorData nod = new OperatorData(od);
+ 		for (FacetData fd: nod.getFacets()) {
+ 			FacetData nfd =fd;
+ 			switch (fd.memUse()) {
+ 				case FUNCTION: 
+ 					nfd = new FacetData(fd, MemoryUse.READER);
+ 					break;
+ 				case READER: 
+ 					if (!fd.name().equals(STATE_ID_FACET)) {
+ 	 					nfd = new FacetData(fd, MemoryUse.READER);
+ 					}
+ 					break;
+ 				default: break; 	//no changes for WRITER and UNSPECIFIED
+ 			}
+ 			facets.add(nfd);
+ 		}
+
+ 		/**Add a stateID facet**/
+ 	 	facets.add(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+ 		
+ 		nod.setFacets(facets);
+ 		return nod;
+ 	} 	
+	
 }

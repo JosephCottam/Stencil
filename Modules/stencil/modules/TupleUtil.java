@@ -3,7 +3,6 @@ package stencil.modules;
 import java.util.ArrayList;
 
 import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.FacetData.MemoryUse;
@@ -151,12 +150,12 @@ public class TupleUtil extends BasicModule {
 		public static OperatorData complete(OperatorData base, Specializer spec) {
 			OperatorData od = new OperatorData(base);
 			String[] keys  = getNames(spec);
-			FacetData fd = od.getFacet(StencilOperator.MAP_FACET);
-			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
+			FacetData fd = od.getFacet("map");
+			fd = new FacetData(fd.name(), MemoryUse.FUNCTION, keys);
 			od.addFacet(fd);
 			
-			fd = od.getFacet(StencilOperator.QUERY_FACET);
-			fd = new FacetData(fd.getName(), MemoryUse.FUNCTION, keys);
+			fd = od.getFacet("query");
+			fd = new FacetData(fd.name(), MemoryUse.FUNCTION, keys);
 			od.addFacet(fd);
 			return od;
 		}

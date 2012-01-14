@@ -66,4 +66,12 @@ public class Utilities {
 		}		
 		return rv;
 	}
+	
+	public static final String counterpart(AstInvokeable inv, String facet) {
+		StencilOperator op = inv.getOperator();
+		if (op == null) {
+			throw new IllegalArgumentException("Cannot derive counterpart for non-operator invokeables.");
+		} 
+		return op.getOperatorData().defaultFacet().name();
+	} 
 }

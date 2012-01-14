@@ -3,6 +3,7 @@
 import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
+import stencil.module.util.FacetData;
 import stencil.modules.Average;
 import stencil.parser.ParseStencil;
 import stencil.parser.ParserConstants;
@@ -34,8 +35,11 @@ public class TestMean extends StencilTestCase {
 	
 	public void testFullRange() throws Exception {
 		StencilOperator meaner = average.instance("Mean", makeContext("Mean", "Range", "[range: ALL]"), ParserConstants.EMPTY_SPECIALIZER);
-		Invokeable map = meaner.getFacet(StencilOperator.MAP_FACET);
-		Invokeable query = meaner.getFacet(StencilOperator.QUERY_FACET);
+		
+		
+		FacetData fd = meaner.getOperatorData().defaultFacet();
+		Invokeable map = meaner.getFacet(fd.name());
+		Invokeable query = meaner.getFacet(fd.counterpart());
 		
 		int count =0;
 		double sum =0;

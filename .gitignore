@@ -1,7 +1,10 @@
 Core/stencil/parser/string/*.java
 Core/stencil/parser/string/*.tokens
+Core/stencil/parser/string/validators/*
 .metadata/.log
 .metadata/.lock
 .metadata/.plugins/*
 .metadata/version.ini
 bin/
+testResults/*
+lastBuild.txt

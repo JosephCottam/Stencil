@@ -179,8 +179,8 @@ public class PersistentData extends BasicModule {
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
 			OperatorData od = new OperatorData(basic);
-			od.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, fields));
-			od.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, fields));
+			od.addFacet(new FacetData("map", MemoryUse.WRITER, fields));
+			od.addFacet(new FacetData("query", MemoryUse.READER, fields));
 			return od;
 		}
 

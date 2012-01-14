@@ -11,6 +11,7 @@ tokens {
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
+  DEFAULT_FACET;
   DIRECT_YIELD;
   DYNAMIC_RULE;
   DYNAMIC_REDUCER;
@@ -180,13 +181,7 @@ tokens {
   	else {super.emitErrorMessage(msg);}
   }
   
-  public List getErrors() {return errors;}  
-  
-  
-  public String ensureFacet(String name, String defaultFacet) {
-    if (name.indexOf(".") >0) {return name;}
-    else {return name + "." + defaultFacet;}
-  }  
+  public List getErrors() {return errors;}    
 }
 
 program : imports* (globalValue | externalStream)* order  (canvasLayer | viewLayer | elementDef | layerDef | operatorDef | operatorTemplate | streamDef)*
@@ -333,9 +328,9 @@ functionCall returns [String baseName]
      -> callName specializer ISLAND_BLOCK;
 
 callName
-  : ID NAMESPACE ID        -> ^(OP_NAME ID ID ID[MAP_FACET])
+  : ID NAMESPACE ID        -> ^(OP_NAME ID ID DEFAULT_FACET)
   | ID NAMESPACE ID DOT ID -> ^(OP_NAME ID ID ID)
-  | ID                     -> ^(OP_NAME DEFAULT ID ID[MAP_FACET])
+  | ID                     -> ^(OP_NAME DEFAULT ID DEFAULT_FACET)
   | ID DOT ID              -> ^(OP_NAME DEFAULT ID ID);
 
 target[int defaultTarget] 

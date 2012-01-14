@@ -19,7 +19,6 @@ options {
 
 	import java.util.regex.Pattern;
 	import stencil.parser.tree.StencilTree;
-	import static stencil.parser.ParserConstants.QUERY_FACET;
 }
 
 @members{
@@ -98,6 +97,6 @@ options {
 }
 
 topdown: ^(FUNCTION n=. s=. b=ISLAND_BLOCK y=. c=.) 
-			 -> {doPrintf($b)}? ^(FUNCTION ^(OP_NAME DEFAULT ID[PRINTF_OP] ID[QUERY_FACET]) ^(SPECIALIZER DEFAULT) {printfArgs($b)} DIRECT_YIELD 
+			 -> {doPrintf($b)}? ^(FUNCTION ^(OP_NAME DEFAULT ID[PRINTF_OP] DEFAULT_FACET) ^(SPECIALIZER DEFAULT) {printfArgs($b)} DIRECT_YIELD 
 			         ^(FUNCTION $n $s ^(LIST_ARGS ^(TUPLE_REF ^(NUMBER["0"]))) $y $c))
 			 -> ^(FUNCTION $n $s ^(LIST_ARGS ^(STRING[stripBraces($b)])) $y $c);

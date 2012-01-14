@@ -2,6 +2,7 @@ package stencil.unittests.module.operator;
 
 import stencil.adapters.java2D.Adapter;
 import stencil.module.operator.util.Invokeable;
+import stencil.module.util.FacetData;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
 import stencil.tuple.Tuple;
@@ -9,7 +10,6 @@ import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.MultiResultTuple;
 import stencil.unittests.StencilTestCase;
 import static stencil.parser.string.StencilParser.*;
-import static stencil.module.operator.StencilOperator.*;
 
 public class TestHigherOrder extends StencilTestCase {
 
@@ -54,8 +54,9 @@ public class TestHigherOrder extends StencilTestCase {
 		assertTrue(sumMap.getName().contains("#Map_"));
 		//TODO: Test that the map is targeting add1
 
-		Invokeable iMap = sumMap.getOperator().getFacet(MAP_FACET);
-		Invokeable iQuery = sumMap.getOperator().getFacet(QUERY_FACET);
+		FacetData fd = sumMap.getOperatorData().defaultFacet();
+		Invokeable iMap = sumMap.getOperator().getFacet(fd.name());
+		Invokeable iQuery = sumMap.getOperator().getFacet(fd.counterpart());
 		
 		assertNotNull("Facet on map not not found.", iMap);
 		assertNotNull("Facet on map not not found.", iQuery);
@@ -72,8 +73,9 @@ public class TestHigherOrder extends StencilTestCase {
 		assertNotNull("Map operator not instantiated.", reformMap.getOperator());
 		assertTrue(reformMap.getName().contains("#Map_"));
 
-		Invokeable iMap = reformMap.getOperator().getFacet(MAP_FACET);
-		Invokeable iQuery = reformMap.getOperator().getFacet(QUERY_FACET);
+		FacetData fd = reformMap.getOperatorData().defaultFacet();
+		Invokeable iMap = reformMap.getOperator().getFacet(fd.name());
+		Invokeable iQuery = reformMap.getOperator().getFacet(fd.counterpart());
 		assertNotNull("Facet on map not not found.", iMap);
 		assertNotNull("Facet on map not not found.", iQuery);
 		

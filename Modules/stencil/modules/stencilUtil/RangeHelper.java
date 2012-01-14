@@ -33,7 +33,7 @@ import static java.lang.String.format;
 @Description("Higher order operator for performing range-related summarization")
 public abstract class RangeHelper implements StencilOperator<StencilOperator>, Cloneable {
 	public static final String FACET_KEY = "facet";
-	public static final String DEFAULT_SPECIALIZER = "[" + Range.RANGE_KEY + ": \"ALL\", " + FACET_KEY +": \"" + MAP_FACET + "\"]";
+	public static final String DEFAULT_SPECIALIZER = "[" + Range.RANGE_KEY + ": \"ALL\", " + FACET_KEY +": map\"]";
 	
 	private abstract static class RangeTarget implements Invokeable {
 		final RangeHelper helper;
@@ -209,9 +209,9 @@ public abstract class RangeHelper implements StencilOperator<StencilOperator>, C
 	 * If the operator/facet is not a function, then query is not a premited facetName to use here.
 	 */
 	public Invokeable getFacet(String facetName) {
-		if (facetName.equals(MAP_FACET)) {
+		if (facetName.equals("map")) {
 			return new RangeTarget.Map(this, baseOperator, opFacetName, flatten);			
-		} else if (facetName.equals(QUERY_FACET)) {
+		} else if (facetName.equals("query")) {
 			return new RangeTarget.Query(this, baseOperator, opFacetName, flatten);
 		} else if (facetName.equals(STATE_ID_FACET)) {
 			return new ReflectiveInvokeable("stateID", this);

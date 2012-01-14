@@ -10,6 +10,9 @@ import stencil.tuple.Tuple;
  * 
  * Text is usually related to the invokeable, but is not
  * necessarily a consistent relationship across contexts.
+ * 
+ * TODO: When can there be an inv but no op...ever?
+ *       If it never happens, get rid of  the Inv field and just derive the inv durring freeze
  * */
 public final class AstInvokeable<R> extends StencilTree {
 	private StencilOperator op;

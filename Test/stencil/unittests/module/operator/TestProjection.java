@@ -8,7 +8,6 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.modules.Projection;
 import stencil.parser.ParseStencil;
-import stencil.parser.ParserConstants;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.OperatorProxy;
 import stencil.parser.tree.StencilTree;
@@ -36,7 +35,7 @@ public class TestProjection extends StencilTestCase {
 	}
 	
 	private void testRankOp(StencilOperator op, int[] ranks, Object[][] inputs) throws Exception {
-		Invokeable inv = op.getFacet(ParserConstants.MAP_FACET);
+		Invokeable inv = op.getFacet(op.getOperatorData().defaultFacet().name());
 		for (int i=0; i<inputs.length; i++) {
 			Object rslt = inv.invoke(inputs[i]);
 			assertEquals("Rank not as expected for " + Arrays.deepToString(inputs[i]), ranks[i],rslt);

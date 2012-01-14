@@ -25,6 +25,11 @@ import static stencil.parser.string.StencilParser.*;
 
 /**Operator defined through a stencil definition.**/
 public class SyntheticOperator implements StencilOperator {
+	//TODO: Move a the parts that depend on these names into the compiler...
+	private static final String MAP_FACET = "map";
+	private static final String QUERY_FACET = "query";
+
+	
 	private static final class SynthInvokeable implements Invokeable {
 		private final SyntheticOperator op;
 		private final boolean map;
@@ -86,7 +91,7 @@ public class SyntheticOperator implements StencilOperator {
 
 		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null);
 		
-		opData.addFacet(new FacetData(MAP_FACET, MemoryUse.WRITER, findPrototype(MAP_FACET)));	
+		opData.addFacet(new FacetData(MAP_FACET, MAP_FACET, QUERY_FACET, MemoryUse.WRITER, findPrototype(MAP_FACET)));	
 		opData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, findPrototype(QUERY_FACET)));	
 		opData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 		
@@ -115,9 +120,9 @@ public class SyntheticOperator implements StencilOperator {
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {
 		try {
-			if (name.equals(StencilOperator.MAP_FACET)) {
+			if (name.equals(MAP_FACET)) {
 				return new SynthInvokeable(this, true);
-			} else if (name.equals(StencilOperator.QUERY_FACET)) {
+			} else if (name.equals(QUERY_FACET)) {
 				return new SynthInvokeable(this, true);				
 			} else if (name.equals(StencilOperator.STATE_ID_FACET)) {
 				return new ReflectiveInvokeable(name, this);

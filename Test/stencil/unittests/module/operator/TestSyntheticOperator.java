@@ -40,9 +40,9 @@ public class TestSyntheticOperator extends TestCase {
 	public void testMap() throws Exception {
 		StencilTree program = ParseStencil.programTree(fullOperatorSource, ADAPTER);
 		SyntheticOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
-		FacetData facetData = operator.getOperatorData().getFacet(StencilOperator.MAP_FACET);
-		TuplePrototype prototype = facetData.getPrototype();
-		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
+		FacetData facetData = operator.getOperatorData().defaultFacet();
+		TuplePrototype prototype = facetData.prototype();
+		Invokeable map = operator.getFacet(facetData.name());
 		Tuple rv;
 		
 		boolean error = false;
@@ -62,7 +62,7 @@ public class TestSyntheticOperator extends TestCase {
 		StencilTree program = ParseStencil.programTree(basicOperatorSource, ADAPTER);
 
 		SyntheticOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
-		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
+		Invokeable map = operator.getFacet(operator.getOperatorData().defaultFacet().name());
 
 		boolean error = false;
 		try {
@@ -92,7 +92,7 @@ public class TestSyntheticOperator extends TestCase {
 	public void testMapfail() throws Exception {
 		StencilTree program = ParseStencil.programTree(fullOperatorSource, ADAPTER);
 		StencilOperator operator = new SyntheticOperator("TestModule", program.find(LIST_OPERATORS).getChild(0));
-		Invokeable map = operator.getFacet(StencilOperator.MAP_FACET);
+		Invokeable map = operator.getFacet(operator.getOperatorData().defaultFacet().name());
 		
 		boolean failed = false;
 		try {

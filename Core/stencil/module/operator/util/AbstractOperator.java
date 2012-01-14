@@ -62,7 +62,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	 */
 	public Invokeable getFacet(String name) {
 		FacetData fd = operatorData.getFacet(name);
-		String target = fd.getTarget();
+		String target = fd.target();
 		try {
 			for (Method method: this.getClass().getMethods()) {
 				if (method.getName().equals(target)) {return new ReflectiveInvokeable(method, this);}
@@ -86,7 +86,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	public static boolean isFunction(StencilOperator op) {return isFunction(op.getOperatorData());}
 	public static boolean isFunction(OperatorData op) {
 		for (FacetData fd: op.getFacets()) {
-			if (fd.getMemUse() != MemoryUse.FUNCTION) {return false;}
+			if (fd.memUse() != MemoryUse.FUNCTION) {return false;}
 		}
 		return true;
 	}
