@@ -10,6 +10,7 @@ import org.antlr.runtime.tree.TreeAdaptor;
 
 import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.AstInvokeable;
+import stencil.parser.tree.StencilTree;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
 import static stencil.parser.ParserConstants.STATE_ID_FACET;
 
@@ -67,11 +68,23 @@ public class Utilities {
 		return rv;
 	}
 	
+	public static final String counterpart(StencilTree inv, StencilTree facet) {
+		return counterpart((AstInvokeable) inv, facet.getText());
+	}
+	
 	public static final String counterpart(AstInvokeable inv, String facet) {
 		StencilOperator op = inv.getOperator();
 		if (op == null) {
 			throw new IllegalArgumentException("Cannot derive counterpart for non-operator invokeables.");
 		} 
+		return op.getOperatorData().getFacet(facet).counterpart();
+	}
+	
+	public static final String defaultFacet(AstInvokeable inv) {
+		StencilOperator op = inv.getOperator();
+		if (op == null) {
+			throw new IllegalArgumentException("Cannot discern default operatro for non-operator invokeables.");
+		} 
 		return op.getOperatorData().defaultFacet().name();
-	} 
+	}
 }

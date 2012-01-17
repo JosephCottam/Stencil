@@ -29,7 +29,6 @@ options {
    
       
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
-   import static stencil.parser.ParserConstants.MAP_FACET;
    
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
@@ -173,7 +172,7 @@ replaceCompactForm:
  ^(f=FUNCTION n=. s=. a=. gy=GUIDE_YIELD t=.) ->
 		^(FUNCTION  $n $s $a DIRECT_YIELD[$gy.text] 
 		      ^(FUNCTION 
-		          ^(OP_NAME DEFAULT ID[selectOperator($t, true)] ID[MAP_FACET]) 
+		          ^(OP_NAME DEFAULT ID[selectOperator($t, true)] DEFAULT_FACET) 
 		          {spec($t, true)} 
 		          {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
 		          DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
@@ -184,7 +183,7 @@ ensure:
 		  {$c.getAncestor(RULES_RESULT) != null &&  requiresChanges($c)}? ->
 		    ^(CALL_CHAIN    
 		       ^(FUNCTION
-		          ^(OP_NAME DEFAULT ID[selectOperator($t, false)] ID[MAP_FACET]) 
+		          ^(OP_NAME DEFAULT ID[selectOperator($t, false)] DEFAULT_FACET) 
                   {spec($t, true)} 
                   {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
                   DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]

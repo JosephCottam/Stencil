@@ -17,8 +17,6 @@ options {
   import static stencil.parser.ParserConstants.DYNAMIC_STORE_FIELD;
   import static stencil.parser.string.util.Utilities.genSym;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
-  import static stencil.parser.ParserConstants.MAP_FACET;
-  
 }
 
 @members {
@@ -43,5 +41,5 @@ results
         ^(RULES_RESULT $rules*
             ^(RULE ^(TARGET ^(TARGET_TUPLE ^(TUPLE_FIELD ID[DYNAMIC_STORE_FIELD])))
                    ^(CALL_CHAIN 
-                       ^(FUNCTION ^(OP_NAME DEFAULT ID["ToTuple"] ID[MAP_FACET]) SPECIALIZER {args(reducer)} DIRECT_YIELD[frameName] ^(PACK ^(TUPLE_REF ID[frameName]))))))
+                       ^(FUNCTION ^(OP_NAME DEFAULT ID["ToTuple"] DEFAULT_FACET) SPECIALIZER {args(reducer)} DIRECT_YIELD[frameName] ^(PACK ^(TUPLE_REF ID[frameName]))))))
       ->^(RULES_RESULT $rules*); 

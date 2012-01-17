@@ -15,6 +15,7 @@ public class TestClasses extends StencilTestCase {
 		int prefixLength = new java.io.File(".").getCanonicalPath().length() + 5; //five is for "/bin/"
 		
 		for (String fileName: files) {
+			if (fileName.contains("$")) {continue;}
 			try {
 				String truncated = fileName.substring(prefixLength, fileName.length()-6); // -6 to remove ".class" 
 				String className = truncated.replace("/", ".");

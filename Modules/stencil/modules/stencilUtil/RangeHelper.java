@@ -33,7 +33,7 @@ import static java.lang.String.format;
 @Description("Higher order operator for performing range-related summarization")
 public abstract class RangeHelper implements StencilOperator<StencilOperator>, Cloneable {
 	public static final String FACET_KEY = "facet";
-	public static final String DEFAULT_SPECIALIZER = "[" + Range.RANGE_KEY + ": \"ALL\", " + FACET_KEY +": map\"]";
+	public static final String DEFAULT_SPECIALIZER = "[" + Range.RANGE_KEY + ": \"ALL\", " + FACET_KEY +": \"map\"]";
 	
 	private abstract static class RangeTarget implements Invokeable {
 		final RangeHelper helper;

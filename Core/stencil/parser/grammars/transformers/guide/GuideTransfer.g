@@ -30,7 +30,6 @@ options {
   import stencil.interpreter.guide.MonitorOperator;
   import stencil.parser.ProgramCompileException;
   
-  import static stencil.parser.ParserConstants.QUERY_FACET;
   import static stencil.parser.ParserConstants.INVOKEABLE;
   import static stencil.parser.string.util.Utilities.*;
 }
@@ -134,8 +133,8 @@ copyQuery: ^(GUIDE type=. spec=. selector=. actions=. lgg=.) ->
 changeFacets
    @after{
      StencilTree func = $changeFacets.tree;
-     func.find(INVOKEABLE).changeFacet(QUERY_FACET);
-     //TODO: Remove when no longer relying on copy propagation to keep shared state correct
+     func.find(INVOKEABLE).changeFacet(func.find(OP_NAME).getChild(2).getText());
+     //TODO: Remove this @after when no longer relying on copy propagation to keep shared state correct
    }
    : ^(f=FUNCTION i=. ^(OP_NAME pre=. base=. facet=.) spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> 
-        ^(FUNCTION $i ^(OP_NAME $pre $base ID[QUERY_FACET]) $spec $args $style $c);
+        ^(FUNCTION $i ^(OP_NAME $pre $base ID[counterpart(i, facet)]) $spec $args $style $c);

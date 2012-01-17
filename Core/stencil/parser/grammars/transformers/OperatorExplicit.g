@@ -25,7 +25,6 @@ options {
   import stencil.parser.tree.*;
   import static stencil.parser.ParserConstants.NAME_SEPARATOR;
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
-  import static stencil.parser.ParserConstants.MAP_FACET;
   import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 }
 

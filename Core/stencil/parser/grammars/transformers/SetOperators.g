@@ -33,29 +33,47 @@ options {
      modules = (ModuleCache) args[0];
   }
 
+  public Object downup(Object p) {
+    downup(p, this, "resolveDefaultFacets");     //Determine what the default facets are, directly note
+    downup(p, this, "instantiate");  			//Create the AstInvokeable nodes
+    return p;
+  }
+
 	protected ModuleCache modules;
 	
-    public AstInvokeable makeInvokeable(StencilTree func) {
-  		StencilOperator op;
+	private StencilOperator getOp(StencilTree func) {
    		MultiPartName name =  Freezer.multiName(func.find(OP_NAME));
   		
   		try {
          Specializer s = Freezer.specializer(func.find(SPECIALIZER));
-         //TODO: Do not use modules for this, instead just search the AST
-         op = modules.instance(name, null, s, false);   //null context and false is fine BECAUSE all ops should be instantiated in the AST already
+         //TODO: Do not use modules for this, pull it from a table of operators stored in the AST (and abolish the ad-hoc module)
+         return modules.instance(name, null, s, false);   //null context and false is fine BECAUSE all ops should be instantiated in the AST already
     	} catch (Exception e) {
     		String message = String.format("Error creating invokeable instance for function \%1\$s.", name); //TODO: Add path to the point of error...
     		throw new RuntimeException(message, e);
     	}
-    	
+	}
+	
+    public AstInvokeable makeInvokeable(StencilTree func) {
+	   StencilOperator op = getOp(func);
+	   MultiPartName name =  Freezer.multiName(func.find(OP_NAME));
        AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
        inv.setOperator(op);
        inv.setInvokeable(op.getFacet(name.facet()));
        return inv;
     }
+    
+    private String defaultFacet(StencilTree dfNode) {
+       StencilTree func = dfNode.getAncestor(FUNCTION);
+       StencilOperator op = getOp(func);
+       return op.getOperatorData().defaultFacet().name();  
+    }
 }
 
-topdown 
+resolveDefaultFacets
+  : ^(OP_NAME p=. o=. df=DEFAULT_FACET) -> ^(OP_NAME $p $o ID[defaultFacet(df)]);
+
+instantiate 
   : (FUNCTION AST_INVOKEABLE ) => ^(f=FUNCTION AST_INVOKEABLE .*) 
   | ^(f=FUNCTION name=. spec=. args=. yield=. pack=.) -> ^(FUNCTION {makeInvokeable($f)} $name $spec $args $yield $pack);
 

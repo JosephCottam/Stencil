@@ -100,13 +100,12 @@ options {
        return false;
    }
    
-   /**Creates the appropriate call for constructing a tuple.
-    *  TODO: ToTuple is currently used, but without a prototype-creating-specializer; should a prototype be created for it? 
-    */
+   
+   /**Creates the appropriate call for constructing a tuple.*/
    private StencilTree createExtension(StencilTree splice, Tree pass) {
        StencilTree pack = splice.findDescendant(PACK);
        String frameName = genSym(FRAME_SYM_PREFIX);
-       StencilTree newCall = (StencilTree) adaptor.create(FUNCTION, "ToTuple." + ParserConstants.MAP_FACET);
+       StencilTree newCall = (StencilTree) adaptor.create(FUNCTION, "ToTuple.map");	//TODO: Remove hard-coded call to map; replace with call to default...
        Object newArgs = adaptor.create(LIST_ARGS, StencilTree.typeName(LIST_ARGS));
        for (StencilTree arg: pack) {adaptor.addChild(newArgs, adaptor.dupTree(arg));}           
        adaptor.addChild(newCall, adaptor.dupTree(ParserConstants.EMPTY_SPECIALIZER_TREE));

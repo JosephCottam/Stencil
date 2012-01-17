@@ -26,8 +26,8 @@ import static stencil.parser.string.StencilParser.*;
 /**Operator defined through a stencil definition.**/
 public class SyntheticOperator implements StencilOperator {
 	//TODO: Move a the parts that depend on these names into the compiler...
-	private static final String MAP_FACET = "map";
-	private static final String QUERY_FACET = "query";
+	public static final String DEFAULT_FACET = "map";
+	public static final String COUNTERPART_FACET = "query";
 
 	
 	private static final class SynthInvokeable implements Invokeable {
@@ -91,8 +91,8 @@ public class SyntheticOperator implements StencilOperator {
 
 		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null);
 		
-		opData.addFacet(new FacetData(MAP_FACET, MAP_FACET, QUERY_FACET, MemoryUse.WRITER, findPrototype(MAP_FACET)));	
-		opData.addFacet(new FacetData(QUERY_FACET, MemoryUse.READER, findPrototype(QUERY_FACET)));	
+		opData.addFacet(new FacetData(DEFAULT_FACET, DEFAULT_FACET, COUNTERPART_FACET, MemoryUse.WRITER, findPrototype(DEFAULT_FACET)));	
+		opData.addFacet(new FacetData(COUNTERPART_FACET, MemoryUse.READER, findPrototype(COUNTERPART_FACET)));	
 		opData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 		
 		this.operatorData = opData;
@@ -120,9 +120,9 @@ public class SyntheticOperator implements StencilOperator {
 
 	public Invokeable getFacet(String name) throws UnknownFacetException {
 		try {
-			if (name.equals(MAP_FACET)) {
+			if (name.equals(DEFAULT_FACET)) {
 				return new SynthInvokeable(this, true);
-			} else if (name.equals(QUERY_FACET)) {
+			} else if (name.equals(COUNTERPART_FACET)) {
 				return new SynthInvokeable(this, true);				
 			} else if (name.equals(StencilOperator.STATE_ID_FACET)) {
 				return new ReflectiveInvokeable(name, this);
@@ -135,12 +135,12 @@ public class SyntheticOperator implements StencilOperator {
 	public OperatorData getOperatorData() {return operatorData;}
 	
 	private OperatorFacet getQuery() {
-		if (query == null) {query = Freezer.operatorFacet(operatorData.getName(), findFacet(QUERY_FACET));}
+		if (query == null) {query = Freezer.operatorFacet(operatorData.getName(), findFacet(COUNTERPART_FACET));}
 		return query;
 	}
 
 	private OperatorFacet getMap() {
-		if (map == null) {map = Freezer.operatorFacet(operatorData.getName(), findFacet(MAP_FACET));}
+		if (map == null) {map = Freezer.operatorFacet(operatorData.getName(), findFacet(DEFAULT_FACET));}
 		return map;
 	}
 	
