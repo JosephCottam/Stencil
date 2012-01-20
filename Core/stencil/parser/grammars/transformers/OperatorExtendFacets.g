@@ -12,25 +12,19 @@ options {
  
   package stencil.parser.string;
 
-  import stencil.parser.tree.StencilTree;
-  import static stencil.parser.string.util.Utilities.*;
+  import stencil.parser.tree.StencilTree;  
   import stencil.module.operator.wrappers.SyntheticOperator;
+  import static stencil.parser.string.util.Utilities.*;
 }
 
-@members {
+@members {  
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
   public Object downup(Object t) {
     downup(t, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees
-    downup(t, this, "toQuery");
+    downup(t, this, "toCounterpart");
     return t;
   }
-  
-  //TODO: Add counterpart meta-data to the operator metadata
-  public String counterPart(StencilTree facet) {
-     if (facet.getText().equals(SyntheticOperator.DEFAULT_FACET)) {return SyntheticOperator.COUNTERPART_FACET;}
-     else {return facet.getText();}
-  } 
 }
 
 //Extend the operator definition to include the required facets 
@@ -41,9 +35,9 @@ replicate: ^(r=OPERATOR proto=. prefilter=. rules=.)
 	          STATE_QUERY);//Query is filled in later...
 	          
 
-//Properly construct the query facet
-toQuery: ^(f=FUNCTION ^(OP_NAME pre=. base=. facet=.) rest+=.*) 
+//Properly construct the counterpart facet
+toCounterpart: ^(f=FUNCTION ^(opName=OP_NAME pre=. base=. facet=.) rest+=.*) 
           {$f.getAncestor(PREDICATE)  == null                                   //No predicate specified 
-            && $f.getAncestor(OPERATOR_FACET) != null                           //Face is specified
+            && $f.getAncestor(OPERATOR_FACET) != null                           //Facet is specified
             && $f.getAncestor(OPERATOR_FACET).getText().equals(SyntheticOperator.COUNTERPART_FACET)}? ->    //And the facet group being transformed is a query THEN...
-          ^(FUNCTION ^(OP_NAME $pre $base ID[counterPart($facet)])  $rest*);
+          ^(FUNCTION ^(OP_NAME $pre $base COUNTERPART_FACET[facet.getText()])  $rest*);

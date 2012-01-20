@@ -16,7 +16,7 @@ import stencil.testUtilities.treeView.ANTLRNode;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
 public class TreeView {
-	public static String HEADER_FLAG = "-header";
+	public static String HEADER_FLAG = "--header";
 	
 	public static String test = "";
 
@@ -34,7 +34,7 @@ public class TreeView {
 		props.loadFromXML(new FileInputStream(args[0]));
 		ANTLRNode.showClass= true;
 		
-		if (args.length >0){
+		if (args.length >1){
 			boolean skipHeader = args[1].toLowerCase().equals(HEADER_FLAG);
 			if (skipHeader) {
 				file =args[2];

@@ -8,7 +8,13 @@ import java.util.List;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
 
+import stencil.interpreter.tree.Freezer;
+import stencil.interpreter.tree.MultiPartName;
+import stencil.module.Module;
+import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
+import stencil.module.util.OperatorData;
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.AstInvokeable;
 import stencil.parser.tree.StencilTree;
 import static stencil.parser.string.StencilParser.STATE_QUERY;
@@ -68,6 +74,25 @@ public class Utilities {
 		return rv;
 	}
 	
+	
+	public static final String defaultFacet(ModuleCache modules, StencilTree opName) {
+		MultiPartName name = Freezer.multiName(opName);
+		Module m = modules.findModuleForOperator(name);
+		OperatorData od = m.getOperatorData(name.name(), ParserConstants.EMPTY_SPECIALIZER);
+		return od.defaultFacet().name();
+	}
+	
+	public static final String counterpart(ModuleCache modules, StencilTree opName) {
+		MultiPartName name = Freezer.multiName(opName);
+		Module m = modules.findModuleForOperator(name);
+		OperatorData od = m.getOperatorData(name.name(), ParserConstants.EMPTY_SPECIALIZER);
+		String facet = name.facet();
+		if (facet.equals("DEFAULT_FACET")) {
+			facet = od.defaultFacet().name();
+		} 
+		return od.getFacet(facet).counterpart();
+	}
+	
 	public static final String counterpart(StencilTree inv, StencilTree facet) {
 		return counterpart((AstInvokeable) inv, facet.getText());
 	}
@@ -86,5 +111,5 @@ public class Utilities {
 			throw new IllegalArgumentException("Cannot discern default operatro for non-operator invokeables.");
 		} 
 		return op.getOperatorData().defaultFacet().name();
-	}
+	}	
 }

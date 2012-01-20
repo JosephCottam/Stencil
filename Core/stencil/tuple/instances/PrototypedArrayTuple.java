@@ -81,12 +81,15 @@ public class PrototypedArrayTuple<T extends TupleFieldDef> implements Prototyped
 		return newValues;
 	}
 
-	/**Verify that the names list contains no duplicates.*/
+	/**Verify that the names list contains no duplicates.
+	 * Duplicates ARE permitted when the name starts with a # (and is thus administrative in the stencil compiler).
+	 * */
 	private static final String findDuplicateName(String[] names) {
 		String[] ns = new String[names.length];
 		System.arraycopy(names, 0, ns, 0, names.length);
 		Arrays.sort(ns);		
 		for (int i =0; i<ns.length-1; i++) {
+			if (ns[i].startsWith("#")) {continue;}
 			if (ns[i].equals(ns[i+1])) {return ns[i];}
 		}
 		return null;

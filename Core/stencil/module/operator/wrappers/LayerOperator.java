@@ -53,14 +53,19 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		facets.add(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
 		facets.add(new FacetData(CONTAINS, MemoryUse.READER, prototype));
 		facets.add(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
-		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, "find", facets, new ArrayList());
+		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, FIND, facets, new ArrayList());
 	}
 	
 	public String getName() {return layer.name();}
 
 	public Invokeable getFacet(String facet) throws UnknownFacetException {
 		FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
-		return new ReflectiveInvokeable(fd.target(), this);
+
+		if (fd.name().equals(NEAR)) {
+			return new ReflectiveInvokeable(fd.target(), this);
+		} else {
+			return new ReflectiveInvokeable(fd.target(), layer);
+		}
 	}
 
 	public OperatorData getOperatorData() {return operatorData;}
@@ -87,7 +92,12 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 
 		public Invokeable getFacet(String facet) throws IllegalArgumentException {
 			FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
-			return new ReflectiveInvokeable(fd.target(), this);
+			
+			if (fd.name().equals(NEAR)) {
+				return new ReflectiveInvokeable(fd.target(), this);
+			} else {
+				return new ReflectiveInvokeable(fd.target(), layer);
+			}
 		}
 
 		

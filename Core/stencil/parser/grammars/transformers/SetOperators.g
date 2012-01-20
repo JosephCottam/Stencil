@@ -24,9 +24,15 @@ options {
   import stencil.interpreter.tree.Specializer;
   import stencil.interpreter.tree.MultiPartName;
   import stencil.interpreter.tree.Freezer;
+  
+  import static stencil.parser.string.util.Utilities.counterpart;
+  import static stencil.parser.string.util.Utilities.defaultFacet;
+  
 }
 
 @members { 
+  protected ModuleCache modules;
+  
   public static StencilTree apply (Tree t, ModuleCache modules) {return (StencilTree) TreeRewriteSequence.apply(t, modules);}
   
   protected void setup(Object... args) {
@@ -34,12 +40,11 @@ options {
   }
 
   public Object downup(Object p) {
-    downup(p, this, "resolveDefaultFacets");     //Determine what the default facets are, directly note
-    downup(p, this, "instantiate");  			//Create the AstInvokeable nodes
+    p=downup(p, this, "resolveDefaultFacets");     //Determine what the default facets are, directly note
+    p=downup(p, this, "instantiate");  			//Create the AstInvokeable nodes
     return p;
   }
 
-	protected ModuleCache modules;
 	
 	private StencilOperator getOp(StencilTree func) {
    		MultiPartName name =  Freezer.multiName(func.find(OP_NAME));
@@ -62,16 +67,11 @@ options {
        inv.setInvokeable(op.getFacet(name.facet()));
        return inv;
     }
-    
-    private String defaultFacet(StencilTree dfNode) {
-       StencilTree func = dfNode.getAncestor(FUNCTION);
-       StencilOperator op = getOp(func);
-       return op.getOperatorData().defaultFacet().name();  
-    }
 }
 
 resolveDefaultFacets
-  : ^(OP_NAME p=. o=. df=DEFAULT_FACET) -> ^(OP_NAME $p $o ID[defaultFacet(df)]);
+  : ^(on=OP_NAME p=. o=. f=DEFAULT_FACET) -> ^(OP_NAME $p $o ID[defaultFacet(modules, $on)])
+  | ^(on=OP_NAME p=. o=. f=COUNTERPART_FACET) -> ^(OP_NAME $p $o ID[counterpart(modules, $on)]);
 
 instantiate 
   : (FUNCTION AST_INVOKEABLE ) => ^(f=FUNCTION AST_INVOKEABLE .*) 

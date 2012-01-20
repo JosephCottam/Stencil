@@ -174,16 +174,16 @@ public abstract class ParseStencil {
 		p = SeparateRules.apply(p);				//Group the operator chains, switch everything to "Target"
 		p = EnsureOrders.apply(p);				//Ensure the proper order blocks
 
-		ModuleCache modules = Imports.apply(p);	//Do module imports
+		ModuleCache modules = Imports.apply(p);		//Do module imports
 		
-		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
-		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
-		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
+		p = PrepareCustomArgs.apply(p);				//Parse custom argument blocks
+		p = Predicate_Expand.apply(p);				//Convert filters to standard rule chains
+		p = SpecializerDeconstant.apply(p);			//Remove references to constants in specializers
 		p = DefaultSpecializers.apply(p, modules, adapter); 	//Add default specializers where required
-		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
-		p = OperatorInstantiateTemplates.apply(p);		//Remove all template references
+		p = OperatorToOpTemplate.apply(p);			//Converting all operator defs to template/ref pairs
+		p = OperatorInstantiateTemplates.apply(p);	//Remove all template references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
-		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
+		p = OperatorExtendFacets.apply(p); 			//Expand operatorDefs to include query and stateID
 
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 
 		NoOperatorReferences.apply(p);					//Validate the ad-hocs are all created

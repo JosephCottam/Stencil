@@ -11,6 +11,7 @@ tokens {
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
   CALL_CHAIN;
+  COUNTERPART_FACET;	//The facet enclosed should NOT be used, its counterpart should be used instead
   DEFAULT_FACET;
   DIRECT_YIELD;
   DYNAMIC_RULE;
