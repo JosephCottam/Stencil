@@ -60,12 +60,16 @@ options {
 	}
 	
     public AstInvokeable makeInvokeable(StencilTree func) {
-	   StencilOperator op = getOp(func);
+       StencilOperator op = getOp(func);
 	   MultiPartName name =  Freezer.multiName(func.find(OP_NAME));
-       AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
-       inv.setOperator(op);
-       inv.setInvokeable(op.getFacet(name.facet()));
-       return inv;
+	   try {
+           AstInvokeable inv = (AstInvokeable) adaptor.create(AST_INVOKEABLE, "");
+           inv.setOperator(op);
+           inv.setInvokeable(op.getFacet(name.facet()));
+           return inv;
+	   } catch (Exception e) {
+		   throw new RuntimeException("Error constructing invokeable for " + name.toString(), e);
+	   }
     }
 }
 
