@@ -26,12 +26,12 @@ public class TestProjection extends StencilTestCase {
 		String simple = "stream S(A,B,C) layer L from S ID: Count()";		
 		StencilTree s = ParseStencil.programTree(simple, Adapter.ADAPTER);
 		op = ((OperatorProxy) s.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
-		assertEquals("Did not find simple operator when expected.", "Counter", op.getOperatorData().getTarget());
+		assertEquals("Did not find simple operator when expected.", "Counter", op.getOperatorData().target());
 		
 		String complex = "stream S(A,B,C) layer L from S ID: Count(A)";
 		StencilTree c = ParseStencil.programTree(complex, Adapter.ADAPTER);
 		op = ((OperatorProxy) c.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
-		assertEquals("Did not find complex operator when expected.", "Count", op.getOperatorData().getTarget());
+		assertEquals("Did not find complex operator when expected.", "Count", op.getOperatorData().target());
 	}
 	
 	private void testRankOp(StencilOperator op, int[] ranks, Object[][] inputs) throws Exception {

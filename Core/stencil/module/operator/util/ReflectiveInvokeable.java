@@ -62,7 +62,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 			if (m.getName().equals(methodName)) {return m;}
 		}
 		
-		throw new IllegalArgumentException(String.format("Could not find method named %1$s in class %2$s.", methodName, clss.getName()));
+		throw new IllegalArgumentException(String.format("Could not find method named '%1$s' in class %2$s.", methodName, clss.getName()));
 	}
 	
 	/**Is the underlying method static?*/

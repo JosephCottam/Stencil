@@ -33,9 +33,9 @@ public final class Modules {
 	 * @throws SpecializationException 
 	 **/
 	public static StencilOperator instance(Class source, OperatorData operatorData, Object...args) {
-		String module = operatorData.getModule();
-		String name = operatorData.getName();
-		String target = operatorData.getTarget();
+		String module = operatorData.module();
+		String name = operatorData.name();
+		String target = operatorData.target();
 
 		if (target == null) {throw new IllegalArgumentException("Cannot use null target.");}
 		target = target.toUpperCase();

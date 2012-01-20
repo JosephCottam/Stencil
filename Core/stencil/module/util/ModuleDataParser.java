@@ -1,6 +1,9 @@
 package stencil.module.util;
 
 import java.lang.reflect.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
@@ -41,11 +44,11 @@ public class ModuleDataParser {
 		final String opName = EMPTY.equals(o.name().trim()) ? defaultName : o.name();
 		
 		final Specializer spec = ParseStencil.specializer(o.spec());
-		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName(), o.tags());
+		FacetData[] facets = makeFacetData(f, m.getName());
+
+		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName(), o.defaultFacet(), Arrays.asList(facets), Arrays.asList(o.tags()));
 
 		
-		FacetData[] fds = makeFacetData(f, m.getName());
-		for (FacetData fd:fds) {od.addFacet(fd);}
 		return od;
 	}
 
@@ -84,14 +87,16 @@ public class ModuleDataParser {
 		
 		final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
 		final Specializer spec = ParseStencil.specializer(o.spec());
-		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.tags());
 		
+		List<FacetData> facets = new ArrayList();
 		for (Method m: c.getMethods()) {
 			Facet f = m.getAnnotation(Facet.class);
 			if (f== null) {continue;}
 			FacetData[] fds = makeFacetData(f, m.getName());
-			for (FacetData fd:fds) {od.addFacet(fd);}
+			facets.addAll(Arrays.asList(fds));
 		}
+
+		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.defaultFacet(), facets, Arrays.asList(o.tags()));
 		
 		return od;
 	}

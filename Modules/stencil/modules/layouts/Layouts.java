@@ -35,11 +35,11 @@ public class Layouts extends BasicModule {
 		validate(name, specializer);
 		
 		OperatorData operatorData = getModuleData().getOperator(name);
-		if (operatorData.getName().equals(Circular.NAME)) {
+		if (operatorData.name().equals(Circular.NAME)) {
 			return new Circular(operatorData, specializer);
-		} else if (operatorData.getName().equals(RadialTree.NAME)) {
+		} else if (operatorData.name().equals(RadialTree.NAME)) {
 			return new RadialTree(operatorData, specializer);
-		} else if (operatorData.getName().equals(TreeMap.NAME)) {
+		} else if (operatorData.name().equals(TreeMap.NAME)) {
 			return new TreeMap(operatorData, specializer);
 		}
 		

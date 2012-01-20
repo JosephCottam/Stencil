@@ -22,11 +22,11 @@ public abstract class MonitorBase<T extends MonitorBase> extends AbstractOperato
 		OperatorData od = new OperatorData(base);
 		FacetData fd = od.getFacet("map");
 		fd = new FacetData(fd.name(), MemoryUse.WRITER, new String[0]);
-		od.addFacet(fd);
+		od = od.modFacet(fd);
 		
 		fd = od.getFacet("query");
 		fd = new FacetData(fd.name(), MemoryUse.WRITER, new String[0]);
-		od.addFacet(fd);
+		od = od.modFacet(fd);
 		
 		return od;
 	}

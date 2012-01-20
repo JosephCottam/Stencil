@@ -13,7 +13,7 @@ import stencil.tuple.prototype.TuplePrototype;
  * The basis will be in Y-Up/Negative coordinates but getting X or y will be in Y-Up/positive coordinates.
  **/
 public final class PointTuple implements PrototypedTuple {
-	private static final TuplePrototype PROTO = new TuplePrototype(new String[]{"x", "y"}, new Class[]{Point2D.class, double.class, double.class});
+	private static final TuplePrototype PROTO = new TuplePrototype(new String[]{"x", "y"}, new Class[]{double.class, double.class});
 	
 	private final Point2D p;
 	

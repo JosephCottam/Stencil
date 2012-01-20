@@ -5,6 +5,8 @@ import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 
 import stencil.display.Display;
@@ -44,13 +46,14 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		this.layer = layer;
 
 		TuplePrototype prototype = layer.prototype();
-		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null);
-		operatorData.addFacet(new FacetData(FIND, MemoryUse.READER, prototype));
-		operatorData.addFacet(new FacetData(NEAR, MemoryUse.READER, prototype));
-		operatorData.addFacet(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
-		operatorData.addFacet(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
-		operatorData.addFacet(new FacetData(CONTAINS, MemoryUse.READER, prototype));
-		operatorData.addFacet(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
+		List<FacetData> facets = new ArrayList();
+		facets.add(new FacetData(FIND, MemoryUse.READER, prototype));
+		facets.add(new FacetData(NEAR, MemoryUse.READER, prototype));
+		facets.add(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
+		facets.add(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
+		facets.add(new FacetData(CONTAINS, MemoryUse.READER, prototype));
+		facets.add(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
+		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, "find", facets, new ArrayList());
 	}
 	
 	public String getName() {return layer.name();}

@@ -24,7 +24,7 @@ public class TestModules extends TestCase {
 		Module m = mc.getModule(n.prefix());
 		assertNotNull("Module not found " + n.prefix(), m);
 		
-		Specializer s = m.getModuleData().getOperator(n.name()).getDefaultSpecializer();
+		Specializer s = m.getModuleData().getOperator(n.name()).defaultSpecializer();
 		assertNotNull(s);
 		
 		StencilOperator l = m.instance(n.name(), null, s);		

@@ -32,7 +32,7 @@ public class PersistentData extends BasicModule {
 			else {return queue.peek();}
 		}
 		
-		@Facet(memUse="WRITER", prototype="(size)", alias="map, push")
+		@Facet(memUse="WRITER", prototype="(size)", alias={"map", "push"})
 		public Object offer(Object value) {
 			queue.add(value);
 			return queue.size();
@@ -109,7 +109,7 @@ public class PersistentData extends BasicModule {
 		public int size() {return list.size();}
 	}
 	
-	@Operator()
+	@Operator(defaultFacet="put")
 	@Description("Dictionary for key/value pairs.  The specializer determines how many of the passed values are the key and how many are the values. Retrieval by key yields a tuple with just the values.")
 	public static final class Dict extends AbstractOperator.Statefull {		
 		public static final String NAMES = "fields";
@@ -135,8 +135,8 @@ public class PersistentData extends BasicModule {
 			this.names = names;
 		}
 
-		@Facet(memUse="WRITER", prototype="()")
-		public Object[] map(Object key, Object... values) {
+		@Facet(memUse="WRITER", prototype="()", counterpart="query")
+		public Object[] put(Object key, Object... values) {
 			Object[] objects = new Object[values.length];
 			System.arraycopy(values, 0, objects, 0, values.length); //Copy is required for storage.
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
@@ -151,7 +151,10 @@ public class PersistentData extends BasicModule {
 		}
 		
 		@Facet(memUse="READER", prototype="()")
-		public Object[] query(Object key, Object... values) {
+		public Object[] query(Object key, Object... values) {return get(key);}
+		
+		@Facet(memUse="READER", prototype="()")
+		public Object[] get(Object key) {
 			if (!caseSensitive && key instanceof String) {key = ((String) key).toUpperCase();}
 
 			Object result = dict.get(key);
@@ -171,16 +174,16 @@ public class PersistentData extends BasicModule {
 		public Dict viewpoint() {return new Dict(dict, operatorData, caseSensitive, names);}
 		
 		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
-			String module = basic.getModule();
-			String name = basic.getName();
+			String module = basic.module();
+			String name = basic.name();
 			String[] fields;
 			
 			try {fields = getNames(specializer);}
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
-			OperatorData od = new OperatorData(basic);
-			od.addFacet(new FacetData("map", MemoryUse.WRITER, fields));
-			od.addFacet(new FacetData("query", MemoryUse.READER, fields));
+			OperatorData od = new OperatorData(basic)
+									.modFacet(new FacetData("map", MemoryUse.WRITER, fields))
+									.modFacet(new FacetData("query", MemoryUse.READER, fields));
 			return od;
 		}
 

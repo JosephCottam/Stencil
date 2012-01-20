@@ -6,11 +6,12 @@ import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Operator;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.MultiResultTuple;
 
-@Operator(name="Map", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
+@Operator(name="Map", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG, defaultFacet="####error####")
 @Description("Higher order operator for applying an opertor to each value of a tuple.")
 public class MapWrapper implements StencilOperator {
 	private static final class MapInvokeable implements Invokeable {
@@ -52,7 +53,7 @@ public class MapWrapper implements StencilOperator {
 		}
 
 		@Override
-		public String targetIdentifier() {return wrapper.getName();}
+		public String targetIdentifier() {return wrapper.getName();}		
 	}
 	
 	private final StencilOperator op;
@@ -70,4 +71,8 @@ public class MapWrapper implements StencilOperator {
 	public String getName() {return op.getName() + "#Map";}
 	public MapWrapper viewpoint() {return new MapWrapper(op.viewpoint());}
 	public MapWrapper duplicate() throws UnsupportedOperationException {throw new UnsupportedOperationException("Duplicate not supported for map.");}
+	
+	@Facet(alias="####error####")
+	public String errorOut() {throw new RuntimeException("Mal-formed java function invoked.");}		
+
 }

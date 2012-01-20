@@ -64,7 +64,7 @@ public final class InvokeableOperator extends AbstractOperator<InvokeableOperato
 		}
 	}
 		
-	public String getName() {return operatorData.getName();}
+	public String getName() {return operatorData.name();}
 	
 	//TODO: Would it be better to see if all facets were functions as a quick-check?
 	//TODO: implement a more general duplicate

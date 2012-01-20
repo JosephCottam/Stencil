@@ -35,7 +35,7 @@ public class DateUtils extends BasicModule {
 			super(od);
 			String f = Converter.toString(spec.get("f"));
 			try {instanceFormatter = new SimpleDateFormat(f);}
-			catch (Exception e) {throw new SpecializationException(od.getModule(), od.getName(), spec, e);}
+			catch (Exception e) {throw new SpecializationException(od.module(), od.name(), spec, e);}
 		}
 	
 		@Description("Parse the passed string, usinging the passed format string.")

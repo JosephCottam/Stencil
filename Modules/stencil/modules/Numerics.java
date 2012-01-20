@@ -43,21 +43,18 @@ public class Numerics extends BasicModule {
 		public static StencilOperator instance(OperatorData od, Specializer spec) {
 			Object base = spec.get("base");
 			if (base instanceof String && ((String) base).toLowerCase().equals("e")) {
-				od = new OperatorData(od);
-				od.setTarget("log");
+				od = new OperatorData(od).target("log");
 				return Modules.instance(java.lang.Math.class, od);
 			} else if (base instanceof Number){
 				double bs = Converter.toDouble(spec.get("base"));
 				if (bs == 10) {
-					od = new OperatorData(od);
-					od.setTarget("log10");
+					od = new OperatorData(od).target("log10");
 					return Modules.instance(java.lang.Math.class, od);					
 				} else {
 					return new LogFixed(od, bs);
 				}
 			} else {
-				od = new OperatorData(od);
-				od.setTarget("logParam");
+				od = new OperatorData(od).target("logParam");
 				return Modules.instance(Numerics.LogFixed.class, od);
 			}
 		}

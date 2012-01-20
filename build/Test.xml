@@ -96,7 +96,7 @@
                 <pathelement path="${testsLocation}"/>
                 <pathelement path="${java.class.path}"/>
                 <pathelement path="."/>
-                <fileset dir="${runtimeLibrary}" includes="*.jar"/>
+                <fileset dir="${runtimeLibrary}" includes="**/*.jar"/>
             </classpath>
             <test name="stencil.unittests.TestConfigure"/>
             <formatter type="plain"/>

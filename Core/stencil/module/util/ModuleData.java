@@ -22,7 +22,7 @@ public final class ModuleData {
 	public void setDescription(String description) {this.description = description;}
 
 	public Specializer getDefaultSpecializer(String op) {
-		return getOperator(op).getDefaultSpecializer();
+		return getOperator(op).defaultSpecializer();
 	}
 	
 	public void setTargetClass(String clazz) {this.clazz = clazz;}
@@ -46,7 +46,7 @@ public final class ModuleData {
 	/**Adds an operator to the module;  will ignore nulls.*/
 	public void addOperator(OperatorData od) {
 		if (od == null) {return;}
-		operators.put(od.getName(), od);
+		operators.put(od.name(), od);
 	}
 
 	public OperatorData getOperator(String name) {

@@ -1,5 +1,8 @@
 package stencil.module.operator.wrappers;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import stencil.interpreter.Environment;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Freezer;
@@ -57,7 +60,7 @@ public class SyntheticOperator implements StencilOperator {
 		}
 
 		@Override
-		public String targetIdentifier() {return op.operatorData.getName();}
+		public String targetIdentifier() {return op.operatorData.name();}
 
 		@Override
 		public Invokeable viewpoint() {
@@ -89,11 +92,12 @@ public class SyntheticOperator implements StencilOperator {
 		this.module = module;
 		this.opDef = opDef;
 
-		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null);
-		
-		opData.addFacet(new FacetData(DEFAULT_FACET, DEFAULT_FACET, COUNTERPART_FACET, MemoryUse.WRITER, findPrototype(DEFAULT_FACET)));	
-		opData.addFacet(new FacetData(COUNTERPART_FACET, MemoryUse.READER, findPrototype(COUNTERPART_FACET)));	
-		opData.addFacet(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+		List<FacetData> facets = new ArrayList(); 
+		facets.add(new FacetData(DEFAULT_FACET, DEFAULT_FACET, COUNTERPART_FACET, MemoryUse.WRITER, findPrototype(DEFAULT_FACET)));	
+		facets.add(new FacetData(COUNTERPART_FACET, MemoryUse.READER, findPrototype(COUNTERPART_FACET)));	
+		facets.add(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
+
+		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null, "map", facets, new ArrayList());		
 		
 		this.operatorData = opData;
 	}
@@ -128,19 +132,19 @@ public class SyntheticOperator implements StencilOperator {
 				return new ReflectiveInvokeable(name, this);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
-		throw new UnknownFacetException(operatorData.getName(), name, operatorData.getFacetNames());
+		throw new UnknownFacetException(operatorData.name(), name, operatorData.getFacetNames());
 	}
 
-	public String getName() {return operatorData.getName();}
+	public String getName() {return operatorData.name();}
 	public OperatorData getOperatorData() {return operatorData;}
 	
 	private OperatorFacet getQuery() {
-		if (query == null) {query = Freezer.operatorFacet(operatorData.getName(), findFacet(COUNTERPART_FACET));}
+		if (query == null) {query = Freezer.operatorFacet(operatorData.name(), findFacet(COUNTERPART_FACET));}
 		return query;
 	}
 
 	private OperatorFacet getMap() {
-		if (map == null) {map = Freezer.operatorFacet(operatorData.getName(), findFacet(DEFAULT_FACET));}
+		if (map == null) {map = Freezer.operatorFacet(operatorData.name(), findFacet(DEFAULT_FACET));}
 		return map;
 	}
 	
@@ -165,7 +169,7 @@ public class SyntheticOperator implements StencilOperator {
 		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		
 		try {prefilter = Interpreter.processEnv(env, facet.getPrefilterRules());}
-		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.getName(), facet.getName(), tuple.toString()));}
+		catch (Exception e) {throw new RuntimeException(String.format("Error with prefilter in %1$s.%2$s and tuple %3$s.", operatorData.name(), facet.getName(), tuple.toString()));}
 		env.setFrame(Environment.PREFILTER_FRAME, prefilter);
 		
 		OperatorRule action = matchingAction(facet, env);
@@ -174,7 +178,7 @@ public class SyntheticOperator implements StencilOperator {
 			try {
 				 return action.invoke(env);
 			} catch (Exception e) {
-				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", operatorData.getName(), facet.getName()),e);
+				throw new RuntimeException (String.format("Error executing method in %1$s.%2$s.", operatorData.name(), facet.getName()),e);
 			}
 		}
 		

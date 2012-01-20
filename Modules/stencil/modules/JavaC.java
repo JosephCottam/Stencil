@@ -39,6 +39,7 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Operator;
 import stencil.module.util.ann.Module;
 import stencil.parser.string.DefaultSpecializers;
@@ -52,7 +53,7 @@ public class JavaC extends BasicModule {
 	private static final String BODY_KEY = "body";
 	private static final String CLASS_KEY = "class";
 	
-	@Operator(name="Java", spec="[ body:\"\", header:\"\"]")
+	@Operator(name="Java", spec="[ body:\"\", header:\"\"]", defaultFacet="####error####")
 	@Description("Compile a java operator without state.")
 	public static final class Function extends AbstractOperator<Function> {
 		private final StencilOperator operator;
@@ -70,10 +71,13 @@ public class JavaC extends BasicModule {
 
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
 		public OperatorData getOperatorData() {return opData;}
+		
+		@Facet(alias="####error####")
+		public String errorOut() {throw new RuntimeException("Mal-formed java function invoked.");}		
 	}
 	
 	
-	@Operator(name="JavaC", spec="[body:\"\", header:\"\", class:\"AbstractOperator.Statefull\"]")
+	@Operator(name="JavaC", spec="[body:\"\", header:\"\", class:\"AbstractOperator.Statefull\"]", defaultFacet="####error####")
 	@Description("Compile a java operator.  Expects full method declarations.")
 	public static final class Stateful extends AbstractOperator.Statefull<Stateful> {
 		private final StencilOperator operator;
@@ -92,14 +96,16 @@ public class JavaC extends BasicModule {
 		
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
 		public OperatorData getOperatorData() {return opData;}
+		
+		@Facet(alias="####error####")
+		public String errorOut() {throw new RuntimeException("Mal-formed java function invoked.");}
 	}
 
 	
 	private static OperatorData blendOpData(OperatorData custom, OperatorData defaults) {
-		Specializer spec = DefaultSpecializers.blend(custom.getDefaultSpecializer(), defaults.getDefaultSpecializer());
+		Specializer spec = DefaultSpecializers.blend(custom.defaultSpecializer(), defaults.defaultSpecializer());
 		OperatorData copy = new OperatorData(custom);
-		copy.setDefaultSpecializer(spec);
-		return copy;
+		return copy.defaultSpecializer(spec);
 	}
 	
 	

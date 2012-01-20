@@ -25,7 +25,7 @@ public abstract class DirectOperator implements StencilOperator, Invokeable {
 	public Invokeable getFacet(String facet) throws UnknownFacetException {return this;}
 
 	@Override
-	public String getName() {return od.getName();}
+	public String getName() {return od.name();}
 
 	@Override
 	public OperatorData getOperatorData() {return od;}

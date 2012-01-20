@@ -11,5 +11,5 @@ public @interface Operator {
 	String[] tags() default {};	//List of tags.  Tags are typically used to communicate properties of a particular implementation
 	
 	/**Which facet should be used by default.  In general, this facet should have a counterpart.*/
-	String defaultFacet() default "map";	
+	String defaultFacet() default "";	
 }

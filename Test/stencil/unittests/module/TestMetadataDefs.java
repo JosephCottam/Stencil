@@ -52,6 +52,8 @@ public class TestMetadataDefs  extends TestCase {
 		assertNotNull("Could not find Add1", od);
 		assertNotNull(od.getFacet("map"));
 		assertNotNull(od.getFacet("query"));
+		assertNotNull(od.defaultFacet());
+		assertNotNull(od.defaultFacet().name());
 		assertEquals(MemoryUse.FUNCTION, od.getFacet("map").memUse());
 		assertEquals(MemoryUse.FUNCTION, od.getFacet("query").memUse());
 		assertEquals(od.getFacet("query").target(), od.getFacet("map").target());

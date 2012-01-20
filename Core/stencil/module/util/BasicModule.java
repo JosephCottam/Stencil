@@ -1,5 +1,6 @@
 package stencil.module.util;
 
+import stencil.module.MetadataHoleException;
 import stencil.module.Module;
 import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
@@ -15,20 +16,6 @@ import stencil.interpreter.tree.Specializer;
  * 
  */
 public abstract class BasicModule implements Module {
-	/**Indicate that an meta-data object has an incomplete field, when
-	 * all fields are expected to be complete.
-	 */
-	public static class MetaDataHoleException extends SpecializationException {
-		private OperatorData operatorData;
-		
-		public MetaDataHoleException(String module, String operator, Specializer spec, OperatorData operatorData) {
-			super(module, operator, spec);
-			this.operatorData = operatorData;
-		}
-		
-		public OperatorData getOperatorData() {return operatorData;} 
-	}
-	
 	protected ModuleData moduleData;
 
 	protected BasicModule() throws MetaDataParseException {this.moduleData = loadOperatorData();}
@@ -56,14 +43,12 @@ public abstract class BasicModule implements Module {
 	 * 
 	 *  @throws IllegalArgumentException Unknown operator requested
 	 *  @throws SpecializationException Non-default specializer provided.
-	 *  @throws MetaDataHoleException Default meta-data object is incomplete
+	 *  @throws MetadataHoleException Default meta-data object is incomplete
 	 */
-	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException, MetaDataHoleException {
+	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException, MetadataHoleException {
 		validate(name, specializer);
 		OperatorData ld = moduleData.getOperator(name);
-		if (ld.isComplete()) {return ld;}
-		
-		throw new MetaDataHoleException(moduleData.getName(), name, specializer, ld);
+		return ld;
 	}
 	
 

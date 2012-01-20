@@ -68,13 +68,13 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 				if (method.getName().equals(target)) {return new ReflectiveInvokeable(method, this);}
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(format("Error retrieving facet %1$s on %2$s.", name, operatorData.getName()),e);
+			throw new RuntimeException(format("Error retrieving facet %1$s on %2$s.", name, operatorData.name()),e);
 		}
-		throw new IllegalArgumentException(format("Facet %1$s has incorrect target on %2$s.", name, operatorData.getName()));
+		throw new IllegalArgumentException(format("Facet %1$s has incorrect target on %2$s.", name, operatorData.name()));
 	}
 	
 	public OperatorData getOperatorData() {return operatorData;}	
-	public String getName() {return operatorData.getName();}
+	public String getName() {return operatorData.name();}
 	
 	/**Returns self (essentially assuming that the operator implements a function).*/
 	public StencilOperator duplicate() {return this;}

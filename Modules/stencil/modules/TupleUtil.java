@@ -2,6 +2,7 @@ package stencil.modules;
 
 import java.util.ArrayList;
 
+import stencil.module.MetadataHoleException;
 import stencil.module.SpecializationException;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
@@ -152,11 +153,11 @@ public class TupleUtil extends BasicModule {
 			String[] keys  = getNames(spec);
 			FacetData fd = od.getFacet("map");
 			fd = new FacetData(fd.name(), MemoryUse.FUNCTION, keys);
-			od.addFacet(fd);
+			od = od.modFacet(fd);
 			
 			fd = od.getFacet("query");
 			fd = new FacetData(fd.name(), MemoryUse.FUNCTION, keys);
-			od.addFacet(fd);
+			od = od.modFacet(fd);
 			return od;
 		}
 		
@@ -240,6 +241,6 @@ public class TupleUtil extends BasicModule {
 
 		if (name.equals("Rename")) {return Rename.complete(od, specializer);}
 		else if (od.isComplete()) {return od;}
-		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
+		throw new MetadataHoleException(od, specializer);
 	}
 }

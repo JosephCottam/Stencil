@@ -11,13 +11,20 @@ public final class FacetData {
 	private final String target;
 	private final String counterpart;
 	
-	/**Copy everything but the memory useage from the passed fd.  Use the new memory usage.**/
+	/**Copy everything but the memory usage from the passed facet data.  Use the new memory usage.**/
 	public FacetData(FacetData fd, MemoryUse memory) {this(fd.name, fd.target, fd.counterpart, memory, fd.prototype);}
 
 	public FacetData(String name, MemoryUse memory, String... fields) {this(name, name, name, memory, new TuplePrototype(fields));}
 	public FacetData(String name, String counterpart, MemoryUse memory, String... fields) {this(name, name, counterpart, memory, new TuplePrototype(fields));}
 	public FacetData(String name, MemoryUse memory, TuplePrototype prototype) {this(name, name, name, memory, prototype);}
 	public FacetData(String name, String target, String counterpart, MemoryUse memory, TuplePrototype prototype) {
+		
+		//If there is no specified counterpart AND the memory use is compatible with counterpart, make it self-counterpart
+		if ((counterpart == null || counterpart.trim().equals("")) 
+			&& (memory.equals(MemoryUse.FUNCTION) || memory.equals(MemoryUse.READER))) {
+			counterpart = name;
+		}
+		
 		this.name = name;
 		this.target = target;
 		this.counterpart = counterpart;

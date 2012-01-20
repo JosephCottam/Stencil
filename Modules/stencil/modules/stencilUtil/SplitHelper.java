@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
-@Operator(name= "Split", spec="[fields:0, ordered:\"#F\"]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG)
+@Operator(name= "Split", spec="[fields:0, ordered:\"#F\"]", tags=stencil.module.util.OperatorData.HIGHER_ORDER_TAG, defaultFacet="####error####")
 @Description("Higher order operator for performing split/cross-tab summarization")
 public abstract class SplitHelper implements StencilOperator {
 	private static final Object[] EMPTY_ARGS = new Object[0];
@@ -156,8 +156,7 @@ public abstract class SplitHelper implements StencilOperator {
 	protected SplitHelper(Split split, StencilOperator operator) {
 		this.split = split;
 		this.operator = operator;		
-		this.operatorData = noFunctions(operator.getOperatorData());
-		this.operatorData.addFacet(STATE_ID_FD);
+		this.operatorData = noFunctions(operator.getOperatorData()).modFacet(STATE_ID_FD);
 	}
 	
 	public Invokeable getFacet(String facet) {
@@ -231,6 +230,10 @@ public abstract class SplitHelper implements StencilOperator {
 	}
 	
 	
+	@Facet(alias="####error####")
+	public String errorOut() {throw new RuntimeException("Mal-formed java function invoked.");}		
+
+	
 	/**Produce operator meta-data that indicates all facets in the operator data are not functions.*/
 	private static final OperatorData noFunctions(OperatorData od) {
  		List<FacetData> facets = new ArrayList();
@@ -255,8 +258,7 @@ public abstract class SplitHelper implements StencilOperator {
  		/**Add a stateID facet**/
  	 	facets.add(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
  		
- 		nod.setFacets(facets);
- 		return nod;
+ 		return nod.modFacets(facets);
  	} 	
 	
 }

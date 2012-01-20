@@ -29,7 +29,7 @@ public class Summary extends BasicModule {
  			this.GT = GT;
  			
  			try {targetClass = Converter.toClass(spec.get("c"));}
- 			catch (Exception e) {throw new SpecializationException(opData.getModule(), opData.getName(), spec, "Unknown class specified.");}
+ 			catch (Exception e) {throw new SpecializationException(opData.module(), opData.name(), spec, "Unknown class specified.");}
  			
  		}
  		

@@ -6,7 +6,8 @@ public class RunTest {
 	
 	public static void main(String[] args) throws Exception {
 		//JUnitCore.main("stencil.unittests.module.operator.TestViewpointCache");
-		JUnitCore.main("stencil.unittests.module.TestMetadataDefs");
+		//JUnitCore.main("stencil.unittests.module.TestMetadataDefs");
+		JUnitCore.main("stencil.unittests.parser.string.TestParseStencil");
 	}
 
 }

@@ -3,6 +3,7 @@ package stencil.modules.stencilUtil;
 
 import java.util.*;
 
+import stencil.module.MetadataHoleException;
 import stencil.module.OperatorInstanceException;
 import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
@@ -113,10 +114,10 @@ public final class StencilUtil extends BasicModule {
 		OperatorData od = moduleData.getOperator(name);
 
 		//TODO: HACK: Avoid the direct name-based stuff...its difficult to maintain
-		if (od.getName().contains("Monitor")) {od = MonitorBase.complete(od, specializer);}
+		if (od.name().contains("Monitor")) {od = MonitorBase.complete(od, specializer);}
 		
 		if (od.isComplete()) {return od;}
-		throw new MetaDataHoleException(moduleData.getName(), name, specializer, od);
+		throw new MetadataHoleException(od, specializer);
 	}
 	
 	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
