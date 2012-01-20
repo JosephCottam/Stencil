@@ -6,5 +6,6 @@ Core/stencil/parser/string/validators/*
 .metadata/.plugins/*
 .metadata/version.ini
 bin/
+TestData/Explore.stencil
 testResults/*
 lastBuild.txt
