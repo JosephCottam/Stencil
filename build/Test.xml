@@ -26,6 +26,7 @@
                 <pathelement path="."/>
                 <fileset dir="${runtimeLibrary}" includes="*.jar"/>
                 <fileset dir="${runtimeLibrary}/JUNG/" includes="*.jar"/>
+            	<fileset dir="${runtimeLibrary}/twitter" includes="*.jar"/>
             </classpath>
             
             <batchtest todir="${results}">
@@ -61,6 +62,7 @@
                 <pathelement path="."/>
                 <fileset dir="${runtimeLibrary}" includes="*.jar"/>
                 <fileset dir="${runtimeLibrary}/JUNG/" includes="*.jar"/>
+            	<fileset dir="${runtimeLibrary}/twitter/" includes="*.jar"/>
             </classpath>
             
             
