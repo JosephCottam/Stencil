@@ -6,7 +6,7 @@ import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
-@Operator(spec="[distX: 50, distY: 50]")
+@Operator(spec="[distX: 50, distY: 50]", defaultFacet="mapVertex")
 public final class TreeLayout extends GraphOperator {
 	private static final String DIST_X = "distX";
 	private static final String DIST_Y = "distY";

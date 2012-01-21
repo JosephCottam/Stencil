@@ -2,14 +2,14 @@ STREAM: File
 NAME: Reader
 TUPLE_SIZE: 1
 SEPARATOR: $^
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 STREAM: File
 NAME: RawLines
 TUPLE_SIZE: 1
 SEPARATOR: $^
-SOURCE: /Users/jcottam/Documents/workspace/Stencil/TestData/RegressionImages/TextArc/AliceInWonderland.txt
+SOURCE: ./AliceInWonderland.txt
 SKIP: 0
 STRICT: true
 
@@ -50,7 +50,7 @@ from RawWords
 
 stream PrimeCenter ()
 from Words
- () : LineIndex.query(word) -> ExtendTuple(LineIndex.0, line) -> LineIndex(word, ExtendTuple.*)
+ () : LineIndex.get(word) -> ExtendTuple(LineIndex.0, line) -> LineIndex(word, ExtendTuple.*)
  () : WordCount(word)
 
 layer Border["TEXT"]
@@ -100,7 +100,7 @@ operator LineIndex : Dict[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   default =>
-    (X,Y): LineIndex.query(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
+    (X,Y): LineIndex.get(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
             -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
             -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
             -> (X,Y)

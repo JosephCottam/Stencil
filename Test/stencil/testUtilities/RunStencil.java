@@ -16,6 +16,7 @@ public class RunStencil {
 		stencil.explore.PropertyManager.stencilConfig = "./TestData/Stencil.properties";
 
 		String command = "./ " + OPEN_FLAG + " ./TestData/StencilExplore.stencil " + "-png2 500 -1 test.png";
+		//String command = "./ " + OPEN_FLAG + " ./TestData/RegressionImages/SquareShells/SquareShells.stencil " + "-png2 500 -1 test.png";
 		
 		stencil.explore.ui.Batch.batchInvoke(command);
 	}

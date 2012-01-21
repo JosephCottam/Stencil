@@ -11,5 +11,5 @@ stream Stream(V)
 layer Layer
 from Stream
 	ID: Count()
-    SIZE: (1,2)
+    SIZE: (V,V)
 

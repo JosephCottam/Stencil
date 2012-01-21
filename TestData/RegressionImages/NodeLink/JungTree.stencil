@@ -12,7 +12,7 @@ stream VertexList (parent, child)
 
 stream Prime ()
 from VertexList
-  () : Layout.add(parent,child)
+  () : Layout.addEdge(parent,child)
 
 layer Nodes
 from VertexList 
@@ -20,19 +20,19 @@ from VertexList
     REGISTRATION : "CENTER"
     FILL_COLOR:  Color{BLUE}
     (SHAPE, SIZE) : ("ELLIPSE", 5)
-    (X,Y) :* Layout.query(child)
+    (X,Y) :* Layout(child)
      
 layer Edges["LINE"]
 from VertexList 
     ID: Concatenate(parent, child)
-    (X1, Y1):* Nodes.find(parent) -> (Nodes.X, Nodes.Y)
-    (X2, Y2):* Nodes.find(child) ->  (Nodes.X, Nodes.Y)
+    (X1, Y1):* Nodes(parent) -> (Nodes.X, Nodes.Y)
+    (X2, Y2):* Nodes(child) ->  (Nodes.X, Nodes.Y)
     PEN_COLOR: Color{GRAY30,80}
 
 layer Labels["TEXT"]
 from VertexList
     ID : child
-    (X,Y):* Nodes.query(child) -> (Nodes.X, Nodes.Y)
+    (X,Y):* Nodes(child) -> (Nodes.X, Nodes.Y)
     TEXT: child
     FONT: Font{10}
     COLOR: Color{GRAY60}

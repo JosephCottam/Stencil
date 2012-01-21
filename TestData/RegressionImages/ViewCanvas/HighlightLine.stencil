@@ -23,7 +23,7 @@ from Stocks
 layer Markers["POLY_POINT"]
 guide 
   axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "LEFT", axisOffset: 10] Linear from X
-        label.TEXT: Date.query(_) -> Print(Date)
+        label.TEXT: Date.get(_) -> Print(Date)
   axis[tickCount: 10, label.SCALE_BY: "NONE", label.FONT: 10, line.PEN: 1, tickSize: 5, textOffset: 6, label.REGISTRATION: "RIGHT", axisOffset: -10] Linear from Y
 from Stocks
     ID: Count()

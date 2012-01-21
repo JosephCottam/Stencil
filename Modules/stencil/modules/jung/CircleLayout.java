@@ -8,7 +8,7 @@ import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
 
-@Operator(spec="[width: 500, height: 500, radius: 100, sort: \"SEQ\"]")
+@Operator(spec="[width: 500, height: 500, radius: 100, sort: \"SEQ\"]", defaultFacet="mapVertex")
 public final class CircleLayout extends GraphOperator.SizedOperator {
 	private static final String RADIUS = "radius";
 	private static final String SORTER_KEY ="sort";

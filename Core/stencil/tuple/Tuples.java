@@ -323,6 +323,7 @@ public final class Tuples {
 	 * Behavior is undefined if the same index is listed multiple times,
 	 * it is expected that the idx list only has unique values before this method is called.
 	 */
+	@SuppressWarnings("null")
 	public static Tuple delete(Tuple t, int... idxs) {
 		TuplePrototype proto = null;
 		List<TupleFieldDef> defs = null;

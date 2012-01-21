@@ -150,8 +150,9 @@ public class PersistentData extends BasicModule {
 			return objects;
 		}
 		
+		@Description("get, but ignores all but the first argument.  Provide as counterpart to `put`; useage of get directly is preferred.")
 		@Facet(memUse="READER", prototype="()")
-		public Object[] query(Object key, Object... values) {return get(key);}
+		public Object[] putQuery(Object key, Object... values) {return get(key);}
 		
 		@Facet(memUse="READER", prototype="()")
 		public Object[] get(Object key) {
@@ -182,8 +183,10 @@ public class PersistentData extends BasicModule {
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
 			OperatorData od = new OperatorData(basic)
-									.modFacet(new FacetData("map", MemoryUse.WRITER, fields))
-									.modFacet(new FacetData("query", MemoryUse.READER, fields));
+				.modFacet(new FacetData("put", MemoryUse.WRITER, fields))
+				.modFacet(new FacetData("putQuery", MemoryUse.READER, fields))
+				.modFacet(new FacetData("get", MemoryUse.WRITER, fields));
+
 			return od;
 		}
 

@@ -59,7 +59,7 @@ public class Projection extends BasicModule {
 	
 	/**Projects a range of numbers onto a red/white scale.*/
 	@Description("Project between two colors; records the max/min seen.")
-	@Operator(spec="[cold: \"RED\", hot: \"WHITE\", throw: \"TRUE\"]")
+	@Operator(spec="[cold: \"RED\", hot: \"WHITE\", throw: \"TRUE\"]", defaultFacet="map")
 	public static final class HeatScale extends AbstractOperator.Statefull {
 		private float min = Float.NaN;
 		private float max = Float.NaN;
@@ -237,7 +237,7 @@ public class Projection extends BasicModule {
 	 */
 
 	@Description("Count the number of times the argument combination has been seen (including the current one)")
-	@Operator(spec="[]")
+	@Operator(spec="[]", defaultFacet="map")
 	public static final class Count extends AbstractOperator.Statefull {
 		private static final class CompoundKey {
 			final Object[] values;

@@ -23,7 +23,7 @@ options {
   public StencilTree downup(Object t) {
     t=downup(t, this, "changeType");
     t=downup(t, this, "convert");
-    t=downup(t, this, "toQuery");
+    t=downup(t, this, "toCounterpart");
     return (StencilTree) t;
   }  
   
@@ -35,7 +35,7 @@ toDynamic:  ^(r=RULE rest+=.*) -> ^(DYNAMIC_RULE {adaptor.dupTree($r)} {adaptor.
             
 convert: ^(DYNAMIC_RULE r=. sq=.) -> ^(DYNAMIC_RULE $r {stateQueryList(adaptor, $sq)});  
 
-toQuery 
+toCounterpart 
   @after{((AstInvokeable) inv).changeFacet(counterpart((AstInvokeable) inv, facet.getText()));}
   : ^(FUNCTION inv=. ^(OP_NAME pre=. base=. facet=.) rest+=.*) 
           {$inv.getAncestor(DYNAMIC_RULE) != null}? ->

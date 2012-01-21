@@ -216,43 +216,43 @@ public class Numerics extends BasicModule {
 	public static double round(double a) {return Math.round(a);}
 	
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double val)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double val)", alias={"map","query"})
 	public static double random() {return Math.random();}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double sign)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double sign)", alias={"map","query"})
 	public static double signum(double d) {return Math.signum(d);}
 	
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double sin)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double sin)", alias={"map","query"})
 	public static double sin(double d) {return Math.sin(d);}
 	
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double sinh)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double sinh)", alias={"map","query"})
 	public static double sinh(double d) {return Math.sinh(d);}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double sqrt)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double sqrt)", alias={"map","query"})
 	public static double sqrt(double d) {return Math.sqrt(d);}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double tan)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double tan)", alias={"map","query"})
 	public static double tan(double d) {return Math.tan(d);}
 	
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double tanh)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double tanh)", alias={"map","query"})
 	public static double tanh(double d) {return Math.tanh(d);}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double radians)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double radians)", alias={"map","query"})
 	public static double toRadians(double degrees) {return Math.toRadians(degrees);}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double degrees)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double degrees)", alias={"map","query"})
 	public static double toDegrees(double radians) {return Math.toRadians(radians);}
 
 	@Operator()
-	@Facet(memUse="OPAQUE", prototype="(double ulp)", alias={"map","query"})
+	@Facet(memUse="FUNCTION", prototype="(double ulp)", alias={"map","query"})
 	public static double ulp(double d) {return Math.ulp(d);}
 	
 	@Operator()

@@ -5,7 +5,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 
-@Operator(spec="[width: 500, height: 500]")
+@Operator(spec="[width: 500, height: 500]", defaultFacet="mapVertex")
 public final class BalloonLayout extends GraphOperator.SizedOperator {
 	private final edu.uci.ics.jung.algorithms.layout.BalloonLayout storedLayout;
 	

@@ -25,53 +25,85 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 	protected GraphOperator(OperatorData opData) {super(opData);}
 
 	/**Recalculate the layout.
-	 * This method must call 'setLayout'.
+	 * Implementations of this method must call 'setLayout'.
 	 */
 	protected abstract void resetLayout();
 	
 	protected void setLayout(Layout layout) {this.layout = layout;}
 	
+	///---------------------- Edge Methods ----------------------------------------------------------------------------------------
 	
-	@Facet(memUse="WRITER", prototype="(boolean modified)")
-	public boolean add(Object... values) {
-		extendGraph(values);
-		return true;	
-	}
-
-	@Facet(memUse="WRITER", prototype="(double X, double Y)")
-	public Point2D map(Object... values) {
-		extendGraph(values);
-		return query(values);
-	}
-	
-	/**Add an entity. 
-	 * Three arguments: Start, End, ID
-	 * Two arguments: Start, End (synthesizes ID based on Start and End)
-	 * 
-	 * @return Always true...
-	 */
-	protected void extendGraph(Object... values) {
+	@Description("Add an edge to graph.  Must supply start and end; optionally include an identifier for the edge.")
+	@Facet(memUse="WRITER", prototype="(boolean contained)", counterpart="hasEdge")
+	public boolean addEdge(Object... values) {
 		Object start = values[0];
 		Object end = values[1];
 
-		if (start.equals(end)) {
-        	graph.addVertex(values[0]);
-        } else {
-			Object id;
-			if (values.length == 2) {id = String.format("%1$s <-> %2$s", start, end);}
-			else {id = values[2];}
-			
-			graph.addEdge(id, start,end, EdgeType.DIRECTED);
-        }
+		Object id;
+		if (values.length == 2) {id = generateEdgeID(start, end);}
+		else {id = values[2];}
+		
+		graph.addEdge(id, start,end, EdgeType.DIRECTED);
+
 		stateID++;
 		layout = null;
+
+		return true;	
 	}
 	
-	@Facet(memUse="READER", prototype="(double X, double Y)")
-	public Point2D query(Object id) {
+	@Description("Is there an edge in the graph.  Identified with two values as from v1 to v2  OR one value as the ID")
+	@Facet(memUse="READER", prototype="(boolean contained)")
+	public boolean hasEdge(Object... values) {
+		if (values.length == 2) {
+			Object start = values[0];
+			Object end = values[1];
+			return graph.containsEdge(generateEdgeID(start, end));
+		} else {
+			return graph.containsEdge(values[0]);
+		}
+	}
+	
+	@Description("Standard ID generator")
+	@Facet(memUse="FUNCTION", prototype="(String ID)")
+	public String generateEdgeID(Object start, Object end) {
+		return String.format("%1$s <-> %2$s", start, end);
+	}
+	
+	//TODO: Add edge map/query: return a pair of points
+	
+	///---------------------- Vertex Methods ---------------------------------------------------------------------------------------- 
+	
+	@Description("Add a vertext to the graph.")
+	@Facet(memUse="READER", prototype="(boolean contained)", counterpart="hasVertex")
+	public boolean addVertex(Object v) {
+        graph.addVertex(v);
+		stateID++;
+		layout = null;
+	
+        return true;
+	}
+
+	@Description("Is there an vertex in the graph.")
+	@Facet(memUse="READER", prototype="(boolean contained)")
+	public boolean hasVertex(Object v) {
+		return graph.containsVertex(v);
+	}
+
+	
+
+	@Facet(memUse="WRITER", prototype="(double X, double Y)", counterpart="queryVertex")
+	public Point2D mapVertex(Object... values) {
+		addVertex(values);
+		return queryVertex(values);
+	}
+
+	@Description("What is the position of the vertex with the given ID")
+	@Facet(memUse="READER", prototype="(double X, double Y)", counterpart="query")
+	public Point2D queryVertex(Object id) {
 		if (layout == null) {resetLayout();}
 		return layout.transform(id);
 	}
+	
 	
 	
 	/**Utility class for graph operators covering layouts that use a size factor.
@@ -127,9 +159,9 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 			super.setLayout(layout);
 		}
 		
-		public Point2D query(String id) {
+		public Point2D queryVertex(String id) {
 			if (super.layout == null) {resetLayout();}
-			return super.query(id);
+			return super.queryVertex(id);
 		}
 		
 		

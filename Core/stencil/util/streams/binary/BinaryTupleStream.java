@@ -30,6 +30,7 @@ public class BinaryTupleStream {
 	public static final int INT_BYTES = 4;
 	public static final int DOUBLE_BYTES = 8;
 	public static final int LONG_BYTES = 8;
+	public static boolean DO_REPORTING = false;
 
 	/**Means of producing a file that can be read by the Reader**/
 	public static final class Writer {
@@ -120,7 +121,7 @@ public class BinaryTupleStream {
 						file.write(entry);						
 					}
 					tuplesWritten++;
-					if (tuplesWritten - (tuplesWritten %1000000)==0) {System.out.printf("%1$s tuples written.\n", tuplesWritten);}
+					if (DO_REPORTING && tuplesWritten %1000000==0) {System.out.printf("%1$s tuples written.\n", tuplesWritten);}
 				}
 			} finally {file.close();}
 		}
@@ -212,6 +213,8 @@ public class BinaryTupleStream {
 	 * @param args: stencil file, stream to load, file to save in
 	 */
 	public static void main(String[] args) throws Exception {
+		DO_REPORTING = true;
+		
 		String input = args[0];
 		int size = Integer.parseInt(args[1]);
 		String delimiter = args[2];

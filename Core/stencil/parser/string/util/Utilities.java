@@ -89,7 +89,7 @@ public class Utilities {
 		String facet = name.facet();
 		if (facet.equals("DEFAULT_FACET")) {
 			facet = od.defaultFacet().name();
-		} 
+		}
 		return od.getFacet(facet).counterpart();
 	}
 	

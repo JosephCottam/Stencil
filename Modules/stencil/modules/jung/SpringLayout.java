@@ -5,7 +5,7 @@ import stencil.module.util.OperatorData;
 import stencil.module.util.ann.Operator;
 import stencil.interpreter.tree.Specializer;
 
-@Operator(spec="[width: 500, height: 500, steps: 50]")
+@Operator(spec="[width: 500, height: 500, steps: 50]", defaultFacet="mapVertex")
 public final class SpringLayout extends GraphOperator.StepOperator {
 	public SpringLayout(OperatorData opData, Specializer spec) {
 		super(opData, spec); 

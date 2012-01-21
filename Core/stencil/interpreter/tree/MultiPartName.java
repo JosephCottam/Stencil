@@ -26,7 +26,11 @@ public final class MultiPartName {
 	public String name() {return name;}
 	
 	/**What was the facet (same as suffix, but used in operator names).*/
-	public String facet() {if (facet == null) {throw new UnsupportedOperationException("Null facet.");} else {return facet;}}
+	public String facet() {
+		if (facet == null) {
+			throw new UnsupportedOperationException("Null facet.");
+		} else {return facet;}
+	}
 	
 	public boolean hasFacet() {return facet != null;}
 		

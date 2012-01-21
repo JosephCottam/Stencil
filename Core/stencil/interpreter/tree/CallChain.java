@@ -45,7 +45,7 @@ public class CallChain implements Viewpoint<CallChain> {
 		} 
 		catch (NoOutput.Signal s) {result = NoOutput.TUPLE;}
 		catch (Exception e) {
-			throw new FunctionApplicationException(inv.targetIdentifier(), env, e);
+			throw new OperatorApplicationException(inv.targetIdentifier(), env, e);
 		}
 		return result;
 	}
@@ -57,8 +57,8 @@ public class CallChain implements Viewpoint<CallChain> {
 		} catch (NoOutput.Signal s) {return NoOutput.TUPLE;}
 	}
 	
-	private static final class FunctionApplicationException extends RuntimeException {
-		public FunctionApplicationException(String name, Tuple t, Exception e) {
+	private static final class OperatorApplicationException extends RuntimeException {
+		public OperatorApplicationException(String name, Tuple t, Exception e) {
 			super(String.format("Error applying function %1$s with environment %2$s.", name, t.toString()), e);
 		}
 	}
