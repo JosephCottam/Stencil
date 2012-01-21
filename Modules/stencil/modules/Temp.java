@@ -45,7 +45,7 @@ public class Temp extends BasicModule {
 		Object value;
 		public Remember(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="WRITER", prototype="(prior)")
+		@Facet(memUse="WRITER", prototype="(prior)", counterpart="query")
 		public Object map(Object v) {
 			Object prior = value;
 			value = v;
@@ -106,7 +106,7 @@ public class Temp extends BasicModule {
 		@Override
 		public MonitorSegments duplicate() {return new MonitorSegments(operatorData, gapSize);}
 
-		@Facet(memUse="WRITER", prototype="(int rank)")
+		@Facet(memUse="WRITER", prototype="(int rank)", counterpart="query")
 		public long map(long value) {return rank(true, value);} 
 		
 		@Facet(memUse="READER", prototype="(int rank)")
@@ -181,7 +181,7 @@ public class Temp extends BasicModule {
 		
 		public AutoID(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="WRITER", prototype="(Integer id)")
+		@Facet(memUse="WRITER", prototype="(Integer id)", counterpart="query")
 		public MultiResultTuple map(int count) {
 			MultiResultTuple  rs = query(count);
 			id += count;
@@ -295,7 +295,7 @@ public class Temp extends BasicModule {
 			return new double[]{start,end,bucket};
 		}
 		
-		@Facet(memUse="WRITER", prototype="(double start, double end, int bucket)")
+		@Facet(memUse="WRITER", prototype="(double start, double end, int bucket)", counterpart="query")
 		public double[] map(double dv) {
 			updateSpan(dv);
 			return query(dv);
@@ -404,7 +404,7 @@ public class Temp extends BasicModule {
 			return states[idx];
 		}
 		
-		@Facet(memUse="WRITER", prototype="(value)")
+		@Facet(memUse="WRITER", prototype="(value)", counterpart="query")
 		public synchronized Object map(){
 			stateID++;
 			Object rv = query();

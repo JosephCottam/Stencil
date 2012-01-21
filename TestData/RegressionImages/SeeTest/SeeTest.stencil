@@ -167,7 +167,7 @@ operator Layout : JavaC
    static final List<String> XIndex = new ArrayList();
    static final List<String> YIndex = new ArrayList();
    
-   \@Facet(memUse="WRITER", prototype="(double X, double Y)")
+   \@Facet(memUse="OPAQUE", prototype="(double X, double Y)")
    public double[] suite(String X1, String X2, String Y1, String Y2, String suite) {
       double[] base = map(X1,X2,Y1,Y2);
       if (suites.indexOf(suite) <0) {throw new IllegalArgumentException("Unknown suite: " + suite);}
@@ -177,7 +177,7 @@ operator Layout : JavaC
       return new double[]{x,y};
    }
    
-   \@Facet(memUse="WRITER", prototype="(double X, double Y)")
+   \@Facet(memUse="WRITER", prototype="(double X, double Y)", counterpart="query")
    public double[] map(String X1, String X2, String Y1, String Y2) {
         String XBase = X1+X2;
         String YBase = Y1+Y2;

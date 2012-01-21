@@ -50,7 +50,7 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		facets.add(new FacetData(FIND, MemoryUse.READER, prototype));
 		facets.add(new FacetData(NEAR, MemoryUse.READER, prototype));
 		facets.add(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
-		facets.add(new FacetData(REMOVE, MemoryUse.WRITER, prototype));
+		facets.add(new FacetData(REMOVE, MemoryUse.OPAQUE, prototype));
 		facets.add(new FacetData(CONTAINS, MemoryUse.READER, prototype));
 		facets.add(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
 		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, FIND, facets, new ArrayList());

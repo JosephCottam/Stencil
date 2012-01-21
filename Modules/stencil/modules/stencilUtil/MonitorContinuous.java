@@ -19,7 +19,7 @@ import stencil.types.Converter;
 /**Returns what was passed in, but records the range of elements
  * seen.  Used for continuous operators and should probably never
  * be used directly.*/
-@Operator()
+@Operator(defaultFacet="map")
 public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 	public static final String NAME = MonitorContinuous.class.getSimpleName();
 	public static final String MAX_KEY = "max";
@@ -50,7 +50,7 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 		return new SampleSeed(CONTINUOUS, l);
 	}
 	
-	@Facet(memUse="OPAQUE", prototype="()")
+	@Facet(memUse="OPAQUE", prototype="()", counterpart="query")
 	public Tuple map(Object value) {
 		if (value instanceof MultiResultTuple) {
 			mapAll((MultiResultTuple) value);
@@ -58,8 +58,11 @@ public final class MonitorContinuous extends MonitorBase<MonitorContinuous> {
 			mapOne(Converter.toDouble(value));
 		}
 		return Tuples.EMPTY_TUPLE;
-
 	}
+	
+	@Facet(memUse="READER", prototype="(VALUE)")
+	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
+	
 	private void mapAll(final MultiResultTuple values) {
 		for (int i=0; i< values.size(); i++) {
 			Tuple v = values.getTuple(i);

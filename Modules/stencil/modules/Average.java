@@ -30,7 +30,7 @@ public class Average extends BasicModule {
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
 	@Suppress 
-	@Operator(name="Mean", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="Mean", defaultFacet="map", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
 	public static class FullMean extends AbstractOperator.Statefull {
 		int start;
 		double total =0;
@@ -46,7 +46,7 @@ public class Average extends BasicModule {
 			this.start = start;
 		}
 
-		@Facet(memUse="WRITER", prototype="(double avg)")
+		@Facet(memUse="WRITER", prototype="(double avg)", counterpart="query")
 		public double map(double... values) {
 			if (start >0) {start--;}
 			if (start >0) {return 0;}
@@ -84,7 +84,7 @@ public class Average extends BasicModule {
 		return sum/values.length;
 	}
 
-	@Suppress @Operator(name = "Mode")
+	@Suppress @Operator(name = "Mode", defaultFacet="map")
 	public static class SimpleMode extends AbstractOperator {
 		public SimpleMode(OperatorData opData) {super(opData);}
 		
@@ -133,7 +133,7 @@ public class Average extends BasicModule {
 	 * in the range) or the mean of the two middle-most values.  Median is computed
 	 * the same for full range as sub-range.
 	 */
-	@Operator()
+	@Operator(defaultFacet="map")
 	public static class Median extends AbstractOperator {
 		protected Median(OperatorData opData) {super(opData);}
 		
@@ -155,7 +155,7 @@ public class Average extends BasicModule {
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
-	@Operator()
+	@Operator(defaultFacet="map")
 	public static class Mode extends AbstractOperator {
 		public Mode(OperatorData opData) {super(opData);}
 		

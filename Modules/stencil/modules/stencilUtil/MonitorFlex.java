@@ -6,6 +6,7 @@ import stencil.module.SpecializationException;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.tuple.Tuple;
+import stencil.tuple.Tuples;
 import stencil.types.Converter;
 import stencil.util.ConversionException;
 
@@ -16,7 +17,7 @@ import stencil.util.ConversionException;
  * @author jcottam
  *
  */
-@Operator()
+@Operator(defaultFacet="map")
 public class MonitorFlex extends MonitorBase<MonitorFlex> {
 	private final MonitorContinuous cont;
 	private final MonitorCategorical cat;
@@ -34,7 +35,7 @@ public class MonitorFlex extends MonitorBase<MonitorFlex> {
 		cat = new MonitorCategorical(opData, spec);
 	}
 	
-	@Facet(memUse="OPAQUE", prototype="()")
+	@Facet(memUse="OPAQUE", prototype="()", counterpart="query")
 	public Tuple map(Object... args) {
 		try {
 			return cont.map(Converter.toDouble(args[0]));
@@ -42,6 +43,10 @@ public class MonitorFlex extends MonitorBase<MonitorFlex> {
 		catch (NumberFormatException e) {return cat.map(args);}
 		catch (ConversionException e) {return cat.map(args);}
 	}
+	
+	@Facet(memUse="READER", prototype="(VALUE)")
+	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
+
 	
 	@Override 
 	public MonitorFlex duplicate() {return new MonitorFlex(operatorData, cont.duplicate(), cat.duplicate());}

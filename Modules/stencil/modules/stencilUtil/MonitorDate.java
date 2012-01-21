@@ -17,7 +17,7 @@ import stencil.types.Converter;
 
 /**TODO:Generalize this with MonitorContinuous and MonitorSegments;
  * 		probably involves moving the synthetic max/min/rangelock to the sampler instead of the monitor...*/
-@Operator()
+@Operator(defaultFacet="map")
 public final class MonitorDate extends MonitorBase<MonitorDate> {
 	public static final String NAME = MonitorDate.class.getSimpleName();
 	public static final String MAX_KEY = "max";
@@ -42,7 +42,7 @@ public final class MonitorDate extends MonitorBase<MonitorDate> {
 		return new SampleSeed(CONTINUOUS, l);
 	}
 	
-	@Facet(memUse="OPAQUE", prototype="()")
+	@Facet(memUse="OPAQUE", prototype="()", counterpart="query")
 	public Tuple map(Object... args) {
 		assert args.length == 1;
 		Date value = (Date) Converter.convert(args[0], Date.class);
@@ -55,4 +55,7 @@ public final class MonitorDate extends MonitorBase<MonitorDate> {
 		
 		return Tuples.EMPTY_TUPLE;
 	}
+
+	@Facet(memUse="READER", prototype="(VALUE)")
+	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 }

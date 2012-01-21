@@ -17,7 +17,7 @@ import static stencil.interpreter.guide.SampleSeed.SeedType.*;
 
 /**Returns exactly what it was passed, but
  * records elements seen (for categorization).*/
-@Operator()	
+@Operator(defaultFacet="map")	
 public final class MonitorCategorical extends MonitorBase<MonitorCategorical> {
 	public static final String NAME = MonitorCategorical.class.getSimpleName();
 	
@@ -29,11 +29,14 @@ public final class MonitorCategorical extends MonitorBase<MonitorCategorical> {
 	
 	public SampleSeed getSeed() {return new SampleSeed(CATEGORICAL, seen);}
 
-	@Facet(memUse="OPAQUE", prototype="()")
+	@Facet(memUse="OPAQUE", prototype="()", counterpart="query")
 	public Tuple map(Object... args) {
 		if (!deepContains(seen, args)) {seen.add(args);}
 		return Tuples.EMPTY_TUPLE;
 	}
+	
+	@Facet(memUse="READER", prototype="(VALUE)")
+	public Tuple query(Object... args) {return Tuples.EMPTY_TUPLE;}
 	
 	private static final boolean deepContains(List<Object[]> list, Object[] candidate) {
 		for (Object[] e: list) {if (Arrays.deepEquals(e, candidate)) {return true;}}

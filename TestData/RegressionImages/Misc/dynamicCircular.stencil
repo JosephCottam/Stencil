@@ -40,7 +40,7 @@ operator Ordering (ID)->(index)
 operator Circular : JavaC
     [@"int max=0;
     
-     \@Facet(memUse="WRITER", prototype="(double X, double Y)")
+     \@Facet(memUse="WRITER", prototype="(double X, double Y)", counterpart="query")
      public double[] map(int seq) {
          if (seq+1 > max){ max=seq+1;}
          return query(seq);

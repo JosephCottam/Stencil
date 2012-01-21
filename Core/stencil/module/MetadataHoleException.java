@@ -23,6 +23,10 @@ public class MetadataHoleException extends RuntimeException {
 		this.operatorData = operatorData;
 	}
 	
+	public MetadataHoleException(String message) {
+		super(message);
+	}
+	
 	
 	public OperatorData getOperatorData() {return operatorData;}
 	

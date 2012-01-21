@@ -73,13 +73,13 @@ public class TreeMap extends Layout {
 		return result;
 	}
 	
-	@Facet(memUse="WRITER", prototype="(X,Y,W,H)")
+	@Facet(memUse="WRITER", prototype="(X,Y,W,H)", counterpart="query")
 	public Rectangle2D map(final Object id, final Object parent, double value) {
 		add(id, parent, value);
 		return query(id);
 	}
 
-	@Facet(memUse="WRITER", prototype="(X,Y,W,H)")
+	@Facet(memUse="OPAQUE", prototype="(X,Y,W,H)")
 	public boolean add(final Object id, final Object parentID, double value) {
 		stateID++;
 		LayoutTree parent = Tree.findNode(root, parentID);

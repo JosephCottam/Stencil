@@ -215,7 +215,7 @@ public class RadialTree extends Layout{
     }
 
     /**Add a node and report where it was placed.*/
-    @Facet(memUse="WRITER", prototype="(X,Y)")
+    @Facet(memUse="WRITER", prototype="(X,Y)", counterpart="query")
     public Point2D map(Object id, Object parentID) {
     	add(id, parentID);
     	return query(id);
@@ -227,7 +227,7 @@ public class RadialTree extends Layout{
      * @param parentID Identity of parent
      * @return         Did adding this node change anything?
      */
-    @Facet(memUse="WRITER", prototype="(boolean newRoot)")
+    @Facet(memUse="OPAQUE", prototype="(boolean newRoot)")
     public boolean add(Object id, Object parentID) {
     	LayoutTree node = Tree.findNode(root, id);
     	LayoutTree parent = Tree.findNode(root, parentID);

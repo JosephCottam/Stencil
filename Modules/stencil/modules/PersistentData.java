@@ -17,7 +17,7 @@ import org.pcollections.*;
 @Module
 public class PersistentData extends BasicModule {
 	
-	@Operator(name="Queue")
+	@Operator(name="Queue", defaultFacet="offer")
 	@Description("A FIFO queue (with peek).  Not suitable for dynamic binding (no map/query pair).")
 	public static class QueueIt extends AbstractOperator {
 		private final Queue queue=new ArrayDeque();
@@ -32,7 +32,7 @@ public class PersistentData extends BasicModule {
 			else {return queue.peek();}
 		}
 		
-		@Facet(memUse="WRITER", prototype="(size)", alias={"map", "push"})
+		@Facet(memUse="WRITER", prototype="(size)", alias={"push"}, counterpart="peek")
 		public Object offer(Object value) {
 			queue.add(value);
 			return queue.size();
@@ -85,7 +85,7 @@ public class PersistentData extends BasicModule {
 		private TreePVector list = TreePVector.empty();
 		public  List(OperatorData opData) {super(opData);}
 
-		@Facet(memUse="WRITER", prototype="(value)")
+		@Facet(memUse="WRITER", prototype="(value)", counterpart="query")
 		@Description("Add an element to the list at the given index.  If index <0, it is added to the end.  Returns the added value.")
 		public Object map(int index, Object value) {
 			if (index < 0) {list = list.plus(value);}
@@ -93,7 +93,7 @@ public class PersistentData extends BasicModule {
 			return value;
 		}
 		
-		@Facet(memUse="WRITER", prototype="(value)")
+		@Facet(memUse="WRITER", prototype="(value)", counterpart="query")
 		@Description("Removes the element at the given index.  Returns the element removed.")
 		public Object remove(int index) {
 			Object rv = list.get(index);
@@ -135,7 +135,7 @@ public class PersistentData extends BasicModule {
 			this.names = names;
 		}
 
-		@Facet(memUse="WRITER", prototype="()", counterpart="query")
+		@Facet(memUse="WRITER", prototype="()", counterpart="putQuery")
 		public Object[] put(Object key, Object... values) {
 			Object[] objects = new Object[values.length];
 			System.arraycopy(values, 0, objects, 0, values.length); //Copy is required for storage.
@@ -183,9 +183,9 @@ public class PersistentData extends BasicModule {
 			catch (Exception e) {throw new SpecializationException(module, name, specializer, e);}
 
 			OperatorData od = new OperatorData(basic)
-				.modFacet(new FacetData("put", MemoryUse.WRITER, fields))
+				.modFacet(new FacetData("put", "putQuery", MemoryUse.WRITER, fields))
 				.modFacet(new FacetData("putQuery", MemoryUse.READER, fields))
-				.modFacet(new FacetData("get", MemoryUse.WRITER, fields));
+				.modFacet(new FacetData("get", MemoryUse.READER, fields));
 
 			return od;
 		}

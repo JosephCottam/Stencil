@@ -64,7 +64,7 @@ public class Presentation extends BasicModule {
 			this.panel = new Panel(this);
 		}
 
-		@Facet(memUse="WRITER")
+		@Facet(memUse="WRITER", counterpart="query")
 		public boolean map(String v) {
 			if (!fields.contains(v)) {panel.augment(v);}
 			int i = fields.indexOf(v);
@@ -149,7 +149,7 @@ public class Presentation extends BasicModule {
 			panel = new Panel(this);
 		}
 
-		@Facet(memUse="WRITER")
+		@Facet(memUse="WRITER", counterpart="query")
 		public Color map(String v) {
 			if (!fields.contains(v)) {panel.augment(v);}
 			int i = fields.indexOf(v);
@@ -232,7 +232,7 @@ public class Presentation extends BasicModule {
 			query = op.getFacet("query");
 		}
 		
-		@Facet(memUse="WRITER")
+		@Facet(memUse="WRITER", counterpart="query")
 		public Object map(Object... args) {return map.invoke(args);}
 
 		@Facet(memUse="READER")

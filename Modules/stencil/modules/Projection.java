@@ -89,7 +89,7 @@ public class Projection extends BasicModule {
 		 * If the key passed cannot be parsed as number and 'throwExceptions' is set to false, black is returned.
 		 * If the key passed cannot be parsed and 'throwExceptions' is set to true, an exception is thrown.
 		 */
-		@Facet(memUse="WRITER", prototype="(Color VALUE)")
+		@Facet(memUse="WRITER", prototype="(Color VALUE)", counterpart="query")
 		public Color map(float d) {
 			float p =-1;			
 				
@@ -165,7 +165,7 @@ public class Projection extends BasicModule {
 			this.throwExceptions = throwException;
 		}
 		
-		@Facet(memUse="WRITER", prototype="(Color VALUE)")
+		@Facet(memUse="WRITER", prototype="(Color VALUE)", counterpart="query")
 		public Color map(Object value) {
 			int idx = Collections.binarySearch(seen, value);
 			if (idx < 0) {
@@ -219,7 +219,7 @@ public class Projection extends BasicModule {
 			return 0;
 		}
 
-		@Facet(memUse="WRITER", prototype="(double index)")
+		@Facet(memUse="WRITER", prototype="(double index)", counterpart="query")
 		public int map(Object key) {
 			if (!labels.contains(key)) {labels = labels.plus(key);}
 			return labels.indexOf(key);
@@ -254,7 +254,7 @@ public class Projection extends BasicModule {
 		
 		public Count(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="WRITER", prototype="(long count)")
+		@Facet(memUse="WRITER", prototype="(long count)", counterpart="query")
 		public long map(Object... keys) {
 			long value;
 			CompoundKey key = new CompoundKey(keys);
@@ -294,7 +294,7 @@ public class Projection extends BasicModule {
 		public StencilOperator duplicate() {return new Counter(operatorData);}
 		public String getName() {return "Count";}
 
-		@Facet(memUse="WRITER", prototype="(long count)")
+		@Facet(memUse="WRITER", prototype="(long count)", counterpart="query")
 		public long map() {return count++;}
 		
 		@Facet(memUse="READER", prototype="(long count)")
@@ -322,7 +322,7 @@ public class Projection extends BasicModule {
 			list.addAll(values);
 		}
 	
-		@Facet(memUse="WRITER", prototype="(int rank)")
+		@Facet(memUse="WRITER", prototype="(int rank)", counterpart="query")
 		public int map(Comparable value) {return rank(true, value);} 
 		
 		@Facet(memUse="READER", prototype="(int rank)")
@@ -413,7 +413,7 @@ public class Projection extends BasicModule {
 			set.addAll(values);
 		}
 	
-		@Facet(memUse="WRITER", prototype="(int rank)")
+		@Facet(memUse="WRITER", prototype="(int rank)", counterpart="query")
 		public int map(Object... values) {return rank(true, values);} 
 		
 		@Facet(memUse="READER", prototype="(int rank)")
@@ -471,7 +471,7 @@ public class Projection extends BasicModule {
 			this.rank = rank;
 		}
 	
-		@Facet(memUse="WRITER", prototype="(int count)")
+		@Facet(memUse="WRITER", prototype="(int count)", counterpart="query")
 		public int map(Object... values) {
 			rank.map(values);
 			return rank.set.size();
@@ -532,7 +532,7 @@ public class Projection extends BasicModule {
 			span = outMax-outMin;
 		}
 		
-		@Facet(memUse="WRITER", prototype="(double value)")
+		@Facet(memUse="WRITER", prototype="(double value)", counterpart="query")
 		public double map(double dv) {
 			double newInMin = Math.min(dv, inMin);
 			double newInMax = Math.max(dv, inMax);
@@ -590,7 +590,7 @@ public class Projection extends BasicModule {
 
 		public DScale(OperatorData od) {super(od);}
 		
-		@Facet(memUse="WRITER", prototype="(double value)")
+		@Facet(memUse="WRITER", prototype="(double value)", counterpart="query")
 		public double map(double dv, double outMin, double outMax) {
 			double newInMin = Math.min(dv, inMin);
 			double newInMax = Math.max(dv, inMax);
@@ -648,7 +648,7 @@ public class Projection extends BasicModule {
 
 		}
 		
-		@Facet(memUse="WRITER", prototype="(Number p, Number min, Number max)")
+		@Facet(memUse="WRITER", prototype="(Number p, Number min, Number max)", counterpart="query")
 		public Tuple map(Number value) {
 			if (min == null) {min = value;}
 			if (max == null) {max = value;}

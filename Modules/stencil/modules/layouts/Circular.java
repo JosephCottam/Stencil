@@ -46,7 +46,7 @@ public class Circular extends Layout {
 		elementCount = Converter.toInteger(spec.get(ELEMENT_COUNT));
 	}
 	
-	@Facet(memUse="WRITER", prototype="(angle, count, pad, r, ratio)")
+	@Facet(memUse="OPAQUE", prototype="(angle, count, pad, r, ratio)")
 	public Tuple configure(Double angle, Integer count, Double pad, Double radius, Double ratio, Double cx, Double cy) {
 		this.startAngle   = angle != null  ? angle  : startAngle;
 		this.radius       = radius != null ? radius : this.radius;
@@ -81,7 +81,7 @@ public class Circular extends Layout {
 		return new Point2D.Double(x,y);
 	}
 	
-	@Facet(memUse="WRITER", prototype="(X,Y)")
+	@Facet(memUse="WRITER", prototype="(X,Y)", counterpart="query")
 	public Point2D map(int idx) {
 		int max = Math.max(elementCount, idx);
 		

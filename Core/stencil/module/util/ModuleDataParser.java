@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import stencil.module.MetadataHoleException;
 import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.*;
 import stencil.parser.ParseStencil;
@@ -92,8 +93,13 @@ public class ModuleDataParser {
 		for (Method m: c.getMethods()) {
 			Facet f = m.getAnnotation(Facet.class);
 			if (f== null) {continue;}
-			FacetData[] fds = makeFacetData(f, m.getName());
-			facets.addAll(Arrays.asList(fds));
+
+			try {
+				FacetData[] fds = makeFacetData(f, m.getName());
+				facets.addAll(Arrays.asList(fds));
+			} catch (MetadataHoleException ex) {
+				throw new MetaDataParseException("Error preparing metadata for " + opName + ": " + ex.getMessage());
+			}
 		}
 
 		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.defaultFacet(), facets, Arrays.asList(o.tags()));

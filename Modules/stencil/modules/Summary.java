@@ -102,14 +102,14 @@ public class Summary extends BasicModule {
  		}
 	}
 	
-	@Operator(name="FullMin", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullMin", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG, defaultFacet="map")
 	public static class FullMin extends FullExtreme {
 		private FullMin(OperatorData opData, Class target) {super(opData, target, false);}
 		public FullMin(OperatorData opData, Specializer spec) {
 			super(opData, spec, false);
 		}
 		
-		@Facet(memUse="WRITER", prototype="(Comparable v)")
+		@Facet(memUse="WRITER", prototype="(Comparable v)", counterpart="query")
  		public Comparable map(Object... values) {return super.map(values);}
  		
  		@Facet(memUse="READER", prototype="(Comparable v)")
@@ -118,14 +118,14 @@ public class Summary extends BasicModule {
  		public FullMin duplicate() {return new FullMin(operatorData, targetClass);}
 	}
 
-	@Operator(name="FullMax", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullMax", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG, defaultFacet="map")
 	public static class FullMax extends FullExtreme {
 		private FullMax(OperatorData opData, Class target) {super(opData, target, false);}
 		public FullMax(OperatorData opData, Specializer spec) {
 			super(opData, spec, true);
 		}
 		
-		@Facet(memUse="WRITER", prototype="(Comparable v)")
+		@Facet(memUse="WRITER", prototype="(Comparable v)", counterpart="query")
  		public Comparable map(Object... values) {return super.map(values);}
  		
  		@Facet(memUse="READER", prototype="(Comparable v)")

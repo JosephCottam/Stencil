@@ -1,5 +1,6 @@
 package stencil.module.util;
 
+import stencil.module.MetadataHoleException;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
@@ -23,6 +24,12 @@ public final class FacetData {
 		if ((counterpart == null || counterpart.trim().equals("")) 
 			&& (memory.equals(MemoryUse.FUNCTION) || memory.equals(MemoryUse.READER))) {
 			counterpart = name;
+		}
+		
+		//If this a writer and there is no counterpart, don't continue...
+		if (memory == MemoryUse.WRITER 
+			&& (counterpart == null || counterpart.trim().equals("") || counterpart.equals(name))) {
+			throw new MetadataHoleException("Must provide proper counterpart for WRITER facet: " + name);
 		}
 		
 		this.name = name;

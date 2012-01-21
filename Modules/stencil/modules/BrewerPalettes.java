@@ -32,7 +32,7 @@ public class BrewerPalettes  extends BasicModule {
 			reserve = stencil.types.color.ColorCache.get((String) spec.get(RESERVE));
 		}
 
-		@Facet(memUse="WRITER", prototype="(Color color)")
+		@Facet(memUse="WRITER", prototype="(Color color)", counterpart="query")
 		public Tuple map(String value) {
 			int idx = Collections.binarySearch(seen, value);
 			if (idx<0) {
