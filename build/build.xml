@@ -134,5 +134,8 @@
  	<target name="Test" depends="Stencil"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>
-
+ 	
+ 	<target name="GenerateRegressionImages">
+ 	     <ant antfile="./build/Test.xml" inheritRefs="true" target="GenerateRegressionImages"/>
+    </target>
  </project>

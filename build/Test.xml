@@ -1,15 +1,11 @@
  <project name="TestStencil" default="RunTests">
     <target name="RunTests" depends="JUnit"/>
     
-    <target name="CleanUpTests">
-        <delete failonerror="false"><fileset dir="testResults" includes="**/TEST_*"/></delete>
-    </target>
-    
     <target name="MakeJar">
        <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
     </target>
     
-    <target name="OneTest" depends="CleanUpTests,MakeJar">
+    <target name="OneTest" depends="MakeJar">
         <tstamp><format property="now" pattern="ddMMMyyyy HH:mm"/></tstamp>
         <property name="results" location="./testResults/${now}" />
 
@@ -39,7 +35,7 @@
         <delete file="TestData/Stencil.jar"/>
     </target>
     
-    <target name="JUnit" depends="CleanUpTests,MakeJar">
+    <target name="JUnit" depends="MakeJar">
         <tstamp><format property="now" pattern="yyyyMMMdd_HH_mm"/></tstamp>
         <property name="base" location="./testResults/${now}" />
         <property name="results" location="${base}/raw" />
@@ -89,7 +85,7 @@
         
     </target>
 
-    <target name="JUnit-Singles" depends="CleanUpTests,MakeJar">
+    <target name="JUnit-Singles" depends="MakeJar">
         <move file="Stencil.jar" toDir="TestData"/>
         
         <junit fork="yes" dir="./">
@@ -107,12 +103,8 @@
 
 
 	<!--GUnit tests--> 	
- 	<target name="GUnit"> 
+ 	<target name="GUnit" depends="MakeJar"> 
 	 	<property name="testsLocation" location="bin/stencil/unittests/parser/string/grammars/" />
-
-		<jar jarfile="${runtimeLibrary}/Stencil.jar" includes="*.class" basedir=".">
-			<fileset dir="bin"/>
-		</jar>
 
 		<java classname="org.antlr.gunit.Interp" fork="yes" dir="${target}">
 			<classpath>
@@ -135,4 +127,17 @@
  		
  		<delete file="${runtimeLibrary}/Stencil.jar"/>
 	</target>
+ 	
+ 	
+ 	<target name="GenerateRegressionImages" depends="MakeJar">
+ 	  <java jar="Stencil.jar" fork="yes" dir="TestData">
+ 	  	<arg value="-batch"/>
+ 	  	<arg value="-open"/>
+	  	<arg value="RegressionImages/testSet.stencils" />
+ 	  	<arg value="-settings"/>
+ 	  	<arg value="Stencil.properties"/>
+ 	  	<arg value="Explore.properties"/>
+ 	  </java>
+ 	</target>
+ 	   
  </project>

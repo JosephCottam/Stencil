@@ -1,11 +1,7 @@
  <project name="Release" default="Release">
     <property name="JarFile" value="Stencil.jar"/>
 
-    <target name="CleanUpTests">
-       <ant antfile="./build/Test.xml" inheritRefs="true" target="CleanUpTests"/>
-    </target>
-
- 	<target name="Release" depends="CompiledJar, CleanUpTests">
+ 	<target name="Release" depends="CompiledJar">
  		<property name="release" location="./release"/>
  		<tstamp><format property="today" pattern="ddMMMyyyy"/></tstamp>
  		<property name="result" value="Stencil_${today}.zip"/>
