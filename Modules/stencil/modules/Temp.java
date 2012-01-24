@@ -40,21 +40,25 @@ public class Temp extends BasicModule {
 		return ms;
 	}
 	
-	@Operator(spec="[]")
+	@Operator(spec="[]", defaultFacet="query")
 	public static final class Remember extends AbstractOperator.Statefull {
 		Object value;
 		public Remember(OperatorData opData) {super(opData);}
 		
-		@Facet(memUse="WRITER", prototype="(prior)", counterpart="query")
-		public Object map(Object v) {
+		@Facet(memUse="WRITER", prototype="(prior)", counterpart="setQuery")
+		public Object set(Object v) {
 			Object prior = value;
 			value = v;
 			stateID++;
 			return prior;
 		}
+		
+		@Description("Counterpart for set. Ignores arguments and returns same value as query.")
+		@Facet(memUse="READER", prototype="(prior)")
+		public Object setQuery(Object v) {return query();}
 		 
 		@Facet(memUse="READER", prototype="(prior)")
-		public Object Query(Object v) {return value;}
+		public Object query() {return value;}
 	}
 	
 	@Operator(spec="[]")

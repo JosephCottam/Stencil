@@ -121,7 +121,7 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 				validateTypes(arguments, paramTypes, 0, arguments.length, args);
 			}
 		} catch (Exception e) {
-			throw new MethodInvokeFailedException(format("Exception thrown peparing arguments: %1$s.", deepToString(arguments)),method, target, e);
+			throw new MethodInvokeFailedException(format("Exception thrown preparing arguments: %1$s.", deepToString(arguments)),method, target, e);
 		}
 			
 		try {return (R) method.invoke(target, args);} 

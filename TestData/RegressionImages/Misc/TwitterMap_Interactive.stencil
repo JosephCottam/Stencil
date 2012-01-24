@@ -13,7 +13,7 @@ stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CT
 
 view
 from #Render
-  (X,Y,WIDTH, HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+  (X,Y,WIDTH, HEIGHT) : Map.bounds()
 
 
 layer Map
@@ -29,10 +29,15 @@ from Tweets
  
 layer Locations["TEXT"]
 from Tweets
-   ID: Count()
+   filter (geo != NULL)
+   local(id) : Count()
+   ID: local.id
    TEXT: message
-   VISIBLE: "FALSE"
-   VISIBLE:* Nearest() -> EQ(_, self.ID)     /*Framing error here, self is not known....*/
+   (X,Y): (geo.1, geo.0) 
+   VISIBLE:* Nearest() -> EQ(_, local.id)
+   IMPLANT: "POINT"
+
+stream interact()
 from Mouse
    (): Locations.nearest(X,Y) -> Nearest.set(Locations.ID)
 
