@@ -169,7 +169,7 @@ public final class SimpleTable implements Table {
 	@Override
 	public Rectangle2D getBoundsReference() {return tenured.getBoundsReference();}
 	public RectangleTuple bounds() {
-		return new RectangleTuple(tenured.getBoundsReference().getBounds2D());
+		return new RectangleTuple(tenured.getBoundsReference().getBounds2D(), true);
 	}
 	
 	@Override
