@@ -16,7 +16,7 @@ import stencil.tuple.Tuples;
 import stencil.types.Converter;
 
 /**Creates a set of continuous segments, like a hybrid between continuous and categorical.*/
-@Operator(spec="[margin: 1]",defaultFacet="map")
+@Operator(spec="[margin: 1]", defaultFacet="map")
 public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 	public static final String NAME = MonitorSegments.class.getSimpleName();
 	public static final String MARGIN_KEY = "margin";
@@ -84,7 +84,7 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 		return seed;
 	}
 	
-	@Facet(memUse="OPAQUE", prototype="()", alias={"map","query"})
+	@Facet(memUse="OPAQUE", prototype="()", alias={"map","query"}, counterpart="query")
 	public Tuple map(double value) {
 		int index;
 		Segment oldSegment=null;

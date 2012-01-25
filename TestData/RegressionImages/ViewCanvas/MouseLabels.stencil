@@ -1,0 +1,46 @@
+STREAM: Mouse
+NAME: Mouse
+FREQUENCY: -2147483648
+STREAM: File
+NAME: Elements
+TUPLE_SIZE: 1
+SEPARATOR: ,
+SOURCE: /Users/jcottam/Documents/Projects/Stencil-Root/Stencil/TestData/RegressionImages/Rotation/RotationData.txt
+SKIP: 1
+STRICT: true
+
+
+stream Elements(Name)
+stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+
+view
+from #Render
+  (X,Y,WIDTH,HEIGHT) : Center.bounds()
+
+
+layer Center
+from Elements
+    ID: Count()
+    SHAPE: "CROSS"
+    REGISTRATION: "CENTER"
+    ROTATION: Count() -> Mult(12.8, Count) -> ToRadians(_)
+    X : Count() -> Mult(40, _) -> Add(15,_)
+    Y : -100
+    SIZE: 30
+    FILL_COLOR: Color{BLUE}
+
+
+layer Labels["TEXT"]
+from Elements
+   local(id) : Count()
+   TEXT: Name
+   ID: local.id
+   X : Count() -> Mult(40, _) -> Add(15,_)
+   Y : -100
+   VISIBLE:* Nearest() -> EQ(_, local.id)
+
+stream interact()
+from Mouse
+   (): Center.nearest(X,Y) -> Nearest.set(Center.ID)
+
+operator Nearest : Remember

@@ -4,6 +4,7 @@ package stencil.module.operator.wrappers;
 import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +77,6 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 	public Tuple nearest(double x, double y) {
 		AffineTransform t = Display.view.viewTransform();
 		Point2D p = new Point2D.Double(x,y);
-		t.transform(p, p);
 		return layer.nearest(p);
 	}
 	
@@ -104,7 +104,10 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		public Tuple nearest(double x, double y) {
 			AffineTransform t = Display.view.viewTransform();
 			Point2D p = new Point2D.Double(x,y);
-			t.transform(p, p);
+			
+			try {t.inverseTransform(p, p);}
+			catch (NoninvertibleTransformException e) {return null;}
+			
 			return layer.nearest(p);
 		}
 

@@ -54,7 +54,7 @@ options {
   
   /**Shuffles the children of source the thing at index i is pulled from source[permute[i]].**/
   private StencilTree shuffle(int moveToZero, StencilTree source) {
-      assert moveToZero != -1;
+      if (moveToZero == -1) {throw new IllegalArgumentException("Attempting to transform layer WITHOUT an ID field set.");}
       StencilTree root = (StencilTree) adaptor.dupNode(source);
       adaptor.addChild(root, source.getChild(moveToZero));
       
