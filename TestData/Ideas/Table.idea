@@ -1,0 +1,26 @@
+Some data is static…and some algorithms are better viewed as tables anyway (layouts, Voronoi cells).  Provide a table type for Stencil that is like a layer, but is not rendered. The system "knows" about about tables and can use them intelligently (e.g., share columns with them).
+
+
+table ZipCodes["Dict"]
+from Zips
+   (Zip, X,Y,City,State) : (Zip,X,Y,City, State)
+   Order: Zip
+
+layer scribble
+from ZipCodes
+  group: State
+  Order: Zip
+  (X,Y) : (X,Y)
+  Color: Coloring(State)
+
+//This would only store the information once, but use it for both the table and the layer.
+
+
+
+table Cells["Voronoi"]
+from Places
+  (ID,X,Y) : (ID,X,Y)
+
+//Type Voronoi determines that X,Y and ID are settable, but returns point-sets under ID, and points…
+
+layer 

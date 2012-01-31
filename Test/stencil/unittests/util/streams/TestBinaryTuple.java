@@ -14,13 +14,28 @@ import static stencil.unittests.util.streams.Util.*;
 
 public class TestBinaryTuple extends StencilTestCase {
 	
+
+	public void testTrovesSpeedQueued() throws Exception {
+		final int QUEUE_SIZE = 300;
+		
+		DelimitedParser source = trovesStream();		
+		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
+		source.stop();
+		
+		//QueuedStream.THREAD = false;
+		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
+		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
+		testSpeed("trove queued", re, bin);
+	}
+
+	
 	public void testEncodeDecode() throws Exception {
-		DelimitedParser source = coordStream();
-		prepBinary(source, COORD_TUPLES_FILE, COORD_TYPES);
+		DelimitedParser source = trovesStream();
+		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
 		source.stop();
 
-		DelimitedParser oldTuples = coordStream();
-		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader(oldTuples.getName(), COORD_TUPLES_FILE);
+		DelimitedParser oldTuples = trovesStream();
+		BinaryTupleStream.Reader newTuples = new BinaryTupleStream.Reader(oldTuples.getName(), TROVES_TUPLES_FILE);
 		
 		//Walk tuple-by-tuple through both streams, all tuples should be equal
 		int i=0;
@@ -53,19 +68,6 @@ public class TestBinaryTuple extends StencilTestCase {
 		BinaryTupleStream.Reader binSource = new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE);
 		testSpeed("trove unqueued", source, binSource);
 	}
-
-	public void testTrovesSpeedQueued() throws Exception {
-		final int QUEUE_SIZE = 300;
-		
-		DelimitedParser source = trovesStream();		
-		prepBinary(source, TROVES_TUPLES_FILE, TROVES_TYPES);
-		source.stop();
-		
-		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
-		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
-		testSpeed("trove queued", re, bin);
-	}
-
 	
 	public void testCoordSpeed() throws Exception {
 		DelimitedParser reSource = coordStream();
@@ -96,9 +98,8 @@ public class TestBinaryTuple extends StencilTestCase {
 		long binEnd = System.currentTimeMillis();
 		long binTime = binEnd-binStart;
 		
-		//System.out.printf("\nBinary parsing is %1$s percent of regexp parsing for %5$s (%2$d ms vs %3$d ms over %4$s tuples).\n", 100 * (binTime/(double) reTime), binTime, reTime, reTuples, tag);
-		assertTrue("No advantage to binary.", binTime < reTime);
 		assertEquals("Unequal tuple count.", reTuples, binTuples);
+		assertTrue("No advantage to binary.", binTime < reTime);
 	}
 	
 	public static void prepBinary(TupleStream source, String targetFile, String types) throws Exception {

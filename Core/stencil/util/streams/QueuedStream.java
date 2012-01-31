@@ -29,7 +29,7 @@ public class QueuedStream implements TupleStream {
 				if (!source.hasNext()) {break;}
 				int getMore = prefetchSize - tupleCache.size(); //queue.size is not necessarily constant time, so the value is grabbed and used in the inner loop
 				boolean doSleep = getMore < 10;					//Not much to get, take a quick break
-				for (int i=0; i<getMore; i++) {loadQueue();}
+				loadQueue();
 				if (doSleep) {Thread.yield();}
 			}
 		}
@@ -64,7 +64,7 @@ public class QueuedStream implements TupleStream {
 	
 	@Override
 	public boolean hasNext() {
-		if (tupleCache.isEmpty()) {loadQueue();}
+		if (loader != null && tupleCache.isEmpty()) {loadQueue();} 		//Pre-fetch if there is no loader...
 		return !tupleCache.isEmpty() || source.hasNext();
 	}
 

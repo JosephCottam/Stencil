@@ -1,0 +1,25 @@
+Remove the stream requirements from explore and pull them into Stencil by adding a specializer clause to the "stream" declaration.
+
+
+stream flowers(sepalLen, petalLen, obs) 
+	from File["./dla;kj"]
+
+stream tests(id, platform, pass, fail)
+   from DB["./..."]
+
+stream mouse(X,Y) from Mouse
+
+
+Implementation:
+  A specializer field #prototype is added that captures the prototype.
+  The stream source must return tuples with that prototype (in that order).
+  Exactly how they do it is implementation specific (for example, file
+     streams may just assume it is correct if arity is correct but mouse
+     may select a subset of the possible fields and repack them).
+  Stream init occurs by default, but the stencil compiler takes a 
+     dictionary of name/stream-source pairs to do override of any 
+     stream definition that occurs in the dictionary.  Passed stream
+     sources MUST have matching prototypes to the ones defined in the
+     declaration.
+
+
