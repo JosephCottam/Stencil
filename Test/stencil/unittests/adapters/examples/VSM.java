@@ -1,5 +1,6 @@
 package stencil.unittests.adapters.examples;
 
+
 public class VSM extends ImageTest {
 	public VSM(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/VSM/",

@@ -64,8 +64,13 @@ public final class OperatorData {
 	}
 
 	private void validate() {
-		assert defaultFacet != null && defaultFacet.trim() != "" : String.format("Default facet not provided for %1$s.%2$s", module, name);
-		assert facets.containsKey(defaultFacet) : String.format("Default facet not found in facets lists for %1$s.%2$s", module, name);		
+		if (defaultFacet == null || defaultFacet.trim().equals("")) { 
+			throw new MetadataHoleException(module, name, "Default facet required but not provided.");
+		}
+		
+		if (!facets.containsKey(defaultFacet)) {
+			throw new MetadataHoleException(module, name, String.format("Default facet '%1$s' not found in facets lists.", defaultFacet));		
+		}
 	}
 	
 	/**Return facet data for the default facet.*/
@@ -77,12 +82,12 @@ public final class OperatorData {
 	
 	public FacetData getFacet(String name) {
 		if (facets.containsKey(name)) {return facets.get(name);}
-		throw new UnknownFacetException(this.name, name, getFacetNames());
+		throw new UnknownFacetException(this.name, name, facetNames());
 	}
 	
-	public boolean hasFacet(String name) {return getFacetNames().contains(name);}
-	public List<String> getFacetNames() {return new ArrayList(facets.keySet());}
-	public List<FacetData> getFacets() {return new ArrayList(facets.values());}
+	public boolean hasFacet(String name) {return facetNames().contains(name);}
+	public List<String> facetNames() {return new ArrayList(facets.keySet());}
+	public List<FacetData> facets() {return new ArrayList(facets.values());}
 
 	public String module() {return module;}
 	public String name() {return name;}

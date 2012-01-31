@@ -85,7 +85,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	/** Does given operator/meta-data include any stateful facets?  If not, it is a function.**/ 
 	public static boolean isFunction(StencilOperator op) {return isFunction(op.getOperatorData());}
 	public static boolean isFunction(OperatorData op) {
-		for (FacetData fd: op.getFacets()) {
+		for (FacetData fd: op.facets()) {
 			if (fd.memUse() != MemoryUse.FUNCTION) {return false;}
 		}
 		return true;

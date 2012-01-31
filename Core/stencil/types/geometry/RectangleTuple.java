@@ -20,26 +20,16 @@ public final class RectangleTuple implements PrototypedTuple {
 	public static final TuplePrototype PROTO = new TuplePrototype(new String[]{"X","Y","W","H"}, new Class[]{double.class, double.class, double.class, double.class});
 	private final Rectangle2D basis;
 	
-	public RectangleTuple(Rectangle2D basis) {this(basis, false);}
-	public RectangleTuple(Rectangle2D basis, boolean invertY) {
-		if (invertY) {
-			this.basis = new Rectangle2D.Double(basis.getX(), -basis.getY(), basis.getWidth(), basis.getHeight());
-		} else {
-			this.basis = basis;
-		}
-	}
+	public RectangleTuple(Rectangle2D basis) {this.basis = basis;}
 	
 	public Object get(int idx) throws TupleBoundsException {
-		if (idx ==0) {return getY();}
-		if (idx ==1) {return getX();}
+		if (idx ==0) {return basis.getMinX();}
+		if (idx ==1) {return -basis.getMinY();}
 		if (idx ==2) {return basis.getWidth();}
 		if (idx ==3) {return basis.getHeight();}
 		throw new TupleBoundsException(idx, this);
 	}
 
-	public double getX() {return -basis.getMinY();}
-	public double getY() {return basis.getMinX();}
-	
 	public String toString() {return Tuples.toString("Rectangle", this, 0);}
 
 	@Override
@@ -51,5 +41,5 @@ public final class RectangleTuple implements PrototypedTuple {
 	@Override
 	public int size() {return PROTO.size();}
 	
-	public  Rectangle2D basis() {return basis;}
+	public Rectangle2D basis() {return basis;}
 }

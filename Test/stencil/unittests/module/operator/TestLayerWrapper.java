@@ -13,7 +13,7 @@ public class TestLayerWrapper extends StencilTestCase {
 		LayerOperator op = new LayerOperator("test", l);
 		
 		OperatorData od = op.getOperatorData();
-		for (String facetName: od.getFacetNames()) {
+		for (String facetName: od.facetNames()) {
 			FacetData fd = od.getFacet(facetName);
 			assertNotNull("Facet listed in facet data, but not found in layer operator", fd);
 		}

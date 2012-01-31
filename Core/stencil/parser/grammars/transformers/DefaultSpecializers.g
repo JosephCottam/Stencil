@@ -31,6 +31,7 @@ options {
   import static stencil.parser.ParserConstants.DEFAULT_VIEW_SPECIALIZER;
   import static stencil.parser.ParserConstants.DEFAULT_LAYER_SPECIALIZER;
   import static stencil.parser.ParserConstants.POSITIONAL_ARG;
+  import static stencil.parser.string.util.Utilities.isGenSymRoot;
 }
 
 @members{
@@ -146,7 +147,7 @@ options {
     List<String> keys =new ArrayList();
     List<Object> values = new ArrayList();
     for (int i=0; i<updates.size(); i++) {
-      if (updates.prototype().get(i).name().equals(POSITIONAL_ARG)) {
+      if (isGenSymRoot(POSITIONAL_ARG, updates.prototype().get(i).name())) {
         if (defaults.size() < i) {throw new ProgramCompileException("Specializer with insufficient defaults for positional specializer arguments.");}
         keys.add(defaults.prototype().get(i).name());
       } else {

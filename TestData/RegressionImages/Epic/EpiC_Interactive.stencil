@@ -14,10 +14,10 @@ stream Data(Timestep, Line, Value)
 view
 from #Render
 	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60, 20)
-	WIDTH : Mult(canvas.WIDTH, 1.2)
-	HEIGHT : Mult(canvas.HEIGHT, 1.2)
+	W : Mult(canvas.W, 1.2)
+	H : Mult(canvas.H, 1.2)
 	X : Sub(canvas.X, local.WidthOffset)
-	Y : Mult(canvas.HEIGHT, -1) -> Sub(_, local.HeightOffset)
+	Y : Mult(canvas.H, -1) -> Sub(_, local.HeightOffset)
 
 layer Lines["POLY_POINT"]
 guide

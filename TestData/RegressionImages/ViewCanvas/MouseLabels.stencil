@@ -5,7 +5,7 @@ STREAM: File
 NAME: Elements
 TUPLE_SIZE: 1
 SEPARATOR: ,
-SOURCE: /Users/jcottam/Documents/Projects/Stencil-Root/Stencil/TestData/RegressionImages/Rotation/RotationData.txt
+SOURCE: ../Rotation/RotationData.txt
 SKIP: 1
 STRICT: true
 
@@ -15,7 +15,7 @@ stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CT
 
 view
 from #Render
-  (X,Y,WIDTH,HEIGHT) : Center.bounds()
+  (X,Y,W,H) : Center.bounds()
 
 
 layer Center

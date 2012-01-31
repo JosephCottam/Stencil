@@ -125,12 +125,6 @@
         <ant antfile="./build/Test.xml" inheritRefs="true"/>
     </target>
 
-
-    <!-- Just test with whatever is already built, but  just the specified tests-->
-    <target name="TestOne" depends=""> 
-        <ant antfile="./build/Test.xml" inheritRefs="true" target="OneTest"/>
-    </target>
-
  	<target name="Test" depends="Stencil"> 
  		<ant antfile="./build/Test.xml" inheritRefs="true"/>
 	</target>

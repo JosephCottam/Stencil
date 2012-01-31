@@ -154,9 +154,10 @@ tokens {
 @header{
   package stencil.parser.string;
 
-  import static stencil.parser.ParserConstants.*;
   import stencil.parser.tree.StencilTree;
   import stencil.interpreter.tree.Freezer;
+  import static stencil.parser.ParserConstants.*;
+  import static stencil.parser.string.util.Utilities.genSym;
 }
 
 @lexer::header{
@@ -364,8 +365,8 @@ specializer
 
 argList : argEntry  (SEPARATOR! argEntry)*;
 private argEntry
-    : ID -> ^(MAP_ENTRY[POSITIONAL_ARG] ID)
-    | atom -> ^(MAP_ENTRY[POSITIONAL_ARG] atom);
+    : ID -> ^(MAP_ENTRY[genSym(POSITIONAL_ARG)] ID)
+    | atom -> ^(MAP_ENTRY[genSym(POSITIONAL_ARG)] atom);
 
 mapList
   : mapEntry (SEPARATOR! mapEntry)*;

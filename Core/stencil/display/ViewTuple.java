@@ -36,7 +36,7 @@ import stencil.tuple.prototype.TuplePrototype;
 public abstract class ViewTuple implements PrototypedTuple {
 	public static final String VIEW_IMPLANTATION = "STENCIL_VIEW";
 	public static final TuplePrototype PROTOTYPE;
-	public static final String PROTOTYPE_STRING = "(double ZOOM, double X, double Y, double WIDTH, double HEIGHT, double PORTAL_WIDTH, double PORTAL_HEIGHT, double BOTTOM, double RIGHT)";
+	public static final String PROTOTYPE_STRING = "(double ZOOM, double X, double Y, double W, double H, double PORTAL_WIDTH, double PORTAL_HEIGHT)";
 	
 	static {
 		TuplePrototype proto = null;

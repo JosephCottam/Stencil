@@ -6,6 +6,7 @@ import java.io.File;
 
 import javax.imageio.*;
 
+
 import java.awt.image.BufferedImage;
 
 public abstract class ImageTest {
@@ -99,4 +100,40 @@ public abstract class ImageTest {
  
 	
 	public TestRecord getTestRecord() {return record;}
+
+	public static abstract class Probablistc extends ImageTest {
+		protected final double permissibleVariance;
+		
+		/**
+		 * @param record
+		 * @param permissibleVariance -- How much are sizes permitted to vary (as a percent deviation from original)?
+		 */
+		public Probablistc(double permissibleVariance, TestRecord record) {
+			super (record);
+			this.permissibleVariance = permissibleVariance;
+		}
+		
+		public void diffImage(String original, String testResult, String deltaFile) throws Exception {
+			BufferedImage o,r;
+
+			File f1 = new File(original);
+			File f2 = new File(testResult);
+			assertTrue("Original file could not be found: " + original, f1.exists());
+			assertTrue("Test result file could not be found: " + testResult, f2.exists());
+
+			
+			try {o = ImageIO.read(f1);} catch (Exception e) {throw new RuntimeException("Error opening reference image.", e);}
+			try {r = ImageIO.read(f2);} catch (Exception e) {throw new RuntimeException("Error opening results image.", e);}
+
+			double maxWidth = r.getWidth() * (1+permissibleVariance);
+			double minWidth = r.getWidth() * (1-permissibleVariance);
+			double maxHeight = r.getHeight() * (1+permissibleVariance);
+			double minHeight = r.getHeight() * (1-permissibleVariance);
+
+			
+			assertTrue("Widths not in tolerance.", o.getWidth() > minWidth && o.getWidth() < maxWidth);
+			assertTrue("Heights not in tolerance.", o.getHeight() > minHeight && o.getHeight() < maxHeight);
+		}
+
+	}
 }

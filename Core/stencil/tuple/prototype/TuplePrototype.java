@@ -31,7 +31,7 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 			fields.add((T) d);	//HACK: Remove this cast by turning this into a static factory method
 		}
 		this.fields = Collections.unmodifiableList(fields);
-		assert validateNames() : "Name validation ended in exception.";
+		validateNames();
 	}
 	
 	public TuplePrototype(T... defs) {

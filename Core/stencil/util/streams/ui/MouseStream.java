@@ -137,7 +137,7 @@ public class MouseStream implements TupleStream {
 			values[PROTOTYPE.indexOf("Y")] = -mouse.currentCanvas.getY();
 			values[PROTOTYPE.indexOf("BUTTON")] = mouse.storedEvent.getButton();
 			values[PROTOTYPE.indexOf("DELTA_X")] = mouse.current.getX() - mouse.prior.getX();
-			values[PROTOTYPE.indexOf("DELTA_Y")] = mouse.current.getY() - mouse.prior.getY();
+			values[PROTOTYPE.indexOf("DELTA_Y")] = -(mouse.current.getY() - mouse.prior.getY());
 			values[PROTOTYPE.indexOf("SCREEN_X")] = mouse.current.getX();
 			values[PROTOTYPE.indexOf("SCREEN_Y")] = mouse.current.getY();
 			values[PROTOTYPE.indexOf("CLICK_COUNT")] = mouse.storedEvent.getClickCount();

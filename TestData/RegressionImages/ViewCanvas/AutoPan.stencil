@@ -2,7 +2,7 @@ STREAM: File
 NAME: Stocks
 TUPLE_SIZE: 6
 SEPARATOR: ,
-SOURCE: ./google_stocks.csv
+SOURCE: ../Stocks/google_stocks.csv
 SKIP: 1
 STRICT: true
 STREAM: Mouse
@@ -24,17 +24,17 @@ from Stocks
 
 view 
 from #Render
-    (HEIGHT, Y) : (canvas.HEIGHT, canvas.Y)
+    (H, Y) : (canvas.H, canvas.Y)
 from AlignedStocks
     filter(prefilter.Margin < 50)
     filter(prefilter.TimeStep < prefilter.RIGHT)
     prefilter(TimeStep, Margin, RIGHT) : 
-        [Right] TranslateRegistration("TOP_LEFT", view.X, view.Y, view.WIDTH, view.HEIGHT, "RIGHT") ->
+        [Right] TranslateRegistration("TOP_LEFT", view.X, view.Y, view.W, view.H, "RIGHT") ->
         [Time] TimeStep(Date) -> Sub(Right.X, _) -> (Time.S, Sub, Right.X) 
     X: Add(5, view.X)
 from Mouse
     filter(BUTTON = 1)
-    X : [dim] ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, dim.Width)
+    X : [dim] ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, dim.W)
 
 
 layer Ticker["POLY_POINT"]

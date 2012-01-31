@@ -64,7 +64,7 @@ public class QueuedStream implements TupleStream {
 	
 	@Override
 	public boolean hasNext() {
-		//if (!tupleCache.isEmpty()) {return true;}
+		if (tupleCache.isEmpty()) {loadQueue();}
 		return !tupleCache.isEmpty() || source.hasNext();
 	}
 

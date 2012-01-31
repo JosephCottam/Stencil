@@ -4,6 +4,7 @@ import static junit.framework.Assert.*;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
+
  
 public class LowProcessing extends ImageTest {
 	public LowProcessing(String[] configs) {

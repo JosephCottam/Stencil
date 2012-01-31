@@ -12,7 +12,7 @@ stream Tweets(MESSAGE)
 
 view
 from Tweets
-    ZOOM : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.WIDTH, canvas.HEIGHT)
+    ZOOM : Zoom(view.PORTAL_WIDTH, view.PORTAL_HEIGHT, canvas.W, canvas.H)
     (X,Y): (canvas.X, canvas.Y)
 
 layer Counts

@@ -6,15 +6,15 @@ import ViewCanvas
 
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
 
-canvas main[BACKGROUND_COLOR: "BLACK"]
+canvas main[COLOR: "BLACK"]
 
 view
 from Mouse
     filter(BUTTON=1) 
     filter(TYPE=~"DRAG")
     filter(SHIFT!~"TRUE")
-    X : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, ScreenToCanvasDimension.Width)
-    Y : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view.Y, ScreenToCanvasDimension.Height)
+    X : ScreenToCanvasDimension(DELTA_X,0) -> Sub(view.X, ScreenToCanvasDimension.W)
+    Y : ScreenToCanvasDimension(0,DELTA_Y) -> Sub(view.Y, ScreenToCanvasDimension.H)
 from Mouse
     filter(BUTTON=1)
     filter(SHIFT=~"true")
@@ -23,7 +23,7 @@ from Mouse
 from Mouse
     filter(BUTTON=1)
     filter(CLICK_COUNT=3)
-    (WIDTH, HEIGHT, X,Y) : (canvas.WIDTH, canvas.HEIGHT, canvas.X, canvas.Y)
+    (W, H, X,Y) : (canvas.W, canvas.H, canvas.X, canvas.Y)
 
 
 

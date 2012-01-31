@@ -29,11 +29,15 @@ public class GuideUtil {
 		
 		for (String field: TuplePrototypes.getNames(t.prototype())) {
 			String[] parts = field.split(NAME_SEPARATOR_PATTERN);
+			
 			if (parts.length == 1) {continue;}
 			if (excludes.contains(parts[0])) {continue;}
-			if (fields.contains(parts[0])) {continue;}
-			fields.add(parts[0] + NAME_SEPARATOR + "IMPLANT");
-			implants.add(implant);
+			
+			String newName = parts[0] + NAME_SEPARATOR + "IMPLANT"; 
+			if (!fields.contains(newName)) {
+				fields.add(newName);
+				implants.add(implant);
+			}
 		}
 		return Tuples.merge(t, new PrototypedArrayTuple(fields, implants));
 		

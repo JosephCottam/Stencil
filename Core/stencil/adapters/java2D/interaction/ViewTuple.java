@@ -20,6 +20,13 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		canvas = view.getCanvas().getComponent();
 	}
 
+	
+	/**Set a value on the view/canvas. 
+	 * If setting Y, assumes it is in the Y-positive/Up convention (tuple convention)
+	 * 
+	 * @param name
+	 * @param value
+	 */
 	public void set(String name, Object value) {
 		if (PROTOTYPE.contains(name)) {
 			AffineTransform t = canvas.viewTransform();
@@ -43,11 +50,11 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 				return;
 			} else if (name.equals("Y")) {
 				t.setToScale(scaleX, scaleY);
-				t.translate(oldX, -val);
+				t.translate(oldX, val);
 				try {canvas.setViewTransform(t);}
 				catch (NoninvertibleTransformException e) {/*Modifications to translate cannot give errors.*/}
 				return;
-			} else if (name.equals("WIDTH")) {
+			} else if (name.equals("W")) {
 				space = canvas.getWidth();
 				if (space == 0) {space =1;} //Keep the world from exploding
 				if (val == 0) {val =1;}
@@ -58,7 +65,7 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 				try {canvas.setViewTransform(t);}
 				catch (NoninvertibleTransformException e) {/*Scale so calculated cannot yield error.*/}
 				return;
-			} else if (name.equals("HEIGHT")) {
+			} else if (name.equals("H")) {
 				space = canvas.getHeight();
 				if (space == 0) {space =1;} //Keep the world from exploding
 				if (val == 0) {val =1;}
@@ -74,6 +81,10 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		throw new IllegalArgumentException(String.format("Cannot set %1$s on view.", name));
 	}
 
+	
+	/**Retrieve a view value.  
+	 * Uses Y-positive/up (tuple convention)
+	 */
 	public Object get(String name) throws InvalidNameException {
 		if (PROTOTYPE.contains(name)) {
 			AffineTransform t = canvas.inverseViewTransform();
@@ -83,16 +94,14 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 			if (name.equals("Y")){ return getY();}
 			if (name.equals("PORTAL_WIDTH")){ return view.getInsetBounds().getWidth();}
 			if (name.equals("PORTAL_HEIGHT")){return view.getInsetBounds().getHeight();}
-			if (name.equals("WIDTH")){ 
+			if (name.equals("W")){ 
 				Point2D p = new Point2D.Double(view.getInsetBounds().getWidth(), 0);
 				return t.deltaTransform(p,p).getX();
 			}
-			if (name.equals("HEIGHT")){ 
+			if (name.equals("H")){ 
 				Point2D p = new Point2D.Double(0,view.getBounds().getHeight());
 				return t.deltaTransform(p, p).getY();
 			}
-			if (name.equals("RIGHT")) {return (Double) get("X") + (Double) get("WIDTH");}
-			if (name.equals("BOTTOM")) {return (Double) get("Y") + (Double) get("HEIGHT");}
 		}
 		throw new IllegalArgumentException("Unknown field, cannot query " + name + " on view.");
 	}
@@ -104,7 +113,7 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 	
 	private double getY() {
 		AffineTransform t = canvas.viewTransform();
-		return -t.getTranslateY()/t.getScaleY();	
+		return t.getTranslateY()/t.getScaleY();	
 	}
 	
 	public Point2D canvasToView(Point2D p) {

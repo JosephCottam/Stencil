@@ -13,7 +13,7 @@ stream RawLines(text)
 
 view
 from #Render
-  (X,Y,WIDTH,HEIGHT) : (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+  (X,Y,W,H) : (canvas.X, canvas.Y, canvas.W, canvas.H)
 
 
 stream Lines (line, text)

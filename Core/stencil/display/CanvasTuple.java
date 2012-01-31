@@ -7,6 +7,7 @@ import stencil.parser.ProgramParseException;
 import stencil.tuple.InvalidNameException;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.TupleBoundsException;
+import stencil.tuple.Tuples;
 import stencil.tuple.prototype.TuplePrototype;
 
 /**The CanvasTuple represents an actual drawing surface
@@ -24,14 +25,22 @@ public abstract class CanvasTuple implements PrototypedTuple {
 
 	public static final String CANVAS_IMPLANTATION = "STENCIL_CANVAS";
 	public static final TuplePrototype PROTOTYPE;
-	public static final String PROTOTYPE_STRING ="(color BACKGROUND_COLOR, double X, double Y, double WIDTH, double HEIGHT, double RIGHT, double BOTTOM)";
-	public static final String BACKGROUND_COLOR = "BACKGROUND_COLOR";
+	public static final String PROTOTYPE_STRING ="(color COLOR, double X, double Y, double W, double H)";
+	public static final String BACKGROUND_COLOR = "COLOR";
+	
+	private static int COLOR, X,Y,W,H;
 	
 	static {
 		TuplePrototype proto = null;
 		try {proto = ParseStencil.prototype(PROTOTYPE_STRING, false);}
 		catch (ProgramParseException e) {System.err.println("Error parsing view tuple prototype.)");}
 		PROTOTYPE = proto;
+		
+		COLOR = PROTOTYPE.indexOf("BACKGROUND_COLOR");
+		X = PROTOTYPE.indexOf("X");
+		Y = PROTOTYPE.indexOf("Y");
+		W = PROTOTYPE.indexOf("W");
+		H = PROTOTYPE.indexOf("H");
 	}
 
 
@@ -40,26 +49,22 @@ public abstract class CanvasTuple implements PrototypedTuple {
 	protected abstract Rectangle getBounds();
 
 	public Object get(int idx) {
-		try {return get(PROTOTYPE.get(idx).name());} 
-		catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
+		if (idx == COLOR) return getComponent().getBackground();
+		if (idx == X) {return getX();}
+		if (idx == Y) {return getY();}
+		if (idx == W) {return getWidth();}
+		if (idx == H) {return getHeight();}
+		throw new TupleBoundsException(idx, size());
 	}
 
 	public Object get(String name) throws InvalidNameException {
-		Rectangle bounds = getBounds();
-
-		if (BACKGROUND_COLOR.equals(name)) return getComponent().getBackground();
-		if ("X".equals(name)) return bounds.getX();
-		if ("Y".equals(name)) return bounds.getY();
-		if ("WIDTH".equals(name)) return bounds.getWidth();
-		if ("HEIGHT".equals(name)) return bounds.getHeight();
-		if (name.equals("RIGHT")) {return bounds.getX() + bounds.getWidth();}
-		if (name.equals("BOTTOM")) {return (-bounds.getY()) + bounds.getHeight();}
-		
-		throw new InvalidNameException(name, PROTOTYPE);
+		return Tuples.namedDereference(name, this);
 	}
 
 	public double getX() {return getBounds().getX();}
-	public double getY() {return getBounds().getY();}
+	
+	/**Return the Y-positive/Up (tuple convention) for Y position.**/
+	public double getY() {return -getBounds().getY();}
 	public double getWidth() {return getBounds().getWidth();}
 	public double getHeight() {return getBounds().getHeight();}
 

@@ -1,8 +1,9 @@
 package stencil.unittests.adapters.examples;
 
-public class RadialTree extends ImageTest {
+
+public class RadialTree extends ImageTest.Probablistc {
 	public RadialTree(String[] configs) {
-		super(new TestRecord("./TestData/RegressionImages/NodeLink/",
+		super(.3, new TestRecord("./TestData/RegressionImages/NodeLink/",
 				resultSpace("NodeLink"),
 				"RadialTree.stencil",
 				  null,

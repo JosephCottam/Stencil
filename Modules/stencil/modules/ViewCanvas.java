@@ -36,7 +36,7 @@ public class ViewCanvas extends BasicModule {
 	}
 
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Width, double Height)", alias={"map","query"})
+	@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
 	public static double[] screenToCanvasDimension(double width, double height) {
 		Dimension2D p = Display.view.viewToCanvas(new DoubleDimension( width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
@@ -51,7 +51,7 @@ public class ViewCanvas extends BasicModule {
 	}
 
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Width, double Height)", alias={"map","query"})
+	@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
 	public static double[] canvasToScreenDimension(double width, double height) {
 		Dimension2D p = Display.view.canvasToView(new DoubleDimension(width, height));
 		return new double[]{p.getWidth(), p.getHeight()};
@@ -67,7 +67,7 @@ public class ViewCanvas extends BasicModule {
 	 * @return
 	 */
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double Width)", alias={"map","query"})
+	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
 	public static double[] zoom(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
 		return zoomPadded(portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
 	}
@@ -77,7 +77,7 @@ public class ViewCanvas extends BasicModule {
 	 * 
 	 */
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double Width)", alias={"map","query"})
+	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
 	public static double[] zoomPadded(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
 		CanvasTuple global = Display.canvas;
 		

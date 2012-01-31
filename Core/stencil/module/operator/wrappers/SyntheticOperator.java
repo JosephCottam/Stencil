@@ -117,7 +117,7 @@ public class SyntheticOperator implements StencilOperator {
 		if (operatorData == null) {
 			throw new Error(String.format("Facet %1$s presented without required name: %2$s.", opDef.getText(), name));
 		} else {
-			throw new UnknownFacetException(opDef.getText(), name, operatorData.getFacetNames());
+			throw new UnknownFacetException(opDef.getText(), name, operatorData.facetNames());
 		}
 		
 	}
@@ -132,7 +132,7 @@ public class SyntheticOperator implements StencilOperator {
 				return new ReflectiveInvokeable(name, this);
 			}
 		} catch (Exception e) {throw new RuntimeException("Exception while creating invokeable for standard method", e);}
-		throw new UnknownFacetException(operatorData.name(), name, operatorData.getFacetNames());
+		throw new UnknownFacetException(operatorData.name(), name, operatorData.facetNames());
 	}
 
 	public String getName() {return operatorData.name();}

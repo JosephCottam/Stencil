@@ -32,7 +32,7 @@ public class PersistentData extends BasicModule {
 			else {return queue.peek();}
 		}
 		
-		@Facet(memUse="WRITER", prototype="(size)", alias={"push"}, counterpart="peek")
+		@Facet(memUse="WRITER", prototype="(size)", alias={"push","offer"}, counterpart="peek")
 		public Object offer(Object value) {
 			queue.add(value);
 			return queue.size();

@@ -239,7 +239,7 @@ public abstract class SplitHelper implements StencilOperator {
  		List<FacetData> facets = new ArrayList();
  		
  		OperatorData nod = new OperatorData(od);
- 		for (FacetData fd: nod.getFacets()) {
+ 		for (FacetData fd: nod.facets()) {
  			FacetData nfd =fd;
  			switch (fd.memUse()) {
  				case FUNCTION: 

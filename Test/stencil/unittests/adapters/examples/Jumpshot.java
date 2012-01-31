@@ -1,6 +1,7 @@
 package stencil.unittests.adapters.examples;
 
 
+
  
 public class Jumpshot extends ImageTest {
 	public Jumpshot(String[] configs) {

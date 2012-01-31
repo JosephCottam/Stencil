@@ -1,5 +1,6 @@
 package stencil.unittests.adapters.examples;
 
+
 /**Tests the equivalence of the flex guide to explicitly chosen
  * guides if the explicit statement indicates the same sample type as the 
  * flex guide automatically chooses.

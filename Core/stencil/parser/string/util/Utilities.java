@@ -25,10 +25,22 @@ public class Utilities {
 	/**Name that should be used with genSym whenever creating an auotmatic label for a yield/map/fold operator.**/
 	public static final String FRAME_SYM_PREFIX = "Frame";
 	
+	
 	private static int gsCounter = 0;
+	
+	/**Generate a guaranteed unusued name.**/
 	public static String genSym(String name) {
 		if (gsCounter <0) {throw new Error("Exceed gensym guranteed namespace capacity.");}
 		return "#" + name + "_" + gsCounter++;
+	}
+	
+	/**Could the passed name have been generated from the given root?
+	 * This does not guarantee it was so generated, only testing the possibility that it was.
+	 * @param root -- The possible root
+	 * @param name -- The name being test against the root
+	 * **/
+	public static boolean isGenSymRoot(String root, String name) {
+		return name.substring(1).startsWith(root);
 	}
 	
 	public static List<AstInvokeable> gatherInvokeables(Tree root) {

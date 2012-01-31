@@ -1,5 +1,6 @@
 package stencil.unittests.adapters.examples;
 
+
 public class VSM_FillGrid extends ImageTest {
 	public VSM_FillGrid(String[] configs) {
 		super(new TestRecord("./TestData/RegressionImages/VSM/",

@@ -5,35 +5,6 @@
        <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
     </target>
     
-    <target name="OneTest" depends="MakeJar">
-        <tstamp><format property="now" pattern="ddMMMyyyy HH:mm"/></tstamp>
-        <property name="results" location="./testResults/${now}" />
-
-        <move file="Stencil.jar" toDir="TestData"/>
-        <mkdir dir="${results}"/>
-
-        
-        <junit fork="yes" dir="../">
-            <formatter type="plain"/>
-
-            <classpath>
-                <pathelement location="./TestData/Stencil.jar"/>
-                <pathelement path="${java.class.path}"/>
-                <pathelement path="."/>
-                <fileset dir="${runtimeLibrary}" includes="*.jar"/>
-                <fileset dir="${runtimeLibrary}/JUNG/" includes="*.jar"/>
-            	<fileset dir="${runtimeLibrary}/twitter" includes="*.jar"/>
-            </classpath>
-            
-            <batchtest todir="${results}">
-                <fileset dir="./bin/">
-                    <include name="**/*TestProjection.class"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        
-        <delete file="TestData/Stencil.jar"/>
-    </target>
     
     <target name="JUnit" depends="MakeJar">
         <tstamp><format property="now" pattern="yyyyMMMdd_HH_mm"/></tstamp>

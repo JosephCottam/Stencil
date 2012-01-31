@@ -146,7 +146,7 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 	 */
 	public static abstract class StepOperator extends SizedOperator {
 		private static final String STEPS_KEY = "steps";
-		private IterativeContext layout;
+		protected IterativeContext layout;
 		protected final int maxIterations;
 		
 		protected StepOperator(OperatorData opData, Specializer spec) {

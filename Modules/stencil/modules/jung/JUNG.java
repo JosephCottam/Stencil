@@ -32,6 +32,7 @@ public class JUNG extends BasicModule {
 			operatorData(KKLayout.class, MODULE_NAME),
 			operatorData(RadialTreeLayout.class, MODULE_NAME),
 			operatorData(SpringLayout.class, MODULE_NAME),
+			operatorData(DAGLayout.class, MODULE_NAME)
 		};
 		
 		ModuleData md = moduleData(this.getClass());

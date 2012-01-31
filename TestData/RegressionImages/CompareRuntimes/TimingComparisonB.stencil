@@ -12,7 +12,7 @@ stream times(elapse, size, refs, perm, type, i)
 
 view
 from #Render
-  (X,Y,WIDTH,HEIGHT): (canvas.X, canvas.Y, canvas.WIDTH, canvas.HEIGHT)
+  (X,Y,W,H): (canvas.X, canvas.Y, canvas.W, canvas.H)
 
 layer Runtimes["POLY_POINT"]
 guide
