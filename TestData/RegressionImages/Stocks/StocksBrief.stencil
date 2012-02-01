@@ -1,6 +1,6 @@
 import Dates
 
-stream Stocks(Date, Open) from Text["./google_stocks.csv"]
+stream Stocks(Date,Open,High,Low,Close,Volume) from Text["./google_stocks.csv"]
 
 stream AlignedStocks(Date, Open)
 from Stocks

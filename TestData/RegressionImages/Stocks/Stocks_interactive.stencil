@@ -1,6 +1,6 @@
 import Dates 
 
-stream Stocks(Date, Open) from Text["./google_stocks.csv"]
+stream Stocks(Date,Open,High,Low,Close,Volume) from Text["./google_stocks.csv"]
 stream Mouse(X, Y, DELTA_X, DELTA_Y, BUTTON, SHIFT, CNTRL, COMMAND, CLICK_COUNT) from Mouse
 
 stream AlignedStocks(Date, Open)

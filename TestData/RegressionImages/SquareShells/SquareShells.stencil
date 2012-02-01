@@ -1,4 +1,4 @@
-stream Layout(ID, X, Y) from Text["./squarified_10K.txt", sep="\\s+"]
+stream Layout(ID, X, Y) from Text["./squarified_10K.txt", sep:"\\s+"]
 
 layer Nodes
 from Layout

@@ -1,12 +1,4 @@
-STREAM: File
-NAME: EntityFeed
-HEADER: ID
-SEPARATOR: $^
-SOURCE: /Volumes/scratch/jcottam/workspace/Stencil/Stencil/TestData/RegressionImages/Sourceforge/vx_cluster_0_8.6_min_cuts.coord
-SKIP: 0
-STRICT: true
-
-stream Stream(V)
+stream Stream(V) from Text["../none.txt"]
 
 layer Layer
 from Stream

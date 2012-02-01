@@ -1,5 +1,5 @@
-stream NodePositions(ID, X,Y) from Text["./vx_cluster_0_8.6_min_cuts.coord", sep="\\s+", skip:0] /*Precomputed layout*/
-stream Attributes(ID, ATT) from Text["./project_troves.txt", sep="\|", skip:1]       /*Additional attributes*/
+stream NodePositions(ID, X,Y) from Text["./vx_cluster_0_8.6_min_cuts.coord", sep:"\\s+", skip:0] /*Precomputed layout*/
+stream Attributes(ID, ATT) from Text["./project_troves.txt", sep:"\\|", skip:1]       /*Additional attributes*/
 
 order NodePositions > Attributes         /*Load the NodePositions first*/
 
