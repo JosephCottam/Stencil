@@ -177,13 +177,14 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	/**Actions that must be taken before the run will be valid.
 	 * TODO: Remove return type when StencilRunner is integrated into the full stencil runtime...
 	 * */
-	public Map<String, TupleStream> preRun(Map<String, TupleStream> overrides) {
+	public Map<String, TupleStream> preRun() {
 		//TODO: Modify when view and canvas can have multiple instances
 		Display.canvas = getCanvas();
 		Display.view = getView();
 
 		StreamDec[] decs = program.streamDecs();
 		Map<String, TupleStream> streams = new HashMap();
+				
 		for (StreamDec dec: decs) {
 			TupleStream s = StreamTypeRegistry.instance(dec, this);
 			streams.put(dec.name(),s);

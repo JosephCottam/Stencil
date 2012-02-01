@@ -22,5 +22,5 @@
 ./RegressionImages/SquareShells/ -open SquareShells.stencil -png2 1000 -1 squareShells.png
 ./RegressionImages/Stocks/ -open Stocks.stencil -png2 1000 -1 stocks.png
 ./RegressionImages/TextArc -open textArc.stencil -png2 1000 -1 TextArcAlice.png
-./RegressionImages/VSM/ -open VSM.stencil -source VertexList ws_400_12_0.1.adj BFS ws_400_12_0.1.bfs -png2 1000 -1 VSM.png
-./RegressionImages/VSM/ -open VSM.stencil -source VertexList fillGrid.adj -source BFS fillGrid.bfs -png2 1000 -1 fillGrid.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList Text [file:"ws_400_12_0.1.adj"] -source BFS Text [file:"ws_400_12_0.1.bfs"] -png2 1000 -1 VSM.png
+./RegressionImages/VSM/ -open VSM.stencil -source VertexList Text [file:"fillGrid.adj"] -source BFS Text [file:"fillGrid.bfs"] -png2 1000 -1 fillGrid.png

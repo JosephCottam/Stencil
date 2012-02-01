@@ -52,7 +52,7 @@ public final class StencilRunner extends Thread {
 			JFrame windows = null;
 			StencilPanel panel = model.getStencilPanel();
 			Program program = panel.getProgram();
-			Map<String, TupleStream> streamSources = panel.preRun(null);
+			Map<String, TupleStream> streamSources = panel.preRun();
 			Order order = program.order();
 
 			List<JPanel> panels = new ArrayList();

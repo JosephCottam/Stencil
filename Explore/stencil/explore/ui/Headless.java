@@ -1,38 +1,44 @@
 package stencil.explore.ui;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList;
 
 import static stencil.explore.Application.reporter;
 import stencil.explore.*;
 import stencil.explore.model.Model;
 import stencil.explore.util.StencilIO;
 import stencil.explore.util.StencilRunner;
+import stencil.interpreter.tree.Specializer;
+import stencil.interpreter.tree.StreamDec;
+import stencil.parser.ParseStencil;
+import stencil.parser.string.DefaultSpecializers;
 
 import stencil.WorkingDir;
 
 public class Headless {
 
-	/**Parse the arguments and return an array of source changes.
-	 * Even-numbered array entries will be names, the odd entries the
-	 * file sources.
+	/**Parse the arguments and modifies the decs array passed with new stream definitions
 	 *
 	 * @param args
 	 * @return
 	 */
-	private static String[] getSourceRewrites(String[] args) {
-		List<String> result = new ArrayList<String>();
-		try {
-			for (int i=0; i< args.length; i++) {
-				if (args[i].equals(Application.SOURCE_FLAG)) {
-					result.add(args[i+1]);
-					result.add(args[i+2]);
+	private static void rewriteSources(String[] args, StreamDec[] decs) {
+		for (int i=0; i< args.length; i++) {
+			if (args[i].equals(Application.SOURCE_FLAG)) {
+				String name = args[i+1];
+				try {
+					String type = args[i+2];
+					Specializer spec = ParseStencil.specializer(args[i+3]);
+					
+					for (int d=0; d<decs.length; d++) {
+						StreamDec dec = decs[d];
+						if (!dec.name().equals(name)) {continue;}
+						decs[d] = new StreamDec(name, dec.prototype(), type, DefaultSpecializers.blend(spec, dec.specializer()));
+					}
+
+				} catch (Exception e) {throw new IllegalArgumentException("Error in source-redefine arguments for: " + name);}
+
 				}
 			}
-		} catch (Exception e) {throw new IllegalArgumentException("Error in source-redefine arguments.");}
-
-		return result.toArray(new String[]{});
 	}
 
 	public static void main(String[] args) throws Exception {main("", args);}
@@ -64,17 +70,14 @@ public class Headless {
 
 		StencilIO.load(WorkingDir.resolve(file), model);
 		WorkingDir.set(file);
+		model.compile();
+
 
 		//Load new stream sources
-		String[] sourceRewrites = getSourceRewrites(args);
-
-		//TODO: Implements means of performing source overrides
-		//   Idea: Have a dictionary that is passed to the stencil runner.
-		//      At stream instantiation time, it replaces default stream dictionary elements with matching names provided at the command line
-		//      The command line rewites could then be full stream statements
-
-		//Run
-		model.compile();
+		rewriteSources(args, model.getStencilPanel().getProgram().streamDecs());
+		
+		
+		
 		try {
 			StencilRunner t = model.execute();
 			t.join();

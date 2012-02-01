@@ -62,9 +62,9 @@ public final class TestRecord {
 			b.append(SOURCE_FLAG);
 			b.append(" ");
 			b.append(names[i]);
-			b.append(" ");
+			b.append(" Text [file:\"");
 			b.append(inputs[i]);
-			b.append(" ");
+			b.append("\"] ");
 		}
 		return b.toString();
 	}

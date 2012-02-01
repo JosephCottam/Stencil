@@ -39,9 +39,9 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 	}
 
 	@Override
-	public Map<String, TupleStream> preRun(Map<String, TupleStream> overrides) {
+	public Map<String, TupleStream> preRun() {
 		if (continuousPainting) {painterThread.start();}
-		return super.preRun(overrides);
+		return super.preRun();
 	}
 	
 	@Override

@@ -71,13 +71,12 @@ public class Application {
 		System.out.printf("      -%1$s <file> : File to be loaded at the start of the application and ", OPEN_FLAG);
 		System.out.println("             auto-saved to");
 		System.out.println("\n");
-		System.out.printf("Usage: Explore %1$s %2$s <file> [%3$s <name> <file>]* [-(png|eps|pdf|tuples) <file>]\n", HEADLESS_FLAG, OPEN_FLAG, SOURCE_FLAG);
+		System.out.printf("Usage: Explore %1$s %2$s <file> [%3$s <name> <type> <spec>]* [-(png|-png2) <file>]\n", HEADLESS_FLAG, OPEN_FLAG, SOURCE_FLAG);
 		System.out.printf("      -%1$s <file> : Base stencil and default sources file.\n", OPEN_FLAG);
-		System.out.printf("      -%1$s <name> <file> : Replace a source origin with a new source origin.", SOURCE_FLAG);
-		System.out.println("             Regardless of the type of the original origin, it will now be of");
-		System.out.println("             type file.  Header information is kept from the original source.");
-		System.out.println("             The 'name' parameter is kept the same, and is used to decide which");
-		System.out.println("             source to  modify.  Name matching is case sensitive.");
+		System.out.printf("      -%1$s <name> <type> <spec>: Replace a stream definitions type with the specified values.", SOURCE_FLAG);
+		System.out.println("             Any type may be specified BUT any specializer arguments must be named.");
+		System.out.println("             Specializer will be MERGED with the one present in the stencil program.");
+		System.out.println("             Prototypes CANNOT be over-ridden at the command line.");
 		System.out.println("      -(png|eps|pdf|tuples) <file> :  Output to the file named using the specified");
 		System.out.println("             format. Export failure may or may not be a terminal failure.");
 		System.out.println("\n");

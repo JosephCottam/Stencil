@@ -1,7 +1,5 @@
 package stencil.unittests.adapters;
 
-import static stencil.unittests.adapters.TestTupleLoader.OVERLAY_SHORT;
-
 import java.io.File;
 
 import stencil.WorkingDir;
@@ -16,7 +14,9 @@ import stencil.unittests.StencilTestCase;
 import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class GeneratorBase extends StencilTestCase {
-	private static final String sourceFile = "./TestData/RegressionImages/SeeTest/SeeTest.stencil";
+	private static final String SOURCE_DIR = "./TestData/RegressionImages/SeeTest/";
+	private static final String SOURCE_STENCIL = "./SeeTest.stencil";
+	private static final String NA_DATA = "./NoData-Comp.txt";
 	private File originalWorkingDir;
 	
 	private StencilPanel panel;
@@ -24,7 +24,7 @@ public abstract class GeneratorBase extends StencilTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		originalWorkingDir = WorkingDir.get();
-		WorkingDir.set(sourceFile);
+		WorkingDir.set(SOURCE_DIR);
 	}
 	
 	public void tearDown() {
@@ -33,7 +33,7 @@ public abstract class GeneratorBase extends StencilTestCase {
 	}
 	
 	public StencilPanel testCompile(Adapter adapter) throws Exception {
-		String streamRules = StringUtils.getContents(sourceFile);
+		String streamRules = StringUtils.getContents(SOURCE_STENCIL);
 		Program program = ParseStencil.program(streamRules, adapter);
 		panel = adapter.compile(streamRules);
 
@@ -50,9 +50,9 @@ public abstract class GeneratorBase extends StencilTestCase {
 	}
 
 	public TupleLoader testMakeLoader(Adapter adapter) throws Exception {
-		String streamRules = StringUtils.getContents(sourceFile);
+		String streamRules = StringUtils.getContents(SOURCE_STENCIL);
 		panel = adapter.compile(streamRules);
-		DelimitedParser stream = new DelimitedParser("NodeAttributes",OVERLAY_SHORT, "\\|", 2, true,1);
+		DelimitedParser stream = new DelimitedParser("MTTNotApplicable",NA_DATA, "\\s*,\\s*", 4, true,1);
 		TupleLoader loader = new TupleLoader(panel, stream);
 
 		assertNotNull(loader);
