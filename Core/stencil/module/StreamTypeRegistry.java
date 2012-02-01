@@ -16,6 +16,7 @@ import stencil.types.Converter;
 import stencil.util.collections.PropertyUtils;
 import stencil.util.streams.DelayStream;
 import stencil.util.streams.QueuedStream;
+import static stencil.parser.ParserConstants.SYSTEM_STREAM_TYPE;
 
 public class StreamTypeRegistry {
 	public static final String STREAM_KEY = "streamType";
@@ -93,7 +94,7 @@ public class StreamTypeRegistry {
 		Specializer spec = streamDec.specializer();
 		TuplePrototype proto = streamDec.prototype();
 		
-		if (type.startsWith("#")) {return null;}
+		if (type.equals(SYSTEM_STREAM_TYPE)) {return null;}
 		
 		
 		Class clazz = registry.get(type);
@@ -101,19 +102,27 @@ public class StreamTypeRegistry {
 		
 		Constructor<TupleStream> c;
 		TupleStream s;
-		try {
-			c = clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class);
-			s = c.newInstance(name, proto, spec);
+		boolean additionalArgs = false;
+		try {c = clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class);
 		} catch (Exception e) {
 			try {
 				c = clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class, Object[].class);
-				s = c.newInstance(name, proto, spec, args);
+				additionalArgs = true;
 			}
 			catch (Exception ex) {
-				String msg = String.format("Error constructing stream of type %1$s: No compatible constructor found.");
+				String msg = String.format("Error constructing stream of type %1$s: No compatible constructor found.", name);
 				throw new RuntimeException(msg, e);
 			}
 		}
+		
+		try {
+			if (!additionalArgs) {s = c.newInstance(name, proto, spec);}
+			else {s = c.newInstance(name, proto, spec, args);}		
+		} catch (Exception e) {
+			String msg = String.format("Error invoking constructor on stream of type %1$s.", name);
+			throw new RuntimeException(msg, e);
+		}
+
 		
 		int queueSize = Converter.toInteger(spec.get(QUEUE_KEY, -1));
 		int delayLen = Converter.toInteger(spec.get(DELAY_KEY, -1));
@@ -129,7 +138,9 @@ public class StreamTypeRegistry {
 		if (type.startsWith("#")) {return ParserConstants.EMPTY_SPECIALIZER;}
 		
 		Specializer spec = defSpec.get(type);
-		if (spec == null) {throw new IllegalArgumentException("Stream type unknown: " + type);}
+		if (spec == null) {
+			throw new IllegalArgumentException("Stream type unknown: " + type);
+		}
 		return spec;
 	}
 	

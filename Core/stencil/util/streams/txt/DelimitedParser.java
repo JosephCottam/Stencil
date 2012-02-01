@@ -26,10 +26,10 @@ import static java.lang.String.format;
  *
  */
 @Description("For parsing simple delimited files.  Defaults configuration is comma separated with a header.")
-@Stream(name="Text", spec="[file: \"\", delim: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
+@Stream(name="Text", spec="[file: \"\", sep: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
 public final class DelimitedParser implements TupleStream {
 	public static final String FILE_KEY = "file";
-	public static final String DELIM_KEY = "delim";
+	public static final String SEP_KEY = "sep";
 	public static final String STRICT_KEY = "strict";
 	public static final String SKIP_KEY = "skip";
 	
@@ -55,7 +55,7 @@ public final class DelimitedParser implements TupleStream {
 	public DelimitedParser(String name, TuplePrototype proto, Specializer spec) throws Exception {
 		this(name,
 			Converter.toString(spec.get(FILE_KEY)), 
-			Converter.toString(spec.get(DELIM_KEY)), 
+			Converter.toString(spec.get(SEP_KEY)), 
 			proto.size(), 
 			Converter.toBoolean(spec.get(STRICT_KEY)), 
 			Converter.toInteger(spec.get(SKIP_KEY)));

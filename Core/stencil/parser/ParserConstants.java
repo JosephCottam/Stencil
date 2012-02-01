@@ -34,6 +34,7 @@ public abstract class ParserConstants {
 	public static final String SIGIL = "@";
 	
 	public static final String RENDER_STREAM = "#Render";
+	public static final String SYSTEM_STREAM_TYPE = "#System";
 
 
 	/**Field a used to store data for dynamic bindings.

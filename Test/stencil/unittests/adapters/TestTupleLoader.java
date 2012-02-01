@@ -1,7 +1,7 @@
 
 package stencil.unittests.adapters;
 
- import stencil.adapters.TupleLoader;
+import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.columnStore.TableShare;
@@ -21,7 +21,7 @@ public class TestTupleLoader extends StencilTestCase {
 	public void tearDown() {
 		if (panel != null) {panel.dispose();}
 	}
-	
+		
 	public void testLoad() throws Exception {
 		String ruleSource = StringUtils.getContents(STENCIL);
 		

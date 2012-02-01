@@ -14,7 +14,7 @@ import stencil.tuple.instances.Singleton;
 public abstract class LayerBase extends junit.framework.TestCase {
 	private static final int TUPLE_COUNT = 100;
 	
-	private String ruleSources ="stream Stream1(Source, A,B,C) layer Layer1 from Stream1 (ID,X,Y,Z) : (Source,A,B,C)";
+	private String ruleSources ="stream Stream1(Source, A,B,C) from Text layer Layer1 from Stream1 (ID,X,Y,Z) : (Source,A,B,C)";
 	private StencilPanel panel;
 
 	public void setUp() throws Exception {stencil.Configure.loadProperties("./TestData/Stencil.properties");}

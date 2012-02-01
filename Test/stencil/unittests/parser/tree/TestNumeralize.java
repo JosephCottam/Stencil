@@ -6,7 +6,7 @@ import stencil.parser.ParseStencil;
 public class TestNumeralize extends stencil.unittests.StencilTestCase {
 
 	private final String POINT_LABEL = 
-			  "stream Data(value)\n"
+			  "stream Data(value) from Text\n"
 			+ "layer Display\n"
 			+ "  guide pointLabels from ID\n"
 			+ "from Data " +

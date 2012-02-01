@@ -23,12 +23,12 @@ public class TestProjection extends StencilTestCase {
 	public void testCount() throws Exception {
 		StencilOperator op;
 		
-		String simple = "stream S(A,B,C) layer L from S ID: Count()";		
+		String simple = "stream S(A,B,C) from Text layer L from S ID: Count()";		
 		StencilTree s = ParseStencil.programTree(simple, Adapter.ADAPTER);
 		op = ((OperatorProxy) s.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
 		assertEquals("Did not find simple operator when expected.", "Counter", op.getOperatorData().target());
 		
-		String complex = "stream S(A,B,C) layer L from S ID: Count(A)";
+		String complex = "stream S(A,B,C) from Text layer L from S ID: Count(A)";
 		StencilTree c = ParseStencil.programTree(complex, Adapter.ADAPTER);
 		op = ((OperatorProxy) c.find(StencilParser.LIST_OPERATORS).getChild(0)).getOperator();
 		assertEquals("Did not find complex operator when expected.", "Count", op.getOperatorData().target());
@@ -45,7 +45,7 @@ public class TestProjection extends StencilTestCase {
 	}
 	
 	public void testRankSingle() throws Exception {
-		String single = "stream S(A,B,C) layer L from S ID: Rank(A)";
+		String single = "stream S(A,B,C) from Text layer L from S ID: Rank(A)";
 		StencilTree program = ParseStencil.programTree(single, Adapter.ADAPTER);
 		StencilTree operators = program.find(StencilParser.LIST_OPERATORS);
 		assertEquals("Unexpected number of operators created.", 1, operators.getChildCount());
@@ -67,7 +67,7 @@ public class TestProjection extends StencilTestCase {
 	}
 	
 	public void testRankMultiple() throws Exception {
-		String multiple = "stream S(A,B,C) layer L from S ID: Rank(A,B,C)";
+		String multiple = "stream S(A,B,C) from Text layer L from S ID: Rank(A,B,C)";
 		StencilTree program = ParseStencil.programTree(multiple, Adapter.ADAPTER);
 		StencilTree operators = program.find(StencilParser.LIST_OPERATORS);
 		assertEquals("Unexpected number of operators created.", 1, operators.getChildCount());

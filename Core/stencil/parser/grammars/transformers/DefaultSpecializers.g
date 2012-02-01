@@ -50,6 +50,11 @@ options {
 
   //Be careful of order as some things with specializers are nested inside other things with specializers (e.g. canvas: guide: function can occur)
   private Specializer getDefault(StencilTree spec) {
+    StencilTree s = spec.getAncestor(STREAM);
+	if (s != null) {return StreamTypeRegistry.defaultSpecializer(s.find(ID).getText());}
+	     	     	     
+    
+    
     try {
 	   StencilTree f = spec.getAncestor(OP_AS_ARG, FUNCTION);
 	   if (f != null) {return getOperatorDefault(f.find(OP_NAME));}
@@ -63,9 +68,6 @@ options {
        StencilTree v = spec.getAncestor(VIEW);
        if (v != null) {return Freezer.specializer(DEFAULT_VIEW_SPECIALIZER);}
 
-	   StencilTree s = spec.getAncestor(STREAM_DECL);
-	   if (s != null) {return StreamTypeRegistry.defaultSpecializer(s.find(ID).getText());}
-	     	     	     
 	   StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
 	   if (ref != null) {return getOperatorDefault(ref.find(OPERATOR_BASE));}
 

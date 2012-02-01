@@ -44,7 +44,7 @@ public class TestHigherOrder extends StencilTestCase {
 	}
 
 	
-	private final String MAP_TEST = "stream S(v1, v2)\n layer L\n from S\n ID: Map(@Reform, v1)\n X: Map(@Add1, *)\n operator Reform (v) -> (v) default => v: Trim(v)";
+	private final String MAP_TEST = "stream S(v1, v2) from Text\n layer L\n from S\n ID: Map(@Reform, v1)\n X: Map(@Add1, *)\n operator Reform (v) -> (v) default => v: Trim(v)";
 	public void testSimpleMap() throws Exception {
 		StencilTree p = ParseStencil.programTree(MAP_TEST, Adapter.ADAPTER);
 		

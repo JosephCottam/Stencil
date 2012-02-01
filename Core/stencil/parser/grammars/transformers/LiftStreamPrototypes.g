@@ -13,13 +13,14 @@ options {
    package stencil.parser.string;
 	
    import stencil.parser.tree.*;
+   import static stencil.parser.ParserConstants.SYSTEM_STREAM_TYPE;
 }
 
 @members {
   public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
   public StencilTree downup(Object t) {
-    t = downup(t, this, "topdown"); 
+    t = downup(t, this, "streamStreamLift"); 
     t = downup(t, this, "addSystemStreams");
     return (StencilTree) t; 
   }
@@ -29,6 +30,8 @@ options {
      
       Object s = adaptor.create(STREAM, streamDef.getText());
       adaptor.addChild(s, adaptor.dupTree(streamDef.find(TUPLE_PROTOTYPE)));
+      adaptor.addChild(s, adaptor.create(ID, SYSTEM_STREAM_TYPE));
+      adaptor.addChild(s, adaptor.create(SPECIALIZER, ""));
       return s;
    }   
 
@@ -41,7 +44,7 @@ options {
 }
 
 //Add stream defs for internally defined streams
-topdown
+streamStreamLift
   : ^(PROGRAM i=. gv=. sd=. o=. cd=. vd=. s=. r+=.*) 
       -> ^(PROGRAM $i $gv {addPrototypes($sd, $s)} $o $cd $vd $s $r*);
 
@@ -52,6 +55,6 @@ addSystemStreams
   		-> ^(LIST_STREAM_DECLS 
   				^(STREAM["#Render"] 
   					^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["#COUNT"] DEFAULT))
-  					ID["#Render"]
+  					ID[SYSTEM_STREAM_TYPE]
   					SPECIALIZER) 
   			$defs*);

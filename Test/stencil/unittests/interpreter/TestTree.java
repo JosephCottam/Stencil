@@ -6,10 +6,11 @@ import stencil.interpreter.tree.Specializer;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
 import stencil.parser.string.DefaultSpecializers;
+import stencil.unittests.StencilTestCase;
 import stencil.util.collections.ArrayUtil;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
 
-public class TestTree extends junit.framework.TestCase{
+public class TestTree extends StencilTestCase {
 	public void testSpecializerBlend() throws ProgramParseException {
 		Specializer spec1 = ParseStencil.specializer("[one:1, two:2, three:3]");
 		Specializer spec2 = ParseStencil.specializer("[one:11, four:4, five:5]");
@@ -26,7 +27,7 @@ public class TestTree extends junit.framework.TestCase{
 	}
 	
 	public void testStreamStream() throws Exception {
-		String input = "stream VertexList(ID1, ID2)\n"
+		String input = "stream VertexList(ID1, ID2) from Text\n"
 			+ "stream VertexPair(ID1, ID2) from VertexList (ID1, ID2): (ID1, ID2)";
 		
 		ParseStencil.program(input, ADAPTER);

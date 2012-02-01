@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.display.Display;
+import stencil.interpreter.tree.Specializer;
 import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Stream;
 import stencil.parser.ParseStencil;
@@ -108,6 +109,17 @@ public class MouseStream implements TupleStream {
 	protected int sequence =0;
 	protected long priorTime;
 
+	
+	public MouseStream(String name, TuplePrototype proto, Specializer spec, Object[] args) {
+		this(findComponent(args));
+		if (!proto.nameEqual(PROTOTYPE)) {throw new IllegalArgumentException("Must provide exact prototype for mouse: " + PROTOTYPE);}
+	}
+	
+	private static final Component findComponent(Object[] args) {
+		for (Object arg: args) {if (arg instanceof Component) {return (Component) arg;}}
+		throw new Error("System must supply StencilPanel for mouse streamt o work...");
+	}
+	
 	/**Mouse stream adapter, must have a component that roots its mouse events.
 	 * It is suggested that the root Stencil Panel be passed in as the listened to component.
 	 *

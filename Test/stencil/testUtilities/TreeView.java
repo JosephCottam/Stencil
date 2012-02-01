@@ -16,10 +16,6 @@ import stencil.testUtilities.treeView.ANTLRNode;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
 public class TreeView {
-	public static String HEADER_FLAG = "--header";
-	
-	public static String test = "";
-
 	//Arguments: <StencilProperties> [-header] <SourceFile>
 	//	If header is indicated, will treat source file as if it has a stencil explore header
 	//  If header is not indicated, all lines in the source file will loaded
@@ -27,23 +23,12 @@ public class TreeView {
 	 public static void main(String args[]) throws Exception {
 		 ParseStencil.abortOnValidationException = false;
 		 
-		String text = TreeView.test;
-		String file = null;
+		String file = args[1];
+		String text = StringUtils.getContents(file);
 		//Init modules...
 		Properties props = new Properties();
 		props.loadFromXML(new FileInputStream(args[0]));
 		ANTLRNode.showClass= true;
-		
-		if (args.length >1){
-			boolean skipHeader = args[1].toLowerCase().equals(HEADER_FLAG);
-			if (skipHeader) {
-				file =args[2];
-				text = StringUtils.getContents(file, true);
-			} else {
-				file =args[1];
-				text = StringUtils.getContents(file, false);
-			}
-		}
 		
 		Tree tree;
 		JFrame f;

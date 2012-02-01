@@ -31,7 +31,7 @@ public class StringUtils {
 		for (String file: files) {
 			File f= new File(file);
 			if (f.isDirectory()) {continue;}//Skip directories
-			programs.put(f.getName(), getContents(f.getCanonicalPath(), true));
+			programs.put(f.getName(), getContents(f.getCanonicalPath()));
 		}
 		return programs;
 	}
@@ -59,8 +59,7 @@ public class StringUtils {
 	}
 
 	
-	public static String getContents(String fileName) throws Exception {return getContents(fileName, true);}
-	public static String getContents(String fileName, boolean header) throws Exception {
+	public static String getContents(String fileName) throws Exception {
 	 File aFile = new File(fileName);
 	 //...checks on aFile are elided
 	    StringBuilder contents = new StringBuilder();
@@ -71,18 +70,6 @@ public class StringUtils {
 	      BufferedReader input =  new BufferedReader(new FileReader(aFile));
 	      try {
 	        String line = null; //not declared within while loop
-	        /*
-	        * readLine is a bit quirky :
-	        * it returns the content of a line MINUS the newline.
-	        * it returns null only for the END of the stream.
-	        * it returns an empty String if two newlines appear in a row.
-	        */
-	        if (header) {
-	        	line = input.readLine();
-		        while (!line.equals("")) {
-		        	line = input.readLine();
-		        }
-	        }
 	
 	        while (( line = input.readLine()) != null){
 	          contents.append(line);

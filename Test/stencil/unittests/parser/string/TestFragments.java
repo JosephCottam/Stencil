@@ -50,7 +50,7 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testAdHocPrime() throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
+		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil");
 		StencilTree p = init(source);
 		Adapter adapter = Adapter.ADAPTER;
 
@@ -79,7 +79,7 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testOpCreate() throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
+		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil");
 		Adapter adapter = Adapter.ADAPTER;
 
 		StencilTree program = ParseStencil.programTree(source, adapter);
@@ -105,7 +105,7 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testSpecializer() throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil", true);
+		String source = StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil");
 		Adapter adapter = Adapter.ADAPTER;
 		StencilTree program = ParseStencil.programTree(source, adapter);
 		Test test = new Test() {
@@ -125,14 +125,14 @@ public class TestFragments extends TestCase {
 	}
 	
 	public void testLiftLayerConstants() throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil", true);
+		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/dynamicCircular.stencil");
 		StencilTree program = ParseStencil.programTree(source,  Adapter.ADAPTER);
 		assertEquals("Incorrectly identified defaults count on nodes.", 4, program.find(LIST_LAYERS).find(LAYER, "Nodes").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD).size());
 		assertEquals("Incorrectly identified defaults count on edges.", 2, program.find(LIST_LAYERS).find(LAYER, "Edges").find(RULES_DEFAULTS).findAllDescendants(TUPLE_FIELD).size());
 	}
 
 	public void testTargetPackMismatch() throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/TargetPackMismatch.stencil.bad", true);
+		String source = StringUtils.getContents("./TestData/RegressionImages/Misc/TargetPackMismatch.stencil.bad");
 		try {ParseStencil.program(source, Adapter.ADAPTER);}
 		catch (TargetMatchesPack.TargetPackMismatchException e) {/**Ignored**/}		
 	}
