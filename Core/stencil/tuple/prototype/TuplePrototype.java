@@ -104,6 +104,14 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 		return true;
 	}
 
+	/**Check if the names of two prototypes are in the same order.**/
+	public boolean nameEqual(TuplePrototype alter) {
+		for (int i=0; i< size(); i++) {
+			if (!alter.get(i).name().equals(get(i).name())) {return false;}
+		}
+		return true;
+	}
+	
 	@Override
 	public Iterator<T> iterator() {return fields.iterator();}
 	

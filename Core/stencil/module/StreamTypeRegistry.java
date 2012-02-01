@@ -40,17 +40,24 @@ public class StreamTypeRegistry {
 			} catch (Exception e) {
 				throw new RuntimeException(String.format("Error accessing stream class: " + className), e);
 			}
-			register(streamClass);
+			register(streamClass, key);
 		}
 	}
 	
-	public static void register(Class clazz) {
+	/**@param clazz Register this class
+	 * @param key If the class was loaded through the properties system, what was its entry key? (null otherwise)
+	 */
+	public static void register(Class clazz, String key) {
 		if (!TupleStream.class.isAssignableFrom(clazz)) {
 			throw new IllegalArgumentException("Stream annotated classes must subtype TupleStream.");
 		}
 		
 		Stream ann = (Stream) clazz.getAnnotation(Stream.class);
 		if (ann == null) {throw new IllegalArgumentException("Only classes with a 'Stream' annotation may be registered.");}
+		
+		if (key != null && !key.endsWith(ann.name())) {
+			throw new IllegalArgumentException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), ann.name()));
+		}
 		
 		Specializer spec;
 		try {spec = ParseStencil.specializer(ann.spec());}

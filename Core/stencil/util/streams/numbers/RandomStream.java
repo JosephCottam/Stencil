@@ -6,28 +6,45 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.List;
+import java.util.Random;
 
+import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 
+@Description("Sequence of random numbers.")
+@Stream(name="Random", spec="[seed:\"now\", length:-1, size:1]")
 public class RandomStream implements TupleStream {
-	public static final Class VALUE_TYPE  = double.class;
+	public static final String SIZE = "size";
+	public static final String LENGTH = "length";
+	public static final String SEED = "seed";
 	
 	private final long length; //How many tuples to produce
 	private long count;			//How many tuples have been produced
-	private final String name;	//Name of thes tream
+	private final String name;	//Name of the stream
 	private final int size;		//How many fields per tuple
 	private final TuplePrototype prototype;
+	private final Random random;
 	
-	public RandomStream(String name) {this(name, 2, Integer.MIN_VALUE);}
+
+	public RandomStream(String name, TuplePrototype proto, Specializer spec) {
+		this(name,
+			Converter.toInteger(spec.get(SIZE)),
+			Converter.toInteger(spec.get(LENGTH)),
+			spec.get(SEED).equals("now") ? System.currentTimeMillis() : Converter.toLong(spec.get(SEED)));
+	}
 	
-	public RandomStream(String name, int size, long length) {
+	public RandomStream(String name, int size, long length, long seed) {
 		this.name = name;
 		this.length = length;
 		this.size =size;
+		this.random = new Random(seed);
 
 		count =0;
 		String[] fields = TuplePrototypes.defaultNames(size, "VALUE");
@@ -39,7 +56,7 @@ public class RandomStream implements TupleStream {
 		count++;
 		
 		List<Double> values = new ArrayList(size);
-		for (int i =0; i<size; i++) {values.add(Math.random());}
+		for (int i =0; i<size; i++) {values.add(random.nextDouble());}
 		return new SourcedTuple.Wrapper(name, new PrototypedArrayTuple(prototype, values));
 	}
 

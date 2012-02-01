@@ -9,16 +9,23 @@ import java.util.Queue;
 import twitter4j.*;
 import twitter4j.conf.*;
 
+import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.prototype.TuplePrototypes;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 
+@Description("Retrieve information from twitter.")
+@Stream(name="Twitter", spec="[topic:\"\"]")
 public class TwitterTuples implements TupleStream {
 	public static final String[] FIELDS = new String[]{"message", "user", "tags", "geo", "place", "date"};
 	public static final TuplePrototype PROTOTYPE = new TuplePrototype(FIELDS);
+	public static final String TOPIC_KEY = "topic";
 	
 	private final String name;	//Name of the stream
 	private final TwitterStream twitter;
@@ -43,8 +50,11 @@ public class TwitterTuples implements TupleStream {
 	
 	protected void finalize() {stop();}
 
-	public void stop() {
-		twitter.cleanUp();
+	public void stop() {twitter.cleanUp();}
+	
+	public TwitterTuples(String name, TuplePrototype proto, Specializer spec) throws TwitterException {
+		this(name, Converter.toString(spec.get(TOPIC_KEY)));
+		if (!proto.nameEqual(PROTOTYPE)) {throw new IllegalArgumentException("Tuple prototype for twitter stream msut be:" + PROTOTYPE.toString());}
 	}
 	
 	public TwitterTuples(String name, String topic) throws TwitterException {

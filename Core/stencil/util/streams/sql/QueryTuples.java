@@ -2,25 +2,43 @@ package stencil.util.streams.sql;
 
 import java.sql.*;
 
+import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
  * but no other meta-data validation is performed.
  */
 
-//TODO: Mark as queue-able
+@Description("Database query results, in tuple form.")
+@Stream(name="SQL", spec="[query: \"\", connect:\"\", driver:\"\", queue:50]")
 public class QueryTuples implements TupleStream {
+	public static final String QUERY = "query";
+	public static final String DRIVER = "driver";
+	public static final String CONNECT = "connect";
+	
 	protected Connection connection;
 	protected Statement statement;
+	
 
 	protected final String name;
 	protected final String query;
 	protected final int columnCount;
 	protected ResultSet results;
 
+	public QueryTuples(String name, TuplePrototype proto, Specializer spec) throws Exception {
+		this(name, 
+			proto.size(),
+			Converter.toString(spec.get(QUERY)),
+			Converter.toString(spec.get(CONNECT)),
+			Converter.toString(spec.get(DRIVER)));
+	}
 
 	public QueryTuples(String name, int columnCount, String driver, String connect, String query) throws Exception {
 		this.name = name;

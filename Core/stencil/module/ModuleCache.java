@@ -192,7 +192,7 @@ public class ModuleCache {
 			catch (Exception e) {throw new RuntimeException(String.format("Error parsing meta-data file %1$s.", className), e);}
 			
 			if (!key.endsWith(md.getName())) {
-				throw new RuntimeException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), md.getName()));
+				throw new IllegalArgumentException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), md.getName()));
 			}
 			
 			register(m);

@@ -9,7 +9,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
 
-@Description("Sequence of numbers.")
+@Description("Sequence of numbers progressing by fixed increment.")
 @Stream(name="Sequence", spec="[start:0, step:1, stop:" + Integer.MAX_VALUE + "]")
 public class SequenceStream implements TupleStream {
 	public static final String START = "start";

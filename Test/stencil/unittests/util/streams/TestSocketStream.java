@@ -20,7 +20,6 @@ public class TestSocketStream extends StencilTestCase {
 		SocketTupleSender sender = new SocketTupleSender(stream, COORD_TYPES.toCharArray(), newTuples.socket().getLocalSocketAddress());
 		Thread senderThread = new Thread(sender);
 		senderThread.start();
-		newTuples.init();
 		
 		//Walk tuple-by-tuple through both streams, all tuples should be equal
 		int i=0;

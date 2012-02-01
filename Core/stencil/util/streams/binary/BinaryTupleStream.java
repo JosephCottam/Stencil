@@ -1,9 +1,13 @@
 package stencil.util.streams.binary;
 
 import stencil.WorkingDir;
+import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
 import stencil.util.streams.txt.DelimitedParser;
@@ -32,6 +36,8 @@ public class BinaryTupleStream {
 	public static final int LONG_BYTES = 8;
 	public static boolean DO_REPORTING = false;
 
+	public static final String FILE_KEY = "file";
+	
 	/**Means of producing a file that can be read by the Reader**/
 	public static final class Writer {
 		private final TupleStream source;
@@ -129,7 +135,8 @@ public class BinaryTupleStream {
 	
 	
 	/**Stream source that can read a FastStream written by the above included Writer**/
-	//TODO: Mark as queue-able
+	@Description("Loads data written by the BinaryTupleStream.Writer.")
+	@Stream(name="Binary", spec="[file: \"\", queue: 50]")
 	public static final class Reader implements TupleStream {
 		/**File channel contents are loaded from**/
 		private final ByteChannel input;
@@ -141,6 +148,10 @@ public class BinaryTupleStream {
 		/**Number of value fields per tuple**/
 		private final int tupleSize;
 		private final char[] types;
+		
+		public Reader(String streamName, TuplePrototype proto, Specializer spec) throws Exception {
+			this(streamName, Converter.toString(spec.get(FILE_KEY)));
+		}
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
 			FileChannel input = new FileInputStream(WorkingDir.resolve(sourcefile)).getChannel();
