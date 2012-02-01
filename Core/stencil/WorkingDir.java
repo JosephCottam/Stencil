@@ -47,14 +47,4 @@ public class WorkingDir {
 		try {return f.getCanonicalPath();}
 		catch (Exception e) {throw new RuntimeException("Error resolving path", e);}
 	}
-
-	/**If the filename is prefixed by the working directory, replace
-	 * that prefix with the relative prefix.  Otherwise it is untouched.
-	 * @param filename
-	 * @return
-	 */
-	public static String relativize(String filename) {
-		File newPath = new File(resolve(filename));
-		return get().toURI().relativize(newPath.toURI()).getPath();
-	}
 }

@@ -1,11 +1,11 @@
 package stencil.util.streams.binary;
 
+import stencil.WorkingDir;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
-import stencil.util.streams.QueuedStream;
 import stencil.util.streams.txt.DelimitedParser;
 
 import java.nio.*;
@@ -129,7 +129,8 @@ public class BinaryTupleStream {
 	
 	
 	/**Stream source that can read a FastStream written by the above included Writer**/
-	public static final class Reader implements TupleStream, QueuedStream.Queable {
+	//TODO: Mark as queue-able
+	public static final class Reader implements TupleStream {
 		/**File channel contents are loaded from**/
 		private final ByteChannel input;
 		private final ByteBuffer mainBuffer;
@@ -142,7 +143,7 @@ public class BinaryTupleStream {
 		private final char[] types;
 		
 		public Reader(String streamName, String sourcefile) throws Exception {
-			FileChannel input = new FileInputStream(sourcefile).getChannel();
+			FileChannel input = new FileInputStream(WorkingDir.resolve(sourcefile)).getChannel();
 			this.input = input;
 			long size = input.size();
 			mainBuffer = input.map(FileChannel.MapMode.READ_ONLY, 0, size);

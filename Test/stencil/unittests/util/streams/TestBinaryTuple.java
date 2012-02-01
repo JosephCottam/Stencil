@@ -23,8 +23,8 @@ public class TestBinaryTuple extends StencilTestCase {
 		source.stop();
 		
 		//QueuedStream.THREAD = false;
-		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE);
-		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE);
+		TupleStream re =  new QueuedStream(trovesStream(), QUEUE_SIZE, true);
+		TupleStream bin = new QueuedStream(new BinaryTupleStream.Reader(source.getName(), TROVES_TUPLES_FILE), QUEUE_SIZE, true);
 		testSpeed("trove queued", re, bin);
 	}
 

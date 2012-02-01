@@ -48,4 +48,10 @@ topdown
   
 //Add stream defs for system streams
 addSystemStreams
-  : ^(LIST_STREAM_DECLS defs+=.*) -> ^(LIST_STREAM_DECLS ^(STREAM["#Render"] ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["#COUNT"] DEFAULT))) $defs*);
+  : ^(LIST_STREAM_DECLS defs+=.*) 
+  		-> ^(LIST_STREAM_DECLS 
+  				^(STREAM["#Render"] 
+  					^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID["#COUNT"] DEFAULT))
+  					ID["#Render"]
+  					SPECIALIZER) 
+  			$defs*);

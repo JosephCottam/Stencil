@@ -80,13 +80,23 @@ public final class Freezer {
 		return new StreamDef(streamDef.getText(), blocks, proto);
 	}
 	
+	public static StreamDec streamDec(StencilTree streamDec) {
+		assert verifyType(streamDec, STREAM);
+		final Specializer spec = Freezer.specializer(streamDec.find(SPECIALIZER));
+		final String type = streamDec.find(ID).getText();
+		final String name = streamDec.getText();
+		final TuplePrototype proto = Freezer.prototype(streamDec.find(TUPLE_PROTOTYPE));
+		return new StreamDec(name, proto, type, spec);
+	}
+	
 	public static Program program(StencilTree program) {
 		assert verifyType(program, PROGRAM);
 		Order order = order(program.find(ORDER));
 		ViewOrCanvas view = viewOrCanvas(program.find(VIEW));
 		ViewOrCanvas canvas = viewOrCanvas(program.find(CANVAS));
 		Layer[] layers = layers(program.find(LIST_LAYERS));
-		StreamDef[] streams = streams(program.find(LIST_STREAM_DEFS));
+		StreamDef[] streamDefs = streamDefs(program.find(LIST_STREAM_DEFS));
+		StreamDec[] streamDecs = streamDecs(program.find(LIST_STREAM_DECLS));
 		
 		List<StencilTree> dynamicRules = program.findAllDescendants(DYNAMIC_RULE);
 		final DynamicRule[] dynamics = new DynamicRule[dynamicRules.size()];
@@ -98,7 +108,7 @@ public final class Freezer {
 		
 		Object[] operators = operators(program);
 		
-		return new Program(view, canvas, layers, streams, order, dynamics, guides, operators);
+		return new Program(view, canvas, layers, streamDecs, streamDefs, order, dynamics, guides, operators);
 	}
 	
 	private static Object[] operators(StencilTree program) {
@@ -164,12 +174,17 @@ public final class Freezer {
 		return typedArray(root, Layer.class, "layer");
 	}
 	
-	public static StreamDef[] streams(StencilTree root) {
+	public static StreamDef[] streamDefs(StencilTree root) {
 		assert verifyType(root, LIST_STREAM_DEFS);
 		return typedArray(root, StreamDef.class, "streamDef");
 	}
 	
+	public static StreamDec[] streamDecs(StencilTree root) {
+		assert verifyType(root, LIST_STREAM_DECLS);
+		return typedArray(root, StreamDec.class, "streamDec");
+	}
 
+	
 	private static <T> T[] typedArray(StencilTree root, Class<T> type, String freezerName) throws FreezeException {return typedArray(root, root.getChildCount(), type, freezerName);}
 	private static <T> T[] typedArray(Iterable<StencilTree> root, int size, Class<T> type, String freezerName) throws FreezeException {
 		try {

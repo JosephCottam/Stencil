@@ -12,10 +12,4 @@ import java.lang.annotation.*;
 public @interface Stream {
 	String name() default "";	//Type name to be used in the Stencil system
 	String spec() default "";	//Default specializer
-	
-	/**Specializer key that will be used to pass the tuple prototype to the constructor.*/
-	public static String PROTOTYPE_KEY = "#proto";
-	
-	/**Specializer key that will be used to pass the stream name.*/
-	public static String NAME_KEY = "#name";
 }

@@ -6,16 +6,16 @@ import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
+import stencil.WorkingDir;
 import stencil.interpreter.tree.Specializer;
 import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Stream;
-import stencil.parser.ParseStencil;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.InvalidTupleException;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
-import stencil.util.streams.QueuedStream;
 
 import static java.lang.String.format;
 
@@ -26,8 +26,8 @@ import static java.lang.String.format;
  *
  */
 @Description("For parsing simple delimited files.  Defaults configuration is comma separated with a header.")
-@Stream(name="Text", spec="[file: \"\", delim: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1]")
-public final class DelimitedParser implements TupleStream, QueuedStream.Queable {
+@Stream(name="Text", spec="[file: \"\", delim: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
+public final class DelimitedParser implements TupleStream {
 	public static final String FILE_KEY = "file";
 	public static final String DELIM_KEY = "delim";
 	public static final String STRICT_KEY = "strict";
@@ -52,11 +52,11 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	/**Has this stream reached its end?*/
 	private boolean ended = false;
 	
-	public DelimitedParser(Specializer spec) throws Exception {
-		this( Converter.toString(spec.get(Stream.NAME_KEY)), 
+	public DelimitedParser(String name, TuplePrototype proto, Specializer spec) throws Exception {
+		this(name,
 			Converter.toString(spec.get(FILE_KEY)), 
 			Converter.toString(spec.get(DELIM_KEY)), 
-			ParseStencil.prototype(Converter.toString(spec.get(Stream.PROTOTYPE_KEY)), false).size(), 
+			proto.size(), 
 			Converter.toBoolean(spec.get(STRICT_KEY)), 
 			Converter.toInteger(spec.get(SKIP_KEY)));
 	}
@@ -65,7 +65,7 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 		splitter = Pattern.compile(delimiter);
 		
 		this.name = name;
-		this.filename = filename != null ? filename.trim() : null;
+		this.filename = WorkingDir.resolve(filename != null ? filename.trim() : null);
 		this.skip = skip;
 		
 		if (strict) {this.channel = new StrictChannel(tupleSize, splitter);}

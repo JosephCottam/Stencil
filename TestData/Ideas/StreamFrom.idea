@@ -23,3 +23,9 @@ Implementation:
      declaration.
 
 
+Interplay --
+  System: Load stream type data (classes in config file, annotations cary specifics) 
+  Compiler -- Prepare default information
+  StencilPanel -- Instantiate streams during pre-run, use a passed name/TupleStream to override pre-defined streams
+  				** TEMP: Pre-run returns streams map so StencilRunner still works; eventually StencilRunner is the dispatcher, so the return is no longer required
+  				 

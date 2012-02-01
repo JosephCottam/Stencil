@@ -8,6 +8,7 @@ import stencil.adapters.java2D.util.MultiThreadPainter;
 import stencil.adapters.java2D.util.PainterThread;
 import stencil.display.StencilPanel;
 import stencil.interpreter.tree.Program;
+import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
 
 import java.awt.Insets;
@@ -18,6 +19,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Array;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -36,9 +38,10 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 		painterThread = new Thread(painter, "Painter");
 	}
 
-	public void preRun() {
-		super.preRun();
+	@Override
+	public Map<String, TupleStream> preRun(Map<String, TupleStream> overrides) {
 		if (continuousPainting) {painterThread.start();}
+		return super.preRun(overrides);
 	}
 	
 	@Override

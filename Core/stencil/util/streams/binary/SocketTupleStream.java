@@ -8,10 +8,10 @@ import java.net.Socket;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
-import stencil.util.streams.QueuedStream;
 
 //TODO: Use nio instead of DataInputStream, then pass the stream in as the buffer to the binary reader.
-public class SocketTupleStream implements TupleStream, QueuedStream.Queable {
+//TODO: Mark as queue-able
+public class SocketTupleStream implements TupleStream {
 	/**File channel contents are loaded from**/
 	private ServerSocket serverSocket;
 	private Socket socket;

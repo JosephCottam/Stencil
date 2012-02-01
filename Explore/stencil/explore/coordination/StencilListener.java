@@ -16,8 +16,4 @@ public abstract class StencilListener {
 	public interface StencilChanged extends EventListener {
 		public void stencilChanged(StencilEvent.StencilChanged stencilUpdate);
 	}
-
-	public interface SourcesChanged extends EventListener {
-		public void sourceChanged(StencilEvent.SourcesChanged sourceUpdate);
-	}
 }

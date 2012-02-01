@@ -24,7 +24,6 @@ import stencil.explore.util.StencilIO;
 import stencil.explore.util.StencilRunner;
 import stencil.explore.ui.components.AdapterOptsPanel;
 import stencil.explore.ui.components.MessagePanel;
-import stencil.explore.ui.interactive.components.MainEditor;
 import stencil.types.geometry.GeometryWrapper;
 
 /**Wraps the application with a GUI.**/
@@ -88,14 +87,12 @@ public class Interactive implements Runnable {
 		reporter = messages;  //Set message reporting to the window system
 		
 		editor.getStencilEditor().addStencilChangedListener(controller);
-		editor.getSourcesEditor().addStencilChangedListener(controller);
 
 		adapterOpts.addStencilChangedListener(controller);
 		adapterOpts.setAdapterOpts(model.getAdapterOpts());
 
 
 		controller.addMutable(editor.getStencilEditor(), Type.Stencil);
-		controller.addMutable(editor.getSourcesEditor(), Type.Sources);
 		controller.addMutable(adapterOpts, Type.Config);
 		set(model);
 

@@ -1,9 +1,6 @@
 package stencil.explore.coordination;
 
-import java.util.Collection;
-
 import stencil.explore.model.AdapterOpts;
-import stencil.explore.model.sources.StreamSource;
 
 /**Provide proper methods for mutating a Stencil.
  *
@@ -19,9 +16,5 @@ public interface StencilMutable {
 
 	public static interface Stencil extends StencilMutable {
 		public void setStencil(String stencil);
-	}
-
-	public static interface Sources<T extends StreamSource> extends StencilMutable {
-		public void setSources(Collection<? extends T> source);
 	}
 }

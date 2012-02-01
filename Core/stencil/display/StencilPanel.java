@@ -5,15 +5,20 @@ import java.awt.BorderLayout;
 import java.awt.LayoutManager;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import stencil.display.Display;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Program;
 import stencil.interpreter.tree.Layer;
+import stencil.interpreter.tree.StreamDec;
+import stencil.module.StreamTypeRegistry;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
+import stencil.tuple.stream.TupleStream;
 import stencil.util.IndexTupleSorter;
 
 /**Wraps the layers and glyphs to tie them to a display context.
@@ -169,11 +174,23 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 		synchronized(canvas.visLock) {interpreter.processTuple(source);}
 	}
 	
-	/**Actions that must be taken before the run will be valid.*/
-	public void preRun() {
+	/**Actions that must be taken before the run will be valid.
+	 * TODO: Remove return type when StencilRunner is integrated into the full stencil runtime...
+	 * */
+	public Map<String, TupleStream> preRun(Map<String, TupleStream> overrides) {
 		//TODO: Modify when view and canvas can have multiple instances
 		Display.canvas = getCanvas();
 		Display.view = getView();
+
+		StreamDec[] decs = program.streamDecs();
+		Map<String, TupleStream> streams = new HashMap();
+		for (StreamDec dec: decs) {
+			TupleStream s = StreamTypeRegistry.instance(dec, this);
+			streams.put(dec.name(),s);
+		}
+		
+		
+		return streams;
 	}
 	
 	

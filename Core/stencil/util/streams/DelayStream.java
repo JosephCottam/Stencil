@@ -10,12 +10,16 @@ import stencil.tuple.stream.TupleStream;
  *
  */
 public class DelayStream implements TupleStream {
-	/**Milliseconds to delay.*/
-	public static int DELAY = 0;
 
 	private final TupleStream source;
+
+	/**Milliseconds to delay.*/
+	private final int delay;
 		
-	public DelayStream(TupleStream source) {this.source=source;}
+	public DelayStream(TupleStream source, int delay) {
+		this.source=source;
+		this.delay = delay;
+	}
 	
 	
 	@Override
@@ -23,10 +27,8 @@ public class DelayStream implements TupleStream {
 
 	@Override
 	public SourcedTuple next() {
-		if (DELAY > 0) {
-			try {Thread.sleep(DELAY);}
-			catch (InterruptedException e) {/**Ignored**/}
-		}
+		try {Thread.sleep(delay);}
+		catch (InterruptedException e) {/**Ignored**/}
 		return source.next();
 	}
 

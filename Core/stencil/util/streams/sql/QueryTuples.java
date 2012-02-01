@@ -5,13 +5,14 @@ import java.sql.*;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.TupleStream;
-import stencil.util.streams.QueuedStream;
 
 /**Converts a query and connect string to a stream of tuples.
  * Connection will always be verified as having the correct number of columns,
  * but no other meta-data validation is performed.
  */
-public class QueryTuples implements TupleStream, QueuedStream.Queable {
+
+//TODO: Mark as queue-able
+public class QueryTuples implements TupleStream {
 	protected Connection connection;
 	protected Statement statement;
 

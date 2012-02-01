@@ -6,13 +6,23 @@ import java.util.Map;
 import java.util.Properties;
 
 import stencil.interpreter.tree.Specializer;
+import stencil.interpreter.tree.StreamDec;
 import stencil.module.util.ann.Stream;
 import stencil.parser.ParseStencil;
+import stencil.parser.ParserConstants;
+import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 import stencil.util.collections.PropertyUtils;
+import stencil.util.streams.DelayStream;
+import stencil.util.streams.QueuedStream;
 
 public class StreamTypeRegistry {
 	public static final String STREAM_KEY = "streamType";
+	public static final String QUEUE_KEY = "queue";
+	public static final String QUEUE_THREAD_KEY = "queueThread";
+	public static final String DELAY_KEY = "delay";
+	
 	
 	private static final Map<String, Class> registry = new HashMap();
 	private static final Map<String, Specializer> defSpec = new HashMap();
@@ -48,12 +58,12 @@ public class StreamTypeRegistry {
 				
 		//validate information about the class
 		try {
-			clazz.getConstructor(Specializer.class);
+			clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class);
 		} catch (Exception e) {
 			try {
-				clazz.getConstructor(Specializer.class, Object[].class);
+				clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class, Object[].class);
 			} catch (Exception ex) {
-				throw new IllegalArgumentException("Error in stream type " + ann.name() + ": Must provide an accessible constructor that takes either a single specializer or a specializer and an object array.", e);
+				throw new IllegalArgumentException("Error in stream type " + ann.name() + ": Must provide an accessible constructor that takes stream name, prototype and specializer (optionally: additional Object[]).", e);
 			}
 		}
 		
@@ -65,28 +75,52 @@ public class StreamTypeRegistry {
 	 * If a specializer-argument-only constructor exists, it will be used.
 	 * Otherwise a specializer+Object[] constructor will be sought and used if found.
 	 * It is up to the implementing class to sort and employ the passed arguments. 
+	 * 
+	 * The instantiation process performed here will also take care of queuing and delaying, if indicated by the specializer,
+	 * so the specific stream types do not need to.
+	 * 
 	 */
-	public static TupleStream instance(String type, Specializer spec, Object... args) {
+	public static TupleStream instance(StreamDec streamDec, Object... args) {
+		String type = streamDec.type();
+		String name = streamDec.name();
+		Specializer spec = streamDec.specializer();
+		TuplePrototype proto = streamDec.prototype();
+		
+		if (type.startsWith("#")) {return null;}
+		
+		
 		Class clazz = registry.get(type);
-		if (clazz == null) {throw new IllegalArgumentException("Stream type unknown: " + type);}
-				
+		if (clazz == null) {throw new IllegalArgumentException("Stream type unknown: " + streamDec.type());}
+		
 		Constructor<TupleStream> c;
+		TupleStream s;
 		try {
-			c = clazz.getConstructor(Specializer.class);
-			return c.newInstance(spec);
+			c = clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class);
+			s = c.newInstance(name, proto, spec);
 		} catch (Exception e) {
 			try {
-				c = clazz.getConstructor(Specializer.class, Object[].class);
-				return c.newInstance(spec, args);
+				c = clazz.getConstructor(String.class, TuplePrototype.class, Specializer.class, Object[].class);
+				s = c.newInstance(name, proto, spec, args);
 			}
 			catch (Exception ex) {
-				String msg = String.format("Error constructing stream of type %1$s: No compatible constructor found.", type);
+				String msg = String.format("Error constructing stream of type %1$s: No compatible constructor found.");
 				throw new RuntimeException(msg, e);
 			}
 		}
+		
+		int queueSize = Converter.toInteger(spec.get(QUEUE_KEY, -1));
+		int delayLen = Converter.toInteger(spec.get(DELAY_KEY, -1));
+		boolean queueThread = Converter.toBoolean(spec.get(QUEUE_THREAD_KEY, true));
+
+		if (queueSize > 0) {s = new QueuedStream(s,queueSize, queueThread);}
+		if (delayLen > 0) {s = new DelayStream(s,delayLen);}
+		return s;
+		
 	}
 	
 	public static Specializer defaultSpecializer(String type) {
+		if (type.startsWith("#")) {return ParserConstants.EMPTY_SPECIALIZER;}
+		
 		Specializer spec = defSpec.get(type);
 		if (spec == null) {throw new IllegalArgumentException("Stream type unknown: " + type);}
 		return spec;

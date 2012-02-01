@@ -56,26 +56,4 @@ public class TestWorkingDir extends junit.framework.TestCase {
 			assertEquals("Error testing: " + test, new File(expect).getCanonicalPath(), new File(resolved).getCanonicalPath());
 		}
 	}
-	
-	public void testRelativize() throws Exception {
-		String root = "/Root/Root2/";
-		WorkingDir.set(root);
-		assertEquals("Test not properly intialized.", new File(root), WorkingDir.get());
-		
-		
-		String[][] tests = new String[][] {
-				{root + "more", 				"more"},
-				{root + "more/and/more/",	"more/and/more"},
-				{"/Not/Root",				"/Not/Root"}
-		};
-		
-		for (String[] testCase: tests) {
-			String test = testCase[0];
-			String expect = testCase[1];
-			String result = WorkingDir.relativize(test);
-			assertEquals("Testing " + test, expect, result);
-		}
-		
-	}
-
 }

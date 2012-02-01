@@ -1,18 +1,15 @@
 package stencil.explore.coordination;
 
-import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
 
 import stencil.explore.coordination.StencilEvent;
 import stencil.explore.model.AdapterOpts;
-import stencil.explore.model.sources.StreamSource;
 import static stencil.explore.coordination.StencilEvent.*;
 
-public class Controller implements StencilListener.ConfigChanged, StencilListener.StencilChanged, StencilListener.SourcesChanged {
+public class Controller implements StencilListener.ConfigChanged, StencilListener.StencilChanged {
 	protected Set<StencilMutable.Config> configReceivers = new HashSet();
 	protected Set<StencilMutable.Stencil> stencilReceivers = new HashSet();
-	protected Set<StencilMutable.Sources> sourceReceivers = new HashSet();
 
 	/**Set to indicate that events should not be propagated.*/
 	protected boolean suspendEvents = false;
@@ -21,11 +18,9 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 		switch(type) {
 			case Config: configReceivers.remove(receiver); break;
 			case Stencil: stencilReceivers.remove(receiver); break;
-			case Sources: sourceReceivers.remove(receiver); break;
 			case All:
 				configReceivers.remove(receiver);
 				stencilReceivers.remove(receiver);
-				sourceReceivers.remove(receiver);
 		}
 	}
 
@@ -34,11 +29,9 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 		switch(type) {
 			case Config: configReceivers.add((StencilMutable.Config) receiver); break;
 			case Stencil: stencilReceivers.add((StencilMutable.Stencil) receiver); break;
-			case Sources: sourceReceivers.add((StencilMutable.Sources) receiver); break;
 			case All:
 				configReceivers.add((StencilMutable.Config) receiver);
 				stencilReceivers.add((StencilMutable.Stencil) receiver);
-				sourceReceivers.add((StencilMutable.Sources) receiver);
 		}
 	}
 
@@ -59,16 +52,6 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 			reciver.setStencil(stencil);
 		}
 	}
-
-	public void sourceChanged(SourcesChanged sourceUpdate) {
-		if (suspendEvents) {return;}
-		for (StencilMutable.Sources reciver: sourceReceivers) {
-			if (reciver.equals(sourceUpdate.getSource())) {continue;}
-			List<StreamSource> sources = sourceUpdate.getValue();
-			reciver.setSources(sources);
-		}
-	}
-
 
 	/**Indicate that events should not be propagated for a time.*/
 	public void suspendEvents() {suspendEvents = true;}

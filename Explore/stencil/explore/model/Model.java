@@ -1,17 +1,11 @@
 package stencil.explore.model;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Collection;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
-import stencil.explore.model.sources.StreamSource;
-import stencil.explore.util.ListModel;
 import stencil.explore.util.StencilRunner;
 import stencil.adapters.Adapter;
 import stencil.explore.coordination.*;
@@ -21,14 +15,13 @@ import stencil.explore.coordination.*;
  * Various application modes manipulate model objects to achieve
  * interactive, head-less,etc operation.
  */
-public final class Model implements StencilMutable.Config, StencilMutable.Sources<StreamSource>, StencilMutable.Stencil {
+public final class Model implements StencilMutable.Config, StencilMutable.Stencil {
 	public static final String NEW_LINE = System.getProperty("line.separator");
 	public static boolean VERBOSE_END_OF_RUN = false;
 	
 	protected ListenerQueues listeners = new ListenerQueues();
 
 	protected String stencil;
-	protected List<StreamSource> sources;
 	protected AdapterOpts adapterOpts;
 	protected StencilPanel stencilPanel;
 
@@ -36,21 +29,12 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	/**Construct a new model for the Stencil application.*/
 	public Model() {
-		sources = new ListModel();
 		adapterOpts = new AdapterOpts();
 		runner = new StencilRunner(this);
 	}
 
 	public String getStencil() {return stencil;}
 	public AdapterOpts getAdapterOpts() {return adapterOpts;}
-	public List<StreamSource> getSources() {return sources;}
-	public Map<String, StreamSource> getSourcesMap() {
-		Map<String, StreamSource> map = new HashMap();
-		for (StreamSource source: sources) {
-			map.put(source.name(), source);
-		}
-		return map;
-	}
 
 	public StencilPanel getStencilPanel() {return stencilPanel;}
 	public void setStencilPanel(StencilPanel stencilPanel) {
@@ -149,27 +133,6 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	public boolean isRunning() {return runner.isRunning();}
 	public void signalStop() {if (runner.isRunning()) {runner.signalStop();}}
 
-	/**Remove all sources.*/
-	public void clearSources(boolean raise) {
-		sources.clear();
-		if (raise) {listeners.fireSourceChanged(this, getSources());}
-	}
-
-	/**Set all sources.  Discards any existing sources.
-	 * Will only add one source per name if there are duplicate
-	 * named sources in the incoming collection.
-	 * @param sources
-	 * @param raise
-	 */
-	public void setSources(Collection<? extends StreamSource> sources) {
-		if (this.sources == sources) {return;}
-		this.sources.clear();
-		for (StreamSource source: sources) {
-			this.sources.add(source);
-		}
-		listeners.fireSourceChanged(this, getSources());
-	}
-
 	/**Set the Stencil source text.*/
 	public void setStencil(String stencil) {
 		String oldStencil = this.stencil;
@@ -187,7 +150,6 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 
 	public void fireAll() {
 		listeners.fireConfigChanged(this, adapterOpts);
-		listeners.fireSourceChanged(this, getSources());
 		listeners.fireStencilChanged(this, stencil);
 	}
 
@@ -197,10 +159,8 @@ public final class Model implements StencilMutable.Config, StencilMutable.Source
 	 */
 	public void addAllListeners(Object target) {
 		if (target instanceof StencilListener.ConfigChanged) {listeners.addListener((StencilListener.ConfigChanged) target);}
-		if (target instanceof StencilListener.SourcesChanged) {listeners.addListener((StencilListener.SourcesChanged) target);}
 		if (target instanceof StencilListener.StencilChanged) {listeners.addListener((StencilListener.StencilChanged) target);}
 	}
 	public void addConfigChangedListener(StencilListener.ConfigChanged l) {listeners.addListener(l);}
-	public void addSourceChangedListener(StencilListener.SourcesChanged l) {listeners.addListener(l);}
 	public void addStencilChangedListener(StencilListener.StencilChanged l) {listeners.addListener(l);}
 }

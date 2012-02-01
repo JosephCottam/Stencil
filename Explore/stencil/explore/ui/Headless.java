@@ -3,14 +3,10 @@ package stencil.explore.ui;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static stencil.explore.Application.reporter;
 import stencil.explore.*;
 import stencil.explore.model.Model;
-import stencil.explore.model.sources.BinarySource;
-import stencil.explore.model.sources.FileSource;
-import stencil.explore.model.sources.StreamSource;
 import stencil.explore.util.StencilIO;
 import stencil.explore.util.StencilRunner;
 
@@ -38,14 +34,6 @@ public class Headless {
 
 		return result.toArray(new String[]{});
 	}
-
-	private static StreamSource findSource(String name, Collection<StreamSource> sources) {
-		for (StreamSource s: sources) {
-			if (name.equals(s.name())) {return s;}
-		}
-		return null;
-	}
-
 
 	public static void main(String[] args) throws Exception {main("", args);}
 
@@ -80,27 +68,10 @@ public class Headless {
 		//Load new stream sources
 		String[] sourceRewrites = getSourceRewrites(args);
 
-		Collection<StreamSource> sources = model.getSources();
-
-		for (int i=0; i< sourceRewrites.length; i= i+1) {
-			StreamSource source = findSource(sourceRewrites[i], sources);
-			if (source == null) {continue;}
-
-			sources.remove(source);
-			if (source instanceof FileSource) {
-				source = ((FileSource) source).filename(sourceRewrites[i+1]);
-				sources.add(source);
-			} else if (sourceRewrites[i+1].endsWith(".tuples")){
-				BinarySource newSource = new BinarySource(source.name());
-				newSource = newSource.filename(sourceRewrites[i+1]);
-				sources.add(newSource);
-			} else {
-				FileSource newSource = new FileSource(source.name());
-				newSource = newSource.filename(sourceRewrites[i+1]);
-				sources.add(newSource);
-			}
-		}
-		model.setSources(sources);
+		//TODO: Implements means of performing source overrides
+		//   Idea: Have a dictionary that is passed to the stencil runner.
+		//      At stream instantiation time, it replaces default stream dictionary elements with matching names provided at the command line
+		//      The command line rewites could then be full stream statements
 
 		//Run
 		model.compile();

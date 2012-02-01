@@ -7,16 +7,12 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import stencil.WorkingDir;
 import stencil.adapters.TupleLoader;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
 import stencil.explore.model.Model;
-import stencil.explore.model.sources.*;
 import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.ConcurrentStream;
-import stencil.util.streams.DelayStream;
-import stencil.util.streams.QueuedStream;
 import stencil.interpreter.tree.Order;
 import stencil.interpreter.tree.Program;
 
@@ -54,10 +50,9 @@ public final class StencilRunner extends Thread {
 			running = true;
 
 			JFrame windows = null;
-			Map<String, StreamSource> streamSources = model.getSourcesMap();
 			StencilPanel panel = model.getStencilPanel();
 			Program program = panel.getProgram();
-			panel.preRun();
+			Map<String, TupleStream> streamSources = panel.preRun(null);
 			Order order = program.order();
 
 			List<JPanel> panels = new ArrayList();
@@ -86,15 +81,11 @@ public final class StencilRunner extends Thread {
 				List<TupleStream> streams = new ArrayList<TupleStream>();
 				for (String name: group) {
 					if (!streamSources.containsKey(name)) {continue;}
+					input = streamSources.get(name);
+					if (input == null) {continue;} //HACK:  System streams currently return null from the StreamTypeRegistry...that needs to be handled better!
 					
 					names = names + " and " + name;
-					StreamSource stream = streamSources.get(name);
-					if (stream instanceof FileSource) {stream=resolvePaths(((FileSource) stream));}
-					if (stream instanceof BinarySource) {stream=resolvePaths(((BinarySource) stream));}
-					input = stream.getStream(model);
-					if (input instanceof QueuedStream.Queable) {input = new QueuedStream(input);}
-					if (stream.delay()) {input = new DelayStream(input);}
-							
+					
 					streams.add(input);
 				}
 
@@ -121,21 +112,6 @@ public final class StencilRunner extends Thread {
 			reporter.addError("Error executing Stencil program: %1$s.", e.getMessage());
 		}
 		running = false;
-	}
-
-	/**Make sure the filename is resolved relative to the working directory.*/
-	private FileSource resolvePaths(FileSource source) {
-		String filename = source.filename();
-		filename = WorkingDir.resolve(filename);
-		return source.filename(filename);
-	}
-
-	/**Make sure the filename is resolved relative to the working directory.*/
-	//HACK: Join Binary and File sources in the class heirarchy to remove this method
-	private BinarySource resolvePaths(BinarySource source) {
-		String filename = source.filename();
-		filename = WorkingDir.resolve(filename);
-		return source.filename(filename);
 	}
 
 	public boolean isRunning() {return isAlive() && running;}

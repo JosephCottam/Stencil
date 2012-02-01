@@ -1,10 +1,6 @@
 package stencil.explore.coordination;
 
-import java.util.List;
-
 import stencil.explore.model.AdapterOpts;
-import stencil.explore.model.sources.StreamSource;
-
 
 /**Event indicating that a stencil object was changed was changed.*/
 public class StencilEvent<T> extends java.util.EventObject {
@@ -20,13 +16,6 @@ public class StencilEvent<T> extends java.util.EventObject {
 	/**Event to indicate the actual stencil code changed.*/
 	public static class StencilChanged extends StencilEvent<String> {
 		public StencilChanged(Object source, String value) {super(source, Type.Stencil, value);}
-	}
-
-	/**Event to indicate that the stencil sources have changed.
-	 * This can indicate that a source has been either added, removed or edited.
-	 */
-	public static class SourcesChanged extends StencilEvent<List<StreamSource>> {
-		public SourcesChanged(Object source, List<StreamSource> streamSource) {super(source, Type.Sources, streamSource);}
 	}
 
 	protected Type type;

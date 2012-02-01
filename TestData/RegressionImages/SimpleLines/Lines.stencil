@@ -1,12 +1,7 @@
-STREAM: SequenceNumbers
-NAME: LineSource
-START: 0
-STOP: 4
-INCREMENT: 1
-
 /*Dead simple test.  Just draws some lines.*/
 
 stream LineSource(count)
+  from Sequence[0,1,4]
  
 layer GridLines["LINE"]
 from LineSource
