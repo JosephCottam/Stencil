@@ -10,3 +10,4 @@ TestData/StencilExplore.stencil
 TestData/ExploreSession.properties
 testResults/*
 lastBuild.txt
+*.zip

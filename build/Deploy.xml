@@ -1,5 +1,6 @@
  <project name="Release" default="Release">
     <property name="JarFile" value="Stencil.jar"/>
+ 	<property name="includes" value="./ReleaseIncludes/" />
 
  	<target name="Release" depends="CompiledJar">
  		<property name="release" location="./release"/>
@@ -9,8 +10,11 @@
  		<!--Clear up prior attempts-->
  		<delete dir="${release}"/>
  		<delete file="${result}"/>
+ 		<delete file="${includes}/Readme.aux"/>
+ 		<delete file="${includes}/Readme.log"/>
+ 		<delete file="${includes}/Readme.out"/>
+ 		<delete file="${includes}/Readme.synctex.gz"/>
  		<mkdir dir="${release}"/>
- 		
  		
  		<copy file="${JarFile}" todir="${release}"/>
  		<!--create Zip file with jar -->
