@@ -1,15 +1,7 @@
-STREAM: File
-NAME: Deaths
-TUPLE_SIZE: 3
-SEPARATOR: \s*,\s*
-SOURCE: ./NightingaleCrimeaSplit.csv
-SKIP: 1
-STRICT: true
-
 import Dates
 import Geometry
 
-stream Deaths(date, type, count)
+stream Deaths(date, type, count) from Text["./NightingaleCrimeaSplit.csv"]
 
 layer Rose["SLICE"]
 guide

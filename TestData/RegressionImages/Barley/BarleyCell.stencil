@@ -1,14 +1,8 @@
-STREAM: File
-NAME: Barley
-TUPLE_SIZE: 4
-SEPARATOR: \s*,\s+
-SOURCE: ./BeckersBarley.csv
-SKIP: 1
-STRICT: true
-
 import BrewerPalettes
-stream Barley(year, site, yield, variety)             /*@\label{barley:streamDecl}@*/
 
+stream Barley(year, site, yield, variety)             /*@\label{barley:streamDecl}@*/
+  from Text["./BeckersBarley.csv"]
+  
 const MAX: 100
 const MIN: 10
 

@@ -1,12 +1,4 @@
-STREAM: File
-NAME: Renders
-TUPLE_SIZE: 2
-SEPARATOR: \s*,\s*
-SOURCE: /Volumes/scratch/jcottam/Documents/Papers/others/dissertation/figures/stencilExamples/ScheduleOpt/RenderCounts.csv
-SKIP: 1
-STRICT: true
-
-stream Renders(Config, Count)
+stream Renders(Config, Count) from Text["./RenderCounts.csv"]
 
 layer Chart
   guide axis from X

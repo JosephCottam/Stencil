@@ -1,30 +1,8 @@
-STREAM: File
-NAME: Visibility
-TUPLE_SIZE: 2
-SEPARATOR: \s*,\s*
-SOURCE: ./Visibliity.txt
-SKIP: 1
-STRICT: true
-STREAM: File
-NAME: LineColor
-TUPLE_SIZE: 2
-SEPARATOR: \s*,\s*
-SOURCE: ./LineColor.txt
-SKIP: 1
-STRICT: true
-STREAM: File
-NAME: Data
-TUPLE_SIZE: 3
-SEPARATOR: \s*,\s*
-SOURCE: ./EpicSampleData.csv
-SKIP: 1
-STRICT: true
-
 import ViewCanvas
 
-stream Data(Timestep, Line, Value)
-stream Visibility(Line, Visible)
-stream LineColor(Line, Color)
+stream Data(Timestep, Line, Value) from Text["./EpicSampleData.csv"]
+stream Visibility(Line, Visible) from Text["./Visibliity.txt"]
+stream LineColor(Line, Color) from Text[" ./LineColor.txt"]
 
 order (Data | Visibility | LineColor)
 

@@ -1,21 +1,5 @@
-STREAM: File
-NAME: Reg
-TUPLE_SIZE: 1
-SEPARATOR: \s+
-SOURCE: ./RegistrationData.txt
-STRICT: TRUE
-SKIP: 0
-STREAM: File
-NAME: Reg2
-TUPLE_SIZE: 1
-SEPARATOR: \s+
-SOURCE: ./RegistrationData.txt
-STRICT: TRUE
-SKIP: 0
-
-
-stream Reg(Name)
-stream Reg2(Name)
+stream Reg(Name) from Text["./RegistrationData.txt", skip:0]
+stream Reg2(Name) from Text["./RegistrationData.txt", skip:0]
 
 order Reg > Reg2
 

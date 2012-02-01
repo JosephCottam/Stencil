@@ -1,14 +1,6 @@
-STREAM: File
-NAME: Tweets
-TUPLE_SIZE: 1
-SEPARATOR: ,
-SOURCE: ./Tweets.txt
-SKIP: 1
-STRICT: TRUE
-
 import ViewCanvas
 
-stream Tweets(MESSAGE)	
+stream Tweets(MESSAGE) from Text["./Tweets.txt"]	
 
 view
 from Tweets

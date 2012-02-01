@@ -1,23 +1,8 @@
-STREAM: File
-NAME: trans
-TUPLE_SIZE: 8
-HEADER: op source dest start end size G r g b
-SEPARATOR: \s+
-SOURCE: ./diss_16.viz
-SKIP: 0
-STRICT: false
-STREAM: File
-NAME: overheads
-HEADER: op rank cpu start end r g b
-TUPLE_SIZE: 8
-SEPARATOR: \s+
-SOURCE: ./diss_16.viz
-SKIP: 0
-STRICT: false
-
-stream ranks(rank, label)
+stream ranks(rank, label) from Text
 stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
+  from Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
 stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
+  from Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
 
 order ranks > (overheads | trans)
 

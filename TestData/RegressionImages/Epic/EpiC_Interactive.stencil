@@ -1,15 +1,7 @@
-STREAM: File
-NAME: Data
-TUPLE_SIZE: 3
-SEPARATOR: \s*,\s*
-SOURCE: ./EpiCSampleData.csv
-SKIP: 1
-STRICT: true
-
 import ViewCanvas
 import Presentation
 
-stream Data(Timestep, Line, Value)
+stream Data(Timestep, Line, Value) from Text["./EpiCSampleData.csv"]
 
 view
 from #Render

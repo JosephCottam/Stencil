@@ -1,10 +1,6 @@
-STREAM: Mouse
-NAME: Mouse
-FREQUENCY: 30
-
 import ViewCanvas
 
-stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+stream Mouse(X, Y) from Mouse
 
 canvas main[COLOR: "BLACK"]
 

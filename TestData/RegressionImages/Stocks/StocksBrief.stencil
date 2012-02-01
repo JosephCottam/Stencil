@@ -1,14 +1,6 @@
-STREAM: File
-NAME: Stocks
-TUPLE_SIZE: 6
-SEPARATOR: ,
-SOURCE: ./google_stocks.csv
-SKIP: 1
-STRICT: true
-
 import Dates
 
-stream Stocks(Date, Open)
+stream Stocks(Date, Open) from Text["./google_stocks.csv"]
 
 stream AlignedStocks(Date, Open)
 from Stocks

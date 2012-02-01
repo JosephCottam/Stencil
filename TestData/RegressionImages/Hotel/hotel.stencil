@@ -1,14 +1,6 @@
-STREAM: File
-NAME: HotelStays
-TUPLE_SIZE: 3
-SEPARATOR: \s*,\s*
-SOURCE: ./BertinHotel.csv
-SKIP: 1
-STRICT: true
-
 import Dates
 
-stream HotelStays(count, type, month)
+stream HotelStays(count, type, month) from Text["./BertinHotel.csv"]
 
 layer Chart
 guide

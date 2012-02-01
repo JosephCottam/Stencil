@@ -1,13 +1,4 @@
-STREAM: File
-NAME: Elements
-TUPLE_SIZE: 1
-SEPARATOR: ,
-SOURCE: ./RotationData.txt
-STRICT: TRUE
-SKIP: 1
-
-
-stream Elements(Name)
+stream Elements(Name) from Text["./RotationData.txt"]
 
 layer Text["TEXT"]
 from Elements

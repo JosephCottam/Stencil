@@ -1,10 +1,6 @@
-STREAM: Twitter
-NAME: Tweets
-USERNAME: jacottam
-
 import ViewCanvas
 
-stream Tweets(message, user, country, countryCode)	
+stream Tweets(message, user, country, countryCode) from Twitter
 
 view
 from #Render

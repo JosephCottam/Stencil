@@ -1,12 +1,4 @@
-STREAM: File
-NAME: Values
-TUPLE_SIZE: 1
-SEPARATOR: ,
-SOURCE: ../AutoGuide/Fruits.txt
-SKIP: 0
-STRICT: true
-
-stream Values(Category)
+stream Values(Category) from Text["../AutoGuide/Fruits.txt"]
 
 view
 from #Render

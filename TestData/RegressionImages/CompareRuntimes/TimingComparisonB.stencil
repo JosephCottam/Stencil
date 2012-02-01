@@ -1,14 +1,6 @@
-STREAM: File
-NAME: times
-TUPLE_SIZE: 6
-SEPARATOR: \s*,\s*
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/CompareRuntimes/StateVsFlowRuntimes.csv
-SKIP: 1
-STRICT: true
-
 import BrewerPalettes
 
-stream times(elapse, size, refs, perm, type, i)
+stream times(elapse, size, refs, perm, type, i) from Text ["./StateVsFlowRuntimes.csv"]
 
 view
 from #Render

@@ -1,12 +1,4 @@
-STREAM: File
-NAME: Degrees
-TUPLE_SIZE: 1
-SEPARATOR: ,
-SOURCE: ./degrees.txt
-SKIP: 1
-STRICT: true
-
-stream Degrees(Deg)
+stream Degrees(Deg) from Text["./degrees.txt"]
 
 stream Semis(Deg)
 from Degrees

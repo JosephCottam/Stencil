@@ -1,23 +1,10 @@
-STREAM: File
-NAME: MTTSource
-TUPLE_SIZE: 8
-SEPARATOR: \s*\|\s*
-SOURCE: ./18049-arch-compiler.output.txt
-SKIP: 2
-STRICT: false
-STREAM: File
-NAME: MTTNotApplicable
-TUPLE_SIZE: 4
-SEPARATOR: ,\s*
-SOURCE: ./NoData-Comp.txt
-SKIP: 1
-STRICT: true
-
 import PatternUtils
 import JavaC
 
 stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
+   from Text["./18049-arch-compiler.output.txt", sep:"\\s*\\|\\s*", skip:2, strict: false]
 stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
+   from Text["./NoData-Comp.txt"]
 
 order MTTSource > MTTNotApplicable
 

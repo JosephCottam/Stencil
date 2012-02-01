@@ -1,22 +1,7 @@
-STREAM: File
-NAME: VertexList
-TUPLE_SIZE: 2
-SEPARATOR: ,
-SOURCE: ./er_100_0.005.adj
-SKIP: 1
-STRICT: true
-STREAM: File
-NAME: BFS
-TUPLE_SIZE: 1
-SEPARATOR: \s+
-SOURCE: ./er_100_0.005.bfs
-SKIP: 1
-STRICT: true
-
 import JavaC
 
-stream BFS (ID) 
-stream VertexList (ID1, ID2)
+stream BFS (ID)  from Text["./er_100_0.005.bfs", sep:"\\s+"]
+stream VertexList (ID1, ID2) from Text["./er_100_0.005.adj"]
 
 order BFS > VertexList          /*Load the node list before the vertex list.*/
 

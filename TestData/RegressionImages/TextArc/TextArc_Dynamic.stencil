@@ -1,15 +1,7 @@
-STREAM: File
-NAME: RawLines
-TUPLE_SIZE: 1
-SEPARATOR: $^
-SOURCE: ./AliceInWonderland.txt
-SKIP: 0
-STRICT: true
-
 import Layouts
 import Geometry : Geo
 
-stream RawLines(text)
+stream RawLines(text) from Text["./AliceInWonderland.txt", sep:"$^", skip:0]
 
 view
 from #Render

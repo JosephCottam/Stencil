@@ -1,10 +1,4 @@
-STREAM: SequenceNumbers
-NAME: LineSource
-START: 0
-STOP: 3
-INCREMENT: 1
-
-stream LineSource(count)
+stream LineSource(count) from Sequence[0,1,3]
 
 layer Vertical["ARC"]
 from LineSource

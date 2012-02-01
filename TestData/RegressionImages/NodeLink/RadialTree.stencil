@@ -1,14 +1,6 @@
-STREAM: File
-NAME: VertexList
-TUPLE_SIZE: 2
-SEPARATOR: ,
-SOURCE: ./treeMultiRoot.tree
-SKIP: 1
-STRICT: true
-
 import Layouts
 
-stream VertexList (parent, child)
+stream VertexList (parent, child) from Text["/treeMultiRoot.tree"]
 
 stream Prime ()
 from VertexList

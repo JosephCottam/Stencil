@@ -1,19 +1,8 @@
-STREAM: File
-NAME: Stocks
-TUPLE_SIZE: 6
-SEPARATOR: ,
-SOURCE: ../Stocks/google_stocks.csv
-SKIP: 1
-STRICT: true
-STREAM: Mouse
-NAME: Mouse
-FREQUENCY: -2147483648
-
 import ViewCanvas
 import Dates
 
-stream Stocks(Date, Open)
-stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+stream Stocks(Date, Open) from Text["../Stocks/google_stocks.csv"]
+stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE) from Mouse
 
 order (Stocks | Mouse)
 

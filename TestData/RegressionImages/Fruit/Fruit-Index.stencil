@@ -1,13 +1,4 @@
-STREAM: File
-NAME: survey
-TUPLE_SIZE: 1
-SEPARATOR: $^
-SOURCE: ./Fruits.txt
-SKIP: 0
-STRICT: true
-
-
-stream survey(fruit)
+stream survey(fruit) from Text["./Fruits.txt", sep:"$^"]
 
 layer plot
 guide

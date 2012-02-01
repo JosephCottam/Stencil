@@ -1,17 +1,9 @@
-STREAM: File
-NAME: MethodCalls
-TUPLE_SIZE: 3
-SEPARATOR: \s*:\s*
-SOURCE: /Volumes/scratch/jcottam/Stencil/Stencil/TestData/RegressionImages/ThreadInterleave/Viewpoint_5000.btrace
-SKIP: 0
-STRICT: true
-
 import BrewerPalettes
 import LongMath
 
 const width : 8
 
-stream MethodCalls(Method, Dir, Time)
+stream MethodCalls(Method, Dir, Time) from Text["Viewpoint_5000.btrace", skip:0]
 
 stream Priors ()
 from MethodCalls

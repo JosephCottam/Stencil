@@ -1,13 +1,6 @@
-STREAM: File
-NAME: Edges
-TUPLE_SIZE: 2
-SEPARATOR: ,
-SOURCE: ./er_100_0.005.adj
-CHECKHEADER: true
-
 import JavaC
 
-stream Edges (ID1, ID2)
+stream Edges (ID1, ID2) from Text["./er_100_0.005.adj"]
 
 
 /*Layout values in a circle.  Circle radius grows as value count increases.*/

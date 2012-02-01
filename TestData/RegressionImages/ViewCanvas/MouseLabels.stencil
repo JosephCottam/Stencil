@@ -1,17 +1,5 @@
-STREAM: Mouse
-NAME: Mouse
-FREQUENCY: -2147483648
-STREAM: File
-NAME: Elements
-TUPLE_SIZE: 1
-SEPARATOR: ,
-SOURCE: ../Rotation/RotationData.txt
-SKIP: 1
-STRICT: true
-
-
-stream Elements(Name)
-stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+stream Elements(Name) from Text["../Rotation/RotationData.txt"]
+stream Mouse(X, Y) from Mouse
 
 view
 from #Render

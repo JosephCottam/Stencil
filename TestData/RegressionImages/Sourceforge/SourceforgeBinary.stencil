@@ -1,12 +1,5 @@
-STREAM: Binary
-NAME: NodePositions
-SOURCE: ./vx_cluster_0_8.6_min_cuts.tuples
-STREAM: Binary
-NAME: Attributes
-SOURCE: ./project_troves.tuples
-
-stream NodePositions(ID, X,Y)  /*Precomputed layout*/
-stream Attributes(ID, ATT)       /*Additional attributes*/
+stream NodePositions(ID, X,Y) from Binary["./vx_cluster_0_8.6_min_cuts.tuples"]  /*Precomputed layout*/
+stream Attributes(ID, ATT) from Binary["./project_troves.tuples"]      /*Additional attributes*/
 
 order NodePositions > Attributes         /*Load the NodePositions first*/
 

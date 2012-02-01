@@ -1,15 +1,8 @@
-STREAM: Twitter
-NAME: Tweets
-KEYWORDS: 
-STREAM: Mouse
-NAME: Mouse
-FREQUENCY: -2147483648
-
 import Layouts
 import Geometry : Geo
 
-stream Tweets(message, user, tags, geo, place, date)
-stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE)
+stream Tweets(message, user, tags, geo, place, date) from Twitter
+stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE) from Mouse
 
 view
 from #Render

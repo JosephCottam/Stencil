@@ -1,11 +1,7 @@
-STREAM: Twitter
-NAME: RawLines
-KEYWORDS: Obama, Washington, Congress
-
 import Layouts
 import Geometry : Geo
 
-stream RawLines(message, user, date)
+stream RawLines(message, user, date) from Twitter[topic:"Obama, Washington, Congress"]
 
 stream Lines (line, text)
 from RawLines

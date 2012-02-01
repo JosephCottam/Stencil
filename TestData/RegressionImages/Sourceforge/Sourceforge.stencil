@@ -1,20 +1,5 @@
-STREAM: File
-NAME: NodePositions
-TUPLE_SIZE: 3
-SEPARATOR: \s+
-SOURCE: ./vx_cluster_0_8.6_min_cuts.coord
-SKIP: 0
-STRICT: true
-STREAM: File
-NAME: Attributes
-TUPLE_SIZE: 2
-SEPARATOR: \|
-SOURCE: ./project_troves.txt
-SKIP: 1
-STRICT: true
-
-stream NodePositions(ID, X,Y)  /*Precomputed layout*/
-stream Attributes(ID, ATT)       /*Additional attributes*/
+stream NodePositions(ID, X,Y) from Text["./vx_cluster_0_8.6_min_cuts.coord", sep="\\s+", skip:0] /*Precomputed layout*/
+stream Attributes(ID, ATT) from Text["./project_troves.txt", sep="\|", skip:1]       /*Additional attributes*/
 
 order NodePositions > Attributes         /*Load the NodePositions first*/
 

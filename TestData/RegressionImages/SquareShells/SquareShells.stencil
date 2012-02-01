@@ -1,14 +1,4 @@
-STREAM: File
-NAME: Layout
-TUPLE_SIZE: 3
-SEPARATOR: \s+
-SOURCE: ./squarified_10K.txt
-SKIP: 1
-STRICT: true
-
-
-
-stream Layout(ID, X, Y)
+stream Layout(ID, X, Y) from Text["./squarified_10K.txt", sep="\\s+"]
 
 layer Nodes
 from Layout

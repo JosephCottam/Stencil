@@ -1,14 +1,6 @@
-STREAM: File
-NAME: TokenCounts
-TUPLE_SIZE: 4
-SEPARATOR: \s*,\s*
-SOURCE: ./tokenCounts.csv
-SKIP: 1
-STRICT: true
-
 import JavaC
 
-stream TokenCounts(chart, stencil, protovis, ggplot2)
+stream TokenCounts(chart, stencil, protovis, ggplot2) from Text["./tokenCounts.csv"]
 
 const WIDTH: 10
 
