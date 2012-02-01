@@ -63,6 +63,8 @@ options {
        StencilTree v = spec.getAncestor(VIEW);
        if (v != null) {return Freezer.specializer(DEFAULT_VIEW_SPECIALIZER);}
 
+	   StencilTree s = spec.getAncestor(STREAM_DECL);
+	   if (s != null) {return StreamTypeRegistry.defaultSpecializer(s.find(ID).getText());}
 	     	     	     
 	   StencilTree ref = spec.getAncestor(OPERATOR_REFERENCE);
 	   if (ref != null) {return getOperatorDefault(ref.find(OPERATOR_BASE));}

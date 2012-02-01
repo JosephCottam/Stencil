@@ -221,7 +221,12 @@ globalValue
 //TODO: Allow calculations using only constant values (maybe process the constants before doing the rest of the program)
 
 
-externalStream: STREAM name=ID tuple[false] -> ^(STREAM[$name.text] tuple);
+externalStream: 
+  STREAM name=ID tuple[false] FROM type=ID specializer 
+  	-> ^(STREAM[$name.text] 
+  	      tuple
+  	      $type
+  	      specializer);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 canvasLayer

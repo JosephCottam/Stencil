@@ -6,6 +6,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import stencil.display.Display;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
 import stencil.parser.ParseStencil;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
@@ -14,10 +16,8 @@ import stencil.tuple.prototype.TupleFieldDef;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 
-/**A way to track the mouse position/state at all points in time.
- *
- * @author jcottam
- */
+@Description("Tracking of the position and state of the mouse cursor.")
+@Stream(name="Mouse", spec="[freq:-1]")
 public class MouseStream implements TupleStream {
 	public static String NAME = "Mouse";
 	
@@ -65,7 +65,7 @@ public class MouseStream implements TupleStream {
 	}
 
 	/**Indicate to frequency setting that only changes are interesting.*/
-	public static final int ON_CHANGE = Integer.MIN_VALUE;
+	public static final int ON_CHANGE = -1;
 
 	/**How often should the mouse values be updated?  This should be expressed as updates per second.*/
 	public static int frequency = ON_CHANGE;

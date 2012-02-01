@@ -36,6 +36,7 @@ public class Configure {
 
 		stencil.module.ModuleCache.registerModules(props);
 		stencil.types.Converter.registerWrappers(props);
+		stencil.module.StreamTypeRegistry.registerStreams(props);
 		
 		threadPoolSize = Integer.parseInt(props.getProperty(THREAD_POOL_SIZE_KEY,"-1")); 
 		if (threadPoolSize <1) {

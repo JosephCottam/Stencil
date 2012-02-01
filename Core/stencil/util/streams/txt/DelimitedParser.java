@@ -6,10 +6,15 @@ import java.io.*;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
+import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ann.Description;
+import stencil.module.util.ann.Stream;
+import stencil.parser.ParseStencil;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.tuple.stream.InvalidTupleException;
 import stencil.tuple.stream.TupleStream;
+import stencil.types.Converter;
 import stencil.util.streams.QueuedStream;
 
 import static java.lang.String.format;
@@ -20,7 +25,14 @@ import static java.lang.String.format;
  * @author jcottam
  *
  */
+@Description("For parsing simple delimited files.  Defaults configuration is comma separated with a header.")
+@Stream(name="Text", spec="[file: \"\", delim: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1]")
 public final class DelimitedParser implements TupleStream, QueuedStream.Queable {
+	public static final String FILE_KEY = "file";
+	public static final String DELIM_KEY = "delim";
+	public static final String STRICT_KEY = "strict";
+	public static final String SKIP_KEY = "skip";
+	
 	/**Reader to get tuples from*/
 	private BufferedReader source;
 
@@ -40,7 +52,16 @@ public final class DelimitedParser implements TupleStream, QueuedStream.Queable 
 	/**Has this stream reached its end?*/
 	private boolean ended = false;
 	
-	public DelimitedParser(String name, String filename, String delimiter, int tupleSize, boolean strict, int skip) throws Exception {
+	public DelimitedParser(Specializer spec) throws Exception {
+		this( Converter.toString(spec.get(Stream.NAME_KEY)), 
+			Converter.toString(spec.get(FILE_KEY)), 
+			Converter.toString(spec.get(DELIM_KEY)), 
+			ParseStencil.prototype(Converter.toString(spec.get(Stream.PROTOTYPE_KEY)), false).size(), 
+			Converter.toBoolean(spec.get(STRICT_KEY)), 
+			Converter.toInteger(spec.get(SKIP_KEY)));
+	}
+
+	public DelimitedParser(String name, String filename, String delimiter, int tupleSize, boolean strict, int skip) throws Exception {		
 		splitter = Pattern.compile(delimiter);
 		
 		this.name = name;
