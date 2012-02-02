@@ -1,15 +1,7 @@
-STREAM: File
-NAME: flowers
-TUPLE_SIZE: 5
-SEPARATOR: \s*,\s*
-SOURCE: ./AndersonsFlowers.csv
-SKIP: 1
-STRICT: true
-
 import BrewerPalettes
 
-stream flowers(sepalL, petalW, sepalW, 
-                        petalL, species, obs)
+stream flowers(sepalL, petalW, sepalW, petalL, species, obs)
+   from Text["./AndersonsFlowers.csv"]
 
 layer FlowerPlot
 guide
