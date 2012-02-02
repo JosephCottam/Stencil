@@ -22,16 +22,21 @@ import static java.lang.String.format;
 /**
  * TupleStream implementation that converts a delimited text file into a tuple
  * stream.  Each line of the file is treated as a tuple.
+ * 
+ * Also handles standard in --  Use [file:"StdIn", queue: -1]
+ * If you do not set Queue to -1, behavior consumption of all input is not guaranteed.
+ * 
  * @author jcottam
  *
  */
-@Description("For parsing simple delimited files.  Defaults configuration is comma separated with a header.")
+@Description("For parsing simple delimited text sources (files and standard in).  Defaults configuration is comma separated with a header.")
 @Stream(name="Text", spec="[file: \"\", sep: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
 public final class DelimitedParser implements TupleStream {
 	public static final String FILE_KEY = "file";
 	public static final String SEP_KEY = "sep";
 	public static final String STRICT_KEY = "strict";
 	public static final String SKIP_KEY = "skip";
+	public static final String STD_IN = "StdIn";
 	
 	/**Reader to get tuples from*/
 	private BufferedReader source;
@@ -65,7 +70,11 @@ public final class DelimitedParser implements TupleStream {
 		splitter = Pattern.compile(delimiter);
 		
 		this.name = name;
-		this.filename = WorkingDir.resolve(filename != null ? filename.trim() : null);
+		if (STD_IN.equals(filename)) {
+			this.filename = filename;
+		} else {
+			this.filename = WorkingDir.resolve(filename != null ? filename.trim() : null);
+		}
 		this.skip = skip;
 		
 		if (strict) {this.channel = new StrictChannel(tupleSize, splitter);}
@@ -84,7 +93,9 @@ public final class DelimitedParser implements TupleStream {
 		assert (filename != null && !filename.equals("")) : "Invalid filename supplied.  May not be null.  May not be empty.";
 
 		try {
-			if (filename.endsWith("gz")) {
+			if (filename.equals(STD_IN)) {
+				source = new BufferedReader(new InputStreamReader(System.in));
+			} else if (filename.endsWith("gz")) {
 				InputStream is = new GZIPInputStream(new FileInputStream(filename));
 				source = new BufferedReader(new InputStreamReader(is));				
 			} else if (filename.endsWith("zip")) {
