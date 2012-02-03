@@ -53,7 +53,7 @@ public class QueuedStream implements TupleStream {
 	
 	@Override
 	public boolean hasNext() {
-		if (loader != null && tupleCache.isEmpty()) {loadQueue();} 		//Pre-fetch if there is no loader...
+		if (loader == null && tupleCache.isEmpty()) {loadQueue();} 	//Pre-fetch if there is no loader...
 		return !tupleCache.isEmpty() || source.hasNext();
 	}
 

@@ -23,13 +23,13 @@ import static java.lang.String.format;
  * TupleStream implementation that converts a delimited text file into a tuple
  * stream.  Each line of the file is treated as a tuple.
  * 
- * Also handles standard in --  Use [file:"StdIn", queue: -1]
+ * Also handles standard in --  Use [file:"StdIn"]
  * If you do not set Queue to -1, behavior consumption of all input is not guaranteed.
  * 
  * @author jcottam
  *
  */
-@Description("For parsing simple delimited text sources (files and standard in).  Defaults configuration is comma separated with a header.")
+@Description("For parsing regular-expression delmited, line-oriented text sources (files and standard in).  Defaults configuration is comma separated with a header.")
 @Stream(name="Text", spec="[file: \"\", sep: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
 public final class DelimitedParser implements TupleStream {
 	public static final String FILE_KEY = "file";
