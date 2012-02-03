@@ -7,6 +7,7 @@ import stencil.display.DisplayLayer;
 import stencil.display.StencilPanel;
 import static stencil.explore.Application.reporter;
 import stencil.explore.util.StencilRunner;
+import stencil.explore.util.StencilRunner.AbnormalTerminiationException;
 import stencil.adapters.Adapter;
 import stencil.explore.coordination.*;
 
@@ -138,7 +139,10 @@ public final class Model implements StencilMutable.Config, StencilMutable.Stenci
 		String oldStencil = this.stencil;
 		if (stencil == null && oldStencil == null || (stencil != null && stencil.equals(oldStencil))) {return;}
 		this.stencil = stencil;
-		if (runner.isRunning()) {runner.signalStop();}
+		if (runner.isRunning()) {
+			try {runner.signalStop();}
+			catch (AbnormalTerminiationException e) {e.printStackTrace();}
+		}
 		listeners.fireStencilChanged(this, stencil);
 	}
 

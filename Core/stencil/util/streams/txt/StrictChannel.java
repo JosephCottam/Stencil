@@ -2,6 +2,7 @@ package stencil.util.streams.txt;
 
 import java.io.BufferedReader;
 import java.io.EOFException;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -35,6 +36,9 @@ final class StrictChannel implements NextChannel {
 	public String[] next(BufferedReader source) throws NoSuchElementException, RuntimeException {
 		String line;
 
+		try {if (!source.ready()) {return null;}}
+		catch (IOException e) {throw new NoSuchElementException();}
+				
 		try {
 			line = source.readLine();
 		} catch (EOFException eof) {
@@ -78,6 +82,7 @@ final class StrictChannel implements NextChannel {
 		if (tupleSize < 0) {throw new Exception("Invalid tuple size.");}
 
 		source.mark(READ_AHEAD_LIMIT);
+		while(!source.ready()) {Thread.sleep(100);}
 		String line = source.readLine();
 		
 		String[] parts = splitter.split(line);

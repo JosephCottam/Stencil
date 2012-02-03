@@ -3,6 +3,7 @@ package stencil.util.streams.txt;
 
 import java.io.BufferedReader; 
 import java.io.EOFException;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
@@ -38,6 +39,9 @@ final class LooseChannel implements NextChannel {
 	
 	private String[] softNext(BufferedReader source) {
 		String line;
+		
+		try {if (!source.ready()) {return null;}}
+		catch (IOException e) {throw new NoSuchElementException();}
 
 		try {
 			line = source.readLine();

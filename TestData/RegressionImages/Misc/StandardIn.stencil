@@ -1,0 +1,15 @@
+/**Read from standard in.
+   Type single words and follow with newline.
+   The "strict:false" is optional, it prevents errors if bad input is found on standard in.
+**/
+stream survey(fruit) from Text["StdIn", strict:false]
+
+layer plot
+guide
+  axis from X              
+from survey
+   ID: Count()
+   X:* Rank(fruit) -> Mult(5, Rank)
+   Y: Count(fruit) -> Mult(5, Count)
+   REGISTRATION: "CENTER"
+   

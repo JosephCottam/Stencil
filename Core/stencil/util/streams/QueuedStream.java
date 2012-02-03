@@ -14,9 +14,13 @@ import stencil.tuple.stream.TupleStream;
  *
  */
 public class QueuedStream implements TupleStream {
-	private final class QueueLoader implements Runnable {
+	private final class QueueLoader extends Thread {
+		private volatile boolean stop = false;
+		
+		public QueueLoader() {super("Queued Tuple Loader");}
+		
 		public void run() {
-			while (source != null) {
+			while (!stop && source != null) {
 				if (!source.hasNext()) {break;}
 				int getMore = prefetchSize - tupleCache.size(); //queue.size is not necessarily constant time, so the value is grabbed and used in the inner loop
 				boolean doSleep = getMore < 10;					//Not much to get, take a quick break
@@ -24,6 +28,8 @@ public class QueuedStream implements TupleStream {
 				if (doSleep) {Thread.yield();}
 			}
 		}
+		
+		public void signalStop() {stop = true;}
 	}	
 	
 	private final TupleStream source;
@@ -34,13 +40,13 @@ public class QueuedStream implements TupleStream {
 	/**Pre-fetched tuples**/
 	private final Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
 	
-	private final Thread loader;
+	private final QueueLoader loader;
 	
 	public QueuedStream(TupleStream source, int prefetch, boolean thread) {
 		this.source = source;
 		this.prefetchSize = prefetch;
 		if (thread) {
-			loader = new Thread(new QueueLoader(), "Queued Tuple Loader");
+			loader = new QueueLoader();
 			loader.start();
 		} else {
 			loader = null;
@@ -49,7 +55,10 @@ public class QueuedStream implements TupleStream {
 	}
 
 	@Override
-	public void stop() {source.stop();}
+	public void stop() {
+		if (loader != null) {loader.signalStop();}
+		source.stop();
+	}
 	
 	@Override
 	public boolean hasNext() {

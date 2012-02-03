@@ -53,9 +53,9 @@ public final class DelimitedParser implements TupleStream {
 	private final int skip;
 	
 	private final NextChannel channel;
-		
-	/**Has this stream reached its end?*/
-	private boolean ended = false;
+
+	/**File streams are only not ready when they are done.*/
+	private boolean filestream;
 	
 	public DelimitedParser(String name, TuplePrototype proto, Specializer spec) throws Exception {
 		this(name,
@@ -91,20 +91,26 @@ public final class DelimitedParser implements TupleStream {
 	 */
 	private void open() {
 		assert (filename != null && !filename.equals("")) : "Invalid filename supplied.  May not be null.  May not be empty.";
-
+		filestream = true;
 		try {
+			InputStreamReader isr;
 			if (filename.equals(STD_IN)) {
-				source = new BufferedReader(new InputStreamReader(System.in));
+				filestream = false;
+				//Input stream reader that WILL NOT close the underlying stream...Standard In
+				isr = new InputStreamReader(System.in) {
+					public void close() {}
+				};
 			} else if (filename.endsWith("gz")) {
 				InputStream is = new GZIPInputStream(new FileInputStream(filename));
-				source = new BufferedReader(new InputStreamReader(is));				
+				isr = new InputStreamReader(is);				
 			} else if (filename.endsWith("zip")) {
 				ZipFile zf = new ZipFile(filename);
 				ZipEntry ze = zf.entries().nextElement();
-				source = new BufferedReader(new InputStreamReader(zf.getInputStream(ze)));				
+				isr = new InputStreamReader(zf.getInputStream(ze));				
 			} else {
-				source = new BufferedReader(new FileReader(filename));				
+				isr = new FileReader(filename);
 			}
+			source = new BufferedReader(isr);
 			
 			int skip = this.skip;
 			try {while (skip-- > 0) {source.readLine();}}
@@ -120,13 +126,16 @@ public final class DelimitedParser implements TupleStream {
 		Object[] values;
 		try {values = channel.next(source);}
 		catch (NoSuchElementException e) {
-			ended = true;
+			stop();
 			return null;
 		}
 		catch (InvalidTupleException ex) {throw ex;}
 		catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 	
-		return new SourcedTuple.Wrapper(name, new ArrayTuple(values));
+		if (values == null) {
+			if (filestream) {stop(); return null;}
+			else {return null;}
+		} else {return new SourcedTuple.Wrapper(name, new ArrayTuple(values));}
 	}
 
 	/**Close the tree stream.  The next operation will no longer work.
@@ -134,7 +143,7 @@ public final class DelimitedParser implements TupleStream {
 	 */
 	public void stop() {
 		try {
-			if (source != null && source.ready()) {
+			if (source != null) {
 				source.close();
 			}
 		} catch (Exception e) {}
@@ -145,7 +154,7 @@ public final class DelimitedParser implements TupleStream {
 	 * and there are more tuples on it.  False if there
 	 * are no more tuples (guaranteed to never be more).
 	 */
-	public boolean hasNext() {return source != null && !ended;}
+	public boolean hasNext() {return source != null;}
 
 	public String getName() {return name;}
 	
