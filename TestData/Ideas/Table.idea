@@ -17,10 +17,19 @@ from ZipCodes
 
 
 
-table Cells["Voronoi"]
-from Places
-  (ID,X,Y) : (ID,X,Y)
+-----------------------
+Osciliscope using table and a sampling strategy....
+import Time
 
-//Type Voronoi determines that X,Y and ID are settable, but returns point-sets under ID, and pointsÉ
+stream data(v) from Text["StdIn"]
 
-layer 
+table subset[sample:"newest", size:1000]
+from data
+  v : v
+  time: Now() -> [Min] Range[ALL](v, @Min) -> Sub(Now,Min)
+
+layer scope["polyline"]
+from subset
+  ID: Count()
+  X:* Scale[0,100](time)
+  Y: Scale[0,100](v)
