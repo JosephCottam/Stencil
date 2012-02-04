@@ -1,7 +1,7 @@
 import ViewCanvas
 import Dates
 
-stream Stocks(Date, Open) from Text["../Stocks/google_stocks.csv"]
+stream Stocks(Date,Open,High,Low,Close,Volume) from Text["../Stocks/google_stocks.csv", delay:20]
 stream Mouse(X, Y, BUTTON, SCREEN_X, SCREEN_Y, DELTA_X, DELTA_Y, CLICK_COUNT, CTRL, ALT, SHIFT, META, TYPE) from Mouse
 
 order (Stocks | Mouse)
