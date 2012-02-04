@@ -114,6 +114,17 @@ public class DateUtils extends BasicModule {
 		
 	}
 	
+	@Description("Current date/time;  Use with `calendar' operator to get details.")
+	@Operator
+	@Facet(memUse="READER", prototype=DateTuple.PROTOTYPE)
+	public static DateTuple now() {
+		return new DateTuple(java.util.Calendar.getInstance());
+	}
+	
+	@Description("Current date/time as milliseconds.")
+	@Operator
+	@Facet(memUse="READER", prototype="(long millis)")
+	public static long currentMillis() {return System.currentTimeMillis();}
 	
 	@Description("What is the calendar field value from the given date?  Valid fields are those from java.util.Calendar.get(int).")
 	@Operator()
@@ -123,7 +134,7 @@ public class DateUtils extends BasicModule {
 		Field f;
 		int field;
 		try {
-			f = cal.getClass().getField(fieldName);
+			f = cal.getClass().getField(fieldName.toUpperCase());
 			field = (Integer) f.get(cal);
 		} catch (Exception e) {
 			throw new IllegalArgumentException("Error accessing calendar field `" + fieldName + "'", e);

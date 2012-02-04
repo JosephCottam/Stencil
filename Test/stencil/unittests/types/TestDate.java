@@ -2,6 +2,8 @@ package stencil.unittests.types;
 
 import junit.framework.TestCase;
 import stencil.types.date.*;
+
+import java.util.Calendar;
 import java.util.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -41,4 +43,30 @@ public class TestDate extends TestCase {
 		assertEquals(10, DateUtils.dateDiff("YEARS", Jan2000, Jan2010));
 		assertEquals(1, DateUtils.dateDiff("YEARS", Dec2000, Jan2001));
 	}
+	
+	public void testCurrentMillis() throws Exception {
+		assertTrue("Millis diff exceeded tolerance", Math.abs(DateUtils.currentMillis() - System.currentTimeMillis()) < 10);
+		assertTrue("Millis diff exceeded tolerance", Math.abs(DateUtils.currentMillis() - System.currentTimeMillis()) < 10);
+		assertTrue("Millis diff exceeded tolerance", Math.abs(DateUtils.currentMillis() - System.currentTimeMillis()) < 10);
+		assertTrue("Millis diff exceeded tolerance", Math.abs(DateUtils.currentMillis() - System.currentTimeMillis()) < 10);
+		assertTrue("Millis diff exceeded tolerance", Math.abs(DateUtils.currentMillis() - System.currentTimeMillis()) < 10);
+	}
+	
+	public void testNow() throws Exception {
+		DateTuple t = DateUtils.now();
+		Calendar cal = Calendar.getInstance(); 
+		
+		assertEquals(DateUtils.calendar(t, "Hour"), cal.get(Calendar.HOUR));
+		assertEquals(DateUtils.calendar(t, "Hour_of_day"), cal.get(Calendar.HOUR_OF_DAY));
+		assertEquals(DateUtils.calendar(t, "Month"), cal.get(Calendar.MONTH));
+		assertEquals(DateUtils.calendar(t, "Year"), cal.get(Calendar.YEAR));
+		assertEquals(DateUtils.calendar(t, "Day_of_week"), cal.get(Calendar.DAY_OF_WEEK));
+		
+		boolean fail = false;
+		try {
+			DateUtils.calendar(t,  "Some_bad_Field");
+		} catch (Exception e) {fail = true;}
+		assertTrue("Failure to throw exception on invalid field.", fail);
+	}
+	
 }
