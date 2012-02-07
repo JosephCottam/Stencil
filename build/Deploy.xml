@@ -10,10 +10,10 @@
  		<!--Clear up prior attempts-->
  		<delete dir="${release}"/>
  		<delete file="${result}"/>
- 		<delete file="${includes}/Readme.aux"/>
- 		<delete file="${includes}/Readme.log"/>
- 		<delete file="${includes}/Readme.out"/>
- 		<delete file="${includes}/Readme.synctex.gz"/>
+ 		<delete file="${includes}/Overview.aux"/>
+ 		<delete file="${includes}/Overview.log"/>
+ 		<delete file="${includes}/Overview.out"/>
+ 		<delete file="${includes}/Overview.synctex.gz"/>
  		<mkdir dir="${release}"/>
  		
  		<copy file="${JarFile}" todir="${release}"/>
@@ -44,8 +44,11 @@
  		</copy>
  		
  		<copy todir="${release}" overwrite="true">
- 			<fileset dir="./ReleaseIncludes/" includes="**"/>
- 		</copy>
+      <fileset dir="./ReleaseIncludes/" includes="**">
+        <exclude name="Overview.tex"/>
+      </fileset>
+      
+    </copy>
  		
  		<!--Create the zip files-->
  		<zip destfile="${result}" basedir="${release}"/>
