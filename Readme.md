@@ -22,10 +22,10 @@ Testing
 
 In the Stencil directory you checked out from github, do the following:
 
-ant -f build/build.xml -lib Library/ Test
+    ant -f build/build.xml -lib Library/ Test
 
 This will generate a running textual status as well as
-generate an html report in directory called testResults.
+generate an html report in directory called `testResults'.
 
 Note 1: Some test images involve non-deterministic operations.
 Such tests attempt to account for this behavior, but will still fail occasionally.
