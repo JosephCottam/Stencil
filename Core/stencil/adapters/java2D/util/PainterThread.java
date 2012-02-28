@@ -17,8 +17,10 @@ public final class PainterThread implements Runnable {
 	 * Setting this value to zero results in just a yield call.
 	 * Setting this value to -1 results in no delay.
 	 */
-	public static int DELAY = 0; 	
-	private int paintCount =0;
+	public static int DELAY = 0;
+	
+	/**Static monitoring variable.  Not reliable when more than one painter thread is instantiated.**/
+	public static int paintCount =0;
 
 	private static final Rectangle DEFAULT_SIZE =new Rectangle(0,0,1,1);
 	
@@ -37,6 +39,7 @@ public final class PainterThread implements Runnable {
 	public PainterThread(final Panel panel) {
 		this.target = panel.getCanvas().getComponent();
 		this.painter = new MultiThreadPainter(panel.getProgram(), panel);
+		paintCount = 0;
 	}
 
 	public synchronized void finalize() {painter.signalShutdown();}

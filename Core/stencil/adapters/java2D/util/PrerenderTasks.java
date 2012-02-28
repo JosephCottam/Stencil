@@ -61,7 +61,9 @@ public class PrerenderTasks {
 		for (Table l: layers) {simpleUpdaters.add(new SimpleUpdateTask(l));}
 	}
 	
-	public void signalShutodwn() {if (!updatePool.isShutdown()) {updatePool.shutdown();}}
+	public void signalShutodwn() {
+		if (!updatePool.isShutdown()) {updatePool.shutdown();}
+	}
 	
 	public synchronized void prerender() throws Exception {
 		synchronized(panel.getCanvas().getComponent().visLock) { 					//Suspend analysis until the viewpoint is ready
@@ -109,6 +111,7 @@ public class PrerenderTasks {
 	 * @throws Exception
 	 */
 	private void executeAll(Collection targets) throws Exception {
+		if (updatePool.isShutdown()) {return;}
 		List<Future<Finisher>> results = updatePool.invokeAll(targets);
 		for (Future<Finisher> f: results) {
 			Finisher finalizer = f.get();

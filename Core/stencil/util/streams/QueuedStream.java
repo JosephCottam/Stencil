@@ -47,6 +47,7 @@ public class QueuedStream implements TupleStream {
 		this.prefetchSize = prefetch;
 		if (thread) {
 			loader = new QueueLoader();
+			loader.setDaemon(true);
 			loader.start();
 		} else {
 			loader = null;
