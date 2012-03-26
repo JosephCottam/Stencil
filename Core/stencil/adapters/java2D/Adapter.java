@@ -51,6 +51,7 @@ public final class Adapter implements stencil.adapters.Adapter {
 		else if (name.equals("sumLegend")) {return Legend.class;}
 		else if (name.equals("gridlines")) {return Gridlines.class;}
 		else if (name.equals("title")) {return Title.class;}
+		else if (name.equals("density")) {return Density.class;}
 		
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
@@ -112,6 +113,8 @@ public final class Adapter implements stencil.adapters.Adapter {
 				canvas.addGuide(new Gridlines(guideDef));
 			} else if (guideDef.type().equals("title")) {
 				canvas.addGuide(new Title(guideDef));
+			} else if (guideDef.type().equals("density")) {
+				canvas.addGuide(new Density(guideDef));
 			} else {
 				throw new IllegalArgumentException("Unknown guide type requested: " + guideDef.type());
 			}

@@ -26,7 +26,7 @@ options {
 
   //TODO: HACK, this is tied to the available guide types...which is determined by the adaptor...
   public static boolean isValidCombo(String type, String att) {
-    if (type.equals("axis") || type.equals("gridlines")) {return att.startsWith("X") || att.startsWith("Y");}
+    if (type.equals("axis") || type.equals("gridlines") || type.equals("density")) {return att.startsWith("X") || att.startsWith("Y");}
     if (GuideDistinguish.DIRECT_TYPES.contains(type) && att.equals(IDENTIFIER_FIELD)) {return false;}
     return !att.equals("X") && !att.equals("Y");
   }

@@ -62,6 +62,13 @@ options {
         if (!names.contains(Y_FIELD)) {
            adaptor.addChild(rules, ParseStencil.ruleTree(Y_FIELD, Y_FIELD));
         }
+     } else if (guideType.equals("density")) {
+        if (!names.contains(X_FIELD)) {
+           adaptor.addChild(rules, ParseStencil.ruleTree(X_FIELD, X_FIELD));
+        }
+        if (!names.contains(Y_FIELD)) {
+           adaptor.addChild(rules, ParseStencil.ruleTree(Y_FIELD, Y_FIELD));
+        }
      } else if (guideType.equals("title")) {
         //No rules!
      } else {          
