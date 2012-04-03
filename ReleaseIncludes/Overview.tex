@@ -28,7 +28,7 @@
 
 \section {Quick Start}
 %Stencil can be acquired from \url{http://www.cs.indiana.edu/~jcottam/Stencil.xml}.  
-This  document reflects the version for January 2012.
+This  document reflects the version for March 2012.
 If you are itching to just jump in, run "java -jar Stencil.jar" from the command line in the directory this document was found in.  
 If you get lost, read this document.  If you're still lost, feel free to contact me (jcottam@indiana.edu).
 
@@ -131,11 +131,12 @@ By default, all operators in a module are placed in the root namespace.
 However, if colon-namespace for is used, the namespace prefix must be used to refer to any operator from the module.
 
 \subsection{Stream Declaration}
-\textbf{stream $<$name$>$ ($<$field$>$+)}\\
+\textbf{stream $<$name$>$ ($<$field$>$+)} from $<$source$>$\\
 All Stencil programs must consume external data.
 Therefore, Stencil programs usually include a list of external data sources.  
 The data descriptor is is started the \textbf{stream} keyword and includes a name and a list of field names (called  its prototype).  
 Incoming data must conform to the give prototype (e.g. it must have the same number of fields).
+The \textbf{from}-segment describes where the data will be loaded from (typically a file).
 
 \subsection{Order Declaration}
 \textbf{order $<group>$+}
@@ -366,10 +367,10 @@ In operator context, the `default' keyword can be supplied as a filter that matc
 Operator filters are formed like layer filters.  If the filter passes, then the rule is executed.  Filters are evaluated in top-to-bottom fashion.
 $prefilter$ rules are also permitted in operators. All $prefilter$ rules will be executed before any filters are checked.
 Operator rules are formed like layer mapping rules.
-
-An alternative operator form has no rules, instead using \textbf{operator $<$name$>$ : $<$operator$>$}.
-This indicates that the operator named is an instance 2nd operator.  
-This is useful for sharing memory between operator references.
+%
+%An alternative operator form has no rules, instead using \textbf{operator $<$name$>$ : $<$operator$>$}.
+%This indicates that the operator named is an instance 2nd operator.  
+%This is useful for sharing memory between operator references.
 
 
 \section{Examples}
@@ -407,8 +408,8 @@ from flowers
 \section{Known Errors and Issues}
 The implantation is not always correct, especially in the guides.
 
-Editing a Stencil program will sometimes cause the Explore stream-list to go empty.  
-Further edits to the Stencil program bring the stream-list back without loss of already set properties.
+An experimental multi-thread, queued-loader (to hide I/O latency) sometimes cannot detect the end of file properly.
+This can result in an infinite loop or a dropped tuple.  
 
 Error messages from Stencil are horrible...sorry.
 
