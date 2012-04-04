@@ -32,12 +32,6 @@ final class LooseChannel implements NextChannel {
 	 *
 	 */
 	public String[] next(BufferedReader source) {
-		String[] rv = null;
-		while (rv == null) {rv= softNext(source);}
-		return rv;
-	}
-	
-	private String[] softNext(BufferedReader source) {
 		String line;
 		
 		try {if (!source.ready()) {return null;}}

@@ -19,7 +19,7 @@
         <mkdir dir="${report}"/>
 
         
-        <junit fork="yes" dir="./">
+        <junit fork="yes" dir="./" printsummary="yes">
             <formatter type="xml"/>
         	<jvmarg value="-DtestDir=${base}"/>
 
