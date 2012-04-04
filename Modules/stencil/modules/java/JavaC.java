@@ -42,12 +42,14 @@ import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Operator;
 import stencil.module.util.ann.Module;
+import stencil.module.util.ann.StreamType;
 import stencil.parser.string.DefaultSpecializers;
 import stencil.types.Converter;
 import stencil.interpreter.tree.Specializer;
 
 /**Module for java compiler**/
 @Module()
+@StreamType(sourceClass=GeneratorStream.class)
 public class JavaC extends BasicModule {
 	private static final String HEADER_KEY = "header";
 	private static final String BODY_KEY = "body";
@@ -110,7 +112,7 @@ public class JavaC extends BasicModule {
 	
 	
 	/**Compiler infrastructure shared between all of the compiled methods.**/
-	private static class JavaCompilerWrapper {
+	static class JavaCompilerWrapper {
 		private static final String PACKAGE = "stencil.modules.adHoc";
 		
 		private static final String FUNCTION_BODY =

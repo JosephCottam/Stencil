@@ -1,4 +1,4 @@
-package stencil.unittests.module.operator;
+package stencil.unittests.module.java;
 
 
 import stencil.interpreter.tree.Specializer;
