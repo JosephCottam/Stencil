@@ -3,7 +3,6 @@ package stencil.module;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import stencil.interpreter.tree.Specializer;
 import stencil.interpreter.tree.StreamDec;
@@ -13,7 +12,6 @@ import stencil.parser.ParserConstants;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.tuple.stream.TupleStream;
 import stencil.types.Converter;
-import stencil.util.collections.PropertyUtils;
 import stencil.util.streams.DelayStream;
 import stencil.util.streams.QueuedStream;
 import static stencil.parser.ParserConstants.SYSTEM_STREAM_TYPE;
@@ -28,37 +26,22 @@ public class StreamTypeRegistry {
 	private static final Map<String, Class> registry = new HashMap();
 	private static final Map<String, Specializer> defSpec = new HashMap();
 	
-	public static void registerStreams(Properties props) {
-		for (String key: PropertyUtils.filter(props, STREAM_KEY)) {
-			String className = props.getProperty(key);
-			Class streamClass;
-			try {
-				if (className.startsWith("file://")) {
-					streamClass = ClassLoader.getSystemClassLoader().loadClass(className);
-				} else {
-					streamClass = Class.forName(className);
-				}
-			} catch (Exception e) {
-				throw new RuntimeException(String.format("Error accessing stream class: " + className), e);
-			}
-			register(streamClass, key);
-		}
+	/**Remove all registered stream types.**/
+	public static void reset() {
+		registry.clear();
+		defSpec.clear();
 	}
 	
 	/**@param clazz Register this class
 	 * @param key If the class was loaded through the properties system, what was its entry key? (null otherwise)
 	 */
-	public static void register(Class clazz, String key) {
+	public static void register(Class clazz) {
 		if (!TupleStream.class.isAssignableFrom(clazz)) {
 			throw new IllegalArgumentException("Stream annotated classes must subtype TupleStream.");
 		}
 		
 		Stream ann = (Stream) clazz.getAnnotation(Stream.class);
 		if (ann == null) {throw new IllegalArgumentException("Only classes with a 'Stream' annotation may be registered.");}
-		
-		if (key != null && !key.endsWith(ann.name())) {
-			throw new IllegalArgumentException(String.format("Configuration key did not match meta-data: Key: %1$s, meta-data: %2$s.", key.substring(key.indexOf(":")+1), ann.name()));
-		}
 		
 		Specializer spec;
 		try {spec = ParseStencil.specializer(ann.spec());}

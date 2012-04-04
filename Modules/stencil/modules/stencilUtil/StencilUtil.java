@@ -24,6 +24,14 @@ import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
+import stencil.util.streams.binary.BinaryTupleStream;
+import stencil.util.streams.binary.SocketTupleStream;
+import stencil.util.streams.numbers.RandomStream;
+import stencil.util.streams.numbers.SequenceStream;
+import stencil.util.streams.sql.QueryTuples;
+import stencil.util.streams.twitter.TwitterTuples;
+import stencil.util.streams.txt.DelimitedParser;
+import stencil.util.streams.ui.MouseStream;
 
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.util.ModuleDataParser.moduleData;
@@ -33,6 +41,9 @@ import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 
 @Module
 @Description("Operators used in various stencil transformations.")
+@StreamTypes(classes = {BinaryTupleStream.Reader.class, SocketTupleStream.class, 
+						SequenceStream.class, RandomStream.class, QueryTuples.class, 
+						TwitterTuples.class, DelimitedParser.class, MouseStream.class})
 public final class StencilUtil extends BasicModule {
 	/**Some modules provide optimizations for some range sets.  
 	 * If an operator instance is range optimized, it must include this tag in its operator data to indicate

@@ -4,6 +4,7 @@ import java.util.*;
 
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.*;
+import stencil.module.util.ann.StreamTypes;
 import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
@@ -57,6 +58,8 @@ public class ModuleCache {
 
 	/**Resets the imported modules list.*/
 	public void reset() {
+		StreamTypeRegistry.reset();
+		
 		importedModules = new LinkedList<PrefixedModule>();
 		importedModules.add(new PrefixedModule("", new MutableModule(AD_HOC_NAME)));
 		
@@ -120,6 +123,14 @@ public class ModuleCache {
 		PrefixedModule pm = new PrefixedModule(prefix, module);
 		
 		importedModules.offer(pm);
+
+		//Import stream types from the module
+		if (module.getClass().isAnnotationPresent(StreamTypes.class)) {
+			StreamTypes st = module.getClass().getAnnotation(StreamTypes.class);
+			for (Class c: st.classes()) {
+				StreamTypeRegistry.register(c);
+			}
+		}
 	}
 
 	/**Get a module.  Only examines imported modules (does not consider "known" modules, 
