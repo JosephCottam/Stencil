@@ -5,7 +5,7 @@ import stencil.interpreter.tree.Specializer;
 import stencil.module.Module;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
-import stencil.modules.JavaC;
+import stencil.modules.java.JavaC;
 import stencil.parser.ParseStencil;
 import stencil.unittests.StencilTestCase;
 

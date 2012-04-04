@@ -1,4 +1,4 @@
-package stencil.modules;
+package stencil.modules.java;
 
 import static java.lang.String.format;
 
