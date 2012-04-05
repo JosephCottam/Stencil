@@ -13,6 +13,7 @@ import stencil.parser.ParseStencil;
 import stencil.parser.string.*;
 import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.treeView.ANTLRNode;
+import stencil.util.FileUtils;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
 public class TreeView {
@@ -24,7 +25,7 @@ public class TreeView {
 		 ParseStencil.abortOnValidationException = false;
 		 
 		String file = args[1];
-		String text = StringUtils.getContents(file);
+		String text = FileUtils.readFile(file);
 		//Init modules...
 		Properties props = new Properties();
 		props.loadFromXML(new FileInputStream(args[0]));

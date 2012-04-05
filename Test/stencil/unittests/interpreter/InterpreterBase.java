@@ -13,11 +13,11 @@ import stencil.display.Glyph;
 import stencil.display.IDException;
 import stencil.display.StencilPanel;
 import stencil.module.ModuleCache;
-import stencil.testUtilities.StringUtils;
 import stencil.testUtilities.TestModule;
 import stencil.tuple.PrototypedTuple;
 import stencil.util.streams.numbers.SequenceStream;
 import stencil.util.streams.txt.DelimitedParser;
+import stencil.util.FileUtils;
 
 public abstract class InterpreterBase extends junit.framework.TestCase{
 	public static String registerFailRule = "import TestModule " +
@@ -51,7 +51,7 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 	}
 
 	public void testSimpleLines(Adapter adapter) throws Exception {
-		String source = StringUtils.getContents("./TestData/RegressionImages/SimpleLines/Lines.stencil");
+		String source = FileUtils.readFile("./TestData/RegressionImages/SimpleLines/Lines.stencil");
 		panel = adapter.compile(source);
 		
 		SequenceStream stream = new SequenceStream("LineSource", 0, 1, 5);

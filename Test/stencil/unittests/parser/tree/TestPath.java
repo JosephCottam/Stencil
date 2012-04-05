@@ -2,7 +2,7 @@ package stencil.unittests.parser.tree;
 
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
-import stencil.testUtilities.StringUtils;
+import stencil.util.FileUtils;
 import junit.framework.TestCase;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
 import static stencil.parser.string.StencilParser.*;
@@ -12,8 +12,8 @@ public class TestPath extends TestCase {
 	
 	public void setUp() throws Exception {
 		stencil.Configure.loadProperties("./TestData/Stencil.properties");
-		tree1 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
-		tree2 = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
+		tree1 = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
+		tree2 = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 	}
 	
 	public void tearDown() {

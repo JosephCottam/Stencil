@@ -6,12 +6,12 @@ import stencil.module.ModuleCache;
 import stencil.module.operator.wrappers.SyntheticOperator;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.StencilTree;
-import stencil.testUtilities.StringUtils;
+import stencil.util.FileUtils;
 import static stencil.parser.string.StencilParser.*;
 
 public class TestViewpoint extends stencil.unittests.StencilTestCase {
 	public void testSyntheticOperator() throws Exception {
-		StencilTree p = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/SeeTest/SeeTest.stencil"), ADAPTER);
+		StencilTree p = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/SeeTest/SeeTest.stencil"), ADAPTER);
 		
 		StencilTree opDef= p.findAllDescendants(OPERATOR).get(0);
 		
@@ -22,7 +22,7 @@ public class TestViewpoint extends stencil.unittests.StencilTestCase {
 	}
 	
 	public void testStateQuery() throws Exception {
-		Program p = ParseStencil.program(StringUtils.getContents("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
+		Program p = ParseStencil.program(FileUtils.readFile("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 		StateQuery sq = p.allGuides()[0].stateQuery();
 		StateQuery vp = sq.viewpoint();
 		

@@ -1,11 +1,10 @@
 package stencil.testUtilities;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.*;
+
+import stencil.util.FileUtils;
 
 public class StringUtils {
 	public static final String STENCIL_CACHE_DIRECTORY = "./TestData/RegressionImages";
@@ -31,7 +30,7 @@ public class StringUtils {
 		for (String file: files) {
 			File f= new File(file);
 			if (f.isDirectory()) {continue;}//Skip directories
-			programs.put(f.getName(), getContents(f.getCanonicalPath()));
+			programs.put(f.getName(), FileUtils.readFile(f.getCanonicalPath()));
 		}
 		return programs;
 	}
@@ -57,33 +56,4 @@ public class StringUtils {
 		}
 		return matchedFiles; 		
 	}
-
-	
-	public static String getContents(String fileName) throws Exception {
-	 File aFile = new File(fileName);
-	 //...checks on aFile are elided
-	    StringBuilder contents = new StringBuilder();
-	
-	    try {
-	      //use buffering, reading one line at a time
-	      //FileReader always assumes default encoding is OK!
-	      BufferedReader input =  new BufferedReader(new FileReader(aFile));
-	      try {
-	        String line = null; //not declared within while loop
-	
-	        while (( line = input.readLine()) != null){
-	          contents.append(line);
-	          contents.append(System.getProperty("line.separator"));
-	        }
-	      }
-	      finally {
-	        input.close();
-	      }
-	    }
-	    catch (IOException ex){
-	      ex.printStackTrace();
-	    }
-	
-	    return contents.toString();
-	  }
 }

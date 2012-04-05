@@ -9,19 +9,20 @@ import stencil.parser.ParseStencil;
 import stencil.parser.string.StencilParser;
 import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.StringUtils;
+import stencil.util.FileUtils;
 import stencil.unittests.StencilTestCase;
 import static stencil.adapters.java2D.Adapter.ADAPTER;
 import static stencil.parser.string.StencilParser.*;
 
 public class TestParseStencil extends StencilTestCase {
 	public void testParse() throws Exception {
-		StencilTree p = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
+		StencilTree p = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/VSM/VSM.stencil"), ADAPTER);
 		assertNotNull(p);
 
 		assertEquals("Incorrect number of layers found.", 1, p.find(LIST_LAYERS).getChildCount());
 		
 		
-		p = ParseStencil.programTree(StringUtils.getContents("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);
+		p = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/Stocks/Stocks.stencil"), ADAPTER);
 		assertNotNull(p);
 		
 		assertEquals("Incorrect number of layers found.", 2, p.find(LIST_LAYERS).getChildCount());

@@ -1,39 +1,21 @@
 package stencil.explore.util;
 
-import static stencil.explore.model.Model.NEW_LINE;
-
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 
 import stencil.explore.model.Model;
+import stencil.util.FileUtils;
 
 /**Utilities for loading/saving stencil explore files (Stencil+Sources information).*/
 public abstract class StencilIO {
-	
-	/**Loads the contents of the specified file in to the
-	 * passed model.*/
-	public static void load(String filename, Model model) {
-		BufferedReader input;
-		try {input = new BufferedReader(new FileReader(filename));}
-		catch(Exception e) {throw new RuntimeException("Error Restoring prior state.", e);}
-		load(input, model);
-	}
 
-	/**Creates an editor using the passed buffer as the data source.*/
-	public static void load(BufferedReader input, Model model) {
+
+	/**Creates an editor using the passed filename as the data source.*/
+	public static void load(String filename, Model model) {
 		String stencil = "";
 
-		try {
-			StringBuilder lines = new StringBuilder();
-			while (input.ready()) {
-				lines.append(input.readLine());
-				lines.append(NEW_LINE);
-			}
-
-			stencil = lines.toString();
-		} catch (Exception e) {
+		try {stencil = FileUtils.readFile(filename);}
+		catch (Exception e) {
 			throw new RuntimeException("Error restoring prior state.", e);
 		}
 		

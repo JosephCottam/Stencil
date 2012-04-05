@@ -9,8 +9,8 @@ import stencil.display.StencilPanel;
 import stencil.interpreter.tree.Layer;
 import stencil.interpreter.tree.Program;
 import stencil.parser.ParseStencil;
-import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
+import stencil.util.FileUtils;
 import stencil.util.streams.txt.DelimitedParser;
 
 public abstract class GeneratorBase extends StencilTestCase {
@@ -33,7 +33,7 @@ public abstract class GeneratorBase extends StencilTestCase {
 	}
 	
 	public StencilPanel testCompile(Adapter adapter) throws Exception {
-		String streamRules = StringUtils.getContents(SOURCE_STENCIL);
+		String streamRules = FileUtils.readFile(SOURCE_STENCIL);
 		Program program = ParseStencil.program(streamRules, adapter);
 		panel = adapter.compile(streamRules);
 
@@ -50,7 +50,7 @@ public abstract class GeneratorBase extends StencilTestCase {
 	}
 
 	public TupleLoader testMakeLoader(Adapter adapter) throws Exception {
-		String streamRules = StringUtils.getContents(SOURCE_STENCIL);
+		String streamRules = FileUtils.readFile(SOURCE_STENCIL);
 		panel = adapter.compile(streamRules);
 		DelimitedParser stream = new DelimitedParser("MTTNotApplicable",NA_DATA, "\\s*,\\s*", 4, true,1);
 		TupleLoader loader = new TupleLoader(panel, stream);

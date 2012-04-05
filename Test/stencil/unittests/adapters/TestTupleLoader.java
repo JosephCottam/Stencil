@@ -5,8 +5,8 @@ import stencil.adapters.TupleLoader;
 import stencil.adapters.java2D.*;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.columnStore.TableShare;
-import stencil.testUtilities.StringUtils;
 import stencil.unittests.StencilTestCase;
+import stencil.util.FileUtils;
 import stencil.util.streams.txt.DelimitedParser;
 
 
@@ -23,7 +23,7 @@ public class TestTupleLoader extends StencilTestCase {
 	}
 		
 	public void testLoad() throws Exception {
-		String ruleSource = StringUtils.getContents(STENCIL);
+		String ruleSource = FileUtils.readFile(STENCIL);
 		
 		panel = Adapter.ADAPTER.compile(ruleSource);
 
@@ -42,7 +42,7 @@ public class TestTupleLoader extends StencilTestCase {
 	}
 
 	public void testThread() throws Exception {
-		String ruleSource = StringUtils.getContents(STENCIL);
+		String ruleSource = FileUtils.readFile(STENCIL);
 
 		panel = Adapter.ADAPTER.compile(ruleSource);
 
