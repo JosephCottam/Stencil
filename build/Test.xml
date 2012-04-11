@@ -18,7 +18,7 @@
         <mkdir dir="${results}"/>
         <mkdir dir="${report}"/>
 
-        
+        <!-- Five minute timeout-->
         <junit fork="yes" dir="./">
             <formatter type="xml"/>
         	<!--TODO: Make my own formatter...-->

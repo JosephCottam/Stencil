@@ -14,6 +14,7 @@ options {
 	
 	import stencil.parser.tree.StencilTree;	
 	import stencil.parser.tree.*;
+	import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members{
@@ -21,7 +22,7 @@ options {
     public DefaultPackExpansionException(String msg) {super(msg);}
   }
   
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
   public Object fromDefault(StencilTree pack) {
       StencilTree rule = pack.getAncestor(RULE);

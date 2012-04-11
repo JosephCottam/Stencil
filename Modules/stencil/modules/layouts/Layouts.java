@@ -8,9 +8,8 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.ModuleIncompleteError;
 import stencil.module.util.OperatorData;
-import stencil.module.util.ModuleDataParser.MetaDataParseException;
+import stencil.module.util.ModuleDataParser.MetadataParseException;
 import stencil.module.util.ann.*;
-import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 
 @Module
@@ -18,7 +17,7 @@ import stencil.interpreter.tree.Specializer;
 public class Layouts extends BasicModule {
 	private static final String MODULE_NAME = "Layouts";
 	
-	protected ModuleData loadOperatorData() throws MetaDataParseException {
+	protected ModuleData loadOperatorData() throws MetadataParseException {
 		OperatorData[] ods = new OperatorData[]{
 			operatorData(Circular.class, MODULE_NAME),
 			operatorData(Layout.class, MODULE_NAME),
@@ -31,7 +30,8 @@ public class Layouts extends BasicModule {
 		return md;
 	}
 
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {			
+	@Override
+	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
 		OperatorData operatorData = getModuleData().getOperator(name);

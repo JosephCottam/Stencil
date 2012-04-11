@@ -41,11 +41,11 @@ public class TestModuleCache extends StencilTestCase {
 		ModuleCache m = new ModuleCache();
 		StencilOperator l= null;
 
-		try {l=m.instance(new MultiPartName("", "NoMethod"), null, EMPTY_SPECIALIZER, false);}
+		try {l=m.instance(new MultiPartName("", "NoMethod"), null, EMPTY_SPECIALIZER);}
 		catch (OperatorInstanceException e) {/*Exception expected, tested below.*/}
 		assertNull("Method found when not expected.",l);
 
-		try {m.instance(new MultiPartName("", "Concatenate"), null, EMPTY_SPECIALIZER, false);}
+		try {m.instance(new MultiPartName("", "Concatenate"), null, EMPTY_SPECIALIZER);}
 		catch (OperatorInstanceException e) {fail("Method not found when expected.");}
 		catch (Exception e) {fail("Unexpected error looking for method.");}
 	}

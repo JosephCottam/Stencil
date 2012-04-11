@@ -22,6 +22,7 @@ options {
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.MultiPartName;
   import stencil.module.util.OperatorData;
+  import stencil.parser.string.util.TreeRewriteSequence;
 
   import static stencil.interpreter.Environment.*;
 }

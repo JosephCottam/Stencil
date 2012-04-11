@@ -1,7 +1,8 @@
 import Layouts
 import Geometry : Geo
 
-stream RawLines(message, user, date) from Twitter[topic:"Obama, Washington, Congress"]
+stream RawLines(message, user, tags, geo, place, date) 
+   : Twitter[topic:"Obama, Washington, Congress"]
 
 stream Lines (line, text)
 from RawLines
@@ -11,7 +12,7 @@ from RawLines
 stream RawWords (line, word)
 from Lines
    line: line
-   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, *) -> *
+   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, "query", *) -> *
 
 operator NormalizeWords(word) -> (word)
   default => word: Strip(word) -> ToLower(_)
@@ -45,7 +46,7 @@ from Words
    REGISTRATION: "CENTER"
    IMPLANT: "LARGEST"
    (COLOR, FONT):* 
-        [count] WordCount.query(word) -> Range[ALL](@Max, _) 
+        [count] WordCount.query(word) -> FullMax(_)
         -> [freq]  Divide(count, _) 
         -> [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq)
                 -> LineCount.query() -> Log(LineCount, count) -> Mult(LineCount, Log) 
@@ -57,7 +58,7 @@ operator LineIndex : Dict[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   default =>
-    (X,Y): LineIndex.get(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
+    (X,Y): LineIndex.get(word) -> [Points] Map.query(@Layout, "query", LineIndex.0) 
             -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
             -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
             -> (X,Y)

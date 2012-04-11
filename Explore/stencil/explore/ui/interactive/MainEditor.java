@@ -14,23 +14,15 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 	protected StencilEditorPanel stencilEditor;
 	protected StatusBar statusBar;
 
-	protected JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
-
 	public MainEditor() {
 		this.stencilEditor = new StencilEditorPanel();
-
-		split.setLeftComponent(stencilEditor);
-
-		split.setResizeWeight(1);//All extra goes to the left region
-		naturalSize();
 
 		statusBar = new StatusBar();
 
 		stencilEditor.addStencilChangedListener(this);
 		stencilEditor.addTextPositionChangedListener(this);
 		this.setLayout(new BorderLayout());
-		this.add(split, BorderLayout.CENTER);
+		this.add(stencilEditor, BorderLayout.CENTER);
 		this.add(statusBar, BorderLayout.SOUTH);
 
 	}
@@ -42,8 +34,6 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 		statusBar.setLineNum(line+1);
 		statusBar.setCharNum(charNum+1);
 	}
-
-	public void naturalSize() {split.setDividerLocation(.75);}
 
 	public JMenu getEditMenu() {
 		return stencilEditor.getEditMenu();

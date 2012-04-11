@@ -54,6 +54,63 @@ public class TestParseStencil extends StencilTestCase {
 		finally {if (!failed) {fail("Parser accepted null program, should have thrown an exception.");}}
 	}
 
+	private static enum ErrorType {Pretty,Reparse,Compare}
+	private static final class PrettyError {
+		public final ErrorType type;
+		public final String file;
+		public final Exception e;
+		public PrettyError(ErrorType type, String file, Exception e) {
+			this.type = type;
+			this.file = file;
+			this.e = e;
+		}
+		public String toString() {
+			String error = e == null ? "" : ": " +  e.getClass().getSimpleName();
+			return type+":"+file + error;
+		}
+	}
+	public void testPrettyPrintFixedPoint() throws Exception {
+		ArrayList<PrettyError> errors = new ArrayList();
+		
+		Map<String, String> programs = StringUtils.allPrograms(StringUtils.STENCIL_CACHE_DIRECTORY);
+		assertTrue("Insufficient programs found to conduct test.", programs.size() >0);
+
+		StencilTree t;
+		String program, pretty, pretty2;
+		for (String name: programs.keySet()) {
+			try {
+				program = programs.get(name);
+				t= stencil.parser.ParseStencil.checkParse(program);
+			} catch (Exception e) {continue;}//Skip it if it can't parse in the first place.
+			
+				
+			try {pretty = stencil.parser.string.PrettyPrinter.format(t);}
+			catch (Exception e) {
+				errors.add(new PrettyError(ErrorType.Pretty, name, e));
+				e.printStackTrace();
+				continue;
+			}
+			
+			try {t = stencil.parser.ParseStencil.checkParse(pretty);}
+			catch (Exception e) {
+				errors.add(new PrettyError(ErrorType.Reparse, name, e));
+				e.printStackTrace();
+				continue;
+			}
+			
+			try {pretty2 = stencil.parser.string.PrettyPrinter.format(t);}
+			catch (Exception e) {
+				errors.add(new PrettyError(ErrorType.Pretty, name, e));
+				e.printStackTrace();
+				continue;
+			}
+
+			if (!pretty2.equals(pretty)) {errors.add(new PrettyError(ErrorType.Compare, name, null));}
+		}
+
+		assertEquals("Errors found parsing " + errors.size() + " file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
+	}
+	
 	public void testParseAllStored() throws Exception {
 		ArrayList errors = new ArrayList();
 		
@@ -73,7 +130,6 @@ public class TestParseStencil extends StencilTestCase {
 
 		assertEquals("Errors found parsing " + errors.size() + " file(s).", "[]", java.util.Arrays.deepToString(errors.toArray()));
 	}
-	
 
 	/**Checks that children/parents agree on their relationship.
 	 * 

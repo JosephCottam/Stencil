@@ -1,5 +1,5 @@
-stream Elements(Name) from Text["../Rotation/RotationData.txt"]
-stream Mouse(X, Y) from Mouse
+stream Elements(Name) : Text["../Rotation/RotationData.txt"]
+stream Mouse(X, Y) : Mouse
 
 view
 from #Render

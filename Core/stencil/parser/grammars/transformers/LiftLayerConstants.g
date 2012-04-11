@@ -15,6 +15,8 @@ options {
    *   
    *   Also tags the constant fields in the schema as constants (reducing the amount of copying done and storage used).
    *   Must be run after constant propagation and constant operator evaluation
+   *
+   *  TODO: Change to re-instantiate the layer (instead of mutating it)...allows the .layer() accessor to be removed from LayerOperator 
   **/
 
   package stencil.parser.string;
@@ -36,17 +38,22 @@ options {
   import stencil.display.DisplayLayer;
   import stencil.display.SchemaFieldDef;
   import stencil.types.Converter;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.wrappers.LayerOperator;
+  import stencil.parser.string.util.Utilities;
+  
   
 }
 
 @members {	
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-  public Object downup(Object t) {
-    downup(t, this, "liftShared");
-    downup(t, this, "updateLayers");  
-    downup(t, this, "flagConstantFields");  
-    return t;
+  public StencilTree downup(Object p) {
+    StencilTree r;
+    r = downup(p, this, "liftShared");
+    r = downup(r, this, "updateLayers");  
+    r = downup(r, this, "flagConstantFields");  
+    return r;
   }
 
 
@@ -165,7 +172,8 @@ options {
      try {
         StencilTree rules = layerDef.find(RULES_DEFAULTS);
         for (StencilTree ruleSource: rules) {
-           DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();
+           LayerOperator layerOp = (LayerOperator) Utilities.findOperator(layerDef, layerDef.getText());
+           DisplayLayer dl = layerOp.layer();
            Rule rule = Freezer.rule(ruleSource);
            
            //Find the defaults...
@@ -199,7 +207,8 @@ options {
 	 **/ 
 	private void flagConstFields(StencilTree layerDef) {
      try {
-       DisplayLayer dl = (DisplayLayer) ((Const) layerDef.find(CONST)).getValue();
+       LayerOperator layerOp = (LayerOperator) Utilities.findOperator(layerDef, layerDef.getText());
+       DisplayLayer dl = layerOp.layer();
  
        //Calculate which columns are actually updated
        List<StencilTree> resultRules = layerDef.findAllDescendants(RULES_RESULT);
@@ -228,8 +237,8 @@ options {
 
 }
 
-liftShared: ^(LAYER spec=. guides=. defaultList=. consumes=. direct=.)
-  -> ^(LAYER $spec $guides {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)} $direct);
+liftShared: ^(LAYER spec=. guides=. defaultList=. consumes=.)
+  -> ^(LAYER $spec $guides {augmentDefaults((StencilTree) defaultList, (StencilTree) consumes)} {reduceConstants((StencilTree) consumes)});
 	
 updateLayers: ^(l=LAYER .*) {updateLayer(l);};
 flagConstantFields: ^(l=LAYER .*) {flagConstFields(l);};

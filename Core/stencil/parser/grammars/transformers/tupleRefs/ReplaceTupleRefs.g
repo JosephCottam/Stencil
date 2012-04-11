@@ -14,12 +14,13 @@ options {
 
   import java.util.Map;
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members {
   private static Map<StencilTree, StencilTree> subst;
 
-  public synchronized static Tree apply (Tree t, Map<StencilTree, StencilTree> subst) {
+  public synchronized static StencilTree apply (StencilTree t, Map<StencilTree, StencilTree> subst) {
      return TreeRewriteSequence.apply(t, subst);
   }
   

@@ -43,7 +43,16 @@ public class TestTuplePrototypes extends TestCase {
 		
 		assertEquals(SimpleFieldDef.class, p3.get(0).getClass());
 		assertEquals(SchemaFieldDef.class, p3.get(3).getClass());
+	}
 	
+	public void testStripWhitespace() {
+		String[] names = new String[]{"after ", " around ", "  tab	"};
+		
+		TuplePrototype p1 = new TuplePrototype(names);
+		for (int i=0; i< names.length; i++) {
+			String name =p1.get(i).name();
+			assertEquals("Whitespace not stripped in prototype", names[i].trim(), name);
+		}
 		
 	}
 }

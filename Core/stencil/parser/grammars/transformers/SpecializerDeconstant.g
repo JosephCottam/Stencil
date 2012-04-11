@@ -11,9 +11,10 @@ options {
   /**Identifies constants in specializers and replaces them with values.*/
 	package stencil.parser.string;
 	
-  import stencil.tuple.prototype.TuplePrototype;
-	import stencil.parser.tree.StencilTree;
-	import stencil.parser.string.util.*;
+   import stencil.parser.string.util.TreeRewriteSequence;
+   import stencil.tuple.prototype.TuplePrototype;
+   import stencil.parser.tree.StencilTree;
+   import stencil.parser.string.util.*;
 }
 
 @members {  

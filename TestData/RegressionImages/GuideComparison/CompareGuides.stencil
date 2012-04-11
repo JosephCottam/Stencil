@@ -1,6 +1,6 @@
 import JavaC
 
-stream TokenCounts(chart, stencil, protovis, ggplot2) from Text["./tokenCounts.csv"]
+stream TokenCounts(chart, stencil, protovis, ggplot2) : Text["./tokenCounts.csv"]
 
 const WIDTH: 10
 

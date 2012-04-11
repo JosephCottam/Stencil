@@ -1,18 +1,19 @@
-import BrewerPalettes
+import BrewerPalettes 
 
 stream flowers(sepalL, petalW, sepalW, petalL, species, obs)
-   from Text["./AndersonsFlowers.csv"]
+   : Text["./AndersonsFlowers.csv"]
 
-layer FlowerPlot
+layer FlowerPlot					
 guide
- trend[sample: "SIMPLE"] from ID 
- legend[X: 0, Y: 100] from FILL_COLOR
- axis[guideLabel: "Petal Width"] Linear from Y
- axis[guideLabel: "Petal Length"] Linear from X
-
-from flowers
-   ID: obs
+  trend from ID                     
+  legend[X: 0, Y: 100] from FILL_COLOR
+  axis[guideLabel: "Petal Length"] Linear from X
+  axis[guideLabel: "Petal Width"] Linear from Y
+		                             		
+from flowers	
+   ID: obs	
    X:* Scale[min: 0, max:100](petalL)
    Y:* Scale[min: 0, max:100](petalW)
-   FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)
+   FILL_COLOR: BrewerColors(species) -> SetAlpha(50,_)	
    REGISTRATION: "CENTER"
+   SHAPE: "CROSS"

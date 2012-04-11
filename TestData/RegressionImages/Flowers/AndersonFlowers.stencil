@@ -1,7 +1,7 @@
 import BrewerPalettes 
 
 stream flowers(sepalL, petalW, sepalW, petalL, species, obs)		/*@\label{flowers:stream}@*/
-   from Text["./AndersonsFlowers.csv"]
+   : Text["./AndersonsFlowers.csv"]
 
 layer FlowerPlot					/*@\label{flowers:layerDef}@*/
 guide

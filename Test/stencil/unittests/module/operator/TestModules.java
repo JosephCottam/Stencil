@@ -27,7 +27,7 @@ public class TestModules extends TestCase {
 		Specializer s = m.getModuleData().getOperator(n.name()).defaultSpecializer();
 		assertNotNull(s);
 		
-		StencilOperator l = m.instance(n.name(), null, s);		
+		StencilOperator l = m.instance(n.name(), s);		
 		assertNotNull(l);
 		
 	}

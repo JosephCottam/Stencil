@@ -14,16 +14,18 @@ options {
 
   import stencil.parser.tree.StencilTree;  
   import stencil.module.operator.wrappers.SyntheticOperator;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.string.util.Utilities.*;
 }
 
 @members {  
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-  public Object downup(Object t) {
-    downup(t, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees
-    downup(t, this, "toCounterpart");
-    return t;
+  public StencilTree downup(Object p) {
+    StencilTree r;
+    r = downup(p, this, "replicate");     //Build a mapping from the layer/attribute names to mapping trees
+    r = downup(r, this, "toCounterpart");
+    return r;
   }
 }
 
@@ -40,4 +42,4 @@ toCounterpart: ^(f=FUNCTION ^(opName=OP_NAME pre=. base=. facet=.) rest+=.*)
           {$f.getAncestor(PREDICATE)  == null                                   //No predicate specified 
             && $f.getAncestor(OPERATOR_FACET) != null                           //Facet is specified
             && $f.getAncestor(OPERATOR_FACET).getText().equals(SyntheticOperator.COUNTERPART_FACET)}? ->    //And the facet group being transformed is a query THEN...
-          ^(FUNCTION ^(OP_NAME $pre $base COUNTERPART_FACET[facet.getText()])  $rest*);
+          ^(FUNCTION ^(OP_NAME $pre $base ^(COUNTERPART_FACET $facet))  $rest*);

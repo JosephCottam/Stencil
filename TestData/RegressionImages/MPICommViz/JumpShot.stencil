@@ -1,8 +1,8 @@
-stream ranks(rank, label) from Text
+stream ranks(rank, label) : Text
 stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
-  from Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
+  : Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
 stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
-  from Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
+  : Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
 
 order ranks > (overheads | trans)
 

@@ -1,5 +1,7 @@
 package stencil.explore.util;
 
+import java.io.PrintStream;
+
 /**Basic wrapper of System.out and System.err*/
 public class SystemMessageReporter implements MessageReporter {
 	/**Echo a message to System.err.*/
@@ -13,6 +15,8 @@ public class SystemMessageReporter implements MessageReporter {
 		if (message ==null) {return;}
 		System.out.println(String.format(message, args));
 	}
+	
+	public PrintStream errorAsStream() {return System.out;}
 	
 	/**Does nothing.*/
 	public void clear() {/*Provided for interface compatibility.*/}

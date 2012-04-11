@@ -1,8 +1,8 @@
-stream Degrees(Deg) from Text["./degrees.txt"]
+stream Degrees(Deg) : Text["./degrees.txt"]
 
 stream Semis(Deg)
 from Degrees
-  Deg: ToTuple(0,90) ->Map(@Add, *, Deg) -> *
+  Deg: ToTuple(0,90) ->Map(@Add, "map", *, Deg) -> *
 
 stream Quads(Deg)
 from Semis
@@ -15,7 +15,7 @@ default
   CAP1: "ARROW"
   CAP2: "ARROW"
 from Semis
-  ID  : IDS("")
+  ID  : IDS()
   X1 : Cosine(Deg) -> Mult(_,-50)
   Y1 : Sine(Deg) -> Mult(_,-50)
   X2 : Cosine(Deg) -> Mult(_,50)
@@ -40,7 +40,7 @@ from Quads
     CAP1: "ARROW"
     PEN_COLOR: ColorBy(Deg)
 
-operator IDS : Count
+operator IDS()->(v) : Count()
 
 operator ColorBy(Deg) -> (C)
   prefilter(quad) : Div(Deg, 90)

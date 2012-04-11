@@ -27,7 +27,7 @@ public class TestTree extends StencilTestCase {
 	}
 	
 	public void testStreamStream() throws Exception {
-		String input = "stream VertexList(ID1, ID2) from Text\n"
+		String input = "stream VertexList(ID1, ID2)\n"
 			+ "stream VertexPair(ID1, ID2) from VertexList (ID1, ID2): (ID1, ID2)";
 		
 		ParseStencil.program(input, ADAPTER);

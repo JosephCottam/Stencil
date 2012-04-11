@@ -63,4 +63,34 @@ public final class MultiPartName {
 		}
 		return b.toString();
 	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof MultiPartName)) {return false;}
+		MultiPartName other = (MultiPartName) o;
+		return name.equals(other.name) 
+				&& pre.equals(other.pre) 
+				&& (facet == other.facet || (facet != null && facet.equals(other.facet)));
+	}
+	
+	@Override
+	public int hashCode() {
+		return name.hashCode() * pre.hashCode() * facet.hashCode();
+	}
+
+	
+	public static MultiPartName parse(String input) {
+		int ns = input.indexOf(NAME_SPACE);
+		int sep = input.indexOf(NAME_SEPARATOR);
+		
+		String pre = ns < 0 ? "" : input.substring(0, ns);
+		String facet = sep < 0 ? "" : input.substring(sep+1);
+		
+		String name =  input;
+		if (pre.length() >0) {name=name.substring(ns+1);}
+		if (facet.length()>0) {name=name.substring(0,sep);}
+		
+		return new MultiPartName(pre, name, facet);
+	}
+	
 }

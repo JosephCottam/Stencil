@@ -5,5 +5,5 @@ import stencil.modules.stencilUtil.StencilUtil;
 import stencil.unittests.module.ModuleMetadataBase;
 
 public class TestModuleMetadata extends ModuleMetadataBase {
-	public TestModuleMetadata() {super(StencilUtil.class, 8);}
+	public TestModuleMetadata() {super(StencilUtil.class, 9);}
 }

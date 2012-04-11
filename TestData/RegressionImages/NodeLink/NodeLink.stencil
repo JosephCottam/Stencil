@@ -1,7 +1,7 @@
 import JavaC
 
-stream BFS (ID)  from Text["./er_100_0.005.bfs", sep:"\\s+"]
-stream VertexList (ID1, ID2) from Text["./er_100_0.005.adj"]
+stream BFS (ID)  : Text["./er_100_0.005.bfs", sep:"\\s+"]
+stream VertexList (ID1, ID2) : Text["./er_100_0.005.adj"]
 
 order BFS > VertexList          /*Load the node list before the vertex list.*/
 

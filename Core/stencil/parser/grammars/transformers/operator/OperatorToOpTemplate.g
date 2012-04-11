@@ -13,11 +13,12 @@ options {
   package stencil.parser.string;
     
   import stencil.parser.tree.*;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.string.util.Utilities.genSym;
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
    private String newName;
    

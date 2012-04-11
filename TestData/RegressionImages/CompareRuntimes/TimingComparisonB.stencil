@@ -1,6 +1,6 @@
 import BrewerPalettes
 
-stream times(elapse, size, refs, perm, type, i) from Text ["./StateVsFlowRuntimes.csv"]
+stream times(elapse, size, refs, perm, type, i) : Text ["./StateVsFlowRuntimes.csv"]
 
 view
 from #Render
@@ -17,8 +17,6 @@ from times
   GROUP: local.name
   ORDER: Index(size)
   X:* Mult(size,2) -> Scale[0,100](_)
-  Y:* Split[2](@Avg, local.name, size, elapse) -#> Scale[min:0, max:100](_)
+  Y:* Split[2](@FullMean, "map", local.name, size, elapse) -#> Scale[min:0, max:100](_)
   PEN_COLOR:* BrewerColors(local.name)
 
-operator FullMax: Range[ALL](@Max)
-operator Avg: Range[ALL](@Mean)

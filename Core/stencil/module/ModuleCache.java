@@ -44,30 +44,18 @@ public class ModuleCache {
 	/**Modules that have been loaded from the registered modules.*/
 	protected Queue<PrefixedModule> importedModules;
 
-	/**Identifier for a ModuleCache instance.  Used for debugging, and cannot be null.
-	 * Attempting to set this value to null will not return an error, but will not have an effect either.*/
-	private String cacheName = "";
-
-	public ModuleCache() {this(null);}
-	public ModuleCache(String name) {
-		if(name != null) {this.cacheName = name;}
-		reset();
-	}
-
-	public String getName() {return cacheName;}
+	public ModuleCache() {reset();}
 
 	/**Resets the imported modules list.*/
 	public void reset() {
 		StreamTypeRegistry.reset();
 		
 		importedModules = new LinkedList<PrefixedModule>();
-		importedModules.add(new PrefixedModule("", new MutableModule(AD_HOC_NAME)));
 		
 		for (String module: defaultModules) {
 			importModule(module, "");
 		}
 	}
-
 
 	/**From the Modules imported into the stencil, find a given operator and specialize it.
 	 *
@@ -75,17 +63,14 @@ public class ModuleCache {
 	 * @param specializer
 	 * @return
 	 */
-	public StencilOperator instance(MultiPartName name, Context context, Specializer specializer, boolean higherOrder) throws OperatorInstanceException {		
+	public StencilOperator instance(MultiPartName name, Context context, Specializer specializer) throws OperatorInstanceException {		
 		try {
 			Module module = findModuleForOperator(name);
 			String operatorName = name.name();
 
 			StencilOperator operator;
-			if (higherOrder) {
-				operator = module.instance(operatorName, context, specializer, this);
-			} else {
-				operator = module.instance(operatorName, context, specializer);
-			}
+			operator = module.instance(operatorName, specializer);
+			operator = module.optimize(operator, context);
 			
 			return operator;
 		}
@@ -146,19 +131,8 @@ public class ModuleCache {
 		throw new RuntimeException("Request made for operator that has not been imported or created: " + moduleName);
 	}
 
-	/**Return the ad-hoc module of this module cache.*/
-	public MutableModule getAdHoc() {
-		Module m = importedModules.peek().module;
-		if (m instanceof MutableModule) {return (MutableModule) m;}
-		throw new Error("Could not locate a module suitable for ad-hoc use.");
-	}
-
-
 	/**Key on properties in a properties list that indicates module to be registered.*/
 	public static final String MODULE_KEY = "module";
-
-	/**Name that should be used to identify the ad-hoc module.**/
-	public static final String AD_HOC_NAME = "AdHoc";
 
 	public static final String DEFAULT_MODULES_KEY ="defaultModules";
 	

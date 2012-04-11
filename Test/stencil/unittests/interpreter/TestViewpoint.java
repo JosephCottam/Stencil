@@ -2,9 +2,9 @@ package stencil.unittests.interpreter;
 
 import static stencil.adapters.java2D.Adapter.ADAPTER;
 import stencil.interpreter.tree.*;
-import stencil.module.ModuleCache;
 import stencil.module.operator.wrappers.SyntheticOperator;
 import stencil.parser.ParseStencil;
+import stencil.parser.ParserConstants;
 import stencil.parser.tree.StencilTree;
 import stencil.util.FileUtils;
 import static stencil.parser.string.StencilParser.*;
@@ -15,7 +15,7 @@ public class TestViewpoint extends stencil.unittests.StencilTestCase {
 		
 		StencilTree opDef= p.findAllDescendants(OPERATOR).get(0);
 		
-		SyntheticOperator op = new SyntheticOperator(ModuleCache.AD_HOC_NAME, opDef);
+		SyntheticOperator op = new SyntheticOperator(ParserConstants.STAND_IN_GROUP, opDef);
 		SyntheticOperator vp = op.viewpoint();
 		
 		assertNotSame("Viewpoint did not return distinct entity.", op, vp);

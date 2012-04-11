@@ -55,21 +55,29 @@ public final class ArrayUtil {
 		return b.toString();
 	}
 	
-	public static final String prettyString(Iterable entries) {
+	/**Comma separated string.**/
+	public static final String prettyString(Iterable entries) {return prettyString(entries, ", ");}
+
+	/**String formatted for error messages.**/
+	public static final String prettyString(Object[] entries) {return prettyString(Arrays.asList(entries));}
+
+	/**String formatted for error messages.**/
+	public static final String prettyString(Object[] entries, String sep) {return prettyString(Arrays.asList(entries), sep);}
+
+	
+	/**List of entries, using the given separator.**/
+	public static final String prettyString(Iterable entries, String sep) {
 		StringBuilder b = new StringBuilder();
 		for (Object entry: entries) {
 			b.append(entry.toString());
-			b.append(", ");
+			b.append(sep);
 		}
 		if (b.length() >0) {
-			b.deleteCharAt(b.length()-1);
-			b.deleteCharAt(b.length()-1);
+			b.delete(b.length()-sep.length(), b.length());
 		}
 		return b.toString();
 	}
 	
-	/**String formatted for error messages.**/
-	public static final String prettyString(Object[] entries) {return prettyString(Arrays.asList(entries));}
 	
 	public static int[] intArray(List<Integer> values) {
 		final int[] ints = new int[values.size()];

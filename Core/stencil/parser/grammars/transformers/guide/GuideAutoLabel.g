@@ -24,10 +24,11 @@ options {
   import stencil.interpreter.tree.Freezer;
   import stencil.parser.string.util.EnvironmentUtil;
   import stencil.tuple.prototype.TuplePrototype;
-  
-  
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.StencilOperator;
+
+  import static stencil.parser.string.util.Utilities.findOperator;
   import static stencil.parser.ParserConstants.GUIDE_LABEL;
-  import static stencil.parser.ParserConstants.INVOKEABLE;
 }
 
 @members{
@@ -68,16 +69,16 @@ options {
     if (rule==null) {throw new SelectorException("Guide request did not match any (non-constant) rule.");}
            
     StencilTree tail = rule.find(CALL_CHAIN).find(FUNCTION, PACK);
-    AstInvokeable target=null;
+    StencilOperator operator=null; 
     
     while (tail.getType() == FUNCTION) {
-      target = tail.find(INVOKEABLE);
-      if (target != null && target.getOperator() instanceof MonitorOperator) {break;}
+      operator = findOperator(tail.find(OP_NAME));
+      if (operator instanceof MonitorOperator) {break;}
       tail = tail.find(FUNCTION, PACK);
     }
 
 
-    if (target == null || !(target.getOperator() instanceof MonitorOperator)) {
+    if (operator == null || !(operator instanceof MonitorOperator)) {
        throw new SelectorException("Guide path did not lead to location with monitor operator");
     }
    

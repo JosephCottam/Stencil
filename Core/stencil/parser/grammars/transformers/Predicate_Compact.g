@@ -15,20 +15,21 @@ options {
   package stencil.parser.string;
   
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members {
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
-  public Object downup(Object p) {
-    downup(p, this, "flatPreds");
-    downup(p, this, "flatFilters");
-    return p;
+  public StencilTree downup(Object p) {
+     StencilTree r = downup(p, this, "flatPreds");
+     r = downup(r, this, "flatFilters");
+     return r;
   }
 }
 
 //Remove the rule furniture from pedicates
-flatPreds: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION inv=. ^(OP_NAME . n=. .) spec=. args=. .+)))) -> ^(PREDICATE[$n.getText()] $inv $args); 
+flatPreds: ^(PREDICATE ^(RULE . ^(CALL_CHAIN ^(f=FUNCTION ^(OP_NAME . n=. .) spec=. args=. .+)))) -> ^(PREDICATE[$n.getText()] $args); 
 
 //Remove the nesting from filter predicates (they are just anded by the interpreter anyway)
 //TODO: Remove this step if OR is introduced into the filters list

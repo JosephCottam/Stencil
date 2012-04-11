@@ -2,9 +2,9 @@ import PatternUtils
 import JavaC
 
 stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
-   from Text["./18049-arch-compiler.output.txt", sep:"\\s*\\|\\s*", skip:2, strict: false]
+   : Text["./18049-arch-compiler.output.txt", sep:"\\s*\\|\\s*", skip:2, strict: false]
 stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
-   from Text["./NoData-Comp.txt"]
+   : Text["./NoData-Comp.txt"]
 
 order MTTSource > MTTNotApplicable
 

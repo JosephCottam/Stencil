@@ -7,15 +7,12 @@ import stencil.module.MetadataHoleException;
 import stencil.module.operator.UnknownFacetException;
 
 public final class OperatorData {
-	public static final String HIGHER_ORDER_TAG = "HIGHER_ORDER";
-	
 	private final Specializer spec;		 /**Default Specializer*/
 	private final String name;			 /**Operator name*/
 	
 	//TODO: Make this a real class or method (not just a string pointing at one)
 	private final String target;			 /**Method or class to use for the given operator (containing class is determined by the module).*/
 	private final String module;		     /**Module this operator belongs to.*/
-	private final Set<String> tags; /**Extra flags used in further optimization**/
 	private final Map<String, FacetData> facets;
 	private final String defaultFacet;
 
@@ -24,11 +21,11 @@ public final class OperatorData {
 
 	
 
-	public OperatorData(String module, String name, Specializer specializer, String target, String defaultFacet, Collection<FacetData> facets, Collection<String> tags) {
-		this(module, name, specializer, target, defaultFacet, prepFacets(facets), prepTags(tags));
+	public OperatorData(String module, String name, Specializer specializer, String target, String defaultFacet, Collection<FacetData> facets) {
+		this(module, name, specializer, target, defaultFacet, prepFacets(facets));
 	}
 	
-	public OperatorData(String module, String name, Specializer specializer, String target, String defaultFacet, Map<String, FacetData> facets, Set<String> tags) {
+	public OperatorData(String module, String name, Specializer specializer, String target, String defaultFacet, Map<String, FacetData> facets) {
 		
 		//If there is no default facet...
 		/// AND there is only one facet grab that facet
@@ -46,7 +43,6 @@ public final class OperatorData {
 		this.defaultFacet = defaultFacet;
 		this.description = null;
 		this.facets = new HashMap(facets);
-		this.tags = new HashSet(tags);
 		
 		validate();
 	}
@@ -57,7 +53,6 @@ public final class OperatorData {
 		target = source.target;
 		module = source.module;
 		description = source.description;
-		tags = new HashSet(source.tags);
 		facets = new HashMap(source.facets);
 		defaultFacet = source.defaultFacet;
 		validate();
@@ -76,9 +71,6 @@ public final class OperatorData {
 	/**Return facet data for the default facet.*/
 	public FacetData defaultFacet() {return getFacet(defaultFacet);}	
 	public Specializer defaultSpecializer() {return spec;}
-	public boolean hasTag(String name) {return tags.contains(name);}
-	public void addTag(String name) {tags.add(name);}
-	public void removeTag(String name) {tags.remove(name);}
 	
 	public FacetData getFacet(String name) {
 		if (facets.containsKey(name)) {return facets.get(name);}
@@ -96,19 +88,19 @@ public final class OperatorData {
 	
 	
 	public OperatorData module(String module) {
-		return new OperatorData(module, name, spec, target, defaultFacet, facets, tags);
+		return new OperatorData(module, name, spec, target, defaultFacet, facets);
 	}
 	
 	public OperatorData name(String name) {
-		return new OperatorData(module, name, spec, target, defaultFacet, facets, tags);
+		return new OperatorData(module, name, spec, target, defaultFacet, facets);
 	}
 		
 	public OperatorData defaultSpecializer(Specializer spec) {
-		return new OperatorData(module, name, spec, target, defaultFacet, facets, tags);
+		return new OperatorData(module, name, spec, target, defaultFacet, facets);
 	}
 	
 	public OperatorData target(String target) {
-		return new OperatorData(module, name, spec, target, defaultFacet, facets, tags);
+		return new OperatorData(module, name, spec, target, defaultFacet, facets);
 	}
 	
 	
@@ -122,14 +114,7 @@ public final class OperatorData {
 		Map<String, FacetData> facets = new HashMap();
 		facets.putAll(this.facets);
 		facets.put(facet.name(), facet);
-		return new OperatorData(module, name, spec, target, defaultFacet, facets, tags);
-	}
-
-	
-	public static Set<String> prepTags(Collection<String> tags) {
-		Set<String> tgs = new HashSet();
-		tgs.addAll(tags);
-		return tgs;
+		return new OperatorData(module, name, spec, target, defaultFacet, facets);
 	}
 
 	public static Map<String, FacetData> prepFacets(Collection<FacetData> facets) {

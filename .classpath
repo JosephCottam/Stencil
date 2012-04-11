@@ -3,6 +3,7 @@
 	<classpathentry kind="src" path="Explore"/>
 	<classpathentry kind="src" path="Test"/>
 	<classpathentry kind="src" path="Modules"/>
+	<classpathentry kind="src" path="REVL"/>
 	<classpathentry kind="lib" path="Library/JUNG/collections-generic-4.01.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/colt-1.2.0.jar"/>
 	<classpathentry kind="lib" path="Library/JUNG/jung-algorithms-2.0.1.jar"/>

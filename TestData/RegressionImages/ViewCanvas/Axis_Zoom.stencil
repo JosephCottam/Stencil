@@ -1,4 +1,4 @@
-stream Values(Category) from Text["../AutoGuide/Fruits.txt"]
+stream Values(Category) : Text["../AutoGuide/Fruits.txt"]
 
 view
 from #Render

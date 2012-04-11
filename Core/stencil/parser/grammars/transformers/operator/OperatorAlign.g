@@ -22,11 +22,13 @@ options {
   import stencil.parser.tree.*;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.interpreter.tree.Freezer;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.parser.string.util.ValidationException;
   
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   private int[] permute;
   

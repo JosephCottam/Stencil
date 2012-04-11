@@ -3,7 +3,7 @@
    The "strict:false" is optional, it prevents errors if bad input is found on standard in.
    The "skip:0" is also optional; by default the Text stream assumes a header...which doesn't always happen on std in.
 **/
-stream survey(fruit) from Text["StdIn", strict:false, skip:0]
+stream survey(fruit) : Text["StdIn", strict:false, skip:0]
 
 layer plot
 guide

@@ -1,12 +1,14 @@
 package stencil.explore.util;
 
+import java.io.PrintStream;
+
 /**Interface for reporting textual information to the user/programmer.
  * For consistency, the reporter calls should go before any direct calls
  * to System.out, System.err, printStackTrace, etc. This keeps message
  * order consistent for reporters that echo to the System streams.
  * 
  */
-public interface MessageReporter {
+public interface MessageReporter  {
 	/**Add a formated message to the report.*/
 	public void addMessage(String format, Object...objects); 
 
@@ -17,4 +19,8 @@ public interface MessageReporter {
 	 * reporter, this should simply return.
 	 */
 	public void clear();
+
+	
+	/**Provide a print-stream representation, suitable for capturing stack traces.**/
+	public PrintStream errorAsStream();
 }

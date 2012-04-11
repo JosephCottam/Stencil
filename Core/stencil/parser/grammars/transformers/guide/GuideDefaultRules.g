@@ -22,7 +22,7 @@ options {
    import stencil.tuple.prototype.TuplePrototype;
    import stencil.parser.string.util.EnvironmentUtil;
    import stencil.parser.ParseStencil;
-
+   import stencil.parser.string.util.TreeRewriteSequence;
 
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
    import static stencil.parser.ParserConstants.IDENTIFIER_FIELD;	

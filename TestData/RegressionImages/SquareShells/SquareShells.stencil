@@ -1,9 +1,9 @@
-stream Layout(ID, X, Y) from Text["./squarified_10K.txt", sep:"\\s+"]
+stream Data(ID, X, Y) : Text["./squarified_10K.txt", sep:"\\s+"]
 
 layer Nodes
-from Layout
+from Data
     ID: ID
-    (X,Y) :* Range[ALL](@Max, ID) -> Sub(_, ID)  -> Layout(ID)
+    (X,Y) :* FullMax(ID) -> Sub(_, ID)  -> Layout(ID)
     FILL_COLOR:* HeatScale[](ID)
 /*  (X,Y) : Layout(ID) 
     FILL_COLOR: Color{RED} */

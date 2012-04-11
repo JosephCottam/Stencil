@@ -1,6 +1,6 @@
 import Layouts
 
-stream VertexList (parent, child) from Text["./tree2.tree"]
+stream VertexList (parent, child) : Text["./tree2.tree"]
 
 stream Prime ()
 from VertexList

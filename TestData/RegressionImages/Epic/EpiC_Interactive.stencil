@@ -1,15 +1,15 @@
 import ViewCanvas
 import Presentation
 
-stream Data(Timestep, Line, Value) from Text["./EpiCSampleData.csv"]
+stream Data(Timestep, Line, Value) : Text["./EpiCSampleData.csv"]
 
 view
 from #Render
-	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60, 20)
+	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60,-20)
 	W : Mult(canvas.W, 1.2)
 	H : Mult(canvas.H, 1.2)
 	X : Sub(canvas.X, local.WidthOffset)
-	Y : Mult(canvas.H, -1) -> Sub(_, local.HeightOffset)
+	Y : Sub(canvas.H, local.HeightOffset)
 
 layer Lines["POLY_POINT"]
 guide

@@ -54,7 +54,7 @@ public class TwitterTuples implements TupleStream {
 	
 	public TwitterTuples(String name, TuplePrototype proto, Specializer spec) throws TwitterException {
 		this(name, Converter.toString(spec.get(TOPIC_KEY)));
-		if (!proto.nameEqual(PROTOTYPE)) {throw new IllegalArgumentException("Tuple prototype for twitter stream msut be:" + PROTOTYPE.toString());}
+		if (!proto.nameEqual(PROTOTYPE)) {throw new IllegalArgumentException("Tuple prototype for twitter stream must be: (" + TuplePrototypes.prettyNames(PROTOTYPE) + ")");}
 	}
 	
 	public TwitterTuples(String name, String topic) throws TwitterException {

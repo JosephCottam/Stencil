@@ -13,20 +13,20 @@ import stencil.interpreter.tree.Specializer;
 import stencil.tuple.prototype.TuplePrototype;
 
 public class ModuleDataParser {
-	public static final class MetaDataParseException extends RuntimeException {
+	public static final class MetadataParseException extends RuntimeException {
 		private final String message;
 
-		public MetaDataParseException(String message) {
+		public MetadataParseException(String message) {
 			super();
 			this.message = message;
 		}
 		
-		public MetaDataParseException(Class source, Exception cause) {
+		public MetadataParseException(Class source, Exception cause) {
 			super(cause);
 			message = String.format("%1$s\n(For class %2$s).", super.getMessage(), source.getCanonicalName());
 		}
 		
-		public MetaDataParseException(Method source, Exception cause) {
+		public MetadataParseException(Method source, Exception cause) {
 			super(cause);
 			message = String.format("%1$s\n(For static method %2$s in %3$s).", super.getMessage(), source.getName(), source.getDeclaringClass().getCanonicalName());
 		}
@@ -47,8 +47,7 @@ public class ModuleDataParser {
 		final Specializer spec = ParseStencil.specializer(o.spec());
 		FacetData[] facets = makeFacetData(f, m.getName());
 
-		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName(), o.defaultFacet(), Arrays.asList(facets), Arrays.asList(o.tags()));
-
+		OperatorData od = new OperatorData(moduleName, opName, spec, m.getName(), o.defaultFacet(), Arrays.asList(facets));
 		
 		return od;
 	}
@@ -78,69 +77,65 @@ public class ModuleDataParser {
 	 * @param moduleName Name of the surrounding module
 	 * @param suppress Should the suppress flag be adhered to?
 	 * @return
-	 * @throws MetaDataParseException
+	 * @throws MetadataParseException
 	 */
-	private static OperatorData operatorData(Class c, String moduleName, boolean suppress) throws Exception {
-		if (suppress && c.getAnnotation(Suppress.class) != null) {return null;}
-		
-		Operator o = (Operator) c.getAnnotation(Operator.class);
-		if (o == null) {return null;}
-		
-		final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
-		final Specializer spec = ParseStencil.specializer(o.spec());
-		
-		List<FacetData> facets = new ArrayList();
-		for (Method m: c.getMethods()) {
-			Facet f = m.getAnnotation(Facet.class);
-			if (f== null) {continue;}
-
-			try {
-				FacetData[] fds = makeFacetData(f, m.getName());
-				facets.addAll(Arrays.asList(fds));
-			} catch (MetadataHoleException ex) {
-				throw new MetaDataParseException("Error preparing metadata for " + opName + ": " + ex.getMessage());
+	public static OperatorData operatorData(Class c, String moduleName) {
+		try {
+			Operator o = (Operator) c.getAnnotation(Operator.class);
+			if (o == null) {return null;}
+			
+			final String opName = EMPTY.equals(o.name().trim()) ? c.getSimpleName() : o.name();
+			final Specializer spec = ParseStencil.specializer(o.spec());
+			
+			List<FacetData> facets = new ArrayList();
+			for (Method m: c.getMethods()) {
+				Facet f = m.getAnnotation(Facet.class);
+				if (f== null) {continue;}
+	
+				try {
+					FacetData[] fds = makeFacetData(f, m.getName());
+					facets.addAll(Arrays.asList(fds));
+				} catch (MetadataHoleException e) {
+					throw new MetadataHoleException(moduleName, opName, e.getMessage());
+				}
 			}
-		}
-
-		final OperatorData od = new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.defaultFacet(), facets, Arrays.asList(o.tags()));
-		
-		return od;
+	
+			return new OperatorData(moduleName, opName, spec, c.getSimpleName(), o.defaultFacet(), facets);
+		} 
+		catch (MetadataHoleException e) {throw e;}
+		catch (Exception e) {throw new MetadataParseException(c, e);}
 	}
 	
 	/**Given an input stream, will parse the contents 
 	 * and return a ModuleData object.
-	 * @throws MetaDataParseException 
+	 * @throws MetadataParseException 
 	 */
-	public static ModuleData moduleData(Class source) throws MetaDataParseException {
+	public static ModuleData moduleData(Class source) throws MetadataParseException {
 		Module ma = (Module) source.getAnnotation(Module.class);
-		if (ma == null) {throw new MetaDataParseException("No module annotation found in " + source.getCanonicalName());}
+		if (ma == null) {throw new MetadataParseException("No module annotation found in " + source.getCanonicalName());}
 
 		final String moduleName = EMPTY.equals(ma.name().trim()) ? source.getSimpleName():ma.name();			
 		ModuleData md = new ModuleData(moduleName);
 		
 			for (Class c: source.getClasses()) {
 				try {
-					final OperatorData od = operatorData(c, moduleName, true);
+					final OperatorData od = operatorData(c, moduleName);
 					if (od == null) {continue;}
 					md.addOperator(od);
-				} catch (Exception e) {throw new MetaDataParseException(c,e);}
+				} 
+				catch (MetadataHoleException e) {throw e;}
+				catch (Exception e) {throw new MetadataParseException(c,e);}
 			}
 			
 			for (Method m: source.getMethods()) {
 				try {md.addOperator(operatorData(m, moduleName));}
-				catch (Exception e) {throw new MetaDataParseException(m,e);}
+				catch (Exception e) {throw new MetadataParseException(m,e);}
 			}
 
 		return md;
 	}
 	
-	public static ModuleData moduleData(String className) throws ClassNotFoundException, MetaDataParseException {
+	public static ModuleData moduleData(String className) throws ClassNotFoundException, MetadataParseException {
 		return moduleData(Class.forName(className));
-	}
-	
-	/**Load operator data (ignores suppress flag)*/
-	public static OperatorData operatorData(Class c, String moduleName) throws MetaDataParseException {
-		try {return operatorData(c, moduleName, false);}
-		catch (Exception e) {throw new MetaDataParseException(c, e);}
 	}
 }

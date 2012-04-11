@@ -17,12 +17,13 @@ options {
   import stencil.parser.tree.*;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.interpreter.tree.Freezer;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.ParserConstants.IDENTIFIER_FIELD;
   
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   private int moveToZero;
   

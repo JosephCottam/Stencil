@@ -1,11 +1,11 @@
 package stencil.unittests.parser.string;
 
 import junit.framework.TestCase;
-import stencil.modules.stencilUtil.Range;
+import stencil.modules.stencilUtil.range.RangeDescriptor;
 import stencil.parser.ParseStencil;
 import stencil.parser.ProgramParseException;
 import stencil.parser.string.StencilParser;
-import stencil.parser.string.ValidationException;
+import stencil.parser.string.util.ValidationException;
 import stencil.parser.string.validators.SpecializerValidator;
 import stencil.parser.tree.StencilTree;
 import stencil.testUtilities.SuppressOutput;
@@ -35,7 +35,7 @@ public class TestSpecializerParse extends TestCase {
 		for (String test: ranges) {
 			SuppressOutput.suppress();
 			boolean failed = false;
-			try {new Range(test);}
+			try {new RangeDescriptor(test);}
 			catch (ValidationException e) {failed =true;}
 			finally {SuppressOutput.restore();}		
 			assertTrue(String.format("Expected failure parsing %1$s did not occur.", test), failed);

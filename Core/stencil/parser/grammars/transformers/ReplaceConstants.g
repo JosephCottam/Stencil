@@ -15,8 +15,11 @@ options {
    package stencil.parser.string;
 	
    import stencil.parser.tree.*;
+   import stencil.module.operator.StencilOperator;
    import stencil.parser.string.util.*;
+   import stencil.parser.string.util.TreeRewriteSequence;
    import static stencil.parser.ParserConstants.GLOBALS_FRAME;
+   import static stencil.parser.string.util.Utilities.findOperator;
 }
 
 @members {  
@@ -25,15 +28,33 @@ options {
      return (StencilTree) TreeRewriteSequence.apply(t, globals);
   }
   
+  
+  public Object downup(Object p) {
+    p=downup(p, this, "globalsDown", "globalsUp");     
+    p=downup(p, this, "opAsArg");  //Move the needed ones to the guide definitions
+    return p;
+  }
+  
   protected void setup(Object... args) {globals = (GlobalsTuple) args[0];}
   
   private GlobalsTuple globals;
 }
 
-topdown: 
-	^(TUPLE_REF frame=ID field=ID) 
+globalsDown
+   : ^(TUPLE_REF frame=ID field=ID) 
 		{$frame.text.equals(GLOBALS_FRAME) &&
   		  globals.prototype().contains($field.text)}? ->  {adaptor.dupTree(globals.get($field.text))};
 
 //Delete the global list of constants
-bottomup: ^(p=PROGRAM .*) {adaptor.deleteChild(p, p.find(LIST_GLOBALS).getChildIndex());};
+globalsUp: ^(p=PROGRAM .*) {adaptor.deleteChild(p, p.find(LIST_GLOBALS).getChildIndex());};
+
+
+//TODO: Should this resolve to the invokeable level instead?
+opAsArg
+@after {
+   Const c = (Const) retval.tree;
+   StencilOperator op = findOperator($on);
+   c.setValue(op);
+   //c.setValue(op.getFacet($facet.getText()));
+}
+  : ^(OP_AS_ARG ^(on=OP_NAME pre=. name=. facet=.)) -> CONST[on.getToken(), name.getText()];     

@@ -1,6 +1,6 @@
 import BrewerPalettes
 
-stream times(elapse, size, refs, perm, type, i) from Text["./1iters_1Mc.csv"]
+stream times(elapse, size, refs, perm, type, i) : Text["./1iters_1Mc.csv"]
 
 
 layer Runtimes["POLY_POINT"]

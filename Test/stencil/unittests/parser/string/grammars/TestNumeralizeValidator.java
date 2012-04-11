@@ -1,8 +1,8 @@
 package stencil.unittests.parser.string.grammars;
 
 import junit.framework.TestCase;
+import stencil.parser.string.util.ValidationException;
 import stencil.parser.string.validators.*;
-import stencil.parser.string.ValidationException;
 import stencil.parser.tree.StencilTree;
 import static stencil.parser.ParseStencil.*;
 import static stencil.parser.string.StencilParser.*;

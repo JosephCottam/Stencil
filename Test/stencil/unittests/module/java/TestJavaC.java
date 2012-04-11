@@ -17,7 +17,7 @@ public class TestJavaC extends StencilTestCase {
 	public void testJava_Add() throws Exception {
 		String add = "[body: \"(int a, int b) =>  a+b\", header:\"\"]";
 		Specializer s = ParseStencil.specializer(add);
-		StencilOperator o = javac.instance("Java", null, s);
+		StencilOperator o = javac.instance("Java", s);
 		Invokeable inv = o.getFacet("map");
 		assertNotNull(inv);
 
@@ -40,7 +40,7 @@ public class TestJavaC extends StencilTestCase {
 							+ "header:\"import stencil.module.operator.util.AbstractOperator;\", "
 							+ "class:\"AbstractOperator.Statefull\"]";
 		Specializer s = ParseStencil.specializer(triangular);
-		StencilOperator o = javac.instance("JavaC", null, s);
+		StencilOperator o = javac.instance("JavaC", s);
 		Invokeable inv = o.getFacet("map");
 		assertNotNull(inv);
 		

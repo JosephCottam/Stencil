@@ -1,7 +1,7 @@
 /*Dead simple test.  Just draws some lines.*/
 
 stream LineSource(count)
-  from Sequence[0,1,4]
+  : Sequence[0,1,4]
  
 layer GridLines["LINE"]
 from LineSource

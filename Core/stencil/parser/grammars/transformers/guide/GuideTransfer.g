@@ -29,15 +29,15 @@ options {
   import stencil.module.*;
   import stencil.interpreter.guide.MonitorOperator;
   import stencil.parser.ProgramCompileException;
-  
-  import static stencil.parser.ParserConstants.INVOKEABLE;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.StencilOperator;
   import static stencil.parser.string.util.Utilities.*;
 }
 
 @members{
   public static class AutoGuideException extends ProgramCompileException {public AutoGuideException(String message) {super(message);}}
 
-  public static StencilTree apply (Tree t, ModuleCache modules) {
+  public static StencilTree apply (StencilTree t, ModuleCache modules) {
      return (StencilTree) TreeRewriteSequence.apply(t, modules);
   }
   
@@ -47,12 +47,12 @@ options {
   protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
   
   public Object downup(Object p) {
-    downup(p, this, "buildMappings");     //Get a listing of layer/attribute definitions
-    downup(p, this, "transferMappings");  //Move the needed ones to the guide definitions
-    downup(p, this, "fillFragments");     //Convert the transfered parts to rules
-    downup(p, this, "trimGuide");         //Throw out the rule parts not required
-    downup(p, this, "copyQuery");         //Create the state query
-    downup(p, this, "changeFacets");      //Switch the facet invoked
+    p=downup(p, this, "buildMappings");     //Get a listing of layer/attribute definitions
+    p=downup(p, this, "transferMappings");  //Move the needed ones to the guide definitions
+    p=downup(p, this, "fillFragments");     //Convert the transfered parts to rules
+    p=downup(p, this, "trimGuide");         //Throw out the rule parts not required
+    p=downup(p, this, "copyQuery");         //Create the state query
+    p=downup(p, this, "changeFacets");      //Switch the facet invoked
     return p;
   }
 
@@ -68,8 +68,9 @@ options {
 	//cuts things down so the generator only includes things after that point
    private Tree trimCall(StencilTree tree) {
       if (tree.getType() == StencilParser.PACK) {throw new RuntimeException("Error trimming (no monitor operator found): " + tree.getAncestor(CALL_CHAIN).toStringTree());}
-
-      if (tree.find(INVOKEABLE).getOperator() instanceof MonitorOperator) {return (Tree) adaptor.dupTree(tree);}
+      
+	  StencilOperator op = findOperator(tree);
+      if (op instanceof MonitorOperator) {return (Tree) adaptor.dupTree(tree);}
       else {return trimCall(tree.find(FUNCTION, PACK));}
    }
    
@@ -123,18 +124,13 @@ trimGuideGenRule
 
 
 //Update query creation -----------------------------------------------
-copyQuery: ^(GUIDE type=. spec=. selector=. actions=. lgg=.) ->
-        ^(GUIDE $type $spec $selector $actions $lgg {stateQueryList(adaptor, $lgg)});
+copyQuery: ^(g=GUIDE type=. spec=. selector=. actions=. lgg=.) ->
+        ^(GUIDE $type $spec $selector $actions {adaptor.dupTree($lgg)} {stateQueryList(adaptor, $lgg)});
 
 
 //Rename mappings -----------------------------------------------
 //Pick the 'guide'-related function instead of whatever else
 //was selected for each function
 changeFacets
-   @after{
-     StencilTree func = $changeFacets.tree;
-     func.find(INVOKEABLE).changeFacet(func.find(OP_NAME).getChild(2).getText());
-     //TODO: Remove this @after when no longer relying on copy propagation to keep shared state correct
-   }
-   : ^(f=FUNCTION i=. ^(OP_NAME pre=. base=. facet=.) spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> 
-        ^(FUNCTION $i ^(OP_NAME $pre $base ID[counterpart(i, facet)]) $spec $args $style $c);
+   : ^(f=FUNCTION ^(on=OP_NAME pre=. base=. facet=.) spec=. args=. style=. c=. ) {c.getAncestor(LIST_GUIDE_GENERATORS) != null}? -> 
+        ^(FUNCTION ^(OP_NAME $pre $base ID[counterpartFacet($on)]) $spec $args $style $c);

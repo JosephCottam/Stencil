@@ -19,7 +19,7 @@ public class TestTupleUtil extends TestCase {
 	
 	public void testToTuple() throws Exception {
 		Specializer spec = ParseStencil.specializer("[CONVERT: \"java.lang.Object\"]");
-		StencilOperator op = tupleUtils.instance("ToTuple", null, spec);
+		StencilOperator op = tupleUtils.instance("ToTuple", spec);
 		Invokeable f = op.getFacet("query");
 
 		Object r = f.invoke(new Object[]{"one"});

@@ -22,10 +22,10 @@ public class TestNumerics extends StencilTestCase {
 		Specializer spec2 = ParseStencil.specializer("[base: 2, range: LAST]");
 		Specializer specNone = ParseStencil.specializer("[base: NULL, range: LAST]");
 		
-		StencilOperator log10 = numerics.instance("Log", null, spec10);
-		StencilOperator logE = numerics.instance("Log", null, specE);
-		StencilOperator log2 = numerics.instance("Log", null, spec2);
-		StencilOperator logNone = numerics.instance("Log", null, specNone);
+		StencilOperator log10 = numerics.instance("Log", spec10);
+		StencilOperator logE = numerics.instance("Log", specE);
+		StencilOperator log2 = numerics.instance("Log", spec2);
+		StencilOperator logNone = numerics.instance("Log", specNone);
 		
 		assertEquals(InvokeableOperator.class, log10.getClass());
 		assertEquals(InvokeableOperator.class, logE.getClass());

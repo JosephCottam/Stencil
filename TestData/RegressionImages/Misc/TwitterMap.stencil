@@ -1,7 +1,7 @@
 import Layouts
 import Geometry : Geo
 
-stream Tweets(message, user, tags, geo, place, date) from Twitter
+stream Tweets(message, user, tags, geo, place, date) : Twitter
 
 view
 from #Render

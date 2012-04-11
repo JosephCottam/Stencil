@@ -26,26 +26,27 @@ options {
    import stencil.interpreter.tree.MultiPartName;
    import stencil.interpreter.guide.Samplers;
    import stencil.parser.ProgramCompileException;
-   
+   import stencil.parser.string.util.TreeRewriteSequence;
       
    import static stencil.parser.ParserConstants.BIND_OPERATOR;
-   
    import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
    import static stencil.parser.string.util.Utilities.genSym;
+   import static stencil.parser.string.util.Utilities.addOperator;
 }
 
 @members {
-  public static StencilTree apply (Tree t, ModuleCache modules) {
-     return (StencilTree) TreeRewriteSequence.apply(t, modules);
+  public static StencilTree apply (StencilTree t, ModuleCache modules) {
+     return TreeRewriteSequence.apply(t, modules);
   }
     
   protected void setup(Object... args) {this.modules = (ModuleCache) args[0];}
   
-  public Object downup(Object t) {
-    downup(t, this, "listRequirements");
-    downup(t, this, "replaceCompactForm");    /**Replace the auto-categorize operator.**/
-    downup(t, this, "ensure");  /**Make sure that things which need guides have minimum necessary operators.*/    
-    return t;
+  public StencilTree downup(Object p) {
+    StencilTree r;
+    r = downup(p, this, "listRequirements");
+    r = downup(r, this, "replaceCompactForm");    /**Replace the auto-categorize operator.**/
+    r = downup(r, this, "ensure");  /**Make sure that things which need guides have minimum necessary operators.*/    
+    return r;
   }
 
   private static final String SEED_PREFIX = "seed.";
@@ -90,7 +91,7 @@ options {
     /**Does the given call group already have the appropriate sampling operator?**/ 
     private boolean requiresChanges(StencilTree chain) {
       StencilTree r = chain.getAncestor(RULE);
-      if (r == null || !requestedGuides.containsKey(key(r))) {return false;}
+      if (r == null || !requestedGuides.containsKey(key(r))) {return false;}      
       String type = requestedGuides.get(key(r)).find(SAMPLE_TYPE).getText();
       String operatorName = Samplers.monitor(type);
       if (operatorName == null) {throw new ProgramCompileException("Unknown sample type requested: " + type, chain);}
@@ -99,7 +100,8 @@ options {
       StencilTree call = chain.find(FUNCTION, PACK);
       while(call.getType() == FUNCTION) {
         MultiPartName name = Freezer.multiName(call.find(OP_NAME));
-        if (operatorName.equals(name.name())) {return false;}
+        String root = name.name();
+        if (root.contains(operatorName)) {return false;}
         call = call.find(FUNCTION, PACK);
       }
       return true;
@@ -122,26 +124,33 @@ options {
        return newArgs;
     }
         
-    /**Determine which monitor operator to use.  
+    /**Determine which monitor operator to use.
+      * Create and instance of it, add it to the operators list and return the name.  
       *If this is to replace a compact form, the flag should be set to true (different error conditions apply)
       **/
-    private String selectOperator(StencilTree t, boolean compactForm) {
+    private String makeOperator(StencilTree t, boolean compactForm) {
       StencilTree layer = t.getAncestor(LAYER);
       StencilTree r = t.getAncestor(RULE);
       String field = Freezer.tupleField(r.findDescendant(TARGET_TUPLE).getChild(0)).toString();
 
       StencilTree request = requestedGuides.get(key(layer.getText(), field));
+      String opName;
       if (request == null && !compactForm) {throw new RuntimeException("Error construction guide: Request for guide does not correspond to a property with rules.");}
-      else if (request == null) {return Samplers.monitor("NOP");}
+      else if (request == null) {opName= Samplers.monitor("NOP");}
       else {
           String type = request.find(SAMPLE_TYPE).getText();
-          return Samplers.monitor(type);
+          opName = Samplers.monitor(type);
       }
+
+      Specializer specializer = Freezer.specializer(spec(t));
+      String refName = addOperator(opName, specializer, modules, t, adaptor);
+      
+      return refName;
     }
     
-    private StencilTree spec(StencilTree t, boolean compactForm) {
+    private StencilTree spec(StencilTree t) {
        StencilTree request = requestedGuides.get(key(t.getAncestor(RULE)));
-       if (request == null && compactForm) {return ParserConstants.EMPTY_SPECIALIZER_TREE;}
+       if (request == null) {return ParserConstants.EMPTY_SPECIALIZER_TREE;}
        
        StencilTree guide = request.getAncestor(GUIDE);
        Specializer spec = Freezer.specializer(guide.find(SPECIALIZER));
@@ -168,12 +177,12 @@ listRequirements: ^(sel=SELECTOR .*)
    }};
 
 //Replace the #-> with a monitor operator...
-replaceCompactForm:
- ^(f=FUNCTION n=. s=. a=. gy=GUIDE_YIELD t=.) ->
+replaceCompactForm: 
+   ^(f=FUNCTION n=. s=. a=. gy=GUIDE_YIELD t=.) ->
 		^(FUNCTION  $n $s $a DIRECT_YIELD[$gy.text] 
 		      ^(FUNCTION 
-		          ^(OP_NAME DEFAULT ID[selectOperator($t, true)] DEFAULT_FACET) 
-		          {spec($t, true)} 
+		          ^(OP_NAME DEFAULT ID[makeOperator($t, true)] DEFAULT_FACET) 
+		          {spec($t)} 
 		          {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
 		          DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)] 
 		          $t));  
@@ -183,8 +192,9 @@ ensure:
 		  {$c.getAncestor(RULES_RESULT) != null &&  requiresChanges($c)}? ->
 		    ^(CALL_CHAIN    
 		       ^(FUNCTION
-		          ^(OP_NAME DEFAULT ID[selectOperator($t, false)] DEFAULT_FACET) 
-                  {spec($t, true)} 
+		          ^(OP_NAME DEFAULT ID[makeOperator($t, false)] DEFAULT_FACET) 
+                  {spec($t)} 
                   {echoArgs($t, constArgs($t.getAncestor(CALL_CHAIN)))} 
                   DIRECT_YIELD[genSym(FRAME_SYM_PREFIX)]
                   $t));
+	                  

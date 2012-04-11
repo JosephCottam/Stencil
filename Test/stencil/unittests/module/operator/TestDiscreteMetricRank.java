@@ -15,7 +15,7 @@ public class TestDiscreteMetricRank  extends StencilTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		spec = ParseStencil.specializer("[margin: 1]");
-		op = module.instance("DiscreteMetricRank", null, spec);
+		op = module.instance("DiscreteMetricRank", spec);
 	}
 	
 	public void testRanking() throws Exception {

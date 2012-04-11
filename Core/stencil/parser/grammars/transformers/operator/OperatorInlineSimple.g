@@ -21,6 +21,7 @@ options {
   import stencil.tuple.prototype.TupleFieldDef;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.interpreter.tree.Freezer;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
   import static stencil.parser.string.util.Utilities.genSym;
   
@@ -28,12 +29,13 @@ options {
 }
 
 @members {
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
-  public Object downup(Object t) {
+  public StencilTree downup(Object p) {
      simple.clear();
-     downup(t, this, "search");
-     downup(t, this, "replace");
+     StencilTree t;
+     t = downup(p, this, "search");
+     t = downup(t, this, "replace");
      return t;
   }  
   
@@ -81,7 +83,7 @@ options {
       frameName = splicePass.getText();
       adaptor.setChild(lastCall, splicePass.getChildIndex(), adaptor.create(pass.getType(), frameName));//Make sure the pass type is retained
                       
-      return RenameFrames.apply((Tree) adaptor.dupTree(splice)); //Rename because the insertion can cause the same frame name to appear in multiple rules
+      return RenameFrames.apply((StencilTree) adaptor.dupTree(splice)); //Rename because the insertion can cause the same frame name to appear in multiple rules
   }
   
   private StencilTree getFacetTree(String name, StencilTree operator) {

@@ -149,9 +149,6 @@ public abstract class ParseStencil {
 			Token lastToken = tokens.get(tokens.index()-1);
 			throw new ProgramParseException("Error parsing Stencil program; no input consumed after line " + lastToken.getLine());
 		}
-		
-		
-
 		p = DefaultPack.apply(p);				//Add default packs where required
 
 		parseValidate(p);
@@ -167,41 +164,44 @@ public abstract class ParseStencil {
 	 */
 	public static StencilTree programTree(String source, Adapter adapter) throws ProgramParseException, Exception {
 		StencilTree p = checkParse(source);
+
+		RulesProvided.apply(p);					//Verify that it is a reasonably-complete program...
 	
-		p = SimplifyViewCanvas.apply(p);
+		p = SimplifyViewCanvas.apply(p);		//Remove this pass when multiple views/canvases are supported 
 		p = LiftStreamPrototypes.apply(p);		//Create prototype definitions for internally defined streams
-		p = ElementToLayer.apply(p);			//Convert "element" statements into layers
+		p = ElementToLayer.apply(p);			//Convert "element" statements into layers		
+		p = OperatorExpandCompactForm.apply(p);	 
+		p = DefaultPack.apply(p);				//Add default packs where required
+
 		p = SeparateRules.apply(p);				//Group the operator chains, switch everything to "Target"
 		p = EnsureOrders.apply(p);				//Ensure the proper order blocks
-
-		ModuleCache modules = Imports.apply(p);		//Do module imports
-		
-		p = PrepareCustomArgs.apply(p);				//Parse custom argument blocks
+		p = OperatorCustomArgs.apply(p);				//Convert custom-format arguments to printf/call pairs
 		p = Predicate_Expand.apply(p);				//Convert filters to standard rule chains
 		p = SpecializerDeconstant.apply(p);			//Remove references to constants in specializers
-		p = DefaultSpecializers.apply(p, modules, adapter); 	//Add default specializers where required
+
+		ModuleCache modules = Imports.apply(p);		//Do module imports		
+		p = DefaultSpecializers.apply(p, modules, adapter); //Add default specializers where required
 		p = OperatorToOpTemplate.apply(p);			//Converting all operator defs to template/ref pairs
-		p = OperatorInstantiateTemplates.apply(p);	//Remove all template references
+		p = OperatorExpandTemplates.apply(p);		//Remove all template references
+		p = ViewCanvasOps.apply(p);					//Add view/canvas operator calls
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p); 			//Expand operatorDefs to include query and stateID
 
 		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 
-		NoOperatorReferences.apply(p);					//Validate the ad-hocs are all created
-
+		p = OperatorOptimize.apply(p, modules);
+		//TODO: Do some analysis here so higher-order ops can update their memory use and tuple prototypes IFF they have constant operator/facet information.
+		
+		p = SemanticFacetResolve.apply(p);			//Replace semantic facet labels with actual facet names
 		p = GuideDistinguish.apply(p);				//Distinguish between guide types
-		p = ViewCanvasOps.add(p);
 		p = FrameTupleRefs.apply(p, modules);		//Ensure that all tuple references have a frame reference
-		p = ViewCanvasOps.remove(p);
 		p = OperatorInlineSimple.apply(p);			//In-line simple synthetic operators		
 		
 //		BEGIN GUIDE SYSTEM----------------------------------------------------------------------------------
 		p = GuideDefaultSelector.apply(p); 
 		p = GuideInsertMonitorOp.apply(p, modules);		//Ensure that auto-guide requirements are met
 		p = GuideSampleInSpec.apply(p);
-		p = DefaultSpecializers.apply(p, modules, adapter); 		
-		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
-													//TODO: Move to later since operators are all explicitly named...stop relying on propagation of copies to keep things sharing memory
-		
+		p = DefaultSpecializers.apply(p, modules, adapter);
+		p = SemanticFacetResolve.apply(p);				//Replace semantic facet labels with actual facet names
 		p = GuideTransfer.apply(p, modules);		
 		p = GuideModifyGenerator.apply(p);
 		p = GuideDefaultRules.apply(p);
@@ -209,8 +209,6 @@ public abstract class ParseStencil {
 		p = GuideLegendGeom.apply(p);
 
 		p = DefaultSpecializers.apply(p, modules, adapter); 
-		p = SetOperators.apply(p, modules);
-
 		p = GuideSampleOp.apply(p);
 		p = GuideExtendQuery.apply(p);
 		p = GuideSetID.apply(p);
@@ -224,22 +222,20 @@ public abstract class ParseStencil {
 		p = DynamicSeparateRules.apply(p);
 		p = DynamicToSimple.apply(p);
 	    p = DynamicCompleteRules.apply(p);
+		p = SemanticFacetResolve.apply(p);			//Replace semantic facet labels with actual facet names
 	    p = DynamicReducer.apply(p);
-	    p = DynamicStoreSource.apply(p);
+	    p = DynamicStoreSource.apply(p, modules);
 		p = DefaultSpecializers.apply(p, modules, adapter); 		
-		p = SetOperators.apply(p, modules);			//Prime tree nodes with operators from the modules cache
 
 		p = OperatorStateQuery.apply(p);
 	    
 	   // SIMPlIFICATIONS AND OPTIMIZATIONS
 		p = ReplaceConstants.apply(p);  					//Replace all references to CONST values with the actual value
-		p = ViewCanvasOps.remove(p);
 		p = FillCoConsumes.apply(p);
 		p = CombineRules.apply(p);
-		p = ViewCanvasOps.add(p);
-		p = SetOperators.apply(p, modules);					//Prime tree nodes with operators from the modules cache
 		p = NumeralizeTupleRefs.apply(p); 					//Numeralize all tuple references
 		p = Predicate_Compact.apply(p);						//Improve performance of filter rules by removing all the scaffolding				
+		p = SemanticFacetResolve.apply(p);					//Replace semantic facet labels with actual facet names
 		p = ReplaceConstantOps.apply(p, modules);			//Evaluate functions that only have constant arguments, propagate results around
 		p = LiftLayerConstants.apply(p);					//Move constant property assignments to the defaults section so they are only applied once.
 		p = GuideAdoptLayerDefaults.apply(p);				//Take identified layer constants, apply them to the guides
@@ -255,6 +251,11 @@ public abstract class ParseStencil {
 		return Freezer.program(programTree(source, adapter));
 	}
 	
+	/**Pretty-print the passed program.*/
+	public static String prettyPrint(String source) throws ProgramParseException {
+		StencilTree tree = checkParse(source);
+		return PrettyPrinter.format(tree);
+	}
 	
 	//Validations to run right after a checkParse
 	private static void parseValidate(Tree p) {
@@ -262,6 +263,7 @@ public abstract class ParseStencil {
 			TargetMatchesPack.apply(p);
 			StreamDeclarationValidator.apply(p);
 			ViewCanvasSingleDef.apply(p);
+			UniqueNames.apply(p);
 		} catch (RuntimeException e) {
 			if (abortOnValidationException) {throw e;}
 			else {System.err.println(e.getMessage());}
@@ -271,9 +273,10 @@ public abstract class ParseStencil {
 	//Run all validators.
 	private static void validate(Tree p) {
 		try {
+			TargetMatchesPack.apply(p);
 			SpecializerValidator.apply(p);
 			FullNumeralize.apply(p);			
-			AllInvokeables.apply(p);
+			OperatorProxiesPopulated.apply(p);
 			OperatorPrefilter.apply(p);
 			LimitDynamicBind.apply(p);
 			StoreValidator.apply(p);

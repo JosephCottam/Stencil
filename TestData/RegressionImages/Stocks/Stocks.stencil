@@ -1,6 +1,6 @@
 import Dates
 
-stream Stocks(Date,Open,High,Low,Close,Volume) from Text["./google_stocks.csv"] 
+stream Stocks(Date,Open,High,Low,Close,Volume) : Text["./google_stocks.csv"] 
 
 
 stream AlignedStocks(Date, Open)
@@ -29,7 +29,7 @@ from AlignedStocks
    GROUP: "Google_30"
    ORDER: Count()
    X: TimeStep(Date)
-   Y: Range["-30..n"](@Mean, Open)	    /*Average the most recent 30 values.*/
+   Y: Range["-30..n"](@Mean, "map", Open)	    /*Average the most recent 30 values.*/
    PEN: Stroke{1}
    PEN_COLOR: Color{LIME,150}
 from AlignedStocks
@@ -37,7 +37,7 @@ from AlignedStocks
    GROUP: "Google_ALL"
    ORDER: Count()
    X: TimeStep(Date)
-   Y: Range[ALL](@Mean, Open)		    /*Average all values.*/
+   Y: Range[ALL](@Mean, "map", Open)		    /*Average all values.*/
    PEN: Stroke{1}
    PEN_COLOR: Color{CRIMSON,150}
 from AlignedStocks
@@ -45,15 +45,15 @@ from AlignedStocks
    GROUP: "Google_20"
    ORDER: Count()
    X: TimeStep(Date)
-   Y: Range["-30 .. -10"](@Mean, Open) /*Average that lags by 10 and includes 20 values.*/
+   Y: Range["-30 .. -10"](@Mean, "map", Open) /*Average that lags by 10 and includes 20 values.*/
    PEN: Stroke{1}
    PEN_COLOR: Color{ORANGE,150}
 
 operator Ids : Count 
 
 operator TimeStep (T) -> (S)
-default => (S) : Range[ALL](@DateMin, T) 
-                   -> DateDiff("DAYS", Range, T) 
+default => (S) : DateMin(T) 
+                   -> DateDiff("DAYS", DateMin, T) 
                    -> Mult(_, 3)
 
-operator DateMin : Min[c:"Date"]  
+operator DateMin : FullMin[c:"Date"]  

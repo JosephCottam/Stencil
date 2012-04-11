@@ -1,4 +1,4 @@
-stream Renders(Config, Count) from Text["./RenderCounts.csv"]
+stream Renders(Config, Count) : Text["./RenderCounts.csv"]
 
 layer Chart
   guide axis from X

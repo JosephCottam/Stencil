@@ -18,7 +18,7 @@
    <property name="ast" location ="/stencil/parser/tree/"/>
    <property name="interpreter" location ="${core}/stencil/interpreter/"/>
  	 	
-    <target name="Stencil" depends="Transformers, Infos, Validators, Compile"/>
+    <target name="Stencil" depends="ClearOldAntlrResults, Transformers, Infos, Validators, Compile"/>
  	
     <!-- Just the core stencil grammar, not the additional processing.
          Which grammar is specified at the command line with -Dn=...   -->
@@ -66,28 +66,63 @@
             <fileset dir="${grammars}/transformers"/>
             <param name="antlrTarget" value="${parser}"/>
         </foreach>
+    	<antcall target="ClearANTLRTemps"/>
     </target>
  	
 
+    <!--Tree manipulations that gather information, but do not change the tree-->
     <target name="Infos" depends="StencilGrammar">
         <foreach target="antlrBuild" param="file" inheritall="true">
            <fileset dir="${grammars}/info" />
            <param name="antlrTarget" value="${parser}"/>
         </foreach>
+    	<antcall target="ClearANTLRTemps"/>
+    </target>
+ 	
+
+    <!--Tree manipulations that validate the tree structure--> 	
+    <target name="Validators" depends="StencilGrammar">
+       <property name="tDir" value="${parser}/validators"/>
+       <mkdir dir="${tDir}"/> 
+       <foreach target="antlrBuild" param="file" inheritall="true">
+           <fileset dir="${grammars}/validators" />
+           <param name="antlrTarget" value="${tDir}"/>
+        </foreach>
+    	<antcall target="ClearANTLRTemps"/>
+    </target>
+
+ 	<!--Cleanup after an ANTLR run.-->
+    <target name="ClearANTLRTemps">
+    	<delete>
+    	  <fileset dir="${parser}">
+    		   <include name="*.tokens"/>
+    	  	   <include name="*.tmp"/>
+    	  	   <exclude name="Stencil.tokens"/>  <!--leave this so tokens inheretence works.-->
+               <include name="validators/*.tokens"/>
+               <include name="validators/*.tmp"/>
+    	  </fileset>
+    	</delete> 	
     </target>
 
  	
-    <target name="Validators" depends="StencilGrammar">
-      <property name="tDir" value="${parser}/validators"/>
-      <mkdir dir="${tDir}"/> 
-    	<foreach target="antlrBuild" param="file" inheritall="true">
-    	   <fileset dir="${grammars}/validators" />
-           <param name="antlrTarget" value="${tDir}"/>
-    	</foreach>
+ 	<!--Remove existing ANTLR results completely.-->
+ 	<target name="ClearOldAntlrResults">
+    	<delete>
+    	  <fileset dir="${parser}">
+    	  	   <include name="*.java"/>
+    		   <include name="*.tokens"/>
+    	  	   <include name="*.tmp"/>
+    	  	   <include name="validators/*.java"/>
+               <include name="validators/*.tokens"/>
+               <include name="validators/*.tmp"/>
+    	  </fileset>
+    	</delete>
     </target>
 
-    <target name="antlrBuild" depends="antlr_classpath">
-        <antlr3
+ 	
+    <!--Build a single antlr target-->
+ 	<target name="antlrBuild" depends="antlr_classpath">
+ 		<antlr3
           target="${file}"
           outputdirectory="${antlrTarget}"
           libdirectory="${parser}"

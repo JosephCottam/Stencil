@@ -10,10 +10,11 @@ import stencil.interpreter.TupleStore;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.MonitorOperator;
 import stencil.module.operator.util.Invokeable;
+import stencil.module.operator.wrappers.LayerOperator;
 import stencil.parser.string.StencilParser;
-import stencil.parser.tree.AstInvokeable;
-import stencil.parser.tree.Const;
+import stencil.parser.string.util.Utilities;
 import stencil.parser.tree.OperatorProxy;
+import stencil.parser.tree.Const;
 import stencil.parser.tree.StencilTree;
 import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
@@ -159,12 +160,13 @@ public final class Freezer {
 	
 	public static MonitorOperator monitorOperator(StencilTree root) {
 		assert verifyType(root, MONITOR_OPERATOR);
-		return (MonitorOperator) ((Const) root.find(CONST)).getValue();
+		return (MonitorOperator) Utilities.findOperator(root, root.getText());
 	}
 	
 	public static SampleOperator sampleOperator(StencilTree root) {
-		assert verifyType(root, SAMPLE_OPERATOR);
-		return (SampleOperator) ((Const) root.find(CONST)).getValue();
+		assert verifyType(root, CONST);
+		assert verifyType(root.getParent(), LIST_GUIDE_SAMPLERS);
+		return (SampleOperator) ((Const) root).getValue();
 	}
 	
 	
@@ -222,7 +224,8 @@ public final class Freezer {
 		String name = layer.getText();
 		Specializer spec = specializer(layer.find(SPECIALIZER));
 		Consumes[] groups = groups(layer.find(StencilParser.LIST_CONSUMES));
-		DisplayLayer impl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();			
+		LayerOperator op = (LayerOperator) Utilities.findOperator(layer, layer.getText());
+		DisplayLayer impl = op.layer();			
 
 		return new Layer(impl, name, spec, groups);
 	}
@@ -247,7 +250,7 @@ public final class Freezer {
 		ArrayList<Object[]> args = new ArrayList();
 		
 		for (StencilTree func: chain.findAllDescendants(FUNCTION)) {
-			invokeables.add(invokeable(func.find(AST_INVOKEABLE)));
+			invokeables.add(invokeable(func.find(OP_NAME)));
 			args.add(valueList(func.find(LIST_ARGS)));
 		}
 		Invokeable[] invs = invokeables.toArray(new Invokeable[invokeables.size()]);
@@ -315,8 +318,7 @@ public final class Freezer {
 		final Invokeable[] invs = new Invokeable[stateQuery.getChildCount()];
 		for (int i=0; i< stateQuery.getChildCount(); i++) {
 			StencilTree child = stateQuery.getChild(i);
-			assert verifyType(child, AST_INVOKEABLE);
-			invs[i] = ((AstInvokeable) child).getInvokeable();
+			invs[i] = invokeable(child);
 		}
 		return new StateQuery(invs);
 	}
@@ -434,7 +436,7 @@ public final class Freezer {
 	}
 	public static Predicate predicate(StencilTree predicate) {
 		assert verifyType(predicate, PREDICATE);
-		Invokeable inv = invokeable(predicate.find(AST_INVOKEABLE));
+		Invokeable inv = Utilities.findOperator(predicate, predicate.getText()).getFacet("query");
 		Object[] args = valueList(predicate.find(LIST_ARGS));
 		return new Predicate(inv, args);
 	}
@@ -457,21 +459,24 @@ public final class Freezer {
 		catch (Exception e) {throw new FreezeException(num, e);}
 	}
 	
-	public static Invokeable invokeable(StencilTree inv) {
-		assert verifyType(inv, AST_INVOKEABLE);
-		try{return ((AstInvokeable) inv).getInvokeable();}
-		catch (Exception e) {throw new FreezeException(inv, e);}
+	public static Invokeable invokeable(StencilTree opName) {
+		assert verifyType(opName, OP_NAME);
+		MultiPartName name = multiName(opName);
+		try{return Utilities.findOperator(opName).getFacet(name.facet());}
+		catch (Exception e) {throw new FreezeException(opName, e);}
 	}
 	
 	public static Specializer specializer(StencilTree spec) {
 		assert verifyType(spec, SPECIALIZER);
-
-		String[] keys = new String[spec.getChildCount()];
-		Object[] vals = new Object[spec.getChildCount()];
+		
+		List<StencilTree> entries = spec.findAll(MAP_ENTRY);
+		
+		String[] keys = new String[entries.size()];
+		Object[] vals = new Object[entries.size()];
 		
 		try {
 			for (int i=0; i< keys.length; i++) {
-				StencilTree entry = spec.getChild(i);
+				StencilTree entry = entries.get(i);
 				assert verifyType(entry, MAP_ENTRY);
 				assert entry.getChildCount() == 1 : "Malformed MAP_ENTRY found" + entry.toStringTree();
 				keys[i] = entry.getText();

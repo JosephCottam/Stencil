@@ -15,6 +15,7 @@ options {
 	
 	import stencil.parser.tree.*;
 	import stencil.module.*;
+	import stencil.parser.string.util.TreeFilterSequence;
 	import org.antlr.runtime.tree.*;
 	
 }

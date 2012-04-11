@@ -15,6 +15,9 @@ options {
 	package stencil.parser.string;
 
 	import stencil.parser.tree.*;
+	import stencil.parser.string.util.TreeRewriteSequence;
+	import stencil.parser.string.util.ValidationException;
+	
 	import static stencil.parser.ParserConstants.IDENTIFIER_FIELD;
 	import static stencil.parser.string.GuideDistinguish.DIRECT_TYPES;
 }

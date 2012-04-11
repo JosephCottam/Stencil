@@ -102,7 +102,7 @@ public class StreamTypeRegistry {
 			if (!additionalArgs) {s = c.newInstance(name, proto, spec);}
 			else {s = c.newInstance(name, proto, spec, args);}		
 		} catch (Exception e) {
-			String msg = String.format("Error invoking constructor on stream of type %1$s.", name);
+			String msg = String.format("Error invoking constructor on stream %1$s.", name);
 			throw new RuntimeException(msg, e);
 		}
 

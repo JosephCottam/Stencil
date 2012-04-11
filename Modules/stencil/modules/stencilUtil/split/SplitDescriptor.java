@@ -1,14 +1,14 @@
-package stencil.modules.stencilUtil;
+package stencil.modules.stencilUtil.split;
 
-import stencil.parser.string.ValidationException;
+import stencil.parser.string.util.ValidationException;
 
 /**Class to capture the split sub-concept of specialization.
  * */
-public class Split {	
+public class SplitDescriptor {	
 	private final boolean ordered;	//Is it an ordered split (incoming values are guaranteed to be in order, default is false)?
 	private final int fields;		//How many fields are involved in the split (default is 1)
 	
-	public Split(int keysize, boolean ordered) {
+	public SplitDescriptor(int keysize, boolean ordered) {
 		fields = keysize;
 		this.ordered = ordered;
 		
@@ -27,9 +27,9 @@ public class Split {
 	
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
-		if (!(other instanceof Split)) {return false;}
+		if (!(other instanceof SplitDescriptor)) {return false;}
 		
-		Split alter = (Split) other;
+		SplitDescriptor alter = (SplitDescriptor) other;
 		
 		return this.ordered == alter.ordered
 			&& this.fields == alter.fields;

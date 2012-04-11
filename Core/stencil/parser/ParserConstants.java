@@ -4,12 +4,9 @@ import stencil.display.CanvasTuple;
 import stencil.display.DisplayLayer;
 import stencil.interpreter.tree.Specializer;
 import stencil.module.operator.StencilOperator;
-import stencil.parser.tree.AstInvokeable;
 import stencil.parser.tree.StencilTree;
 
 public abstract class ParserConstants {
-	public static final Class<AstInvokeable> INVOKEABLE = AstInvokeable.class;
-	
 	/**Used to represent a default value that should be automatically derived.
 	 * Not all places can use a default value, but those that can should use this value to 
 	 * indicate that default should be used.*/
@@ -73,8 +70,8 @@ public abstract class ParserConstants {
 	
 	public static final String BIND_OPERATOR = ":";
 	
-	public static final String OP_ARG_PREFIX = "Op";
-	
+	//TODO: Remove when top-level groups are added (and names there-from)
+	public static final String STAND_IN_GROUP = "NOT A GROUP...GROUP";
 	
 	public static final StencilTree DEFAULT_CANVAS_SPECIALIZER;
 	public static final StencilTree DEFAULT_VIEW_SPECIALIZER;

@@ -2,10 +2,9 @@ package stencil.module.util;
 
 import stencil.module.MetadataHoleException;
 import stencil.module.Module;
-import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
-import stencil.module.util.ModuleDataParser.MetaDataParseException;
+import stencil.module.util.ModuleDataParser.MetadataParseException;
 import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 
@@ -18,14 +17,14 @@ import stencil.interpreter.tree.Specializer;
 public abstract class BasicModule implements Module {
 	protected ModuleData moduleData;
 
-	protected BasicModule() throws MetaDataParseException {this.moduleData = loadOperatorData();}
+	protected BasicModule() throws MetadataParseException {this.moduleData = loadOperatorData();}
 	
 	/**Actually load the operator data into the module.
 	 * This method is called by the constructor and should be over-ridden 
 	 * if the default loading mechanism (scanning the module for operator definitions) should not be used.
-	 * @throws MetaDataParseException 
+	 * @throws MetadataParseException 
 	 */
-	protected ModuleData loadOperatorData() throws MetaDataParseException {
+	protected ModuleData loadOperatorData() throws MetadataParseException {
 		return ModuleDataParser.moduleData(this.getClass());
 	}
 	
@@ -58,7 +57,7 @@ public abstract class BasicModule implements Module {
 	 * Context is ignored by default.
 	 */
 	@Override
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {			
+	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {			
 		validate(name, specializer);
 		
 		OperatorData operatorData = getOperatorData(name, specializer);		
@@ -66,15 +65,11 @@ public abstract class BasicModule implements Module {
 		
 		return operator;
 		
-	}
-
-	/**Throws unsupported operation exception ALWAYS.*/
-	@Override
-	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
-		throw new UnsupportedOperationException(String.format("Higher order instantation not supported (requested for %1$s).", name));
-	}
-
+	}	
 	
+	/**No optimization is attempted (by default).**/
+	@Override
+	public StencilOperator optimize(StencilOperator op, Context context) {return op;}
 	
 	/**Verify that the name/specializer combination is valid, throws appropriate exceptions
 	 * if they are not valid.

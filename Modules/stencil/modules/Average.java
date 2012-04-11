@@ -2,19 +2,20 @@ package stencil.modules;
 
 import java.util.HashMap;
 
-import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.modules.stencilUtil.Range;
-import stencil.modules.stencilUtil.StencilUtil;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.interpreter.tree.Freezer;
-import stencil.interpreter.tree.Specializer;
+import stencil.modules.stencilUtil.range.Range;
+import stencil.modules.stencilUtil.range.RangeDescriptor;
 import stencil.parser.string.StencilParser;
 import stencil.parser.string.util.Context;
+import stencil.parser.tree.StencilTree;
+import stencil.interpreter.tree.Freezer;
+import stencil.interpreter.tree.MultiPartName;
+import stencil.interpreter.tree.Specializer;
 
 //TODO: Extend median to handle any sortable objects
 //TODO: Extend Mode to handle any object with .equals (because you can count with .equals!)
@@ -29,16 +30,14 @@ public class Average extends BasicModule {
 	 * TODO: Implement the 'calculate but do not render' message to handle case where minimum range has not bee reached
 	 * TODO: Augment full-mean to take absolute start and relative end (e.g. hybrid-style range instead of just a full range)
 	 */
-	@Suppress 
-	@Operator(name="Mean", defaultFacet="map", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullMean", defaultFacet="map")
 	public static class FullMean extends AbstractOperator.Statefull {
 		int start;
 		double total =0;
 		long count=0;
 
-		public FullMean(OperatorData opData, Specializer specializer, int start) {
+		public FullMean(OperatorData opData) {
 			super(opData);			
-			this.start = start;
 		}
 		
 		private FullMean(OperatorData opData, int start) {
@@ -76,7 +75,7 @@ public class Average extends BasicModule {
 
 
 	/**Takes a mean over exactly what is passed, keeps no memory*/
-	@Operator(name="Mean", tags=StencilUtil.RANGE_FLATTEN_TAG)
+	@Operator(name="Mean")
 	@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
 	public static double mean(double...values) {
 		double sum =0;
@@ -84,49 +83,6 @@ public class Average extends BasicModule {
 		return sum/values.length;
 	}
 
-	@Suppress @Operator(name = "Mode", defaultFacet="map")
-	public static class SimpleMode extends AbstractOperator {
-		public SimpleMode(OperatorData opData) {super(opData);}
-		
-		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
-		public Object query(Object... values) {
-			HashMap<Object, Integer> m = new HashMap();
-			for (Object value: values) {
-				if (!m.containsKey(value)) {m.put(value,0);}
-				m.put(value, m.get(value)+1);
-			}
-			
-			int max = Integer.MIN_VALUE;
-			Object result = null;
-			for (Object key: m.keySet()) {
-				if (m.get(key) > max) {
-					max = m.get(key);
-					result = key;
-				}
-			}
-			
-			return result; 
-		}
-	}
-	
-	@Suppress @Operator(name = "Median")
-	public static class SimpleMedian extends AbstractOperator {
-		public SimpleMedian(OperatorData opData) {super(opData);}
-		
-		@Facet(memUse="FUNCTION", prototype="(double avg)", alias={"query","map"})
-		public Object query(Object... values) {
-			java.util.Arrays.sort(values);
-			int idx = (int) Math.floor(values.length/2);
-
-			//If an incomplete median can averaged...do so
-			if (values.length%2 != 0 
-					&& values[idx] instanceof Number && values[idx+1] instanceof Number) {
-				return (((Number) values[idx]).doubleValue() + ((Number)values[idx+1]).doubleValue())/2;
-			}
-			
-			return values[idx];
-		}
-	}
 	
 	/**Returns the median value of a range.  The median is defined
 	 * as either the middle-most value (when there are an odd number of elements
@@ -155,6 +111,7 @@ public class Average extends BasicModule {
 	 * occurring entry in a range.  Mode is computed the same
 	 * for full range as sub-range.
 	 */
+	//TODO: Provide an associative-map (Object->Count) based Mode for full-range optimization
 	@Operator(defaultFacet="map")
 	public static class Mode extends AbstractOperator {
 		public Mode(OperatorData opData) {super(opData);}
@@ -185,27 +142,33 @@ public class Average extends BasicModule {
 			return value;
 		}
 	}
+	
+	
+	@Override
+	public StencilOperator optimize(StencilOperator op, Context context) {
+		if (op.getName().equals("Mean") 
+			&& context.callSites().size() == 1
+			&& context.callSites().get(0).is(StencilParser.OP_AS_ARG)) {
+			StencilTree site = context.callSites().get(0).getAncestor(StencilParser.FUNCTION);
+			MultiPartName name = Freezer.multiName(site.find(StencilParser.OP_NAME));
 
-	public StencilOperator instance(String name, Context context, Specializer specializer) 
-		throws SpecializationException,IllegalArgumentException {
-
-		validate(name, specializer);
-		
-		try {
-		if (name.equals("Mean")) {
-			if (context.highOrderUses("Range").size() ==0) {return super.instance(name, context, specializer);}
+			//--------------------------------------------------------------------------------------------------------
+			//HACK: This is a bad idea...but I don't have a better one right now!
+			boolean isRange = name.name().contains("Range"); 
+			//--------------------------------------------------------------------------------------------------------
 			
-			Specializer spec = Freezer.specializer(context.highOrderUses("Range").get(0).findDescendant(StencilParser.SPECIALIZER));
-			Range range = new Range(spec.get(Range.RANGE_KEY));
-
-			if (range.isFullRange()) {
-				StencilOperator op = new FullMean(ModuleDataParser.operatorData(FullMean.class, "Average"), specializer, range.getStart());
-				return op;
-			} 
-			return super.instance(name, context, specializer);}	
-
-		} catch(Exception e) {throw new Error("Error locating method to invoke in Average package.", e);}
-		throw new Error("Unannticiapted argumente combination");
+			if (!isRange) {return op;}	//Can only optimize ranges...
+			
+			Specializer spec = Freezer.specializer(site.find(StencilParser.SPECIALIZER));
+			if (!spec.containsKey(Range.RANGE_KEY)) {return op;}
+			
+			RangeDescriptor r = new RangeDescriptor(spec.get(Range.RANGE_KEY));
+			if (r.isFullRange()) {
+				OperatorData od=ModuleDataParser.operatorData(FullMean.class, this.getName());
+				od = od.name(op.getName());
+				return new FullMean(od);
+			}
+		}
+		return op;
 	}
-
 }

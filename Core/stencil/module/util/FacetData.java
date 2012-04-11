@@ -4,6 +4,11 @@ import stencil.module.MetadataHoleException;
 import stencil.tuple.prototype.TuplePrototype;
 
 public final class FacetData {
+	/**Lattice of memory use types.
+	 * If an operator changes memory use type during compilation 
+	 * (as specializer or argument values are made more detailed),
+	 * it may only move towards more restrictive memory uses.
+	 * **/
 	public static enum MemoryUse {FUNCTION, READER, WRITER, OPAQUE} 
 	
 	private final String name;
@@ -29,7 +34,7 @@ public final class FacetData {
 		//If this a writer and there is no counterpart, don't continue...
 		if (memory == MemoryUse.WRITER 
 			&& (counterpart == null || counterpart.trim().equals("") || counterpart.equals(name))) {
-			throw new MetadataHoleException("Must provide proper counterpart for WRITER facet: " + name);
+			throw new MetadataHoleException("Must provide proper counterpart for WRITER facet '" + name + "'");
 		}
 		
 		this.name = name;

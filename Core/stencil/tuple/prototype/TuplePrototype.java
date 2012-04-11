@@ -27,7 +27,7 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 		List<T> fields = new  ArrayList();
 		int count = names.size();
 		for (int i=0; i < count; i++) {
-			SimpleFieldDef d = new SimpleFieldDef(names.get(i), types.get(i), null);
+			SimpleFieldDef d = new SimpleFieldDef(names.get(i).trim(), types.get(i), null);
 			fields.add((T) d);	//HACK: Remove this cast by turning this into a static factory method
 		}
 		this.fields = Collections.unmodifiableList(fields);

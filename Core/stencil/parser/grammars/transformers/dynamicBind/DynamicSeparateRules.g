@@ -12,6 +12,7 @@ options {
   package stencil.parser.string;
 	
   import stencil.parser.tree.*;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.string.SeparateRules.siftRules;
 
 }

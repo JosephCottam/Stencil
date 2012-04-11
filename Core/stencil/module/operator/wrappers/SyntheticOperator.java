@@ -97,7 +97,7 @@ public class SyntheticOperator implements StencilOperator {
 		facets.add(new FacetData(COUNTERPART_FACET, MemoryUse.READER, findPrototype(COUNTERPART_FACET)));	
 		facets.add(new FacetData(STATE_ID_FACET, MemoryUse.READER, "VALUE"));
 
-		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null, "map", facets, new ArrayList());		
+		OperatorData opData = new OperatorData(module, opDef.getText(), EMPTY_SPECIALIZER, null, "map", facets);		
 		
 		this.operatorData = opData;
 	}

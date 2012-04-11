@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Color;
+import java.io.PrintStream;
 
 import java.util.Arrays;
 
@@ -17,6 +18,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListCellRenderer;
  
 import stencil.explore.util.MessageReporter;
+import stencil.explore.util.ReporterAsStream;
 
 /**Special panel that can be used display the messages of System.out or System.err in a
  *  window.
@@ -124,5 +126,9 @@ public class MessagePanel extends JPanel implements MessageReporter {
 	
 	protected synchronized void addMessage(String message, boolean error) {
 		javax.swing.SwingUtilities.invokeLater(new MessageUpdate(message, error));
+	}
+
+	public PrintStream errorAsStream() {
+		return new PrintStream(new ReporterAsStream(this));
 	}
 }

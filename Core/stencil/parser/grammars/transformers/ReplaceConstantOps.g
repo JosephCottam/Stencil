@@ -21,9 +21,12 @@ options {
   import stencil.interpreter.tree.Specializer;
   import stencil.interpreter.tree.MultiPartName;
   import stencil.parser.ProgramCompileException;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.StencilOperator;
+  import stencil.module.operator.util.Invokeable;
   
   import static stencil.tuple.Tuples.EMPTY_TUPLE;
-  import static stencil.parser.ParserConstants.INVOKEABLE;
+  import static stencil.parser.string.util.Utilities.findOperator;
 }
 
 @members {
@@ -33,7 +36,7 @@ options {
 	}
 
    public static StencilTree apply (StencilTree t, ModuleCache modules) {
-     return (StencilTree) TreeRewriteSequence.apply(t, modules);
+     return TreeRewriteSequence.apply(t, modules);
    }
   
    protected void setup(Object... args) {modules = (ModuleCache) args[0];}
@@ -42,7 +45,7 @@ options {
   
   //Fixed point for updating constants
   private boolean changed; 
-  public Object downup(Object p) {
+  public StencilTree downup(Object p) {
      
      changed = true;
      while(changed) {
@@ -64,23 +67,21 @@ options {
     private boolean isTrueFunction(StencilTree func) {
       MultiPartName name= Freezer.multiName(func.find(OP_NAME));
       Specializer spec = Freezer.specializer(func.find(SPECIALIZER));
-      
-      try{
-    		Module m = modules.findModuleForOperator(name);
-            OperatorData od = m.getOperatorData(name.name(), spec);
-    		FacetData fd=od.getFacet(name.facet());
-    		return fd.memUse() == FacetData.MemoryUse.FUNCTION;
-   		} catch (Exception e) {
-   			throw new ConstantOpError("Error getting module information for operator " + name, e);
-   	  }
-		}
+      OperatorData od = findOperator(func).getOperatorData();
+      FacetData fd=od.getFacet(name.facet());
+	  return fd.memUse() == FacetData.MemoryUse.FUNCTION;
+    }
 
     private Tuple evaluate(StencilTree f) {
         assert isConstant(f) : "Reached evaluate for non-const operator application.";
         try {
+          MultiPartName name= Freezer.multiName(f.find(OP_NAME));
           Object[] args = Freezer.valueList(f.find(LIST_ARGS));
-          return f.find(INVOKEABLE).invoke(args);}
-        catch (Exception e) {throw new ConstantOpError("Error evaluating constant operator during constant propagation; " + f.toStringTree(), e);}
+
+          StencilOperator op = findOperator(f);
+          Invokeable inv = op.getFacet(name.facet());
+          return inv.tupleInvoke(args);
+        } catch (Exception e) {throw new ConstantOpError("Error evaluating constant operator during constant propagation; " + f.toStringTree(), e);}
     }
   
   private static final Environment defaultEnvironment(StencilTree chain) {
@@ -129,13 +130,13 @@ options {
   }
   
   private int afterFrame; 
-  private Object reframe(Object tree) {
+  private StencilTree reframe(StencilTree tree) {
 
      Tree cursor = (Tree) tree;
      afterFrame = Environment.DEFAULT_FRAME_NAMES.length-1;   //-1 is required becuase the loop will always execute at least once.
      while (cursor.getType() != CALL_CHAIN) {afterFrame++; cursor = cursor.getParent();}
      
-     return downup(adaptor.dupTree(tree), this, "frameSub1");
+     return downup((StencilTree) adaptor.dupTree(tree), this, "frameSub1");
   }
   
   private String maybeSub1(Object number) {
@@ -152,7 +153,7 @@ replaceOps
 	  c.setValue(evaluate($f));
       changed=true;
   }
-  : ^(f=FUNCTION inv=. name=. spec=. args=. yield=. target=.)
+  : ^(f=FUNCTION name=. spec=. args=. yield=. target=.)
         {isConstant($f) && f.getAncestor(CALL_CHAIN) != null}? -> ^(CONST["CONST"] $yield $target);
 
 //Propogate constants through call chains        
@@ -160,8 +161,8 @@ propogateValues
   : ^(c=CALL_CHAIN chain[defaultEnvironment($c)] depth=.);        
 
 chain[Environment env]
-  : ^(f=FUNCTION inv=. name=. spec=. args=. yield=. target=chain[env.extend(EMPTY_TUPLE)])
-    -> ^(FUNCTION $inv $name $spec {updateArgs($args, env)} $yield $target)
+  : ^(f=FUNCTION name=. spec=. args=. yield=. target=chain[env.extend(EMPTY_TUPLE)])
+    -> ^(FUNCTION $name $spec {updateArgs($args, env)} $yield $target)
   | ^(c=CONST yield=. target=chain[env.extend((Tuple) ((Const) c).getValue())])
   | ^(p=PACK .*)
     -> {updatePack($p, env)};
@@ -169,7 +170,7 @@ chain[Environment env]
 //Remove all CONST entities with their targets
 removeConsts
   : ^(CALL_CHAIN ^(CONST . target=.)) -> ^(CALL_CHAIN {reframe($target)}) 
-  | ^(FUNCTION inv=. name=. spec=. args=. yield=. ^(CONST constYield=. target=.)) -> ^(FUNCTION $inv $name $spec $args $constYield {reframe($target)});
+  | ^(FUNCTION name=. spec=. args=. yield=. ^(CONST constYield=. target=.)) -> ^(FUNCTION $name $spec $args $constYield {reframe($target)});
   
   
 frameSub1: ^(TUPLE_REF frame=. rest+=.*) -> ^(TUPLE_REF NUMBER[maybeSub1($frame)] $rest*);

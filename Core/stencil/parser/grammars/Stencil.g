@@ -6,7 +6,6 @@ options {
 }
 
 tokens {
-  AST_INVOKEABLE; //Holder for invokeables
   ANNOTATION;
   BASIC;         //Marker for specialization (BASIC vs. ORDER)
   CONSUMES;
@@ -16,6 +15,7 @@ tokens {
   DIRECT_YIELD;
   DYNAMIC_RULE;
   DYNAMIC_REDUCER;
+  EMPTY;				//Marker for later deletion
   FUNCTION;
   GUIDE_GENERATOR;
   GUIDE_DIRECT;
@@ -72,7 +72,6 @@ tokens {
   PROTOTYPE_ARG;
   PROTOTYPE_RESULT;
 
-  SAMPLE_OPERATOR;//Guide system sample-operator node
   SAMPLE_TYPE;    //Guide system sample-operator indicator  
   STATE_QUERY;    //List of entities ot check if state has changed
   SPECIALIZER;
@@ -89,7 +88,7 @@ tokens {
   
   
   //General Keywords
-  ALL = 'ALL';        //Pattern that matches anything; range proxy for 1..n
+  ALL = 'ALL';        	//Pattern that matches anything; range proxy for 1..n.....TODO: REmove and replace with '*'
   CANVAS  = 'canvas';
   CONST = 'const';
   DEFAULT = 'default';
@@ -211,8 +210,8 @@ order
   | -> ^(ORDER);
 
 orderRef
-  : ID -> ^(LIST_STREAMS["Streams"] ID)
-  | GROUP ID ('|' ID)+ CLOSE_GROUP ->  ^(LIST_STREAMS ID+);
+  : i=ID -> ^(LIST_STREAMS[$i,""] $i)
+  | GROUP ID ('|' ID)* CLOSE_GROUP ->  ^(LIST_STREAMS ID+);
 
 globalValue
 //  options{backtrack=true;}
@@ -221,12 +220,17 @@ globalValue
 //TODO: Allow calculations using only constant values (maybe process the constants before doing the rest of the program)
 
 
-externalStream: 
-  STREAM name=ID tuple[false] FROM type=ID specializer 
-  	-> ^(STREAM[$name.text] 
-  	      tuple
-  	      $type
-  	      specializer);
+externalStream
+ : s=STREAM name=ID tuple[false] DEFINE type=ID specializer 
+  	 -> ^(STREAM[$s, $name.text] 
+  	       tuple
+  	       $type
+  	       specializer)
+ | s=STREAM name=ID tuple[false]  
+  	 -> ^(STREAM[$s, $name.text] 
+  	       tuple
+  	       ID["DEFERRED"]
+  	       SPECIALIZER);
 
 //////////////////////////////////////////// CANVAS & VIEW LAYER ///////////////////////////
 canvasLayer
@@ -245,8 +249,8 @@ streamDef
     -> ^(STREAM_DEF[$name.text] tuple ^(LIST_CONSUMES["Consumes"] consumesBlock+));
 
 layerDef
-  : LAYER name=ID specializer guidesBlock defaultsBlock consumesBlock[false]+
-    -> ^(LAYER[$name.text] specializer guidesBlock defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock+));
+  : LAYER name=ID specializer guidesBlock defaultsBlock consumesBlock[false]*
+    -> ^(LAYER[$name.text] specializer guidesBlock defaultsBlock ^(LIST_CONSUMES["Consumes"] consumesBlock*));
 
 elementDef
   : ELEMENT name=ID specializer defaultsBlock consumesBlock[false]+
@@ -257,10 +261,10 @@ defaultsBlock
   | -> RULES_DEFAULTS;
   
 consumesBlock[boolean allowRender]
-  : FROM stream=ID filter* rule[RESULT]+
-     ->  ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+))
-  | {allowRender}? FROM stream=RENDER filter*  rule[RESULT]+
-    -> ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule+));
+  : FROM stream=ID filter* rule[RESULT]*
+     ->  ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule*))
+  | {allowRender}? FROM stream=RENDER filter*  rule[RESULT]*
+    -> ^(CONSUMES[$stream.text] ^(LIST_FILTERS filter*) ^(LIST_RULES rule*));
 
 filter: FILTER! predicate;
 
@@ -285,20 +289,24 @@ selector
 operatorTemplate : TEMPLATE od=operatorDef -> ^(OPERATOR_TEMPLATE[((Tree) $od.tree).getText()] operatorDef);
   
 operatorDef
-  : OPERATOR name=ID tuple[false] YIELDS tuple[false] pf=rule[PREFILTER]* operatorRule+
-    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER $pf*) ^(RULES_OPERATOR operatorRule+))
+  : OPERATOR name=ID tuple[true] YIELDS tuple[false] pf=rule[PREFILTER]* operatorRule*
+    ->  ^(OPERATOR[$name.text] ^(YIELDS tuple tuple) ^(RULES_PREFILTER $pf*) ^(RULES_OPERATOR operatorRule*))
+  | OPERATOR name=ID tuple[true] YIELDS tuple[false] DEFINE opName specializer valueList
+    -> ^(OPERATOR_REFERENCE[$name.text] ^(YIELDS tuple tuple) opName specializer ^(LIST_ARGS valueList))
+  | OPERATOR name=ID tuple[true] YIELDS tuple[false] DEFINE opName specializer emptySet
+    -> ^(OPERATOR_REFERENCE[$name.text] ^(YIELDS tuple tuple) opName specializer ^(LIST_ARGS))
   | OPERATOR name=ID DEFINE opName specializer
-    -> ^(OPERATOR_REFERENCE[$name.text] opName specializer)
-  | OPERATOR name=ID DEFINE opName specializer GROUP opRef CLOSE_GROUP
-    -> ^(OPERATOR_REFERENCE[$name.text] opName specializer ^(LIST_ARGS opRef));
+    -> ^(OPERATOR_REFERENCE[$name.text] opName specializer);
+
+
 
 opName
   : pre=ID NAMESPACE post=ID -> ^(OPERATOR_BASE ID ID) 
   | post=ID -> ^(OPERATOR_BASE DEFAULT ID);
 
 operatorRule
-  : predicate GATE rule[RESULT]+
-    -> ^(OPERATOR_RULE predicate ^(LIST_RULES["Rules"] rule+));
+  : predicate GATE rule[RESULT]*
+    -> ^(OPERATOR_RULE predicate ^(LIST_RULES["Rules"] rule*));
 
 /////////////////////////////////////////  CALLS  ////////////////////////////////////
 rule[int defaultTarget]  : target[defaultTarget] (DEFINE | DYNAMIC | ANIMATED | ANIMATED_DYNAMIC) callChain
@@ -356,8 +364,9 @@ longName : ID (DOT ID)* -> ^(TUPLE_FIELD ID*);
 
 //////////////////////////////////////////// GENERAL OBJECTS ///////////////////////////
 predicate
-  : DEFAULT
+  : (DEFAULT | GROUP DEFAULT CLOSE_GROUP)
     -> ^(LIST_PREDICATES ^(PREDICATE ALL))  //TODO: Change this (and down-stream references) to be DEFAULT as well
+  
   | GROUP value booleanOp value (SEPARATOR value booleanOp value)* CLOSE_GROUP
     -> ^(LIST_PREDICATES ^(PREDICATE value booleanOp value)+);
 
@@ -397,13 +406,12 @@ valueList:  GROUP! value (SEPARATOR! value)* CLOSE_GROUP!;
 		
 value : tupleRef | atom | opRef;
 atom  : number | STRING | DEFAULT | ALL | TRUE | FALSE  | NULL;
-opRef : o=TAGGED_ID specializer -> ^(OP_AS_ARG ^(OP_NAME DEFAULT ID[$o.text.substring(1)] DEFAULT)   specializer)
-      | ns=TAGGED_ID NAMESPACE o=ID specializer -> ^(OP_AS_ARG ^(OP_NAME ID[$ns.text.substring(1)] $o DEFAULT)  specializer);      
+opRef : o=TAGGED_ID specializer -> ^(OP_AS_ARG ^(OP_NAME DEFAULT ID[$o.text.substring(1)] DEFAULT_FACET)   specializer)
+      | ns=TAGGED_ID NAMESPACE o=ID specializer -> ^(OP_AS_ARG ^(OP_NAME ID[$ns.text.substring(1)] $o DEFAULT_FACET)  specializer);      
             //Operator as an argument is prefixed by the tag, strips off tag 
                       //TODO: Restrict where opRef can be used
                       //TODO: Extend to chains, not just single names
                       //TODO: Ensure no facet in op name
-                      //TODO: Does this really belong in the specializer (it gets moved there eventually anyway...)
                       
   
 tupleRef

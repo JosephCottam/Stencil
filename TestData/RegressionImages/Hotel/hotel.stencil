@@ -1,6 +1,6 @@
 import Dates
 
-stream HotelStays(count, type, month) from Text["./BertinHotel.csv"]
+stream HotelStays(count, type, month) : Text["./BertinHotel.csv"]
 
 layer Chart
 guide
@@ -18,13 +18,13 @@ from HotelStays
    ID: AutoID(2) -> *
    X: MonthNum(month) -> Mult(MonthNum,5) -> Add(_,60) -> MultiResult(Mult, Add) -> *
    Y: Permute(type) -> Mult(12,_) 
-   HEIGHT: Split[1](@Scale[min: 1, max:10], type, count)		/*@\label{hotel:height}@*/
-   FILL_COLOR:* Split[1](@Avg, type, count) -> FillBy(_, count)		/*@\label{hotel:color}@*/
+   HEIGHT: Split[1](@Scale[min: 1, max:10], "map", type, count)		/*@\label{hotel:height}@*/
+   FILL_COLOR:* Split[1](@Avg, "map", type, count) -> FillBy(_, count)		/*@\label{hotel:color}@*/
    PEN_COLOR: Color{BLACK}
    PEN: Stroke{.5}
    (SHAPE, REGISTRATION): ("RECTANGLE", "BOTTOM")
 
-operator Avg :Range[ALL](@Mean)
+operator Avg : FullMean
 
 operator MonthNum (mmmm) -> (m)
    default => m:Parse.reformat(mmmm, "MMM", "M")

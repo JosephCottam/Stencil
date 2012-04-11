@@ -12,7 +12,8 @@ options {
 
   package stencil.parser.string;
   
-  import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.ProgramCompileException;
+  import stencil.parser.string.util.TreeFilterSequence;
   import stencil.parser.string.util.Context;
   import stencil.interpreter.tree.MultiPartName;
   import stencil.interpreter.tree.Freezer;
@@ -22,6 +23,9 @@ options {
 @members{
   private static Context inProgress;
   
+  /**@param t Tree to search in 
+   * @param target Operator name to search for
+   **/
   public static Context apply (Tree t, String target) {
      inProgress = new Context(target);
      TreeFilterSequence.apply(t);
@@ -29,32 +33,29 @@ options {
   }
   
   public void downup(Object p) {
-    downup(p, this, "argCount");
-    downup(p, this, "highOrderArg");
+    downup(p, this, "args");
   }
   
 
   
 }
 
-//TODO: Remove if statement when numeralize is done in return values as well
-argCount
+args
  : ^(f=FUNCTION r=OP_NAME . . . .)
     { MultiPartName n = Freezer.multiName(r);
       if (n.name().equals(inProgress.target())) {
-        inProgress.update(f.find(LIST_ARGS).getChildCount());
-        }
+        StencilTree args = f.find(LIST_ARGS);
+        inProgress = inProgress.maxArgCount(args.getChildCount());
+        inProgress = inProgress.args(args);
+        inProgress = inProgress.addCallSite(f);
+      }
+    }
+ | ^(a=OP_AS_ARG ref=.)
+    {MultiPartName n = Freezer.multiName(ref);
+      if (n.name().equals(inProgress.target())) {
+          inProgress = inProgress.addCallSite(a);
+      }
     };
     
 
-highOrderArg
-  : opArg=OP_AS_ARG
-    {MultiPartName n = Freezer.multiName(opArg.find(OP_NAME));
-      if (n.name().equals(inProgress.target())) {
-           StencilTree base = opArg.getAncestor(OPERATOR_REFERENCE);
-           String type = Freezer.multiName(base.find(OPERATOR_BASE)).toString();
-           inProgress.addHighOrderUse(type, base);
-      }
-    }; 
-  
   

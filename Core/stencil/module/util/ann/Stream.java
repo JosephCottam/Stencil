@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 
 /**Indicate that a class should be treated as a stream source.
- * Must also provide a two-argument constructor that takes a Specializer.
+ * Must also provide a constructor that takes a name, a prototype and a specializer.
  *
  */
 @Retention(RetentionPolicy.RUNTIME)

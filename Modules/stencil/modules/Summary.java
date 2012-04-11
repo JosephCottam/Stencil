@@ -3,16 +3,10 @@ package stencil.modules;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.modules.stencilUtil.Range;
-import stencil.modules.stencilUtil.StencilUtil;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
-import static stencil.module.util.ModuleDataParser.operatorData;
-import stencil.parser.string.StencilParser;
-import stencil.parser.string.util.Context;
 
 @Description("Summarization of groups of things (currently just max and min).")
 @Module()
@@ -53,7 +47,7 @@ public class Summary extends BasicModule {
  		} 		
 	}
 	
-	@Operator(name="Min", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_FLATTEN_TAG)
+	@Operator(name="Min", spec="[c: \"Comparable\"]")
 	public static class Min extends Extreme {
 		private Min(OperatorData opData, Class target) {super(opData, target, false);}
 		public Min(OperatorData opData, Specializer spec) {
@@ -65,7 +59,7 @@ public class Summary extends BasicModule {
  		public Min duplicate() {return new Min(operatorData, targetClass);}
 	}
 	
-	@Operator(name="Max", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_FLATTEN_TAG)
+	@Operator(name="Max", spec="[c: \"Comparable\"]")
 	public static class Max extends Extreme {
 		private Max(OperatorData opData, Class target) {super(opData, target, false);}
 		public Max(OperatorData opData, Specializer spec) {
@@ -102,7 +96,7 @@ public class Summary extends BasicModule {
  		}
 	}
 	
-	@Operator(name="FullMin", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG, defaultFacet="map")
+	@Operator(name="FullMin", spec="[c: \"Comparable\"]", defaultFacet="map")
 	public static class FullMin extends FullExtreme {
 		private FullMin(OperatorData opData, Class target) {super(opData, target, false);}
 		public FullMin(OperatorData opData, Specializer spec) {
@@ -118,7 +112,7 @@ public class Summary extends BasicModule {
  		public FullMin duplicate() {return new FullMin(operatorData, targetClass);}
 	}
 
-	@Operator(name="FullMax", spec="[c: \"Comparable\"]", tags=StencilUtil.RANGE_OPTIMIZED_TAG, defaultFacet="map")
+	@Operator(name="FullMax", spec="[c: \"Comparable\"]", defaultFacet="map")
 	public static class FullMax extends FullExtreme {
 		private FullMax(OperatorData opData, Class target) {super(opData, target, false);}
 		public FullMax(OperatorData opData, Specializer spec) {
@@ -131,28 +125,5 @@ public class Summary extends BasicModule {
  		@Facet(memUse="READER", prototype="(Comparable v)")
  		public Comparable query(Object... values) {return super.query(values);}
  		public FullMax duplicate() {return new FullMax(operatorData, targetClass);}
-	}
-
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperator(name);
-
-		validate(name, specializer);
-		
-		try {
-			if (context == null || context.highOrderUses("Range").size() ==0) {
-				return Modules.instance(this.getClass(), operatorData, specializer);
-			}
-
-			Specializer spec = Freezer.specializer(context.highOrderUses("Range").get(0).find(StencilParser.SPECIALIZER));
-			Range range = new Range(spec.get(Range.RANGE_KEY));
-			
-			if (range.isFullRange()) {
-				if (name.equals("Max")) {return new FullMax(operatorData(FullMax.class, getName()), specializer);}
-				if (name.equals("Min")) {return new FullMin(operatorData(FullMin.class, getName()), specializer);}
-			} 
-
-
-		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Summary package.", name), e);}
-		throw new Error("Unnanticipated argument set encountered");
 	}
 }

@@ -1,17 +1,17 @@
 import JavaC
 
-stream Edges (ID1, ID2) from Text["./er_100_0.005.adj"]
+stream EdgeData (ID1, ID2) : Text["./er_100_0.005.adj"]
 
 
 /*Layout values in a circle.  Circle radius grows as value count increases.*/
 
 layer Nodes
-from Edges
+from EdgeData
 	ID: ID1 
 	FILL_COLOR: Color{MAROON}
 	(X,Y):* Ordering(ID1) -> Circular.query(Ordering.index) -> (Circular.X, Circular.Y)
 	(REGISTRATION, SHAPE, SIZE) : ("CENTER", "ELLIPSE", 2)
-from Edges
+from EdgeData
 	ID: ID2
 	FILL_COLOR: Color{MAROON}
 	(X,Y):* Ordering(ID2) -> Circular.query(Ordering.index) -> (Circular.X,Circular.Y)
@@ -20,7 +20,7 @@ from Edges
 layer Edges["LINE"]
 default
 	PEN_COLOR: Color{GRAY80, .8}
-from Edges 
+from EdgeData 
 	ID: Concatenate(ID1,ID2)
 	(X1, Y1):* Nodes.find(ID1) -> (Nodes.X,Nodes.Y)
 	(X2, Y2):* Nodes.find(ID2) ->  (Nodes.X,Nodes.Y)

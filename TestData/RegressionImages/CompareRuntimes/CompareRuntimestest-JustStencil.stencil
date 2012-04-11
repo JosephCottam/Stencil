@@ -1,6 +1,6 @@
 import BrewerPalettes 
 
-stream times(elapse, size, refs, perm, type, i) from Text["./1iters_1Mc.csv"]
+stream times(elapse, size, refs, perm, type, i) : Text["./1iters_1Mc.csv"]
 
 
 layer Runtimes["POLY_POINT"]
@@ -15,9 +15,5 @@ from times
   GROUP: local.name
   ORDER: ToNumber(size)
   X:* Mult(size,2) -> Scale[0,100](_)
-  Y:* Split[2](@Avg, local.name, size, elapse) -#> Scale[min:0, max:100](_)
+  Y:* Split[2](@FullMean, local.name, size, elapse) -#> Scale[min:0, max:100](_)
   PEN_COLOR:* BrewerColors[palette:"set3"](local.name)
-
-
-operator FullMax: Range[ALL](@Max)
-operator Avg: Range[ALL](@Mean)

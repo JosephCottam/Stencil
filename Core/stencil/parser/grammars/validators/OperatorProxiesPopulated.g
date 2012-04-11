@@ -1,4 +1,4 @@
-tree grammar AllInvokeables;
+tree grammar OperatorProxiesPopulated;
 options {
   tokenVocab = Stencil;
   ASTLabelType = StencilTree;  
@@ -7,12 +7,12 @@ options {
 }
 
 @header {
-/* Verifies that all AST_INVOKEABLE nodes have an invokeable set.*/ 
+/* Verifies that all OPERATOR_PROXY nodes have an operator set.*/ 
   package stencil.parser.string.validators;
   
   import stencil.parser.tree.*;
-  import stencil.parser.string.ValidationException;
-  import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.string.util.ValidationException;
+  import stencil.parser.string.util.TreeFilterSequence;
 }
 
 @members {
@@ -25,5 +25,5 @@ options {
   public static void apply (Tree t) {TreeFilterSequence.apply(t);}
 }
 
-topdown: i = AST_INVOKEABLE 
-      {if (((AstInvokeable) i).getInvokeable() == null) {throw new OperatorMissingException("AST Invokeable.");}};  
+topdown: i = OPERATOR_PROXY 
+      {if (((OperatorProxy) i).getOperator() == null) {throw new OperatorMissingException($i.getText());}};  

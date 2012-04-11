@@ -1,7 +1,7 @@
 import Dates
 import Geometry
 
-stream Deaths(date, type, count) from Text["./NightingaleCrimeaSplit.csv"]
+stream Deaths(date, type, count) : Text["./NightingaleCrimeaSplit.csv"]
 
 layer Rose["SLICE"]
 guide
@@ -30,7 +30,8 @@ operator ColorBy (t) -> (C)
    (t=~"other") => C:Color{DarkGray}
    (t=~"disease") => C:Color{LightBlue}
 
-operator MonthMin : Split[1](@FullMin["Integer"])
+operator MonthMin (month, count) -> (min)
+ default => min: Split[1](@FullMin["Integer"], "map", month, count)
 
 operator ParseLabel(id) -> (text)
    (id =~ ".*dise.*") => text: IndexOf(id,":") -> Add1(_) 

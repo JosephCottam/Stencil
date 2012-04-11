@@ -1,5 +1,5 @@
-stream Reg(Name) from Text["./RegistrationData.txt", skip:0]
-stream Reg2(Name) from Text["./RegistrationData.txt", skip:0]
+stream Reg(Name) : Text["./RegistrationData.txt", skip:0]
+stream Reg2(Name) : Text["./RegistrationData.txt", skip:0]
 
 order Reg > Reg2
 

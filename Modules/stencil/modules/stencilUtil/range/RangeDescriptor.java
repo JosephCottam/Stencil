@@ -1,7 +1,7 @@
-package stencil.modules.stencilUtil;
+package stencil.modules.stencilUtil.range;
 
 import static stencil.parser.ParserConstants.*;
-import stencil.parser.string.ValidationException;
+import stencil.parser.string.util.ValidationException;
 
 /**Class to capture the range sub-concept of specialization.
  * Gramar is:
@@ -10,9 +10,7 @@ import stencil.parser.string.ValidationException;
  *    White space arround the '..' is ingored.
  * 
  * */
-public class Range {
-	public static final String RANGE_KEY = "range";
-	
+public class RangeDescriptor {
 	private static final class RangeValidationException extends ValidationException {
 		public RangeValidationException(String source) {
 			super("Invalid range:" + source);
@@ -22,11 +20,11 @@ public class Range {
 	final int start;
 	final int end;
 	
-	public Range(Object source) {
+	public RangeDescriptor(Object source) {
 		this(source.toString());
 	}
 	
-	public Range(String source) {
+	public RangeDescriptor(String source) {
 		if (source.equals(ALL)) {
 			start = RANGE_START_INT;
 			end = RANGE_END_INT;
@@ -82,8 +80,8 @@ public class Range {
 	
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
-		if (!(other instanceof Range)) {return false;}
-		Range alter = (Range) other;
+		if (!(other instanceof RangeDescriptor)) {return false;}
+		RangeDescriptor alter = (RangeDescriptor) other;
 		return this.getStartValue() == alter.getStartValue() 
 			&& this.getEndValue() == alter.getEndValue(); 
 	}

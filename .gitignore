@@ -11,3 +11,4 @@ TestData/ExploreSession.properties
 testResults/*
 lastBuild.txt
 *.zip
+REVLSave.stencil

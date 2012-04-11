@@ -13,6 +13,7 @@ options {
   package stencil.parser.string;
   
   import stencil.parser.tree.StencilTree; 
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members {

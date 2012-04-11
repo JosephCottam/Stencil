@@ -1,4 +1,4 @@
-tree grammar PrepareCustomArgs;
+tree grammar OperatorCustomArgs;
 options {
   tokenVocab = Stencil;
   ASTLabelType = StencilTree;  
@@ -19,10 +19,11 @@ options {
 
 	import java.util.regex.Pattern;
 	import stencil.parser.tree.StencilTree;
+	import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
 	public static final String PRINTF_OP = "Format";
 	public static final String VALIDATE_PATTERN = "([^\\{\\}]*(\\{.+\\})?)*";
@@ -48,13 +49,14 @@ options {
  	     if (!part.equals("")) {
 	 	     Tree leaf;
 	 	     if (inRef) {
+
           //TODO: Figure out how to re-use the lexer...
           StencilLexer lexer = new StencilLexer(new ANTLRStringStream(part));
 	 	     	CommonTokenStream tokens = new CommonTokenStream(lexer);
 	 	     	StencilParser parser = new StencilParser(tokens);
 	 	     	parser.setTreeAdaptor(adaptor);
 	 	     	try {leaf = (Tree) parser.tupleRef().getTree();}
-	 	     	catch (Exception e) {throw new RuntimeException("Error parsing tuple ref in sigil: " + part);}
+	 	     	catch (Exception e) {throw new RuntimeException("Error parsing tuple reference in island grammar: " + part);}
 	 	     	leaf = (Tree) adaptor.dupTree(leaf);
 	 	     } else {
 	 	        leaf = (Tree) adaptor.create(STRING, part); 	     

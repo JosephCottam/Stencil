@@ -4,8 +4,6 @@ package stencil.modules.stencilUtil;
 import java.util.*;
 
 import stencil.module.MetadataHoleException;
-import stencil.module.OperatorInstanceException;
-import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.DirectOperator;
@@ -13,17 +11,18 @@ import stencil.module.operator.util.MethodInvokeFailedException;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.OperatorData;
-import stencil.module.util.ModuleDataParser.MetaDataParseException;
+import stencil.module.util.ModuleDataParser.MetadataParseException;
 import stencil.module.util.ann.*;
-import stencil.parser.string.util.Context;
+import stencil.modules.stencilUtil.range.Range;
+import stencil.modules.stencilUtil.split.Split;
 import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.SampleSeed;
-import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 import stencil.tuple.Tuple;
 import stencil.tuple.Tuples;
 import stencil.tuple.instances.ArrayTuple;
 import stencil.types.Converter;
+import stencil.util.streams.DeferredStream;
 import stencil.util.streams.binary.BinaryTupleStream;
 import stencil.util.streams.binary.SocketTupleStream;
 import stencil.util.streams.numbers.RandomStream;
@@ -35,40 +34,14 @@ import stencil.util.streams.ui.MouseStream;
 
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.util.ModuleDataParser.moduleData;
-import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
-import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 
 
 @Module
 @Description("Operators used in various stencil transformations.")
 @StreamTypes(classes = {BinaryTupleStream.Reader.class, SocketTupleStream.class, 
 						SequenceStream.class, RandomStream.class, QueryTuples.class, 
-						TwitterTuples.class, DelimitedParser.class, MouseStream.class})
+						TwitterTuples.class, DelimitedParser.class, MouseStream.class,DeferredStream.class})
 public final class StencilUtil extends BasicModule {
-	/**Some modules provide optimizations for some range sets.  
-	 * If an operator instance is range optimized, it must include this tag in its operator data to indicate
-	 * that no further ranging is required.  
-	 * If this tag is included, the range wrapper factory will return the passed operator without further wrapping.
-	 */
-	public static final String RANGE_OPTIMIZED_TAG = "#__RANGE_OPTIMIZED";
-	
-	/**Some operators can be efficiently implemented for ranging if the list of lists of formals
-	 * of arguments are first converted is combined into a single list of formals.  The conversion
-	 * is called "flattening" and this tag indicates that it should be done.  This is the only way
-	 * that a non-mutative facet can be used in range.
-	 */
-	public static final String RANGE_FLATTEN_TAG = "#__RANGE_FLATTEN";
-
-	
-	/**Indicates that range is explicitly disallowed.*/
-	public static final String RANGE_DISALLOW_TAG = "#__NO_RANGE_ALLOWED";
-
-	/**Indicates that range is explicitly disallowed.*/
-	public static final String MAP_DISALLOW_TAG = "#__NO_MAP_ALLOWED";
-
-	/**Indicates that split is explicitly disallowed.*/
-	public static final String DISALLOW_TAG = "#__NO_SPLIT_ALLOWED";
-	
 	@Operator()
 	@Facet(memUse="FUNCTION", prototype="()", alias={"map","query"})
 	@Description("Use the Converter to change the value(s) passed into a tuple.")
@@ -94,7 +67,7 @@ public final class StencilUtil extends BasicModule {
 	public static final Tuple valuesTuple(Object... values) {return new ArrayTuple(values);} 
 
 	@Override
-	protected ModuleData loadOperatorData() throws MetaDataParseException {
+	protected ModuleData loadOperatorData() throws MetadataParseException {
 		final String MODULE_NAME = this.getClass().getSimpleName();
 		
 		ModuleData md = moduleData(this.getClass());	//Loads the meta-data for operators defined in this class
@@ -106,9 +79,9 @@ public final class StencilUtil extends BasicModule {
 		md.addOperator(operatorData(MonitorSegments.class, MODULE_NAME));
 		md.addOperator(operatorData(MonitorDate.class, MODULE_NAME));
 		
-		md.addOperator(operatorData(MapWrapper.class, MODULE_NAME));
-		md.addOperator(operatorData(RangeHelper.class, MODULE_NAME));
-		md.addOperator(operatorData(SplitHelper.class, MODULE_NAME));
+		md.addOperator(operatorData(Map.class, MODULE_NAME));
+		md.addOperator(operatorData(Range.class, MODULE_NAME));
+		md.addOperator(operatorData(Split.class, MODULE_NAME));
 		md.addOperator(operatorData(SpecialTuples.Canvas.class, MODULE_NAME));
 		md.addOperator(operatorData(SpecialTuples.View.class, MODULE_NAME));
 		
@@ -128,11 +101,12 @@ public final class StencilUtil extends BasicModule {
 		throw new MetadataHoleException(od, specializer);
 	}
 	
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
+	@Override
+	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getOperatorData(name, specializer);
 
 		if (name.equals("ToTuple") || name.equals("ValuesTuple")) {
-			return super.instance(name, context, specializer);
+			return super.instance(name, specializer);
 		} else if (name.equals("Nop")) {
 			return new Nop(operatorData);
 		} else if (name.equals("MonitorCategorical")) {
@@ -145,42 +119,18 @@ public final class StencilUtil extends BasicModule {
 			return new MonitorSegments(operatorData, specializer);			
 		} else if (name.equals("MonitorDate")) {
 			return new MonitorDate(operatorData);			
-		} else if (name.equals("view")) {
+		} else if (name.equals(SpecialTuples.VIEW_TUPLE_OP)) {
 			return new SpecialTuples.View(operatorData);
-		} else if (name.equals("canvas")) {
+		} else if (name.equals(SpecialTuples.CANVAS_TUPLE_OP)) {
 			return new SpecialTuples.Canvas(operatorData);
-		}
-		
-		throw new Error("Could not instantiate regular operator " + name);
-	}
-
-	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
-		List<StencilOperator> opArgs = new ArrayList();
-
-		
-		//TODO: This is a horrible way to resolve things, have the operator as value in a CONST in the specializer instead of the name
-		for (String key: specializer.keySet()) {
-			if (key.startsWith(OP_ARG_PREFIX)) {
-				StencilOperator op;
-				try {
-					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);
-					opArgs.add(op);
-				} catch (OperatorInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
-			}
-		}
-		
-		assert opArgs.size() >0;
-		if (opArgs.size() >1) {throw new IllegalArgumentException(name + " can only accept one higher order arg, recieved " + opArgs.size());}
-		
-		
-		if (name.equals("Map")) {
-			return new MapWrapper(opArgs.get(0));
+		} else if (name.equals("Map")) {
+			return new Map(operatorData);
 		} else if (name.equals("Range")) {
-			return RangeHelper.makeOperator(specializer, opArgs.get(0));	
+			return new Range(operatorData, specializer);	
 		} else if (name.equals("Split")) {
-			return SplitHelper.makeOperator(specializer, opArgs.get(0));			
+			return new Split(operatorData, specializer);			
 		} 
 		
-		throw new Error("Could not instantiate higher-order operator " + name);
+		throw new Error("Could not instantiate  operator " + name);
 	}
 }

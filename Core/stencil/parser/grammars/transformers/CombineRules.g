@@ -16,10 +16,11 @@ options {
 	
    import stencil.parser.tree.*;
    import stencil.parser.string.util.*;
+   import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members {  
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
  
   //Merge the targets----------------------------------------------
   public Object mergeTargets(StencilTree rulesRoot) {
@@ -42,16 +43,16 @@ options {
   
 
   //Merge the chains and  packs
-  public StencilTree mergeChains(Object rules) {
+  public StencilTree mergeChains(StencilTree rules) {
     StencilTree newPack = (StencilTree) adaptor.create(PACK, "");
 
     StencilTree newChain = (StencilTree) adaptor.create(CALL_CHAIN, "");
     adaptor.addChild(newChain, adaptor.create(PACK, ""));
     StencilTree head = newChain;    
 
-    for (int i=0; i<((Tree) rules).getChildCount(); i++) {
-       StencilTree rule = (StencilTree) ((Tree) rules).getChild(i);
-       StencilTree chain = (StencilTree) RenameFrames.apply((Tree) adaptor.dupTree(rule.find(CALL_CHAIN)));
+    for (int i=0; i< rules.getChildCount(); i++) {
+       StencilTree rule = (StencilTree) rules.getChild(i);
+       StencilTree chain =  RenameFrames.apply((StencilTree) adaptor.dupTree(rule.find(CALL_CHAIN)));
        
        //Splice in call chain
        Object splice = chain.find(FUNCTION);

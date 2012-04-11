@@ -8,7 +8,6 @@ import java.util.Date;
 
 import stencil.interpreter.tree.Specializer;
 import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
@@ -16,7 +15,6 @@ import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Facet;
 import stencil.module.util.ann.Module;
 import stencil.module.util.ann.Operator;
-import stencil.parser.string.util.Context;
 import stencil.types.Converter;
 
 @Description("Date support, based on the date tuple")
@@ -142,7 +140,5 @@ public class DateUtils extends BasicModule {
 		cal.setTime(t);
 		return cal.get(field);
 	}
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
-		return super.instance(name, context, specializer);
-	}
+
 }

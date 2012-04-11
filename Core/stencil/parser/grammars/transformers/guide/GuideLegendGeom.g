@@ -17,6 +17,8 @@ options {
   
   import stencil.parser.tree.*;
   import stencil.interpreter.tree.Freezer;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  
   import static stencil.adapters.java2D.render.guides.Legend.GEOM_TAG;
   import static stencil.display.DisplayLayer.TYPE_KEY;
 }

@@ -1,5 +1,5 @@
-stream VertexList(ID1, ID2) from Text["./ws_400_12_0.1.adj"]
-stream BFS(ID) from Text["./ws_400_12_0.1.bfs"]
+stream VertexList(ID1, ID2) : Text["./ws_400_12_0.1.adj"]
+stream BFS(ID) : Text["./ws_400_12_0.1.bfs"]
 
 order BFS > VertexList
 

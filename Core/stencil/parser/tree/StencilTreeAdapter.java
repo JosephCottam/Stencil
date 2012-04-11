@@ -10,10 +10,18 @@ import stencil.parser.string.StencilParser;
 public class StencilTreeAdapter extends CommonTreeAdaptor {
 
 	@Override
-	public Object create(Token token) {
-		Object t;
+	public StencilTree create(int type, Token token) {
+		return (StencilTree) super.create(type, token);
+	}
+
+	@Override
+	public StencilTree create(int type, Token token, String text) {return (StencilTree) super.create(type, token, text);}
+
+	
+	@Override
+	public StencilTree create(Token token) {
+		StencilTree t;
 		if (token == null) {t = new StencilTree(null);}
-		else if (token.getType() == StencilParser.AST_INVOKEABLE) {t = new AstInvokeable(token);}
 		else if (token.getType() == StencilParser.CONST) {t = new Const(token);}
 		else if (token.getType() == StencilParser.OPERATOR_PROXY) {t = new OperatorProxy(token);}
 		else {t = new StencilTree(token);}
@@ -25,6 +33,4 @@ public class StencilTreeAdapter extends CommonTreeAdaptor {
 			RecognitionException e) {
 		return new ErrorNode(start, stop, e);
 	}
-	
-	
 }

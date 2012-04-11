@@ -1,4 +1,4 @@
-stream Elements(Name) from Text["./RotationData.txt"]
+stream Elements(Name) : Text["./RotationData.txt"]
 
 layer Text["TEXT"]
 from Elements

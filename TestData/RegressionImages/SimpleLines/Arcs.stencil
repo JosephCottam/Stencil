@@ -1,4 +1,4 @@
-stream LineSource(count) from Sequence[0,1,3]
+stream LineSource(count) : Sequence[0,1,3]
 
 layer Vertical["ARC"]
 from LineSource

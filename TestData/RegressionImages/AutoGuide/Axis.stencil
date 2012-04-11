@@ -1,4 +1,4 @@
-stream Values(Category) from Text["./Fruits.txt"]
+stream Values(Category) : Text["./Fruits.txt"]
 
 layer Chart
 guide

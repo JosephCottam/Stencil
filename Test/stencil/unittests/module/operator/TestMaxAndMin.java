@@ -20,28 +20,28 @@ public class TestMaxAndMin extends StencilTestCase {
 	}
 	
 	public void testFullMax() {
-		StencilOperator op = SUMMARY.instance("FullMax", null, SPEC);
+		StencilOperator op = SUMMARY.instance("FullMax", SPEC);
 		Invokeable inv = op.getFacet("map");
 		runTest(inv, ORDERED_INTS, 10);
 		runTest(inv, MIXED_INTS, 54);
 	}
 
 	public void testFullMin() {
-		StencilOperator op = SUMMARY.instance("FullMin", null, SPEC);
+		StencilOperator op = SUMMARY.instance("FullMin", SPEC);
 		Invokeable inv = op.getFacet("map");
 		runTest(inv, ORDERED_INTS, 1);
 		runTest(inv, MIXED_INTS, -1);
 	}
 	
 	public void testMax() {
-		StencilOperator op = SUMMARY.instance("Max", null, SPEC);
+		StencilOperator op = SUMMARY.instance("Max", SPEC);
 		Invokeable inv = op.getFacet("map");
 		runTest(inv, ORDERED_INTS, 10);
 		runTest(inv, MIXED_INTS, 9);
 	}
 	
 	public void testMin() {
-		StencilOperator op = SUMMARY.instance("Min", null, SPEC);
+		StencilOperator op = SUMMARY.instance("Min", SPEC);
 		Invokeable inv = op.getFacet("map");
 		runTest(inv, ORDERED_INTS, 10);
 		runTest(inv, MIXED_INTS, 9);

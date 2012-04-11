@@ -133,7 +133,10 @@ public final class DelimitedParser implements TupleStream {
 		catch (Exception e) {throw new RuntimeException ("Unexpected error reading " + filename, e);}
 	
 		if (values == null) {
-			if (filestream) {stop(); return null;}
+			if (filestream) {
+				stop(); 
+				return null;
+			}
 			else {return null;}
 		} else {return new SourcedTuple.Wrapper(name, new ArrayTuple(values));}
 	}

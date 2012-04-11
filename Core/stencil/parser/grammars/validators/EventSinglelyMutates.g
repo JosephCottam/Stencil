@@ -14,8 +14,8 @@ options {
   package stencil.parser.string.validators;
   
   import stencil.parser.tree.StencilTree;
-  import stencil.parser.string.ValidationException;
-  import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.string.util.ValidationException;
+  import stencil.parser.string.util.TreeFilterSequence;
   import java.util.ArrayList;
   import java.util.HashSet;
   import java.util.Set;

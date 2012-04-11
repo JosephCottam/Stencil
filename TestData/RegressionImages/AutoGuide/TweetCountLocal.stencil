@@ -1,6 +1,6 @@
 import ViewCanvas
 
-stream Tweets(MESSAGE) from Text["./Tweets.txt"]	
+stream Tweets(MESSAGE) : Text["./Tweets.txt"]	
 
 view
 from Tweets

@@ -1,17 +1,9 @@
 package stencil.modules;
 
-import stencil.module.SpecializationException;
-import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.modules.stencilUtil.Range;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.interpreter.tree.Freezer;
-import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
-import static stencil.module.util.ModuleDataParser.operatorData;
-import stencil.parser.string.StencilParser;
-import stencil.parser.string.util.Context;
 
 @Module
 @Description("Math functions that are defined in terms of longs instead of the default doubles")
@@ -20,8 +12,7 @@ public class LongMath extends BasicModule {
 	/**Sum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 **/
-	@Suppress
-	@Operator(name="Sum", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullSum")
 	public static final class FullSum extends AbstractOperator.Statefull {
  		private long sum = 0;
  		
@@ -35,7 +26,7 @@ public class LongMath extends BasicModule {
  			return sum;
  		}
  		
-		@Facet(memUse="WRITER", prototype="(double sum)")
+		@Facet(memUse="WRITER", prototype="(double sum)", counterpart="query")
 		public long map(long... args) {
 			sum += sum(args);
 			stateID++;
@@ -54,8 +45,7 @@ public class LongMath extends BasicModule {
 	/**Minimum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 */
-	@Suppress
-	@Operator(name="Min", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullMin")
 	public static final class FullMin extends AbstractOperator.Statefull {
  		private long min = Long.MAX_VALUE;
 
@@ -70,7 +60,7 @@ public class LongMath extends BasicModule {
 			return min;
  		}
  		
- 		@Facet(memUse="WRITER", prototype="(double min)")
+ 		@Facet(memUse="WRITER", prototype="(double min)", counterpart="query")
  		public long map(long... values) {
  			long newMin = Math.min(min, min(values));
  			if (newMin != min) {
@@ -92,8 +82,7 @@ public class LongMath extends BasicModule {
 	/**Maximum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 */
-	@Suppress
-	@Operator(name="Max", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullMax")
 	public static class FullMax extends AbstractOperator.Statefull {
  		private long max = -Long.MAX_VALUE;	
 
@@ -107,7 +96,7 @@ public class LongMath extends BasicModule {
 			return max;
  		}
  		
- 		@Facet(memUse="WRITER", prototype="(double max)")
+ 		@Facet(memUse="WRITER", prototype="(double max)", counterpart="query")
 		public long map(long... values) {
  			long newMax = Math.max(max, max(values));
  			if (newMax != max) {
@@ -191,23 +180,4 @@ public class LongMath extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(long value)", alias={"map","query"})
 	//TODO: Remove when converter has its own module/operator
 	public static Number asNumber(Object v) {return Converter.toNumber(v);}
- 	 	
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
-		OperatorData operatorData = getModuleData().getOperator(name);
-
-		validate(name, specializer);
-		
-		try {
-			if (context.highOrderUses("Range").size() ==0) {return Modules.instance(this.getClass(), operatorData);}
-			Specializer spec = Freezer.specializer(context.highOrderUses("Range").get(0).find(StencilParser.SPECIALIZER));
-			Range range = new Range(spec.get(Range.RANGE_KEY));
-				
-			if (range.isFullRange()) {
-				if (name.equals("Sum")) {return new FullSum(operatorData(FullSum.class, getName()));}
-				if (name.equals("Max")) {return new FullMax(operatorData(FullMax.class, getName()));}
-				if (name.equals("Min")) {return new FullMin(operatorData(FullMin.class, getName()));}
-			} 
-		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}
-		throw new Error("Unnanticipated argument set encountered");
-	}
 }

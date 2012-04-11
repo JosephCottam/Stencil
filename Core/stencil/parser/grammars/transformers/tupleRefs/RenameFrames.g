@@ -13,6 +13,9 @@ options {
 
   import java.util.Map;
   import java.util.HashMap;
+  
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.parser.tree.StencilTree;
   import static stencil.parser.string.util.Utilities.genSym;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;
   
@@ -22,9 +25,9 @@ options {
   /**Old name to new name mapping.*/
   private static Map<String, String> subst = new HashMap();
 
-  public static Tree apply (Tree t) {
+  public static StencilTree apply (StencilTree t) {
      subst.clear();
-     return (Tree) TreeRewriteSequence.apply(t);
+     return TreeRewriteSequence.apply(t);
   }
 }
 

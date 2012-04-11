@@ -3,7 +3,7 @@ import LongMath
 
 const width : 8
 
-stream MethodCalls(Method, Dir, Time) from Text["Viewpoint_5000.btrace", skip:0]
+stream MethodCalls(Method, Dir, Time) : Text["Viewpoint_5000.btrace", ":\\s", skip:0]
 
 stream Priors ()
 from MethodCalls

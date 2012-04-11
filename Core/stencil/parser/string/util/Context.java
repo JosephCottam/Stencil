@@ -5,49 +5,47 @@ import stencil.parser.tree.StencilTree;
 
 public final class Context {
      private final String target;
-     private int maxArgCount;
+     private final int maxArgCount;
+     private final List<StencilTree> callSites;
+     private final List<StencilTree> args;
      
-     /**How many times does this appear as part of a high-order container?**/
-     private final Map<String, Set<StencilTree>> highOrderUses = new HashMap();
-          
-     public Context(String target) {this.target = target;}
+     public Context(String target) {
+    	 this.target = target;
+    	 maxArgCount = 0;
+    	 callSites = new ArrayList();
+    	 args = new ArrayList();
+     }
+     
+     public Context(String target, int maxArgCount, List<StencilTree> callSites, List<StencilTree> args) {
+    	 this.target = target;
+    	 this.maxArgCount = maxArgCount;
+    	 this.callSites = callSites;
+    	 this.args = args;
+     }
+     
+     public List<StencilTree> args() {return args;}
+     public Context args(Iterable<StencilTree> args) {
+    	 ArrayList l = new ArrayList(this.args);
+    	 for (StencilTree t:args) {l.add(t);}
+    	 return new Context(target, maxArgCount, callSites, l);
+     }
      
      public int maxArgCount() {return maxArgCount;}
-     public void update(int argCount) {
-    	 maxArgCount = Math.max(argCount, maxArgCount);
+     public Context maxArgCount(int maxArgCount) {
+    	 return new Context(target,Math.max(this.maxArgCount, maxArgCount),callSites,args);
      }
+     
+     public List<StencilTree> callSites() {return callSites;}
+     public Context addCallSite(StencilTree callSite) {
+    	 List<StencilTree> t = new ArrayList(callSites);
+    	 t.add(callSite);
+    	 return new Context(target, maxArgCount, t, args);
+     }
+     
      public String target() {return target;}
      
-     /**When is this used in a higher-order function as an argument?
-      * StencilTree must be an operator reference
-      * Type is typically the type of the operator base associated with it
-      * */
-     public void addHighOrderUse(String type, StencilTree reference) {
-    	 Set<StencilTree> uses = _highOrderUses(type);
-    	 uses.add(reference);
-    	 highOrderUses.put(type, uses);
-     }
-     
-     private Set<StencilTree> _highOrderUses(String useType) {
-    	 if (highOrderUses.containsKey(useType)) {
-    		 return highOrderUses.get(useType);
-    	 }
-    	 
-    	 return new HashSet();
-     }
-
-     public List<StencilTree> highOrderUses(String useType) {
-    	 return new ArrayList(_highOrderUses(useType));
-     }
-     
-     public Set<String> highOrderUses() {return Collections.unmodifiableSet(highOrderUses.keySet());}
-     
-     
      public String toString() {
-    	 return String.format("Context for %1$s: %2$s args; High-order uses: %3$s", 
-    			 target, 
-    			 maxArgCount, 
-    			 Arrays.deepToString(highOrderUses.keySet().toArray()));
+    	 return String.format("Context for %1$s", target); 
      }
 
 }

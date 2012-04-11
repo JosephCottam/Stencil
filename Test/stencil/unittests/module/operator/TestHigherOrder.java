@@ -2,6 +2,7 @@ package stencil.unittests.module.operator;
 
 import stencil.adapters.java2D.Adapter;
 import stencil.module.operator.util.Invokeable;
+import stencil.module.operator.wrappers.SyntheticOperator;
 import stencil.module.util.FacetData;
 import stencil.parser.ParseStencil;
 import stencil.parser.tree.*;
@@ -44,14 +45,18 @@ public class TestHigherOrder extends StencilTestCase {
 	}
 
 	
-	private final String MAP_TEST = "stream S(v1, v2) from Text\n layer L\n from S\n ID: Map(@Reform, v1)\n X: Map(@Add1, *)\n operator Reform (v) -> (v) default => v: Trim(v)";
+	private final String MAP_TEST = "stream S(v1, v2)\n layer L\n from S\n ID: Map(@Reform, \"map\", v1)\n X: Map(@Add1, \"map\", *)\n operator Reform (v) -> (v) default => v: Trim(v)";
 	public void testSimpleMap() throws Exception {
 		StencilTree p = ParseStencil.programTree(MAP_TEST, Adapter.ADAPTER);
 		
-		OperatorProxy sumMap = (OperatorProxy) p.findAllDescendants(OPERATOR_PROXY).get(2);	//Map for add1
+		//TODO: Fix this searching...it is horribly fragile
+		OperatorProxy sumMap = (OperatorProxy) p.findAllDescendants(OPERATOR_PROXY).get(2);	//Map operator (generic)
+		OperatorProxy add1 = (OperatorProxy) p.findAllDescendants(OPERATOR_PROXY).get(1);	//add1 for map
+		
 		assertNotNull("Test not properly configured.", sumMap);
 		assertNotNull("Map operator not instantiated.", sumMap.getOperator());
-		assertTrue(sumMap.getName().contains("#Map_"));
+		assertTrue("Did not find Map operator when expected.  Instead, found: " + sumMap.getName(), sumMap.getName().contains("#Map_"));
+		assertTrue("Did not find Add1 operator when expected.  Instead, found: " + add1.getName(), add1.getName().contains("#Add1"));
 		//TODO: Test that the map is targeting add1
 
 		FacetData fd = sumMap.getOperatorData().defaultFacet();
@@ -62,16 +67,19 @@ public class TestHigherOrder extends StencilTestCase {
 		assertNotNull("Facet on map not not found.", iQuery);
 		
 		ArrayTuple numbers = ArrayTuple.from(1,2,3,4,5);
-		assertEquals(mapTuple(2.0d,3.0d,4.0d,5.0d,6.0d), iMap.invoke(new Object[]{numbers}));
+				
+		assertEquals(mapTuple(2.0d,3.0d,4.0d,5.0d,6.0d), iMap.invoke(new Object[]{add1.getOperator(), "map", numbers}));
 	}
 	
 	public void testSyntheticMap() throws Exception {
 		StencilTree p = ParseStencil.programTree(MAP_TEST, Adapter.ADAPTER);
 
-		OperatorProxy reformMap = (OperatorProxy) p.findAllDescendants(OPERATOR_PROXY).get(1);	//Map for reform
+		OperatorProxy reformMap = (OperatorProxy) p.findAllDescendants(OPERATOR_PROXY).get(2);	//Map operator (generic)
+		SyntheticOperator reform = new SyntheticOperator("test group", p.findDescendant(OPERATOR));
 		assertNotNull("Test not properly configured.", reformMap);
 		assertNotNull("Map operator not instantiated.", reformMap.getOperator());
-		assertTrue(reformMap.getName().contains("#Map_"));
+		assertTrue("Did not find Map operator when expected.  Instead, found: " + reformMap.getName(), reformMap.getName().contains("#Map_"));
+		assertTrue("Did not find Reform operator when expected.  Instead, found: " + reform.getName(), reform.getName().contains("Reform"));
 
 		FacetData fd = reformMap.getOperatorData().defaultFacet();
 		Invokeable iMap = reformMap.getOperator().getFacet(fd.name());
@@ -80,7 +88,7 @@ public class TestHigherOrder extends StencilTestCase {
 		assertNotNull("Facet on map not not found.", iQuery);
 		
 		ArrayTuple values = ArrayTuple.from("   A", "   1","   B","   2");
-		assertEquals(mapTuple("A","1", "B", "2"), iMap.invoke(new Object[]{values}));
+		assertEquals(mapTuple("A","1", "B", "2"), iMap.invoke(new Object[]{reform, "map", values}));
 	}
 	
 	private MultiResultTuple mapTuple(Object... values) {

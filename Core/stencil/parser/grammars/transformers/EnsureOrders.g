@@ -13,10 +13,11 @@ options {
 	package stencil.parser.string;
 	
 	import stencil.parser.tree.*;
+	import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
   public StencilTree downup(Object t) {
     newOrder = (StencilTree) adaptor.create(ORDER, StencilTree.typeName(ORDER));

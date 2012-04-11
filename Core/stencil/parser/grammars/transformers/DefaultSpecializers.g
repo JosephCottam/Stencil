@@ -26,6 +26,8 @@ options {
   import stencil.tuple.Tuple;
   import stencil.tuple.Tuples;
   import stencil.tuple.prototype.TupleFieldDef;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  
   import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER_TREE;
   import static stencil.parser.ParserConstants.DEFAULT_CANVAS_SPECIALIZER;
   import static stencil.parser.ParserConstants.DEFAULT_VIEW_SPECIALIZER;
@@ -35,7 +37,7 @@ options {
 }
 
 @members{
-  public static StencilTree apply (Tree t, ModuleCache modules, Adapter adapter) {
+  public static StencilTree apply (StencilTree t, ModuleCache modules, Adapter adapter) {
      return (StencilTree) TreeRewriteSequence.apply(t, modules, adapter);
   }
 
@@ -151,7 +153,7 @@ options {
     List<String> keys =new ArrayList();
     List<Object> values = new ArrayList();
     for (int i=0; i<updates.size(); i++) {
-      if (isGenSymRoot(POSITIONAL_ARG, updates.prototype().get(i).name())) {
+      if (isGenSymRoot(POSITIONAL_ARG, updates.prototype().get(i).name()) && defaults.prototype().size() > i) {
         if (defaults.size() < i) {throw new ProgramCompileException("Specializer with insufficient defaults for positional specializer arguments.");}
         keys.add(defaults.prototype().get(i).name());
       } else {

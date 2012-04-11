@@ -28,22 +28,10 @@ public interface Module {
 	 * @throws SpecializationException Specializer passed not permitted with the given operator.
 	 * @return
 	 */
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException, IllegalArgumentException;
+	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException, IllegalArgumentException;
 	
-	/**Get an instance of a higher-oder operator (OPTIONAL OPERATION).
-	 * Higher-order operators take operators as arguments, and thus require the modules cache.
-	 * If the operator is tagged with the OperatorData.HIGHER_ORDER_TAG field, the instantiation will occur through this method.
-	 * 
-	 * @param name
-	 * @param context
-	 * @param specializer
-	 * @param modules
-	 * @return
-	 * @throws SpecializationException
-	 * @throws IllegalArgumentException
-	 * @throws UnsupportedOperationException If the module defines no higher-order operators.
-	 */
-	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException, IllegalArgumentException;
+	/**Get an optimized version of the operator given the current instance and context.**/
+	public StencilOperator optimize(StencilOperator op, Context context) throws SpecializationException, IllegalArgumentException;
 	
 	/**Get the meta-data about a specific operator, given the specializer.
 	 * 

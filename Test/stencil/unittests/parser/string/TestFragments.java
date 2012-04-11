@@ -7,10 +7,11 @@ import org.antlr.runtime.tree.Tree;
 
 import stencil.adapters.java2D.Adapter;
 import stencil.interpreter.tree.MultiPartName;
-import stencil.module.Module;
 import stencil.module.ModuleCache;
+import stencil.module.operator.StencilOperator;
 import stencil.parser.ParseStencil;
 import stencil.parser.string.*;
+import stencil.parser.string.util.Utilities;
 import stencil.parser.string.validators.TargetMatchesPack;
 import stencil.parser.tree.*;
 import stencil.util.FileUtils;
@@ -61,21 +62,24 @@ public class TestFragments extends TestCase {
 		//Do module imports
 		ModuleCache modules = Imports.apply(p);
 		
-		p = PrepareCustomArgs.apply(p);			//Parse custom argument blocks
+		p = OperatorCustomArgs.apply(p);			//Parse custom argument blocks
 		p = Predicate_Expand.apply(p);			//Convert filters to standard rule chains
 		p = SpecializerDeconstant.apply(p);		//Remove references to constants in specializers
 		p = DefaultSpecializers.apply(p, modules, adapter); 			//Add default specializers where required
 		p = DefaultPack.apply(p);				//Add default packs where required
 		p = OperatorToOpTemplate.apply(p);		//Converting all operator defs to template/ref pairs
-		p = OperatorInstantiateTemplates.apply(p);		//Remove all operator references
+		p = OperatorExpandTemplates.apply(p);		//Remove all operator references
 		p = OperatorExplicit.apply(p);				//Remove anonymous operator references; replaced with named instances and regular references
 		p = OperatorExtendFacets.apply(p);  		//Expand operatorDefs to include query and stateID
 
 		p = ElementToLayer.apply(p);					//Convert "element" statements into layers
-		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
-		Module m = modules.getAdHoc();
+		
 		int expected = p.find(LIST_OPERATORS).getChildCount() + p.find(LIST_LAYERS).getChildCount();
-		assertEquals("Ad-hoc operators size incorrect.", expected, m.getModuleData().getOperators().size());
+		p = AdHocOperators.apply(p, modules, adapter);	//Create ad-hoc operators 		
+		int found = p.find(LIST_OPERATORS).getChildCount();
+		
+		
+		assertEquals("Ad-hoc operators size incorrect.", expected, found);
 	}
 	
 	public void testOpCreate() throws Exception {
@@ -87,7 +91,12 @@ public class TestFragments extends TestCase {
 
 			public boolean check(StencilTree t) {
 				if (t.getType() == StencilParser.FUNCTION) {
-					return ((AstInvokeable) t.find(StencilParser.AST_INVOKEABLE)).getOperator() != null;
+					try {
+						StencilOperator op = Utilities.findOperator(t.find(OP_NAME));
+						return op != null;
+					}catch (Exception e) {
+						return false;
+					}
 				}
 				return true;
 			}

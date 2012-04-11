@@ -12,8 +12,8 @@ options {
 
   package stencil.parser.string.validators;
 
-  import stencil.parser.string.ValidationException;
-  import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.string.util.ValidationException;
+  import stencil.parser.string.util.TreeFilterSequence;
   import stencil.parser.tree.Path;
   import stencil.parser.tree.StencilTree;
   import stencil.parser.string.StencilParser;

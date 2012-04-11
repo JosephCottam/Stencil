@@ -67,16 +67,16 @@ public class TestSplitSigil extends TestCase {
 	
 	public void testValidate() throws Exception {
 		for (Case c: passCases) {
-			assertTrue("Validate failed on: " + c.text, c.text.matches(PrepareCustomArgs.VALIDATE_PATTERN));
+			assertTrue("Validate failed on: " + c.text, c.text.matches(OperatorCustomArgs.VALIDATE_PATTERN));
 		}
 		for (Case c: validateFails) {
-			assertFalse("Validated succeeded on: " + c.text, c.text.matches(PrepareCustomArgs.VALIDATE_PATTERN));
+			assertFalse("Validated succeeded on: " + c.text, c.text.matches(OperatorCustomArgs.VALIDATE_PATTERN));
 		}
 	}
 	
 	public void testSplit() throws Exception {
 		for (Case c: passCases) {
-			String[] parts =PrepareCustomArgs.split(c.text);
+			String[] parts =OperatorCustomArgs.split(c.text);
 			assertEquals("Error in case: " + c.text, c.parts, parts.length);
 		}
 	}
@@ -88,7 +88,7 @@ public class TestSplitSigil extends TestCase {
 			Case c = failCases[i];
 
 			boolean failed = false;
-			try {PrepareCustomArgs.splitArgs(c.text, adaptor);}
+			try {OperatorCustomArgs.splitArgs(c.text, adaptor);}
 			catch (Throwable ex) {failed=true;}
 			assertTrue("Did not fail when expected: " + c.text, failed);
 		}
@@ -100,7 +100,7 @@ public class TestSplitSigil extends TestCase {
 		for (Case c: passCases) {
 			Tree t = null;
 			
-			try {t = PrepareCustomArgs.splitArgs(c.text, adaptor);}
+			try {t = OperatorCustomArgs.splitArgs(c.text, adaptor);}
 			catch (Throwable ex) {fail("Error parsing " + c.text + "\n" + ex.getMessage()); continue;}
 			
 			assertEquals("Error in case " +i, c.tree, t.toStringTree());

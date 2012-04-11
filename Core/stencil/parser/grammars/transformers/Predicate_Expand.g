@@ -14,12 +14,13 @@ options {
 
   package stencil.parser.string;
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.string.util.Utilities.genSym;
   import static stencil.parser.string.util.Utilities.FRAME_SYM_PREFIX;  
 }
 
 @members {
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
    /**Converts the operator from a symbol to a regular name.*/
    public static String opName(String opSymbol) {

@@ -14,10 +14,10 @@ options {
   package stencil.parser.string.validators;
   
   import stencil.interpreter.tree.Freezer;
-  import stencil.parser.string.TreeFilterSequence;
+  import stencil.parser.string.util.TreeFilterSequence;
   import stencil.tuple.prototype.TuplePrototype;
   import stencil.tuple.prototype.TupleFieldDef;
-  import stencil.parser.string.ValidationException;
+  import stencil.parser.string.util.ValidationException;
   import static java.lang.String.format;
   import stencil.parser.tree.StencilTree;
   import stencil.parser.string.util.EnvironmentUtil;

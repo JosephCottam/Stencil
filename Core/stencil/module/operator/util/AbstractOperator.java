@@ -7,7 +7,6 @@ import static java.lang.String.format;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.FacetData;
 import stencil.module.util.OperatorData;
-import stencil.module.util.FacetData.MemoryUse;
 import stencil.module.util.ann.Facet;
 
 public abstract class AbstractOperator<T extends StencilOperator> implements StencilOperator<T>, Cloneable {
@@ -22,7 +21,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	 * the meta-data provided here.
 	 **/
 	public static abstract class Statefull<R extends StencilOperator> extends AbstractOperator<R> {
-		protected int stateID = Integer.MIN_VALUE;
+		protected int stateID = Integer.MIN_VALUE;	//TODO: Should this be an AtomicInteger and made volatile?
 		
 		protected Statefull(OperatorData opData) {super(opData);}
 
@@ -81,13 +80,4 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 
 	/**Default viewpoint is self.  This is safe ONLY if the operator implements a true function.**/
 	public T viewpoint() {return (T) this;}
-	
-	/** Does given operator/meta-data include any stateful facets?  If not, it is a function.**/ 
-	public static boolean isFunction(StencilOperator op) {return isFunction(op.getOperatorData());}
-	public static boolean isFunction(OperatorData op) {
-		for (FacetData fd: op.facets()) {
-			if (fd.memUse() != MemoryUse.FUNCTION) {return false;}
-		}
-		return true;
-	}
 }

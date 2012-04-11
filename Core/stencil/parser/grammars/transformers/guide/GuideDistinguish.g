@@ -16,13 +16,14 @@ options {
 
   import java.util.Arrays;
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members {
   //TODO: Get the list of direct types from the adaptor
   public static List<String> DIRECT_TYPES = Arrays.asList("axis", "legend","gridlines");
 
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
     
   private boolean isDirect(Tree t) {return DIRECT_TYPES.contains(t.getText());}
   

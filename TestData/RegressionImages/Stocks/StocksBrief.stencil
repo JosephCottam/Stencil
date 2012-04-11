@@ -1,6 +1,6 @@
 import Dates
 
-stream Stocks(Date,Open,High,Low,Close,Volume) from Text["./google_stocks.csv"]
+stream Stocks(Date,Open,High,Low,Close,Volume) : Text["./google_stocks.csv"]
 
 stream AlignedStocks(Date, Open)
 from Stocks
@@ -23,18 +23,19 @@ from AlignedStocks
    PEN: Stroke{1}
    PEN_COLOR: 
 		ToTuple("BLUE", "LIME,150", "CRIMSON,150", "ORANGE,150") 
-			-> Map(@Color, ToTuple.*) -> *
+			-> Map(@Color, "map", ToTuple.*) -> *
 
-operator Avg20 : Range["-30..-10"](@Mean)
-operator Avg30 : Range["-30..n"](@Mean)
-operator AvgAll : Range[ALL](@Mean)
 
+/*TODO: Move facet in specializer...maybe as optional (if not in specializer, expect it as 2nd arg)*/
+operator Avg20 (v)->(a) : Range["-30..-10"](@Mean,"map", v)
+operator Avg30 (v) -> (a) : Range["-30..n"](@Mean,"map", v)
+operator AvgAll (v) -> (a) : Range[ALL](@Mean, "map", v)
 
 operator Ids : Count 
 
 operator TimeStep (T) -> (S)
-default => (S) : Range[ALL](@DateMin, T) 
-                   -> DateDiff("DAYS", Range, T) 
+default => (S) : DateMin(T) 
+                   -> DateDiff("DAYS", DateMin, T) 
                    -> Mult(_, 3)
 
-operator DateMin : Min[c:"Date"]
+operator DateMin : FullMin[c:"Date"]

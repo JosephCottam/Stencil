@@ -14,10 +14,11 @@ options {
   package stencil.parser.string;
   
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 }
 
 topdown

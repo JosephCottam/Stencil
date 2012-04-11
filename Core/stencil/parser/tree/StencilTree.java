@@ -2,9 +2,9 @@ package stencil.parser.tree;
 
 import java.lang.reflect.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.antlr.runtime.Token;
@@ -62,7 +62,7 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 	
 	/**Find a direct descendants from the given type list;
 	 * if more than one child from the type list is found, an assertion error occurs (if assertions are enabled).*/
-	public StencilTree find(Integer... types) {
+	public StencilTree find(int... types) {
 		java.util.List<StencilTree> l = searchDescendants(false, types);
 		
 		assert l.size() ==1 : "Searched for single child, but " + l.size() + " children found";
@@ -72,13 +72,13 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 	
 	
 	/**Find all direct descendants of the given type.*/
-	public java.util.List<StencilTree> findAll(Integer... types) {
+	public java.util.List<StencilTree> findAll(int... types) {
 		return searchDescendants(false, types);
 	}
 	
 	/**Find an eventual descendants from the given type list;
 	 * if more than one child from the type list is found, an assertion error occurs (if assertions are enabled).*/
-	public StencilTree findDescendant(Integer... types) {
+	public StencilTree findDescendant(int... types) {
 		java.util.List<? extends CommonTree> l = searchDescendants(true, types);
 		
 		
@@ -90,22 +90,23 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 
 	
 	/**Recursively look for descendants of the given type.*/
-	public java.util.List<StencilTree> findAllDescendants(Integer... types) {
+	public java.util.List<StencilTree> findAllDescendants(int... types) {
 		return searchDescendants(true, types);
 	}
 
-	private java.util.List<StencilTree> searchDescendants(boolean recursive, Integer... type) {
+	private java.util.List<StencilTree> searchDescendants(boolean recursive, int... types) {
 		java.util.List<StencilTree> results = new ArrayList();
 		if (this.getChildren() == null) {return results;}
-		ArrayList types = new ArrayList(Arrays.asList(type));
-		Collections.sort(types);
+		List<Integer> typeIds = new ArrayList(); 
+		for (int i: types)  {typeIds.add(i);}
+		Collections.sort(typeIds);
 		
 		for (Object child: getChildren()) {
-			if (child instanceof StencilTree && types.contains(((Tree) child).getType())) {
+			if (child instanceof StencilTree && typeIds.contains(((Tree) child).getType())) {
 				results.add((StencilTree) child);
 			}
 			if (recursive && child instanceof StencilTree) {
-				results.addAll(((StencilTree) child).searchDescendants(recursive, type));
+				results.addAll(((StencilTree) child).searchDescendants(recursive, types));
 			}
 		}
 		return results;

@@ -20,14 +20,17 @@ options {
    
   package stencil.parser.string;
   
+  import java.util.Arrays;
+
   import stencil.module.*;
   import stencil.parser.string.util.GlobalsTuple;
   import stencil.parser.tree.*;
-  import static stencil.parser.string.util.EnvironmentUtil.*;
-  import stencil.tuple.prototype.TuplePrototype;  
-  import static stencil.parser.ParserConstants.*;
-  import java.util.Arrays;
+  import stencil.tuple.prototype.TuplePrototype;
+  import stencil.parser.string.util.TreeRewriteSequence;  
   import stencil.parser.ProgramCompileException;
+
+  import static stencil.parser.ParserConstants.*;
+  import static stencil.parser.string.util.EnvironmentUtil.*;
 
 }
 
@@ -37,11 +40,12 @@ options {
          super("Could not find a frame for tuple reference '" + at.toStringTree() + "'",  at);}
   }
   
-  public Object downup(Object p) {
-    p = downup(p, this, "ensureFrames");
-    p = downup(p, this, "removeAlls");
-    p = downup(p, this, "generalizeStreamFrames");
-    return p;
+  public StencilTree downup(Object p) {
+    StencilTree r;
+    r = downup(p, this, "ensureFrames");
+    r = downup(r, this, "removeAlls");
+    r = downup(r, this, "generalizeStreamFrames");
+    return r;
   }  
 
   private GlobalsTuple globals;
@@ -113,7 +117,7 @@ ensureFrames
   | ^(c=CALL_CHAIN callTarget[initialFrames($c)] .?);
 	
 callTarget[List<String> frames]
-  : ^(f=FUNCTION a=.? n=. s=. ^(LIST_ARGS value[frames]*) y=. callTarget[extend(frames, $y)])
+  : ^(f=FUNCTION n=. s=. ^(LIST_ARGS value[frames]*) y=. callTarget[extend(frames, $y)])
   | ^(p=PACK value[frames]*);
           
 value[List<String> frames]
@@ -126,15 +130,13 @@ value[List<String> frames]
       -> {frames.contains($n.text)}? ^(TUPLE_REF $n NUMBER["0"])        //By default, frame refs are to the default element of the frame; must be <frame>.* to be whole frame 
       -> {globals.prototype().contains($n.text)}? ^(TUPLE_REF ID[GLOBALS_FRAME] $n)
       -> ^(TUPLE_REF ID[getFrame($n)] $n)
-  | (STRING | NUMBER | NULL);
+  | (STRING | NUMBER | NULL | ^(OP_AS_ARG .));
 
 
 
 //Remove trailing "all" statements; ref of just frame name is now sufficient to return the tuple 
 removeAlls:  ^(tr=TUPLE_REF parts+=.*) -> {trimAll($tr)};
-//    ^(TUPLE_REF parts+=(ID|NUMBER)+ ALL) -> ^(TUPLE_REF $parts+);  <<<---What I REALLY tried to get to work :(
-
 
 //Replace all references to the stream that use the stream name itself.  
-//Insted use the context independnet "stream frame" name
+//Instead use the context independent "stream frame" name
 generalizeStreamFrames : ^(TUPLE_REF f=. parts+=.*) -> ^(TUPLE_REF ID[deStream($f)] $parts*);    

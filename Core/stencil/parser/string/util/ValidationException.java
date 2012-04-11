@@ -1,4 +1,4 @@
-package stencil.parser.string;
+package stencil.parser.string.util;
 
 public class ValidationException extends RuntimeException {
 	public ValidationException(Throwable cause, String msg, Object...args) {super(String.format(msg, args), cause);}

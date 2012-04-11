@@ -13,9 +13,11 @@ options {
   package stencil.parser.string; 
   
   import stencil.parser.tree.*;
+  import stencil.util.collections.ArrayUtil;
+  import stencil.parser.string.util.TreeRewriteSequence;
+
   import static stencil.display.Guide2D.SAMPLE_KEY;
   import static stencil.display.Guide2D.FIELDS_KEY;
-  import stencil.util.collections.ArrayUtil;
   
 }
 

@@ -18,7 +18,7 @@ public class TestOscillate extends StencilTestCase {
 	
 	public void testCycle() throws Exception {
 		Specializer spec = ParseStencil.specializer("[style: \"circle\", states: 5, split:0]");
-		Oscillate op  = (Oscillate) temp.instance("Oscillate", null, spec);
+		Oscillate op  = (Oscillate) temp.instance("Oscillate", spec);
 		
 		Object[] values = new Object[5];
 		for (int i=0; i<values.length; i++) {
@@ -32,7 +32,7 @@ public class TestOscillate extends StencilTestCase {
 	
 	public void testSine() throws Exception {
 		Specializer spec = ParseStencil.specializer("[style: \"sine\", states: 5, split:0]");
-		Oscillate op  = (Oscillate) temp.instance("Oscillate", null, spec);
+		Oscillate op  = (Oscillate) temp.instance("Oscillate", spec);
 		
 		Object[] values = new Object[5];
 		for (int i=0; i<values.length; i++) {
@@ -46,7 +46,7 @@ public class TestOscillate extends StencilTestCase {
 	
 	public void testSine2() throws Exception {
 		Specializer spec = ParseStencil.specializer("[style: \"sine2\", states: 5, split:0]");
-		Oscillate op  = (Oscillate) temp.instance("Oscillate", null, spec);
+		Oscillate op  = (Oscillate) temp.instance("Oscillate", spec);
 		
 		Object[] values = new Object[5];
 		for (int i=0; i<values.length; i++) {
@@ -61,8 +61,8 @@ public class TestOscillate extends StencilTestCase {
 	public void testStates() throws Exception {
 		Specializer spec5 = ParseStencil.specializer("[style: \"circle\", states: 5, split:0]");
 		Specializer spec10 = ParseStencil.specializer("[style: \"circle\", states: 10, split:0]");
-		Oscillate op5  = (Oscillate) temp.instance("Oscillate", null, spec5);
-		Oscillate op10  = (Oscillate) temp.instance("Oscillate", null, spec10);
+		Oscillate op5  = (Oscillate) temp.instance("Oscillate", spec5);
+		Oscillate op10  = (Oscillate) temp.instance("Oscillate", spec10);
 
 		for (int i=0; i< 5; i++) {
 			assertEquals("Oscillation not equal when expected; round " + i, op5.map(), op10.map());

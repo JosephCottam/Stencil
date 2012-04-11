@@ -20,7 +20,11 @@ options {
   import stencil.module.operator.util.ReflectiveInvokeable;
   import stencil.interpreter.guide.samplers.LayerSampler;
   import stencil.display.DisplayLayer;
-  import static stencil.parser.ParserConstants.INVOKEABLE;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.wrappers.LayerOperator;
+  import stencil.parser.string.util.Utilities;
+  import stencil.module.operator.StencilOperator;
+  
   import static stencil.parser.ParserConstants.INPUT_FIELD;
   import static stencil.parser.ParserConstants.GLOBALS_FRAME;
   import static stencil.parser.ParserConstants.VIEW_FRAME;
@@ -84,7 +88,7 @@ options {
   }
   
   
-     //TODO: Only works for named field dereferences...also consider numeric field dereferences 
+   //TODO: Only works for named field dereferences...also consider numeric field dereferences 
    private static boolean isCrossGuide(StencilTree directGuide) {
        StencilTree mons = directGuide.findDescendant(LIST_GUIDE_MONITORS);
        if (mons.getChildCount() <2) {return false;}
@@ -103,6 +107,21 @@ options {
       adaptor.addChild(gen, rules.find(RULE));
       return list;
   }
+
+
+  /**Add a layer monitor operator to the operators list. 
+   **/
+  public String addLayerMonitor(StencilTree layerNode) {
+    String layerName = layerNode.getText();
+    LayerOperator layerOp = (LayerOperator) Utilities.findOperator(layerNode, layerName);
+    DisplayLayer dl = layerOp.layer();
+    StencilOperator op = new LayerSampler.MonitorOperator(dl);
+    
+    String opName = Utilities.genSym(op.getName());
+	StencilTree opList = Utilities.operatorsList(layerNode);		
+	Utilities.addToOperators(ParserConstants.STAND_IN_GROUP, opName, op, opList, adaptor, layerNode.token);
+	return opName;
+  }
 }
 
 
@@ -112,13 +131,10 @@ duplicateGens
      -> ^(GUIDE $type $spec $selector $actions ^(LIST_GUIDE_GENERATORS $gens+) $query ^(LIST_GUIDE_MONITORS $gens+));
 
 
-//If it multiple generators based in the same source, tag it for combining later in the modification process
-//Must be run bottom up or it will cause an infinite loop
+//Multiple generators are used for compound- and cross- guides.
+//These need to be tagged so the generators can be combined later
+//These passes must be run bottom up or it will cause an infinite loop
 tagCompoundGuides: ^(g=GUIDE_DIRECT rest+=.*) {isCompoundGuide($g)}? -> ^(COMPOUND_GUIDE ^(GUIDE_DIRECT $rest*));
-
-
-//If it has multiple generators based on different sources, change it to a cross legend
-//Must be run bottom up or this rule causes an infinite loop
 identifyCrosses: ^(g=GUIDE_DIRECT ^(GUIDE type=. rest+=.*)) {isCrossGuide($g)}? ->  ^(GUIDE_DIRECT ^(GUIDE ID["crossLegend"] $rest*));
 
 
@@ -127,8 +143,7 @@ simplifyGens
   : ^(LIST_GUIDE_GENERATORS simplifyGen+);
 
 simplifyGen
-//  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION (options {greedy=false;} :.)* c=.)))  <--Why doesn't this work???
-  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION . . . . . c=.)))
+  : ^(RULE target=. ^(CALL_CHAIN ^(FUNCTION name=. spec=. args=. y=. c=.)))
     {target.getAncestor(GUIDE_DIRECT) != null}?
       -> ^(GUIDE_GENERATOR ^(RULE $target ^(CALL_CHAIN $c)));
 
@@ -139,29 +154,15 @@ simplifyMons
   : ^(LIST_GUIDE_MONITORS simplifyMon+);
   
 simplifyMon
-  @after {
-     AstInvokeable inv = (AstInvokeable) r.findAllDescendants(AST_INVOKEABLE).get(0);
-     Const c = ((Const) retval.tree.find(CONST));
-     c.setValue(inv.getOperator());
-  }
-  : ^(r=RULE .*) -> ^(MONITOR_OPERATOR CONST);
+  : ^(r=RULE target=. ^(CALL_CHAIN ^(FUNCTION ^(OP_NAME pre=. name=. facet=.) .*))) -> ^(MONITOR_OPERATOR[$r.getToken(), $name.getText()]);
 
 setSummaryMon
-  @after{
-    StencilTree g = retval.tree.getChild(0);
-    String layerName = g.getAncestor(LAYER).getText();
-    StencilTree layer = g.getAncestor(PROGRAM).find(LIST_LAYERS).find(LAYER, layerName);
-    DisplayLayer dl = (DisplayLayer) ((Const) layer.find(CONST)).getValue();
-    
-    MonitorOperator op = new LayerSampler.MonitorOperator(dl);
-    ((Const) g.findDescendant(MONITOR_OPERATOR).find(CONST)).setValue(op);
-  }
-  : ^(GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. smonitor=. query=.))
+  : ^(g=GUIDE_SUMMARIZATION ^(GUIDE type=. spec=. selector=. actions=. smonitor=. query=.))
      -> ^(GUIDE_SUMMARIZATION 
           ^(GUIDE $type $spec $selector $actions 
             ^(LIST_GUIDE_GENERATORS ^(GUIDE_GENERATOR $smonitor))
             $query 
-            ^(LIST_GUIDE_MONITORS ^(MONITOR_OPERATOR CONST))));
+            ^(LIST_GUIDE_MONITORS MONITOR_OPERATOR[addLayerMonitor($g.getAncestor(LAYER))])));
 
 
      
@@ -180,7 +181,7 @@ sameTargets
 
 //Make sure the input appears in the result of the generator -------------
 repackGeneratorRule
-  : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack) .?)) -> ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
+  : ^(GUIDE_GENERATOR ^(RULE retarget ^(CALL_CHAIN repack)));
 
 retarget
   : ^(t=TARGET ^(TARGET_TUPLE p+=.+))
@@ -188,7 +189,7 @@ retarget
 
 //Add sample output to the result prototpye      
 repack
-  : ^(FUNCTION (options {greedy=false;} :.)* repack)
+  : ^(FUNCTION n=. s=. a=. y=. repack)
   | ^(PACK f+=.*) -> ^(PACK $f* ^(TUPLE_REF ID[STREAM_FRAME]));
 
 //Have the generator use the sample frame where it used to use the stream frame--------------------

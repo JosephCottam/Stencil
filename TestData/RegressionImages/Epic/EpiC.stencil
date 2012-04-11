@@ -1,18 +1,18 @@
 import ViewCanvas
 
-stream Data(Timestep, Line, Value) from Text["./EpicSampleData.csv"]
-stream Visibility(Line, Visible) from Text["./Visibliity.txt"]
-stream LineColor(Line, Color) from Text[" ./LineColor.txt"]
+stream Data(Timestep, Line, Value) : Text["./EpicSampleData.csv"]
+stream Visibility(Line, Visible) : Text["./Visibliity.txt"]
+stream LineColor(Line, Color) : Text[" ./LineColor.txt"]
 
 order (Data | Visibility | LineColor)
 
 view
 from #Render
-	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60, 20)
+	local(WidthOffset, HeightOffset) : ScreenToCanvasDimension(60,-20)
 	W : Mult(canvas.W, 1.2)
 	H : Mult(canvas.H, 1.2)
 	X : Sub(canvas.X, local.WidthOffset)
-	Y : Mult(canvas.H, -1) -> Sub(_, local.HeightOffset)
+	Y : Sub(canvas.H, local.HeightOffset)
 
 layer Lines["POLY_POINT"]
 guide

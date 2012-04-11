@@ -20,10 +20,10 @@ import stencil.util.streams.txt.DelimitedParser;
 import stencil.util.FileUtils;
 
 public abstract class InterpreterBase extends junit.framework.TestCase{
-	public static String registerFailRule = "import TestModule " +
-											"stream NodeAttributes(ID, ATT, Source) from Text[\"text.txt\"]"+
-											"layer Overlay from NodeAttributes" +
-											"   filter(ATT =~ \"C\")" +
+	public static String registerFailRule = "import TestModule\n" +
+											"stream NodeAttributes(ID, ATT, Source)\n"+
+											"layer Overlay from NodeAttributes\n" +
+											"   filter(ATT =~ \"C\")\n" +
 											"   ID: FilterFail(ID)";
 
 	StencilPanel panel;

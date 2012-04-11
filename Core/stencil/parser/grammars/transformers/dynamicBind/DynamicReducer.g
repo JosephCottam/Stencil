@@ -16,11 +16,12 @@ options {
   
   import stencil.parser.tree.StencilTree; 
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.ParserConstants.*;
 }
 
 @members {
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   public StencilTree changeRefs(StencilTree dynamicRules) {
      StencilTree reducer = reducer(dynamicRules);

@@ -11,6 +11,7 @@ import stencil.interpreter.guide.samplers.LayerSampler;
 import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
+import stencil.module.operator.StencilOperator;
 import stencil.parser.tree.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -95,8 +96,8 @@ public final class EnvironmentUtil {
 				}
 			}
 
-			if (anc.inRuleList && (((Const) (anc.guide.findAllDescendants(SAMPLE_OPERATOR).get(0).getChild(0))).getValue() instanceof LayerSampler)) {
-				LayerSampler sampler = (LayerSampler) ((Const) (anc.guide.findDescendant(SAMPLE_OPERATOR).getChild(0))).getValue();
+			if (anc.inRuleList && (((Const) (anc.guide.findDescendant(LIST_GUIDE_SAMPLERS).getChild(0))).getValue() instanceof LayerSampler)) {
+				LayerSampler sampler = (LayerSampler) ((Const) (anc.guide.findDescendant(LIST_GUIDE_SAMPLERS).getChild(0))).getValue();
 				return sampler.prototype();
 			} else if (anc.inGuideGenerator) {
 				return SampleOperator.Util.prototype(anc.guide.find(LIST_GUIDE_SAMPLERS).getChildCount());
@@ -191,10 +192,11 @@ public final class EnvironmentUtil {
 	 * **/
 	public static TuplePrototype facetPrototype(StencilTree func) {
 		assert func.getType() == FUNCTION;
-		MultiPartName op = Freezer.multiName(func.find(OP_NAME));		
-		AstInvokeable inv = (AstInvokeable) func.find(AST_INVOKEABLE);
-		assert inv != null;
-		return inv.getOperator().getOperatorData().getFacet(op.facet()).prototype();
+		
+		StencilTree opName = func.find(OP_NAME);
+		MultiPartName name = Freezer.multiName(opName);
+		StencilOperator op = Utilities.findOperator(opName);
+		return op.getOperatorData().getFacet(name.facet()).prototype();
 	}
 
 	/**How many function calls up from here to the root of a call chain?**/

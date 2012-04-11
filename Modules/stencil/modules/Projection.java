@@ -11,13 +11,11 @@ import java.util.TreeSet;
 import java.awt.Color;
 import org.pcollections.*;
 
-import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.ViewpointCache;
 import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleDataParser;
-import stencil.module.util.Modules;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
 import stencil.parser.string.util.Context;
@@ -287,7 +285,7 @@ public class Projection extends BasicModule {
 	}
 
 	/**Counting when there are no keys to worry about.**/
-	@Suppress @Operator(spec="[]")
+	@Operator(spec="[]")
 	public static final class Counter extends AbstractOperator {
 		private long count =1;
 		public Counter(OperatorData opData) {super(opData);}
@@ -312,7 +310,7 @@ public class Projection extends BasicModule {
 	public static class RankSingle extends AbstractOperator.Statefull {
 		private final ArrayList list;
 	
-		public RankSingle(OperatorData opData, Specializer spec) {
+		public RankSingle(OperatorData opData) {
 			super(opData);
 			list = new ArrayList(1000);
 		}
@@ -677,20 +675,19 @@ public class Projection extends BasicModule {
 		}
 	}
 	
-	public StencilOperator instance(String name, Context context, Specializer spec) throws SpecializationException {
-		if (context != null && name.equals("Count")) {
+	@Override
+	public StencilOperator optimize(StencilOperator op, Context context) {
+		if (context != null && op instanceof Count) {
 			if (context.maxArgCount() == 0) {
 				OperatorData od = ModuleDataParser.operatorData(Counter.class, Projection.class.getSimpleName());
-				return Modules.instance(this.getClass(), od, spec);
+				return new Counter(od);
 			}
-		} if (context != null && name.equals("Rank")) {
+		} if (context != null && op instanceof Rank) {
 			if (context.maxArgCount() == 1) {
 				OperatorData od = ModuleDataParser.operatorData(RankSingle.class, Projection.class.getSimpleName());
-				return Modules.instance(this.getClass(), od, spec);
-				
+				return new RankSingle(od);
 			}
 		}
-		
-		return super.instance(name, context, spec);
+		return op;
 	}
 }

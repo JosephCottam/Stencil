@@ -25,7 +25,7 @@ public interface StencilOperator<T extends StencilOperator> extends Viewpoint<T>
 	 * This is used to determine if update operations are required.
 	 */
 	public static final String STATE_ID_FACET = "stateID";
-		
+	
 	/**Retrieve an invokable object.  This is a combined method and target.
 	 * IllegalArgumentException is thrown when the facet is not know.
 	 * */

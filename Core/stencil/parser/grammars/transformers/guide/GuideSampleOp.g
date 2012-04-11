@@ -20,6 +20,10 @@ options {
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.Specializer;
   import stencil.display.DisplayLayer;
+  import stencil.parser.string.util.TreeRewriteSequence;
+  import stencil.module.operator.wrappers.LayerOperator;
+  import stencil.parser.string.util.Utilities;
+  
   import static stencil.parser.ParserConstants.IDENTIFIER_FIELD;
 }
 
@@ -27,10 +31,13 @@ options {
   public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
 
    public StencilTree samplers(StencilTree g) {
-      StencilTree samples = (StencilTree) adaptor.create(LIST_GUIDE_SAMPLERS, "LIST_GUIDE_SAMPLES");
+      StencilTree samples = (StencilTree) adaptor.create(LIST_GUIDE_SAMPLERS, "");
       if (g.getAncestor(GUIDE_SUMMARIZATION) !=null) {
-          DisplayLayer l = (DisplayLayer) ((Const) g.getAncestor(LAYER).find(CONST)).getValue();
-          Const cnst = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
+          String layerName = g.getAncestor(LAYER).getText();
+          LayerOperator layerOp = (LayerOperator) Utilities.findOperator(g, layerName);
+          DisplayLayer l = layerOp.layer();
+      
+          Const cnst = (Const) adaptor.create(CONST, "Sample Operator");
           
           if (g.findAllDescendants(SAMPLE_TYPE).size() ==1) {
 	          cnst.setValue(new LayerSampler(l));
@@ -39,18 +46,12 @@ options {
  	      }         
  	      //TODO: Add case to do group sampling...(Group sampler does multi-result tuple and guide types handle that appropriately)
  	      
-          
-          StencilTree sample = (StencilTree) adaptor.create(SAMPLE_OPERATOR, "SAMPLE_OPERATOR");
-          sample.addChild(cnst);
-          samples.addChild(sample);
+          samples.addChild(cnst);
       } else {
           for (StencilTree sampleType: g.findAllDescendants(SAMPLE_TYPE)) {
-            Const cnst = (Const) adaptor.create(CONST, StencilTree.typeName(CONST));
+            Const cnst = (Const) adaptor.create(CONST, "Sample Operator");
             cnst.setValue(Samplers.get(sampleType.getText()));
-    
-            StencilTree sample = (StencilTree) adaptor.create(SAMPLE_OPERATOR, "SAMPLE_OPERATOR");
-            sample.addChild(cnst);
-            samples.addChild(sample);
+            samples.addChild(cnst);
           }
       }
       

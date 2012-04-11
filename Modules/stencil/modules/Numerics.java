@@ -3,15 +3,10 @@ package stencil.modules;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
-import stencil.modules.stencilUtil.Range;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.interpreter.tree.Freezer;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
-import static stencil.module.util.ModuleDataParser.operatorData;
-import stencil.parser.string.StencilParser;
-import stencil.parser.string.util.Context;
 
 @Description("Math functions; includes many simple re-directions to java.lang.Math.")
 @Module()
@@ -27,7 +22,7 @@ public class Numerics extends BasicModule {
 	@Operator(name="Log", spec="[base: NULL]")
 	public static final class LogFixed extends AbstractOperator {
 		private final double base;
-		public LogFixed(OperatorData od, double base) {
+		protected LogFixed(OperatorData od, double base) {
 			super(od);
 			this.base = base;
 		}
@@ -64,8 +59,7 @@ public class Numerics extends BasicModule {
 	/**Sum of full range of values.
 	 * TODO: Modify to handle fixed-start range
 	 **/
-	@Suppress 
-	@Operator(name="Sum", tags=stencil.modules.stencilUtil.StencilUtil.RANGE_OPTIMIZED_TAG)
+	@Operator(name="FullSum")
 	public static final class FullSum extends AbstractOperator.Statefull {
  		private double sum = 0;
  		
@@ -79,7 +73,7 @@ public class Numerics extends BasicModule {
  			return sum;
  		}
 
- 		@Facet(memUse="WRITER", prototype="(double sum)")
+ 		@Facet(memUse="WRITER", prototype="(double sum)", counterpart="query")
 		public double map(double... args) {
 			sum += sum(args);
 			stateID++;
@@ -267,26 +261,18 @@ public class Numerics extends BasicModule {
 	@Facet(memUse="FUNCTION", prototype="(double value)", alias={"map","query"})
 	//TODO: Remove when converter has its own module/operator
  	public static Number asNumber(Object v) {return Converter.toNumber(v);}
- 	
-	public StencilOperator instance(String name, Context context, Specializer specializer) throws SpecializationException {
+	
+	@Override
+	public StencilOperator instance(String name, Specializer specializer) throws SpecializationException {
 		OperatorData operatorData = getModuleData().getOperator(name);
 
 		validate(name, specializer);
-		
-		try {
-			if (name.equals("Log")) {return LogFixed.instance(operatorData, specializer);}
 
-			if (context == null || context.highOrderUses("Range").size() ==0) {return Modules.instance(this.getClass(), operatorData);}
-
-			Specializer spec = Freezer.specializer(context.highOrderUses("Range").get(0).find(StencilParser.SPECIALIZER));
-			Range range = new Range(spec.get(Range.RANGE_KEY));
-			
-			if (range.isFullRange()) {
-				if (name.equals("Sum")) {return new FullSum(operatorData(FullSum.class, getName()));}
-			} 
-
-
-		} catch (Exception e) {throw new Error(String.format("Error locating %1$s operator in Numerics package.", name), e);}
-		throw new Error("Unnanticipated argument set encountered");
+		if (name.equals("Log")) {
+			return LogFixed.instance(operatorData, specializer);
+		} else {
+			return Modules.instance(this.getClass(), operatorData);
+		}
 	}
+	
 }

@@ -1,4 +1,4 @@
-tree grammar OperatorInstantiateTemplates;
+tree grammar OperatorExpandTemplates;
 options {
   tokenVocab = Stencil;
   ASTLabelType = StencilTree;
@@ -15,10 +15,11 @@ options {
   import stencil.module.*;
   import stencil.interpreter.tree.Freezer;
   import stencil.interpreter.tree.MultiPartName;
+  import stencil.parser.string.util.TreeRewriteSequence;
 }
 
 @members{
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   private Object instantiate(StencilTree opRef) {
     StencilTree t = findTemplate(opRef);

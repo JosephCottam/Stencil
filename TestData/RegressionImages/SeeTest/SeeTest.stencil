@@ -2,9 +2,9 @@ import PatternUtils
 import JavaC
 
 stream MTTSource(graphLabel, axis1A, axis1B, axis2A, axis2B, suite_name, pass, fail)
-   from Text["./18049-arch-compiler.output.txt", sep:"\\s*\\|\\s*", skip:2, strict: false]
+   : Text["./18049-arch-compiler.output.txt", sep:"\\s*\\|\\s*", skip:2, strict: false]
 stream MTTNotApplicable(axis1A, axis1B, axis2A, axis2B)
-   from Text["./NoData-Comp.txt"]
+   : Text["./NoData-Comp.txt"]
 
 order MTTSource > MTTNotApplicable
 
@@ -50,10 +50,9 @@ from MTTSource
     ID: local.ID
     (X,Y): Others.find(local.ID) -> (Others.X, Others.Y)
     TEXT: suite_name
-    FONT: Font{5}
+    FONT: Font{5,BOLD}
     ROTATION: -45
     REGISTRATION: "CENTER"
-    FONT_STYLE: "BOLD"
     COLOR: Color{0,0,0,166}
 
 layer YLabels["TEXT"]
@@ -107,10 +106,10 @@ from MTTSource
     PEN_COLOR: Palette("GRID")
 
 operator EqualWidth (axis1A, axis1B, axis2A, axis2B) -> (X2)
-    default => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Layout.X, 55) -> Range[ALL](@Max, Add)
+    default => X2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Add(Layout.X, 55) -> FullMax(Add)
 
 operator EqualHeight (axis1A, axis1B, axis2A, axis2B) -> (Y2)
-    default => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Sub(Layout.Y, 55) -> Range[ALL](@Min, Sub)
+    default => Y2 : Layout(axis1A, axis1B, axis2A, axis2B) -> Sub(Layout.Y, 55) -> FullMin(Sub)
 
 
 operator NamesIndex(ID) -> (VALUE)

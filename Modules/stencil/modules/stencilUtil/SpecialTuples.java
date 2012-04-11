@@ -12,7 +12,10 @@ import stencil.tuple.Tuple;
  * This includes View and Canvas.
  */
 public abstract class SpecialTuples {
-	@Operator(name="view") 
+	public static final String VIEW_TUPLE_OP = "ViewTuple";
+	public static final String CANVAS_TUPLE_OP = "CanvasTuple";
+	
+	@Operator(name=VIEW_TUPLE_OP, defaultFacet="query") 
 	public static final class View extends DirectOperator {
 		public View(OperatorData od) {super(od);}
 
@@ -25,7 +28,7 @@ public abstract class SpecialTuples {
 	
 	//TODO: Add specializer arg to force pre-render or not (add detection for needed/not to the insertion pass)
 	//Is still be consistent with out it, but not what people expect
-	@Operator(name="canvas")
+	@Operator(name=CANVAS_TUPLE_OP, defaultFacet="query")
 	public static final class Canvas extends DirectOperator {
 		public Canvas(OperatorData od) {super(od);}
 

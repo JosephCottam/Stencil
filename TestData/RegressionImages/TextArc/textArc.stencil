@@ -1,7 +1,7 @@
 import Layouts
 import Geometry : Geo
 
-stream RawLines(text) from Text["./AliceInWonderland.txt", sep:"$^", skip:0]
+stream RawLines(text) : Text["./AliceInWonderland.txt", sep:"$^", skip:0]
 
 stream Lines (line, text)
 from RawLines
@@ -11,7 +11,7 @@ from RawLines
 stream RawWords (line, word)
 from Lines
    line: line
-   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, *) -> *
+   word: SplitOn(text, "\\s+") -> Map(@NormalizeWords, "query", *) -> *
 
 operator NormalizeWords(word) -> (word)
   default => word: Strip(word) -> ToLower(_)
@@ -43,7 +43,7 @@ from Words
    (X,Y):* Centroid(word) -> Contract(Centroid.X, Centroid.Y) 
    REGISTRATION: "CENTER"
    (COLOR, FONT):* 
-        [count] WordCount.query(word) -> Range[ALL](@Max, _) -> 
+        [count] WordCount.query(word) -> FullMax(_) -> 
         [freq]  Divide(count, _) -> 
         [color] HeatScale[hot: "BLUE", cold: "GRAY30"](freq) ->
                 Scale[min: 50, max:1000](freq) -> Font{{_}} -> (color, _)
@@ -54,7 +54,7 @@ operator LineIndex : Dict[fields: "lines"]
 
 operator Centroid (word) -> (X,Y)
   default =>
-    (X,Y): LineIndex.get(word) -> [Points] Map.query(LineIndex.0 , @Layout) 
+    (X,Y): LineIndex.get(word) -> [Points] Map.query(@Layout, "query", LineIndex.0) 
             -> Select[field: 0](Points.*) -> Values(*) -> [X] Mean(_)
             -> Select[field: 1](Points.*) -> Values(*) -> [Y] Mean(_)
             -> (X,Y)

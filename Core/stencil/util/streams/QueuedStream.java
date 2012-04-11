@@ -17,7 +17,10 @@ public class QueuedStream implements TupleStream {
 	private final class QueueLoader extends Thread {
 		private volatile boolean stop = false;
 		
-		public QueueLoader() {super("Queued Tuple Loader");}
+		public QueueLoader() {
+			super("Queued Tuple Loader");
+			this.setDaemon(true);
+		}
 		
 		public void run() {
 			while (!stop && source != null) {

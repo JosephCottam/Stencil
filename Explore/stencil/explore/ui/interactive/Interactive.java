@@ -251,7 +251,7 @@ public class Interactive implements Runnable {
 				if (arg.getSource() == open) {
 					JFileChooser fc = new JFileChooser();
 					fc.setFileFilter(new FileNameExtensionFilter("Stencil File", "stencil"));
-					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"test.stencil"));
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"/test.stencil"));
 
 					int stat = fc.showOpenDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
@@ -264,7 +264,7 @@ public class Interactive implements Runnable {
 					}
 				} else if (arg.getSource() == save) {
 					JFileChooser fc = new JFileChooser();
-					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"test.stencil"));
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"/test.stencil"));
 
 					int stat = fc.showSaveDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
@@ -276,6 +276,8 @@ public class Interactive implements Runnable {
 					}
 				} else if (arg.getSource() == exportTuples) {
 					JFileChooser fc = new JFileChooser();
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"/results.tuples"));
+					
 					int stat = fc.showSaveDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
@@ -288,6 +290,8 @@ public class Interactive implements Runnable {
 					}
 				} else if (arg.getSource() == exportPNG) {
 					JFileChooser fc = new JFileChooser();
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"/results.png"));
+
 					int stat = fc.showSaveDialog(editorFrame);
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
@@ -300,6 +304,8 @@ public class Interactive implements Runnable {
 				} else if (arg.getSource() == exportEPS) {
 					JFileChooser fc = new JFileChooser();
 					int stat = fc.showSaveDialog(editorFrame);
+					fc.setSelectedFile(new java.io.File(WorkingDir.get()+"/results.eps"));
+
 					if (stat == JFileChooser.APPROVE_OPTION) {
 						String filename = fc.getSelectedFile().getAbsolutePath();
 
@@ -376,7 +382,6 @@ public class Interactive implements Runnable {
 
 	public void run() {
 		editorFrame.setVisible(true);
-		editor.naturalSize();
 		messageFrame.setVisible(true);
 		stencilFrame.setVisible(true);
 		editorFrame.toFront();

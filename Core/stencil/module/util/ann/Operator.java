@@ -6,10 +6,12 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Operator {
-	String name() default "";	//If different from the name of the class
-	String spec() default "[]";	//Must conform to specializer grammar AND be include only literal values
-	String[] tags() default {};	//List of tags.  Tags are typically used to communicate properties of a particular implementation
+	/**What is this operator's name?  Will default to the class/method name if omitted.**/
+	String name() default "";
+	
+	/**What is the default specializer?  Must conform to the specializer grammar and only include literal values.**/
+	String spec() default "[]";	
 	
 	/**Which facet should be used by default.  In general, this facet should have a counterpart.*/
-	String defaultFacet() default "";	
+	String defaultFacet() default "";
 }

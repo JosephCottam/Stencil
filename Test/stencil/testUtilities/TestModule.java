@@ -1,7 +1,6 @@
 package stencil.testUtilities;
 
 import stencil.module.Module;
-import stencil.module.ModuleCache;
 import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.Invokeable;
@@ -27,7 +26,7 @@ public class TestModule implements Module {
 			ArrayList<FacetData> facets = new ArrayList();
 			facets.add(new FacetData("map", MemoryUse.FUNCTION, "VALUE"));
 			facets.add(new FacetData("query", MemoryUse.FUNCTION, "VALUE"));
-			OperatorData od = new OperatorData("temp", "FilterFail", ParserConstants.EMPTY_SPECIALIZER, null, "map", facets, new ArrayList());
+			OperatorData od = new OperatorData("temp", "FilterFail", ParserConstants.EMPTY_SPECIALIZER, null, "map", facets);
 			MODULE_DATA.addOperator(od);}
 		catch (Exception e) {throw new Error("Error creating default specializer.");}
 
@@ -46,7 +45,11 @@ public class TestModule implements Module {
 	
 	public ModuleData getModuleData() {return MODULE_DATA;}
 
-	public StencilOperator instance(String name, Context context, Specializer specializer)
+	@Override
+	public StencilOperator optimize(StencilOperator op, Context context) {return op;}
+	
+	@Override
+	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException {
 		
 		try {
@@ -67,12 +70,4 @@ public class TestModule implements Module {
 		if (name.equals("FilterFail")) {return MODULE_DATA.getOperator("FilterFail");}
 		throw new IllegalArgumentException("No operator of name " + name);
 	}
-
-	@Override
-	public StencilOperator instance(String name, Context context,
-			Specializer specializer, ModuleCache modules)
-			throws SpecializationException, IllegalArgumentException {
-		throw new UnsupportedOperationException("No higher-order ops implemented.");
-	}
-
 }

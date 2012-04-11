@@ -2,7 +2,6 @@ package stencil.parser.tree;
 
 import org.antlr.runtime.Token;
 
-import stencil.module.ModuleCache;
 import stencil.module.operator.StencilOperator;
 import stencil.module.util.OperatorData;
 
@@ -14,10 +13,10 @@ public class OperatorProxy extends StencilTree {
 	
 	public String getName() {return token.getText();}
 	
-	public void setOperator(StencilOperator operator, OperatorData operatorData) {
+	public void setOperator(String group, StencilOperator operator, OperatorData operatorData) {
 		this.operator = operator;
 		if (!operatorData.name().equals(getName())) {
-			this.operatorData = new OperatorData(operatorData).module(ModuleCache.AD_HOC_NAME).name(getName());
+			this.operatorData = new OperatorData(operatorData).module(group).name(getName());
 		} else {
 			this.operatorData =operatorData; 
 		}

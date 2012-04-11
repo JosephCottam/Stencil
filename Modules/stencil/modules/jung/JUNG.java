@@ -6,9 +6,8 @@ import stencil.module.util.BasicModule;
 import stencil.module.util.ModuleData;
 import stencil.module.util.ModuleIncompleteError;
 import stencil.module.util.OperatorData;
-import stencil.module.util.ModuleDataParser.MetaDataParseException;
+import stencil.module.util.ModuleDataParser.MetadataParseException;
 import stencil.module.util.ann.*;
-import stencil.parser.string.util.Context;
 import stencil.interpreter.tree.Specializer;
 import static stencil.module.util.ModuleDataParser.operatorData;
 import static stencil.module.util.ModuleDataParser.moduleData;
@@ -21,7 +20,7 @@ public class JUNG extends BasicModule {
 	private static final Class[] OPERATOR_CLASSES = new Class[]{BalloonLayout.class, CircleLayout.class, FRLayout.class, ISOMLayout.class, KKLayout.class, RadialTreeLayout.class, SpringLayout.class, TreeLayout.class};
 	private static final Class[] CONSTRUCTOR_TYPES = new Class[]{OperatorData.class, Specializer.class};
 	
-	protected ModuleData loadOperatorData() throws MetaDataParseException {
+	protected ModuleData loadOperatorData() throws MetadataParseException {
 		final String MODULE_NAME = "JUNG";
 		
 		OperatorData[] ods = new OperatorData[]{
@@ -41,7 +40,7 @@ public class JUNG extends BasicModule {
 	}
 	
 	@Override
-	public StencilOperator instance(String name, Context context, Specializer specializer)
+	public StencilOperator instance(String name, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
 		validate(name, specializer);
 
@@ -62,6 +61,5 @@ public class JUNG extends BasicModule {
 		catch (InvocationTargetException e) {throw new Error("Could not instantiate JUNG operator",e);}
 		
 		throw new ModuleIncompleteError(name);
-	}
-
+	}	
 }

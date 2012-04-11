@@ -16,23 +16,15 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 
-import stencil.module.OperatorInstanceException;
-import stencil.module.ModuleCache;
-import stencil.module.SpecializationException;
 import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
-import stencil.parser.string.util.Context;
 import stencil.types.Converter;
-import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 
 import stencil.explore.util.NeedsPanel;
-
-import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
-import static stencil.parser.ParserConstants.OP_ARG_PREFIX;
 
 /**
  * A with special operators for making presentations.
@@ -219,53 +211,32 @@ public class Presentation extends BasicModule {
 	}
 
 	
-	@Operator
+	@Operator(spec="[map:\"map\", query:\"query\"]")
 	@Description("Runs a passed operator, but on query will alternate between the map and query facets.")
 	public static class BreakBinding extends AbstractOperator {
-		final Invokeable map;
-		final Invokeable query;
 		boolean doMap = false;
+		final String mapFacet;
+		final String queryFacet;
 		
-		public BreakBinding(OperatorData opData, StencilOperator op) {
+		public BreakBinding(OperatorData opData, Specializer spec) {
 			super(opData);
-			map = op.getFacet("map");
-			query = op.getFacet("query");
+			mapFacet = Converter.toString(spec.get("map"));
+			queryFacet = Converter.toString(spec.get("map"));
 		}
 		
 		@Facet(memUse="WRITER", counterpart="query")
-		public Object map(Object... args) {return map.invoke(args);}
+		public Object map(StencilOperator op, Object... args) {
+			Invokeable map = op.getFacet(mapFacet);
+			return map.invoke(args);
+		}
 
 		@Facet(memUse="READER")
-		public Object query(Object... args) {
+		public Object query(StencilOperator op, Object... args) {
 			doMap = !doMap;
-			if (doMap) {return map.invoke(args);}
-			else {return query.invoke(args);}
-		}
-	}
-	
-	public StencilOperator instance(String name, Context context, Specializer specializer, ModuleCache modules) throws SpecializationException {
-		List<StencilOperator> opArgs = new ArrayList();
-
-
-		//TODO: This is a horrible way to resolve things, have the operator as value in a CONST in the specializer instead of the name
-		for (String key: specializer.keySet()) {
-			if (key.startsWith(OP_ARG_PREFIX)) {
-				StencilOperator op;
-				try {
-					op = modules.instance((MultiPartName) specializer.get(key), null, EMPTY_SPECIALIZER, false);
-					opArgs.add(op);
-				} catch (OperatorInstanceException e) {throw new IllegalArgumentException("Error instantiate operator-as-argument " + specializer.get(key), e);}
+			if (doMap) {return map(op, args);}
+			else {
+				return op.getFacet(queryFacet).invoke(args);
 			}
-		}
-		
-		assert opArgs.size() >0;
-		if (opArgs.size() >1) {throw new IllegalArgumentException(name + " can only accept one higher order arg, recieved " + opArgs.size());}
-		
-		
-		if (name.equals("BreakBinding")) {
-			return new BreakBinding(getOperatorData(name, specializer), opArgs.get(0));
-		} else {
-			return super.instance(name, context, specializer, modules);
 		}
 	}
 }

@@ -1,6 +1,6 @@
 import ViewCanvas
 
-stream Mouse(X, Y, TYPE, BUTTON, META, SHIFT, DELTA_X, DELTA_Y, CLICK_COUNT) from Mouse
+stream Mouse(X, Y, TYPE, BUTTON, META, SHIFT, DELTA_X, DELTA_Y, CLICK_COUNT) : Mouse
 
 canvas main[COLOR: "BLACK"]
 

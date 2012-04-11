@@ -18,6 +18,7 @@ options {
   import stencil.interpreter.tree.TupleField;
   import stencil.interpreter.tree.Freezer;
   import stencil.parser.tree.StencilTree;
+  import stencil.parser.string.util.TreeRewriteSequence;
   import static stencil.parser.ParserConstants.GUIDE_ELEMENT_TAG;
 }
 

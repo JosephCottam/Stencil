@@ -1,4 +1,4 @@
-stream Stream(V) from Text["../none.txt"]
+stream Stream(V)
 
 layer Layer
 from Stream

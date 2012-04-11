@@ -1,7 +1,7 @@
 import BrewerPalettes
 
 stream Barley(year, site, yield, variety)             /*@\label{barley:streamDecl}@*/
-  from Text["./BeckersBarley.csv"]
+  : Text["./BeckersBarley.csv"]
   
 const MAX: 100
 const MIN: 10

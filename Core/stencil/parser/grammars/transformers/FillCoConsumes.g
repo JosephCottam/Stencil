@@ -26,13 +26,14 @@ options {
    import stencil.tuple.prototype.TupleFieldDef;
    import stencil.parser.ProgramCompileException;
    import stencil.parser.ParseStencil;
+   import stencil.parser.string.util.TreeRewriteSequence;
    
    import java.util.Set;
    import java.util.HashSet;
 }
 
 @members {  
-  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
   
   public StencilTree augment(StencilTree rules) {
      assert rules.is(RULES_RESULT);
