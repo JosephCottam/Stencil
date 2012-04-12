@@ -170,4 +170,16 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 	public Iterator<StencilTree> iterator() {return new ChildrenIterator(this);}
 	
 	public boolean is(int type) {return this.getType() == type;}
+	
+	@Override
+	public void replaceChildren(int startChildIndex, int stopChildIndex, Object t) {
+		if (t == null) {
+			//Remove childre... but only as long as there is still a child to remove
+			for (int i=startChildIndex; i<stopChildIndex && startChildIndex < this.getChildCount(); i++) {
+				this.deleteChild(startChildIndex);
+			}
+		} else {
+			super.replaceChildren(startChildIndex, stopChildIndex, t);
+		}
+	}
 }

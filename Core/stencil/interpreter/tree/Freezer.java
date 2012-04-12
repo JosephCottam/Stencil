@@ -21,6 +21,8 @@ import stencil.types.Converter;
 
 import static stencil.parser.string.StencilParser.*;
 
+
+//TODO: Remove asserts...they off by default so they don't help much.  Keep the test, drop the assert.
 public final class Freezer {
 	public static Object VALUE_ALL = new String("ALL");	//New strings because these need to be distinct from other "random" usages of the word, but still have these contents
 
@@ -35,6 +37,7 @@ public final class Freezer {
 	private Freezer() {}
 
 	public static boolean verifyType(StencilTree tree, int... types) {
+		if (tree == null) {return true;}  //Null is always a tree of "that" type
 		for (int type: types) {
 			if (tree.is(type)) {return true;}
 		}
@@ -210,6 +213,7 @@ public final class Freezer {
 	
 	//TODO: Merge ViewOrCanvas with Layer
 	public static ViewOrCanvas viewOrCanvas(StencilTree source) {
+		if (source == null) {return null;}
 		assert verifyType(source, VIEW, CANVAS);	
 		
 		String name = source.getText();
@@ -283,7 +287,9 @@ public final class Freezer {
 	}
 	
 	public static DynamicRule[] dynamicRuleList(StencilTree dynamics) {
-		assert verifyType(dynamics, RULES_DYNAMIC);
+		if (dynamics == null) {return new DynamicRule[0];}
+		verifyType(dynamics, RULES_DYNAMIC);
+		
 		DynamicRule[] results = new DynamicRule[dynamics.getChildCount()];
 		for (int i=0; i< results.length; i++) {
 			results[i] = dynamicRule(dynamics.getChild(i));
@@ -467,7 +473,7 @@ public final class Freezer {
 	}
 	
 	public static Specializer specializer(StencilTree spec) {
-		assert verifyType(spec, SPECIALIZER);
+		verifyType(spec, SPECIALIZER);
 		
 		List<StencilTree> entries = spec.findAll(MAP_ENTRY);
 		

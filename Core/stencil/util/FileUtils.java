@@ -16,7 +16,7 @@ public final class FileUtils {
 	
 	public static String readFile(File f) throws Exception {
 		try {return readFile(new BufferedReader(new FileReader(f)));}
-		catch(Exception e) {throw new RuntimeException("Error Restoring prior state.", e);}
+		catch(Exception e) {throw new RuntimeException("Error reading file contents.", e);}
 		
 	}
 	

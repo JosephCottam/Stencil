@@ -17,6 +17,21 @@ import stencil.util.FileUtils;
 import static stencil.unittests.parser.string.TestParseStencil.ancestryCheck;
 
 public class TreeView {
+	public static void showTree(Tree tree, String title) {
+		showTree(tree, title, 0,0);
+	}
+
+	public static void showTree(Tree tree, String title, int x, int y) {
+		JFrame f;
+
+		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
+		f.setTitle(title);
+		f.setSize(500, 800);
+		f.setLocation(x,y);
+		f.setVisible(true);
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
 	//Arguments: <StencilProperties> [-header] <SourceFile>
 	//	If header is indicated, will treat source file as if it has a stencil explore header
 	//  If header is not indicated, all lines in the source file will loaded
@@ -32,7 +47,6 @@ public class TreeView {
 		ANTLRNode.showClass= true;
 		
 		Tree tree;
-		JFrame f;
 		
 		if (file == null) {throw  new IllegalArgumentException("Must provide file name.");}
 		
@@ -40,11 +54,9 @@ public class TreeView {
 		stencil.Configure.loadProperties(props);
 		
 		tree = stencil.parser.ParseStencil.programTree(text, Adapter.ADAPTER);
-		f = new stencil.testUtilities.treeView.TreeFrame(tree, new StencilParser(null));
-		f.setSize(500, 800);
-		f.setVisible(true);
-		
-		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		tree = stencil.parser.ParseStencil.checkParse(text);
+		showTree(tree, "");
+
 		try {ancestryCheck(tree);}
 		catch (Exception e) {
 			System.err.println("Error checking ancestory:");

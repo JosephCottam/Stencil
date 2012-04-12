@@ -21,8 +21,8 @@
         <!-- Five minute timeout-->
         <junit fork="yes" dir="./">
             <formatter type="xml"/>
-        	<!--TODO: Make my own formatter...-->
-            <formatter type="brief" usefile="false"/>
+        	<!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
+            <!--formatter type="brief" usefile="false"/-->
         	<jvmarg value="-DtestDir=${base}"/>
 
             <classpath>
