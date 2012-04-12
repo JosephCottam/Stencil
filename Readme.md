@@ -5,7 +5,7 @@ To check out and build Stencil, do the following:
 
     git clone git@github.iu.edu:jcottam/Stencil.git
     cd Stencil
-    ant -f build/build.xml -lib Library/ Release
+    ant -f build/build.xml Release
 
 This creates `Stencil_DDD.zip`, where `DDD` is the current
 data. Create a new directory called `Stencil`, and unzip your zip file
@@ -22,7 +22,7 @@ Testing
 
 In the Stencil directory you checked out from github, do the following:
 
-    ant -f build/build.xml -lib Library/ Test
+    ant -f build/build.xml Test
 
 This will generate a running textual status as well as
 generate an html report in directory called `testResults`.

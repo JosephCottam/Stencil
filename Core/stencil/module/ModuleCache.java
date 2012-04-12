@@ -183,9 +183,9 @@ public class ModuleCache {
 			register(m);
 		}
 		
-		String defaults = props.get(DEFAULT_MODULES_KEY).toString();
+		Object defaults = props.get(DEFAULT_MODULES_KEY);
 		if (defaults  != null) {
-			defaultModules = defaults.trim().split("\\s*,\\s*");
+			defaultModules = defaults.toString().trim().split("\\s*,\\s*");
 		}
 	}
 	

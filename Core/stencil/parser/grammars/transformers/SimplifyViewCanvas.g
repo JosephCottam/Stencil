@@ -9,7 +9,10 @@ options {
 
 @header {
 /**Ensures there is only one view and one canvas declaration.
-   Places that definition in a standard location.*/
+   Places that definition in a standard location.
+   If there are no layers defined and the view/canvas were not directly defined, does not generate a new one. 
+   
+   */
     package stencil.parser.string;
 
    import stencil.parser.tree.StencilTree;
@@ -17,13 +20,21 @@ options {
 }
 
 @members {
-  public static StencilTree apply (StencilTree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  public static StencilTree apply (Tree t) {return (StencilTree) TreeRewriteSequence.apply(t);}
+  
+  public static int layerCount(StencilTree t) {
+    return t.getAncestor(PROGRAM).findAllDescendants(LAYER).size();
+  } 
 }
 
 topdown
     : ^(LIST_CANVAS def=.) -> $def
     | ^(LIST_VIEW def=.) -> $def
-    | LIST_CANVAS -> ^(CANVAS["default"] ^(SPECIALIZER DEFAULT) LIST_CONSUMES)
-    | LIST_VIEW -> ^(VIEW["default"] ^(SPECIALIZER DEFAULT) LIST_CONSUMES);
+    | lc=LIST_CANVAS 
+        -> {layerCount($lc) > 0}? ^(CANVAS["default"] ^(SPECIALIZER DEFAULT) LIST_CONSUMES)
+        -> LIST_CANVAS
+    | lv=LIST_VIEW 
+        -> {layerCount($lv) > 0}? ^(VIEW["default"] ^(SPECIALIZER DEFAULT) LIST_CONSUMES)
+        -> LIST_VIEW;
     
 	 

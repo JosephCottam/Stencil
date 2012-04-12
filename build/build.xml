@@ -1,10 +1,12 @@
  <project name="Stencil" default="Stencil" basedir="..">
-   <taskdef resource="net/sf/antcontrib/antlib.xml">
-     <classpath><pathelement location="Library/ant-contrib-1.0b3.jar"/></classpath>
-   </taskdef>
-   <taskdef resource="org/apache/tools/ant/antlr/antlib.xml">
-     <classpath><pathelement location="Library/antlr3-ant.jar"/></classpath>
-   </taskdef>
+   <taskdef 
+   	    name="foreach"
+   		classname="net.sf.antcontrib.logic.ForEach"
+   		classpath="Library/ant-contrib-1.0b3.jar"/>
+   <taskdef 
+   	 name="antlr3"
+ 	 classname="org.apache.tools.ant.antlr.ANTLR3"
+   	 classpath="Library/antlr3-ant.jar"/>
    
    <property name="core" location="Core" />
    <property name="modules" location="Modules" />
@@ -52,11 +54,10 @@
 
     <!-- Just the core stencil grammar, not the additional processing.-->
     <target name="StencilGrammar">
-      <antlr3
-	 	target="${grammars}/Stencil.g"
-	 	outputdirectory="${parser}"
-	 	dir="${runtimeLibrary}"
-	 />
+    	<antcall target="antlrBuild">
+    	  <param name="file" value="${grammars}/Stencil.g"/>
+		  <param name="antlrTarget" value="${parser}"/>
+    	</antcall>
     </target>
 
  	
@@ -104,7 +105,6 @@
     	</delete> 	
     </target>
 
- 	
  	<!--Remove existing ANTLR results completely.-->
  	<target name="ClearOldAntlrResults">
     	<delete>
@@ -121,27 +121,15 @@
 
  	
     <!--Build a single antlr target-->
- 	<target name="antlrBuild" depends="antlr_classpath">
+ 	<target name="antlrBuild">
  		<antlr3
           target="${file}"
           outputdirectory="${antlrTarget}"
           libdirectory="${parser}"
-	 	  dir="${runtimeLibrary}"
-        />          
+	 	  dir="${runtimeLibrary}">
+          <classpath path="Library/antlr-3.4.jar"/>
+		</antlr3>
     </target>
- 	
- 	<!-- Check if ANTLR3 can be found in the classpath -->
- 	<target name="antlr_classpath">
-	 	<whichresource property="antlr.in.classpath" class="org.antlr.Tool" />
-	 	<fail message="ANTLR3 not found; use -lib ../Library/ with ant">
-		 	<condition>
-			 	<not>
-				 	<isset property="antlr.in.classpath"/>
-			 	</not>
-	 		</condition>
-	 	</fail>
- 	</target>
-
  	
     <target name="Jar" depends="">
         <ant antfile="./build/Deploy.xml" inheritRefs="true" target="CompiledJar"/>
