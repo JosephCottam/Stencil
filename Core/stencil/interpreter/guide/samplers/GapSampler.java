@@ -16,6 +16,7 @@ import stencil.tuple.instances.ArrayTuple;
 public class GapSampler implements SampleOperator {
 	public GapSampler() {}
 
+	@Override
 	public List<Tuple> sample(SampleSeed sd, Specializer spec) {		
 		ArrayList sample = new ArrayList();
 

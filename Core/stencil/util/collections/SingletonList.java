@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 public class SingletonList<T> implements List {
-	private final T value;
+	protected final T value;
 	
 	public SingletonList(T v) {value = v;}
 	

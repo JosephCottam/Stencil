@@ -54,6 +54,7 @@ public class Guide implements UpdateableComposite<Guide> {
 	/**Which fields are displayed (and what are their sample profiles)**/
 	public Specializer selectors() {return selectors;}
 	
+	@Override
 	public StateQuery stateQuery() {return stateQuery;}
 	public String identifier() {return identifier;}
 	public Specializer specializer() {return spec;}
@@ -138,6 +139,7 @@ public class Guide implements UpdateableComposite<Guide> {
 	}
 	
 	
+	@Override
 	public Guide viewpoint() {		
 		final MonitorOperator<MonitorOperator>[] movp = new MonitorOperator[monitorOps.length];
 		final Rule[] genp = new Rule[generators.length];

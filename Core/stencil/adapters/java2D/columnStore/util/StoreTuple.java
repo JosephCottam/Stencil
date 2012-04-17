@@ -66,16 +66,21 @@ public class StoreTuple implements Tuple, Cloneable, Glyph {
 	 * This is advised whenever a tuple leaves the Stencil system or is stored
 	 * in a data structure.  Otherwise, old versions of a table cannot be garbage collected.
 	 * **/
+	@Override
 	public Tuple clone() {
 		Object[] values = Tuples.toArray(this);
 		Tuple t = new PrototypedArrayTuple(schema, values);
 		return t;
 	}
 
+	@Override
 	public Comparable getID() {return (Comparable) columns[idCol].get(row);}
+	@Override
 	public boolean isVisible() {return (Boolean) columns[visibleCol].get(row);}	
+	@Override
 	public String toString() {return Tuples.toString(this);}
 	
 	
+	@Override
 	public Rectangle2D getBoundsReference() {return ((Rectangle2D) columns[boundsCol].get(row));}
 }

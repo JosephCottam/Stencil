@@ -33,6 +33,7 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 		}
 	}
 	
+	@Override
 	public Finisher update() {
 		TableShare share = table.viewpoint();
 		final List<Tuple> result = viewpointFragment.apply(share);
@@ -77,6 +78,7 @@ public final class DynamicUpdateTask extends UpdateTask<DynamicRule> {
 			
 		}
 		
+		@Override
 		public void finish() {
 			for (int i=0; i<targets.length; i++) {share.setColumn(targets[i], newCols[i]);}
 		}

@@ -56,6 +56,7 @@ public class Interactive implements Runnable {
 		Interactive app;
 
 		public AppCloser(Interactive interactiveApp) {this.app = interactiveApp;}
+		@Override
 		public void windowClosed(WindowEvent e) {
 			((JFrame)e.getSource()).dispose();
 			if (app.stencilFrame != null) {app.stencilFrame.dispose();}
@@ -113,6 +114,7 @@ public class Interactive implements Runnable {
 		stencilContentPanel.setLayout(new BorderLayout());
 
 		execute.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {executeApplication();}
 
 		});
@@ -247,6 +249,7 @@ public class Interactive implements Runnable {
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_W, ActionEvent.META_MASK));
 
 		ActionListener fileMenuListener = new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent arg) {
 				if (arg.getSource() == open) {
 					JFileChooser fc = new JFileChooser();
@@ -354,6 +357,7 @@ public class Interactive implements Runnable {
 		messages.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_3, ActionEvent.META_MASK));
 
  		ActionListener windowMenuListener = new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg) {
 				if (arg.getSource() == editor) {
 					editorFrame.setVisible(true);
@@ -380,6 +384,7 @@ public class Interactive implements Runnable {
 
 	}
 
+	@Override
 	public void run() {
 		editorFrame.setVisible(true);
 		messageFrame.setVisible(true);

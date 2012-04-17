@@ -15,6 +15,7 @@ import java.util.Iterator;
  */
 public interface LayerView<T extends Glyph> extends Iterable<T> {
 	/**Return an iterator of the tuples of this layer*/
+	@Override
 	public Iterator<T> iterator();
 
 	/**Returns an object whose iteration is in the order the contents should be rendered (back-to-front).*/

@@ -19,6 +19,7 @@ public class TargetTuple implements Iterable<TupleField> {
 	
 	public TupleField[] fields() {return fields;}
 	public int size() {return fields.length;}
+	@Override
 	public Iterator<TupleField> iterator() {return Arrays.asList(fields).iterator();}
 	public boolean contains(TupleField field) {return contains(field.toString());}
 	public boolean contains(String field) {

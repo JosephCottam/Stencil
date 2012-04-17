@@ -11,6 +11,7 @@ public class TimeSet<T> extends ConditionSet<T, Long> {
 	public TimeSet(int maxAge) {this.maxAge = maxAge;}
 
 	/**Indicate that a sweep should be made and a new pass started.*/
+	@Override
 	public void sweep() {
 		long oldest = Calendar.getInstance().getTimeInMillis();
 		oldest = oldest - maxAge;
@@ -22,6 +23,7 @@ public class TimeSet<T> extends ConditionSet<T, Long> {
 		}
 	}
 
+	@Override
 	public Entry wrap(T o) {
 		Long l  =Calendar.getInstance().getTimeInMillis();
 		return new Entry(l, o);

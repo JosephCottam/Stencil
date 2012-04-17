@@ -207,6 +207,7 @@ public class BinaryTupleStream {
 			}
 		}
 
+		@Override
 		public void stop() {
 			try {input.close();}
 			catch (Exception e) {}

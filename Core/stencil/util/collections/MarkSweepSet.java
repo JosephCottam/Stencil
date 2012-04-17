@@ -17,6 +17,7 @@ public final class MarkSweepSet<T> extends ConditionSet<T, Integer> {
 
 		public Entry(Integer m, T value) {super(m, value);}
 
+		@Override
 		public boolean equals(Object o) {
 			if (!(o.getClass().equals(Entry.class))) {return false;}
 
@@ -33,6 +34,7 @@ public final class MarkSweepSet<T> extends ConditionSet<T, Integer> {
 	protected int newMark=Integer.MIN_VALUE;
 
 	/**Indicate that a sweep should be made and a new pass started.*/
+	@Override
 	public void sweep() {
 		Iterator<ConditionSet<T,Integer>.Entry> i = contents.iterator();
 		while (i.hasNext()) {
@@ -44,5 +46,6 @@ public final class MarkSweepSet<T> extends ConditionSet<T, Integer> {
 		else {newMark++;}
 	}
 
+	@Override
 	public Entry wrap(T o) {return new Entry(newMark, o);}
 }

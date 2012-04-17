@@ -34,7 +34,8 @@ public class BooleanColumn extends AbstractColumn<Boolean> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return size;}
+    @Override
+	public int size() {return size;}
     
     // ------------------------------------------------------------------------
     // Data Access Methods    
@@ -42,7 +43,8 @@ public class BooleanColumn extends AbstractColumn<Boolean> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public Boolean get(int row) {
+    @Override
+	public Boolean get(int row) {
         return new Boolean(getBoolean(row));
     }
 

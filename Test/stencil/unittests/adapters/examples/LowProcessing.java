@@ -17,6 +17,7 @@ public class LowProcessing extends ImageTest {
 				  configs));
 	}
 	
+	@Override
 	public void setUp() throws Exception {
 		MemoryMXBean mb = ManagementFactory.getMemoryMXBean();
 		MemoryUsage mu = mb.getHeapMemoryUsage();

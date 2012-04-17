@@ -56,6 +56,7 @@ public class QueryTuples implements TupleStream {
 	/**Closes connection.
 	 * Connection cannot be reset after this, it must be recreated.
 	 **/
+	@Override
 	public void stop() {
 		try {
 			results.close();
@@ -64,6 +65,7 @@ public class QueryTuples implements TupleStream {
 		} catch (Exception e) {}
 	}
 
+	@Override
 	public SourcedTuple next() {
 		Object[] values = new Object[columnCount];
 
@@ -81,11 +83,13 @@ public class QueryTuples implements TupleStream {
 		results = statement.executeQuery(query);
 	}
 
+	@Override
 	public boolean hasNext() {
 		try {return !results.isLast();}
 		catch (Exception e) {throw new RuntimeException(e);}
 	}
 
 
+	@Override
 	public void remove() {throw new UnsupportedOperationException("Remove not supported on Query TupleStream.");}
 }

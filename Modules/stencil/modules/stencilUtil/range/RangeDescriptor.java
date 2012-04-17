@@ -78,6 +78,7 @@ public class RangeDescriptor {
 	/**Is the end value relative to the end-of-stream?*/
 	public boolean relativeEnd() {return getEndValue() <= RANGE_END_INT;}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
 		if (!(other instanceof RangeDescriptor)) {return false;}
@@ -94,6 +95,7 @@ public class RangeDescriptor {
 		return String.format("%1$d .. %2$s", start, ev);
 	}
 	
+	@Override
 	public int hashCode() {
 		int a = getStartValue();
 		int b = getEndValue();

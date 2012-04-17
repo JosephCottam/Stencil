@@ -25,7 +25,8 @@ public class IntColumn extends AbstractColumn<Integer> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return m_values.length;}
+    @Override
+	public int size() {return m_values.length;}
     
     // ------------------------------------------------------------------------
     // Data Access Methods    
@@ -33,7 +34,8 @@ public class IntColumn extends AbstractColumn<Integer> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public Integer get(int row) {return new Integer(getInt(row));}
+    @Override
+	public Integer get(int row) {return new Integer(getInt(row));}
 
     // ------------------------------------------------------------------------
     // Data Type Convenience Methods

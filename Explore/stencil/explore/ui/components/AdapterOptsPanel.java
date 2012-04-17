@@ -59,20 +59,24 @@ public final class AdapterOptsPanel extends JPanel implements StencilMutable.Con
 
 		//Listeners for change events.  Indicate something MIGHT have changed.
 		defaultMouse.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {fireOptsChanged();}
 		});
 
 		adapter.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {fireOptsChanged();}
 		});
 
 		debug.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent arg0) {fireOptsChanged();}
 		});
 
 	}
 
 	/**Given the compielrOpts passed, set all controls accordingly.*/
+	@Override
 	public void setAdapterOpts(AdapterOpts source) {
 		if (source.getDebug() == null) {debug.setSelectedItem("null");}
 		else {debug.setSelectedItem(source.getDebug().toString());}

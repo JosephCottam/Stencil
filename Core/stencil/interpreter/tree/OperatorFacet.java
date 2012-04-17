@@ -26,6 +26,7 @@ public class OperatorFacet implements Viewpoint<OperatorFacet> {
 	public OperatorRule[] getRules() {return rules;}
 	public Rule getPrefilterRules() {return prefilters;}
 	
+	@Override
 	public OperatorFacet viewpoint() {
 		final OperatorRule[] vpr = new OperatorRule[rules.length];
 		for (int i=0; i<vpr.length; i++) {vpr[i] = rules[i].viewpoint();}

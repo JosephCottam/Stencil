@@ -18,6 +18,7 @@ public interface Shaper {
 	public static class Const implements Shaper {
 		private final Shape shape;
 		public Const (StandardShape shape, double width, double height) {this.shape = Shapes.getShape(shape, 0, 0, width, height);}
+		@Override
 		public Shape shape(Tuple t) {return shape;}
 	}
 	
@@ -37,6 +38,7 @@ public interface Shaper {
 			this.sizeIdx = sizeIdx;
 		}
 		
+		@Override
 		public Shape shape(Tuple t) {
 			double height = (Double) t.get(heightIdx);
 			double width = (Double) t.get(widthIdx);

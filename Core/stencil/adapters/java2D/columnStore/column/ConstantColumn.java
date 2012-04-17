@@ -23,13 +23,15 @@ public class ConstantColumn<T> extends AbstractColumn<T> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {throw new UnsupportedOperationException();}
+    @Override
+	public int size() {throw new UnsupportedOperationException();}
 
 
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public T get(int row) {return super.m_defaultValue;}
+    @Override
+	public T get(int row) {return super.m_defaultValue;}
 
 	@Override
 	public Column update(Object[] values, int[] targets, int extend) {throw new UnsupportedOperationException("Cannot extend constant column");}

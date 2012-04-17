@@ -43,7 +43,8 @@ public class ObjectColumn<T> extends AbstractColumn<T> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return values.length;}
+    @Override
+	public int size() {return values.length;}
         // ------------------------------------------------------------------------
     // Data Access Methods
     
@@ -52,7 +53,8 @@ public class ObjectColumn<T> extends AbstractColumn<T> {
      * @param row the row from which to retrieve the value
      * @return the data value
      */
-    public T get(int row) {
+    @Override
+	public T get(int row) {
         if ( row < 0 || row >= values.length ) {
             throw new IllegalArgumentException(
                 "Row index out of bounds: "+row);

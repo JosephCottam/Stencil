@@ -12,6 +12,7 @@ public final class ISOMLayout extends GraphOperator.StepOperator {
 	}
 	
 	
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.ISOMLayout l = new edu.uci.ics.jung.algorithms.layout.ISOMLayout(new DelegateForest(graph));
 		l.setSize(size);

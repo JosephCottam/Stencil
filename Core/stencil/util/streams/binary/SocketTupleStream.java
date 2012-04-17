@@ -107,6 +107,7 @@ public class SocketTupleStream implements TupleStream {
 		}
 	}
 
+	@Override
 	public void stop() {
 		try {socket.close();}
 		catch (Exception e) {}

@@ -9,8 +9,10 @@ import stencil.util.ConversionException;
 public class FontWrapper implements TypeWrapper {
 	private static Class[] ACCEPTS = {Font.class};
 
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
 
+	@Override
 	public Object convert(Object v, Class c) {
 		if (c.isAssignableFrom(v.getClass())) {return v;}
 		
@@ -34,6 +36,7 @@ public class FontWrapper implements TypeWrapper {
 		throw new ConversionException(v,c);
 	}
 
+	@Override
 	public Tuple toTuple(Object o) {
 		if (o instanceof Font) {return new FontTuple((Font) o);}
 		throw new RuntimeException("Error wrapping: " + o.toString());

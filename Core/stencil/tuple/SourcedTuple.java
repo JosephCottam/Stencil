@@ -22,18 +22,27 @@ public interface SourcedTuple extends Tuple {
 			this.base = base;
 		}
 		
+		@Override
 		public Object get(int idx) throws TupleBoundsException {
 			if (idx == SOURCE) {return source;}
 			if (idx == VALUES) {return base;}
 			throw new TupleBoundsException(idx, size());
 		}
 
+		@Override
 		public int size() {return 2;}
 		
+		@Override
 		public String getSource() {return source;}
+		@Override
 		public Tuple getValues() {return base;}
+		@Override
 		public String toString() {return Tuples.toString(this);}
 		
+		@Override
 		public boolean equals(Object other) {return Tuples.equals(this, other);}
+		
+		@Override
+		public int hashCode() {return Tuples.hashCode(this);}
 	}
 }

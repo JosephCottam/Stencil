@@ -36,6 +36,7 @@ public final class LayerCrossSampler extends LayerSampler {
 		outPrototype = new TuplePrototype(outNames);
 	}
 
+	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		List<Tuple> l = new ArrayList();
 		TableView view = ((Table) layer).tenured();		
@@ -49,5 +50,6 @@ public final class LayerCrossSampler extends LayerSampler {
 		return l;
 	}
 	
+	@Override
 	public TuplePrototype prototype() {return outPrototype;}
 }

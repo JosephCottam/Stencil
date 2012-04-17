@@ -47,6 +47,7 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 	@Override
 	public void signalStop() {painter.signalStop();}
 	
+	@Override
 	@SuppressWarnings("deprecation")
 	public void dispose() {
 		if (painterThread != null && painterThread.isAlive()) {
@@ -67,12 +68,17 @@ public class Panel extends StencilPanel<StoreTuple, DisplayLayer<StoreTuple>, Ca
 	/**Listening to the panel is really listening to its canvas.
 	 * HACK: Combine panel and canvas when Piccolo goes away...
 	 */
+	@Override
 	public synchronized void addMouseListener(MouseListener l) {canvas.addMouseListener(l);}
+	@Override
 	public synchronized void addMouseMotionListener(MouseMotionListener l) {canvas.addMouseMotionListener(l);}
 	
+	@Override
 	public CanvasTuple getCanvas() {return new CanvasTuple(this.canvas);}
+	@Override
 	public ViewTuple getView() {return new ViewTuple(this);}
 	
+	@Override
 	public void export(String filename, String type, Object info) throws Exception {
 		if (type.equals("PNG") || type.equals("RASTER")) {
 			exportPNG(filename, Converter.toInteger(Array.get(info,0)));

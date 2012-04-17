@@ -25,6 +25,7 @@ public class OperatorProxy extends StencilTree {
 	
 	public OperatorData getOperatorData() {return operatorData;}
 	
+	@Override
 	public String toString() {
 		String result = super.toString();
 		if (operator == null) {result = result + " -Op";}
@@ -32,6 +33,7 @@ public class OperatorProxy extends StencilTree {
 		return result;
 	}
 
+	@Override
 	public OperatorProxy dupNode() {
 		OperatorProxy n = (OperatorProxy) super.dupNode();
 		n.operator = this.operator;

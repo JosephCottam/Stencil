@@ -75,8 +75,10 @@ public class StrokeTuple implements PrototypedTuple {
 	
 	public java.awt.Stroke getStroke() {return stroke;}
 
+	@Override
 	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		if (SELF_IDX == idx) {return this;}
 		if (WIDTH_IDX == idx) {return stroke.getLineWidth();}
@@ -88,6 +90,7 @@ public class StrokeTuple implements PrototypedTuple {
 		throw new TupleBoundsException(idx, this);
 	}
 
+	@Override
 	public TuplePrototype prototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {
@@ -100,10 +103,18 @@ public class StrokeTuple implements PrototypedTuple {
 		return false;
 	}
 
+	@Override
 	public int size() {return FIELDS.length;}
+
+	@Override
 	public String toString() {return Tuples.toString("Stroke", this, 1);}
+
+	@Override
 	public boolean equals(Object other) {
 		return other instanceof StrokeTuple 
 				&& ((StrokeTuple) other).stroke.equals(stroke);
 	}
+	
+	@Override
+	public int hashCode() {return Tuples.hashCode(this);}
 }

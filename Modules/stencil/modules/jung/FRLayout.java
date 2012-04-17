@@ -11,6 +11,7 @@ public final class FRLayout extends GraphOperator.StepOperator {
 		super(opData, spec); 
 	}
 	
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.FRLayout l = new edu.uci.ics.jung.algorithms.layout.FRLayout(new DelegateForest(graph));
 		l.setMaxIterations(maxIterations);

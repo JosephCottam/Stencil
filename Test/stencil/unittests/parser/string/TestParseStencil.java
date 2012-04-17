@@ -64,6 +64,7 @@ public class TestParseStencil extends StencilTestCase {
 			this.file = file;
 			this.e = e;
 		}
+		@Override
 		public String toString() {
 			String error = e == null ? "" : ": " +  e.getClass().getSimpleName();
 			return type+":"+file + error;

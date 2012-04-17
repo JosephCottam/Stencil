@@ -31,6 +31,7 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
 			}
 		}
 		
+		@Override
 		public Object rule() throws RecognitionException {
 			try {
 				return method.invoke(target);
@@ -61,8 +62,10 @@ public abstract class TreeRewriteSequence extends TreeRewriter {
     protected StencilTree downup(Object t, final fptr down, final fptr up) {
         TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
         TreeVisitorAction actions = new TreeVisitorAction() {
-            public Object pre(Object tree)  { return applyOnce(tree, down); }
-            public Object post(Object tree) { return applyRepeatedly(tree, up); }
+            @Override
+			public Object pre(Object tree)  { return applyOnce(tree, down); }
+            @Override
+			public Object post(Object tree) { return applyRepeatedly(tree, up); }
         };
         try {t = v.visit(t, actions);}
         catch (ProgramCompileException ce) {throw ce;}

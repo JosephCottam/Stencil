@@ -160,8 +160,10 @@ public final class ReflectiveInvokeable<T, R> implements Invokeable<R> {
 		return varArgs;
 	}
 	
+	@Override
 	public int hashCode() {return method.hashCode();}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
 		if (!(other instanceof ReflectiveInvokeable)) {return false;}

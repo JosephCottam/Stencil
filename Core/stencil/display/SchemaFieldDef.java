@@ -32,6 +32,7 @@ public class SchemaFieldDef<T> extends SimpleFieldDef<T> {
 	}
 	
 	public boolean isConstant() {return constant;}
+	@Override
 	public String toString() {
 		String prefix;
 		if (isConstant()) {
@@ -42,6 +43,7 @@ public class SchemaFieldDef<T> extends SimpleFieldDef<T> {
 		return String.format("%1$s %2$s : %3$s", prefix, super.toString(), defaultValue());
 	}	
 	
+	@Override
 	public SchemaFieldDef rename(String newName) {
 		return new SchemaFieldDef(newName, defaultValue(), type(), constant);
 	}
@@ -76,6 +78,7 @@ public class SchemaFieldDef<T> extends SimpleFieldDef<T> {
 		@Override
 		public int size() {return prototype.size();}
 		
+		@Override
 		public String toString() {return Tuples.toString(this);}
 	}
 }

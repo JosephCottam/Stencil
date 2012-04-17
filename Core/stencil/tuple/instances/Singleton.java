@@ -12,7 +12,7 @@ import stencil.tuple.prototype.TuplePrototype;
  * operations are resolved at compile-time.
  */
 public class Singleton {
-	private  Singleton() {}
+	protected  Singleton() {}
 	
 	public static Tuple from(Object v) {return new Value(v);}
 	public static PrototypedTuple from(String name, Object v) {return new Prototyped(name, v);}
@@ -22,16 +22,21 @@ public class Singleton {
 		
 		public Value(Object v) {this.value = v;}
 	
+		@Override
 		public Object get(int idx) throws TupleBoundsException {
 			if (idx >0) {throw new TupleBoundsException(idx, this);}
 			return value;
 		}
 		
+		@Override
 		public int size() {return 1;}
 		
+		@Override
 		public String toString() {return Tuples.toString(this);}
 		
+		@Override
 		public boolean equals(Object other) {return Tuples.equals(this, other);}
+		@Override
 		public int hashCode() {return Tuples.hashCode(this);}
 	}
 	
@@ -44,16 +49,21 @@ public class Singleton {
 			this.name = name;
 		}
 					
+		@Override
 		public TuplePrototype prototype() {return new TuplePrototype(name);}
 	
+		@Override
 		public Object get(String name) throws InvalidNameException {
 			if (name.equals(name)) {return value;}
 			throw new InvalidNameException(name, this.prototype());
 		}
 		
+		@Override
 		public int size() {return 1;}
 		
+		@Override
 		public boolean equals(Object other) {return Tuples.equals(this, other);}
+		@Override
 		public int hashCode() {return Tuples.hashCode(this);}
 	}
 }

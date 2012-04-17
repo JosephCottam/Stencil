@@ -18,8 +18,10 @@ import stencil.util.ConversionException;
 public class GeometryWrapper implements TypeWrapper {
 	private static Class[] ACCEPTS = {Point2D.Double.class, Rectangle2D.Double.class, Point2D.Float.class, Rectangle2D.Float.class, Point2D.class, Rectangle2D.class, Point.class, Rectangle.class};
 	
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
 
+	@Override
 	public Object convert(Object v, Class c) {
 		if (v.getClass().isArray()) {
 			int length = Array.getLength(v);

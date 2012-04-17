@@ -12,8 +12,10 @@ public class CanvasTuple extends stencil.display.CanvasTuple {
 	
 	public CanvasTuple(Canvas c) {canvas = c;}
 	
+	@Override
 	public Canvas getComponent() {return canvas;}
 
+	@Override
 	protected Rectangle getBounds() {return canvas.contentBounds(true);}
 
 	public void set(String field, Object value) {

@@ -27,6 +27,7 @@ public interface Capper {
 
 	/**Return an empty path**/
 	public final class None implements Capper {
+		@Override
 		public GeneralPath getCap(Tuple t, Shape line) {return new GeneralPath();}
 	}
 	
@@ -41,6 +42,7 @@ public interface Capper {
 			this.weight = weight;
 		}
 		
+		@Override
 		public GeneralPath getCap(Tuple t, Shape line) {
 			return Util.cap(type, line, weight, left);
 		}
@@ -57,6 +59,7 @@ public interface Capper {
 			this.left = left;
 		}
 		
+		@Override
 		public GeneralPath getCap(Tuple t, Shape line) {
 			Stroke s = (Stroke) t.get(weightIdx);
 			double weight = ((BasicStroke) s).getLineWidth();

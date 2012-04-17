@@ -47,8 +47,10 @@ public class TupleRef 	{
 		return result;
 	}
 	
+	@Override
 	public int hashCode() {return hashCode;}
 	
+	@Override
 	public boolean equals(Object o) {
 		if (o == null 
 				|| !(o instanceof TupleField)

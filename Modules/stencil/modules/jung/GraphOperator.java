@@ -154,6 +154,7 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 			maxIterations = Converter.toInteger(spec.get(STEPS_KEY));
 		}
 		
+		@Override
 		public void setLayout(Layout layout) {
 			this.layout = (IterativeContext) layout;	
 			super.setLayout(layout);
@@ -165,6 +166,7 @@ public abstract class GraphOperator extends AbstractOperator.Statefull {
 		}
 		
 		
+		@Override
 		@Facet(memUse="READER", prototype="(int VALUE)")
 		public int stateID() {
 			if (layout == null) {resetLayout();}

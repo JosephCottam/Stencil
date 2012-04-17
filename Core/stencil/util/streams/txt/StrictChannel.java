@@ -33,6 +33,7 @@ final class StrictChannel implements NextChannel {
 	 * an exception.
 	 *
 	 */
+	@Override
 	public String[] next(BufferedReader source) throws NoSuchElementException, RuntimeException {
 		String line;
 
@@ -76,6 +77,7 @@ final class StrictChannel implements NextChannel {
 	 * @return True if everything that is checked matches.
 	 * @throws Exception Thrown when column count does not match or stream is not open or does not have a labels list.
 	 */
+	@Override
 	public void validate(BufferedReader source) throws Exception, FileValidationException
 	{
 		if (source ==null) {throw new Exception("Parse file cannot be validated before reader has been intialized.");}

@@ -78,7 +78,8 @@ public abstract class AbstractShapeRenderer implements Renderer<TableView> {
 	   return trans;
    }
 
-   public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
+   @Override
+public void render(TableView layer, Graphics2D g, AffineTransform viewTransform) {
 	   for (Glyph glyph: new TupleIterator(layer, layer.renderOrder(), true)) {
 		   if (!glyph.isVisible()) {continue;}
 

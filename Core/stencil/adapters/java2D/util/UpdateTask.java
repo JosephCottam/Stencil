@@ -5,7 +5,8 @@ import java.util.concurrent.Callable;
 import stencil.interpreter.UpdateableComposite;
 
 public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Callable<Finisher> {
-	public static final Finisher NO_WORK = new Finisher() {public void finish() {}};
+	public static final Finisher NO_WORK = new Finisher() {@Override
+	public void finish() {}};
 
 	/**How should this task be identified in string form?*/
 	protected final String taskID;
@@ -55,5 +56,6 @@ public abstract class UpdateTask<T extends UpdateableComposite<T>> implements Ca
 		return NO_WORK;
 	}
 	
+	@Override
 	public String toString() {return taskID;}
 }

@@ -12,6 +12,7 @@ public final class Specializer extends PrototypedArrayTuple {
 	public boolean containsKey(String key) {return prototype().contains(key);}
 	public Iterable<String> keySet() {return Arrays.asList(TuplePrototypes.getNames(prototype));}
 	
+	@Override
 	public String toString() {return "Specializer -- " + Tuples.toString(this);}
 
 	public Object get(String key, Object defVal) {return this.containsKey(key) ? get(key) : defVal;}

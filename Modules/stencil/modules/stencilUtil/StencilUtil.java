@@ -89,10 +89,12 @@ public final class StencilUtil extends BasicModule {
 	}
 	
 	
+	@Override
 	protected void validate(String name, Specializer specializer) throws SpecializationException {
 		if (!moduleData.getOperatorNames().contains(name)) {throw new IllegalArgumentException("Name not known : " + name);}
 	}
 	
+	@Override
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
 		OperatorData od = moduleData.getOperator(name);

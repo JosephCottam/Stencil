@@ -13,6 +13,7 @@ import stencil.unittests.StencilTestCase;
 import static stencil.parser.ParserConstants.EMPTY_SPECIALIZER;
 
 public class TestModuleCache extends StencilTestCase {
+	@Override
 	public void setUp() throws Exception {super.setUp(); ModuleCache.clear();}
 	public static void initCache() throws Exception {
 		Properties props = new Properties();

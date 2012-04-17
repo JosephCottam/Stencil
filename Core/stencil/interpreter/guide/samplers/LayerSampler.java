@@ -39,12 +39,15 @@ public class LayerSampler implements SampleOperator {
 			view = viewpoint ? l.viewpoint() : null;
 		}
 
+		@Override
 		@Facet(memUse="READER")
 		public int stateID() {return (view != null) ? view.stateID() : layer.stateID();}
 
 		
 		public TuplePrototype getSamplePrototype() {return layer.prototype();}
+		@Override
 		public SampleSeed getSeed() {throw new UnsupportedOperationException("Should never seek the seed of a layer sampler.");}
+		@Override
 		public MonitorOperator viewpoint() {
 			return new MonitorOperator(layer);
 		}
@@ -72,6 +75,7 @@ public class LayerSampler implements SampleOperator {
 	protected final DisplayLayer layer;
 	
 	public LayerSampler(DisplayLayer layer) {this.layer = layer;}
+	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer details) {
 		List<Tuple> l = new ArrayList();
 		TableView view = ((Table) layer).tenured();

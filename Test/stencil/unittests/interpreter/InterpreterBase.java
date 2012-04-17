@@ -28,11 +28,13 @@ public abstract class InterpreterBase extends junit.framework.TestCase{
 
 	StencilPanel panel;
 	
+	@Override
 	public void setUp() throws Exception {
 		ModuleCache.register(new TestModule());
 		stencil.Configure.loadProperties("./TestData/Stencil.properties");
 	}
 
+	@Override
 	public void tearDown() throws Exception {
 		ModuleCache.remove("TestModule");
 		if (panel != null) {panel.dispose();}

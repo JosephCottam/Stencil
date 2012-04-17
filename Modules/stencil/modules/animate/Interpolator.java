@@ -29,6 +29,7 @@ public interface Interpolator<T> {
 			this.a = (Integer)a;
 			this.b = (Integer)b;
 		}
+		@Override
 		public Integer step(float f) {
 			return a + ((int)(f*(b-a)));
 		}
@@ -40,6 +41,7 @@ public interface Interpolator<T> {
 			this.a = (Long)a;
 			this.b = (Long)b;
 		}
+		@Override
 		public Long step(float f) {
 			return a + ((long)(((double)f)*(b-a)));
 		}
@@ -51,6 +53,7 @@ public interface Interpolator<T> {
 			this.a = (Float)a;
 			this.b = (Float)b;
 		}
+		@Override
 		public Float step(float f) {
 			return a + f*(b-a);
 		}
@@ -62,6 +65,7 @@ public interface Interpolator<T> {
 			this.a = (Double)a;
 			this.b = (Double)b;
 		}
+		@Override
 		public Double step(float f) {
 			return a + f*(b-a);
 		}

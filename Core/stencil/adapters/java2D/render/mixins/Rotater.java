@@ -13,6 +13,7 @@ public interface Rotater {
 	public abstract AffineTransform rotate(AffineTransform base, Tuple t);
 	
 	public static final class None implements Rotater {
+		@Override
 		public AffineTransform rotate(AffineTransform base, Tuple t) {return base;}
 	}
 	
@@ -20,6 +21,7 @@ public interface Rotater {
 		private final double radians;
 		public Const(double radians) {this.radians = radians;}
 
+		@Override
 		public AffineTransform rotate(AffineTransform base, Tuple t) {
 			base.rotate(radians);
 			return base;
@@ -31,6 +33,7 @@ public interface Rotater {
 		private final int idx;
 		public Variable(int idx) {this.idx = idx;}
 
+		@Override
 		public AffineTransform rotate(AffineTransform base, Tuple t) {
 			double radians = (Double) t.get(idx);
 			base.rotate(radians);

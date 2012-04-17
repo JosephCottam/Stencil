@@ -12,6 +12,7 @@ public final class RadialTreeLayout extends GraphOperator.SizedOperator {
 	}
 
 
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.RadialTreeLayout cLayout = new edu.uci.ics.jung.algorithms.layout.RadialTreeLayout(new DelegateForest(graph));
 		cLayout.setSize(size);

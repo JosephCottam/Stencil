@@ -13,6 +13,7 @@ public class Predicate implements Viewpoint<Predicate> {
 		this.args = args;
 	}
 	
+	@Override
 	public Predicate viewpoint() {
 		try {
 			Invokeable vp = inv.viewpoint();

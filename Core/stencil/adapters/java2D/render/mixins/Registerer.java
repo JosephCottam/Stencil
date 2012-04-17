@@ -18,6 +18,7 @@ public interface Registerer {
 
 	/**No changes made, just echo the base transform back.*/
 	public static final class None implements Registerer {
+		@Override
 		public AffineTransform register(AffineTransform base, Tuple t, Rectangle2D bounds) {return base;}
 	}
 	
@@ -25,6 +26,7 @@ public interface Registerer {
 	public static final class Const implements Registerer {
 		public final Registration reg;
 		public Const(Registration reg) {this.reg =reg;}
+		@Override
 		public AffineTransform register(AffineTransform base, Tuple t, Rectangle2D bounds) {
 			Point2D p = Registrations.registrationToTopLeft(reg, 0,0, bounds.getWidth(), bounds.getHeight());
 			base.translate(p.getX(), p.getY());
@@ -41,6 +43,7 @@ public interface Registerer {
 			this.regIdx = regIdx;
 		}
 		
+		@Override
 		public AffineTransform register(AffineTransform base, Tuple t, Rectangle2D bounds) {
 			Registration registration = (Registration) t.get(regIdx);
 			Point2D p = Registrations.registrationToTopLeft(registration, 0,0, bounds.getWidth(), bounds.getHeight());

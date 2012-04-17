@@ -178,8 +178,10 @@ public class Legend extends Guide2D {
 		return Tuples.mergeAll(label,example, Tuples.delete(contents, label_idx));
 	}	
 
+	@Override
 	public Rectangle2D getBoundsReference() {return data.getBoundsReference();}
 	
+	@Override
 	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
 		renderer.render(data.tenured(), g, viewTransform);
 	}

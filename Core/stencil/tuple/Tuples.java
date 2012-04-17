@@ -27,7 +27,8 @@ public final class Tuples {
 	 * was not set.  Since 'null' is a valid value in some places,
 	 * this is used in some circumstances to indicate that a value was not explicitly set.
 	 */
-	public static final Object UNSET_FIELD = new Object() {public String toString() {return "Unset Field: " + super.toString();}};
+	public static final Object UNSET_FIELD = new Object() {@Override
+	public String toString() {return "Unset Field: " + super.toString();}};
 
 	
 	/**Given a tuple with prefixed fields, creates a tuple with sub-tuples.

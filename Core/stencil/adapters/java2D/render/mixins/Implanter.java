@@ -9,7 +9,7 @@ import stencil.tuple.prototype.TuplePrototype;
 import stencil.types.Converter;
 
 
-/**Modify the scaling of a shape according to implantatiton rules.
+/**Modify the scaling of a shape according to implantation rules.
  * Valid implantations are:
  * 
  *  
@@ -44,31 +44,38 @@ public interface Implanter {
 	
 	/**Identity implanter, provided separately for optimization opportunities.**/
 	public final class Area implements Implanter {
+		@Override
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {return base;}
+		@Override
 		public boolean inBounds(Tuple t) {return true;}
 	}
 	
 	public final class Const implements Implanter {
 		private final ImplantBy implant;
-		private Const(ImplantBy implant) {this.implant =implant;}
+		
+		public Const(ImplantBy implant) {this.implant =implant;}
+		@Override
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {return Util.implant(implant, base, view);}
+		@Override
 		public boolean inBounds(Tuple t) {return implant != ImplantBy.SCREEN;}
 	}
 
 	public static final class Variable implements Implanter {
 		public final int implantIdx;
 		public Variable(int idx) {this.implantIdx = idx;}
+		@Override
 		public AffineTransform implant(AffineTransform base, AffineTransform view, Tuple t) {
 			ImplantBy implant = (ImplantBy) Converter.convert(t.get(implantIdx), ImplantBy.class);
 			return Util.implant(implant, base, view);
 		}
+		@Override
 		public boolean inBounds(Tuple t) {return t.get(implantIdx) != ImplantBy.SCREEN;}
 	}
 	
 	public static final class Util {
 		private Util() {}
 		
-		private static final AffineTransform implant(ImplantBy implant, AffineTransform base, AffineTransform view) {
+		protected static final AffineTransform implant(ImplantBy implant, AffineTransform base, AffineTransform view) {
 			double factor;
 			
 			if (view == null || view.isIdentity()) {return base;}

@@ -28,6 +28,7 @@ public class DateSampler implements SampleOperator {
 	
 	private static enum Unit {DAY, WEEK, MONTH, YEAR, DECADE, CENTURY;}	
 	
+	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		if (!seed.isContinuous()) {throw new RuntimeException("Can only use continuous sample for dates.");}
 		if (seed.size() <=1) {return new ArrayList();}//No seed -> No sample
@@ -113,6 +114,7 @@ public class DateSampler implements SampleOperator {
 	private static interface Predicate {public boolean is(Calendar c);}
 
 	private static final Predicate DECADE = new Predicate() {
+		@Override
 		public boolean is(Calendar c) {
 			int year=c.get(Calendar.YEAR);
 			return year%10==0;
@@ -120,6 +122,7 @@ public class DateSampler implements SampleOperator {
 	};
 	
 	private static final Predicate CENTURY  = new Predicate() {
+		@Override
 		public boolean is(Calendar c) {
 			int year=c.get(Calendar.YEAR);
 			return year%100==0;
@@ -127,6 +130,7 @@ public class DateSampler implements SampleOperator {
 	};
 	
 	private static final Predicate WEEK_START = new Predicate() {
+		@Override
 		public boolean is(Calendar c) {
 			return c.get(Calendar.DAY_OF_WEEK) == c.getFirstDayOfWeek();
 		}

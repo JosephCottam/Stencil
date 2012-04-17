@@ -45,6 +45,7 @@ public final class StencilRunner extends Thread {
 		this.setDaemon(true);	//Don't wait for it to finish before quitting
 	}
 
+	@Override
 	public void run() {
 		try {
 			running = true;

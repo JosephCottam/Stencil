@@ -53,6 +53,7 @@ public final class MultiPartName {
 	}
 
 	/**Return the whole name (prefix, name, facet), appropriately delimited.*/
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		if (!pre.equals("")) {b.append(pre); b.append(NAME_SPACE);}

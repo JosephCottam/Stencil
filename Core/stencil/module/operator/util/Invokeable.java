@@ -19,5 +19,6 @@ public interface Invokeable<R> extends Viewpoint<Invokeable> {
 	/**How should the target be identified when error messages are produced?**/
 	public String targetIdentifier();
 	
+	@Override
 	public Invokeable viewpoint();	
 }

@@ -41,6 +41,8 @@ public final class MultiThreadPainter {
 		protected AffineTransform base;
 		protected int stateID = Integer.MAX_VALUE;
 
+		protected PaintTask() {}
+		
 		/**Does the current painter need an update based on its backing information?
 		 * This method should be as conservative about updating as safe.
 		 */
@@ -88,14 +90,18 @@ public final class MultiThreadPainter {
 				this.renderer = renderer;
 			}
 			
+			@Override
 			public void preRender(BufferedImage prototype, AffineTransform base) {
 				this.view = layer.tenured();
 				super.preRender(prototype, base);
 			}
 			
+			@Override
 			public boolean updateRequired() {return forceUpdate || stateID != view.stateID();}
+			@Override
 			public void forceUpdate() {forceUpdate = true;}
 
+			@Override
 			public BufferedImage call() {
 				if (!updateRequired()) {return buffer;}
 				renderer.render(view, g, base);
@@ -105,6 +111,7 @@ public final class MultiThreadPainter {
 				return buffer;
 			}
 			
+			@Override
 			public String toString() {return "Layer Painter for " + layer.name();}
 		}
 		
@@ -112,15 +119,20 @@ public final class MultiThreadPainter {
 		private static final class Guide extends PaintTask {
 			private Guide2D guideDef;
 			
+			@Override
 			public boolean updateRequired(){return true;}
+			@Override
 			public void forceUpdate() {}
 			
 			public Guide(Guide2D guide) {this.guideDef = guide;}
+			
+			@Override
 			public BufferedImage call() {
 				
 				guideDef.render(g, base);
 				return buffer;
 			}
+			@Override
 			public String toString() {return "Guide Painter for " + guideDef.identifier();}
 		}
 		

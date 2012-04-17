@@ -26,11 +26,15 @@ public class ArrayTuple implements Tuple {
 		}
 	}
 
+	@Override
 	public Object get(int idx) throws TupleBoundsException {return values[idx];}
+	@Override
 	public int size() {return values.length;}
 	
+	@Override
 	public String toString() {return Tuples.toString(this);}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof Tuple)) {return false;}
 		Tuple t = (Tuple) other;
@@ -41,8 +45,12 @@ public class ArrayTuple implements Tuple {
 		return true;
 	}
 	
-	/**Direct access to the contained array, for stencil internal use only.*/
+	@Override
+	public int hashCode() {return Tuples.hashCode(this);}
+	
+	/**Direct access to the contained array...generally an unsafe operation.*/
 	public Object[] getValues() {return values;} 
 	
 	public static final ArrayTuple from(Object... values) {return new ArrayTuple(values);}
+	
 }

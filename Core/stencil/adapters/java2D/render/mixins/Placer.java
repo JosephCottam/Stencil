@@ -17,6 +17,7 @@ public interface Placer {
 	public static final class Variable implements Placer {
 		public final int xIdx, yIdx;
 		public Variable(int xIdx, int yIdx) {this.xIdx = xIdx; this.yIdx = yIdx;}
+		@Override
 		public AffineTransform place(AffineTransform base, Tuple t) {
 			double tx = (Double) t.get(xIdx);
 			double ty = (Double) t.get(yIdx);

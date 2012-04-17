@@ -29,6 +29,7 @@ public class SegmentSampler implements SampleOperator {
 	
 	public SegmentSampler() {}
 
+	@Override
 	public List<Tuple> sample(SampleSeed sd, Specializer spec) {
 		
 		if (!sd.isSegments()) {throw new RuntimeException("Can only be used with segments sample.");}

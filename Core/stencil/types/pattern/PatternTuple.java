@@ -90,6 +90,7 @@ public class PatternTuple implements Paint, PrototypedTuple {
 	@Override
 	public int size() {return PROTOTYPE.size();}
 	
+	@Override
 	public String toString() {return Tuples.toString(this);}
 
 

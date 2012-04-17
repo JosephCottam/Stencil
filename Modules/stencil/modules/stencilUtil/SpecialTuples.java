@@ -22,7 +22,9 @@ public abstract class SpecialTuples {
 		@Facet(memUse="READER", prototype=ViewTuple.PROTOTYPE_STRING, alias={"map", "query"})
 		public Tuple op() {return Display.view;}
 		
+		@Override
 		public Tuple invoke(Object[] args) {return op();}
+		@Override
 		public Tuple tupleInvoke(Object[] args) {return op();}
 	}
 	
@@ -37,7 +39,9 @@ public abstract class SpecialTuples {
 			return Display.canvas;
 		}
 		
+		@Override
 		public Tuple invoke(Object[] args) {return op();}
+		@Override
 		public Tuple tupleInvoke(Object[] args) {return op();}
 	}
 }

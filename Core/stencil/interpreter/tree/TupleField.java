@@ -10,8 +10,10 @@ public class TupleField implements Iterable<String>{
 
 	public String parts(int i) {return parts[i];}
 	public int size() {return parts.length;}
+	@Override
 	public Iterator<String> iterator() {return Arrays.asList(parts).iterator();}
 	
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		for (String part: parts) {
@@ -22,6 +24,7 @@ public class TupleField implements Iterable<String>{
 		return b.toString();
 	}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof TupleField)) {return false;}
 		TupleField alter = (TupleField) other;
@@ -34,5 +37,6 @@ public class TupleField implements Iterable<String>{
 		return true;
 	}
 	
+	@Override
 	public int hashCode() {return Arrays.deepHashCode(parts);}
 }

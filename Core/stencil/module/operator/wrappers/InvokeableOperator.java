@@ -64,10 +64,12 @@ public final class InvokeableOperator extends AbstractOperator<InvokeableOperato
 		}
 	}
 		
+	@Override
 	public String getName() {return operatorData.name();}
 	
 	//TODO: Would it be better to see if all facets were functions as a quick-check?
 	//TODO: implement a more general duplicate
+	@Override
 	public InvokeableOperator duplicate() {
 		boolean allStatic = true;
 		for (ReflectiveInvokeable i: facets.values()) {
@@ -77,12 +79,14 @@ public final class InvokeableOperator extends AbstractOperator<InvokeableOperato
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
 	public Invokeable getFacet(String facet) {
 		Invokeable result = facets.get(facet);
 		if (result == null) {throw new UnknownFacetException(getName(), facet, facets.keySet());}
 		return result;
 	}
 
+	@Override
 	public OperatorData getOperatorData() {return operatorData;}
 }
 

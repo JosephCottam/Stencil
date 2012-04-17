@@ -34,6 +34,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		/**Throws an UnsupportedOperationException; duplicate must be supplied by the underlying
 		 * implementation for stateful operations.
 		 */
+		@Override
 		public StencilOperator duplicate() {throw new UnsupportedOperationException();}
 		
 		/**Default viewpoint creation is to just clone the underlying operator.
@@ -59,6 +60,7 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 	 * the one that matches (case insensitive) the name of the
 	 * facet.
 	 */
+	@Override
 	public Invokeable getFacet(String name) {
 		FacetData fd = operatorData.getFacet(name);
 		String target = fd.target();
@@ -72,12 +74,16 @@ public abstract class AbstractOperator<T extends StencilOperator> implements Ste
 		throw new IllegalArgumentException(format("Facet %1$s has incorrect target on %2$s.", name, operatorData.name()));
 	}
 	
+	@Override
 	public OperatorData getOperatorData() {return operatorData;}	
+	@Override
 	public String getName() {return operatorData.name();}
 	
 	/**Returns self (essentially assuming that the operator implements a function).*/
+	@Override
 	public StencilOperator duplicate() {return this;}
 
 	/**Default viewpoint is self.  This is safe ONLY if the operator implements a true function.**/
+	@Override
 	public T viewpoint() {return (T) this;}
 }

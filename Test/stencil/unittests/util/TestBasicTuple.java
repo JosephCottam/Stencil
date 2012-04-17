@@ -18,6 +18,7 @@ public class TestBasicTuple extends TestCase {
 	public static final List<Object> values = Arrays.asList(new Object[]{"String", 2, 3.14, "Value4", "@Color(100,10,10)", SOURCE}); 
 	public static final List<Class> types = Arrays.asList(new Class[]{String.class, Integer.class, Double.class, String.class, String.class, String.class});
 	
+	@Override
 	public void setUp() {
 		reference = new PrototypedArrayTuple(names, types, values);
 	}

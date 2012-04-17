@@ -122,6 +122,7 @@ public class SyntheticOperator implements StencilOperator {
 		
 	}
 
+	@Override
 	public Invokeable getFacet(String name) throws UnknownFacetException {
 		try {
 			if (name.equals(DEFAULT_FACET)) {
@@ -135,15 +136,17 @@ public class SyntheticOperator implements StencilOperator {
 		throw new UnknownFacetException(operatorData.name(), name, operatorData.facetNames());
 	}
 
+	@Override
 	public String getName() {return operatorData.name();}
+	@Override
 	public OperatorData getOperatorData() {return operatorData;}
 	
-	private OperatorFacet getQuery() {
+	protected OperatorFacet getQuery() {
 		if (query == null) {query = Freezer.operatorFacet(operatorData.name(), findFacet(COUNTERPART_FACET));}
 		return query;
 	}
 
-	private OperatorFacet getMap() {
+	protected OperatorFacet getMap() {
 		if (map == null) {map = Freezer.operatorFacet(operatorData.name(), findFacet(DEFAULT_FACET));}
 		return map;
 	}
@@ -155,7 +158,10 @@ public class SyntheticOperator implements StencilOperator {
 	}
 	
 	//TODO: Can we do something to support duplicate here?  Maybe the 'pristine clone' trick?
+	@Override
 	public SyntheticOperator duplicate() {throw new UnsupportedOperationException();}
+	
+	@Override
 	public SyntheticOperator viewpoint() {
 		SyntheticOperator rv = new SyntheticOperator(module, operatorData);
 		rv.query = getQuery().viewpoint();
@@ -164,7 +170,8 @@ public class SyntheticOperator implements StencilOperator {
 		return rv;
 	}
 
-	private Tuple process(OperatorFacet facet, Tuple tuple) {
+	/**Find a matching action and execute the action on the given tuple.**/
+	protected Tuple process(OperatorFacet facet, Tuple tuple) {
 		Tuple prefilter;
 		Environment env = Environment.getDefault(Tuples.EMPTY_TUPLE, tuple);//Empty tuple is the globals frame;  TODO: Replace with globals when runtime global exist
 		

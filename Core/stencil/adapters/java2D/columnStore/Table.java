@@ -52,13 +52,17 @@ public interface Table extends DisplayLayer<StoreTuple> {
 
 		private DeleteTuple(Comparable id) {this.id = id;}
 
+		@Override
 		public Object get(int idx) throws TupleBoundsException {
 			if (idx ==0) {return id;}
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Object get(String name) throws InvalidNameException {throw new UnsupportedOperationException();}
+		@Override
 		public TuplePrototype prototype() {throw new UnsupportedOperationException();}
+		@Override
 		public int size() {throw new UnsupportedOperationException();}
 		
 

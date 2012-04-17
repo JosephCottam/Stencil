@@ -44,12 +44,17 @@ public class Rule implements Viewpoint<Rule> {
 		return target.finalize(t);
 	}
 	
+	@Override
 	public Rule viewpoint() {return new Rule(path, chain.viewpoint(), target);}	
 	
 	public static final Rule EMPTY_RULE = new Rule(null, null, null)  {
+		@Override
 		public String path() {return "No path; empty rule.";}
+		@Override
 		public TuplePrototype prototype() {return EMPTY_PROTOTYPE;}
+		@Override
 		public Tuple apply(Environment env) {return EMPTY_TUPLE;}
+		@Override
 		public Rule viewpoint() {return this;}
 	};
 }

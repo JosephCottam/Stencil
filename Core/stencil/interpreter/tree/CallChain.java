@@ -20,6 +20,7 @@ public class CallChain implements Viewpoint<CallChain> {
 	
 	public int depth() {return invs.length;}
 	
+	@Override
 	public CallChain viewpoint() {
 		final Invokeable[] vp = new Invokeable[invs.length];
 		for (int i=0; i< vp.length; i++) {

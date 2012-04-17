@@ -101,6 +101,7 @@ public class SliceRenderer extends AbstractShapeRenderer {
     		this.sizeIdx = sizeIdx;
     	}
     	
+		@Override
 		public Shape shape(Tuple t) {
 			double start = (Double) t.get(startIdx);
 			double end = (Double) t.get(endIdx);

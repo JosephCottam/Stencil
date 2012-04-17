@@ -28,15 +28,18 @@ public class StreamDef implements TupleStore {
 		this.prototype = prototype;
 	}
 	
+	@Override
 	public String getName() {return name;}
 	public Consumes[] getGroups() {return groups;}
 	
 	/**Can the tuple be stored?
 	 * Requirements are t is not null and is of the appropriately length.
 	 */
+	@Override
 	public boolean canStore(Tuple t) {return t!=null && t.size() == prototype.size();}
 	
 	
+	@Override
 	public void store(Tuple t) {offer(t);}	
 	public void offer(SourcedTuple t) {queue.offer(t);}
 	public void offer(Tuple t)  {

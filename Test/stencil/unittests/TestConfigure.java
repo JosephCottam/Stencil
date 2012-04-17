@@ -10,6 +10,7 @@ import stencil.util.collections.PropertyUtils;
 public class TestConfigure extends StencilTestCase {
 	private Properties props = new Properties();
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		props.loadFromXML(new FileInputStream(DEFAULT_PROPERTIES_FILE));

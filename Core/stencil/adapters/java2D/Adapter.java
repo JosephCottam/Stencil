@@ -26,6 +26,7 @@ public final class Adapter implements stencil.adapters.Adapter {
 	private boolean defaultMouse;
 
 	private Panel currentPanel;
+	@Override
 	public synchronized Panel compile(String programSource) throws Exception {
 		currentPanel = new Panel();
 		Program program = ParseStencil.program(programSource, this);
@@ -43,6 +44,7 @@ public final class Adapter implements stencil.adapters.Adapter {
 		return currentPanel;
 	}
 
+	@Override
 	public Class getGuideClass(String name) {
 		if (name.equals("axis")) {return Axis.class;}
 		else if (name.equals("legend")) {return Legend.class;}
@@ -56,15 +58,19 @@ public final class Adapter implements stencil.adapters.Adapter {
 		throw new IllegalArgumentException(String.format("Guide type %1$s not known in adapter.", name));
 	}
 
+	@Override
 	public Table makeLayer(String name, Specializer spec) {
 		String type = (String) spec.get(DisplayLayer.TYPE_KEY);
 		return LayerTypeRegistry.makeTable(name, type);
 	}
 
+	@Override
 	public void setDefaultMouse(boolean m) {this.defaultMouse = m;}
+	@Override
 	public void setDebugColor(Color c) {Renderer.Util.DEBUG_COLOR = c;}
 	
 
+	@Override
 	public void setRenderQuality(String value) throws IllegalArgumentException {
 		if (value.equals("LOW")) {
 			MultiThreadPainter.renderQuality = MultiThreadPainter.LOW_QUALITY;
@@ -79,6 +85,7 @@ public final class Adapter implements stencil.adapters.Adapter {
 	private static final class AxisPair {
 		public Guide xAxis;
 		public Guide yAxis;
+		public AxisPair() {}
 	}
 	
 	//TODO: Lift out into a grammar pass...

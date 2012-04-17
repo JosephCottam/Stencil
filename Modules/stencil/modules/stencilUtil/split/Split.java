@@ -39,11 +39,14 @@ public class Split extends AbstractOperator.Statefull<Split> {
 		return opCache.querySplit(op, facet, args);
 	}
 	
+	@Override
 	@Facet(memUse="READER", prototype="(int VALUE)")
 	public int stateID() {return opCache.stateID();}
 	
+	@Override
 	public OperatorData getOperatorData() {return operatorData;}
 	
+	@Override
 	public String getName() {return operatorData.name();}
 
 	/**Removes the first item from the arguments array.
@@ -67,6 +70,7 @@ public class Split extends AbstractOperator.Statefull<Split> {
 		return b.toString();
 	}
 	
+	@Override
 	public StencilOperator duplicate() {
 		return new Split(operatorData, opCache.viewpoint()); 
 	}

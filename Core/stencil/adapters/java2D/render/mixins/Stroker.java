@@ -30,6 +30,7 @@ public interface Stroker {
 	/**No stroke; indicates the paint was constant transparent, so stroke was not needed**/
 	public final class None implements Stroker {
 		public None() {}
+		@Override
 		public Stroke getStroke(Tuple t) {return null;}
 		public Shape stroke(Shape s, Tuple t) {return null;}
 	}
@@ -38,6 +39,7 @@ public interface Stroker {
 	public final class Const implements Stroker {
 		final Stroke stroke;
 		public Const(Stroke stroke) {this.stroke = stroke;}
+		@Override
 		public Stroke getStroke(Tuple t) {return stroke;}
 	}
 	
@@ -45,6 +47,7 @@ public interface Stroker {
 	public final class Variable implements Stroker {
 		private final int strokePen;
 		public Variable(int strokePen) {this.strokePen = strokePen;}
+		@Override
 		public Stroke getStroke(Tuple t)  {return (Stroke) t.get(strokePen);}
 	}
 }

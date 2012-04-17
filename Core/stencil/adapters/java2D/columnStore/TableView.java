@@ -162,5 +162,6 @@ public class TableView implements LayerView<StoreTuple>, ColumnStore<StoreTuple>
 		return new TableView(basis.name, basis.columns, index, basis.schema, basis.stateID, basis.bounds);
 	}
 	
+	@Override
 	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, this);}
 }

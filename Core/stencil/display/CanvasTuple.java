@@ -48,6 +48,7 @@ public abstract class CanvasTuple implements PrototypedTuple {
 	public abstract DisplayCanvas getComponent();
 	protected abstract Rectangle getBounds();
 
+	@Override
 	public Object get(int idx) {
 		if (idx == COLOR) return getComponent().getBackground();
 		if (idx == X) {return getX();}
@@ -57,6 +58,7 @@ public abstract class CanvasTuple implements PrototypedTuple {
 		throw new TupleBoundsException(idx, size());
 	}
 
+	@Override
 	public Object get(String name) throws InvalidNameException {
 		return Tuples.namedDereference(name, this);
 	}
@@ -68,9 +70,12 @@ public abstract class CanvasTuple implements PrototypedTuple {
 	public double getWidth() {return getBounds().getWidth();}
 	public double getHeight() {return getBounds().getHeight();}
 
+	@Override
 	public int size() {return PROTOTYPE.size();}
+	@Override
 	public TuplePrototype prototype() {return PROTOTYPE;}
 
+	@Override
 	public String toString() {return stencil.tuple.Tuples.toString(this);}
 
 	/**Gets the default value for the named property.

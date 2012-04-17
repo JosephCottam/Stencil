@@ -20,6 +20,7 @@ public interface Liner {
 		private final Shape line;
 		public Const (double x1, double y1, double x2, double y2) {line = new Line2D.Double(x1,-y1,x2,-y2);}
 		public Const (double arcHeight, double x1, double y1, double x2, double y2) {line = Util.getArc(x1,-y1,x2,-y2,arcHeight);}
+		@Override
 		public Shape line(Tuple t) {return line;}
 	}
 	
@@ -36,6 +37,7 @@ public interface Liner {
 			this.y2Idx = y2Idx;
 		}
 		
+		@Override
 		public Shape line(Tuple t) {
 			double x1 = (Double) t.get(x1Idx);
 			double y1 = (Double) t.get(y1Idx);
@@ -54,6 +56,7 @@ public interface Liner {
 			this.arcHeightIdx = arcHeightIdx;
 		}
 		
+		@Override
 		public QuadCurve2D line(Tuple t) {
 			double x1 = (Double) t.get(x1Idx);
 			double y1 = (Double) t.get(y1Idx);
@@ -67,7 +70,7 @@ public interface Liner {
 	public static class Util {
 		private Util() {}
 		
-		private static final QuadCurve2D getArc( double x1, double y1, double x2, double y2, double arcHeight) {
+		public static final QuadCurve2D getArc( double x1, double y1, double x2, double y2, double arcHeight) {
 			Point2D mid = new Point2D.Double((x1+x2)/2.0, (y1+y2)/2.0);
 			
 			Point2D control;

@@ -22,6 +22,7 @@ public class QueuedStream implements TupleStream {
 			this.setDaemon(true);
 		}
 		
+		@Override
 		public void run() {
 			while (!stop && source != null) {
 				if (!source.hasNext()) {break;}
@@ -35,13 +36,13 @@ public class QueuedStream implements TupleStream {
 		public void signalStop() {stop = true;}
 	}	
 	
-	private final TupleStream source;
+	protected final TupleStream source;
 
 	/**Maximum queue size.**/
-	private final int prefetchSize;
+	protected final int prefetchSize;
 	
-	/**Pre-fetched tuples**/
-	private final Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
+	/**Storage for pre-fetched tuple cache**/
+	protected final Queue<SourcedTuple> tupleCache = new ConcurrentLinkedQueue();
 	
 	private final QueueLoader loader;
 	
@@ -81,7 +82,7 @@ public class QueuedStream implements TupleStream {
 	 * 	               (b) the source returns null
 	 *                 (c) the source  hasNext returns false
 	 **/
-	private void loadQueue() {
+	protected void loadQueue() {
 		for (int i=0; i< prefetchSize && source.hasNext(); i++) {
 			SourcedTuple t = source.next();
 			if (t  == null) {break;}

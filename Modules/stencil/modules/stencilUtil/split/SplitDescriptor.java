@@ -25,6 +25,7 @@ public class SplitDescriptor {
 
 	
 	
+	@Override
 	public boolean equals(Object other) {
 		if (this == other) {return true;}
 		if (!(other instanceof SplitDescriptor)) {return false;}
@@ -35,6 +36,7 @@ public class SplitDescriptor {
 			&& this.fields == alter.fields;
 	}
 
+	@Override
 	public int hashCode() {
 		int o = isOrdered() ? 0x99999999 : 0x66666666;    //1001 vs. 0110
 		return fields * o;

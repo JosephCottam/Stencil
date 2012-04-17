@@ -6,6 +6,7 @@ import stencil.adapters.java2D.Panel;
 public class TestGenerate extends stencil.unittests.adapters.GeneratorBase {
 	private Panel panel;
 	
+	@Override
 	public void tearDown() {
 		super.tearDown();
 		if (panel != null) {panel.dispose();}

@@ -64,6 +64,7 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		return b.toString();
 	}
 
+	@Override
 	public String toString() {return toString(this);}
 	
 	public Object get(String name) {
@@ -74,7 +75,9 @@ public final class ColorTuple extends java.awt.Color implements Tuple {
 		throw new InvalidNameException(name, prototype());
 	}
 	
+	@Override
 	public int size() {return FIELDS.length;}
+	@Override
 	public Object get(int idx) {
 		if (idx == SELF) {return this;}
 		if (idx == RED) {return getRed();}

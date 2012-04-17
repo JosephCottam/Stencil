@@ -260,6 +260,7 @@ public class TextRenderer implements Renderer<TableView> {
 				dims = new DoubleDimension[lines.length];
 			}
 			
+			@Override
 			public String toString() {
 				return String.format("%1$s[fw=%2$f, fh=%3$f]", super.toString(), fullWidth, fullHeight);
 			}

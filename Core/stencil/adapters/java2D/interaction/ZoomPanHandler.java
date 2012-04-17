@@ -20,7 +20,8 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
 	/**
      * @see java.awt.event.MouseListener#mousePressed(java.awt.event.MouseEvent)
      */
-    public void mousePressed(MouseEvent e) { 	
+    @Override
+	public void mousePressed(MouseEvent e) { 	
         if (buttonEquals(e, ZOOM_BUTTON) ) {
             Canvas canvas = (Canvas)e.getComponent();
 
@@ -37,7 +38,8 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
     /**
      * @see java.awt.event.MouseMotionListener#mouseDragged(java.awt.event.MouseEvent)
      */
-    public void mouseDragged(MouseEvent e) {
+    @Override
+	public void mouseDragged(MouseEvent e) {
         if (buttonEquals(e, ZOOM_BUTTON) ) {
         	Canvas canvas = (Canvas)e.getComponent();
             
@@ -87,7 +89,8 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
     /**
      * @see java.awt.event.MouseListener#mouseReleased(java.awt.event.MouseEvent)
      */
-    public void mouseReleased(MouseEvent e) {
+    @Override
+	public void mouseReleased(MouseEvent e) {
         if (buttonEquals(e, ZOOM_BUTTON) || buttonEquals(e, PAN_BUTTON)) {
             e.getComponent().setCursor(Cursor.getDefaultCursor());
         } 
@@ -97,6 +100,7 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
     	return (e.getModifiers() & button) == button;
     }
 
+	@Override
 	public void mouseClicked(MouseEvent e) { 
 		if (e.getClickCount() == 2) {
 			Canvas canvas = (Canvas)e.getComponent();
@@ -117,9 +121,12 @@ public class ZoomPanHandler implements MouseListener, MouseMotionListener{
 		
 	}
 
+	@Override
 	public void mouseEntered(MouseEvent e) {/*Ignored.*/}
 
+	@Override
 	public void mouseExited(MouseEvent e) {/*Ignored.*/}
 
+	@Override
 	public void mouseMoved(MouseEvent e) {/*Ignored.*/}
 }

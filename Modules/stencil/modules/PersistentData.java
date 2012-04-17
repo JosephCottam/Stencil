@@ -174,7 +174,7 @@ public class PersistentData extends BasicModule {
 		@Override
 		public Dict viewpoint() {return new Dict(dict, operatorData, caseSensitive, names);}
 		
-		private static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
+		protected static OperatorData getOperatorData(OperatorData basic, Specializer specializer) throws SpecializationException{
 			String module = basic.module();
 			String name = basic.name();
 			String[] fields;
@@ -194,6 +194,7 @@ public class PersistentData extends BasicModule {
 		
 	}
 	
+	@Override
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {
 		if(name.equals(Dict.NAME)) {
 			return Dict.getOperatorData(getModuleData().getOperator(name), specializer);

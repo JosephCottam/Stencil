@@ -16,8 +16,8 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 
 	public void removeMutable(StencilMutable receiver, StencilEvent.Type type) {
 		switch(type) {
-			case Config: configReceivers.remove(receiver); break;
 			case Stencil: stencilReceivers.remove(receiver); break;
+			case Config: configReceivers.remove(receiver); break;
 			case All:
 				configReceivers.remove(receiver);
 				stencilReceivers.remove(receiver);
@@ -35,6 +35,7 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 		}
 	}
 
+	@Override
 	public void configChanged(ConfigChanged configUpdate) {
 		if (suspendEvents) {return;}
 		AdapterOpts opts = configUpdate.getValue();
@@ -44,6 +45,7 @@ public class Controller implements StencilListener.ConfigChanged, StencilListene
 		}
 	}
 
+	@Override
 	public void stencilChanged(StencilChanged stencilUpdate) {
 		if (suspendEvents) {return;}
 		for (StencilMutable.Stencil reciver: stencilReceivers) {

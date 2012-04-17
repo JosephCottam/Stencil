@@ -89,6 +89,7 @@ public class TestFragments extends TestCase {
 		StencilTree program = ParseStencil.programTree(source, adapter);
 		Test test = new Test() {
 
+			@Override
 			public boolean check(StencilTree t) {
 				if (t.getType() == StencilParser.FUNCTION) {
 					try {
@@ -101,6 +102,7 @@ public class TestFragments extends TestCase {
 				return true;
 			}
 			
+			@Override
 			public String getMessage() {return "Null operator after prime.";}
 			
 		};
@@ -119,6 +121,7 @@ public class TestFragments extends TestCase {
 		StencilTree program = ParseStencil.programTree(source, adapter);
 		Test test = new Test() {
 
+			@Override
 			public boolean check(StencilTree t) {
 				if (t.getType() == StencilParser.FUNCTION) {
 					return t.find(SPECIALIZER) != null &&
@@ -127,6 +130,7 @@ public class TestFragments extends TestCase {
 				return true;
 			}
 
+			@Override
 			public String getMessage() {return "Default or Null specializer after specializer pass.";}
 			
 		};

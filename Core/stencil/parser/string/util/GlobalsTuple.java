@@ -27,19 +27,23 @@ public class GlobalsTuple implements PrototypedTuple {
 		}
 	}
 	
+	@Override
 	public Object get(String name) throws InvalidNameException {
 		return Tuples.namedDereference(name, this);
 	}
 
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		try {return values[idx];}
 		catch (ArrayIndexOutOfBoundsException e) {throw new TupleBoundsException(idx, this);}
 	}
 
+	@Override
 	public TuplePrototype prototype() {return prototype;}
 
 	public boolean isDefault(String name, Object value) {return false;}
 
+	@Override
 	public int size() {return values.length;}
 
 }

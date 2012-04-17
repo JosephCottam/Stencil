@@ -48,6 +48,7 @@ public final class Canvas extends DisplayCanvas {
 		setOpaque(true);
 	}
 	
+	@Override
 	public void paintComponent(Graphics g) {
 		synchronized(this) {
 			g.drawImage(buffer, 0, 0, null);
@@ -61,9 +62,13 @@ public final class Canvas extends DisplayCanvas {
 		}
 	}
 	
+	@Override
 	public DisplayGuide getGuide(String identifier) {return guides.get(identifier);}
+	@Override
 	public void addGuide(Guide2D guide) {guides.put(guide.identifier(), guide);}
+	@Override
 	public boolean hasGuide(String identifier) {return guides.containsKey(identifier);}
+	@Override
 	public Collection<Guide2D> getGuides() {return guides.values();}
 	
 	/**What are the bounds of everything currently on this canvas 
@@ -71,6 +76,7 @@ public final class Canvas extends DisplayCanvas {
 	 * 
 	 * @return
 	 */
+	@Override
 	public Rectangle contentBounds(boolean includeGuides) {
 		if (layers.length == 0) {return new Rectangle(0,0,0,0);}
 		final Rectangle2D bounds = new Rectangle(0,0,-1,-1);
@@ -217,6 +223,7 @@ public final class Canvas extends DisplayCanvas {
     /**Use this transform to convert values from the absolute system
      * to the screen system.
      */
+	@Override
 	public synchronized AffineTransform viewTransform() {return new AffineTransform(viewTransform);}
 	public synchronized AffineTransform viewTransformRef() {return viewTransform;}
 	
