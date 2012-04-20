@@ -29,7 +29,6 @@ options {
   }
 }
 
-//topdown: ^(PROGRAM imports globals decls canvas view defs layers ops);
 program: ^(PROGRAM i=imports g=globals sdec=streamDecs o=order c=canvases v=views sdef=streamDefs l=layers ops=operators) 
 	-> template(i={$i.st},g={$g.st},sdec={$sdec.st},o={$o.st},c={$c.st},v={$v.st},sdef={$sdef.st},l={$l.st},ops={$ops.st}) 
 		"<i><g><sdec><o><c><v><sdef><l><ops>";
