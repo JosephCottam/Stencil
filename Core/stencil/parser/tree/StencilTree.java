@@ -36,6 +36,7 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 		return null;
 	}
 	
+	@Override
 	public StencilTree getChild(int i) {return (StencilTree) super.getChild(i);}
 	
 	/**Find an element with the given name and text equal to value.*/
@@ -135,11 +136,15 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 			this.root = root;
 		}
 		
+		@Override
 		public boolean hasNext() {return idx < max;}
+		@Override
 		public T next() {return (T) root.getChild(idx++);}
+		@Override
 		public void remove() {throw new UnsupportedOperationException("Cannot remove from a Stencil Tree List.");}			
 	}
 	
+	@Override
 	public int hashCode() {
 		int code =getText().hashCode() * getType();
 
@@ -150,6 +155,7 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 		return code;
 	}
 	
+	@Override
 	public boolean equals(Object othr) {
 		if (othr == null || !(othr instanceof StencilTree)) {return false;}
 		StencilTree other = (StencilTree) othr;
@@ -167,6 +173,7 @@ public class StencilTree extends CommonTree implements Iterable<StencilTree> {
 		return true;
 	}
 	
+	@Override
 	public Iterator<StencilTree> iterator() {return new ChildrenIterator(this);}
 	
 	public boolean is(int type) {return this.getType() == type;}

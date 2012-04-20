@@ -46,12 +46,16 @@ public class SequenceStream implements TupleStream {
 		if (proto.size() != 1) {throw new IllegalArgumentException("Can only produce singleton tuples.");}
 	}
 	
+	@Override
 	public SourcedTuple next() {
 		current = current + increment;
 		return new SourcedTuple.Wrapper(name, new ArrayTuple(current));
 	}
 
+	@Override
 	public boolean hasNext() {return increment>0 ? current < stop : current > stop;}
+	@Override
 	public void stop() {}
+	@Override
 	public void remove() {throw new UnsupportedOperationException();}
 }

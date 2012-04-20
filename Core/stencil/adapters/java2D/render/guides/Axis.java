@@ -146,6 +146,7 @@ public class Axis extends Guide2D  {
 	}
 	
 	
+	@Override
 	public void render(Graphics2D g, AffineTransform viewTransform) {renderer.render(data.tenured(), g, viewTransform);}
 	
 	@Override
@@ -175,22 +176,20 @@ public class Axis extends Guide2D  {
 	}
 
 	
-	/**Where should the baseline be placed, returns value in y-up/positive convention**/
+	/**Utility tuples for baseline placement.**/
 	private static final Tuple ZERO = Singleton.from(0d);
 	private static final Tuple ONE = Singleton.from(1d);
-
 	
-	private double baseline(POSITION position, AXIS axis, Rectangle2D parentBounds, Double baseline) {
-		
+	/**Where should the baseline be placed, returns value in y-up/positive convention**/	
+	private double baseline(POSITION position, AXIS axis, Rectangle2D parentBounds, Double baseline) {		
 		Double zeroPoint;
 		try {
-			zeroPoint = Converter.toDouble(Interpreter.processTuple(ZERO, alterZero).get(0));	//TOOD: may not be .get(0), what is it in general?
+			zeroPoint = Converter.toDouble(Interpreter.processTuple(ZERO, alterZero).get(0));	//TODO:HACK: may not be .get(0), what is it in general?  
 			if (Double.isInfinite(zeroPoint)) {
-				zeroPoint = Converter.toDouble(Interpreter.processTuple(ONE, alterZero).get(0));	//TOOD: may not be .get(0), what is it in general?
+				zeroPoint = Converter.toDouble(Interpreter.processTuple(ONE, alterZero).get(0));	//TODO:HACK: may not be .get(0), what is it in general?
 			}
 		} catch (Exception e) {zeroPoint = null;}
 
-		
 		if (position == POSITION.AUTO) {
 			if(zeroPoint == null) {position = POSITION.LEAST;}
 			else {position = POSITION.ZERO;}
@@ -211,9 +210,11 @@ public class Axis extends Guide2D  {
 			if (axis == AXIS.X) {return -parentBounds.getMinY();}
 			else {return parentBounds.getMaxX();}
 		case LEAST:
+			if (zeroPoint == null) {throw new Error("Null-based guard evaded.  Error in axis implementation.");}
 			if (axis == AXIS.X) {return -Math.max(parentBounds.getMinY(), -zeroPoint);}
 			else {return Math.min(parentBounds.getMaxX(), zeroPoint);}
 		case MOST: 
+			if (zeroPoint == null) {throw new Error("Null-based guard evaded.  Error in axis implementation.");}
 			if (axis == AXIS.X) {return -Math.min(parentBounds.getMinY(), -zeroPoint);}
 			else {return Math.max(parentBounds.getMaxX(), zeroPoint);}
 		case AUTO:

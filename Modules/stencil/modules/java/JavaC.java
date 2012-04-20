@@ -71,7 +71,9 @@ public class JavaC extends BasicModule {
 			this.opData = blendOpData(operator.getOperatorData(), super.operatorData);
 		}
 
+		@Override
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
+		@Override
 		public OperatorData getOperatorData() {return opData;}
 		
 		@Facet(alias="####error####")
@@ -96,7 +98,9 @@ public class JavaC extends BasicModule {
 
 		}		
 		
+		@Override
 		public Invokeable getFacet(String name) {return operator.getFacet(name);}
+		@Override
 		public OperatorData getOperatorData() {return opData;}
 		
 		@Facet(alias="####error####")
@@ -104,7 +108,9 @@ public class JavaC extends BasicModule {
 	}
 
 	
-	private static OperatorData blendOpData(OperatorData custom, OperatorData defaults) {
+	/**Combines the default specializer from two OperatorData objects.
+	 * Produces a new OperatorData object, based on the first argument but with the blended specializer.**/ 
+	protected static OperatorData blendOpData(OperatorData custom, OperatorData defaults) {
 		Specializer spec = DefaultSpecializers.blend(custom.defaultSpecializer(), defaults.defaultSpecializer());
 		OperatorData copy = new OperatorData(custom);
 		return copy.defaultSpecializer(spec);
@@ -232,7 +238,8 @@ public class JavaC extends BasicModule {
 		      setDiagnostics(diagnostics);
 		   }
 		   
-		   public String getMessage() {
+		   @Override
+		public String getMessage() {
 			   StringBuilder base = new StringBuilder(super.getMessage() + "\n");
 			   for (Diagnostic d: diagnostics.getDiagnostics()) {
 				   base.append(d.getMessage(null));

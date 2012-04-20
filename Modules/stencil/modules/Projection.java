@@ -139,6 +139,7 @@ public class Projection extends BasicModule {
 			else              {return map(d);} //value is in the range of requested values, no risk of mutation
 		}
 
+		@Override
 		public HeatScale duplicate() {return new HeatScale(operatorData, cold, hot, throwExceptions);} 
 	}
 	
@@ -187,12 +188,14 @@ public class Projection extends BasicModule {
 			return ColorCache.get(new java.awt.Color(Color.HSBtoRGB(offset, .8f, idx/total)));
 		}
 		
+		@Override
 		public RainbowScale viewpoint() {
 			RainbowScale s = (RainbowScale) super.viewpoint();
 			s.seen.addAll(seen);
 			return s;
 		}
 		
+		@Override
 		public RainbowScale duplicate() {return new RainbowScale(operatorData, reserve, throwExceptions);} 
 	}
 	
@@ -225,6 +228,7 @@ public class Projection extends BasicModule {
 
 		@Facet(memUse="READER", prototype="(int VALUE)") 
 		public int stateID() {return labels.size();}
+		@Override
 		public Index duplicate() {return new Index(operatorData);}
 	}
 
@@ -240,7 +244,9 @@ public class Projection extends BasicModule {
 		private static final class CompoundKey {
 			final Object[] values;
 			public CompoundKey(Object... values) {this.values = Arrays.copyOf(values, values.length);}
+			@Override
 			public int hashCode() {return Arrays.hashCode(values);}
+			@Override
 			public boolean equals(Object o) {
 				return o != null 
 					&& o instanceof CompoundKey  
@@ -281,6 +287,7 @@ public class Projection extends BasicModule {
 			return value;
 		}
 
+		@Override
 		public Count duplicate() {return new Count(operatorData);}
 	}
 
@@ -289,7 +296,9 @@ public class Projection extends BasicModule {
 	public static final class Counter extends AbstractOperator {
 		private long count =1;
 		public Counter(OperatorData opData) {super(opData);}
+		@Override
 		public StencilOperator duplicate() {return new Counter(operatorData);}
+		@Override
 		public String getName() {return "Count";}
 
 		@Facet(memUse="WRITER", prototype="(long count)", counterpart="query")
@@ -383,6 +392,7 @@ public class Projection extends BasicModule {
 				return firstArray.length-secondArray.length;
 			}
 	
+			@Override
 			public int compare(Object f, Object s) {
 				if (f instanceof Object[] && s instanceof Object[]) {return compareArrays((Object[]) f, (Object[]) s);}
 				else if (f instanceof Object[]) {return -1;}
@@ -402,8 +412,8 @@ public class Projection extends BasicModule {
 		}
 		private static final CompoundCompare COMPARE = new CompoundCompare();
 		
-		private final SortedSet set = new TreeSet(COMPARE);
-		private final ViewpointCache<Rank> viewpoint = new ViewpointCache();
+		protected final SortedSet set = new TreeSet(COMPARE);
+		protected final ViewpointCache<Rank> viewpoint = new ViewpointCache();
 	
 		public Rank(OperatorData opData, Specializer spec) {super(opData);}
 		private Rank(OperatorData opData, SortedSet values) {
@@ -555,6 +565,7 @@ public class Projection extends BasicModule {
 			return value;
 		}
 		
+		@Override
 		public Scale duplicate() {return new Scale(operatorData, outMin, outMax);}
 	}
 	
@@ -615,6 +626,7 @@ public class Projection extends BasicModule {
 		}
 		
 		
+		@Override
 		public DScale duplicate() {return new DScale(operatorData);}
 	}
 	
@@ -625,10 +637,19 @@ public class Projection extends BasicModule {
 		private static final class PIXTuple implements PrototypedTuple {
 			private static final TuplePrototype PROTOTYPE = new TuplePrototype(new String[]{"p","min","max"}, new Class[]{Number.class, Number.class, Number.class});
 			private final Number[] values;
-			private PIXTuple(Number percent, Number min, Number max){values=new Number[]{percent, min, max};}			
+
+			protected PIXTuple(Number percent, Number min, Number max){values=new Number[]{percent, min, max};}
+			
+			@Override
 			public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
+			
+			@Override
 			public Object get(int idx) throws TupleBoundsException {return values[idx];}
+			
+			@Override
 			public TuplePrototype prototype() {return PROTOTYPE;}
+			
+			@Override
 			public int size() {return PROTOTYPE.size();}			
 		}
 		

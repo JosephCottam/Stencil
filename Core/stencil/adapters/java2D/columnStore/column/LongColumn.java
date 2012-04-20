@@ -27,13 +27,15 @@ public class LongColumn extends AbstractColumn<Long> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return m_values.length;}
+    @Override
+	public int size() {return m_values.length;}
     
     
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public Long get(int row) {return new Long(getLong(row));}
+    @Override
+	public Long get(int row) {return new Long(getLong(row));}
 
 
     /**

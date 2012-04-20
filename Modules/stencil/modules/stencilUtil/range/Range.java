@@ -60,10 +60,12 @@ public class Range extends AbstractOperator<Range> {
 	@Facet(memUse="READER", prototype="(int VALUE)")
 	public int stateID() {return cache.stateID.get();}
 	
+	@Override
 	public Range duplicate() {
 		return new Range(this.operatorData, cache.range);
 	}
 	
+	@Override
 	public Range viewpoint() {
 		return new Range(this.operatorData, cache.viewpoint());
 	}

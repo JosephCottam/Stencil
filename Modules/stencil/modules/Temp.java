@@ -337,6 +337,7 @@ public class Temp extends BasicModule {
 			return query(dv);
 		}
 		
+		@Override
 		public Partition duplicate() {
 			return new Partition(operatorData, buckets, autoMin, autoMax, min, max);
 		}
@@ -482,6 +483,7 @@ public class Temp extends BasicModule {
 			return rv;
 		}
 		
+		@Override
 		public StencilOperator duplicate() {
 			StencilOperator nop = new Oscillate(operatorData, states, style);
 			return nop;

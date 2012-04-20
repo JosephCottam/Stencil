@@ -59,14 +59,22 @@ public interface ColumnStore<T extends Tuple> extends Iterable<T>{
 				this.visibleIdx = visibleIdx;
 			}
 			
+			@Override
 			public Rectangle getBoundsReference() {return null;}
+			@Override
 			public String getID() {return (String) source.get(idIdx);}
+			@Override
 			public boolean isVisible() {return (Boolean) source.get(visibleIdx);}
 
+			@Override
 			public Object get(String name) throws InvalidNameException {return source.get(name);}
+			@Override
 			public Object get(int idx) throws TupleBoundsException {return source.get(idx);}
+			@Override
 			public TuplePrototype prototype() {return source.prototype();}
+			@Override
 			public int size() {return source.size();}
+			@Override
 			public String toString() {return Tuples.toString(this);}
 		}
 

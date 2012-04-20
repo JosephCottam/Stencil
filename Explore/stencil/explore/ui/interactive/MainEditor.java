@@ -30,6 +30,7 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 	public StencilEditorPanel getStencilEditor() {return stencilEditor;}
 
 
+	@Override
 	public void textPositionChanged(int line, int charNum) {
 		statusBar.setLineNum(line+1);
 		statusBar.setCharNum(charNum+1);
@@ -40,6 +41,7 @@ public class MainEditor extends JPanel implements StencilListener.StencilChanged
 	}
 
 
+	@Override
 	public void stencilChanged(StencilEvent.StencilChanged stencilUpdate) {
 		try {ParseStencil.checkParse(stencilEditor.getStencil());}
 		catch (Exception e) {return;}

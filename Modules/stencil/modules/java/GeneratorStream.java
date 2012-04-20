@@ -51,13 +51,17 @@ public class GeneratorStream implements TupleStream {
 		if (proto.size() != 1) {throw new IllegalArgumentException("Can only produce singleton tuples.");}
 	}
 	
+	@Override
 	public SourcedTuple next() {
 		current = current + increment;
 		Tuple t = inv.tupleInvoke(new Object[]{current});
 		return new SourcedTuple.Wrapper(name, t);
 	}
 
+	@Override
 	public boolean hasNext() {return increment>0 ? current < stop : current > stop;}
+	@Override
 	public void stop() {}
+	@Override
 	public void remove() {throw new UnsupportedOperationException();}
 }

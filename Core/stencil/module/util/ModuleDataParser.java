@@ -31,6 +31,7 @@ public class ModuleDataParser {
 			message = String.format("%1$s\n(For static method %2$s in %3$s).", super.getMessage(), source.getName(), source.getDeclaringClass().getCanonicalName());
 		}
 		
+		@Override
 		public String getMessage() {return message;}
 	}
 	

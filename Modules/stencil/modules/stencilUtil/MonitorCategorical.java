@@ -25,8 +25,10 @@ public final class MonitorCategorical extends MonitorBase<MonitorCategorical> {
 			
 	public MonitorCategorical(OperatorData opData) {super(opData);}
 	public MonitorCategorical(OperatorData opData, Specializer s) throws SpecializationException {super(opData);}
+	@Override
 	public MonitorCategorical duplicate() throws UnsupportedOperationException {return new MonitorCategorical(operatorData);}
 	
+	@Override
 	public SampleSeed getSeed() {return new SampleSeed(CATEGORICAL, seen);}
 
 	@Facet(memUse="OPAQUE", prototype="()", counterpart="query")
@@ -43,6 +45,7 @@ public final class MonitorCategorical extends MonitorBase<MonitorCategorical> {
 		return false;
 	}
 	
+	@Override
 	@Facet(memUse="READER", prototype="(int VALUE)")		
 	public int stateID() {return seen.size();}
 }

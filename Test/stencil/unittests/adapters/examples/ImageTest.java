@@ -113,6 +113,7 @@ public abstract class ImageTest {
 			this.permissibleVariance = permissibleVariance;
 		}
 		
+		@Override
 		public void diffImage(String original, String testResult, String deltaFile) throws Exception {
 			BufferedImage o,r;
 

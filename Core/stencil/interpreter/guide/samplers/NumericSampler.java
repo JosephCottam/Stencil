@@ -35,6 +35,7 @@ public class NumericSampler implements SampleOperator {
 	 */
 	public static final String TIGHT = "tight";
 
+	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
 		Iterable source;
 		int sourceSize;

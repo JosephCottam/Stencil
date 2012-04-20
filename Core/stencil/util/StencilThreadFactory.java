@@ -14,6 +14,7 @@ public final class StencilThreadFactory implements ThreadFactory {
 		this.priority = priority;
 	}
 
+	@Override
 	public Thread newThread(Runnable r) {
         Thread t = new Thread(group, r, group.getName() + "-" + threadNumber.getAndIncrement() + " (pool)");
 		t.setDaemon(false);

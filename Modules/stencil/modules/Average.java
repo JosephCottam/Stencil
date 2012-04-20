@@ -70,6 +70,7 @@ public class Average extends BasicModule {
 //			}
 		}
 		
+		@Override
 		public FullMean duplicate() {return new FullMean(operatorData, start);}
 	}
 

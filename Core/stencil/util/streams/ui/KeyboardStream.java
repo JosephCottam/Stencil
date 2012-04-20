@@ -41,15 +41,19 @@ public abstract class KeyboardStream implements TupleStream {
 			this.modifiers = modifiers;
 		}
 
+		@Override
 		public Object get(String name) {return Tuples.namedDereference(name, this);}
 		
+		@Override
 		public int size() {return PROTOTYPE.size();}
+		@Override
 		public Object get(int idx) {
 			if (idx == KEY) {return key;}
 			if (idx == MODIFIER) {return modifiers;}
 			throw new TupleBoundsException(idx, size());
  		}
 
+		@Override
 		public TuplePrototype prototype() {return PROTOTYPE;}
 
 		public boolean hasField(String name) {
@@ -82,13 +86,16 @@ public abstract class KeyboardStream implements TupleStream {
 			}
 		}
 
+		@Override
 		public boolean hasNext() {return buffer != -1;}
+		@Override
 		public void stop() {
 			try {stream.close();}
 			catch(Exception e) {throw new RuntimeException("Error closing buffer.", e);}
 			finally {buffer=(char)-1;}
 		}
 		
+		@Override
 		public SourcedTuple next() {return new SourcedTuple.Wrapper(source, read());}
 	}
 
@@ -107,21 +114,27 @@ public abstract class KeyboardStream implements TupleStream {
 			buffer = new ArrayList<KeysTuple>();
 		}
 
+		@Override
 		public void keyPressed(KeyEvent arg0) {/*No action taken on event.*/}
+		@Override
 		public void keyReleased(KeyEvent arg0) {/*No action taken on event.*/}
+		@Override
 		public void keyTyped(KeyEvent evt) {
 			KeysTuple t = new KeysTuple(evt.getKeyChar(), evt.getModifiers());
 			buffer.add(t);
 		}
 
+		@Override
 		public boolean hasNext() {return buffer.size()>0;}
 
+		@Override
 		public SourcedTuple next() {
 			KeysTuple t = buffer.get(0);
 			buffer.remove(0);
 			return new SourcedTuple.Wrapper(source, t);
 		}
 
+		@Override
 		public void stop() {
 			control.removeKeyListener(this);
 			buffer.clear();
@@ -143,8 +156,10 @@ public abstract class KeyboardStream implements TupleStream {
 	public static KeyboardStream make(JComponent control, String source) {return new ComponentWrapper(control, source);}
 
 	public void reset() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
+	@Override
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	
 	/**Close stream, disposing of relevant resources.*/
+	@Override
 	public abstract void stop();
 }

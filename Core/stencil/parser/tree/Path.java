@@ -33,6 +33,7 @@ public final class Path {
 		return root;
 	}
 	
+	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof Path)) {return false;}
 		Path op = (Path) other;
@@ -43,6 +44,7 @@ public final class Path {
 		return true;
 	}
 	
+	@Override
 	public int hashCode() {
 		int code=1;
 		for (int i=0; i<turns.size(); i++) {
@@ -51,6 +53,7 @@ public final class Path {
 		return code;
 	}
 	
+	@Override
 	public String toString() {		
 		if (turns.size() >0){
 			StringBuilder b= new StringBuilder();

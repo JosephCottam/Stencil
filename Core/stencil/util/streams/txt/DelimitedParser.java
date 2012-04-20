@@ -98,6 +98,7 @@ public final class DelimitedParser implements TupleStream {
 				filestream = false;
 				//Input stream reader that WILL NOT close the underlying stream...Standard In
 				isr = new InputStreamReader(System.in) {
+					@Override
 					public void close() {}
 				};
 			} else if (filename.endsWith("gz")) {
@@ -120,6 +121,7 @@ public final class DelimitedParser implements TupleStream {
 		} catch (Exception e) {throw new RuntimeException("Error opening " + filename + ".", e);}
 	}
 	
+	@Override
 	public SourcedTuple next() {
 		if (source == null) {throw new NoSuchElementException(format("Stream %1$s closed.", name));}
 		
@@ -144,6 +146,7 @@ public final class DelimitedParser implements TupleStream {
 	/**Close the tree stream.  The next operation will no longer work.
 	 * Has next will return false;
 	 */
+	@Override
 	public void stop() {
 		try {
 			if (source != null) {
@@ -157,11 +160,13 @@ public final class DelimitedParser implements TupleStream {
 	 * and there are more tuples on it.  False if there
 	 * are no more tuples (guaranteed to never be more).
 	 */
+	@Override
 	public boolean hasNext() {return source != null;}
 
 	public String getName() {return name;}
 	
 	/**Remove operation is not supported by the DelimitParser.
 	 * @exception UnsupportedOperationException is always thrown.*/
+	@Override
 	public void remove() {throw new UnsupportedOperationException("DelimitParser does not support remove operation.");}
 }

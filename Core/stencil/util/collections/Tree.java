@@ -45,6 +45,7 @@ public class Tree<D extends Tree> {
 	public D getParent() {return parent;}
 	public boolean isRoot() {return parent==this;}
 	
+	@Override
 	public String toString() {return toString(0);}
 	
 	private String toString(int nest) {

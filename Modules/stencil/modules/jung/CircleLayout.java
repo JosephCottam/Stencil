@@ -15,6 +15,7 @@ public final class CircleLayout extends GraphOperator.SizedOperator {
 
 	public static final String SEQUENCE_VALUE = "SEQ";	
 	private final Comparator SEQUENCE = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {
 			if (o1.equals(o2)) {return 0;}
 			for (Object v: graph.getVertices()) {
@@ -28,6 +29,7 @@ public final class CircleLayout extends GraphOperator.SizedOperator {
 	
 	public static final String LEXI_VALUE = "LEX";
 	private static final Comparator LEXICOGRAPHIC = new Comparator() {
+		@Override
 		public int compare(Object o1, Object o2) {return o1.toString().compareTo(o2.toString());}
 	};
 	
@@ -48,6 +50,7 @@ public final class CircleLayout extends GraphOperator.SizedOperator {
 		
 	}
 
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.CircleLayout cLayout = new edu.uci.ics.jung.algorithms.layout.CircleLayout(new DelegateForest(graph));
 		cLayout.setSize(size);

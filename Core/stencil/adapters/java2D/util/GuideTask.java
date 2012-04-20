@@ -25,6 +25,7 @@ public class GuideTask extends UpdateTask<Guide> {
 		this.identifier = guideDef.identifier();
 	}
 
+	@Override
 	public boolean needsUpdate() {
 		boolean analysisState = super.needsUpdate();
 		Rectangle2D bounds = canvas.contentBounds(false);
@@ -38,6 +39,7 @@ public class GuideTask extends UpdateTask<Guide> {
 		}
 	}
 	
+	@Override
 	public Finisher update() {
 		DisplayLayer layer = layerFor(identifier);
 		

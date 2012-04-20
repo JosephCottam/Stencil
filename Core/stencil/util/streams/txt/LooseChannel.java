@@ -31,6 +31,7 @@ final class LooseChannel implements NextChannel {
 	 * an exception.
 	 *
 	 */
+	@Override
 	public String[] next(BufferedReader source) {
 		String line;
 		
@@ -53,5 +54,6 @@ final class LooseChannel implements NextChannel {
 	}
 
 	/**Always returns true (part of being loose).*/
+	@Override
 	public void validate(BufferedReader source) throws Exception {/*Does nothing.*/}
 }

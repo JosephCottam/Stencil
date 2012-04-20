@@ -6,6 +6,7 @@ public class ReflectiveInvoke {
 
 	@SuppressWarnings("unused")
 	private static class TestObject {
+		public TestObject() {}
 		public int sum=0;
 		public void add() {sum++;}
 		public void add(int... is) {

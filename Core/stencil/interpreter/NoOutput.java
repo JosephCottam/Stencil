@@ -30,9 +30,13 @@ public final class NoOutput {
 	/**Tuple that will generate a NoOutput.Signal anytime it is accessed.*/
 	public static final stencil.tuple.Tuple TUPLE = new stencil.tuple.PrototypedTuple() {
 		private final Signal SIG = new Signal();
+		@Override
 		public Object get(String name) throws InvalidNameException {throw SIG;}
+		@Override
 		public Object get(int idx) throws TupleBoundsException {throw SIG;}
+		@Override
 		public TuplePrototype prototype() {throw SIG;}
+		@Override
 		public int size() {throw SIG;}		
 	};
 

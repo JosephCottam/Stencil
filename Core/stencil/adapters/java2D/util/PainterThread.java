@@ -42,6 +42,7 @@ public final class PainterThread implements Runnable {
 		paintCount = 0;
 	}
 
+	@Override
 	public synchronized void finalize() {painter.signalShutdown();}
 	
 	public synchronized void signalStop() {
@@ -49,6 +50,7 @@ public final class PainterThread implements Runnable {
 		painter.signalShutdown();
 	}
 	
+	@Override
 	public void run() {
 		while(keepRunning) {
 			if (requiresUpdate()) {runOnce();}

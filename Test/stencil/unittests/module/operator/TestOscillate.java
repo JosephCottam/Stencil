@@ -11,6 +11,7 @@ import static stencil.modules.Temp.Oscillate;
 public class TestOscillate extends StencilTestCase {
 	Temp temp;
 
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		temp = new Temp();

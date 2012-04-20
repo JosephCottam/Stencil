@@ -61,6 +61,7 @@ public final class MonitorSegments extends MonitorBase<MonitorSegments> {
 		/**Does this segment follow the given value? (This does not take tollerance into account.)**/
 		public boolean follows(double value) {return value < start;}
 		
+		@Override
 		public String toString() {return start +  "->" + end;}
 	}
 	

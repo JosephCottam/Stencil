@@ -11,6 +11,7 @@ import stencil.tuple.Tuple;
 public class TestTupleUtil extends TestCase {
 	TupleUtil tupleUtils;
 	
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		tupleUtils = new TupleUtil();

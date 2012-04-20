@@ -15,6 +15,7 @@ public final class BalloonLayout extends GraphOperator.SizedOperator {
 	}
 
 	
+	@Override
 	protected void resetLayout() {
 		storedLayout.setGraph(new DelegateForest(graph));
 		storedLayout.reset();

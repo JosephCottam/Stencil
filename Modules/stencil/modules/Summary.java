@@ -54,9 +54,11 @@ public class Summary extends BasicModule {
 			super(opData, spec, false);
 		}
 		
- 		@Facet(memUse="FUNCTION", prototype="(double v)", alias={"map", "query"})
+ 		@Override
+		@Facet(memUse="FUNCTION", prototype="(double v)", alias={"map", "query"})
 		public Comparable extreme(Object... values) {return super.extreme(values);}
- 		public Min duplicate() {return new Min(operatorData, targetClass);}
+ 		@Override
+		public Min duplicate() {return new Min(operatorData, targetClass);}
 	}
 	
 	@Operator(name="Max", spec="[c: \"Comparable\"]")
@@ -65,9 +67,11 @@ public class Summary extends BasicModule {
 		public Max(OperatorData opData, Specializer spec) {
 			super(opData, spec, true);
 		}
- 		@Facet(memUse="FUNCTION", prototype="(double v)", alias={"map", "query"})
+ 		@Override
+		@Facet(memUse="FUNCTION", prototype="(double v)", alias={"map", "query"})
 		public Comparable extreme(Object... values) {return super.extreme(values);}
- 		public Max duplicate() {return new Max(operatorData, targetClass);}
+ 		@Override
+		public Max duplicate() {return new Max(operatorData, targetClass);}
 	}
 	
 	private static abstract class FullExtreme extends Extreme {
@@ -103,13 +107,16 @@ public class Summary extends BasicModule {
 			super(opData, spec, false);
 		}
 		
+		@Override
 		@Facet(memUse="WRITER", prototype="(Comparable v)", counterpart="query")
  		public Comparable map(Object... values) {return super.map(values);}
  		
- 		@Facet(memUse="READER", prototype="(Comparable v)")
+ 		@Override
+		@Facet(memUse="READER", prototype="(Comparable v)")
  		public Comparable query(Object... values) {return super.query(values);}
  		
- 		public FullMin duplicate() {return new FullMin(operatorData, targetClass);}
+ 		@Override
+		public FullMin duplicate() {return new FullMin(operatorData, targetClass);}
 	}
 
 	@Operator(name="FullMax", spec="[c: \"Comparable\"]", defaultFacet="map")
@@ -119,11 +126,14 @@ public class Summary extends BasicModule {
 			super(opData, spec, true);
 		}
 		
+		@Override
 		@Facet(memUse="WRITER", prototype="(Comparable v)", counterpart="query")
  		public Comparable map(Object... values) {return super.map(values);}
  		
- 		@Facet(memUse="READER", prototype="(Comparable v)")
+ 		@Override
+		@Facet(memUse="READER", prototype="(Comparable v)")
  		public Comparable query(Object... values) {return super.query(values);}
- 		public FullMax duplicate() {return new FullMax(operatorData, targetClass);}
+ 		@Override
+		public FullMax duplicate() {return new FullMax(operatorData, targetClass);}
 	}
 }

@@ -22,6 +22,7 @@ public final class RectangleTuple implements PrototypedTuple {
 	
 	public RectangleTuple(Rectangle2D basis) {this.basis = basis;}
 	
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		if (idx ==0) {return basis.getMinX();}
 		if (idx ==1) {return -basis.getMinY();}
@@ -30,6 +31,7 @@ public final class RectangleTuple implements PrototypedTuple {
 		throw new TupleBoundsException(idx, this);
 	}
 
+	@Override
 	public String toString() {return Tuples.toString("Rectangle", this, 0);}
 
 	@Override

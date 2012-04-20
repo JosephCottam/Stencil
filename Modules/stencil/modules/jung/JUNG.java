@@ -20,6 +20,7 @@ public class JUNG extends BasicModule {
 	private static final Class[] OPERATOR_CLASSES = new Class[]{BalloonLayout.class, CircleLayout.class, FRLayout.class, ISOMLayout.class, KKLayout.class, RadialTreeLayout.class, SpringLayout.class, TreeLayout.class};
 	private static final Class[] CONSTRUCTOR_TYPES = new Class[]{OperatorData.class, Specializer.class};
 	
+	@Override
 	protected ModuleData loadOperatorData() throws MetadataParseException {
 		final String MODULE_NAME = "JUNG";
 		

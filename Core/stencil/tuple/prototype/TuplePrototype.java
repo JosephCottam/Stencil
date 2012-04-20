@@ -77,6 +77,7 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 	}
 	
 	
+	@Override
 	public int hashCode() {
 		if (hashCode == null) {
 			int code =1;
@@ -115,6 +116,7 @@ public class TuplePrototype<T extends TupleFieldDef> implements Iterable<T> {
 	@Override
 	public Iterator<T> iterator() {return fields.iterator();}
 	
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 		b.append("(");

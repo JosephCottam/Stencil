@@ -4,7 +4,7 @@ import stencil.explore.model.AdapterOpts;
 
 /**Event indicating that a stencil object was changed was changed.*/
 public class StencilEvent<T> extends java.util.EventObject {
-	public static enum Type {Stencil, Sources, Config, All}
+	public static enum Type {Stencil, Config, All}
 
 	/**Event to indicate the configuration changed.
 	 * This includes compiler/interpreter configuration or application information.

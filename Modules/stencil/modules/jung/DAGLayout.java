@@ -13,6 +13,7 @@ public final class DAGLayout extends GraphOperator.StepOperator {
 		super(opData, spec); 
 	}
 	
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.DAGLayout l = new edu.uci.ics.jung.algorithms.layout.DAGLayout(new DelegateForest(graph));
 		l.setSize(size);

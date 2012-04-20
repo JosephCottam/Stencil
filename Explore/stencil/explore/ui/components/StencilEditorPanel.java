@@ -39,6 +39,7 @@ public class StencilEditorPanel extends JScrollPane implements StencilMutable.St
 
 		//Line/char number reporting
 		stencilSource.addCaretListener(new CaretListener() {
+			@Override
 			public void caretUpdate(CaretEvent arg0) {
 				int offset = stencilSource.getCaretPosition();
 				int line =-1;
@@ -59,6 +60,7 @@ public class StencilEditorPanel extends JScrollPane implements StencilMutable.St
 		stencilSource.addCaretListener(new CaretListener() {
 			String oldText = "";
 			
+			@Override
 			public void caretUpdate(CaretEvent arg0) {
 				if (internalUpdate) {return;}
 
@@ -76,6 +78,7 @@ public class StencilEditorPanel extends JScrollPane implements StencilMutable.St
 
 		//Link/prepare undo/redo management
 		undoListener = new UndoableEditListener() {
+			@Override
 			public void undoableEditHappened(UndoableEditEvent e) {
 				undoManager.addEdit(e.getEdit());
 			}
@@ -96,6 +99,7 @@ public class StencilEditorPanel extends JScrollPane implements StencilMutable.St
 		edit.add(redo);
 
 		ActionListener editMenuListener = new ActionListener(){
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					if (e.getSource() == undo) {
@@ -113,6 +117,7 @@ public class StencilEditorPanel extends JScrollPane implements StencilMutable.St
 		return edit;
 	}
 
+	@Override
 	public void setStencil(String text) {
 		if (stencilSource.getText().equals(text)) {return;}
 		internalUpdate = true;

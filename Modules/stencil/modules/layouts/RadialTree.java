@@ -16,8 +16,8 @@ public class RadialTree extends Layout{
 	public static final String NAME = "RadialLayout";
 	
 	private class LayoutTree extends Tree<LayoutTree> {
-		private double r, theta1, theta2;
-		private double x,y;
+		protected double r, theta1, theta2;
+		protected double x,y;
 		
 		double avgDescendents;   //Descendents per layer
 		double totalDescendents; //Total number of descedents in all subtrees
@@ -25,6 +25,7 @@ public class RadialTree extends Layout{
 		public LayoutTree(Object id) {super(id, null);}
 		public LayoutTree(Object id, LayoutTree parent) {super(id, parent);}
 		
+		@Override
 		public String toString() {return toString(0);}
 		
 		private String toString(int nest) {

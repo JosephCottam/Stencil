@@ -46,12 +46,15 @@ public abstract class ViewTuple implements PrototypedTuple {
 	}
 
 	//TODO: Convert so the numeric de-reference is the primary one
+	@Override
 	public Object get(int idx) {
 		try {return get(PROTOTYPE.get(idx).name());}
 		catch (IndexOutOfBoundsException e) {throw new TupleBoundsException(idx, size());}
 	}
 
+	@Override
 	public TuplePrototype prototype() {return PROTOTYPE;}
+	@Override
 	public int size() {return PROTOTYPE.size();}		
 	/**Gets the default value for the named property.
 	 * If the named property has no defined default, it is assumed to be 'null'.
@@ -61,6 +64,7 @@ public abstract class ViewTuple implements PrototypedTuple {
 	 */
 	public boolean isDefault(String name, Object value) {return false;}
 
+	@Override
 	public String toString() {return stencil.tuple.Tuples.toString(this);}
 
 	/**Given a point in the canvas, where is it in the view?

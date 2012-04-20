@@ -12,7 +12,9 @@ import stencil.util.ConversionException;
 public class StrokeWrapper implements TypeWrapper {
 	private static final Class[] ACCEPTS = new Class[]{BasicStroke.class};
 	
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
+	@Override
 	public Object convert(Object v, Class c) {
 		if (v instanceof StrokeTuple && Stroke.class.isAssignableFrom(c)) {
 			return ((StrokeTuple) v).getStroke();
@@ -28,6 +30,7 @@ public class StrokeWrapper implements TypeWrapper {
 		throw new ConversionException(v,c);
 	}
 
+	@Override
 	public Tuple toTuple(Object o) {
 		if (o instanceof BasicStroke) {return new StrokeTuple(((BasicStroke) o));}
 		throw new RuntimeException("Error wrapping: " + o.toString());

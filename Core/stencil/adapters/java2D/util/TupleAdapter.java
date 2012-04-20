@@ -20,13 +20,13 @@ import stencil.tuple.prototype.TupleFieldDef;
  */
 public final class TupleAdapter {
 
-	private static final TuplePrototype buildPrototype(int[] translation, TuplePrototype basis) {
+	protected static final TuplePrototype buildPrototype(int[] translation, TuplePrototype basis) {
 		String[] names = new String[translation.length];
 		for (int i=0; i< names.length; i++) {names[i] = basis.get(i).name();}
 		return buildPrototype(names, translation, basis);
 	}
 
-	private static final TuplePrototype buildPrototype(String[] names, int[] translation, TuplePrototype basis) {
+	protected static final TuplePrototype buildPrototype(String[] names, int[] translation, TuplePrototype basis) {
 		assert names.length == translation.length : "Name set and translation set must be of the same length";
 		TupleFieldDef[] defs = new TupleFieldDef[names.length];
 		for (int i=0; i< defs.length; i++) {
@@ -97,6 +97,7 @@ public final class TupleAdapter {
 		@Override
 		public int size() {return translation.length;}
 		
+		@Override
 		public String toString() {return Tuples.toString(this);}
 	}
 }

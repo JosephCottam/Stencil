@@ -41,9 +41,11 @@ public abstract class AbstractColumn<T> implements Column<T> {
      * Returns the most specific superclass for the values in the column
      * @return the Class of the column's data values
      */
-    public Class type() {return m_columnType;}
+    @Override
+	public Class type() {return m_columnType;}
 
-    public boolean readOnly() {return false;}
+    @Override
+	public boolean readOnly() {return false;}
     
     // ------------------------------------------------------------------------
     // Data Access Methods
@@ -51,6 +53,7 @@ public abstract class AbstractColumn<T> implements Column<T> {
     /**
      * Returns the default value for rows that have not been set explicitly. 
      */
-    public Object getDefaultValue() {return m_defaultValue;}
+    @Override
+	public Object getDefaultValue() {return m_defaultValue;}
     
 } // end of abstract class AbstractColumn

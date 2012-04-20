@@ -51,6 +51,7 @@ public class RandomStream implements TupleStream {
 		prototype = new TuplePrototype(fields);
 	}
 	
+	@Override
 	public SourcedTuple next() {
 		if (length > 0 && count >= length) {throw new NoSuchElementException(format("Stream %1$s exhausted.", name));}
 		count++;
@@ -60,9 +61,12 @@ public class RandomStream implements TupleStream {
 		return new SourcedTuple.Wrapper(name, new PrototypedArrayTuple(prototype, values));
 	}
 
+	@Override
 	public boolean hasNext() {return (length < 0 || count < length);}
 
+	@Override
 	public void remove() {throw new UnsupportedOperationException();}
+	@Override
 	public void stop() {}
 	public List<String> getFields() {return Arrays.asList(TuplePrototypes.getNames(prototype));}
 }

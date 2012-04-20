@@ -9,6 +9,7 @@ import stencil.interpreter.tree.Specializer;
 import stencil.unittests.module.TestModuleCache;
 
 public class TestModules extends TestCase {
+	@Override
 	public void setUp() throws Exception {
 		TestModuleCache.initCache();
 	}

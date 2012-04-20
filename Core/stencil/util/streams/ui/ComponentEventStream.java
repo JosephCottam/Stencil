@@ -43,8 +43,10 @@ public final class ComponentEventStream implements TupleStream {
 			this.height = r.height;
 		}
 		
+		@Override
 		public Object get(String name) {return Tuples.namedDereference(name, this);}
 		
+		@Override
 		public Object get(int idx) {
 			if (idx == X) {return x;}
 			if (idx == Y) {return y;}
@@ -53,7 +55,9 @@ public final class ComponentEventStream implements TupleStream {
 			throw new TupleBoundsException(idx, size());
 		}
 		
+		@Override
 		public int size() {return PROTOTYPE.size();}
+		@Override
 		public TuplePrototype prototype() {return PROTOTYPE;}
 	}
 	
@@ -68,6 +72,7 @@ public final class ComponentEventStream implements TupleStream {
 		public CurrentStateSource(JComponent source) {
 			this.component = source;
 		}
+		@Override
 		public Tuple next() {return new ComponentState(component.getBounds());}
 	}
 	
@@ -85,15 +90,20 @@ public final class ComponentEventStream implements TupleStream {
 			source.addComponentListener(this);
 		}
 		
+		@Override
 		public Tuple next() {
 			Rectangle r = lastState.get();
 			lastState.compareAndSet(r, null);			
 			return new ComponentState(r);
 		}
 
+		@Override
 		public void componentMoved(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
+		@Override
 		public void componentResized(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
+		@Override
 		public void componentShown(ComponentEvent e) {lastState.set(e.getComponent().getBounds());}
+		@Override
 		public void componentHidden(ComponentEvent e) {/*Event ignored.*/}
 	}
 	
@@ -110,10 +120,13 @@ public final class ComponentEventStream implements TupleStream {
 		}
 	}
 	
+	@Override
 	public SourcedTuple next() {return new SourcedTuple.Wrapper(name, tupleSource.next());}
+	@Override
 	public boolean hasNext() {return true;}
 
 	/**Throws UnsupportedOpertaionException.*/
+	@Override
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 
 	@Override

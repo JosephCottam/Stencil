@@ -12,6 +12,7 @@ public final class SimpleUpdateTask implements Callable<Finisher> {
 		this.table = table;		
 	}
 	
+	@Override
 	public Finisher call() {
 		table.viewpoint().simpleUpdate();	//No guard ins need on the simpleUpdate call since it will return immediately if there is no work
 		return UpdateTask.NO_WORK;		

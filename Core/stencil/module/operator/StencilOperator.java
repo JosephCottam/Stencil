@@ -68,5 +68,6 @@ public interface StencilOperator<T extends StencilOperator> extends Viewpoint<T>
 	 * 
 	 * @return
 	 */
+	@Override
 	public T viewpoint();
 }

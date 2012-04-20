@@ -10,12 +10,14 @@ import static stencil.parser.string.StencilParser.*;
 public class TestPath extends TestCase {
 	private StencilTree tree1, tree2;
 	
+	@Override
 	public void setUp() throws Exception {
 		stencil.Configure.loadProperties("./TestData/Stencil.properties");
 		tree1 = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 		tree2 = ParseStencil.programTree(FileUtils.readFile("./TestData/RegressionImages/Flowers/AndersonFlowers.stencil"), ADAPTER);
 	}
 	
+	@Override
 	public void tearDown() {
 		tree1 = null;
 		tree2 = null;

@@ -32,6 +32,7 @@ public class ConcurrentStream implements TupleStream {
 	@Override
 	public void stop() {for (TupleStream stream: streams) {stream.stop();}}
 
+	@Override
 	public SourcedTuple next() {
 		SourcedTuple nv = null;
 		int startOffset = offset;
@@ -45,6 +46,7 @@ public class ConcurrentStream implements TupleStream {
 		return nv;
 	}
 
+	@Override
 	public boolean hasNext() {
 		int initial = offset;
 		do {
@@ -55,6 +57,7 @@ public class ConcurrentStream implements TupleStream {
 		return false;
 	}
 
+	@Override
 	public void remove() {throw new UnsupportedOperationException("Remove not supported on ConcurrentStream.");}
 	
 	private void incrimentOffset() {offset = (offset+1) % streams.size();}

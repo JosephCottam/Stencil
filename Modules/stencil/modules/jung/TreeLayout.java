@@ -20,6 +20,7 @@ public final class TreeLayout extends GraphOperator {
 		distY = Converter.toInteger(spec.get(DIST_Y));
 	}
 
+	@Override
 	protected void resetLayout() {
 		setLayout(new edu.uci.ics.jung.algorithms.layout.TreeLayout(new DelegateForest(graph), distX, distY));
 	}	

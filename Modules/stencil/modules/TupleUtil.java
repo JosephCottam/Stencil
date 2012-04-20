@@ -235,6 +235,7 @@ public class TupleUtil extends BasicModule {
 		return new ArrayTuple(l.toArray());
 	}
 			
+	@Override
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException {		
 		validate(name, specializer);
 		OperatorData od = moduleData.getOperator(name);

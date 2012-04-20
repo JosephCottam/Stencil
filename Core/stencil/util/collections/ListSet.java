@@ -18,10 +18,12 @@ public class ListSet<T> extends ArrayList<T> implements Set<T> {
 		for (T value:source) {this.add(value);}
 	}
 
+	@Override
 	public void  add(int i, T element) {
 		validateItem(element);
 		super.add(i, element);
 	}
+	@Override
 	public boolean add(T element) {
 		validateItem(element);
 		return super.add(element);
@@ -33,6 +35,7 @@ public class ListSet<T> extends ArrayList<T> implements Set<T> {
 		return changed;
 	}
 
+	@Override
 	public boolean addAll(Collection<? extends T> c) {
 		for (T g:c) {validateItem(g);}
 		return super.addAll(c);
@@ -49,6 +52,7 @@ public class ListSet<T> extends ArrayList<T> implements Set<T> {
 		return modified;
 	}
 	
+	@Override
 	public T set(int index, T element) {
 		validateItem(element);
 		return super.set(index, element);

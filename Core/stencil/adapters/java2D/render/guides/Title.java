@@ -69,8 +69,10 @@ public class Title extends Guide2D {
 		}		
 	}
 
+	@Override
 	public Rectangle2D getBoundsReference() {return data.getBoundsReference();}
 	
+	@Override
 	public synchronized void render(Graphics2D g, AffineTransform viewTransform) {
 		renderer.render(data.tenured(), g, viewTransform);
 	}

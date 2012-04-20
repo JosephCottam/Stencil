@@ -85,6 +85,7 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 	/**Retrieve a view value.  
 	 * Uses Y-positive/up (tuple convention)
 	 */
+	@Override
 	public Object get(String name) throws InvalidNameException {
 		if (PROTOTYPE.contains(name)) {
 			AffineTransform t = canvas.inverseViewTransform();
@@ -116,10 +117,12 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		return t.getTranslateY()/t.getScaleY();	
 	}
 	
+	@Override
 	public Point2D canvasToView(Point2D p) {
 		return canvas.viewTransform().transform(p, p);
 	}
 	
+	@Override
 	public Dimension2D canvasToView(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
 		canvas.viewTransform().deltaTransform(p, p);
@@ -127,15 +130,18 @@ public final class ViewTuple extends stencil.display.ViewTuple {
 		return d;
 	}
 	
+	@Override
 	public Point2D viewToCanvas(Point2D p) {
 		return canvas.inverseViewTransform().transform(p, p);
 	}
 	
+	@Override
 	public Dimension2D viewToCanvas(Dimension2D d) {
 		Point2D p = new Point2D.Double(d.getWidth(), d.getHeight());
 		p = canvas.inverseViewTransform().deltaTransform(p, p);
 		return new DoubleDimension(p.getX(), p.getY());
 	}
 	
+	@Override
 	public AffineTransform viewTransform() {return canvas.viewTransform();}
 }

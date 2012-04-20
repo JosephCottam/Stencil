@@ -43,6 +43,7 @@ public class TestModule implements Module {
 		}
 	}
 	
+	@Override
 	public ModuleData getModuleData() {return MODULE_DATA;}
 
 	@Override
@@ -63,8 +64,10 @@ public class TestModule implements Module {
 		throw new RuntimeException("No such operator " + name);
 	}
 
+	@Override
 	public String getName() {return MODULE_DATA.getName();}
 
+	@Override
 	public OperatorData getOperatorData(String name, Specializer specializer)
 			throws SpecializationException, IllegalArgumentException {
 		if (name.equals("FilterFail")) {return MODULE_DATA.getOperator("FilterFail");}

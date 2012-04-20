@@ -13,8 +13,11 @@ public final class KeysetConstantMap<K,V> extends ConstantMap<K,V> {
 	protected final class Entry implements java.util.Map.Entry<K, V> {
 		private final K key;
 		public Entry(K key) {this.key = key;}
+		@Override
 		public K getKey() {return key;}
+		@Override
 		public V getValue() {return value;}
+		@Override
 		public V setValue(V value) {throw new UnsupportedOperationException();}
 	}
 	
@@ -24,26 +27,32 @@ public final class KeysetConstantMap<K,V> extends ConstantMap<K,V> {
 		keyset.addAll(keys);
 	}
 	
+	@Override
 	public V get(Object key) {
 		if (keyset.contains(key)) {return value;}
 		return null; 
 	}
 	
+	@Override
 	public boolean containsKey(Object key) {return keyset.contains(key);}
 
+	@Override
 	public Set<java.util.Map.Entry<K,V>> entrySet(){
 		Set<java.util.Map.Entry<K, V>> entries = new HashSet();
 		for (K key: keyset) {entries.add(new Entry(key));}
 		return entries;
 	}
 	
+	@Override
 	public Set<K> keySet() {return keyset;}
 
+	@Override
 	public V put(K key, V value) {
 		if (keyset.contains(key)) {return value;}
 		else {keyset.add(key); return null;}
 	}
 	
+	@Override
 	public V remove(Object key) {
 		if (keyset.contains(key)) {
 			keyset.remove(key);
@@ -51,7 +60,9 @@ public final class KeysetConstantMap<K,V> extends ConstantMap<K,V> {
 		}
 		return null;
 	}
+	@Override
 	public int size() {return keyset.size();}
+	@Override
 	public Collection<V> values() {return null;}
 
 }

@@ -26,6 +26,8 @@ public interface Imager {
 			this.width = width;
 			this.height = height;
 		}
+		
+		@Override
 		public BufferedImage image(Tuple t, AffineTransform viewTrans) {
 			return Util.scale(base, width, height, viewTrans);
 		}
@@ -43,6 +45,7 @@ public interface Imager {
 			this.heightIdx = heightIdx;
 		}
 		
+		@Override
 		public BufferedImage image(Tuple t, AffineTransform viewTrans) {
 			double width = (Double) t.get(widthIdx);
 			double height = (Double) t.get(heightIdx);
@@ -60,6 +63,7 @@ public interface Imager {
 			this.heightIdx = heightIdx;
 		}
 		
+		@Override
 		public BufferedImage image(Tuple t, AffineTransform viewTrans) {
 			String filename = WorkingDir.resolve((String) t.get(fileIdx));
 			BufferedImage base = Util.load(filename);
@@ -73,7 +77,7 @@ public interface Imager {
 	
 	public static final class Util {
 
-		private static double autoScale(double width, double height, BufferedImage base) {
+		public static double autoScale(double width, double height, BufferedImage base) {
 			if (base == null) {return 1;} 								//Nothing to scale yet
 			if (width == AUTO_SCALE && height == AUTO_SCALE) {return 1;}//No scale specified
 			if (width == AUTO_SCALE) {return height/base.getHeight();}	//Scale width based on height specified
@@ -83,7 +87,7 @@ public interface Imager {
 
 
 		
-		private static BufferedImage scale(BufferedImage base, double requestWidth, double requestHeight, AffineTransform viewTrans) {
+		public static BufferedImage scale(BufferedImage base, double requestWidth, double requestHeight, AffineTransform viewTrans) {
 			double width = requestWidth != AUTO_SCALE ? requestWidth : base.getWidth() * Util.autoScale(requestWidth, requestHeight, base);
 			double height = requestHeight !=  AUTO_SCALE ? requestHeight : base.getHeight() * Util.autoScale(requestWidth, requestHeight, base);
 			Point2D dim = new Point2D.Double(width, height);
@@ -102,7 +106,7 @@ public interface Imager {
 			return display;
 		}
 		
-		private static BufferedImage load(String file) {
+		public static BufferedImage load(String file) {
 			String filename = WorkingDir.resolve(file);
 			try {return javax.imageio.ImageIO.read(new File(filename));}
 			catch (Exception e) {throw new RuntimeException("Error loading image: " + file);}

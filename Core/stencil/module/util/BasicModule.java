@@ -28,8 +28,10 @@ public abstract class BasicModule implements Module {
 		return ModuleDataParser.moduleData(this.getClass());
 	}
 	
+	@Override
 	public ModuleData getModuleData() {return moduleData;}
 
+	@Override
 	public String getName() {return moduleData.getName();}
 	
 	/**Return meta-data for the operator of the given name with the
@@ -44,6 +46,7 @@ public abstract class BasicModule implements Module {
 	 *  @throws SpecializationException Non-default specializer provided.
 	 *  @throws MetadataHoleException Default meta-data object is incomplete
 	 */
+	@Override
 	public OperatorData getOperatorData(String name, Specializer specializer) throws SpecializationException, MetadataHoleException {
 		validate(name, specializer);
 		OperatorData ld = moduleData.getOperator(name);

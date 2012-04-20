@@ -21,6 +21,7 @@ public class OperatorRule implements Viewpoint<OperatorRule> {
 	/**Rules 'match' when all of their predicates do.*/
 	public boolean matches(Environment env) {return Predicate.matches(preds, env);}
 
+	@Override
 	public OperatorRule viewpoint() {
 		final Predicate[] vpp = new Predicate[preds.length];
 		for (int i=0; i<vpp.length; i++) {vpp[i] = preds[i].viewpoint();}

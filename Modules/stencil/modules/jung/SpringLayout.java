@@ -11,6 +11,7 @@ public final class SpringLayout extends GraphOperator.StepOperator {
 		super(opData, spec); 
 	}
 	
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.SpringLayout l = new edu.uci.ics.jung.algorithms.layout.SpringLayout(new DelegateForest(graph));
 		l.setSize(size);

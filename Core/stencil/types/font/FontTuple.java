@@ -49,10 +49,12 @@ public final class FontTuple implements PrototypedTuple {
 
 	public FontTuple(Font f) {this.font = f;}
 	
+	@Override
 	public Object get(final String name) throws InvalidNameException {
 		return Tuples.namedDereference(name, this);
 	}
 
+	@Override
 	public Object get(final int idx) throws TupleBoundsException {
 		if (idx == SELF_IDX) {return this;}
 		if (idx == FONT_IDX) {return font.getFamily();}
@@ -63,6 +65,7 @@ public final class FontTuple implements PrototypedTuple {
 	}
 
 	public Font getFont() {return font;}
+	@Override
 	public TuplePrototype prototype() {return PROTOTYPE;}
 
 	public boolean isDefault(String name, Object value) {
@@ -73,7 +76,9 @@ public final class FontTuple implements PrototypedTuple {
 		return false;
 	}
 
+	@Override
 	public int size() {return FIELDS.length;}
+	@Override
 	public String toString() {return Tuples.toString("Font", this, 1);}
 
 }

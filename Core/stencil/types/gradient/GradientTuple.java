@@ -59,8 +59,10 @@ public class GradientTuple implements PrototypedTuple, Paint {
 		this.cyclic = cyclic;
 	}
 	
+	@Override
 	public Object get(String name) throws InvalidNameException {return Tuples.namedDereference(name, this);}
 
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		if (idx==SELF) {return this;}
 		if (idx==START) {return one;}
@@ -76,6 +78,7 @@ public class GradientTuple implements PrototypedTuple, Paint {
 
 	public boolean isDefault(String name, Object value) {return false;}
 
+	@Override
 	public int size() {return PROTOTYPE.size();}
 	
 	public GradientPaint getPaint(Point2D start, Point2D end) {	
@@ -96,7 +99,9 @@ public class GradientTuple implements PrototypedTuple, Paint {
 	}
 
 
+	@Override
 	public int getTransparency() {return Paint.TRANSLUCENT;}
+	@Override
 	public PaintContext createContext(ColorModel cm, Rectangle deviceBounds,
 			Rectangle2D userBounds, AffineTransform xform, RenderingHints hints) {
 		Paint p = getPaint(new Point2D.Double(userBounds.getMinX(), userBounds.getMinY()), new Point2D.Double(userBounds.getMaxX(), userBounds.getMaxY()));

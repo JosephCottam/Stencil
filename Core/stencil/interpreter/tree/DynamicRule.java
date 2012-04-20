@@ -29,6 +29,7 @@ public class DynamicRule implements UpdateableComposite<DynamicRule> {
 	
 	public String layerName() {return layerName;}
 	public int groupID() {return groupID;}
+	@Override
 	public StateQuery stateQuery() {return query;}
 	public Target target() {return target;}
 	
@@ -67,6 +68,7 @@ public class DynamicRule implements UpdateableComposite<DynamicRule> {
 		return results;
 	}	
 	
+	@Override
 	public DynamicRule viewpoint() {
 		return new DynamicRule(layerName, groupID, target, chain.viewpoint(), query.viewpoint());
 	}

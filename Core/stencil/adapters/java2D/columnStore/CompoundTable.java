@@ -72,13 +72,16 @@ public class CompoundTable implements Table {
     }
     
     /**No effect on compound table; all updates are handled in the component tables.*/
-    public TableShare changeGenerations() {throw new UnsupportedOperationException();}
+    @Override
+	public TableShare changeGenerations() {throw new UnsupportedOperationException();}
     
     /**No effect on compound table; all updates are handled in the component tables.*/
-    public void merge(TableShare share) {return;}
+    @Override
+	public void merge(TableShare share) {return;}
     	        
     /**What is ready to render, right now?**/
-    public TableView tenured() {return root.tenured();}  
+    @Override
+	public TableView tenured() {return root.tenured();}  
 
     @Override
     public TableShare viewpoint() {return root.viewpoint();}
@@ -169,6 +172,7 @@ public class CompoundTable implements Table {
 		throw new UnsupportedOperationException();
 	}
 	
+	@Override
 	public int size() {return root.size();}
 
 	/**What are the component tables of this compound?
@@ -176,7 +180,9 @@ public class CompoundTable implements Table {
 	 */
 	public List<Table> components() {return components;}
 
+	@Override
 	public Rectangle2D getBoundsReference() {return root.getBoundsReference();}
+	@Override
 	public RectangleTuple bounds() {
 		return new RectangleTuple(root.getBoundsReference().getBounds2D());
 	}

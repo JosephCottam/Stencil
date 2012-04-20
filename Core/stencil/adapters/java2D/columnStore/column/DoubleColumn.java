@@ -31,12 +31,14 @@ public class DoubleColumn extends AbstractColumn<Double> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return m_values.length;}
+    @Override
+	public int size() {return m_values.length;}
 
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public Double get(int row) {return getDouble(row);}
+    @Override
+	public Double get(int row) {return getDouble(row);}
 
     /**
      * @see stencil.adapters.java2D.columnStore.column.AbstractColumn#getDouble(int)

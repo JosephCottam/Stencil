@@ -22,12 +22,14 @@ public final class PointTuple implements PrototypedTuple {
 	/**Assumes y is in Y-Up/Positive coordinates.**/
 	public PointTuple(double x, double y) {this.p = new Point2D.Double(x,-y);}
 	
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		if (idx ==0) {return p.getX();}
 		if (idx ==1) {return -p.getY();}
 		throw new TupleBoundsException(idx, this);
 	}
 	
+	@Override
 	public String toString() {return Tuples.toString("Point", this, 0);}
 
 	@Override

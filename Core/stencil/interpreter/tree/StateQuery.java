@@ -57,6 +57,7 @@ public class StateQuery implements Viewpoint<StateQuery> {
 	 */
 	public synchronized void setUpdatePoint(int[] ids) {cachedIDs = ids;}
 	
+	@Override
 	public synchronized StateQuery viewpoint() {
 		final Invokeable[] vps = new Invokeable[queries.length];
 		for (int i=0;i<queries.length;i++) {vps[i] = queries[i].viewpoint();}

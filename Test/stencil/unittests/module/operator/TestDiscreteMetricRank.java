@@ -12,6 +12,7 @@ public class TestDiscreteMetricRank  extends StencilTestCase {
 	Specializer spec;
 	StencilOperator op;
 	
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		spec = ParseStencil.specializer("[margin: 1]");

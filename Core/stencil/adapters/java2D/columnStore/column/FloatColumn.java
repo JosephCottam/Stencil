@@ -30,13 +30,15 @@ public class FloatColumn extends AbstractColumn<Float> {
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#getRowCount()
      */
-    public int size() {return m_values.length;}
+    @Override
+	public int size() {return m_values.length;}
     
 
     /**
      * @see stencil.adapters.java2D.columnStore.column.Column#get(int)
      */
-    public Float get(int row) {
+    @Override
+	public Float get(int row) {
         return new Float(getFloat(row));
     }
 

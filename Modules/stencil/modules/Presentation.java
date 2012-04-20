@@ -37,10 +37,10 @@ public class Presentation extends BasicModule {
 		public static final String NAMES_KEY = "names";
 		
 		
-		private final List<String> fields = new ArrayList();
-		private final List<Boolean> vals= new ArrayList();
-		private final Panel panel;
-		private final String label;
+		protected final List<String> fields = new ArrayList();
+		protected final List<Boolean> vals= new ArrayList();
+		protected final Panel panel;
+		protected final String label;
 		
 		public SelectTrues(SelectTrues op) {
 			super(op.operatorData);
@@ -79,7 +79,7 @@ public class Presentation extends BasicModule {
 		public JPanel panel() {return panel;}
 		
 		private static final class Panel extends JPanel {
-			private final SelectTrues operator;
+			protected final SelectTrues operator;
 			public Panel(SelectTrues op) {
 				super();
 				super.setBorder(new TitledBorder(new LineBorder(Color.BLACK), op.label));
@@ -87,6 +87,7 @@ public class Presentation extends BasicModule {
 				this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			}
 			
+			@SuppressWarnings("synthetic-access")
 			public void augment(String name) {
 				final int idx = operator.vals.size();
 
@@ -98,6 +99,7 @@ public class Presentation extends BasicModule {
 				box.setSelected(true);
 				box.setVisible(true);
 				box.addItemListener(new ItemListener() {
+					@Override
 					public void itemStateChanged(ItemEvent ev) {
 						synchronized(operator) {
 							operator.stateID++;
@@ -122,10 +124,10 @@ public class Presentation extends BasicModule {
 		public static final String NAMES_KEY = "names";
 		
 		
-		private final List<String> fields = new ArrayList();
-		private final List<Color> vals= new ArrayList();
-		private final Panel panel;
-		private final String label;
+		protected final List<String> fields = new ArrayList();
+		protected final List<Color> vals= new ArrayList();
+		protected final Panel panel;
+		protected final String label;
 		
 		protected SelectColors(SelectColors op) {
 			super(op.operatorData);
@@ -164,7 +166,7 @@ public class Presentation extends BasicModule {
 		public JPanel panel() {return panel;}
 		
 		private static final class Panel extends JPanel {
-			private final SelectColors operator;
+			protected final SelectColors operator;
 			public Panel(SelectColors op) {
 				super();
 				super.setBorder(new TitledBorder(new LineBorder(Color.BLACK), op.label));
@@ -173,6 +175,7 @@ public class Presentation extends BasicModule {
 				this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 			}
 			
+			@SuppressWarnings("synthetic-access")
 			public void augment(String name) {
 				final int idx = operator.vals.size();
 				final JColorChooser colorChooser = new JColorChooser();

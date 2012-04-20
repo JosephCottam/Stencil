@@ -28,6 +28,7 @@ public abstract class TreeFilterSequence extends TreeFilter {
 			}
 		}
 		
+		@Override
 		public void rule() throws RecognitionException {
 			try {
 				method.invoke(target);
@@ -57,8 +58,10 @@ public abstract class TreeFilterSequence extends TreeFilter {
     protected Object downup(Object t, final fptr down, final fptr up) {
         TreeVisitor v = new TreeVisitor(new CommonTreeAdaptor());
         TreeVisitorAction actions = new TreeVisitorAction() {
-            public Object pre(Object tree)  {applyOnce(tree, down); return tree;}
-            public Object post(Object tree) {applyOnce(tree, up); return tree;}
+            @Override
+			public Object pre(Object tree)  {applyOnce(tree, down); return tree;}
+            @Override
+			public Object post(Object tree) {applyOnce(tree, up); return tree;}
         };
         t = v.visit(t, actions);
         return t;    

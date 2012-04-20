@@ -18,6 +18,7 @@ public interface Colorer {
 
 	/**Set fill to background.**/
 	public final class None implements Colorer {
+		@Override
 		public void setColor(Graphics2D g, Tuple t) {g.setPaint(g.getBackground());}
 	}
 	
@@ -26,6 +27,7 @@ public interface Colorer {
 	public final class Const implements Colorer {
 		private final Paint paint;
 		public Const(Paint paint) {this.paint = paint;}
+		@Override
 		public void setColor(Graphics2D g, Tuple t) {g.setPaint(paint);}
 	}
 
@@ -35,6 +37,7 @@ public interface Colorer {
 		final int fillIdx;
 		public Variable(int fillIdx) {this.fillIdx = fillIdx;}
 		
+		@Override
 		public void setColor(Graphics2D g, Tuple t) {
 			Paint p = (Paint) t.get(fillIdx);
 			g.setPaint(p);

@@ -34,6 +34,7 @@ public class MessagePanel extends JPanel implements MessageReporter {
 			this.setTabSize(1);
 		}
 		
+		@Override
 		public Component getListCellRendererComponent(JList list, Object element, int idx, boolean selected, boolean focused) {
 			String text = "";
 			Color foreground = Color.BLACK;
@@ -80,17 +81,20 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		this.add(clearPanel, BorderLayout.SOUTH);
 
 		clear.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {clear();}
 		});
 
 		clear();
 	}
 
+	@Override
 	public synchronized void clear() {
 		messages.setModel(new DefaultListModel()); 
 	}
 
 	
+	@Override
 	public synchronized void addMessage(String message, Object...args) {
 		if (message == null) {throw new RuntimeException(String.format("Null message add requested (args are %1$s).", Arrays.deepToString(args)));}
 		
@@ -98,6 +102,7 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		else{addMessage(message, false);}
 	}
 	
+	@Override
 	public synchronized void addError(String message, Object...args) {
 		if (message == null) {addMessage("Error occured.  Please check logs.", true); return;}
 		
@@ -115,6 +120,7 @@ public class MessagePanel extends JPanel implements MessageReporter {
 			this.error = error;
 		}
 		
+		@Override
 		public void run() {
 			Entry e = new Entry(message, error);
 			((DefaultListModel) messages.getModel()).addElement(e);
@@ -128,6 +134,7 @@ public class MessagePanel extends JPanel implements MessageReporter {
 		javax.swing.SwingUtilities.invokeLater(new MessageUpdate(message, error));
 	}
 
+	@Override
 	public PrintStream errorAsStream() {
 		return new PrintStream(new ReporterAsStream(this));
 	}

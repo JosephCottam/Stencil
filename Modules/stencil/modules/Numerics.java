@@ -86,7 +86,8 @@ public class Numerics extends BasicModule {
 			return sum;
 		}
 
- 		public FullSum duplicate() {return new FullSum(operatorData);}
+ 		@Override
+		public FullSum duplicate() {return new FullSum(operatorData);}
 	}
 
 	@Operator()

@@ -30,16 +30,19 @@ public class Const extends StencilTree {
 	}
 	
 	
+	@Override
 	public Const dupNode() {
 		Const n = (Const) super.dupNode();
 		n.value = value;
 		return n;
 	}
 	
+	@Override
 	public String toString() {
 		return getValue() == null ? "null" : getValue().toString();
 	}
 
+	@Override
 	public boolean equals(Object other) {
 		if (super.equals(other)) {
 			if (value == null) {return ((Const) value) == null;}

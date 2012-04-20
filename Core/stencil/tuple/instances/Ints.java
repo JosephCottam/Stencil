@@ -7,6 +7,8 @@ public final class Ints implements Tuple {
 
 	public Ints(int[] values) {this.values = values;}
 	
+	@Override
 	public Integer get(int idx) {return values[idx];}
+	@Override
 	public int size() {return values.length;}
 }

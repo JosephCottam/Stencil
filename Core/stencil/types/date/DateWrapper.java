@@ -12,8 +12,10 @@ import stencil.util.ConversionException;
 public class DateWrapper implements TypeWrapper {
 	private static Class[] ACCEPTS = {Date.class, Calendar.class};
 
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
 
+	@Override
 	public Object convert(Object v, Class c) {
 		if (c.equals(String.class) && v instanceof DateTuple) {return v.toString();}
 		if (c.equals(String.class)) {return toTuple(v).toString();}
@@ -39,6 +41,7 @@ public class DateWrapper implements TypeWrapper {
 		throw new ConversionException(v,c);
 	}
 
+	@Override
 	public Tuple toTuple(Object o) {
 		if (o instanceof Date) {return new DateTuple((Date) o);}
 		if (o instanceof Calendar) {return new DateTuple(((Calendar) o).getTime());}

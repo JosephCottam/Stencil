@@ -30,8 +30,10 @@ public class ANTLRNode implements TreeNode {
 
 		public NodeEnumeration(List<ANTLRNode> source) {this.source = source;}
 
+		@Override
 		public boolean hasMoreElements() {return next < source.size();}
 
+		@Override
 		public ANTLRNode nextElement() {
 			ANTLRNode v = source.get(next);
 			next++;
@@ -60,26 +62,33 @@ public class ANTLRNode implements TreeNode {
 		this.parser = parser;
 	}
 
+	@Override
 	public Enumeration<ANTLRNode> children() {
 		ensureChildren();
 		return new NodeEnumeration(this.children);
 	}
 
+	@Override
 	public boolean getAllowsChildren() {return root.getChildCount() > 0;}
 
+	@Override
 	public TreeNode getChildAt(int childIndex) {
 		ensureChildren();
 		return children.get(childIndex);
 	}
 
+	@Override
 	public int getChildCount() {return root.getChildCount();}
 
+	@Override
 	public int getIndex(TreeNode node) {
 		ensureChildren();
 		return children.indexOf(node);
 	}
 
+	@Override
 	public TreeNode getParent() {return parent;}
+	@Override
 	public boolean isLeaf() {return !getAllowsChildren();}
 
 	private String typeName(int type) {
@@ -136,6 +145,7 @@ public class ANTLRNode implements TreeNode {
 	 * name will be included.
 	 * .  
 	 */
+	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder();
 

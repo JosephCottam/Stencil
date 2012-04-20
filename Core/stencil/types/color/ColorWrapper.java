@@ -7,8 +7,10 @@ import stencil.types.TypeWrapper;
 public final class ColorWrapper implements TypeWrapper<ColorTuple> {
 	private static final Class[] ACCEPTS = {Color.class, Paint.class, ColorTuple.class};
 	
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
 
+	@Override
 	public Object convert(Object value, Class c) {
 		String v = value.toString();
 		if (v.startsWith("@")) {
@@ -22,6 +24,7 @@ public final class ColorWrapper implements TypeWrapper<ColorTuple> {
 		throw new RuntimeException("error converting...");	
 	}
 	
+	@Override
 	public ColorTuple toTuple(Object o) {
 		if (o instanceof ColorTuple) {return (ColorTuple) o;}
 		if (o instanceof Color) {return ColorCache.get((Color) o);}

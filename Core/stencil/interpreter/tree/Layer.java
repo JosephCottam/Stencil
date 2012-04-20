@@ -20,16 +20,19 @@ public class Layer implements TupleStore {
 		this.spec = spec;
 	}
 	
+	@Override
 	public String getName() {return name;}
 	public Consumes[] getGroups() {return groups;}
 	public DisplayLayer implementation() {return impl;}
 	public Specializer specializer() {return spec;}
 	
+	@Override
 	public void store(Tuple t) {impl.update((PrototypedTuple) t);}
 	
 	/**Can the object be stored in the underlying layer?
 	 * Minimum requirements are (1) t is not null and (2) t has an identifier field.
 	 */
+	@Override
 	public boolean canStore(Tuple t) {
 		return
 			t != null

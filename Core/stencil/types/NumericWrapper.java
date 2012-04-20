@@ -10,11 +10,13 @@ public class NumericWrapper implements TypeWrapper {
 	private static final Class[] ACCEPTS = {Number.class, Integer.class, Long.class, Double.class, Float.class, int.class, long.class, double.class, float.class};
 
 
+	@Override
 	public Tuple toTuple(Object o) {
 		if (o instanceof Number) {return new NumericSingleton((Number) o);}
 		throw new RuntimeException("Error wrapping:" + o.toString());
 	}
 
+	@Override
 	public Class[] appliesTo() {return ACCEPTS;}
 
 	public static Double toDouble(Object value) {
@@ -85,6 +87,7 @@ public class NumericWrapper implements TypeWrapper {
 		return convert(v, c);
 	}
 
+	@Override
 	public Object convert(Object value, Class c) {
 		if (c.equals(Number.class)) {return toNumber(value);}
 		if (c.equals(Double.class)) {return toDouble(value);}

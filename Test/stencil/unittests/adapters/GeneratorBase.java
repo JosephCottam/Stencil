@@ -21,12 +21,14 @@ public abstract class GeneratorBase extends StencilTestCase {
 	
 	private StencilPanel panel;
 	
+	@Override
 	public void setUp() throws Exception {
 		super.setUp();
 		originalWorkingDir = WorkingDir.get();
 		WorkingDir.set(SOURCE_DIR);
 	}
 	
+	@Override
 	public void tearDown() {
 		if (panel !=null) {panel.dispose();}
 		WorkingDir.set(originalWorkingDir);

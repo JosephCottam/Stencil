@@ -22,6 +22,7 @@ public class ProgramCompileException extends RuntimeException {
 	}
 
 	/**Error message includes the standard message, plus a listing of all included errors.*/
+	@Override
 	public String getMessage() {
 		StringBuilder b = new StringBuilder();
 		if (location != UNKNOWN_LOCATION) {
@@ -34,20 +35,35 @@ public class ProgramCompileException extends RuntimeException {
 		b.append(super.getMessage());
 		return b.toString();
 	}
+	
 	private static final Token UNKNOWN_LOCATION = new Token() {
+		@Override
 		public int getChannel() {return -1;}
+		@Override
 		public int getCharPositionInLine() {return -1;}
+		@Override
 		public CharStream getInputStream() {return null;}
+		@Override
 		public int getLine() {return -1;}
+		@Override
 		public String getText() {return "UNKNOWN_LOCATION";}
+		@Override
 		public int getTokenIndex() {return -1;}
+		@Override
 		public int getType() {return -1;}
+		@Override
 		public void setChannel(int arg0) {}
+		@Override
 		public void setCharPositionInLine(int arg0) {}
+		@Override
 		public void setInputStream(CharStream arg0) {}
+		@Override
 		public void setLine(int arg0) {}
+		@Override
 		public void setText(String arg0) {}
+		@Override
 		public void setTokenIndex(int arg0) {}
+		@Override
 		public void setType(int arg0) {}
 	};
 	

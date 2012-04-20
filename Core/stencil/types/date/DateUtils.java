@@ -25,6 +25,7 @@ public class DateUtils extends BasicModule {
 	@Operator(spec="[f:\"dd-MMM-yy\"]")
 	public static class Parse extends AbstractOperator {
 		private static final ThreadLocal<SimpleDateFormat> FORMAT = new ThreadLocal<SimpleDateFormat>() {
+			@Override
 			protected SimpleDateFormat initialValue() {return new SimpleDateFormat();}
 		};
 		

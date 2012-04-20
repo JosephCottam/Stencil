@@ -95,16 +95,23 @@ public class PrototypedArrayTuple<T extends TupleFieldDef> implements Prototyped
 		return null;
 	}
 	
+	@Override
 	public boolean equals(Object other) {return Tuples.equals(this, other);}
+	@Override
 	public int hashCode() {return Tuples.hashCode(this);}
 	
 	/**Returns a string as-per the static toString() method.**/
+	@Override
 	public String toString() {return Tuples.toString(this);}
 
+	@Override
 	public TuplePrototype<T> prototype() {return prototype;}
 	
+	@Override
 	public Object get(String name) {return Tuples.namedDereference(name, this);}
+	@Override
 	public Object get(int idx) {return values[idx];}
+	@Override
 	public int size() {return values.length;}
 }
 

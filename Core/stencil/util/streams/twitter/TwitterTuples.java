@@ -39,17 +39,24 @@ public class TwitterTuples implements TupleStream {
 			this.queue = queue;
 		}
 		
+		@Override
 		public void onException(Exception arg0) {}
+		@Override
 		public void onDeletionNotice(StatusDeletionNotice arg0) {}
+		@Override
 		public void onScrubGeo(long arg0, long arg1) {}
+		@Override
 		public void onTrackLimitationNotice(int arg0) {}
+		@Override
 		public void onStatus(Status status) {
 			synchronized(queue){queue.add(status);}
 		}
 	}
 	
+	@Override
 	protected void finalize() {stop();}
 
+	@Override
 	public void stop() {twitter.cleanUp();}
 	
 	public TwitterTuples(String name, TuplePrototype proto, Specializer spec) throws TwitterException {
@@ -78,6 +85,7 @@ public class TwitterTuples implements TupleStream {
 		}
 	}
 	
+	@Override
 	public SourcedTuple next() {		
 		Status s;
 		synchronized(queue) {s = queue.poll();}
@@ -109,8 +117,10 @@ public class TwitterTuples implements TupleStream {
 	}
 	
 	
+	@Override
 	public boolean hasNext() {return true;}
 
+	@Override
 	public void remove() {throw new UnsupportedOperationException();}
 	public List<String> getFields() {return Arrays.asList(TuplePrototypes.getNames(PROTOTYPE));}
 }

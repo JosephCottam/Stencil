@@ -30,17 +30,24 @@ public final class NumericSingleton extends Number implements Tuple {
 		preferLong = (n instanceof Long || n instanceof Integer);
 	}
 
+	@Override
 	public double doubleValue() {return dv;}
+	@Override
 	public float floatValue() {return (float) dv;}
+	@Override
 	public int intValue() {return (int) lv;}
+	@Override
 	public long longValue() {return lv;}
 
+	@Override
 	public Object get(int idx) throws TupleBoundsException {
 		if (idx >0) {throw new TupleBoundsException(idx, 1);}
 		if (preferLong) {return lv;}
 		return dv;
 	}
 
+	@Override
 	public int size() {return 1;}	
+	@Override
 	public String toString() {return Tuples.toString(this);}
 }

@@ -19,6 +19,8 @@ import stencil.util.StencilThreadFactory;
 public class DataParallelDynamicBind {	
 
 	private static class Rule {
+		public Rule() {}
+		
 		private Invokeable m;
 		{
 			m = new ReflectiveInvokeable("add1", stencil.modules.Numerics.class);

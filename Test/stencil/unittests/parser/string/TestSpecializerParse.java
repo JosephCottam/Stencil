@@ -24,6 +24,7 @@ public class TestSpecializerParse extends TestCase {
 		testPasses(specializers, true);
 	}
 	
+	@SuppressWarnings("unused")
 	public void testRangeFail() throws Exception {
 		String[] ranges = new String[] {
 				"n .. 1",			//n in first position, not in last

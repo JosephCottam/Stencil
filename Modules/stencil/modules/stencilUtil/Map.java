@@ -49,5 +49,6 @@ public class Map extends AbstractOperator {
 		return new MultiResultTuple(results);		
 	}
 	
+	@Override
 	public Map duplicate() throws UnsupportedOperationException {return this;}
 }

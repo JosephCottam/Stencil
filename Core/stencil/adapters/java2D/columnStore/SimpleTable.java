@@ -44,7 +44,8 @@ public final class SimpleTable implements Table {
      * A share is a view that can be edited and merged back in to the table.
      * Any early created view or share can still be read, but no merge-back is possible.
      */
-    public TableShare changeGenerations() {
+    @Override
+	public TableShare changeGenerations() {
     	synchronized(tableLock) {
     		transfer = updates;
     		updates = new ArrayList();
@@ -60,7 +61,8 @@ public final class SimpleTable implements Table {
      * @param col
      * @param update
      */
-    public void merge(TableShare share) {
+    @Override
+	public void merge(TableShare share) {
     	if (share.source() != this) {throw new TableMergeException(tenured.name, "Can only merge with shares made from the target table.");}
     	if (share != currentShare) {throw new TableMergeException(tenured.name, "Can only merge with most recent share.");}
     	share.dynamicComplete();	//Wait for dynamic bindings to complete before merging
@@ -168,6 +170,7 @@ public final class SimpleTable implements Table {
 
 	@Override
 	public Rectangle2D getBoundsReference() {return tenured.getBoundsReference();}
+	@Override
 	public RectangleTuple bounds() {return new RectangleTuple(tenured.getBoundsReference().getBounds2D());}
 	
 	@Override

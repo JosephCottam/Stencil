@@ -68,6 +68,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Stenci
 		runner.start();
 
 		Thread listener = new Thread("Stencil Termination Listener") {
+			@Override
 			public void run() {
 				try {runner.join();}
 				catch (Exception e) {System.err.println("Waiter interrupted before runner terminated.");}
@@ -135,6 +136,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Stenci
 	public void signalStop() {if (runner.isRunning()) {runner.signalStop();}}
 
 	/**Set the Stencil source text.*/
+	@Override
 	public void setStencil(String stencil) {
 		String oldStencil = this.stencil;
 		if (stencil == null && oldStencil == null || (stencil != null && stencil.equals(oldStencil))) {return;}
@@ -147,6 +149,7 @@ public final class Model implements StencilMutable.Config, StencilMutable.Stenci
 	}
 
 	/**Set the adapter options settings.*/
+	@Override
 	public void setAdapterOpts(AdapterOpts opts) {
 		if ((opts == null && adapterOpts == null) || (opts!=null && opts.equals(this.adapterOpts))) {return;}
 		adapterOpts = opts;

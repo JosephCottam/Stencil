@@ -40,10 +40,15 @@ public class MouseStream implements TupleStream {
 		public Mouse(Component source) {/*Takes argument so enter/levae can be handled in the future.*/}
 
 
+		@Override
 		public synchronized void mouseReleased(MouseEvent event) {storedEvent = event; sequence++;}
+		@Override
 		public synchronized void mousePressed(MouseEvent event) {storedEvent = event; sequence++;}
+		@Override
 		public synchronized void mouseClicked(MouseEvent event) {storedEvent = event; sequence++;}
+		@Override
 		public synchronized void mouseMoved(MouseEvent event) {registerMovement(event, false);}
+		@Override
 		public synchronized void mouseDragged(MouseEvent event) {registerMovement(event, true);}
 
 		private void registerMovement(MouseEvent event, boolean drag) {
@@ -61,7 +66,9 @@ public class MouseStream implements TupleStream {
 			sequence++;
 		}
 
+		@Override
 		public void mouseEntered(MouseEvent arg0) {/*No action taken on event.*/}
+		@Override
 		public void mouseExited(MouseEvent arg0) {/*No action taken on event.*/}
 	}
 
@@ -134,6 +141,7 @@ public class MouseStream implements TupleStream {
 	}
 
 	/**What is the current mouse state?*/
+	@Override
 	public SourcedTuple next() {
 		Object[] values = new Object[PROTOTYPE.size()];
 
@@ -167,6 +175,7 @@ public class MouseStream implements TupleStream {
 	}
 
 	/**Returns true, unless the display is headless.*/
+	@Override
 	public boolean hasNext() {
 		String prop = System.getProperty("java.awt.headless");
 		return prop == null  || !prop.toUpperCase().equals("TRUE");
@@ -184,5 +193,6 @@ public class MouseStream implements TupleStream {
 	/**Throws UnsupportedOpertaionException.*/
 	public void close() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 	/**Throws UnsupportedOpertaionException.*/
+	@Override
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
 }

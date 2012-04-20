@@ -50,8 +50,10 @@ public class SampleSeed<T> implements Iterable<T> {
 	}
 	
 	public T get(int i) {return elements.get(i);}
+	@Override
 	public Iterator<T> iterator() {return elements.iterator();}
 	
+	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(seedType);

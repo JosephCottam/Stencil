@@ -16,6 +16,7 @@ public class ErrorNode extends StencilTree {
 		this.e = e;
 	}
 	
+	@Override
 	public String toString() {
 		return "Error '" + e.getMessage() + "'"
 			+ " at text " + start.getText()

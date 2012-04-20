@@ -18,6 +18,7 @@ public class TestTupleLoader extends StencilTestCase {
 
 	private Panel panel;
 
+	@Override
 	public void tearDown() {
 		if (panel != null) {panel.dispose();}
 	}

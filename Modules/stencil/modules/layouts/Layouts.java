@@ -17,6 +17,7 @@ import stencil.interpreter.tree.Specializer;
 public class Layouts extends BasicModule {
 	private static final String MODULE_NAME = "Layouts";
 	
+	@Override
 	protected ModuleData loadOperatorData() throws MetadataParseException {
 		OperatorData[] ods = new OperatorData[]{
 			operatorData(Circular.class, MODULE_NAME),

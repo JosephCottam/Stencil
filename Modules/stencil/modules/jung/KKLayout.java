@@ -11,6 +11,7 @@ public final class KKLayout extends GraphOperator.StepOperator {
 		super(opData, spec);
 	}
 	
+	@Override
 	protected void resetLayout() {
 		edu.uci.ics.jung.algorithms.layout.KKLayout l = new edu.uci.ics.jung.algorithms.layout.KKLayout(new DelegateForest(graph));
 		l.setMaxIterations(maxIterations);

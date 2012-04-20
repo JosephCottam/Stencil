@@ -21,6 +21,7 @@ public class ReferenceFieldDef extends SchemaFieldDef {
 	public TuplePrototype prototype() {return prototype;}
 	
 	
+	@Override
 	public ReferenceFieldDef rename(String newName) {return new ReferenceFieldDef(newName, prototype);}
 	public ReferenceFieldDef rePrototype(TuplePrototype prototype) {return new ReferenceFieldDef(name(), prototype);}
 	public ReferenceFieldDef modify(String name, TuplePrototype prototype) {return new ReferenceFieldDef(name, prototype);}

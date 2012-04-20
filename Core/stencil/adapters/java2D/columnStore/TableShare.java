@@ -235,6 +235,7 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
 		return viewpoint;
 	}
 	
+	@Override
 	public Rectangle2D getBoundsReference() {return source.tenured().getBoundsReference();}
 
 	
@@ -298,5 +299,6 @@ public class TableShare implements ColumnStore<StoreTuple>, DynamicBindSource<St
     /**Change the screen bounds of the table.**/
     public void setBounds(Rectangle2D fullBounds) {this.fullBounds = fullBounds;}
     
+	@Override
 	public Glyph nearest(Point2D p) {return Table.Util.nearest(p, this);}
 }

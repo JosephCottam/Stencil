@@ -39,7 +39,8 @@ public class LongMath extends BasicModule {
 			return sum;
 		}
 
- 		public FullSum duplicate() {return new FullSum(operatorData);}
+ 		@Override
+		public FullSum duplicate() {return new FullSum(operatorData);}
 	}
 
 	/**Minimum of full range of values.
@@ -76,6 +77,7 @@ public class LongMath extends BasicModule {
 			return min;
 		}
 		
+		@Override
 		public FullMin duplicate() {return new FullMin(operatorData);}
 	}
 
@@ -112,6 +114,7 @@ public class LongMath extends BasicModule {
 			return max;
 		}
 		
+		@Override
 		public FullMax duplicate() {return new FullMax(operatorData);}
 
 	}

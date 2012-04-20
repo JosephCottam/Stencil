@@ -34,6 +34,7 @@ public class Filters extends BasicModule {
 	public static final class GTE extends FilterOp {
 		public GTE(OperatorData od) {super(od);}
 
+		@Override
 		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean op(double n1, double n2) {return n1 >= n2;}		
 	}
@@ -42,6 +43,7 @@ public class Filters extends BasicModule {
 	public static final class GT extends FilterOp {
 		public GT(OperatorData od) {super(od);}
 
+		@Override
 		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean op(double n1, double n2) {return n1 > n2;}		
 	}
@@ -50,6 +52,7 @@ public class Filters extends BasicModule {
 	public static final class LT extends FilterOp {
 		public LT(OperatorData od) {super(od);}
 
+		@Override
 		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean op(double n1, double n2) {return n1 < n2;}		
 	}
@@ -58,6 +61,7 @@ public class Filters extends BasicModule {
 	public static final class LTE extends FilterOp {
 		public LTE(OperatorData od) {super(od);}
 
+		@Override
 		@Facet(memUse="FUNCTION", prototype="(boolean V)", alias={"map", "query"})
 		public boolean op(double n1, double n2) {return n1 <= n2;}		
 	}
@@ -120,6 +124,7 @@ public class Filters extends BasicModule {
 			return !negated == matcherCache.reset(value).matches();
 		}
 
+		@Override
 		public Boolean invoke(Object[] arguments) {
 			if (arguments.length ==1) {return match(arguments[0].toString());}
 			else if (arguments.length ==2) {return query(arguments[0].toString(), arguments[1].toString());}

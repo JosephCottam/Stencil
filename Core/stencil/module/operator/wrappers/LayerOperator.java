@@ -54,8 +54,10 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, FIND, facets);
 	}
 	
+	@Override
 	public String getName() {return layer.name();}
 
+	@Override
 	public Invokeable getFacet(String facet) throws UnknownFacetException {
 		FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
 
@@ -67,9 +69,12 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 	}
 
 	public DisplayLayer layer() {return layer;}
+	@Override
 	public OperatorData getOperatorData() {return operatorData;}
+	@Override
 	public LayerViewOperator viewpoint() {return new LayerViewOperator(layer.viewpoint(), this.operatorData);}
 	
+	@Override
 	public LayerOperator duplicate() {throw new UnsupportedOperationException();}
 	
 	public Tuple nearest(double x, double y) {
@@ -83,10 +88,12 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		final OperatorData operatorData;
 		
 		public LayerViewOperator(LayerView view, OperatorData od) {this.layer = view; operatorData=od;}
+		@Override
 		public StencilOperator duplicate() throws UnsupportedOperationException {
 			throw new UnsupportedOperationException();
 		}
 
+		@Override
 		public Invokeable getFacet(String facet) throws IllegalArgumentException {
 			FacetData fd = operatorData.getFacet(facet);	//Throws exception if facet is not found...
 			
@@ -103,10 +110,13 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 			return layer.nearest(p);
 		}
 
+		@Override
 		public String getName() {return layer.getName();}
 
+		@Override
 		public OperatorData getOperatorData() {throw new UnsupportedOperationException();}
 
+		@Override
 		public LayerViewOperator viewpoint() {return this;}
 	}
 }
