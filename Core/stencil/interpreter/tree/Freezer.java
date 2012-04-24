@@ -11,6 +11,7 @@ import stencil.interpreter.guide.SampleOperator;
 import stencil.interpreter.guide.MonitorOperator;
 import stencil.module.operator.util.Invokeable;
 import stencil.module.operator.wrappers.LayerOperator;
+import stencil.parser.string.CompletePrototypeTypes;
 import stencil.parser.string.StencilParser;
 import stencil.parser.string.util.Utilities;
 import stencil.parser.tree.OperatorProxy;
@@ -366,15 +367,12 @@ public final class Freezer {
 			StencilTree field = prototype.getChild(i);
 			assert verifyType(field, TUPLE_FIELD_DEF);
 			names[i] = field.getChild(0).getText();
-			types[i] = Object.class;
-
-			//TODO: add pass to fill in full type names for common types
-			//try {types[i] = Class.forName(field.getChild(1).getText());}
-			//catch (ClassNotFoundException e) {throw new IllegalArgumentException("Could not freeze prototype (unknown type): " + prototype.toStringTree());}
+			
+			try {types[i] = CompletePrototypeTypes.getType(field.getChild(1).getText());}
+			catch (ClassNotFoundException e) {throw new FreezeException(prototype, e);}
 		}
 		return new TuplePrototype(names, types);
 	}
-	
 	
 	public static Object[] valueList(StencilTree list) {
 		assert verifyType(list, LIST_ARGS, PACK);

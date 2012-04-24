@@ -163,6 +163,7 @@ public abstract class ParseStencil {
 	public static StencilTree normalizeTree(StencilTree program, ModuleCache modules, Adapter adapter) throws ProgramParseException, Exception {
 		RulesProvided.apply(program);					//Verify that it is a reasonably-complete program...
 		
+		program = CompletePrototypeTypes.apply(program);
 		program = SimplifyViewCanvas.apply(program);		//Remove this pass when multiple views/canvases are supported 
 		program = LiftStreamPrototypes.apply(program);		//Create prototype definitions for internally defined streams
 		program = ElementToLayer.apply(program);			//Convert "element" statements into layers		
