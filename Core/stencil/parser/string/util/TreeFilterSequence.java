@@ -32,9 +32,13 @@ public abstract class TreeFilterSequence extends TreeFilter {
 		public void rule() throws RecognitionException {
 			try {
 				method.invoke(target);
-			} catch (Exception e) {
+			} 
+			catch (ValidationException e) {throw e;}
+			catch (Exception e) {
 				if (e.getCause() instanceof RecognitionException) {
 					throw (RecognitionException) e.getCause();
+				} else if (e.getCause() instanceof ValidationException) {
+					throw (ValidationException) e.getCause();
 				} else {
 					throw new Error("Error invoking sequence item.",e);
 				}
