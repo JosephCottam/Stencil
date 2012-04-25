@@ -225,7 +225,7 @@ tuplePrototype
 tupleFieldDef 
   : ^(TUPLE_FIELD_DEF n=ID DEFAULT) -> {%{$n.text}}
   | ^(TUPLE_FIELD_DEF n=ID)         -> {%{$n.text}}
-  | ^(TUPLE_FIELD_DEF n=ID t=ID)    -> template(n={$n}, t={$t}) "<n> : <t>";
+  | ^(TUPLE_FIELD_DEF n=ID t=TYPE)    -> template(n={$n}, t={$t}) " <t> <n>";
   
 tupleField : ^(TUPLE_FIELD n+=value*) -> template(n={$n}) "<n; separator=\".\">";
   
