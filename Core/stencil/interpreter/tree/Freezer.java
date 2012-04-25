@@ -365,9 +365,11 @@ public final class Freezer {
 		final Class[] types = new Class[names.length];
 		for (int i=0; i< names.length; i++) {
 			StencilTree field = prototype.getChild(i);
-			assert verifyType(field, TUPLE_FIELD_DEF);
-			names[i] = field.getChild(0).getText();
+			verifyType(field, TUPLE_FIELD_DEF);
+			verifyType(field.getChild(0), ID);
+			verifyType(field.getChild(1), TYPE, DEFAULT);
 			
+			names[i] = field.getChild(0).getText();
 			try {types[i] = CompletePrototypeTypes.getType(field.getChild(1).getText());}
 			catch (ClassNotFoundException e) {throw new FreezeException(prototype, e);}
 		}

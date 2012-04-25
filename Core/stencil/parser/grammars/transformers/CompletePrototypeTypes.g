@@ -36,14 +36,15 @@ options {
      else if (rootName.equalsIgnoreCase("font")) {type = java.awt.Font.class;}
      else if (rootName.equalsIgnoreCase("PatternTuple")) {type = stencil.types.pattern.PatternTuple.class;}
      else if (rootName.equalsIgnoreCase("DateTuple")) {type = stencil.types.date.DateTuple.class;}
+     else if (rootName.equalsIgnoreCase("Tuple")) {type = stencil.tuple.Tuple.class;}
      
      if (type == null) {
        try {type = Class.forName(typeName);}
        catch (ClassNotFoundException e) {
-         typeName = "java.lang." + typeName;
+         typeName = "java.lang." + rootName;
          try {type = Class.forName(typeName);}
          catch (ClassNotFoundException ex) {
-            typeName = "java.util." + typeName;
+            typeName = "java.util." + rootName;
             type = Class.forName(typeName);
          }
        }
@@ -58,4 +59,4 @@ options {
 
 }
 
-topdown: ^(TUPLE_FIELD_DEF name=. type=.) -> ^(TUPLE_FIELD_DEF $name ID[completeType($type.getText())]);
+topdown: ^(TUPLE_FIELD_DEF name=. type=.) -> ^(TUPLE_FIELD_DEF $name TYPE[completeType($type.getText())]);

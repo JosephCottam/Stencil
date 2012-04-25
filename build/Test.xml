@@ -18,8 +18,8 @@
         <mkdir dir="${results}"/>
         <mkdir dir="${report}"/>
 
-        <!-- Five minute timeout-->
-        <junit fork="yes" dir="./">
+        <!-- One minute timeout-->
+        <junit fork="yes" dir="./" timeout="60000">
             <formatter type="xml"/>
         	<!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
             <!--formatter type="brief" usefile="false"/-->

@@ -396,9 +396,10 @@ tuple[boolean allowEmpty]
     -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT))
   | GROUP ID (SEPARATOR ID)* CLOSE_GROUP
     -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF ID DEFAULT)+)
-  | GROUP t+=ID n+=ID (SEPARATOR t+=ID n+=ID)* CLOSE_GROUP
+  | GROUP t+=typeID n+=ID (SEPARATOR t+=typeID n+=ID)* CLOSE_GROUP
     -> ^(TUPLE_PROTOTYPE ^(TUPLE_FIELD_DEF $n $t)+);
 
+typeID: id=ID -> TYPE[$id];
 
 emptySet: GROUP! CLOSE_GROUP!;
 
