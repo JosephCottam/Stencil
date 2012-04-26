@@ -233,9 +233,43 @@ public abstract class ParseStencil {
 
 		return program;
 	}
+	
+	
+	
 
-	/**Optimizations on the tree.
-	 * **/
+	/**Optimizations on the tree.**/
+	public static StencilTree optimizeTree(StencilTree program, ModuleCache modules) {
+		program = ReplaceConstants.apply(program);  					//Replace all references to CONST values with the actual value
+		program = FillCoConsumes.apply(program);
+		program = CombineRules.apply(program);
+		program = SemanticFacetResolve.apply(program);					//Replace semantic facet labels with actual facet names
+
+		program = GuideAdoptLayerDefaults.apply(program);				//Take identified layer constants, apply them to the guides
+		program = LayerAlign.apply(program);
+		program = CombineRules.apply(program);
+
+		//TODO: Revisit the optimizeTree/optimizeProgram divide.  Some optimizations are written for post-numeralization that don't need to be.
+		
+		return program;
+	}
+
+	/**Optimizations for runtime efficiency.**/
+	public static StencilTree optimizeProgram(StencilTree program, ModuleCache modules) {
+		program = NumeralizeTupleRefs.apply(program); 					//Numeralize all tuple references
+		program = Predicate_Compact.apply(program);						//Improve performance of filter rules by removing all the scaffolding				
+		program = SemanticFacetResolve.apply(program);					//Replace semantic facet labels with actual facet names
+		program = ReplaceConstantOps.apply(program, modules);			//Evaluate functions that only have constant arguments, propagate results around
+		program = LiftLayerConstants.apply(program);					//Move constant property assignments to the defaults section so they are only applied once.
+		program = GuideAdoptLayerDefaults.apply(program);				//Take identified layer constants, apply them to the guides
+		program = OperatorAlign.apply(program);
+		program = LayerAlign.apply(program);
+		program = CombineRules.apply(program);
+
+		return program;		
+	}
+	
+
+	/**Optimizations on the tree.**/
 	public static StencilTree optimize(StencilTree program, ModuleCache modules) {
 		// SIMPlIFICATIONS AND OPTIMIZATIONS
 		program = ReplaceConstants.apply(program);  					//Replace all references to CONST values with the actual value
@@ -266,7 +300,8 @@ public abstract class ParseStencil {
 		ModuleCache modules = processImports(p);
 		p = normalizeTree(p, modules, adapter);
 		p = buildAbstractions(p, modules, adapter);
-		p = optimize(p, modules);
+		p = optimizeTree(p, modules);
+		p = optimizeProgram(p, modules);
 		validate(p);
 		return p;
 	}
