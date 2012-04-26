@@ -267,28 +267,7 @@ public abstract class ParseStencil {
 
 		return program;		
 	}
-	
-
-	/**Optimizations on the tree.**/
-	public static StencilTree optimize(StencilTree program, ModuleCache modules) {
-		// SIMPlIFICATIONS AND OPTIMIZATIONS
-		program = ReplaceConstants.apply(program);  					//Replace all references to CONST values with the actual value
-		program = FillCoConsumes.apply(program);
-		program = CombineRules.apply(program);
-		program = NumeralizeTupleRefs.apply(program); 					//Numeralize all tuple references
-		program = Predicate_Compact.apply(program);						//Improve performance of filter rules by removing all the scaffolding				
-		program = SemanticFacetResolve.apply(program);					//Replace semantic facet labels with actual facet names
-		program = ReplaceConstantOps.apply(program, modules);			//Evaluate functions that only have constant arguments, propagate results around
-		program = LiftLayerConstants.apply(program);					//Move constant property assignments to the defaults section so they are only applied once.
-		program = GuideAdoptLayerDefaults.apply(program);				//Take identified layer constants, apply them to the guides
-		program = OperatorAlign.apply(program);
-		program = LayerAlign.apply(program);
-		program = CombineRules.apply(program);
-
-		return program;
-	}
-
-	/**
+		/**
 	 *
 	 * @param source
 	 * @return
