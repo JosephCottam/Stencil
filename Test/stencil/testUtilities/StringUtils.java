@@ -9,7 +9,18 @@ import stencil.util.FileUtils;
 public class StringUtils {
 	public static final String STENCIL_CACHE_DIRECTORY = "./TestData/RegressionImages";
 	
-	public static String stripSpaces(String source) {return source.replaceAll("\\s", "");}
+
+	/**Strip line-leading space and empty lines.**/
+	public static String stripSpaces(String source) {
+		String[] lines = source.split("\\n");
+		StringBuilder b = new StringBuilder();
+		for (String line: lines) {
+			line = line.trim();
+			line = line.replace("\\s+", " ");
+			if (!line.equals("")) {b.append(line);}
+		}
+		return b.toString();
+	}
 
 	/**Search out occurrences of 'element' in the 'source text.
 	 * Adapted from: http://timvalenta.wordpress.com/2009/01/06/java-count-substring/
