@@ -17,7 +17,7 @@ public class StringUtils {
 		for (String line: lines) {
 			line = line.trim();
 			line = line.replace("\\s+", " ");
-			if (!line.equals("")) {b.append(line);}
+			if (!line.equals("")) {b.append(line); b.append("\n");}
 		}
 		return b.toString();
 	}
