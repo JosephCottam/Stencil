@@ -37,9 +37,14 @@ public class SocketTupleStream implements TupleStream {
 	private SourcedTuple lookahead;
 
 	public SocketTupleStream(String streamName, TuplePrototype proto, Specializer spec) throws Exception {
-		this(streamName, new ServerSocket(Converter.toInteger(spec.get(SOCKET_KEY))));
+		this(streamName, Converter.toInteger(spec.get(SOCKET_KEY)));
 	}
 
+	public SocketTupleStream(String streamName, int port) throws Exception {
+		this(streamName, new ServerSocket(port));
+	}
+
+	
 	/**Establish a listener on given port as the indicated stream.
 	 * Will actually complete the connection handshake on first call to hasNext or next.  
 	 */
@@ -50,7 +55,7 @@ public class SocketTupleStream implements TupleStream {
 	
 	public ServerSocket socket() {return serverSocket;}
 	
-	private void init() {
+	private synchronized void init() {
 		try {
 			socket = serverSocket.accept();
 			stream = new DataInputStream(socket.getInputStream());
@@ -65,21 +70,21 @@ public class SocketTupleStream implements TupleStream {
 	}
 	
 	@Override
-	public boolean hasNext() {
+	public synchronized boolean hasNext() {
 		if (lookahead != null) {return true;}
 		cache();
 		return lookahead != null;
 	}
 
 	@Override
-	public SourcedTuple next() {
+	public synchronized SourcedTuple next() {
 		if (lookahead == null) {cache();}
 		SourcedTuple val = lookahead;
 		lookahead = null;
 		return val;
 	}
 	
-	private void cache() {
+	private synchronized void cache() {
 		if (socket == null) {init();}
 		
 		try {
