@@ -261,7 +261,7 @@ public abstract class ParseStencil {
 		program = ReplaceConstantOps.apply(program, modules);			//Evaluate functions that only have constant arguments, propagate results around
 		program = LiftLayerConstants.apply(program);					//Move constant property assignments to the defaults section so they are only applied once.
 		program = GuideAdoptLayerDefaults.apply(program);				//Take identified layer constants, apply them to the guides
-		program = OperatorAlign.apply(program);
+		program = ResultsAlign.apply(program);
 		program = LayerAlign.apply(program);
 		program = CombineRules.apply(program);
 

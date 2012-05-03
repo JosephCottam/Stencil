@@ -5,8 +5,18 @@ import stencil.module.operator.StencilOperator;
 import stencil.module.operator.util.AbstractOperator;
 import stencil.module.util.*;
 import stencil.module.util.ann.*;
+import stencil.modules.Average.FullMean;
+import stencil.modules.stencilUtil.range.Range;
+import stencil.modules.stencilUtil.range.RangeDescriptor;
+import stencil.parser.string.StencilParser;
+import stencil.parser.string.util.Context;
+import stencil.parser.tree.StencilTree;
+import stencil.interpreter.tree.Freezer;
+import stencil.interpreter.tree.MultiPartName;
 import stencil.interpreter.tree.Specializer;
 import stencil.types.Converter;
+
+//TODO: Auto optimize for range all
 
 @Description("Summarization of groups of things (currently just max and min).")
 @Module()
@@ -136,4 +146,34 @@ public class Summary extends BasicModule {
  		@Override
 		public FullMax duplicate() {return new FullMax(operatorData, targetClass);}
 	}
+//	
+//	@Override
+//	public StencilOperator optimize(StencilOperator op, Context context) {
+////		if (op.getName().equals("Min") || op.getName().equals("Max") 
+////			&& context.callSites().size() == 1
+////			&& context.callSites().get(0).is(StencilParser.OP_AS_ARG)) {
+////			StencilTree site = context.callSites().get(0).getAncestor(StencilParser.FUNCTION);
+////			MultiPartName name = Freezer.multiName(site.find(StencilParser.OP_NAME));
+////
+////			//--------------------------------------------------------------------------------------------------------
+////			//HACK: This is a bad idea...but I don't have a better one right now!
+////			boolean isRange = name.name().contains("Range"); 
+////			//--------------------------------------------------------------------------------------------------------
+////			
+////			if (!isRange) {return op;}	//Can only optimize ranges...
+////			
+////			Specializer spec = Freezer.specializer(site.find(StencilParser.SPECIALIZER));
+////			if (!spec.containsKey(Range.RANGE_KEY)) {return op;}
+////			
+////			RangeDescriptor r = new RangeDescriptor(spec.get(Range.RANGE_KEY));
+////			if (r.isFullRange()) {
+////				OperatorData od=ModuleDataParser.operatorData(FullMean.class, this.getName());
+////				od = od.name(op.getName());
+////				if (op.getName().equals("Min")) {return new FullMin(od, spec);}
+////				else if (op.getName().equals("Max")) {return new FullMax(od,spec);}
+////				else {throw new Error("Neither min nor max requested of summary...");}
+////			}
+////		}
+//		return op;
+//	}
 }
