@@ -108,8 +108,8 @@ public class Legend extends Guide2D {
 	@Override
 	public synchronized void setElements(List<PrototypedTuple> elements, Rectangle2D parentBounds, AffineTransform viewTransform) {
 		if (autoPlace) {
-			x = parentBounds.getMaxX();
-			y = -parentBounds.getMinY();
+			x = parentBounds.getMaxX() + (exampleWidth*2);
+			y = -parentBounds.getMinY() + (exampleWidth*2);
 		}				
 		data = makeTable();
 
