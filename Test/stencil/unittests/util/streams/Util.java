@@ -1,5 +1,8 @@
 package stencil.unittests.util.streams;
 
+import java.io.File;
+
+import stencil.tuple.stream.TupleStream;
 import stencil.util.streams.binary.BinaryTupleStream;
 import stencil.util.streams.txt.DelimitedParser;
 
@@ -36,6 +39,7 @@ public class Util {
 	}
 
 	public static BinaryTupleStream.Reader binaryTrovesStream() throws Exception{
+		ensureTuplesFile(TROVES_TUPLES_FILE, trovesStream(), TROVES_TYPES);
 		return new BinaryTupleStream.Reader("Troves", TROVES_TUPLES_FILE);
 	}	
 
@@ -48,5 +52,18 @@ public class Util {
 
 	public static DelimitedParser fruitsStream() throws Exception {
 		return new DelimitedParser("Fruits", FRUITS_FILE, ",", 1, true,0);
+	}
+	
+	
+	private static void ensureTuplesFile(String tuplesFile, TupleStream rebuildSource, String types) {
+		try {
+			//remove old output (if any)
+			File f = new File(tuplesFile);
+			if (f.exists()) {return;}
+
+			//Push old stream through encoder
+			BinaryTupleStream.Writer writer = new BinaryTupleStream.Writer(rebuildSource);
+			writer.writeStream(tuplesFile, types.toCharArray());
+		} catch (Exception e) {throw new RuntimeException("Could not prepare source file: " + tuplesFile);}
 	}
 }
