@@ -36,12 +36,20 @@ public class StringUtil extends BasicModule {
 	@Operator
 	@Facet(memUse="FUNCTION", prototype="(String value)", alias={"map","query"})
 	public static String delimit(String delimiter, String... values) {
-		StringBuilder b  = new StringBuilder();
-		for (String v: values) {
+		return splice(values, delimiter);
+	}
+	
+	@Operator
+	@Facet(memUse="FUNCTION", prototype="(String value)", alias={"map","query"})
+	public static String splice(String[] parts, String... delimiters) {
+		StringBuilder b = new StringBuilder();
+		int idx=0;
+		for (String v: parts) {
 			b.append(v);
-			b.append(delimiter);
+			b.append(delimiters[idx++]);
+			if (idx == delimiters.length) {idx--;}
 		}
-		b.delete(b.length()-delimiter.length(), b.length());
+		b.delete(b.length()-delimiters[idx].length(), b.length());
 		return b.toString();
 	}
 

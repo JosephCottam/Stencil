@@ -4,6 +4,7 @@ package stencil.util.streams.txt;
 import java.io.BufferedReader; 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.regex.*;
 
@@ -49,8 +50,11 @@ final class LooseChannel implements NextChannel {
 
 		
 		String[] values = splitter.split(line);
-		if (values.length != tupleSize) {return null;}
-		else {return values;}
+		if (values.length < tupleSize) {return null;}
+		else if (values.length>tupleSize){
+			values = Arrays.copyOfRange(values, 0, tupleSize);
+		}
+		return values;
 	}
 
 	/**Always returns true (part of being loose).*/

@@ -30,7 +30,7 @@ import static java.lang.String.format;
  *
  */
 @Description("For parsing regular-expression delmited, line-oriented text sources (files and standard in).  Defaults configuration is comma separated with a header.")
-@Stream(name="Text", spec="[file: \"\", sep: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50]")
+@Stream(name="Text", spec="[file: \"\", sep: \"\\\\s*,\\\\s*\", strict: TRUE, skip: 1, queue: 50, trim: false]")
 public final class DelimitedParser implements TupleStream {
 	public static final String FILE_KEY = "file";
 	public static final String SEP_KEY = "sep";
