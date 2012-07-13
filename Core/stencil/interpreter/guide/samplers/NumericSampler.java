@@ -34,6 +34,8 @@ public class NumericSampler implements SampleOperator {
 	 * If this key is present (regardless of value), the zero point will be ignored.
 	 */
 	public static final String TIGHT = "tight";
+	
+	public static final String EXACT = "exact";
 
 	@Override
 	public List<Tuple> sample(SampleSeed seed, Specializer spec) {
@@ -55,7 +57,7 @@ public class NumericSampler implements SampleOperator {
 		if (!spec.containsKey(TIGHT)) {
 			if (min > 0 &&  max> 0) {min =0;}
 			if (max < 0 && min <0) {max =0;}
-		}
+		} 
 		
 		
 		int tickCount = 10;
@@ -68,8 +70,11 @@ public class NumericSampler implements SampleOperator {
 			tickCount =  Converter.toInteger(spec.get(SAMPLE_COUNT));
 		}
 		
-		if (!log) {
+		if (!log && !spec.containsKey(EXACT)) {
 			source = linearSample(max, min, tickCount, useIntegers);
+		} else if (!log ) {
+			double stride = Converter.toDouble(spec.get(SAMPLE_STRIDE));
+			source=exactSample(max, min, stride, useIntegers);
 		} else {
 			double base = spec.containsKey("base") ? Converter.toDouble(spec.get("base")) : 10;
 			source = logSample(max, min, tickCount, base); 
@@ -113,6 +118,17 @@ public class NumericSampler implements SampleOperator {
 		return new ArrayList(nums);
 	}
 	
+	private static List<Number> exactSample(double max, double min, double stride, boolean useIntegers) {
+		List<Number> numbers = new ArrayList();
+		double at=min;
+		do {
+			numbers.add(useIntegers ? Math.round(at) : at);
+			at += stride;
+		} while(at <= max);
+
+			
+		return numbers;
+	}
 
 	
 	/**Finds a multiple of 1,2 or 5 or a power of 10 near the passed number.

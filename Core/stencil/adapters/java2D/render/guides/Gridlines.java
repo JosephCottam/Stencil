@@ -83,8 +83,8 @@ public class Gridlines extends Guide2D {
 		for (PrototypedTuple t: elements) {
 			double location = Converter.toDouble(t.get(offset_idx));
 			
-			PrototypedTuple tickParts = makeLine(location, floor, lineSize, idCounter++);
-			PrototypedTuple merged = Tuples.mergeAll(updateMask, tickParts, Tuples.delete(t, offset_idx, input_idx));
+			PrototypedTuple lineParts = makeLine(location, floor, lineSize, idCounter++);
+			PrototypedTuple merged = Tuples.mergeAll(updateMask, lineParts, Tuples.delete(t, offset_idx, input_idx));
 			
 			data.update(merged);
 		}

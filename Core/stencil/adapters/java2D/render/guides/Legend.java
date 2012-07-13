@@ -36,11 +36,14 @@ public class Legend extends Guide2D {
 	public static final String GEOM_TAG = "#geom";
 	protected static final String LABEL_PROPERTY_TAG = "label";
 	protected static final String EXAMPLE_WIDTH_TAG = "exampleWidth";
+	protected static final String EXAMPLE_HEIGHT_TAG = "exampleHeight";
+	protected static final String VSPACING_TAG = "vspacing";
+	protected static final String HSPACING_TAG = "hspacing";
 	private static final String IMPLANT_KEY = "implant";
 
 	public static final Specializer DEFAULT_SPECIALIZER;
-	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", exampleWidth: 10]";
-	protected static final String[] SPEC_NON_VALUES = new String[]{EXAMPLE_WIDTH_TAG};	//Things that will be deleted from the specializer when constructing the default values
+	protected static final String defaultValues = "[label.FONT: 4, label.COLOR: \"BLACK\", exampleWidth: 10, vspacing: 3, hspacing: 2, exampleHeight:4]";
+	protected static final String[] SPEC_NON_VALUES = new String[]{EXAMPLE_WIDTH_TAG, VSPACING_TAG, HSPACING_TAG, EXAMPLE_HEIGHT_TAG};	//Things that will be deleted from the specializer when constructing the default values
 	static {
 		try {DEFAULT_SPECIALIZER = ParseStencil.specializer(defaultValues);}
 		 catch (Exception e) {throw new Error("Error parsing Lend configuration.", e);}
@@ -57,8 +60,13 @@ public class Legend extends Guide2D {
 	private final CompoundRenderer renderer;
 	private final PrototypedTuple updateMask;
 	private final double exampleWidth;
-	
+
+	private final float exampleHeight;
+	private final float vSpacing;
+	private final float hSpacing;
+
 	private double x,y;
+	
 	
 	public Legend(Guide guideDef, int idx) {
 		super(guideDef);
@@ -78,6 +86,10 @@ public class Legend extends Guide2D {
 		assert label_idx >=0 : "Input field not found for labeling in results prototype";
 		sorter = new TupleSorter(label_idx);
 
+		vSpacing = Converter.toFloat(spec.get(VSPACING_TAG));
+		hSpacing = Converter.toFloat(spec.get(HSPACING_TAG));
+		exampleHeight = Converter.toFloat(spec.get(EXAMPLE_HEIGHT_TAG));
+		
 		data = makeTable();
 		PrototypedTuple defaultValues = Tuples.delete(DEFAULT_SPECIALIZER, SPEC_NON_VALUES); 
 		PrototypedTuple updateMask = Tuples.merge(data.updateMaskTuple(), defaultValues);
@@ -151,10 +163,6 @@ public class Legend extends Guide2D {
 	}
 	
 	
-	// TODO: Move the layout/registration to guide rules		
-	private static final float exampleHeight =4f;
-	private static final float vSpacing = 3f;
-	private static final float hSpacing = 2f;
 	private PrototypedTuple createLabeledItem(int idx, PrototypedTuple contents, double x, double y) {
 		double indexOffset = y-(idx * exampleHeight) - (idx * vSpacing);  
 
