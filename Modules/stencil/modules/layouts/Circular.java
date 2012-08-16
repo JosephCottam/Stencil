@@ -63,12 +63,12 @@ public class Circular extends Layout {
 	public Point2D query(final int idx) {
 		int index = idx +1;
 
-		double percent = (double) index /(double) elementCount;
+		double percent = (double) index /(double) (elementCount +1);
 		double angle = Math.toRadians((percent *360) -90 + startAngle);
 		
 		double radius = this.radius;		
 		if (radius <= 0) {
-			double c = elementCount * size;
+			double c = (elementCount+1) * size;
 			radius = c/(2 * Math.PI);
 		}
 		
