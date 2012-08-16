@@ -1,0 +1,55 @@
+stream raw(trash, target, trash2, trash22, size, trash3, trash4, source, trash5, timestamp) 
+  : Text[file: "AM_log", sep:",|]|\\s+", strict:false]
+
+stream comm(source, target, size, time)
+from raw
+  (source, target, size, time): (source, target, size, timestamp)
+
+
+operator Spacer(v) -> (v) 
+    default => v : Range[ALL](@Max, _)
+    
+
+layer baseline["LINE"]
+from comm
+   ID: source
+   X1:* FullMin(time)->Timescale(_)
+	X2:* Timescale(time) -> FullMax(_)
+	PEN_COLOR: Color{Gray90}
+	(Y1, Y2): Layout(source) -> (_,_)
+from comm
+	ID: target
+   X1:* FullMin(time)->Timescale(_) 
+	X2:* Timescale(time) -> FullMax(_)
+	PEN_COLOR: Color{Gray90}
+	(Y1,Y2): Layout(target) -> (_,_)
+
+layer coms["LINE"]
+from comm
+   ID: Count()
+	Y1: Layout(source)
+	Y2: Layout(target)
+	X1:* Timescale(time)
+	X2:* Timescale(time)
+	PEN_COLOR : ColorByOp("orecv")
+	CAP2: "ARROW"
+
+operator ColorByOp(op) -> (C)
+	(op =~ "osend") => C: Color{SlateBlue}
+	(op =~ "orecv") => C: Color{MediumSlateBlue}
+	(op =~ "transmission") => C: Color{FireBrick}
+	default => C: Color{BLACK, .5}
+
+operator WeightByOp(op) -> (W)
+	(op =~ "osend") => W : Stroke{1}
+ 	(op =~ "orecv") => W : Stroke{1}
+	(op =~ "transmission") => W: Stroke{5}
+	default => W: Stroke{2}
+   
+	
+operator Layout (rank)->(Y)
+  default => (Y) : Mult(-20, rank)
+ 
+
+operator Timescale(time) -> (time)
+  default => time : FullMin(time) -> Sub(time, _) ->  Mult(_, 5000)
