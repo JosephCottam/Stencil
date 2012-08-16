@@ -1,8 +1,9 @@
-stream raw(trash, target, trash2, trash22, size, trash3, trash4, source, trash5, timestamp) 
+stream raw(trash, target, trash2, type, size, trash3, trash4, source, trash5, timestamp) 
   : Text[file: "AM_log", sep:",|]|\\s+", strict:false]
 
 stream comm(source, target, size, time)
 from raw
+  filter(type=~".*received.*")
   (source, target, size, time): (source, target, size, timestamp)
 
 

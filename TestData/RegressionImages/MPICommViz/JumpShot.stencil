@@ -1,58 +1,26 @@
-stream ranks(rank, label) : Text
-stream overheads(op, rank, cpu, start, end, r,g,b, skewedStart, skewedEnd)
-  : Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
-stream trans(op, source, dest, start, end, size, G, r,g,b, skewedStart, skewedEnd) 
-  : Text["./diss_16.viz", sep:"\\s+", skip:0, strict:false]
+stream overheads(op, rank, cpu, start, end,r,g,b)
+  : Text["./diss_16.viz", sep:"\\s+|;", skip:0, strict:false]
+stream trans(op, source, dest, start, end, size, G, r,g,b) 
+  : Text["./diss_16.viz", sep:"\\s+|;", skip:0, strict:false]
 
-order ranks > (overheads | trans)
+order (overheads | trans)
 
-layer labels["TEXT"]
-from ranks
-	ID: label
-	TEXT: label
-	X: -10
-	Y: Layout(rank)
-	COLOR: Color{GRAY70}
-	REGISTRATION: "RIGHT"
-from overheads
-	filter (start > prefilter.margin)
-	prefilter(margin): Spacer.query() -> Add(5000,_) 
-	
-	ID: start
-	TEXT: start
-	X: Timescale(skewedStart)
-	Y: -10    
-	COLOR: Color{GRAY70}
-	REGISTRATION: "LEFT"
-	ROTATION: "VERTICAL"
-	() : Spacer.map(start)
-from overheads
-	filter (end > prefilter.margin)
-	prefilter(margin): Spacer.query() -> Add(5000,_)
-	
-	ID: end
-	TEXT: end
-	X: Timescale(skewedEnd)
-	Y: -10    
-	COLOR: Color{GRAY70}
-	REGISTRATION: "LEFT"
-	ROTATION: "VERTICAL"
-	() : Spacer.map(end)
-
-operator Spacer(v) -> (v) 
-    default => v : Range[ALL](@Max, _)
-    
 
 layer baseline["LINE"]
+guide pointLabels from ID
+   Y: Layout(ID)
+   X: -20
+   REGISTRATION: "RIGHT"
+   TEXT: Format("Rank %s", ID)
+default
+   PEN_COLOR: Color{Gray90}
 from overheads
 	ID: rank
-	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
-	PEN_COLOR: Color{Gray90}
+	X2: Timescale(start) -> FullMax(_)
 	(Y1, Y2): Layout(rank) -> (_,_)
 from trans
 	ID: source
-	X2: Timescale(skewedStart) -> Range[ALL](@Max, _)
-	PEN_COLOR: Color{Gray90}
+	X2: Timescale(start) -> FullMax(_)
 	(Y1,Y2): Layout(source) ->(_,_)
 
 
@@ -61,7 +29,7 @@ from overheads
 	filter(op =~ "clocalop")
 	ID: Count()
 	Y: Layout(rank) 
-	X: Timescale(skewedStart)
+	X: Timescale(start)
 	FILL_COLOR : Color{Purple}
 	SIZE: 15
 	REGISTRATION: "CENTER"
@@ -71,27 +39,27 @@ from overheads
 	filter(op !~ "clocalop") 
 	ID: Count()
 	(Y1, Y2): Layout(rank) -> (_,_)
-	X1: Timescale(skewedStart)
-	X2: Timescale(skewedEnd)
+	X1: Timescale(start)
+	X2: Timescale(end)
 	PEN_COLOR : ColorByOp(op)
-    PEN: WeightByOp(op)
+   PEN: WeightByOp(op)
 
 
 layer coms["LINE"]
 from trans
-    ID: Count()
+   ID: Count() 
 	Y1: Layout(source)
 	Y2: Layout(dest)
-	X1: Timescale(skewedStart)
-	X2: Timescale(skewedEnd)
-	PEN_COLOR : ColorByOp(op)
+	X1: Timescale(start)
+	X2: Timescale(end)
+	PEN_COLOR : ColorByOp("msg")
 	CAP2: "ARROW"
 
 operator ColorByOp(op) -> (C)
 	(op =~ "osend") => C: Color{SlateBlue}
 	(op =~ "orecv") => C: Color{MediumSlateBlue}
 	(op =~ "transmission") => C: Color{FireBrick}
-	default => C: Color{BLACK, .5}
+	default => C: Color{BLACK, 125}
 
 operator WeightByOp(op) -> (W)
 	(op =~ "osend") => W : Stroke{1}
