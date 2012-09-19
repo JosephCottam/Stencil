@@ -4,6 +4,9 @@
   <property name="temp" location="temp" />
   <property name="runtimeSrc" location="runtimes/" />
 
+  <property name="runtimeJar" value="stencilRuntime.jar"/>
+  <property name="testJar" value="stencilTests.jar"/>
+
   <target name="stencil">
     <echo message="Stencil 'Cardenio' support structure build system."/>
   </target>
@@ -22,7 +25,7 @@
       </classpath>
     </javac>
 
-    <jar destfile="${lib}/stencilJavaRuntime.jar" basedir="${compileTo}" />
+    <jar destfile="${lib}/${runtimeJar}" basedir="${compileTo}" />
   </target>
 
   <target name="test" depends="runtime,prepDirs">
@@ -51,7 +54,7 @@
         <fileset dir="${lib}" includes="*.jar" />
       </classpath>
     </javac>
-    <jar destfile="${lib}/stencilTests.jar" basedir="${compileTo}" />
+    <jar destfile="${lib}/${testJar}" basedir="${compileTo}" />
 
     <!--Run tests -->
     <tstamp><format property="now" pattern="yyyy_MM_dd_HH_mm"/></tstamp>
@@ -64,8 +67,8 @@
     <mkdir dir="${results}" />
     <mkdir dir="${report}" />
 
-    <!-- One minute timeout-->
-    <junit fork="yes" dir="${compileTo}" timeout="60000">
+    <!-- One minute timeout: 60000-->
+    <junit fork="yes" dir="${compileTo}" timeout="5000">
       <formatter type="xml"/>
       <!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
       <!--formatter type="brief" usefile="false"/-->
@@ -96,10 +99,14 @@
   </target>
 
   <target name="prepDirs">
-    <!--Ensure the temp dir exists and is empty-->
-    <delete quiet="true" dir="${temp}" />
     <mkdir dir="${temp}"/>
     <mkdir dir="${lib}"/>
+  </target>
+
+  <target name="clean">
+    <delete quiet="true" dir="${temp}"/>
+    <delete quiet="true" file="${lib}/${runtimeJar}" />
+    <delete quiet="true" file="${lib}/${testJar}" />
   </target>
 
  	 	
