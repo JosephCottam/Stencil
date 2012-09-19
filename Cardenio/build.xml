@@ -68,7 +68,7 @@
     <mkdir dir="${report}" />
 
     <!-- One minute timeout: 60000-->
-    <junit fork="yes" dir="${compileTo}" timeout="5000">
+    <junit fork="yes" timeout="5000" dir="${results}">
       <formatter type="xml"/>
       <!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
       <!--formatter type="brief" usefile="false"/-->
