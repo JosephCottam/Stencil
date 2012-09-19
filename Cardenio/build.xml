@@ -8,7 +8,8 @@
     <echo message="Stencil 'Cardenio' support structure build system."/>
   </target>
 
-  <target name="runtime" depends="tempdir">
+  <target name="runtime" depends="prepDirs">
+    <local name="compileTo" />
     <property name="compileTo" location="${temp}/runtime/bin" />
     <mkdir dir="${compileTo}"/>
 
@@ -24,10 +25,15 @@
     <jar destfile="${lib}/stencilJavaRuntime.jar" basedir="${compileTo}" />
   </target>
 
-  <target name="test" depends="runtime,tempdir">
-    <property name="gatherTo"  location="${temp}/test/src" />
-    <mkdir dir="${gatherTo}" />
+  <target name="test" depends="runtime,prepDirs">
+    <local name="compileTo" />
+    <local name="gatherTo" />
+    <local name="compileTo" />
     
+    <property name="gatherTo"  location="${temp}/test/src" />
+    <property name="compileTo" location="${temp}/test/bin" />
+    <mkdir dir="${gatherTo}" />
+    <mkdir dir="${compileTo}" />
 
     <!--Gather the various parts of testing together-->
     <copy todir="${gatherTo}/stencil/">
@@ -38,10 +44,8 @@
     </copy>
 
     <!--Compile all tests-->
-    <property name="testCompileTo" location="${temp}/test/bin" />
-    <mkdir dir="${testCompileTo}" />
 
-    <javac srcdir="${gatherTo}" destdir="${testCompileTo}" includeAntRuntime="false">
+    <javac srcdir="${gatherTo}" destdir="${compileTo}" includeAntRuntime="false">
       <include name="**/*.java"/>
       <classpath>
         <fileset dir="${lib}" includes="*.jar" />
@@ -61,7 +65,7 @@
     <mkdir dir="${report}" />
 
     <!-- One minute timeout-->
-    <junit fork="yes" dir="./" timeout="60000">
+    <junit fork="yes" dir="${compileTo}" timeout="60000">
       <formatter type="xml"/>
       <!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
       <!--formatter type="brief" usefile="false"/-->
@@ -75,14 +79,13 @@
       </classpath>
 
       <batchtest todir="${results}">
-        <fileset dir="${testCompileTo}">
+        <fileset dir="${compileTo}">
           <include name="**/*Test*.class"/>
           <exclude name="**/*$*"/>
         </fileset>
       </batchtest>
     </junit>
 
-    
     <junitreport todir="${report}">
       <fileset dir="${results}">
         <include name="TEST-*.xml"/>
@@ -92,10 +95,11 @@
     </junitreport>
   </target>
 
-  <target name="tempdir">
+  <target name="prepDirs">
     <!--Ensure the temp dir exists and is empty-->
     <delete quiet="true" dir="${temp}" />
     <mkdir dir="${temp}"/>
+    <mkdir dir="${lib}"/>
   </target>
 
  	 	
