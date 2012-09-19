@@ -23,7 +23,7 @@ public class TextRenderer implements Renderer {
 
   public TextRenderer(String file) {
     this.filename = file;
-    useStdOut = filename != null; 
+    useStdOut = filename == null; 
   }
 
   
