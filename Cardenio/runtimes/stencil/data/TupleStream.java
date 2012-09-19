@@ -15,10 +15,7 @@ public class TupleStream<T> implements BasicStream<Tuple> {
 
   public String name() {return name;}
   public boolean done() {return base.done();}
-  public Tuple next() {
-    Object values = base.next(); 
-    return makeTuple(schema, base.next());
-  }
+  public Tuple next() {return makeTuple(schema, base.next());}
 
   private static Tuple makeTuple(Schema schema, Object values)  {
     if (values == null) {return null;}

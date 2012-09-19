@@ -60,10 +60,10 @@ public class QueueManager {
     Queue q = queues.get(stream);
     TupleStream s = streams.get(stream);
 
-    while (q.size() < i && !s.done()) {
+    while (q.size() <= i && !s.done()) {
       Tuple t = s.next();
       if (t==null) {break;}
-      q.add(s.next());
+      q.add(t);
     }
 
     return q.size();

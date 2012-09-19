@@ -2,26 +2,36 @@ package stencil.test.examples.cannonical;
 
 import java.awt.Color;
 import java.awt.Rectangle;
-import java.lang.invoke.MethodHandle;
+import java.lang.invoke.*;
 
 import stencil.data.*;
-//import stencil.operators.*;
+import stencil.operators.*;
 import stencil.renderer.*;
 import static stencil.data.Schema.Field;
 
 public class SimpleLines extends stencil.StencilPanel {
-   private static final String VALUES_STREAM_NAME = "values";
-   private static final Schema VALUES_SCHEMA = new Schema().extend(new Field("v", Integer.class));
-   private static final Schema PLOT_SCHEMA = new Schema().extend(new Field("id",Integer.class), 
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+  private static final String VALUES_STREAM_NAME = "values";
+  private static final Schema VALUES_SCHEMA = new Schema().extend(new Field("v", Integer.class));
+  private static final Schema PLOT_SCHEMA = new Schema().extend(new Field("id",Integer.class), 
                                                new Field("x1",Integer.class), new Field("x2", Integer.class),
                                                new Field("y1",Integer.class,0), new Field("y2",Integer.class,10), 
                                                new Field("fillColor",java.awt.Color.class,java.awt.Color.GRAY));
 
-   private final MethodHandle __RANGE1_M = null;
-
-   private final TupleStream values = new TupleStream("values", VALUES_SCHEMA, new GeneratorTuples(__RANGE1_M));
-   private final stencil.QueueManager queues = new stencil.QueueManager(values);
+   private final MethodHandle __RANGE1_M;
+   private final TupleStream values;
+   private final stencil.QueueManager queues;
    private final Engine engine = new Engine();
+
+   public SimpleLines() {
+     try {
+       MethodType mt = MethodType.methodType(int[].class, int.class, int.class);
+       MethodHandle mh = LOOKUP.findStatic(Generators.class, "range", mt);
+       __RANGE1_M = MethodHandles.insertArguments(mh, 0, 0, 10);
+       values = new TupleStream("values", VALUES_SCHEMA, new GeneratorTuples(__RANGE1_M));
+       queues = new stencil.QueueManager(values);
+     } catch (Exception e) {throw new RuntimeException("Error intializing panel.", e);}
+   }
 
    public void innerRun() {
      if (queues.done()) {stop(); return;}
@@ -29,7 +39,7 @@ public class SimpleLines extends stencil.StencilPanel {
      engine.process(queues);
      RenderableView view = engine.renderCapture();
      if (view == null) {return;}
-     
+
      view.plotRenderer().render(view.plotTable());
 
      engine.release();
@@ -42,8 +52,7 @@ public class SimpleLines extends stencil.StencilPanel {
 
 
      public RenderableView renderCapture() {
-       try {lock.acquire();}
-       catch (InterruptedException e) {return null;}
+       try {lock.acquire();} catch (InterruptedException e) {return null;}
 
        return new RenderableView(view, plotTable);
      }
@@ -51,10 +60,10 @@ public class SimpleLines extends stencil.StencilPanel {
      public void release() {lock.release();}
 
      public void process(stencil.QueueManager qs) {
-       try {lock.acquire();}
-       catch (InterruptedException e) {return;}
+       try {lock.acquire();} catch (InterruptedException e) {return;}
 
        Tuple t = qs.pop(VALUES_STREAM_NAME,0);
+
        if (t==null) {return;}
        Object[] updates = new Object[6];
        updates[0] = t.get(0);
