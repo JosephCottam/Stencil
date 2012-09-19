@@ -52,16 +52,12 @@ public class SimpleLines extends stencil.StencilPanel {
 
 
      public RenderableView renderCapture() {
-       try {lock.acquire();} catch (InterruptedException e) {return null;}
-
        return new RenderableView(view, plotTable);
      }
 
-     public void release() {lock.release();}
+     public void release() {}
 
      public void process(stencil.QueueManager qs) {
-       try {lock.acquire();} catch (InterruptedException e) {return;}
-
        Tuple t = qs.pop(VALUES_STREAM_NAME,0);
 
        if (t==null) {return;}
@@ -76,7 +72,6 @@ public class SimpleLines extends stencil.StencilPanel {
        updates[5] = java.awt.Color.GRAY; 
 
        plotTable.update(Tuple.Util.from(PLOT_SCHEMA, updates));
-       lock.release();
      }
    }
 

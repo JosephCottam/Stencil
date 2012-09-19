@@ -50,13 +50,31 @@ public interface Tuple {
         if (idx >=0) {
           Object v2 = t2.get(i);
           Object v1 = t1.get(idx);
-          if (!(v2 == null && v1 == null ) ||  !(v2 != null && v2.equals(v1))) {
+          if (!(v1==v2 || (v2 != null && v2.equals(v1)))) {
             values.add(v1);
             schema.add(f);
           }
         }
       }
       return from(new Schema(schema), values.toArray());
+    }
+
+    public static String toString(Tuple t) {
+      final Schema s = t.schema();
+      
+      final StringBuilder b = new StringBuilder();
+      b.append("(");
+      
+      for (int i=0; i< s.size(); i++) {
+        b.append(s.get(i).name);
+        b.append(": ");
+        b.append(t.get(i));
+        b.append(", ");
+      }
+
+      b.delete(b.length()-2, b.length()-1);
+      b.append(")");
+      return b.toString();
     }
   }
 
@@ -86,5 +104,6 @@ public interface Tuple {
     }
 
     public Schema schema() {return schema;}
+    public String toString() {return Util.toString(this);}
   }
 }
