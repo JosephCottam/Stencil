@@ -17,7 +17,8 @@
     <mkdir dir="${compileTo}"/>
 
     <javac destdir="${compileTo}" includeAntRuntime="false" source="1.7" target="1.7">
-      <!--compilerarg value="-Xlint"/-->
+      <compilerarg value="-Xlint" />
+      <compilerarg value="-Xlint:-serial" />
       <include name="**/*.java"/>
       <src><pathelement path="${runtimeSrc}"/></src>
       <classpath>
@@ -31,7 +32,6 @@
   <target name="test" depends="runtime,prepDirs">
     <local name="compileTo" />
     <local name="gatherTo" />
-    <local name="compileTo" />
     
     <property name="gatherTo"  location="${temp}/test/src" />
     <property name="compileTo" location="${temp}/test/bin" />
@@ -46,9 +46,10 @@
       <fileset dir="tests/data" includes="**/*.java"/>
     </copy>
 
+    
     <!--Compile all tests-->
-
     <javac srcdir="${gatherTo}" destdir="${compileTo}" includeAntRuntime="false">
+      <!-- compilerarg value="-Xlint" /--> <!-- Lint disabled because the tests cases are not under as heavy scruitiny-->
       <include name="**/*.java"/>
       <classpath>
         <fileset dir="${lib}" includes="*.jar" />
@@ -57,7 +58,7 @@
     <jar destfile="${lib}/${testJar}" basedir="${compileTo}" />
 
     <!--Run tests -->
-    <tstamp><format property="now" pattern="yyyy_MM_dd_HH_mm"/></tstamp>
+    <tstamp><format property="now" pattern="yyyy_MM_dd__HH_mm"/></tstamp>
     <property name="base" location="./testResults/${now}" />
     <property name="results" location="${base}/raw" />
     <property name="report" location="${base}" />

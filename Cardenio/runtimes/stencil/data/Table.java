@@ -3,7 +3,7 @@ package stencil.data;
 import java.util.*;
 
 /**Table is a collection of tuples.**/
-public interface Table extends Iterable {
+public interface Table extends Iterable<Tuple> {
   public Tuple find(Object id);
   public Schema schema();
   public int size(); 
@@ -17,7 +17,7 @@ public interface Table extends Iterable {
 
   /**Not at all thread safe...**/
   public static final class SimpleIterator implements Iterator<Tuple> {
-    final Iterator idIterator;
+    final Iterator<Object> idIterator;
     final Table table;
     public SimpleIterator(Table table) {
       this.table=table;
@@ -30,8 +30,8 @@ public interface Table extends Iterable {
   }
 
   public static final class SimpleTable implements Table.Updateable {
-    private final ArrayList<Tuple> store = new ArrayList();
-    private final Map<Object, Integer> index = new HashMap();
+    private final ArrayList<Tuple> store = new ArrayList<Tuple>();
+    private final Map<Object, Integer> index = new HashMap<Object, Integer>();
     private final Schema schema;
 
     public SimpleTable(Schema schema) {this.schema = schema;}

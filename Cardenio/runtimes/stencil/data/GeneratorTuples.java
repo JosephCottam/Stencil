@@ -29,10 +29,11 @@ public class GeneratorTuples<T> implements BasicStream<T> {
    * Eager intializiation could cause problems. This delay ensures that the 
    * intiailization happens once the main data processing loop has started.
    **/
+  @SuppressWarnings("unchecked") 
   private void init() {
     final Object values;
     try {
-      queue = new LinkedList();
+      queue = new LinkedList<T>();
       values = method.invoke();
     } catch (Throwable t) {
       throw new RuntimeException("Error generating tuples.", t);

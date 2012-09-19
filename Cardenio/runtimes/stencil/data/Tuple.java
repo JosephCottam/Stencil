@@ -27,7 +27,7 @@ public interface Tuple {
   } 
 
   public final class Util {
-    public static Tuple from(Schema schema, List values) {return new ArrayTuple(schema, values.toArray());}
+    public static Tuple from(Schema schema, List<?> values) {return new ArrayTuple(schema, values.toArray());}
     public static Tuple from(Schema schema, Object[] values) {return new ArrayTuple(schema, values);}
     public static Tuple from(Schema schema, Object value) {return new ArrayTuple(schema, new Object[]{value});}
     public static Tuple from(Schema schema) {
@@ -40,8 +40,8 @@ public interface Tuple {
     public static Tuple subtract(Tuple t1, Tuple t2) {
       Schema s1 = t1.schema();
       Schema s2 = t2.schema();
-      ArrayList values = new ArrayList();
-      ArrayList schema = new ArrayList();
+      ArrayList<Object> values = new ArrayList<Object>();
+      ArrayList<Schema.Field> schema = new ArrayList<Schema.Field>();
 
 
       for (int i=0; i< s2.size(); i++) {

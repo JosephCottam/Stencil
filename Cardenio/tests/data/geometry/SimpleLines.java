@@ -9,6 +9,8 @@ import stencil.operators.*;
 import stencil.renderer.*;
 import static stencil.data.Schema.Field;
 
+
+@SuppressWarnings("all")
 public class SimpleLines extends stencil.StencilPanel {
   private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private static final String VALUES_STREAM_NAME = "values";
@@ -19,7 +21,7 @@ public class SimpleLines extends stencil.StencilPanel {
                                                new Field("fillColor",java.awt.Color.class,java.awt.Color.GRAY));
 
    private final MethodHandle __RANGE1_M;
-   private final TupleStream values;
+   private final TupleStream<?> values;
    private final stencil.QueueManager queues;
    private final Engine engine = new Engine();
 

@@ -9,11 +9,11 @@ import java.util.Collections;
 public class Schema {
   public static class Field {
      public final String name;
-     public final Class type;
+     public final Class<?> type;
      public final Object defaultValue;
 
-     public Field(String name, Class type) {this(name, type, null);}
-     public Field(String name, Class type, Object defaultValue) {
+     public Field(String name, Class<?> type) {this(name, type, null);}
+     public Field(String name, Class<?> type, Object defaultValue) {
        assert name != null;
        assert type != null;
        assert defaultValue == null || type.isInstance(defaultValue);

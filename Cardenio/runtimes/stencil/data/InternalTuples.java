@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class InternalTuples<T> implements BasicStream<T> {
-  private final List<T> values = new ArrayList();
+  private final List<T> values = new ArrayList<T>();
     
   public boolean done() {return false;}
   public void add(T v) {values.add(v);}
