@@ -1,0 +1,34 @@
+
+Binding types:
+  By default, everything is stored.
+  :* is dynamic binding, also stores inputs for periodic updates
+  :- is non-store, but visibile in other rules (like a let*)
+
+
+All of the rule groups are "policy" statements.
+  Not all policy types are needed by all runtimes.
+  Runtime compiliation is the last part of compliation, 
+     emits warnings about ignored policy statements.
+  Example policies:  data, retain, push, pull, remote (ampp extension)
+
+
+Hindley-miller type inferencer in the compiler (Normal form has optional types)
+Normal form programs are valid programs. 
+Compiler passes assume post-normalization input,
+   but may generate output that requires re-normalization
+
+Expressions are king.  Nestable, inlineable...I want to be able to "address"
+   the expression though, for things like the guide system
+
+Tuple-creation as an easy operator...something like #(...) makes a tuple
+Mixed-fixed syntax permitted in some special block, like @(....)
+   @(3+4*sin(theta))  should be allowed
+
+View groups tables and implicitly defines a canvas
+
+Schema-grids are iterated VIEWS, with specific RENDERERs on one data table.
+First-class guides make building guides for such view trivial
+
+
+Protovis showed Lambda...now lets do COMBINATORS:  schema-grid, data-grid, guide
+
