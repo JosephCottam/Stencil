@@ -1,0 +1,41 @@
+Tuples:
+ get: tuple -> int -> value
+ size: tuple -> int
+ tuple: value* -> tuple,   shorthand is #(value ...)
+ Optional --- get: tuple -> id -> value
+
+Tuple-group transformations
+unique: tuple* -> tuple*, return has all unique elements of input  
+select: tuple* -> id* -> tuple'*, return list of tuples with only the fields selected; * means all fields
+
+filter: tuple* -> predicate* -> tuple*, return tuples that match given predicate
+flatten: tuple* -> tuple, turns a list of tuples into a tuple full of values; Flattens only one layer
+flatten*: tuple* -> tuple, like flatten, but flattens to primitives
+
+Layout
+ALL layout operations assume that the target table has X,Y info, probably has W,H as well to calculate bounds from
+Tables MAY have "bounds" attribute as well to short-circuit the process...but maybe not.
+bottom: tuple*->(X,Y), Gets the bounds of a tuple set and returns the logical bottom coordinate
+  Corresponding top/left/right operators
+
+
+Table:
+  update: table -> tuple -> table, makes a new table by adding a tuple to an existing one
+  remove: table -> id -> table, ensures table no longer has item with given ID
+  find: table -> id> -> tuple, return the tuple corresponding to the ID in the table
+  get: table -> int -> tuple, get the nth item in the table
+  
+  Optionals ----
+    acquire: table -> table, a stable view of the input
+    release: table -> table -> table, Post-acquire release of a view, may result in a new table state
+    iterator: table -> iterator, moves through all items in the table
+    bounds: table -> (X,Y,W,H,Z,D), summary of table contents (not always fully-defined)
+    clear: table -> table, get an empty table with the same schema as the input but no contents
+
+View:
+  viewport: view -> (X,Y,W,H), what are the bounds screen-dimensions of the view
+  size: view -> (X,Y,W,H) what are bounds of what can be seen right now (consider adding Z and D)
+  background: view -> color -> view, set the view's background color
+  canvas: view -> (X,Y,W,H,BG), what are the extents of the underlying tables and the current background color
+     (Consider adding Z and D)
+

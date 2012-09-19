@@ -1,0 +1,102 @@
+<project name="Stencil-Cardenio" default="stencil" basedir=".">
+
+  <property name="lib" location="Stencil/lib" />
+  <property name="temp" location="temp" />
+  <property name="runtimeSrc" location="runtimes/" />
+
+  <target name="stencil">
+    <echo message="Stencil 'Cardenio' support structure build system."/>
+  </target>
+
+  <target name="runtime" depends="tempdir">
+    <property name="compileTo" location="${temp}/runtime/bin" />
+    <mkdir dir="${compileTo}"/>
+
+    <javac destdir="${compileTo}" includeAntRuntime="false" source="1.7" target="1.7">
+      <!--compilerarg value="-Xlint"/-->
+      <include name="**/*.java"/>
+      <src><pathelement path="${runtimeSrc}"/></src>
+      <classpath>
+        <fileset dir="${lib}"><include name="**/*.jar"/></fileset>
+      </classpath>
+    </javac>
+
+    <jar destfile="${lib}/stencilJavaRuntime.jar" basedir="${compileTo}" />
+  </target>
+
+  <target name="test" depends="runtime,tempdir">
+    <property name="gatherTo"  location="${temp}/test/src" />
+    <mkdir dir="${gatherTo}" />
+    
+
+    <!--Gather the various parts of testing together-->
+    <copy todir="${gatherTo}/stencil/">
+      <fileset dir="tests/stencil" />
+    </copy>
+    <copy todir="${gatherTo}/stencil/test/examples/cannonical" flatten="true">
+      <fileset dir="tests/data" includes="**/*.java"/>
+    </copy>
+
+    <!--Compile all tests-->
+    <property name="testCompileTo" location="${temp}/test/bin" />
+    <mkdir dir="${testCompileTo}" />
+
+    <javac srcdir="${gatherTo}" destdir="${testCompileTo}" includeAntRuntime="false">
+      <include name="**/*.java"/>
+      <classpath>
+        <fileset dir="${lib}" includes="*.jar" />
+      </classpath>
+    </javac>
+    <jar destfile="${lib}/stencilTests.jar" basedir="${compileTo}" />
+
+    <!--Run tests -->
+    <tstamp><format property="now" pattern="yyyy_MM_dd_HH_mm"/></tstamp>
+    <property name="base" location="./testResults/${now}" />
+    <property name="results" location="${base}/raw" />
+    <property name="report" location="${base}" />
+
+    <delete failonerror="false" dir="${base}"/>
+    <mkdir dir="${base}" />
+    <mkdir dir="${results}" />
+    <mkdir dir="${report}" />
+
+    <!-- One minute timeout-->
+    <junit fork="yes" dir="./" timeout="60000">
+      <formatter type="xml"/>
+      <!--TODO: Make my own formatter that is one line per test and flags failures VERY clearly...-->
+      <!--formatter type="brief" usefile="false"/-->
+      <jvmarg value="-DtestDir=${base}"/>
+
+      <classpath>
+        <pathelement path="${temp}/stencilTests.jar" />
+        <pathelement path="${java.class.path}"/>
+        <pathelement path="."/>
+        <fileset dir="${lib}" includes="*.jar"/>
+      </classpath>
+
+      <batchtest todir="${results}">
+        <fileset dir="${testCompileTo}">
+          <include name="**/*Test*.class"/>
+          <exclude name="**/*$*"/>
+        </fileset>
+      </batchtest>
+    </junit>
+
+    
+    <junitreport todir="${report}">
+      <fileset dir="${results}">
+        <include name="TEST-*.xml"/>
+      </fileset>
+
+      <report todir="${report}" format="frames"/>
+    </junitreport>
+  </target>
+
+  <target name="tempdir">
+    <!--Ensure the temp dir exists and is empty-->
+    <delete quiet="true" dir="${temp}" />
+    <mkdir dir="${temp}"/>
+  </target>
+
+ 	 	
+ </project>

@@ -1,0 +1,48 @@
+(table barley
+   (data (file "beckersBarley.csv"))
+   (fields year site yield variety))
+
+(table plot
+   (renderer 'shapes)
+   (data
+      (pull barley (filter (site =~ "University Farm"))
+        (set (id   :  (concatenate variety year))
+             (penC :* (brewerColors year "PuRd" "BLACK"))
+             (x    :  (scale yeild 0 100))
+             (y    :  ((rank variety) -> (+ (* _ 7) 5)))
+             (reg  :  "CENTER")
+             (fillC:  "Clear")))))
+
+
+
+;;;; Dynamic matrix plot
+(table barley
+   (data (file "beckersBarley.csv"))
+   (fields year site yield variety))
+
+
+(table barleyGrid (barleyCell)
+  (renderer multiPlot)
+  (guide (axis y)
+         (legend plot.penColor))
+  (when (delta barley) 
+     (unique (select barley 'site))  ;; Build a list of unique sites
+     (set (id  : site)
+          (reg: "TOP")
+          (Y   : ((rank (median (select plot X))) -> (if (> rank 0) (bottom (plot.get (- rank 1))) 0)))
+          (plot: (barleCell (stream (filter (== 'site ID) (select barley *))))))))  ;;; Stream converts a list into a stream
+
+(table barleyCell
+   (renderer shapes)
+   (data (push (year site variety yeild)
+      (set (id   :  (concatenate variety year))
+           (penC :* (brewerColors year "PuRd" "BLACK"))
+           (x    :  (scale yeild 0 100))
+           (y    :  ((varietyRank variety) -> (+ (* _ 7) 5)))
+           (reg  :  "CENTER")
+           (fill :  "Clear"))))
+
+(operator varietyRank
+  (map (variety v) -> (a)   
+    (meta (counterpart auto))  ;;;Would be nice to have this be the default.  It would need to "know" about the facet parameter in split...Maybe make that a special "@" variable or something...
+    (default (a (split variety fullMedian map v)))))
