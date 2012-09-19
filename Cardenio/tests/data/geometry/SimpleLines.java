@@ -24,6 +24,8 @@ public class SimpleLines extends stencil.StencilPanel {
    private final Engine engine = new Engine();
 
    public void innerRun() {
+     if (queues.done()) {stop(); return;}
+
      engine.process(queues);
      RenderableView view = engine.renderCapture();
      if (view == null) {return;}

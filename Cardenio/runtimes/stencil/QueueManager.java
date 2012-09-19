@@ -26,6 +26,17 @@ public class QueueManager {
      this.queues =  Collections.unmodifiableMap(qs);     
   }
 
+  /**Have all tuples been processed?*/
+  public boolean done() {
+    for (Queue q: queues.values()) {
+       if (q.size() >0) {return false;}
+    }
+    for (TupleStream s: streams.values()) {
+      if (s.done() == false) {return false;}
+    }
+    return true;
+  }
+
   /**Remove the indicate tuple from the indicated queue, return it.
    * This may cause data to load.**/
   public Tuple pop(String stream, int i) {
@@ -68,10 +79,14 @@ public class QueueManager {
     private final List<Tuple> values = new ArrayList();
     
     public int size() {return values.size();}
-    public Tuple remove(int i) {return values.remove(i);}
+    public Tuple remove(int i) {
+       if (i >= values.size() || i<0) {return null;}
+       else {return values.remove(i);}
+    }
+
     public Tuple get(int i) {
       if (i >= values.size() || i<0) {return null;}
-      return values.get(i);
+      else {return values.get(i);}
     }
     
     public void add(Tuple t) {values.add(t);}
