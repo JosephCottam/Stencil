@@ -37,7 +37,7 @@ options {
 	}
 	  
 	protected void setup(Object... args) {
-	   modules = (ModuleCache) args[0];
+	   modules = (ModuleCache) args[0]; 
 	   adapter = (Adapter) args[1];
 	}
   
