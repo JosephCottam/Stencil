@@ -20,8 +20,8 @@ import stencil.tuple.instances.PrototypedArrayTuple;
 import stencil.types.Converter;
 
 public class Title extends Guide2D {
-	private static final String DEFAULT_SPECIALIZER_SOURCE = "[title: \"\", gap:5]";
-	private static final String[] DEFAULTS_KNOCKOUT = new String[]{"title", "gap"};
+	private static final String[] DEFAULTS_KNOCKOUT = new String[]{"title", "subtitle", "gap"};
+	private static final String DEFAULT_SPECIALIZER_SOURCE = "[title: \"\", subtitle:\"\", gap:5]";
 	public static final Specializer DEFAULT_SPECIALIZER;
 	static {
 		try {DEFAULT_SPECIALIZER = ParseStencil.specializer(DEFAULT_SPECIALIZER_SOURCE);}
@@ -33,6 +33,7 @@ public class Title extends Guide2D {
 	private Table data;
 	private final Renderer renderer;
 	private final String title;
+	private final String subtitle;
 	private final int gap;
 	private final PrototypedTuple updateMask;
 	
@@ -44,6 +45,7 @@ public class Title extends Guide2D {
 		updateMask = Tuples.merge(SchemaFieldDef.asTuple(data.prototype()), Tuples.delete(DEFAULT_SPECIALIZER, DEFAULTS_KNOCKOUT));
 
 		title = Converter.toString(guideDef.specializer().get("title"));
+		subtitle = Converter.toString(guideDef.specializer().get("subtitle"));
 		gap = Converter.toInteger(guideDef.specializer().get("gap"));
 	}
 		

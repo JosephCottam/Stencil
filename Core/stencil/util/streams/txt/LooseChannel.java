@@ -50,7 +50,7 @@ final class LooseChannel implements NextChannel {
 
 		
 		String[] values = splitter.split(line);
-		if (values.length < tupleSize) {return null;}
+		if (values.length < tupleSize) {return next(source);}
 		else if (values.length>tupleSize){
 			values = Arrays.copyOfRange(values, 0, tupleSize);
 		}

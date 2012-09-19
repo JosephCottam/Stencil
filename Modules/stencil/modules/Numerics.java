@@ -211,7 +211,7 @@ public class Numerics extends BasicModule {
 	public static double round(double a) {return Math.round(a);}
 	
 	@Operator()
-	@Facet(memUse="FUNCTION", prototype="(double val)", alias={"map","query"})
+	@Facet(memUse="Opaque", prototype="(double val)", alias={"map","query"})
 	public static double random() {return Math.random();}
 
 	@Operator()
