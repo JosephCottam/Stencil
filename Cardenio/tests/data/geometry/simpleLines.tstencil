@@ -1,0 +1,14 @@
+;;Typed variant of simpleLines.stencil
+;;Cannonical version is simpleLines.stencil, this version is exists for testing purpsoses only
+
+(stream values 
+  (fields v:[int])
+  (data (range 0 10)))
+
+(table plot
+  (render (text "simpleLines_test.tuples"))
+  (data (pull values
+     (set (id : v)
+          ((x1:[double], x2:[double]) : (* 10:[int] v) -> #(_,_))
+          ((y1:[double], y2:[double]) : #(0:[int], 10:[int]))
+          (fillColor[java.awt.Color]: java.awt.Color.GRAY)))))
