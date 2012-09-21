@@ -16,6 +16,7 @@ Hindley-miller type inferencer in the compiler (Normal form has optional types)
 Normal form programs are valid programs. 
 Compiler passes assume post-normalization input,
    but may generate output that requires re-normalization
+Simply Typed Lambda Calculus inferencer: https://gist.github.com/997140
 
 Expressions are king.  Nestable, inlineable...I want to be able to "address"
    the expression though, for things like the guide system
