@@ -30,8 +30,8 @@ public interface Table extends Iterable<Tuple> {
   }
 
   public static final class SimpleTable implements Table.Updateable {
-    private final ArrayList<Tuple> store = new ArrayList<Tuple>();
-    private final Map<Object, Integer> index = new HashMap<Object, Integer>();
+    private final ArrayList<Tuple> store = new ArrayList<>();
+    private final Map<Object, Integer> index = new HashMap<>();
     private final Schema schema;
 
     public SimpleTable(Schema schema) {this.schema = schema;}

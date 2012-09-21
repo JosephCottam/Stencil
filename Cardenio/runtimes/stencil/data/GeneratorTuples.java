@@ -33,7 +33,7 @@ public class GeneratorTuples<T> implements BasicStream<T> {
   private void init() {
     final Object values;
     try {
-      queue = new LinkedList<T>();
+      queue = new LinkedList<>();
       values = method.invoke();
     } catch (Throwable t) {
       throw new RuntimeException("Error generating tuples.", t);

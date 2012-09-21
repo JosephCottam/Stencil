@@ -15,8 +15,8 @@ public class QueueManager {
   private final Map<String, Queue> queues;
   
   public QueueManager(TupleStream ... streams) {
-     Map<String, TupleStream<?>> ss = new HashMap<String, TupleStream<?>>();
-     Map<String, Queue> qs = new HashMap<String, Queue>();
+     Map<String, TupleStream<?>> ss = new HashMap<>();
+     Map<String, Queue> qs = new HashMap<>();
 
      for (TupleStream<?> s: streams) {
        ss.put(s.name(), s);
@@ -76,7 +76,7 @@ public class QueueManager {
   /**Basic queue abstraction + indexed lookup.
    * Returns null when "get" is called on an illegal value.**/
   private class Queue {
-    private final List<Tuple> values = new ArrayList<Tuple>();
+    private final List<Tuple> values = new ArrayList<>();
     
     public int size() {return values.size();}
     public Tuple remove(int i) {
