@@ -43,9 +43,10 @@
           (nil? t) (list (read-string (first tokens)) (rest tokens))
           :else (recur (rest transforms)))))))
           
-(defn parse [src split exclude placeHolder open close transforms]
+(defn parse [src split split2 exclude placeHolder comms open close transforms]
    "Convert a source string into an s-expression.
     split -- divide up tokens, must include white-space (sorry!)
+    split2 -- literal tokens that should also divide items, as a reg-ex that matches in one group
     exclude -- finds large blocks where split should not be applied (like string-literals)
     placeHolder -- used to protect excluded items, MUST NOT be divdied up by split
     open/close -- patterns for moving up and down in the tree, must include any possible match in one group
@@ -53,7 +54,8 @@
                   Trans returns a value and a modified token stream. If the value is NOT nil, it is used in the result."
   (let [bigTokens (re-seq exclude src)
         protected (clojure.string/replace src exclude placeHolder)
-        expanded  (.trim (clojure.string/replace (clojure.string/replace protected open " $1 ") close " $1 "))
+        uncomment (clojure.string/replace protected comms "")
+        expanded  (.trim (clojure.string/replace uncomment split2 " $1 ")) 
         pTokens   (clojure.string/split expanded split)
         tokens    (insertAlters placeHolder pTokens bigTokens)
         [tree _]  (makeTree tokens open close (emitter transforms))]
@@ -61,14 +63,17 @@
 
 
 (defn bind? [tokens] (.equals ":" (first tokens)))
-(defn bind [tokens] (list (read-string "$op:") (rest tokens))) 
+(defn bind [tokens] (list (read-string "$op-colon") (rest tokens))) 
 (defn tupleLit? [tokens] (= (list "#" "(") (take 2 tokens)))
 (defn tupleLit [tokens] (list nil (cons "(" (cons "$tuple" (rest (rest tokens))))))
 
 
 (defn parsePrograms [src]
   "string -> [tree]: Parses stencil programs from a string."
-  (parse src #"[\s,]+" #"\"(?:[^\"\\]|\\.)*\"" "__++STRING_LITERAL++__" #"(\(|\{|\[)" #"(\)|\}|\])" 
+  (parse src #"[\s,]+" #"(:|->|\(|\{|\[|\)|\}|\])" 
+             #"\"(?:[^\"\\]|\\.)*\"" "__++STRING_LITERAL++__" 
+             #";.*$"
+             #"(\(|\{|\[)" #"(\)|\}|\])" 
          `((~tupleLit? ~tupleLit) (~bind? ~bind))))
 
 
