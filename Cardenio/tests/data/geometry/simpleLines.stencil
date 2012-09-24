@@ -8,4 +8,4 @@
      (set (id : v)
           ((x1 x2) : (* 10 v) -> #(_,_))
           ((y1 y2) : #(0, 10))
-          (fillColor: java.awt.Color.GRAY)))))
+          (fillColor : java.awt.Color.GRAY)))))

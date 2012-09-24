@@ -8,14 +8,14 @@
 
 (defn parseProgram [program]
   "string -> tree: Parses a stencil program from a string."
-  (stencil.rparse/parseProgram program)) 
+  (first (stencil.rparse/parsePrograms program)))
 
 (defn readProgram 
   "filename -> tree: reads program from specified file, returns as parse tree"
   [filename] 
     (let [f (new java.io.File filename)
           name (re-find #"[^.]*" (.getName f))]
-    (first (parseProgram (str "(stencil" name (slurp filename) \n \))))))
+    (parseProgram (str "(stencil" name (slurp filename) "\n)" ))))
       
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
