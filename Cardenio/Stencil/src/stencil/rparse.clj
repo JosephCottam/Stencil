@@ -17,12 +17,12 @@
     (empty? tokens) 
        '(() ())
 
-    (not (nil? (re-matches open (first tokens))))
+    (re-matches open (first tokens))
        (let [[phase1 remain] (makeTree (rest tokens) open close emit)
              [phase2 remain] (makeTree remain open close emit)]
          (list (cons phase1 phase2) remain))
 
-    (not (nil? (re-matches close (first tokens)))) 
+    (re-matches close (first tokens))
        (list '() (rest tokens))
     
     :else (let [[phase1 remain] (emit tokens)
@@ -61,8 +61,8 @@
 (defn bind? [token] (.equals ":" token))
 (defn bind [tokens] (list "op:" (rest tokens))) 
 
-(defn parseProgram [program]
-  "string -> tree: Parses a stencil program from a string."
-  (parse program #"[\s,]+" #"\"([^\"\\]|\\.)*\"" "__++STRING_LITERAL++__" #"(\()" #"(\))" `((~bind? ~bind)))) 
+(defn parsePrograms [source]
+  "string -> [tree]: Parses stencil programs from a string."
+  (parse source #"[\s,]+" #"\"([^\"\\]|\\.)*\"" "__++STRING_LITERAL++__" #"(\()" #"(\))" `((~bind? ~bind))))
 
 

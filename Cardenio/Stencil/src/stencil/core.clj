@@ -11,11 +11,11 @@
   (stencil.rparse/parseProgram program)) 
 
 (defn readProgram 
-  "filename -> tree: reads tree from specified file"
+  "filename -> tree: reads program from specified file, returns as parse tree"
   [filename] 
     (let [f (new java.io.File filename)
           name (re-find #"[^.]*" (.getName f))]
-    (parseProgram (str "(stencil" name (slurp filename) \n \)))))
+    (first (parseProgram (str "(stencil" name (slurp filename) \n \))))))
       
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
