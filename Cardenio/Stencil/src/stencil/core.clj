@@ -18,8 +18,3 @@
     (parseStencil (str "(stencil " name (slurp filename) "\n)" ))))
 
 (defn spp [program] (clojure.pprint/pprint program))
-      
-(defn normalize 
-  "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program identity))
-
