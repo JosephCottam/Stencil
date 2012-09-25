@@ -1,4 +1,4 @@
-(in-ns 'stencil.transforms)
+(in-ns 'stencil.transform)
 
 (defn nestBind
   "Move stencil-bind operators to head-position."

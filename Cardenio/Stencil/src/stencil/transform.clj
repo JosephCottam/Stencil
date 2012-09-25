@@ -1,4 +1,4 @@
-(ns stencil.transforms
+(ns stencil.transform
   "Tree transformation functions"
   (:use [clojure.core.match :only (match)]))
 
@@ -7,3 +7,4 @@
 
 (load "transforms/dropComments")
 (load "transforms/nestbind")
+(load "transforms/pullToWhen")

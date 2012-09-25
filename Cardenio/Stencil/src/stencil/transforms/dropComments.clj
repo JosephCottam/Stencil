@@ -1,4 +1,4 @@
-(in-ns 'stencil.transforms)
+(in-ns 'stencil.transform)
 
 (defn- dropAll [program]
   (match [program]
