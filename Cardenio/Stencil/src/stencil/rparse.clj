@@ -21,24 +21,24 @@
           (nil? t) (list (str (first tokens)) (rest tokens))
           :else (recur (rest transforms)))))))
 
-(defn gatherTo [stop tokens]
+(defn gatherTo [stop destroy tokens]
   "term -> tokens -> (inside, tokens)
    Gather all tokens, until the stop token is seen.
    Return tokens seen as inside, and remain stream as tokens."
-   (print stop ":" tokens "\n")
-   (cond 
+     (cond 
       (empty? tokens) 
          '(() ())
+      (= destroy (first tokens)) (gatherTo stop destroy (rest tokens))
       (= stop (take (count stop) tokens))
           (list '() (drop (count stop) tokens))
       :else 
-       (let [[inside remain] (gatherTo stop (rest tokens))]
+       (let [[inside remain] (gatherTo stop destroy (rest tokens))]
          (list (cons (first tokens) inside) remain))))
 
 (defn stComment? [tokens] (= \; (first tokens)))
 (defn stComment [emit tokens] 
   (let [term (if (= '(\; \*) (take 2 tokens)) '(\* \;) '(\newline))
-        [comment remain] (gatherTo term (drop (count term) tokens))]
+        [comment remain] (gatherTo term \; (drop (count term) tokens))]
        (list (concat "(comment " comment ")") remain)))
 
 (defn bind? [tokens] (= \: (first tokens)))
@@ -47,9 +47,7 @@
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
-(defn stMeta? [tokens] 
-  (= '(\: \[) (take 2 tokens)))
-
+(defn stMeta? [tokens] (= '(\: \[) (take 2 tokens)))
 (defn stMeta  [emit tokens] 
   (let [[internal remain] (readUntil emit \] (drop 2 tokens))]
     (list (concat "(meta (" internal "))") remain)))

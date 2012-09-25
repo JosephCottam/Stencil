@@ -6,16 +6,16 @@
 
 ;Directions for reges -- http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
 
-(defn parseProgram [program]
+(defn parseStencil [program]
   "string -> tree: Parses a stencil program from a string."
-  (first (stencil.rparse/parsePrograms program)))
+  (stencil.rparse/parseProgram program))
 
-(defn readProgram 
+(defn readStencil
   "filename -> tree: reads program from specified file, returns as parse tree"
   [filename] 
     (let [f (new java.io.File filename)
           name (re-find #"[^.]*" (.getName f))]
-    (parseProgram (str "(stencil" name (slurp filename) "\n)" ))))
+    (parseStencil (str "(stencil " name (slurp filename) "\n)" ))))
       
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
