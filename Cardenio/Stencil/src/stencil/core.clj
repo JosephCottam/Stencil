@@ -1,5 +1,5 @@
 (ns stencil.core
-   (:require stencil.rparse))
+  (:require stencil.rparse))
 
 (defn -main [from to]
   (println "Compling from" from "to" to "(but not really)"))
@@ -17,7 +17,7 @@
           name (re-find #"[^.]*" (.getName f))]
     (parseStencil (str "(stencil " name (slurp filename) "\n)" ))))
 
-(defn prettyPrint [program] (clojure.pprint/pprint program))
+(defn spp [program] (clojure.pprint/pprint program))
       
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
