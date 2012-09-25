@@ -21,25 +21,24 @@
           (nil? t) (list (str (first tokens)) (rest tokens))
           :else (recur (rest transforms)))))))
 
-(defn gatherTo [stop destroy tokens]
+(defn gatherTo [stop tokens]
   "term -> tokens -> (inside, tokens)
    Gather all tokens, until the stop token is seen.
    Return tokens seen as inside, and remain stream as tokens."
      (cond 
       (empty? tokens) 
          '(() ())
-      (= destroy (first tokens)) (gatherTo stop destroy (rest tokens))
       (= stop (take (count stop) tokens))
           (list '() (drop (count stop) tokens))
       :else 
-       (let [[inside remain] (gatherTo stop destroy (rest tokens))]
+       (let [[inside remain] (gatherTo stop (rest tokens))]
          (list (cons (first tokens) inside) remain))))
 
 (defn stComment? [tokens] (= \; (first tokens)))
 (defn stComment [emit tokens] 
   (let [term (if (= '(\; \*) (take 2 tokens)) '(\* \;) '(\newline))
-        [comment remain] (gatherTo term \; (drop (count term) tokens))]
-       (list (concat "(comment " comment ")") remain)))
+        [comment remain] (gatherTo term (drop (count term) tokens))]
+       (list (concat "(comment \"" comment "\")") remain)))
 
 (defn bind? [tokens] (= \: (first tokens)))
 (defn bind [emit tokens] (list " $op-colon " (rest tokens))) 
