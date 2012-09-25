@@ -1,79 +1,67 @@
-;Based roughly on -- http://thingsaaronmade.com/blog/writing-an-s-expression-parser-in-ruby.html 
+;Based loosely on https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/LispReader.java
 (ns stencil.rparse
-  "Not-quite simple parser.
-   Takes in balanced-delimeter trees and eventually produces s-expressions from them.
-   Has a simple 'reader-macro' system, so the inputs can be not-quite s-expressions.")
+  "An s-expression reader macro system for pre-processing before going to the clojure reader.")
 
-(defn insertAlters [sentinel tokens alters]
+(defn readUntil [emit delim tokens]
   (cond 
-    (empty? alters) tokens
-    (empty? tokens) '()
-    (= sentinel (first tokens)) (cons (first alters) (insertAlters sentinel (rest tokens) (rest alters)))
-    :else (cons (first tokens) (insertAlters sentinel (rest tokens) alters))))
-
-(defn makeTree [tokens open close emit]
-   "Produce an s-expression using open/close to do nesting and transforms to patch over non-compliant regions."
-  (cond 
-    (empty? tokens) 
-       '(() ())
-
-    (re-matches open (first tokens))
-       (let [[phase1 remain] (makeTree (rest tokens) open close emit)
-             [phase2 remain] (makeTree remain open close emit)]
-         (list (cons phase1 phase2) remain))
-
-    (re-matches close (first tokens))
-       (list '() (rest tokens))
-    
-    :else (let [[phase1 remain] (emit tokens)
-                [phase2 remain] (makeTree remain open close emit)]
-            (if (nil? phase1)
-              (list phase2 remain)
-              (list (cons phase1 phase2) remain)))))
-         
-
+    (empty? tokens) '(() ())
+    (= delim (first tokens)) (list () (rest tokens))
+    :else (let [[phase1 remain] (emit emit tokens)
+                [phase2 remain] (readUntil emit delim remain)]
+            (list (concat phase1 phase2) remain))))
 
 (defn emitter [transforms]
-  "Produce a function that take tokens are returns value/token-seq pairs from the transforms"
-  (fn [tokens]
+  "Produce a function that take tokens are returns (before after) pairs from the transforms
+   Transforms must be functions [emitter tokens] -> [tokens tokens] "
+  (fn [emit tokens]
     (loop [transforms transforms]
       (let [[p t] (first transforms)]
         (cond
-          (and (fn? t) (p tokens)) (t tokens)
-          (nil? t) (list (read-string (first tokens)) (rest tokens))
+          (and (fn? t) (p tokens)) (t emit tokens)
+          (nil? t) (list (str (first tokens)) (rest tokens))
           :else (recur (rest transforms)))))))
-          
-(defn parse [src split split2 exclude placeHolder comms open close transforms]
-   "Convert a source string into an s-expression.
-    split -- divide up tokens, must include white-space (sorry!)
-    split2 -- literal tokens that should also divide items, as a reg-ex that matches in one group
-    exclude -- finds large blocks where split should not be applied (like string-literals)
-    placeHolder -- used to protect excluded items, MUST NOT be divdied up by split
-    open/close -- patterns for moving up and down in the tree, must include any possible match in one group
-    transforms -- list of pred/trans pairs.  If the pred passes, trans is applied to the curent token stream.
-                  Trans returns a value and a modified token stream. If the value is NOT nil, it is used in the result."
-  (let [bigTokens (re-seq exclude src)
-        protected (clojure.string/replace src exclude placeHolder)
-        uncomment (clojure.string/replace protected comms "")
-        expanded  (.trim (clojure.string/replace uncomment split2 " $1 ")) 
-        pTokens   (clojure.string/split expanded split)
-        tokens    (insertAlters placeHolder pTokens bigTokens)
-        [tree _]  (makeTree tokens open close (emitter transforms))]
-     tree))
+         
 
 
-(defn bind? [tokens] (.equals ":" (first tokens)))
-(defn bind [tokens] (list (read-string "$op-colon") (rest tokens))) 
-(defn tupleLit? [tokens] (= (list "#" "(") (take 2 tokens)))
-(defn tupleLit [tokens] (list nil (cons "(" (cons "$tuple" (rest (rest tokens))))))
+(defn comment? [tokens] (.equals \; (first tokens)))
+(defn comment [emit tokens] 
+  (let [term (if (= '(; *) (take 2 tokens)) '(* ;) '(\n))
+       [[comment remain] (gatherTo \n (rest tokens))]
+       (list (concat "(comment " comment ")") remain)))
 
+(defn bind? [tokens] (.equals \: (first tokens)))
+(defn bind [emit tokens] 
+  (print "Bind")
+  (list " $op-colon " (rest tokens))) 
 
-(defn parsePrograms [src]
-  "string -> [tree]: Parses stencil programs from a string."
-  (parse src #"[\s,]+" #"(:|->|\(|\{|\[|\)|\}|\])" 
-             #"\"(?:[^\"\\]|\\.)*\"" "__++STRING_LITERAL++__" 
-             #";.*$"
-             #"(\(|\{|\[)" #"(\)|\}|\])" 
-         `((~tupleLit? ~tupleLit) (~bind? ~bind))))
+(defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
+(defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
+(defn stMeta? [tokens] 
+  (print "meta check")
+  (= '(\: \[) (take 2 tokens)))
+
+(defn stMeta  [emit tokens] 
+  (print "meta!")
+  (let [[internal remain] (readUntil emit \] (drop 2 tokens))]
+    (list (concat "(meta (" internal "))") remain)))
+
+(defn stString? [tokens] (= \" (first tokens)))
+(defn stString  [emit tokens]
+  ((fn gather [tokens]
+     (cond
+       (= \\ (first tokens)) (concat (take 2 tokens) (gather (drop 2 tokens)))
+       (= \" (first tokens)) (list '(\") (rest tokens)))) 
+     tokens))
+
+(defn startList? [tokens] (= \( (first tokens)))
+(defn readList [emit tokens] 
+  (let [[internal remain] (readUntil emit \) (rest tokens))]
+    (list (concat "(" internal ")") remain)))
+
+(defn parseProgram [src]
+  "string -> tree: Parses stencil program from a string."
+  (let [[srcLs remain] (readList (emitter `((~stMeta? stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~startList? ~readList))) src)
+        source (apply str srcLs)]
+    (read-string source)))
 
