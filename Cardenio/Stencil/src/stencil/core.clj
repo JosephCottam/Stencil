@@ -16,6 +16,8 @@
     (let [f (new java.io.File filename)
           name (re-find #"[^.]*" (.getName f))]
     (parseStencil (str "(stencil " name (slurp filename) "\n)" ))))
+
+(defn prettyPrint [program] (clojure.pprint/pprint program))
       
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"

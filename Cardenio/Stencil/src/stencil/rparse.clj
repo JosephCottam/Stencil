@@ -46,9 +46,9 @@
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
-(defn stMeta? [tokens] (= '(\: \[) (take 2 tokens)))
+(defn stMeta? [tokens] (= '(\: \[) (take 2 (remove #(Character/isWhitespace %) tokens))))
 (defn stMeta  [emit tokens] 
-  (let [[internal remain] (readUntil emit \] (drop 2 tokens))]
+  (let [[internal remain] (readUntil emit \] (rest (drop-while #(not= \[ %) tokens)))]
     (list (concat "(meta (" internal "))") remain)))
 
 (defn stString? [tokens] (= \" (first tokens)))
