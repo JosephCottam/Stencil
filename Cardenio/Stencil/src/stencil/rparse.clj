@@ -20,29 +20,37 @@
           (and (fn? t) (p tokens)) (t emit tokens)
           (nil? t) (list (str (first tokens)) (rest tokens))
           :else (recur (rest transforms)))))))
-         
 
+(defn gatherTo [stop tokens]
+  "term -> tokens -> (inside, tokens)
+   Gather all tokens, until the stop token is seen.
+   Return tokens seen as inside, and remain stream as tokens."
+   (print stop ":" tokens "\n")
+   (cond 
+      (empty? tokens) 
+         '(() ())
+      (= stop (take (count stop) tokens))
+          (list '() (drop (count stop) tokens))
+      :else 
+       (let [[inside remain] (gatherTo stop (rest tokens))]
+         (list (cons (first tokens) inside) remain))))
 
-(defn comment? [tokens] (.equals \; (first tokens)))
-(defn comment [emit tokens] 
-  (let [term (if (= '(; *) (take 2 tokens)) '(* ;) '(\n))
-       [[comment remain] (gatherTo \n (rest tokens))]
+(defn stComment? [tokens] (= \; (first tokens)))
+(defn stComment [emit tokens] 
+  (let [term (if (= '(\; \*) (take 2 tokens)) '(\* \;) '(\newline))
+        [comment remain] (gatherTo term (drop (count term) tokens))]
        (list (concat "(comment " comment ")") remain)))
 
-(defn bind? [tokens] (.equals \: (first tokens)))
-(defn bind [emit tokens] 
-  (print "Bind")
-  (list " $op-colon " (rest tokens))) 
+(defn bind? [tokens] (= \: (first tokens)))
+(defn bind [emit tokens] (list " $op-colon " (rest tokens))) 
 
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
 (defn stMeta? [tokens] 
-  (print "meta check")
   (= '(\: \[) (take 2 tokens)))
 
 (defn stMeta  [emit tokens] 
-  (print "meta!")
   (let [[internal remain] (readUntil emit \] (drop 2 tokens))]
     (list (concat "(meta (" internal "))") remain)))
 
@@ -61,7 +69,10 @@
 
 (defn parseProgram [src]
   "string -> tree: Parses stencil program from a string."
-  (let [[srcLs remain] (readList (emitter `((~stMeta? stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~startList? ~readList))) src)
+  (let [[srcLs remain] 
+          (readList 
+             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~startList? ~readList))) 
+             src)
         source (apply str srcLs)]
     (read-string source)))
 
