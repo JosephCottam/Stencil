@@ -12,13 +12,9 @@
        (match [program]
          [(['value val :guard symbol?] :seq)] (list 'type val)
 
-
-
-  (match [program]
-
 (defn metaTypes
   "Identify types in meta statements."
   [program]
   (match [program]
-    [(['meta & rest] :seq) (list 'meta (map justTypes rest))
+    [(['meta & rest] :seq)] (list 'meta (map justTypes rest))
     :else (map metaTypes program)))

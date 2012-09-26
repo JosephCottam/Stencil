@@ -1,10 +1,14 @@
 (ns stencil.core
-  (:require stencil.rparse))
+  (:require stencil.rparse)
+  (:require stencil.transform))
 
 (defn -main [from to]
   (println "Compling from" from "to" to "(but not really)"))
 
 ;Directions for reges -- http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
+
+(defn compileStencil [program]
+  (-> program stencil.transform/normalize))
 
 (defn parseStencil [program]
   "string -> tree: Parses a stencil program from a string."
