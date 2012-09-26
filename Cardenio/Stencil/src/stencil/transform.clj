@@ -5,6 +5,9 @@
 (defn atom? [x] 
   (or (symbol? x) (number? x) (string? x)))
 
+(defn namingContext? [n] 
+  (some #(= n %) '(stencil view table operator stream)))
+
 (load "transforms/dropComments")
 (load "transforms/nestbind")
 (load "transforms/pullToWhen")
