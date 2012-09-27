@@ -1,6 +1,6 @@
 (in-ns 'stencil.transform)
 
-(defn pullToWhen
+(defn pull->When
   "Convert pull statements to when statements"
   [program]
   (match [program]

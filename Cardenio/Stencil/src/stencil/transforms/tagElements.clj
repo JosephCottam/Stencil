@@ -8,12 +8,18 @@
     [([(top :guard isTop?) id & parts] :seq)] `(~top (~'$id ~id) ~@(map tagTops parts))
     :else (cons '$policy program)))
 
-(defn- rTagger [renderer] (identity renderer))
-(defn- dTagger [data] (identity data))
-(defn- mTagger [metas] (identity metas))
-(defn- fTagger [facet] (identity facet))
+(defn- tagExpr [ex]
+  (match [ex]
+    [(ex :guard symbol?)] (list '$sym ex)
+    [(ex :guard value?)] (list '$value ex)
+    [([(op :guard symbol?) & args] :seq)] `((~'$op ~op) ~@(map tagExpr args))
+    :else (map tagExpr ex)))
 
-(defn- ptaggers [key] (or ({'renderer rTagger 'data dTagger 'facet fTagger 'meta mTagger} key) identity))
+;;TODO: Make "kind" an ex as wel...
+(defn- tagRender [kind & args] `((~'id ~kind) ~@(map tagExpr args)))
+(defn- tagFacet [facet] (identity facet))
+
+(defn- ptaggers [key] (or ({'renderer tagRender 'facet tagFacet} key) tagExpr))
 (defn- tagInPolicies [kind policy] ((ptaggers kind) policy))
 
 (defn- tagPolicies 
