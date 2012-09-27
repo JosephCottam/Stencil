@@ -18,14 +18,15 @@
 (defn tag? [x]
   (some #(= x %) '($value)))
 
-(load "transforms/dropComments")
-(load "transforms/nestInfix")
-(load "transforms/pulltowhen")
+;(load "transforms/dropComments")
+(load "transforms/normalizeSet")
+(load "transforms/infixToPrefix")
+(load "transforms/pullTowhen")
 (load "transforms/tagElements")
 
 
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program nestInfix pull->When tagElements))
+  [program] (-> program normalizeSet infix->prefix pull->when tagElements))
 
