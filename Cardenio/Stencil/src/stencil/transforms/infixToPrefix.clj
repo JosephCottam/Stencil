@@ -1,10 +1,16 @@
 (in-ns 'stencil.transform)
 
+
+(defn defaultInfix? [x] (and (symbol? x) (every? #(not (. Character isLetterOrDigit %)) (name x))))
+(defn toggled? [x] (and (symbol? x) (= \' (last (name x)))))
+
 (defn infix? [x]
-  (or (= '$op-colon x) (= '-> x) (and (symbol? x) (= \' (last (name x))))))
+  (or (= '$op-colon x) 
+      (and (defaultInfix? x) (not (toggled? x)))
+      (and (not (defaultInfix? x)) (toggled? x))))
 
 (defn infixOp->prefixOp [x]
-  (if (and (symbol? x) (= \' (last (name x))))
+  (if (toggled? x) 
     (symbol (apply str (butlast (name x))))
     x))
 

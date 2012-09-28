@@ -46,6 +46,10 @@
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
+(defn pTupleLit? [tokens] (= '(\# \# \() (take 3 tokens)))
+(defn pTupleLit? [emit tokens] (list nil (concate " ($ptuple " (drop 3 tokens))))
+                          
+
 (defn stMeta? [tokens] (= '(\: \[) (take 2 (remove #(Character/isWhitespace %) tokens))))
 (defn stMeta  [emit tokens] 
   (let [[internal remain] (readUntil emit \] (rest (drop-while #(not= \[ %) tokens)))]
@@ -68,7 +72,7 @@
   "string -> tree: Parses stencil program from a string."
   (let [[srcLs remain] 
           (readList 
-             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~startList? ~readList))) 
+             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)(~startList? ~readList))) 
              src)
         source (apply str srcLs)]
     (read-string source)))
