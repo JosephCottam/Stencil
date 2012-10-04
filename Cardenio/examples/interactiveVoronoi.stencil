@@ -6,7 +6,7 @@
   (fields (id x y))
   (data (map (lambda (n) (tuple n Math.random * width, Math.random*height)) (range 0 100)))
   (data (pull mouse
-         (set (id : "user")
+         (let (id : "user")
               (x  : x)
               (y  : y))))
 
@@ -21,7 +21,7 @@
 (table cells
     (render polygons)
     (data (when (delta centers) ((id xs ys) (voronoi (select (id x y) points)))  
-            (set ((id xs ys) : (id xs ys))
+            (let ((id xs ys) : (id xs ys))
                  (fillColor  : (if (== ID "user")  
                                    (color 'Yellow)
                                    (BrewerColor ID)))

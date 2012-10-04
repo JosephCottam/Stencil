@@ -9,7 +9,7 @@ operator $max (a b) -> (m) from source language
 (operator fullMax
   (table store
     (fields a)   ;;Optional, can be derived from the "data" policy
-    (data (push (v) (set (a : v))))
+    (data (push (v) (let (a : v))))
     (retain (unique a) (= a (max (flatten (select #self a))))))                   ;;Get rid of small things
   (map (v) -> (a)
     (meta (counterpart query))

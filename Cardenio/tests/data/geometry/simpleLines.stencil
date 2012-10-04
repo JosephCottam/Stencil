@@ -5,7 +5,7 @@
 (table plot
   (render (text "simpleLines_test.tuples"))
   (data (pull values
-     (set (id : v)
+     (let (id : v)
           ((x1 x2) : (* 10 v) -> #(_,_))
           ((y1 y2) : #(0, 10))
           (fillColor : java.awt.Color.GRAY)))))

@@ -7,7 +7,7 @@
   (renderer shapes)
   (data 
    (pull flowers
-    (set (x : petalL)
+    (let (x : petalL)
          (y : petalW)
          (fillC : (ColorBy Species))
          (shape : 'Circle)))))
@@ -24,7 +24,7 @@
   (renderer shapes)
   (data 
    (pull source
-         (set (x : Att)
+         (let (x : Att)
               (y : yAtt)
               (fillC : (colorBy colorAtt))
               (shape : 'Circle)))))
