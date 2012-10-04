@@ -1,6 +1,7 @@
 (ns stencil.core
   (:require stencil.rparse)
-  (:require stencil.transform))
+  (:require stencil.transform)
+  (:require clojure.pprint))
 
 (defn -main [from to]
   (println "Compling from" from "to" to "(but not really)"))

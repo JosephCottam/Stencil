@@ -1,5 +1,6 @@
 (ns Stencil.test.core
-  (:use [Stencil.core])
+  (:use [stencil.core])
+  (:use [stencil.transform])
   (:use [clojure.test]))
 
 (deftest replace-me ;; FIXME: write
