@@ -4,9 +4,7 @@
   (:require clojure.pprint))
 
 (defn -main [from to]
-  (println "Compling from" from "to" to "(but not really)"))
-
-;Directions for reges -- http://stackoverflow.com/questions/5695240/php-regex-to-ignore-escaped-quotes-within-quotes
+  (println "Compling from" from "to" to "(but not really...yet)"))
 
 (defn compileStencil [program]
   (-> program stencil.transform/normalize))
