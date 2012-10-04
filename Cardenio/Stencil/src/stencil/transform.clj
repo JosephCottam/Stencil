@@ -19,7 +19,7 @@
   (some #(= x %) '($value)))
 
 ;(load "transforms/dropComments")
-(load "transforms/normalizeSet")
+(load "transforms/normalizeLet")
 (load "transforms/infixToPrefix")
 (load "transforms/pullTowhen")
 (load "transforms/tagElements")
@@ -28,5 +28,5 @@
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program normalizeSet infix->prefix pull->when tagElements))
+  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when tagElements))
 

@@ -47,7 +47,7 @@
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
 
 (defn pTupleLit? [tokens] (= '(\# \# \() (take 3 tokens)))
-(defn pTupleLit? [emit tokens] (list nil (concate " ($ptuple " (drop 3 tokens))))
+(defn pTupleLit [emit tokens] (list nil (concat " ($ptuple " (drop 3 tokens))))
                           
 
 (defn stMeta? [tokens] (= '(\: \[) (take 2 (remove #(Character/isWhitespace %) tokens))))

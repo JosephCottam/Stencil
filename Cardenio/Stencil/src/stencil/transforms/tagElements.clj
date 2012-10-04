@@ -10,14 +10,13 @@
 
 (declare tagExpr)
 
-;;TODO: Can set be translated away before tagging??
-(defn tagSetLine [[op targets ex]] `(~op ~(map #(list '$id %) targets) ~(tagExpr ex)))
+(defn tagLetLine [[op targets ex]] `(~op ~(map #(list '$id %) targets) ~(tagExpr ex)))
 
 (defn tagExpr [ex]
   (match [ex]
     [(ex :guard symbol?)] (list '$sym ex)
     [(ex :guard value?)] (list '$value ex)
-    [(['set & setLines] :seq)] (list 'set (map tagSetLine setLines))
+    [(['let & letLines] :seq)] (list 'let (map tagLetLine letLines))
     [([(op :guard symbol?) & args] :seq)] `((~'$op ~op) ~@(map tagExpr args))
     :else (map tagExpr ex)))
 
