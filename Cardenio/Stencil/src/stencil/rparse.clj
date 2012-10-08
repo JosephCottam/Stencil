@@ -17,8 +17,9 @@
     (loop [transforms transforms]
       (let [[p t] (first transforms)]
         (cond
-          (and (fn? t) (p tokens)) (t emit tokens)
+          (empty? tokens) '()
           (nil? t) (list (str (first tokens)) (rest tokens))
+          (and (fn? t) (p tokens)) (t emit tokens)
           :else (recur (rest transforms)))))))
 
 (defn gatherTo [stop tokens]
@@ -68,11 +69,18 @@
   (let [[internal remain] (readUntil emit \) (rest tokens))]
     (list (concat "(" internal ")") remain)))
 
+(defn driver [emit tokens] 
+  (if (empty? tokens)
+    '(() ())
+    (let [[done remain] (emit emit tokens)
+          [step leftovers] (driver emit remain)]
+      (list (concat done step) leftovers))))
+
 (defn parseProgram [src]
   "string -> tree: Parses stencil program from a string."
   (let [[srcLs remain] 
-          (readList 
-             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)(~startList? ~readList))) 
+          (driver
+            (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)(~startList? ~readList))) 
              src)
         source (apply str srcLs)]
     (read-string source)))
