@@ -6,7 +6,7 @@
   [program]
   (match [program]
     [([(top :guard isTop?) id & parts] :seq)] `(~top (~'$id ~id) ~@(map tagTops parts))
-    :else (cons '$policy program)))
+    :else program))
 
 (declare tagExpr)
 
@@ -30,7 +30,7 @@
 (defn- tagPolicies 
   [program]
   (match [program]
-    [(['$policy kind & policy] :seq)] `(~'$policy (~'$id ~kind) ~@((ptaggers kind) policy))
+    [(['$policy kind & policy] :seq)] `((~'$policy ~kind) ~@((ptaggers kind) policy))
     [([ a & x] :seq)] (map tagPolicies (cons a x))
     :else program))
 

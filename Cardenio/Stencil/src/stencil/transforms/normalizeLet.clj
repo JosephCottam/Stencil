@@ -19,7 +19,7 @@
 (defn gatherBindings
   [lines]
   (match [lines]
-    [([(['$op-colon names body] :seq) & rest] :seq)]  (concat names (gatherBindings rest))
+    [([(['$C names body] :seq) & rest] :seq)]  (concat names (gatherBindings rest))
     :else '()))
 
 (defn makeBody
@@ -31,7 +31,7 @@
 (defn ensureBody
   [lines]
   (match [(last lines)]
-    [(['$op-colon vars ops] :seq)] (concat lines (makeBody lines))
+    [(['$C vars ops] :seq)] (concat lines (makeBody lines))
     :else lines))
 
 

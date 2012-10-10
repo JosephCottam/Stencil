@@ -12,7 +12,7 @@
   (is (= (ps "##(a b c)") '($ptuple a b c)))
   (is (= (ps "##())") '($ptuple)))
   (is (= (ps "(a : [int])") '(a (meta (int)))))
-  (is (= (ps "(a : b)") '(a $op-colon b)))
+  (is (= (ps "(a : b)") '(a $C b)))
   (is (= (ps "; some") '(comment " some")))
   (is (= (ps ";* some then more*;")) '(comment " some then more"))
   (is (= (ps "(;* some*; then more)")) '((comment " some") then more))

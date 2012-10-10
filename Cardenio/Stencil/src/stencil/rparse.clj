@@ -42,7 +42,7 @@
        (list (concat "(comment \"" comment "\")") remain)))
 
 (defn bind? [tokens] (= \: (first tokens)))
-(defn bind [emit tokens] (list " $op-colon " (rest tokens))) 
+(defn bind [emit tokens] (list " $C " (rest tokens))) 
 
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
