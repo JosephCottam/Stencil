@@ -1,38 +1,22 @@
 (in-ns 'stencil.transform)
 
-(defn- isTop? [n] (some (partial = n) '(stencil stream view table op const)))
-
-(defn- tagTops
-  [program]
-  (match [program]
-    [([(top :guard isTop?) id & parts] :seq)] `(~top (~'$id ~id) ~@(map tagTops parts))
-    :else program))
-
-(declare tagExpr)
-
-(defn tagLetLine [[op targets ex]] `(~op ~(map #(list '$id %) targets) ~(tagExpr ex)))
-
-(defn tagExpr [ex]
-  (match [ex]
-    [(ex :guard symbol?)] (list '$sym ex)
-    [(ex :guard value?)] (list '$value ex)
-    [(['let & letLines] :seq)] (list 'let (map tagLetLine letLines))
-    [([(op :guard symbol?) & args] :seq)] `((~'$op ~op) ~@(map tagExpr args))
-    :else (map tagExpr ex)))
-
-;;TODO: Make "kind" an ex as wel...
-(defn- tagRender [kind & args] `((~'$id ~kind) ~@(map tagExpr args)))
-(defn- tagFacet [facet] (identity facet))
-
-(defn- ptaggers [key] (or ({'renderer tagRender 'facet tagFacet} key) tagExpr))
-(defn- tagInPolicies [kind policy] ((ptaggers kind) policy))
-
-(defn- tagPolicies 
-  [program]
-  (match [program]
-    [(['$policy kind & policy] :seq)] `((~'$policy ~kind) ~@((ptaggers kind) policy))
-    [([ a & x] :seq)] (map tagPolicies (cons a x))
-    :else program))
+(defn form? [a] (some (partial = a) '(stencil stream view table op const let)))
+(defn tagged? [a] (and (list? a) (tag? (first a))))
+(defn tag? [a] (some (partial = a) '($policy $val)))
+(defn tagged-atom? [a] (and (list? a) (tag? (first a)) (atom? (second a)) (empty? (drop 2 a))))
+(defn policy-form? [a] (some (partial = a) '(stream view table op)))
 
 
-(defn tagElements [program] (-> program tagTops tagPolicies))
+(defn tag-elements 
+  ([program] (tag-elements false program))
+  ([tagPolicies? program]
+   (match [program]
+     [a :guard tagged-atom?] a
+     [a :guard atom?] (list '$val a)
+     [([(head :guard form?) & tail] :seq)] 
+        (cons head (map (partial tag-elements (policy-form? head)) tail))
+     [([(head :guard atom?) & tail] :seq)]
+         (if tagPolicies?
+           `((~'$policy ~head) ~@(map tag-elements tail))
+           (cons (tag-elements head) (map tag-elements tail)))
+     :else (map tag-elements program))))

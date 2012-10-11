@@ -28,5 +28,5 @@
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when tagElements))
+  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when tag-elements))
 
