@@ -1,5 +1,8 @@
 (in-ns 'stencil.transform)
 
+(defn namingContext? [n] 
+  (contains? #{stencil view table operator stream fields} n))
+
 (defn- qualify
   [prefix program]
   (match [program]

@@ -8,7 +8,7 @@
  (is (= (tag-elements '(stencil program)) '(stencil ($val program))))
  (is (= (tag-elements '(stencil program (table a))) '(stencil ($val program) (table ($val a)))))
  (is (= (tag-elements '(stencil program (table plot (data (range 0 1)))))
-        '(stencil ($val program) (table ($val plot) (($policy data) (($val range) ($val 0) ($val 1))))))))
+        '(stencil ($val program) (table ($val plot) (data (($val range) ($val 0) ($val 1))))))))
 
 (deftest test-liftInfix
   (is (= (infix->prefix '(a + b)) '(+ a b)))

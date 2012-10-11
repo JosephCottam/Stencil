@@ -1,11 +1,10 @@
 (in-ns 'stencil.transform)
 
-(defn form? [a] (some (partial = a) '(stencil stream view table op const let)))
+(defn form? [a] (contains? #{'stencil 'stream 'view 'table 'op 'const 'let} a))
 (defn tagged? [a] (and (list? a) (tag? (first a))))
-(defn tag? [a] (some (partial = a) '($policy $val)))
+(defn tag? [a] (contains? #{'$val} a))
 (defn tagged-atom? [a] (and (list? a) (tag? (first a)) (atom? (second a)) (empty? (drop 2 a))))
-(defn policy-form? [a] (some (partial = a) '(stream view table op)))
-
+(defn policy-form? [a] (contains? #{'stream 'view 'table 'op} a))
 
 (defn tag-elements 
   ([program] (tag-elements false program))
@@ -17,6 +16,6 @@
         (cons head (map (partial tag-elements (policy-form? head)) tail))
      [([(head :guard atom?) & tail] :seq)]
          (if tagPolicies?
-           `((~'$policy ~head) ~@(map tag-elements tail))
+           `(~head ~@(map tag-elements tail))
            (cons (tag-elements head) (map tag-elements tail)))
      :else (map tag-elements program))))

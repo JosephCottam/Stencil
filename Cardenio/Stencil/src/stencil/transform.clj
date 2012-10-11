@@ -12,11 +12,6 @@
   [x]
   (or (symbol? x) (value? x)))
 
-(defn namingContext? [n] 
-  (some #(= n %) '(stencil view table operator stream fields)))
-
-(defn tag? [x]
-  (some #(= x %) '($value)))
 
 ;(load "transforms/dropComments")
 (load "transforms/normalizeLet")

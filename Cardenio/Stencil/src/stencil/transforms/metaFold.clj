@@ -1,7 +1,7 @@
 (in-ns 'stencil.transform)
 
 (defn- metaParent? [n]
-   (some #(= n %) '(stencil view table operator stream value)))
+  (contains? #{stencil view table operator stream value} n))
 
 (defn- meta? [e]
    (and (list? e) (= 'meta (first e))))
