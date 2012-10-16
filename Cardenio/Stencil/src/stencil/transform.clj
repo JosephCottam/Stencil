@@ -19,7 +19,10 @@
 (load "transforms/pullTowhen")
 (load "transforms/tagElements")
 
-
+(defn validateParse
+  "tree->tree/error : Verifies that a parsed tree 'generally' correct after parsing.  
+   This validation is run before normalization, simplifying normalization by removing many checks."
+ [program] (-> program validateLetShape))
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
