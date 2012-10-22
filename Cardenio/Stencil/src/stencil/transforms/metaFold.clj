@@ -1,24 +1,23 @@
 (in-ns 'stencil.transform)
 
-(defn- metaParent? [n]
-  (contains? #{stencil view table operator stream value} n))
-
-(defn- meta? [e]
-   (and (list? e) (= 'meta (first e))))
+(defn meta? [e]
+   (and (list? e) (= '$meta (first e))))
    
-
-(defn- phasedFold
-  [program doFold]
-  (match [program]
-    ['meta & rst] `(meta ~rst)
-    [([tag :guard metaParent? & rst] :seq)] (list tag (phasedFold rst false))
-    [([maybe :guard list? meta :guard meta? & rst] :seq)]
-        (if doFold
-            (list (concat mabye meta) (phasedFold rst doFold))
-            (list maybe meta (phasedFold rst doFold)))
-    :else (map (partial phasedFold true) program)))
-
-(defn metaFold
+(defn foldMetadata
   "Folds meta-data into the preceeding tagged entity"
   [program]
-  (phasedFold program true))
+  (match [program]
+    [([head (mta :guard meta?) & tail] : seq)]
+       (if (list? head)
+         (list (concat head (list mta)) (metaFold tail))
+         (throw (RuntimeException. (str "Attempt to apply meta-data '" mta "' in disallowed context."))))
+    :else (map metaFold program)))
+
+;(defn metadataDict 
+   ;"Converts metadata definitions to dictionaries. If no key is supplied, a $Pn is generated with n as the index."
+  ;[program]
+  ;(match [program]
+    ;[(['$meta & args] :seq)]
+       
+    ;:else (map metadataDict program)))
+

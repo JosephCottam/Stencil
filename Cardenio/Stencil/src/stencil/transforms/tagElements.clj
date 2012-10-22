@@ -1,6 +1,6 @@
 (in-ns 'stencil.transform)
 
-(defn form? [a] (contains? #{'stencil 'stream 'view 'table 'op 'const 'let} a))
+(defn form? [a] (contains? #{'stencil 'stream 'view 'table 'op 'const 'let '$meta} a))
 (defn tag? [a] (contains? #{'$val} a))
 (defn tagged? [a] (and (list? a) (tag? (first a))))
 (defn tagged-atom? [a] (and (list? a) (tag? (first a)) (atom? (second a)) (empty? (drop 2 a))))

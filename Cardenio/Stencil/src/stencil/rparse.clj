@@ -54,7 +54,7 @@
 (defn stMeta? [tokens] (= '(\: \[) (take 2 (remove #(Character/isWhitespace %) tokens))))
 (defn stMeta  [emit tokens] 
   (let [[internal remain] (readUntil emit \] (rest (drop-while #(not= \[ %) tokens)))]
-    (list (concat "(meta (" internal "))") remain)))
+    (list (concat "($meta (" internal "))") remain)))
 
 (defn stString? [tokens] (= \" (first tokens)))
 (defn stString  [emit tokens]
