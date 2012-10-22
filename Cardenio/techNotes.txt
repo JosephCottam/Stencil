@@ -1,3 +1,10 @@
+Variables:
+ * You need a way to refer to a "current value" sometimes.  Especially with interaction.
+ * Needs to be more like a value, than a var...but the var is the name...ARG
+ * (value <name> (data from ....))
+ * Elsewhere (f <name> y z)
+ * Is this just tables with default reference values
+
 
 Binding types:
   By default, everything is stored.
