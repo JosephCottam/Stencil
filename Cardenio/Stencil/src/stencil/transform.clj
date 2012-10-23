@@ -1,6 +1,7 @@
 (ns stencil.transform
   "Tree transformation functions"
-  (:use [clojure.core.match :only (match)]))
+  (:use [clojure.core.match :only (match)])
+  (:require clojure.pprint))
 
 (defn value?
   "Items that are their own values."
@@ -18,6 +19,11 @@
 (load "transforms/infixToPrefix")
 (load "transforms/pullTowhen")
 (load "transforms/tagElements")
+(load "transforms/metas")
+
+(defn spp [program] 
+  "A pretty-printer for stencil."
+  (cleanMetas (clojure.pprint/pprint program)))
 
 (defn validateParse
   "tree->tree/error : Verifies that a parsed tree 'generally' correct after parsing.  
@@ -26,5 +32,5 @@
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when tag-elements))
+  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when supplyMetas))
 

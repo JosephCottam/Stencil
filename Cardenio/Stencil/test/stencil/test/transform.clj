@@ -39,3 +39,23 @@
   (is (thrown? RuntimeException (validateLetShape '(let (a b c) (d e f)))))
   (is (thrown? RuntimeException (validateLetShape '(let (a $C c) (d e f) (h i j))))))
 
+
+(deftest test-supplyMetas
+  (is (= (supplyMetas '(a)) '(a ($meta))))
+  (is (= (supplyMetas '(a ($meta))) '(a ($meta))))
+  (is (= (supplyMetas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (supplyMetas '(a ($meta) b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (supplyMetas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (supplyMetas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (supplyMetas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (supplyMetas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
+  (is (= (supplyMetas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta)))))
+
+
+(deftest test-cleanMetas
+  (is (= (cleanMetas 'a) 'a))
+  (is (= (cleanMetas '(a ($meta))) '(a)))
+  (is (= (cleanMetas '(a (b ($meta) c($meta)))) '(a (b c))))
+  (is (= (cleanMetas '(a ($meta stuff))) '(a ($meta stuff))))
+  (is (= (cleanMetas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
+         '(a ($meta stuff) (b ($meta stuff) c d ($meta stuff))))))
