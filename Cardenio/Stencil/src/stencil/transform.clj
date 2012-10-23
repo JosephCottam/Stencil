@@ -8,11 +8,14 @@
   [x]
   (or (number? x) (string? x)))
 
-(defn atom? 
-  "Items that are no longer divisible."
-  [x]
-  (or (symbol? x) (value? x)))
+(defn st-keyword?
+  [x] 
+  (some (partial = x) '(stencil table stream operator facet)))
 
+(defn atom? 
+  "Items that are no longer divisible, but not keywords."
+  [x]
+  (and (or (symbol? x) (value? x)) (not (st-keyword? x))))
 
 ;(load "transforms/dropComments")
 (load "transforms/normalizeLet")

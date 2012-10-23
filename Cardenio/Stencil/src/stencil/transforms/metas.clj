@@ -30,23 +30,20 @@
        `(~a (~'$meta) ~@(supplyMetas tail))
     [([a & tail] :seq)]
        (cons (supplyMetas a) (supplyMetas tail))))
-   
+  
 
 (defn- hasType? [metas]
-  (cond
-    (null? metas) false
-    (and (list? (first metas)) (= 'type (first (first metas)))) true
-    :else (hasType? (rest metas))))
+  (some (partial = 'type) (map #(if (list? %) (first %) %) (second metas))))
 
-(defn- justTypes [metas]
-  (if (hasType? metas)
-       metas
-       (match [program]
-         [(['value val :guard symbol?] :seq)] (list 'type val)
+(defn- addType [metas]
+  (let [[before after] (split-with list? (second metas))
+        [head & tail] after]
+    (list '$meta (concat before (cons (list 'type head) tail)))))
 
 (defn metaTypes
   "Identify data types in meta statements."
   [program]
   (match [program]
-    [a :guard meta?] (justTypes rest)
+    [a :guard #(and (meta? %)  (hasType? %))] a
+    [a :guard meta?] (addType a)
     :else (map metaTypes program)))

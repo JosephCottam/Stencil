@@ -2,14 +2,6 @@
   (:use [stencil.transform])
   (:use [clojure.test]))
 
-(deftest test-tag
- (is (= (tag-elements 'a) '($val a)))
- (is (= (tag-elements '(a)) '(($val a))))
- (is (= (tag-elements '(stencil program)) '(stencil ($val program))))
- (is (= (tag-elements '(stencil program (table a))) '(stencil ($val program) (table ($val a)))))
- (is (= (tag-elements '(stencil program (table plot (data (range 0 1)))))
-        '(stencil ($val program) (table ($val plot) (data (($val range) ($val 0) ($val 1))))))))
-
 (deftest test-liftInfix
   (is (= (infix->prefix '(a + b)) '(+ a b)))
   (is (= (infix->prefix '(+ a b)) '(+ a b)))
@@ -51,6 +43,13 @@
   (is (= (supplyMetas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
   (is (= (supplyMetas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta)))))
 
+(deftest test-metaTypes
+  (is (= (metaTypes '($meta (a))) '($meta ((type a)))))
+  (is (= (metaTypes '($meta ((type a)))) '($meta ((type a)))))
+  (is (= (metaTypes '($meta (a (type b)))) '($meta (a (type b)))))
+  (is (= (metaTypes '($meta ((some a) (type b)))) '($meta ((some a) (type b)))))
+  (is (= (metaTypes '($meta (a b))) '($meta ((type a) b)))))
+  
 
 (deftest test-cleanMetas
   (is (= (cleanMetas 'a) 'a))
