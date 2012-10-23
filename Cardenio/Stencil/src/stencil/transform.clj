@@ -18,7 +18,6 @@
 (load "transforms/normalizeLet")
 (load "transforms/infixToPrefix")
 (load "transforms/pullTowhen")
-(load "transforms/tagElements")
 (load "transforms/metas")
 
 (defn spp [program] 

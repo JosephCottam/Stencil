@@ -8,8 +8,10 @@
   "Is this a meta-expression with no data?"
   (and (meta? e) (= 1 (count e))))
 
+
+
 (defn cleanMetas
-  "Remove empty metas."
+  "Remove empty metas...mostly for pretty-printing"
   [program]
   (if (list? program)
     (map cleanMetas (remove emptyMeta? program))
@@ -29,3 +31,22 @@
     [([a & tail] :seq)]
        (cons (supplyMetas a) (supplyMetas tail))))
    
+
+(defn- hasType? [metas]
+  (cond
+    (null? metas) false
+    (and (list? (first metas)) (= 'type (first (first metas)))) true
+    :else (hasType? (rest metas))))
+
+(defn- justTypes [metas]
+  (if (hasType? metas)
+       metas
+       (match [program]
+         [(['value val :guard symbol?] :seq)] (list 'type val)
+
+(defn metaTypes
+  "Identify data types in meta statements."
+  [program]
+  (match [program]
+    [a :guard meta?] (justTypes rest)
+    :else (map metaTypes program)))
