@@ -10,7 +10,7 @@
 
 (defn st-keyword?
   [x] 
-  (some (partial = x) '(stencil table stream operator facet)))
+  (some (partial = x) '(facet import operator stencil table stream)))
 
 (defn atom? 
   "Items that are no longer divisible, but not keywords."
@@ -22,6 +22,7 @@
 (load "transforms/infixToPrefix")
 (load "transforms/pullTowhen")
 (load "transforms/metas")
+(load "transforms/imports")
 
 (defn spp [program] 
   "A pretty-printer for stencil."
@@ -34,5 +35,14 @@
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
-  [program] (-> program normalizeLetShape infix->prefix defaultLetBody pull->when supplyMetas))
+  [program] 
+   (-> program 
+    ensureRuntimeImport
+    normalizeLetShape infix->prefix defaultLetBody 
+    pull->when supplyMetas metaTypes))
+
+(defn imports
+  "tree -> modules: process the imports from the program"
+  [program]
+  {})
 

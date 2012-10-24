@@ -8,15 +8,6 @@
   "Is this a meta-expression with no data?"
   (and (meta? e) (= 1 (count e))))
 
-
-
-(defn cleanMetas
-  "Remove empty metas...mostly for pretty-printing"
-  [program]
-  (if (list? program)
-    (map cleanMetas (remove emptyMeta? program))
-    program))
-
 (defn supplyMetas
   "Ensure that there is a meta expression after every atom."
   [program]
@@ -41,9 +32,20 @@
     (list '$meta (concat before (cons (list 'type head) tail)))))
 
 (defn metaTypes
-  "Identify data types in meta statements."
+  "Identify data types in meta statements.
+  TODO: REMOVE THIS AND REPLACE WITH A MORE COMPLETE METADATA LABELING MECHANISM."
   [program]
   (match [program]
     [a :guard #(and (meta? %)  (hasType? %))] a
     [a :guard meta?] (addType a)
     :else (map metaTypes program)))
+
+
+(defn cleanMetas
+  "Remove empty metas...mostly for pretty-printing"
+  [program]
+  (if (list? program)
+    (map cleanMetas (remove emptyMeta? program))
+    program))
+
+

@@ -6,7 +6,10 @@
   (println "Compling from" from "to" to "(but not really...yet)"))
 
 (defn compileStencil [program]
-  (-> program stencil.transform/validateParse stencil.transform/normalize))
+  (let [_ (stencil.transform/validateParse program)
+        program (stencil.transform/normalize program)
+        modules (stencil.transform/imports program)]
+     program))
 
 (defn parseStencil [program]
   "string -> tree: Parses a stencil program from a string."

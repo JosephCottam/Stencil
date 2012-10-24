@@ -58,3 +58,11 @@
   (is (= (cleanMetas '(a ($meta stuff))) '(a ($meta stuff))))
   (is (= (cleanMetas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
          '(a ($meta stuff) (b ($meta stuff) c d ($meta stuff))))))
+
+
+(deftest test-ensureRuntime
+  (is (= (ensureRuntimeImport '(stencil test (import picoRuntime))) 
+         '(stencil test (import picoRuntime))))
+  (is (= (ensureRuntimeImport '(stencil test)) 
+         '(stencil test (import javaPico)))))
+
