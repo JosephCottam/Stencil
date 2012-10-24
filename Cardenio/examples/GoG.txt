@@ -1,0 +1,37 @@
+Integrating the grammar of graphics in Cardenion is based on the data language.
+
+(table source 
+  (fields 'a 'b 'c 'd))
+
+(table plot
+  (gog (data source) (x: a) (y: b) (color: c) (geom: line))
+  (guide trendline))
+
+(extend plot (mouseover (color: 'RED)))
+
+The idea is that GoG is an alternative way to specify schemas.  
+   This can be a "policy" type.  It compiles out to a stencil statment
+   in the standard form.   Furthermore, you can then begin to attach
+   other policy and combinator types.  For exmaple, the trendline or the 
+   mouseover extension.
+
+
+(table plot
+  ;;Expansion of GoG
+  (data (pull source
+     (let (x: a)
+          (y: b)
+          (color : c))))
+  (render line)
+
+  (value backupColor)
+
+  ;;Expansion of the extension
+  (data (from mouseEnter
+    (let (ID: id) (color: 'RED) (backupColor: color))))
+  (data (from mouseExit
+    (let (ID: id) (color: backupColor))))
+ (guide trendline)) 
+
+
+

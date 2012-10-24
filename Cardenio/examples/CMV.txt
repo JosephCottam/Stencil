@@ -1,0 +1,109 @@
+
+Combinators for Information Visualization -- 
+
+
+Many common visualization ingredients must be re-encoded for each visualization produced.
+For example, most visualization libraries require direct encoding of guides and "by-hand" registration of event callbacks for interaction. This persists, despite the fact that these activities have very common implementation patterns.  We propose a declarative means of implementing these (and other common patterns) via combinators of visualization schemas.  Combinators are functions with no free variables, commonly used in functional programming to combine the effects of multiple functions.  Since they have no free variables, the application of combinators is context independent.  Coupled with an ability to inspect a schema, combinators can extend an existing visualization with new capabilities.  This way of thinking about visualization construction sheds light on the ability of ggplot2 (and other R libraries) and Stencil to automatically construct appropriate guides.  We show that the same capability can be used to apply common interaction patterns to and compose multi-view systems from simpler visualization schemas.
+
+
+
+An example...
+Here is a basic scatterplot program.  It takes a (made up) data set of buildings and makes a scatter-plot of building type (think hotel, grocer, etc) and height.
+
+(table buildings
+   (distribute group 'type )
+   (file "buildings.txt")
+   (fields 'name 'type 'height 'width 'lat 'lon))
+
+(table Mouse
+  (fiedls 'lat 'long)
+  (data (data pull ###mousehandler))
+  (retain 'last)))
+
+(table scatter
+   (render 'point)
+   (table …
+     (render 
+   (data (pull buildings
+     (let (ID: name)
+          (X : (sort type))
+          (Y : height))))
+
+
+Now lets add some guides:
+(extend scatter 
+	(guide axis:[categorical] X
+         (pen: {weight: 15}))))
+(extend scatter (guide axis:[linear] Y))
+
+The "extend" and "guide" operators are combinators.  "Extend" adds parts to an existing plot.  "Guide" takes a guide type ("axis" in this case) and a path to the schema.  These expand out into programs that describe axis lines, tick-marks, labels and monitoring of the buildings data table so the guides stay in synch with the plot.
+
+
+A bit of interaction…
+(extend scatter (mouseover (guide label ID) (toggle 'visible)))
+
+The guide generates as before, but mouseover is another combinator that adds the event callback code so the label is only visible on mouse-over.
+
+
+CMV:  
+First to add another plot, a map (rudimentary) of locations--
+(table map
+  (background "fancyMap.png")
+  (data (pull buildings
+    (let (ID: name)
+         ((X,Y) : (lat, lon)))))
+
+
+Now link the views ...
+(link mosueover 
+   (map (let (fill:Red)))
+   (scatter (let (fill:Red))
+   (on (= map.ID scatter.ID)))
+
+
+"Link" is a combinator.  It takes an event type ("mouseover") that will be used to extend every table in the link set.  Then you provide a list of rules for each table to extend.  It also defines a linking function, which is ID equality in this case.  I think this might be a way to expose Chris North's "Snap Together" framework.  
+
+The basic language describes scene-graphs, so if you can get access to a scene-graph and data graph in the underlying representation.  Similar combinators can probably be built for any language.
+
+For completeness, put them both on the screen side-by-size...
+(view
+  (window map (X:0, Y:0, W:100,H:100)) 
+  (window scatter (X:110, Y:0, W: 100, H:100)))
+
+
+
+
+Non incremental program ----------------------------------------------------------------------
+
+(table buildings
+   (file "buildings.txt")
+   (fields 'name 'type 'height 'width 'lat 'lon))
+
+(table scatter
+   (data (pull buildings
+     (let (ID: name)
+          (X : (sort type))
+          (Y : height)))
+   (guide axis X)
+   (guide axis Y)
+   (mouseover (guide label ID)))
+
+
+
+(table map
+  (background "fancyMap.png")
+  (data (pull buildings
+    (let (ID: name)
+         ((X,Y) : (lat, lon)))))
+
+
+(link mosueover 
+   (map (let (fill:Red)))
+   (scatter (let (fill:Red))
+   (on (= map.ID scatter.ID)))
+
+(view
+  (window map (X:0, Y:0, W:100,H:100)) 
+  (window scatter (X:110, Y:0, W: 100, H:100)))
+
+
