@@ -1,21 +1,8 @@
 (ns stencil.transform
   "Tree transformation functions"
   (:use [clojure.core.match :only (match)])
+  (:use stencil.compile)
   (:require clojure.pprint))
-
-(defn value?
-  "Items that are their own values."
-  [x]
-  (or (number? x) (string? x)))
-
-(defn st-keyword?
-  [x] 
-  (some (partial = x) '(facet import operator stencil table stream)))
-
-(defn atom? 
-  "Items that are no longer divisible, but not keywords."
-  [x]
-  (and (or (symbol? x) (value? x)) (not (st-keyword? x))))
 
 ;(load "transforms/dropComments")
 (load "transforms/normalizeLet")

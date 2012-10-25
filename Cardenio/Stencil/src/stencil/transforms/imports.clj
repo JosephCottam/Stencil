@@ -1,6 +1,6 @@
 (in-ns 'stencil.transform)
 
-(def *default-runtime* 'javaPico)
+(def ^:dynamic *default-runtime* 'javaPico)
 (defn ensureRuntimeImport
    "Ensure that there is a runtime in the imports list."
    [program]

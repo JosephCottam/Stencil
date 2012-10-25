@@ -1,13 +1,5 @@
 (in-ns 'stencil.transform)
 
-(defn meta? [e]
-  "Is this a meta expression?"
-   (and (list? e) (= '$meta (first e))))
-
-(defn emptyMeta? [e]
-  "Is this a meta-expression with no data?"
-  (and (meta? e) (= 1 (count e))))
-
 (defn supplyMetas
   "Ensure that there is a meta expression after every atom."
   [program]

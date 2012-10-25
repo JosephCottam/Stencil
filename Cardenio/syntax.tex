@@ -29,14 +29,9 @@ Policies :
   (retain  <condition>...)
      ;;Only valid on table 
      ;;Any whole-table condition will be executed after per-item conditions
-  (render <id> (guide <decl>...) <tuple-expr>)
+  (render <id> <tuple-expr>)
      ;;Only valid in table definitions, indicates how to render the data
-     ;;Guide declarations tell something to do with the rules,
-        can refer to the things that CONTAIN the renderer declaration as
-        well, but not "upstream" dependencies
-        I'm not ecstatic about placing guides here...maybe they should be
-        top-level or attached to the view...
-  (render-GOG <GOG expression>)
+  (GOG <GOG expression>)
     ;;Define a grammar-of-graphics transform on the data
     ;;The GOG expression is not well defined right now
   (guide (<type> <from-table> <for-field> <sample-type> <tuple-expr>) ...)
@@ -82,9 +77,8 @@ Generators
    ;; The type of the from determines exactly what that means
    ;; Stream will just get one tuple at a time
    ;; Table will iterate the whole table whenever the table changes in some way
-   ;; stream: (when (changed <from>) (item <from>) <tuple-expr>) 
-   ;; table: (when (changed <from>)  (items <from>) <tuple-expr>) 
-(init (<tuple>...) <tuple-expr>)
+   ;; (when (changed <from>)  (items <from>) <tuple-expr>) 
+(init (<tuple*-expr>) <tuple-expr>)
    ;; Generates the given set of values
    ;; (when (start-of-program) (tuples <tuple> ...) <tuple-expr>)
 
