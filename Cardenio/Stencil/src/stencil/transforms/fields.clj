@@ -1,18 +1,12 @@
-(in-ns 'stencil.emit)
-
+(in-ns 'stencil.transform)
 
 (defn stream-or-table? [v] (or (= 'stream v) (= 'table v)))
 
 (defn filter-policies 
-  "policy* -> policy*: Filter a list of policies to just the requested policy type"
-  [policy policies] (filter #(= (first %) policy) policies))
-
-(defn default-for-type [type]
-  (case type
-    (int long float double number) 0
-    string ""
-    (throw (RuntimeException. (str "Default not known for type " type)))))
-
+  "[test,] condition, policy* -> policy*: Filter a list of policies per the test and condition. 
+  Test is invoked once for each policy in policy*.  Default test is '='"
+  ([condition policies] (filter-policies = condition policies))
+  ([test condition policies] (filter #(test (first %) condition) policies)))
 
 (defn expr->fields [expr]
   (defn ensure-parts [name meta]
@@ -48,16 +42,17 @@
    After execution, fields policy will include type and default value in its metadata."
   [program]
   (match [program]
+    [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
       (let [fields (filter-policies 'fields policies)
             fields (if (empty? fields) 
                      (expr->fields (ffirst (filter-policies 'data policies)))
                      fields)]
-        `(~tag ~name ~fields ~@policies))
+        `(~tag ~name ~fields ~meta ~@policies))
     :else (map ensureFields program)))
       
 
-
+;;;------------------------------------------------------------------------------------------------------------
 (defn validateFields
   "Test if the 'fields' policy covers the names used in all of the 'data' policies.
    'fields' may include names NOT in a 'data', if that field also has a default value."
@@ -69,10 +64,43 @@
         (clojure.set/subset? fields (meta-keys (expr->fields (ffirst data)))))))
 
   (match [program]
+    [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
       (let [fields (filter-policies 'fields policies)
             data   (filter-policies 'data policies)]
         (map (covers fields) data))
     :else (map validateFields program)))
+
+;;;------------------------------------------------------------------------------------------------------------
+(defn defaults->fields
+  "Merge defaults statement into fields statement.  Assumes that there is a fields statement.
+  If there is a conflict between defaults already present and supplied defauts statement, supplied statement wins."
+  [program]
+
+  (defn extendWith [defaults]
+    (fn [field meta]
+      (if (contains? defaults field)
+        (map->meta (assoc (meta->map meta) 'default (defaults field)))
+         meta)))
+
+  (defn extendFields [fields defaults]
+    (if (or (= 0 (count fields)) (= 0 (count defaults)))
+      fields
+      (let [names (take-nth 2 fields)
+            metas (take-nth 2 (rest fields))]
+        (interleave names (map (extendWith defaults) names metas)))))
+  
+  
+  (match [program]
+    [a :guard atom?] a 
+    [a :guard empty?] a 
+    [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
+      (let [fields   (rest (first (filter-policies 'fields policies)))
+            defaults (lop->map (rest (first (filter-policies 'defaults policies))))]
+          (let [inner (map defaults->fields policies)
+                reduced (filter-policies (complement any=) '(defaults fields) policies)
+                fields (cons 'fields (extendFields fields defaults))]
+          `(~tag ~name ~meta ~fields ~@reduced)))
+    :else (map defaults->fields program)))
 
 

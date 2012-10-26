@@ -2,6 +2,12 @@
   (:require [stencil.compile :as c])
   (:use [clojure.test]))
 
+(deftest default-for-type 
+  (is (= (c/default-for-type 'int) 0))
+  (is (= (c/default-for-type 'double) 0))
+  (is (= (c/default-for-type 'float) 0))
+  (is (= (c/default-for-type 'long) 0))
+  (is (= (c/default-for-type 'string) "")))
 
 (deftest meta->map
   (is (= (c/meta->map '($meta)) {}))

@@ -16,7 +16,7 @@
   
 
 (defn- hasType? [metas]
-  (some (partial = 'type) (map #(if (list? %) (first %) %) (second metas))))
+  (any= 'type (map #(if (list? %) (first %) %) (second metas))))
 
 (defn- addType [metas]
   (let [[before after] (split-with list? (second metas))

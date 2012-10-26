@@ -10,6 +10,7 @@
 (load "transforms/pullTowhen")
 (load "transforms/metas")
 (load "transforms/imports")
+(load "transforms/fields")
 
 (defn spp [program] 
   "A pretty-printer for stencil."
