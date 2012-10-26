@@ -41,16 +41,13 @@
   "Is this a meta-expression with no data?"
   (and (meta? e) (= 1 (count e))))
 
-(defn meta->map [m] (lop->map (second m)))
-(defn map->meta [m]
-  (let [lop (map->lop m)]
-    (if (= 0 (count lop))
-      '($meta)
-      `(~'$meta ~lop))))
+(defn meta-keys [m] (set (map first (rest m))))
+(defn meta-vals [m] (map second (rest m)))
+(defn map->meta [m] (cons '$meta (map->lop m)))
+(defn meta->map 
+  "Makes a map out of the pairs in a meta.  Bare values are dropped."
+  [m] (lop->map (filter list? m))) 
 
-
-(defn meta-keys [m] (set (map first (second m))))
-(defn meta-vals [m] (map second (second m)))
 
 
 (defn default-for-type [type]

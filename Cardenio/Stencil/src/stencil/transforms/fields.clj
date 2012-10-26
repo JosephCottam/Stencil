@@ -74,7 +74,9 @@
 ;;;------------------------------------------------------------------------------------------------------------
 (defn defaults->fields
   "Merge defaults statement into fields statement.  Assumes that there is a fields statement.
-  If there is a conflict between defaults already present and supplied defauts statement, supplied statement wins."
+  If there is a conflict between defaults already present and supplied defauts statement, supplied statement wins.
+  TODO: By moving the defaults into the meta, they are assumed to be CONSTANTS.  
+  Extend to handle statically evaluatable expressions."
   [program]
 
   (defn extendWith [defaults]
@@ -90,10 +92,8 @@
             metas (take-nth 2 (rest fields))]
         (interleave names (map (extendWith defaults) names metas)))))
   
-  
   (match [program]
     [a :guard atom?] a 
-    [a :guard empty?] a 
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
       (let [fields   (rest (first (filter-policies 'fields policies)))
             defaults (lop->map (rest (first (filter-policies 'defaults policies))))]

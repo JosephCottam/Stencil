@@ -15,13 +15,12 @@
        (cons (supplyMetas a) (supplyMetas tail))))
   
 
-(defn- hasType? [metas]
-  (any= 'type (map #(if (list? %) (first %) %) (second metas))))
+(defn- hasType? [metas] (contains? (meta->map metas) 'type))
 
 (defn- addType [metas]
-  (let [[before after] (split-with list? (second metas))
+  (let [[before after] (split-with list? (rest metas))
         [head & tail] after]
-    (list '$meta (concat before (cons (list 'type head) tail)))))
+    (cons '$meta (concat before (cons (list 'type head) tail)))))
 
 (defn metaTypes
   "Identify data types in meta statements.
