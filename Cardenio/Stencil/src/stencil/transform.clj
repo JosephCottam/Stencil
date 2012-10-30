@@ -23,6 +23,7 @@
 (load "transforms/pullTowhen")
 (load "transforms/metas")
 (load "transforms/imports")
+(load "transforms/bindingWhen")
 
 (defn spp [program] 
   "A pretty-printer for stencil."

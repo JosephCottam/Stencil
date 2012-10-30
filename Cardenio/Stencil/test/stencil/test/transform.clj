@@ -66,3 +66,19 @@
   (is (= (ensureRuntimeImport '(stencil test)) 
          '(stencil test (import javaPico)))))
 
+
+(deftest test-binding-when
+  (is (= (binding-when '()) '()))
+  (is (= (binding-when '(stencil test)) '(stencil test)))
+  (is (= (binding-when '(stencil test 
+                         (stream input (fields x)) 
+                         (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))
+         '(stencil test 
+           (stream input (fields x)) 
+           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x))))))))
+  (is (= (binding-when '(stencil test 
+                         (stream input (fields x)) 
+                         (table t (data (when (delta input) (items input) (let (x:x)))))))
+         '(stencil test 
+           (stream input (fields x)) 
+           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))))
