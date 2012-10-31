@@ -1,7 +1,7 @@
 (in-ns 'stencil.transform)
 
 ;; ------- Validate Let-----
-(defn hasBind? [line] (and (list? line) (some (partial = '$C) line)))
+(defn hasBind? [line] (and (list? line) (any= '$C line)))
 
 (defn- validateLineShape
   [lines]

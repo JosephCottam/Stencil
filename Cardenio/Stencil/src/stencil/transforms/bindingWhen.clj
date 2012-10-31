@@ -8,13 +8,13 @@
    (defn findPrototype 
      "Search the program for the tuple source of the given name."
       [name]
-      '(PLACEHOLDER))
+      'PLACEHOLDER)
 
-   (defn binding [generator] '(PLACEHOLDER))
+   (defn binds [generator] 'PLACEHOLDER)
 
    (match [program]
-     [a :guard atom?] a
-     [(['when cond gen trans] :seq)] 
-       `(~'when+ ~cond ~gen ~(binding gen) ~trans)
-     :else (map binding-when program))
+     [(a :guard atom?)] a
+     [(['when cond gen trans] :seq)]
+       `(~'when+ ~cond ~gen ~(binds gen) ~trans)
+     :else (map binding-when program)))
 

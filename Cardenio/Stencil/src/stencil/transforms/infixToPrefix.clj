@@ -1,6 +1,5 @@
 (in-ns 'stencil.transform)
 
-
 (defn defaultInfix? [x] (and (symbol? x) (every? #(not (. Character isLetterOrDigit %)) (name x))))
 (defn toggled? [x] (and (symbol? x) (= \' (last (name x)))))
 
@@ -13,8 +12,6 @@
   (if (toggled? x) 
     (symbol (apply str (butlast (name x))))
     x))
-
-(defn meta? [x] (and (list? x) (= 'meta (first x))))
 
 (defn- stripToggles [program]
   (match [program]

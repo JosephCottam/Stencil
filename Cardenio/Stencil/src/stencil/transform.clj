@@ -1,21 +1,8 @@
 (ns stencil.transform
   "Tree transformation functions"
   (:use [clojure.core.match :only (match)])
+  (:use stencil.compile)
   (:require clojure.pprint))
-
-(defn value?
-  "Items that are their own values."
-  [x]
-  (or (number? x) (string? x)))
-
-(defn st-keyword?
-  [x] 
-  (some (partial = x) '(facet import operator stencil table stream)))
-
-(defn atom? 
-  "Items that are no longer divisible, but not keywords."
-  [x]
-  (and (or (symbol? x) (value? x)) (not (st-keyword? x))))
 
 ;(load "transforms/dropComments")
 (load "transforms/normalizeLet")
@@ -24,13 +11,14 @@
 (load "transforms/metas")
 (load "transforms/imports")
 (load "transforms/bindingWhen")
+(load "transforms/fields")
 
 (defn spp [program] 
   "A pretty-printer for stencil."
   (cleanMetas (clojure.pprint/pprint program)))
 
 (defn validateParse
-  "tree->tree/error : Verifies that a parsed tree 'generally' correct after parsing.  
+  "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
    This validation is run before normalization, simplifying normalization by removing many checks."
  [program] (-> program validateLetShape))
 
@@ -40,7 +28,8 @@
    (-> program 
     ensureRuntimeImport
     normalizeLetShape infix->prefix defaultLetBody 
-    pull->when supplyMetas metaTypes))
+    pull->when supplyMetas metaTypes
+    ensureFields validateFields defaults->fields))
 
 (defn imports
   "tree -> modules: process the imports from the program"

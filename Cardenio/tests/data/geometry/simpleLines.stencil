@@ -1,6 +1,5 @@
 (stream values 
-  (fields v)
-  (data (range 0 10)))
+  (data (init (split (range 0 10)) (let (v: [0])))))
 
 (table plot
   (render (text "simpleLines_test.tuples"))
