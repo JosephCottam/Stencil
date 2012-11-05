@@ -7,7 +7,7 @@
 ;(load "transforms/dropComments")
 (load "transforms/normalizeLet")
 (load "transforms/infixToPrefix")
-(load "transforms/pullTowhen")
+(load "transforms/convertToWhen")
 (load "transforms/metas")
 (load "transforms/imports")
 (load "transforms/fields")
@@ -27,8 +27,9 @@
    (-> program 
     ensureRuntimeImport
     normalizeLetShape infix->prefix defaultLetBody 
-    pull->when supplyMetas metaTypes
-    ensureFields validateFields defaults->fields))
+    file->init pull->when init->when
+    supplyMetas metaTypes
+    ensureFields validateFields display->fields defaults->fields))
 
 (defn imports
   "tree -> modules: process the imports from the program"

@@ -72,35 +72,39 @@
     :else (map validateFields program)))
 
 ;;;------------------------------------------------------------------------------------------------------------
-(defn defaults->fields
-  "Merge defaults statement into fields statement.  Assumes that there is a fields statement.
-  If there is a conflict between defaults already present and supplied defauts statement, supplied statement wins.
-  TODO: By moving the defaults into the meta, they are assumed to be CONSTANTS.  
-  Extend to handle statically evaluatable expressions."
-  [program]
-
-  (defn extendWith [defaults]
+(defn fold-into-fields
+  "Merge a policy statement into fields statement.  Assumes that there is a fields statement.
+  If there is a conflict between elements already present and supplied defauts statement, the new  value wins."
+  [policy-tag meta-tag]
+  (defn extendWith [items]
     (fn [field meta]
-      (if (contains? defaults field)
-        (map->meta (assoc (meta->map meta) 'default (defaults field)))
-         meta)))
+      (if (contains? items field)
+        (map->meta (assoc (meta->map meta) meta-tag (items field)))
+        meta)))
 
-  (defn extendFields [fields defaults]
-    (if (or (= 0 (count fields)) (= 0 (count defaults)))
+  (defn extendFields [fields items]
+    (if (or (= 0 (count fields)) (= 0 (count items)))
       fields
       (let [names (take-nth 2 fields)
             metas (take-nth 2 (rest fields))]
-        (interleave names (map (extendWith defaults) names metas)))))
-  
-  (match [program]
-    [a :guard atom?] a 
-    [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
+        (interleave names (map (extendWith items) names metas)))))
+
+  (fn folder [program]
+    (match [program]
+      [a :guard atom?] a 
+      [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
       (let [fields   (rest (first (filter-policies 'fields policies)))
-            defaults (lop->map (rest (first (filter-policies 'defaults policies))))]
-          (let [inner (map defaults->fields policies)
-                reduced (filter-policies (complement any=) '(defaults fields) policies)
-                fields (cons 'fields (extendFields fields defaults))]
+            source (lop->map (rest (first (filter-policies policy-tag policies))))]
+        (let [inner (map folder policies)
+              reduced (filter-policies (complement any=) (list policy-tag 'fields) policies)
+              fields (cons 'fields (extendFields fields source))]
           `(~tag ~name ~meta ~fields ~@reduced)))
-    :else (map defaults->fields program)))
+      :else (map folder program))))
 
 
+(defn defaults->fields [program]
+  "TODO: By moving the these items into the meta, they are assumed to be CONSTANTS.  
+  Extend to handle statically evaluatable expressions."
+  ((fold-into-fields 'defaults 'default) program))
+
+(defn display->fields [program] ((fold-into-fields 'display 'display) program))

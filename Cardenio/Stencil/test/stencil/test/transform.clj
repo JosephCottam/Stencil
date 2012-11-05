@@ -75,6 +75,11 @@
   (is (= (t/expr->fields '(let [a true] (ptuple '(a ($meta (type int))) 1)))
          '(fields (a ($meta (default 0) (display "a")  (type int)))))))
 
+(deftest display->fields
+  (is (= (t/display->fields '(table x ($meta) (fields a ($meta) b ($meta)))) 
+         '(table x ($meta) (fields a ($meta) b ($meta)))))
+  (is (= (t/display->fields '(table x ($meta) (fields a ($meta) b ($meta)) (display (a "AYE") (b "BEE"))) )
+         '(table x ($meta) (fields a ($meta (display "AYE")) b ($meta (display "BEE")))))))
 
 (deftest defaults->fields
   (is (= (t/defaults->fields '(table x ($meta) (fields a ($meta) b ($meta)))) 
