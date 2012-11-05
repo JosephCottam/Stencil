@@ -5,12 +5,21 @@
    that includes information about the bindings.  This simplifies
    scope tracking later. To denote this change, 'when' becomes 'when+'."
    [program]
+
    (defn findPrototype 
-     "Search the program for the tuple source of the given name."
+     "Search the program for the tuple source of the given name.
+      TODO: There is problem with this...it assuems a fla' namespace,
+            but stencil programs define non-flat namespaces."
       [name]
       'PLACEHOLDER)
 
-   (defn binds [generator] 'PLACEHOLDER)
+   (defn binds [generator] 
+      (match [generator]
+        [(['delta source] :seq)] (findPrototype source)
+        [(['items source] :seq)] (findPrototype source)
+
+        :else (throw (RuntimeException. (str "Generator expression not recognized" generator))))
+   'PLACEHOLDER)
 
    (match [program]
      [(a :guard atom?)] a
