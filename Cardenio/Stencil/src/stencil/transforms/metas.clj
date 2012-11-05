@@ -1,16 +1,22 @@
 (in-ns 'stencil.transform)
 
+(defn- atom-not-form? [a] (and (atom? a) (not (stencil-form? a))))
+
 (defn supplyMetas
   "Ensure that there is a meta expression after every atom."
   [program]
   (match [program]
-    ;[a :guard atom?] (list a '($meta))   ;; How do you associate metadata with just a value?  An expression that just returns the value would be nice: ($ex 3 ($meta)).  Can be safely added and removed.
-    [a :guard empty?] a
-    [([(a :guard atom?)] :seq)] (list a '($meta))
+    [(a :guard atom-not-form?)] a
+    [(a :guard atom?)] (list a '($meta))
+    
+    [(a :guard empty?)] a
+    
     [([(a :guard atom?) (b :guard meta?) & tail] :seq)] 
        `(~a ~b ~@(supplyMetas tail))
-    [([(a :guard atom?) & tail] :seq)] 
+    [([(a :guard atom-not-form?) & tail] :seq)] 
        `(~a (~'$meta) ~@(supplyMetas tail))
+    [([(a :guard atom?) & tail] :seq)] 
+       `(~a ~@(supplyMetas tail))
     [([a & tail] :seq)]
        (cons (supplyMetas a) (supplyMetas tail))))
   

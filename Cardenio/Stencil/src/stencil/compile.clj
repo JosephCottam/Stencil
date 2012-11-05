@@ -14,22 +14,22 @@
 (defn any=
   "item, coll->bool: Is the item in the collection?"
   [item coll]
-  (some (partial = item) coll))
+  (not (nil? (some (partial = item) coll))))
 
 (defn value?
   "Items that are their own values."
   [x]
   (or (number? x) (string? x)))
 
-(defn st-keyword?
-  "Keywords that are NOT expressions"
+(defn stencil-form?
+  "Forms are NOT expressions...but they often contain them."
   [x] 
-  (any= x '(facet import operator stencil table stream)))
+  (any= x '(facet import operator stencil table stream let)))
 
 (defn atom? 
-  "Items that are no longer divisible, but not keywords."
+  "Items that are no longer divisible, includes forms"
   [x]
-  (and (or (symbol? x) (value? x)) (not (st-keyword? x))))
+  (or (symbol? x) (value? x)))
 
 
 

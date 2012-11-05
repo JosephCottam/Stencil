@@ -10,6 +10,7 @@
 (load "transforms/convertToWhen")
 (load "transforms/metas")
 (load "transforms/imports")
+(load "transforms/bindingWhen")
 (load "transforms/fields")
 
 (defn spp [program] 

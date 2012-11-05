@@ -41,7 +41,9 @@
   (is (= (t/supplyMetas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supplyMetas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supplyMetas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
-  (is (= (t/supplyMetas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta)))))
+  (is (= (t/supplyMetas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
+  (is (= (t/supplyMetas '(stencil test)) '(stencil test ($meta))))
+  (is (= (t/supplyMetas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
 
 (deftest metaTypes
   (is (= (t/metaTypes '($meta a)) '($meta (type a))))
@@ -86,3 +88,21 @@
          '(table x ($meta) (fields a ($meta) b ($meta)))))
   (is (= (t/defaults->fields '(table x ($meta) (fields a ($meta) b ($meta)) (defaults (a 0) (b 1))) )
          '(table x ($meta) (fields a ($meta (default 0)) b ($meta (default 1)))))))
+
+(deftest test-binding-when
+  (is (= (t/binding-when '()) '()))
+  (is (= (t/binding-when '(stencil test)) '(stencil test)))
+  (is (= (t/binding-when '(stencil test 
+                         (stream input (fields x)) 
+                         (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))
+         '(stencil test 
+           (stream input (fields x)) 
+           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x))))))))
+  (is (= (t/binding-when '(stencil test 
+                         (stream input (fields x)) 
+                         (table t (data (when (delta input) (items input) (let (x:x)))))))
+         '(stencil test 
+           (stream input (fields x)) 
+           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))))
+
+
