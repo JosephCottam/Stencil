@@ -1,13 +1,14 @@
 package stencil.adapters.java2D.interaction;
 
-import stencil.display.Display;
 import stencil.interpreter.TupleStore;
+import stencil.module.util.ApplyView;
 import stencil.tuple.PrototypedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.prototype.TupleFieldDef;
 
-public class ViewAsStore implements TupleStore {
-
+public class ViewAsStore implements TupleStore, ApplyView {
+	private ViewTuple view;
+	
 	@Override
 	public boolean canStore(Tuple t) {return t!= null && t instanceof PrototypedTuple;}
 
@@ -16,7 +17,6 @@ public class ViewAsStore implements TupleStore {
 
 	@Override
 	public void store(Tuple t) {
-		ViewTuple view = (ViewTuple) Display.view;
 		PrototypedTuple<TupleFieldDef> pt = (PrototypedTuple) t;
 		
 		for (TupleFieldDef field: pt.prototype()) {
@@ -26,5 +26,9 @@ public class ViewAsStore implements TupleStore {
 		}
 	}
 	
-	public stencil.display.ViewTuple viewTuple() {return Display.view;}
+	public stencil.display.ViewTuple viewTuple() {return view;}
+
+	@Override
+	public void setView(stencil.display.ViewTuple view) {this.view = (ViewTuple) view;}
+	
 }

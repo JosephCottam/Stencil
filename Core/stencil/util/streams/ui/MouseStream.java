@@ -5,8 +5,9 @@ import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
-import stencil.display.Display;
+import stencil.display.ViewTuple;
 import stencil.interpreter.tree.Specializer;
+import stencil.module.util.ApplyView;
 import stencil.module.util.ann.Description;
 import stencil.module.util.ann.Stream;
 import stencil.parser.ParseStencil;
@@ -19,11 +20,11 @@ import stencil.tuple.stream.TupleStream;
 
 @Description("Tracking of the position and state of the mouse cursor.")
 @Stream(name="Mouse", spec="[freq:-1]")
-public class MouseStream implements TupleStream {
+public class MouseStream implements TupleStream, ApplyView {
 	public static String NAME = "Mouse";
 	
 	/**Internal utility for capturing mouse information.*/
-	private static class Mouse implements java.awt.event.MouseListener, java.awt.event.MouseMotionListener {
+	private static class Mouse implements ApplyView, java.awt.event.MouseListener, java.awt.event.MouseMotionListener {
 		/**Screen coordinate of the current event*/
 		public Point2D current = new Point(0,0);
 		/**Screen coordinate of the prior event*/
@@ -37,7 +38,9 @@ public class MouseStream implements TupleStream {
 
 		int sequence=Integer.MIN_VALUE;
 
-		public Mouse(Component source) {/*Takes argument so enter/levae can be handled in the future.*/}
+		private ViewTuple view;
+
+		public Mouse(Component source) {/*TODO: Takes component argument so enter/leave can be handled in the future.*/}
 
 
 		@Override
@@ -60,7 +63,7 @@ public class MouseStream implements TupleStream {
 				Point offset = event.getComponent().getLocationOnScreen();		//MouseInfo is in screen coords, so figure out where the window physically is.
 				currentCanvas = new Point2D.Double(current.getX()-offset.x, current.getY() - offset.y);
 			} else {currentCanvas = event.getPoint();}
-			currentCanvas = Display.view.viewToCanvas(currentCanvas); //correct for view transform
+			currentCanvas = view.viewToCanvas(currentCanvas); //correct for view transform
 
 			storedEvent = event;
 			sequence++;
@@ -70,6 +73,10 @@ public class MouseStream implements TupleStream {
 		public void mouseEntered(MouseEvent arg0) {/*No action taken on event.*/}
 		@Override
 		public void mouseExited(MouseEvent arg0) {/*No action taken on event.*/}
+
+
+		@Override
+		public void setView(ViewTuple view) {this.view = view;}
 	}
 
 	/**Indicate to frequency setting that only changes are interesting.*/
@@ -195,4 +202,7 @@ public class MouseStream implements TupleStream {
 	/**Throws UnsupportedOpertaionException.*/
 	@Override
 	public void remove() {throw new UnsupportedOperationException(this.getClass().getName() +" does not support " + Thread.currentThread().getStackTrace()[0].getMethodName() + ".");}
+
+	@Override
+	public void setView(ViewTuple view) {mouse.setView(view);}
 }

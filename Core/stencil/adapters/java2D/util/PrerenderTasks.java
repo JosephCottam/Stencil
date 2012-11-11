@@ -13,7 +13,6 @@ import stencil.Configure;
 import stencil.adapters.java2D.Panel;
 import stencil.adapters.java2D.columnStore.Table;
 import stencil.adapters.java2D.render.Renderer;
-import stencil.display.Display;
 import stencil.interpreter.tree.DynamicRule;
 import stencil.interpreter.tree.Guide;
 import stencil.interpreter.tree.Program;
@@ -97,7 +96,7 @@ public class PrerenderTasks {
 
 		executeAll(guideUpdaters);
 		
-		if (Display.canvas != null && Display.view != null) {
+		if (panel.getCanvas() != null && panel.getView() != null) {
 			panel.processTuple(RENDER_TUPLE);
 		}
 

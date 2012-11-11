@@ -41,7 +41,6 @@ abstract class CacheHelper implements Cloneable {
 		if (range.relativeStart() && range.relativeEnd()) {return new RelativeCache(range);}
 		if (!range.relativeStart() && !range.relativeEnd()) {return new AbsoluteCache(range);}
 		if (!range.relativeStart() && range.relativeEnd()) {return new HybridCache(range);}
-		
 
 		throw new IllegalArgumentException("No cache type defined for " + range.toString());
 	}

@@ -7,15 +7,30 @@ import java.awt.geom.Point2D;
 import stencil.adapters.general.Registrations;
 import stencil.adapters.general.Registrations.Registration;
 import stencil.display.CanvasTuple;
+import stencil.display.ViewTuple;
 
+import stencil.module.operator.util.AbstractOperator;
+import stencil.module.util.ApplyCanvas;
+import stencil.module.util.ApplyView;
 import stencil.module.util.BasicModule;
+import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
-import stencil.display.Display;
 import stencil.util.DoubleDimension;
 
 @Description("Screen/Canvas conversion transformations.")
 @Module
 public class ViewCanvas extends BasicModule {
+	
+	private static abstract class Base extends AbstractOperator.Statefull implements ApplyView, ApplyCanvas {
+		protected Base(OperatorData opData) {super(opData);}
+		private ViewTuple view;
+		private CanvasTuple canvas;
+		
+		public void setView(ViewTuple view) {this.view = view;}
+		public void setCanvas(CanvasTuple canvas) {this.canvas = canvas;}
+		public ViewTuple view() {return view;}
+		public CanvasTuple canvas() {return canvas;}
+	}
 	
 	//Given an original registration and position, what would the X/Y be in the target registration
 	@Operator
@@ -27,34 +42,50 @@ public class ViewCanvas extends BasicModule {
 		return new double[]{targetValue.getX(), targetValue.getY()};
 	}
 	
+
+	@Operator
+	public static class ScreenToCanvasPoint extends Base {
+		public ScreenToCanvasPoint(OperatorData opData) {super(opData);}
 	
-	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
-	public static double[] screenToCanvasPoint(double x, double y) {
-		Point2D p = Display.view.viewToCanvas(new Point2D.Double(x, y));
-		return new double[]{p.getX(), p.getY()};
+		@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
+		public double[] map(double x, double y) {
+			Point2D p = view().viewToCanvas(new Point2D.Double(x, y));
+			return new double[]{p.getX(), p.getY()};
+		}
 	}
 
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
-	public static double[] screenToCanvasDimension(double width, double height) {
-		Dimension2D p = Display.view.viewToCanvas(new DoubleDimension( width, height));
-		return new double[]{p.getWidth(), p.getHeight()};
+	public static class ScreenToCanvasDimension extends Base {
+		public ScreenToCanvasDimension(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
+		public double[] map(double width, double height) {
+			Dimension2D p = view().viewToCanvas(new DoubleDimension( width, height));
+			return new double[]{p.getWidth(), p.getHeight()};
+		}
 	}
 
 
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
-	public static double[] canvasToScreenPoint(double x, double y) {
-		Point2D p = Display.view.canvasToView(new Point2D.Double(x, y));
-		return new double[]{p.getX(), p.getY()};
+	public static class CanvasToScreenPoint extends Base {
+		public CanvasToScreenPoint(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="OPAQUE", prototype="(double X, double Y)", alias={"map","query"})
+		public double[] map(double x, double y) {
+			Point2D p = view().canvasToView(new Point2D.Double(x, y));
+			return new double[]{p.getX(), p.getY()};
+		}
 	}
 
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
-	public static double[] canvasToScreenDimension(double width, double height) {
-		Dimension2D p = Display.view.canvasToView(new DoubleDimension(width, height));
-		return new double[]{p.getWidth(), p.getHeight()};
+	public static class CanvasToScreenDimension extends Base {
+		public CanvasToScreenDimension(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="OPAQUE", prototype="(double W, double H)", alias={"map","query"})
+		public double[] mpa(double width, double height) {
+			Dimension2D p = view().canvasToView(new DoubleDimension(width, height));
+			return new double[]{p.getWidth(), p.getHeight()};
+		}
 	}
 
 	/**Calculates the scale factor to keep values undistorted but all objects visible.
@@ -67,9 +98,13 @@ public class ViewCanvas extends BasicModule {
 	 * @return
 	 */
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
-	public static double[] zoom(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
-		return zoomPadded(portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
+	public static class Zoom extends Base {
+		public Zoom(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
+		public double[] map(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
+			return ViewCanvas.zoomPadded(canvas(), portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
+		}
 	}
 	
 	/**Calculates a scale factor to keep values undistorted and all visible with a given amount of padding on all sides.
@@ -77,10 +112,16 @@ public class ViewCanvas extends BasicModule {
 	 * 
 	 */
 	@Operator
-	@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
-	public static double[] zoomPadded(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
-		CanvasTuple global = Display.canvas;
-		
+	public static class ZoomPadded extends Base {
+		public ZoomPadded(OperatorData opData) {super(opData);}
+
+		@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
+		public double[] map(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
+			return ViewCanvas.zoomPadded(canvas(), portalWidth, portalHeight, canvasWidth, canvasHeight, pad);
+		}
+	}
+	
+	private static double[] zoomPadded(CanvasTuple global, double portalWidth, double portalHeight, double canvasWidth, double canvasHeight, double pad) {
 		double x = global.getX() - pad;
 		double y = global.getY() - pad;
 		double zy = canvasHeight !=0?portalHeight/canvasHeight:1;
