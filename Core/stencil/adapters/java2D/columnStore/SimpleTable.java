@@ -104,7 +104,7 @@ public final class SimpleTable implements Table {
 	public void clear() {
 		synchronized(tableLock) {
 			tenured = new TableView(tenured.name, tenured.schema);
-			if (updates != null) {updates.clear();}
+			updates = new ArrayList();
 			//if (transfer != null) {transfer.clear();}
 		}
 		stateID++;

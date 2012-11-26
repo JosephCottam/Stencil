@@ -489,7 +489,62 @@ public class Temp extends BasicModule {
 			return nop;
 		}
 	}
+	
+	@Operator()
+	public static class GridLayout2 extends AbstractOperator {
+		public GridLayout2(OperatorData opData) {super(opData);}
 
+		@Facet(memUse="READER", prototype="(double id, double x1, double y1, double x2, double y2)", counterpart="lines")
+			public MultiResultTuple lines(int rows, int cols) {
+				Tuple[] tuples =new Tuple[rows+cols+2];
+				for (int r=0; r<=rows; r++) {
+					tuples[r] = ArrayTuple.from(r, r,r,0,cols);
+				}
+				for (int c=0; c<=cols; c++) {
+					tuples[c+rows+1] = ArrayTuple.from(rows+c+1, 0,rows,c,c);
+				}
+		  
+				return new MultiResultTuple(tuples);
+			}
+			
+		   @Facet(memUse="READER", prototype="(double x, double y,double size)", counterpart="map")
+			public Tuple map(int row, int col) {return ArrayTuple.from(row, col,.8);}
+	}
+	
+	@Operator()
+	public static class GridLayout1 extends AbstractOperator.Statefull<GridLayout1> {
+		int rows, cols;
+
+		public GridLayout1(OperatorData opData) {super(opData);}
+
+
+		@Facet(memUse="OPAQUE", prototype="(double id, double x1, double y1, double x2, double y2)", counterpart="lines")
+		public MultiResultTuple lines(int rows, int cols) {
+		    this.rows = rows;
+		    this.cols = cols;
+		    stateID++;
+		    
+		    rows = this.rows*this.cols;
+		    cols = this.rows*this.cols; 
+		    
+			Tuple[] tuples =new Tuple[rows+cols+2];
+			for (int r=0; r<=rows; r++) {
+				tuples[r] = ArrayTuple.from(r, r,r,0,cols);
+			}
+			for (int c=0; c<=cols; c++) {
+				tuples[c+rows+1] = ArrayTuple.from(rows+c+1, 0,rows,c,c);
+			}
+			return new MultiResultTuple(tuples);
+		}
+			
+	   @Facet(memUse="READER", prototype="(double x, double y,double size)", counterpart="map")
+		public Tuple map(int r1, int c1, int r2, int c2) {
+		   Tuple t = ArrayTuple.from((r1*rows)+c1, (r2*rows)+c2,.8);
+		   return t;
+		}
+
+	}
+	
 	@Operator()
 	public static class Table extends AbstractOperator.Statefull<Table>{
 		private int[] widths = new int[0];
