@@ -41,3 +41,15 @@ First-class guides make building guides for such view trivial
 
 Protovis showed Lambda...now lets do COMBINATORS:  schema-grid, data-grid, guide
 
+
+Animated entrance/exit:  Steal the enter/exit/update concepts from D3.
+  Is a set value bindings (the initial value) and a transition rule (for each binding or for the whole block?)
+  Animates from these intiail bindings to the "data" statement value vai the transition
+  "Default" value is the default result of a data OR intiail value, if not specified on enter
+
+
+Custom policy providers also provide a "reducing" translation of that policy to 
+  non-custom policies. This can be invoked by the runtime translator.  In this
+  way custom policies can recieve custom treatment in different rutnimes, but
+  still be supported in all runtimes.  If a policy type does not have a reduced
+  form, then the runtime errors when a program with that policy type is provided.

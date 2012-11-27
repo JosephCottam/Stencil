@@ -93,16 +93,16 @@
   (is (= (t/binding-when '()) '()))
   (is (= (t/binding-when '(stencil test)) '(stencil test)))
   (is (= (t/binding-when '(stencil test 
-                         (stream input (fields x)) 
-                         (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))
+                         (stream input (prototype x ($meta))) 
+                         (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x)))))))
          '(stencil test 
-           (stream input (fields x)) 
-           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x))))))))
+           (stream input (prototype x ($meta))) 
+           (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x))))))))
   (is (= (t/binding-when '(stencil test 
-                         (stream input (fields x)) 
+                         (stream input (prototype x ($meta))) 
                          (table t (data (when (delta input) (items input) (let (x:x)))))))
          '(stencil test 
-           (stream input (fields x)) 
-           (table t (data (when+ (delta input) (items input) ($binding x) (let (x:x)))))))))
+           (stream input (prototype x ($meta))) 
+           (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x)))))))))
 
 
