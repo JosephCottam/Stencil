@@ -2,17 +2,10 @@
 (ns stencil.rparse
   "An s-expression reader macro system for pre-processing before going to the clojure reader.")
 
-(defn readUntil [emit delim tokens]
-  (cond 
-    (empty? tokens) '(() ())
-    (= delim (first tokens)) (list () (rest tokens))
-    :else (let [[phase1 remain] (emit emit tokens)
-                [phase2 remain] (readUntil emit delim remain)]
-            (list (concat phase1 phase2) remain))))
-
 (defn emitter [transforms]
-  "Produce a function that take tokens are returns (before after) pairs from the transforms
-   Transforms must be functions [emitter tokens] -> [tokens tokens] "
+  "Returns a function that converts one character stream into another.
+   Transforms is a list of predicate/transform pairs.  
+   The first predicate that returns true is applied."
   (fn [emit tokens]
     (loop [transforms transforms]
       (let [[p t] (first transforms)]
@@ -22,23 +15,21 @@
           (and (fn? t) (p tokens)) (t emit tokens)
           :else (recur (rest transforms)))))))
 
-(defn gatherTo [stop tokens]
-  "term -> tokens -> (inside, tokens)
-   Gather all tokens, until the stop token is seen.
-   Return tokens seen as inside, and remain stream as tokens."
-     (cond 
-      (empty? tokens) 
-         '(() ())
-      (= stop (take (count stop) tokens))
-          (list '() (drop (count stop) tokens))
-      :else 
-       (let [[inside remain] (gatherTo stop (rest tokens))]
-         (list (cons (first tokens) inside) remain))))
+(defn readUntil 
+  "Read the tokens, applying emitter to each, until the delimiter s found (or end of stream).
+   TODO: Should end-of-stream be an error...at least optionally?"
+   [emit delim tokens]
+  (cond 
+    (empty? tokens) '(() ())
+    (= delim (take (count delim) tokens)) (list () (rest tokens))
+    :else (let [[phase1 remain] (emit emit tokens)
+                [phase2 remain] (readUntil emit delim remain)]
+            (list (concat phase1 phase2) remain))))
 
 (defn stComment? [tokens] (= \; (first tokens)))
 (defn stComment [emit tokens] 
   (let [term (if (= '(\; \*) (take 2 tokens)) '(\* \;) '(\newline))
-        [comment remain] (gatherTo term (drop (count term) tokens))]
+       [comment remain] (readUntil (emitter '()) term (drop (count term) tokens)) ]
        (list (concat "(comment \"" comment "\")") remain)))
 
 (defn bind? [tokens] (= \: (first tokens)))
@@ -49,11 +40,15 @@
 
 (defn pTupleLit? [tokens] (= '(\# \# \() (take 3 tokens)))
 (defn pTupleLit [emit tokens] (list nil (concat " ($ptuple " (drop 3 tokens))))
-                          
 
+(defn tupleRef? [tokens] (= \[ (first tokens)))
+(defn tupleRef [emit tokens] 
+  (let [[internal remain] (readUntil emit '(\]) (rest tokens))]
+   (list (concat "(tuple-ref " internal ")") remain)))
+                          
 (defn stMeta? [tokens] (= '(\: \{) (take 2 (remove #(Character/isWhitespace %) tokens))))
 (defn stMeta  [emit tokens] 
-  (let [[internal remain] (readUntil emit \] (rest (drop-while #(not= \} %) tokens)))]
+  (let [[internal remain] (readUntil emit '(\}) (rest (drop-while #(not= \{ %) tokens)))]
     (list (concat "($meta " internal ")") remain)))
 
 (defn stString? [tokens] (= \" (first tokens)))
@@ -66,7 +61,7 @@
 
 (defn startList? [tokens] (= \( (first tokens)))
 (defn readList [emit tokens] 
-  (let [[internal remain] (readUntil emit \) (rest tokens))]
+  (let [[internal remain] (readUntil emit '(\)) (rest tokens))]
     (list (concat "(" internal ")") remain)))
 
 (defn driver [emit tokens] 
@@ -80,7 +75,9 @@
   "string -> tree: Parses stencil program from a string."
   (let [[srcLs remain] 
           (driver
-            (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)(~startList? ~readList))) 
+            (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
+                       (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)
+                       (~startList? ~readList) (~tupleRef? ~tupleRef))) 
              src)
         source (apply str srcLs)]
     (read-string source)))
