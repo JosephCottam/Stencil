@@ -1,9 +1,9 @@
 (ns stencil.transform
   "Tree transformation functions"
   (:use [clojure.core.match :only (match)])
-  (:use stencil.compile)
   (:require clojure.pprint))
 
+(load "transform-util")
 (load "transforms/dropComments")
 (load "transforms/normalizeLet")
 (load "transforms/infixToPrefix")

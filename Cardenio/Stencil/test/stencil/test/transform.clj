@@ -1,4 +1,4 @@
-(ns Stencil.test.transform
+(ns stencil.test.transform
   (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
