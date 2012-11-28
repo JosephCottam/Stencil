@@ -37,7 +37,7 @@
   "Is this a meta expression?"
    (and (list? e) (= '$meta (first e))))
 
-(defn emptyMeta? [e]
+(defn empty-meta? [e]
   "Is this a meta-expression with no data?"
   (and (meta? e) (= 1 (count e))))
 

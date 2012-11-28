@@ -36,7 +36,7 @@
 
 
 
-(defn ensureFields
+(defn ensure-fields
   "Ensure there is a 'fields' policy in each table and stream.
    If there is not currently a 'fields' policy, generates on based on the first 'data' policy found.
    After execution, fields policy will include type and default value in its metadata."
@@ -49,11 +49,11 @@
                      (expr->fields (ffirst (filter-policies 'data policies)))
                      fields)]
         `(~tag ~name ~fields ~meta ~@policies))
-    :else (map ensureFields program)))
+    :else (map ensure-fields program)))
       
 
 ;;;------------------------------------------------------------------------------------------------------------
-(defn validateFields
+(defn validate-fields
   "Test if the 'fields' policy covers the names used in all of the 'data' policies.
    'fields' may include names NOT in a 'data', if that field also has a default value."
   [program]
@@ -69,7 +69,7 @@
       (let [fields (filter-policies 'fields policies)
             data   (filter-policies 'data policies)]
         (map (covers fields) data))
-    :else (map validateFields program)))
+    :else (map validate-fields program)))
 
 ;;;------------------------------------------------------------------------------------------------------------
 (defn fold-into-fields

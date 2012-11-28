@@ -4,7 +4,7 @@
   (:use stencil.compile)
   (:require clojure.pprint))
 
-;(load "transforms/dropComments")
+(load "transforms/dropComments")
 (load "transforms/normalizeLet")
 (load "transforms/infixToPrefix")
 (load "transforms/convertToWhen")
@@ -15,22 +15,28 @@
 
 (defn spp [program] 
   "A pretty-printer for stencil."
-  (cleanMetas (clojure.pprint/pprint program)))
+  (clean-metas (clojure.pprint/pprint program)))
 
-(defn validateParse
+(defn validate
   "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
    This validation is run before normalization, simplifying normalization by removing many checks."
- [program] (-> program validateLetShape))
+ [program] (-> program validate-let-shape))
 
 (defn normalize 
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
   [program] 
    (-> program 
-    ensureRuntimeImport
-    normalizeLetShape infix->prefix defaultLetBody 
+    ensure-runtime-import
+    normalize-let-shape infix->prefix default-let-body 
     file->init pull->when init->when
-    supplyMetas metaTypes
-    ensureFields validateFields display->fields defaults->fields))
+    supply-metas meta-types
+    ensure-fields validate-fields display->fields defaults->fields
+    binding-when))
+
+(defn prep-emit
+  "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 
+  [program]
+    (-> program drop-comments ))
 
 (defn imports
   "tree -> modules: process the imports from the program"

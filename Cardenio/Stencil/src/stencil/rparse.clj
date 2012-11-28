@@ -59,8 +59,8 @@
        (= \" (first tokens)) (list '(\") (rest tokens)))) 
      tokens))
 
-(defn startList? [tokens] (= \( (first tokens)))
-(defn readList [emit tokens] 
+(defn stList? [tokens] (= \( (first tokens)))
+(defn stList [emit tokens] 
   (let [[internal remain] (readUntil emit '(\)) (rest tokens))]
     (list (concat "(" internal ")") remain)))
 
@@ -71,13 +71,13 @@
           [step leftovers] (driver emit remain)]
       (list (concat done step) leftovers))))
 
-(defn parseProgram [src]
+(defn parse-program [src]
   "string -> tree: Parses stencil program from a string."
   (let [[srcLs remain] 
           (driver
             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
                        (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)
-                       (~startList? ~readList) (~tupleRef? ~tupleRef))) 
+                       (~stList? ~stList) (~tupleRef? ~tupleRef))) 
              src)
         source (apply str srcLs)]
     (read-string source)))

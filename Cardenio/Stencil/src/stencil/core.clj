@@ -5,20 +5,20 @@
 (defn -main [from to]
   (println "Compling from" from "to" to "(but not really...yet)"))
 
-(defn compileStencil [program]
-  (let [_ (stencil.transform/validateParse program)
+(defn compile-stencil [program]
+  (let [_ (stencil.transform/validate program)
         program (stencil.transform/normalize program)
         modules (stencil.transform/imports program)]
      program))
 
-(defn parseStencil [program]
+(defn parse-stencil [program]
   "string -> tree: Parses a stencil program from a string."
-  (stencil.rparse/parseProgram program))
+  (stencil.rparse/parse-program program))
 
-(defn readStencil
+(defn read-stencil
   "filename -> tree: reads program from specified file, returns as parse tree"
   [filename] 
     (let [f (new java.io.File filename)
           name (re-find #"[^.]*" (.getName f))]
-    (parseStencil (str "(stencil " name (slurp filename) "\n)" ))))
+    (parse-stencil (str "(stencil " name (slurp filename) "\n)" ))))
 

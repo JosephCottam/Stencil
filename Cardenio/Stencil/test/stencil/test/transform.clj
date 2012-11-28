@@ -10,61 +10,61 @@
   (is (= (t/infix->prefix '(map plus ls)) '(map plus ls))))
 
 
-(deftest normalizeLetShape
-  (is (= (t/normalizeLetShape '(let (a $C b) (c $C d) (e $C f) (g $C (h i j))))
+(deftest normalize-letshape
+  (is (= (t/normalize-let-shape '(let (a $C b) (c $C d) (e $C f) (g $C (h i j))))
          '(let ((a) $C b) 
                ((c) $C d) 
                ((e) $C f) 
                ((g) $C (h i j))))))
 
-(deftest defaultLetBody
-  (is (= (t/defaultLetBody '(let ($C (a) b))) '(let ($C (a) b) ($ptuple '(a) a))))
-  (is (= (t/defaultLetBody '(let ($C (a) b) (tuple a))) '(let ($C (a) b) (tuple a))))
-  (is (= (t/defaultLetBody '(let ($C (a b) c))) '(let ($C (a b) c) ($ptuple '(a b) a b))))
-  (is (= (t/defaultLetBody '(let ($C (a) b) ($C (c) d))) '(let ($C (a) b) ($C (c) d) ($ptuple '(a c) a c)))))
+(deftest default-let-body
+  (is (= (t/default-let-body '(let ($C (a) b))) '(let ($C (a) b) ($ptuple '(a) a))))
+  (is (= (t/default-let-body '(let ($C (a) b) (tuple a))) '(let ($C (a) b) (tuple a))))
+  (is (= (t/default-let-body '(let ($C (a b) c))) '(let ($C (a b) c) ($ptuple '(a b) a b))))
+  (is (= (t/default-let-body '(let ($C (a) b) ($C (c) d))) '(let ($C (a) b) ($C (c) d) ($ptuple '(a c) a c)))))
 
-(deftest validateLetShape
-  (is (= (t/validateLetShape '(let (a $C b)))) '(let (a $C b)))
-  (is (= (t/validateLetShape '(let (a $C b) (d $C e) ($C f g))) '(let (a $C b) (d $C e) ($C f g))))
-  (is (= (t/validateLetShape '(let (a $C b) (tuple a))) '(let (a $C b) (tuple a))))
-  (is (= (t/validateLetShape '(let (d e f))) '(let (d e f))))
-  (is (thrown? RuntimeException (t/validateLetShape '(let (a b c) (d e f)))))
-  (is (thrown? RuntimeException (t/validateLetShape '(let (a $C c) (d e f) (h i j))))))
+(deftest validate-let-shape
+  (is (= (t/validate-let-shape '(let (a $C b)))) '(let (a $C b)))
+  (is (= (t/validate-let-shape '(let (a $C b) (d $C e) ($C f g))) '(let (a $C b) (d $C e) ($C f g))))
+  (is (= (t/validate-let-shape '(let (a $C b) (tuple a))) '(let (a $C b) (tuple a))))
+  (is (= (t/validate-let-shape '(let (d e f))) '(let (d e f))))
+  (is (thrown? RuntimeException (t/validate-let-shape '(let (a b c) (d e f)))))
+  (is (thrown? RuntimeException (t/validate-let-shape '(let (a $C c) (d e f) (h i j))))))
 
 
-(deftest supplyMetas
-  (is (= (t/supplyMetas '(a)) '(a ($meta))))
-  (is (= (t/supplyMetas '(a ($meta))) '(a ($meta))))
-  (is (= (t/supplyMetas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supplyMetas '(a ($meta) b c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supplyMetas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supplyMetas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supplyMetas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supplyMetas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
-  (is (= (t/supplyMetas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
-  (is (= (t/supplyMetas '(stencil test)) '(stencil test ($meta))))
-  (is (= (t/supplyMetas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
+(deftest supply-metas
+  (is (= (t/supply-metas '(a)) '(a ($meta))))
+  (is (= (t/supply-metas '(a ($meta))) '(a ($meta))))
+  (is (= (t/supply-metas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a ($meta) b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
+  (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
+  (is (= (t/supply-metas '(stencil test)) '(stencil test ($meta))))
+  (is (= (t/supply-metas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
 
-(deftest metaTypes
-  (is (= (t/metaTypes '($meta a)) '($meta (type a))))
-  (is (= (t/metaTypes '($meta (type a))) '($meta (type a))))
-  (is (= (t/metaTypes '($meta a (type b)))) '($meta a (type b)))
-  (is (= (t/metaTypes '($meta (some a) (type b))) '($meta (some a) (type b))))
-  (is (= (t/metaTypes '($meta a b))) '($meta (type a) b)))
+(deftest meta-types
+  (is (= (t/meta-types '($meta a)) '($meta (type a))))
+  (is (= (t/meta-types '($meta (type a))) '($meta (type a))))
+  (is (= (t/meta-types '($meta a (type b)))) '($meta a (type b)))
+  (is (= (t/meta-types '($meta (some a) (type b))) '($meta (some a) (type b))))
+  (is (= (t/meta-types '($meta a b))) '($meta (type a) b)))
   
 
-(deftest cleanMetas
-  (is (= (t/cleanMetas 'a) 'a))
-  (is (= (t/cleanMetas '(a ($meta))) '(a)))
-  (is (= (t/cleanMetas '(a (b ($meta) c ($meta)))) '(a (b c))))
-  (is (= (t/cleanMetas '(a ($meta stuff))) '(a ($meta stuff))))
-  (is (= (t/cleanMetas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
+(deftest clean-metas
+  (is (= (t/clean-metas 'a) 'a))
+  (is (= (t/clean-metas '(a ($meta))) '(a)))
+  (is (= (t/clean-metas '(a (b ($meta) c ($meta)))) '(a (b c))))
+  (is (= (t/clean-metas '(a ($meta stuff))) '(a ($meta stuff))))
+  (is (= (t/clean-metas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
          '(a ($meta stuff) (b ($meta stuff) c d ($meta stuff))))))
 
-(deftest ensureRuntime
-  (is (= (t/ensureRuntimeImport '(stencil test (import picoRuntime))) 
+(deftest ensure-runtime
+  (is (= (t/ensure-runtime-import '(stencil test (import picoRuntime))) 
          '(stencil test (import picoRuntime))))
-  (is (= (t/ensureRuntimeImport '(stencil test)) 
+  (is (= (t/ensure-runtime-import '(stencil test)) 
          '(stencil test (import javaPico)))))
 
 (deftest expr->fields
@@ -93,16 +93,16 @@
   (is (= (t/binding-when '()) '()))
   (is (= (t/binding-when '(stencil test)) '(stencil test)))
   (is (= (t/binding-when '(stencil test 
-                         (stream input (prototype x ($meta))) 
-                         (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x)))))))
+                         (stream input (fields x ($meta))) 
+                         (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x)))))))
          '(stencil test 
-           (stream input (prototype x ($meta))) 
-           (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x))))))))
+           (stream input (fields x ($meta))) 
+           (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x))))))))
   (is (= (t/binding-when '(stencil test 
-                         (stream input (prototype x ($meta))) 
+                         (stream input (fields x ($meta))) 
                          (table t (data (when (delta input) (items input) (let (x:x)))))))
          '(stencil test 
-           (stream input (prototype x ($meta))) 
-           (table t (data (when+ (delta input) (items input) (prototype x ($meta)) (let (x:x)))))))))
+           (stream input (fields x ($meta))) 
+           (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x)))))))))
 
 
