@@ -66,6 +66,11 @@
          '(stencil test (import picoRuntime))))
   (is (= (t/ensure-runtime-import '(stencil test)) 
          '(stencil test (import javaPico)))))
+(deftest ensure-fields
+  (is (= (t/ensure-fields '(table x (fields foo bar))) '(table x (fields foo bar))))
+  (is (= (t/ensure-fields '(table x (data ($ptuple '(foo bar) 1 2))))
+         '(table x (fields foo bar) (data ($ptuple '(foo bar) 1 2))))))
+
 
 (deftest expr->fields
   (is (= (t/expr->fields '(ptuple '(a ($meta (type int))) 1))
