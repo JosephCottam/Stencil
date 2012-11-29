@@ -2,7 +2,7 @@
   (:require [stencil.core :as c])
   (:use [clojure.test]))
 
-(deftest parse
+(deftest stencil-parse
   (is (= (c/parse "(a)") '(a)))
   (is (= (c/parse "(stencil Test)") '(stencil Test)))
   (is (= (c/parse "#(a,b,c)") '($tuple a b c)))
@@ -18,7 +18,7 @@
   ))
 
 (def root "../tests/data/")
-(deftest read
+(deftest stencil-read
   (is (list? (c/read (str root "geometry/simpleLines.stencil"))))
   (is (list? (c/read (str root "geometry/simpleLines.tstencil")))))
 

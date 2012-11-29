@@ -52,4 +52,17 @@
     string ""
     (throw (RuntimeException. (str "Default not known for type " type)))))
 
+(defn full-drop 
+  "Eliminate the first n things and (possibly) accompanying meta from a stencil expression."
+  ([expr] (full-drop 1 expr))
+  ([n expr]
+   (cond
+     (or (zero? n) (empty? expr)) expr
+     (meta? (second expr)) (full-drop (- n 1) (drop 2 expr))
+     :else (full-drop (- n 1) (drop 1 expr)))))
+
+(defn second-expr 
+  "Removes the first element and its meta-data"  
+  [expr] (first (full-drop expr)))
+
 

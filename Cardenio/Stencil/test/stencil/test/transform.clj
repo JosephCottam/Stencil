@@ -50,7 +50,8 @@
   (is (= (t/meta-types '($meta (type a))) '($meta (type a))))
   (is (= (t/meta-types '($meta a (type b)))) '($meta a (type b)))
   (is (= (t/meta-types '($meta (some a) (type b))) '($meta (some a) (type b))))
-  (is (= (t/meta-types '($meta a b))) '($meta (type a) b)))
+  (is (= (t/meta-types '($meta a b))) '($meta (type a) b))
+  (is (= (t/meta-types '(a ($meta a b))) '(a ($meta (type a) b)))))
   
 
 (deftest clean-metas
@@ -68,22 +69,32 @@
          '(stencil test (import javaPico)))))
 
 (deftest ensure-fields
+  (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) '(stream x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) '(table x ($meta) (fields foo bar))))
-  (is (= (t/ensure-fields '(table x ($meta) (data (ptuple '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
+  (is (= (t/ensure-fields '(table x ($meta) (data (ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
          '(table x ($meta) 
             (fields (foo ($meta (default 0) (display "foo") (type int)) 
                      bar ($meta (default 0) (display "bar") (type int)))) 
-           (data (ptuple '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))))
+           (data (ptuple ($meta)'(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+  (is (= (t/ensure-fields 
+           '(table x ($meta) 
+                   (data ($meta) (when ($meta) ($init? ($meta)) () 
+                           (ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+         '(table x ($meta) 
+            (fields (foo ($meta (default 0) (display "foo") (type int)) 
+                     bar ($meta (default 0) (display "bar") (type int)))) 
+           (data ($meta) (when ($meta) ($init? ($meta)) () 
+                           (ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
 
 (deftest expr->fields
-  (is (= (t/expr->fields '(ptuple '(a ($meta (type int))) 1))
+  (is (= (t/expr->fields '(ptuple ($meta) '(a ($meta (type int))) 1))
          '(fields (a ($meta (default 0) (display "a")  (type int))))))
-  (is (= (t/expr->fields '(ptuple '(a ($meta (type int)) b ($meta (type int)) c ($meta (type int))) 1 2 3))
+  (is (= (t/expr->fields '(ptuple ($meta) '(a ($meta (type int)) b ($meta (type int)) c ($meta (type int))) 1 2 3))
          '(fields (a ($meta (default 0) (display "a")  (type int))
                    b ($meta (default 0) (display "b")  (type int)) 
                    c ($meta (default 0) (display "c")  (type int))))))
-  (is (= (t/expr->fields '(let [a true] (ptuple '(a ($meta (type int))) 1)))
+  (is (= (t/expr->fields '(let [a ($meta) true ($meta)] (ptuple ($meta) '(a ($meta (type int))) 1)))
          '(fields (a ($meta (default 0) (display "a")  (type int)))))))
 
 (deftest display->fields
@@ -97,6 +108,11 @@
          '(table x ($meta) (fields a ($meta) b ($meta)))))
   (is (= (t/defaults->fields '(table x ($meta) (fields a ($meta) b ($meta)) (defaults (a 0) (b 1))) )
          '(table x ($meta) (fields a ($meta (default 0)) b ($meta (default 1)))))))
+
+
+(deftest init->when
+  (is (= (t/init->when '(init (gen) (exp))) '(when ($init?) (gen) (exp)))))
+
 
 (deftest test-binding-when
   (is (= (t/binding-when '()) '()))

@@ -15,7 +15,7 @@
   (match [program]
     [a :guard atom?] a
     [(['init gen expr] :seq)]
-      `(when ~'init ~gen ~expr)
+      `(~'when (~'$init?) ~gen ~expr)
     :else (map init->when program)))
 
 

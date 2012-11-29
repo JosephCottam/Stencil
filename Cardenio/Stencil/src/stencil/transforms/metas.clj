@@ -35,6 +35,7 @@
   (match [program]
     [a :guard #(and (meta? %)  (hasType? %))] a
     [a :guard meta?] (addType a)
+    [a :guard atom?] a
     :else (map meta-types program)))
 
 

@@ -8,11 +8,15 @@
   ([condition policies] (filter-policies = condition policies))
   ([test condition policies] (filter #(test (first %) condition) policies)))
 
-(defn expr->fields [expr]
+(defn expr->fields
+  "Convert an expression to a list of fields.
+   The first argument is used to produce error messages only."
+  ([expr] (expr->fields expr expr))
+  ([saved expr]
   (defn ensure-parts [name meta]
     (cond
       (not (contains? meta 'type))
-        (throw (RuntimeException. "Type not found when required.")) 
+        (throw (RuntimeException. "Type not found in metadata when required.")) 
       (not (contains? meta 'display))
         (recur name (assoc meta 'display (str name)))
       (not (contains? meta 'default))
@@ -29,12 +33,12 @@
           metas (map (comp map->meta ensure-parts) names (map meta->map metas))]
       (list 'fields (interleave names metas))))
 
-  (case (first expr)
-    let (expr->fields (nth expr 2))    ;(let <bindings> <body>)...and the body has to return a tuple
-    ptuple (decl->fields (second (second expr)))
-    (throw (RuntimeException. (str "Could not find prototyped tuple in " expr)))))
-
-
+  (cond 
+    (or (atom? expr) (empty? expr))  
+       (throw (RuntimeException. (str "Could not find prototyped tuple in " saved)))
+    (= 'ptuple (first expr)) 
+       (decl->fields (second-expr (second-expr expr)))  ;;get rid of the ptuple and the quote
+    :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields
   "Ensure there is a 'fields' policy in each table and stream.
@@ -44,10 +48,12 @@
   (match [program]
     [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-      (if (empty? (filter-policies 'fields policies))
-          (let [fields (expr->fields (second (first (filter-policies 'data policies))))]
-             `(~tag ~name ~meta ~fields ~@policies))
-          `(~tag ~name ~meta ~@policies))
+      (if (not (empty? (filter-policies 'fields policies)))
+        `(~tag ~name ~meta ~@policies)
+        (let [data (first (filter-policies 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
+              fields (expr->fields (full-drop data))]
+             `(~tag ~name ~meta ~fields ~@policies)))
+         
     :else (map ensure-fields program)))
       
 
