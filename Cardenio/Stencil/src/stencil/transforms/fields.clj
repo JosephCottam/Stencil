@@ -44,11 +44,10 @@
   (match [program]
     [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-      (let [fields (filter-policies 'fields policies)
-            fields (if (empty? fields) 
-                     (expr->fields (ffirst (filter-policies 'data policies)))
-                     fields)]
-        `(~tag ~name ~fields ~meta ~@policies))
+      (if (empty? (filter-policies 'fields policies))
+          (let [fields (expr->fields (second (first (filter-policies 'data policies))))]
+             `(~tag ~name ~meta ~fields ~@policies))
+          `(~tag ~name ~meta ~@policies))
     :else (map ensure-fields program)))
       
 
