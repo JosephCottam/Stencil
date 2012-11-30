@@ -33,7 +33,7 @@
 
 (defn meta? [e]
   "Is this a meta expression?"
-   (and (list? e) (= '$meta (first e))))
+   (and (seq? e) (= '$meta (first e))))
 
 (defn empty-meta? [e]
   "Is this a meta-expression with no data?"
@@ -44,12 +44,13 @@
 (defn map->meta [m] (cons '$meta (map->lop m)))
 (defn meta->map 
   "Makes a map out of the pairs in a meta.  Bare values are dropped."
-  [m] (lop->map (filter list? m))) 
+  [m] (lop->map (filter seq? m))) 
 
 (defn default-for-type [type]
   (case type
     (int long float double number) 0
     string ""
+    nil nil
     (throw (RuntimeException. (str "Default not known for type " type)))))
 
 (defn full-drop 

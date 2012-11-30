@@ -30,8 +30,10 @@
     normalize-let-shape infix->prefix default-let-body 
     file->init pull->when init->when
     supply-metas meta-types
-    ensure-fields validate-fields display->fields defaults->fields
+    ensure-fields display->fields defaults->fields
     binding-when))
+
+;;TODO: validate-fields
 
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 

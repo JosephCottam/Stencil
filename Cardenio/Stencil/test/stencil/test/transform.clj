@@ -73,22 +73,32 @@
 (deftest ensure-fields
   (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) '(stream x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) '(table x ($meta) (fields foo bar))))
-  (is (= (t/ensure-fields '(table x ($meta) (data ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
-         '(table x ($meta) 
-            (fields (foo ($meta (default 0) (display "foo") (type int)) 
-                     bar ($meta (default 0) (display "bar") (type int)))) 
-           (data ($ptuple ($meta)'(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
   (is (= (t/ensure-fields 
-           '(table x ($meta) 
-                   (data ($meta) (when ($meta) ($init? ($meta)) () 
-                           ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
-         '(table x ($meta) 
+          '(table x ($meta) 
+            (data ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
+          '(table x ($meta) 
             (fields (foo ($meta (default 0) (display "foo") (type int)) 
                      bar ($meta (default 0) (display "bar") (type int)))) 
-           (data ($meta) (when ($meta) ($init? ($meta)) () 
-                           ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
+            (data ($ptuple ($meta)'(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+  (is (= (t/ensure-fields 
+           '(stream x ($meta) 
+             (data ($meta) (when ($meta) ($init? ($meta)) () 
+                            ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+           '(stream x ($meta) 
+             (fields (foo ($meta (default 0) (display "foo") (type int)) 
+                      bar ($meta (default 0) (display "bar") (type int)))) 
+             (data ($meta) (when ($meta) ($init? ($meta)) () 
+                            ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
-
+(defn identity? [f a] (= a (f a)))
+(deftest validate-fields
+  (is (t/validate-fields 
+       '(stream x ($meta) 
+               (fields (foo ($meta (default 0) (display "foo") (type int)) 
+                        bar ($meta (default 0) (display "bar") (type int)))) 
+               (data ($meta) (when ($meta) ($init? ($meta)) () 
+                              ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
+  
 (deftest expr->fields
   (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int))) 1))
          '(fields (a ($meta (default 0) (display "a")  (type int))))))

@@ -8,31 +8,31 @@
   ([condition policies] (filter-policies = condition policies))
   ([test condition policies] (filter #(test (first %) condition) policies)))
 
+(defn ensure-parts [name meta]
+ (cond
+  (not (contains? meta 'type))
+    (throw (RuntimeException. "Type not found in metadata when required.")) 
+  (not (contains? meta 'display))
+    (recur name (assoc meta 'display (str name)))
+  (not (contains? meta 'default))
+    (recur name (assoc meta 'default (default-for-type (meta 'type))))
+  :else meta))
+
+(defn decl->fields
+ "A 'declaration' is a set of names and meta-data.  
+ It is essentially syntactically REQUIRED meta-data, where true $meta statements are optional in the source syntax.
+ A 'fields' statement is a list of field names, with meta-data for machine type, default value and display name."
+ [decl]
+ (let [names (take-nth 2 decl)
+  metas (take-nth 2 (rest decl))
+  metas (map #(map->meta (ensure-parts %1 (meta->map %2))) names metas)]
+  (list 'fields (interleave names metas))))
+
 (defn expr->fields
   "Convert an expression to a list of fields.
    The first argument is used to produce error messages only."
   ([expr] (expr->fields expr expr))
   ([saved expr]
-  (defn ensure-parts [name meta]
-    (cond
-      (not (contains? meta 'type))
-        (throw (RuntimeException. "Type not found in metadata when required.")) 
-      (not (contains? meta 'display))
-        (recur name (assoc meta 'display (str name)))
-      (not (contains? meta 'default))
-        (recur name (assoc meta 'default (default-for-type (meta 'type))))
-      :else meta))
-
-  (defn decl->fields
-    "A 'declaration' is a set of names and meta-data.  
-    It is essentially syntactically REQUIRED meta-data, where true $meta statements are optional in the source syntax.
-    A 'fields' statement is a list of field names, with meta-data for machine type, default value and display name."
-    [decl]
-    (let [names (take-nth 2 decl)
-          metas (take-nth 2 (rest decl))
-          metas (map #(map->meta (ensure-parts %1 (meta->map %2))) names metas)]
-      (list 'fields (interleave names metas))))
-
   (cond 
     (or (atom? expr) (empty? expr))  
        (throw (RuntimeException. (str "Could not find prototyped tuple in " saved)))
@@ -57,16 +57,17 @@
       
 
 ;;;------------------------------------------------------------------------------------------------------------
+(defn covers [fields-policy]
+ (let [fields (set (map first (full-drop (first fields-policy))))]
+  (fn [data] 
+   (do 
+     (println "data:" data)
+     (clojure.set/subset? fields (map first (rest (expr->fields data))))))))
+
 (defn validate-fields
   "Test if the 'fields' policy covers the names used in all of the 'data' policies.
    'fields' may include names NOT in a 'data', if that field also has a default value."
   [program]
-
-  (defn covers [fields]
-    (let [fields (set (keys fields))]
-      (fn [data] 
-        (clojure.set/subset? fields (meta-keys (expr->fields (ffirst data)))))))
-
   (match [program]
     [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
