@@ -24,15 +24,17 @@
 
     (defn binds [generator path] 
      (match [generator]
-      [(['delta source] :seq)] (find-names source path)
-      [(['items source] :seq)] (find-names source path)
-      :else (throw (RuntimeException. (str "Generator expression not recognized" generator)))))
+       [e :guard empty?] '(fields)
+       [(['delta (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
+       [(['items (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
+      :else (throw (RuntimeException. (str "Generator expression not recognized: " (first generator) "...")))))
 
    (defn- search [program upPath]
     (match [program]
      [(a :guard atom?)] a
-     [(['when cond gen trans] :seq)]
-     `(~'when+ ~cond ~gen ~(binds gen (reverse upPath)) ~trans)
+     [(m :guard meta?)] m
+     [(['when (m1 :guard meta?) cond gen trans] :seq)]
+     `(~'when+ ~m1 ~cond ~gen ~(binds gen (reverse upPath)) ~trans)
      :else (map-indexed #(search %2 (cons %1 upPath)) program)))
    (search program '()))
 

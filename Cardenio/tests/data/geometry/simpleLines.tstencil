@@ -3,7 +3,7 @@
 
 (stream values 
   (fields v {int})
-  (data (init (split (range 0 10)) (let (v : [0])))))
+  (data (init ($ptuples '(v) (range 0 10)))))
 
 (table plot
   (render (text "simpleLines_test.tuples"))

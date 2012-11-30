@@ -33,11 +33,12 @@
    The first argument is used to produce error messages only."
   ([expr] (expr->fields expr expr))
   ([saved expr]
-  (cond 
+   (cond 
     (or (atom? expr) (empty? expr))  
-       (throw (RuntimeException. (str "Could not find prototyped tuple in " saved)))
-    (= '$ptuple (first expr)) 
-       (decl->fields (second-expr (second-expr expr)))  ;;get rid of the ptuple and the quote
+       (throw (RuntimeException. (str "Could not find prototyped tuple in " (first saved) "...")))
+    (or (= '$ptuples (first expr)) 
+        (= '$ptuple (first expr)))
+       (decl->fields (second-expr (second-expr expr)))  ;;get rid of the operator and the quote
     :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields
@@ -60,9 +61,7 @@
 (defn covers [fields-policy]
  (let [fields (set (map first (full-drop (first fields-policy))))]
   (fn [data] 
-   (do 
-     (println "data:" data)
-     (clojure.set/subset? fields (map first (rest (expr->fields data))))))))
+     (clojure.set/subset? fields (map first (rest (expr->fields data)))))))
 
 (defn validate-fields
   "Test if the 'fields' policy covers the names used in all of the 'data' policies.

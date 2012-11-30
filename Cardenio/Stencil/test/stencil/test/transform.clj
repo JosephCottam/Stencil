@@ -74,6 +74,12 @@
   (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) '(stream x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) '(table x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields 
+           '(table x ($meta) 
+                   (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0)))))
+           '(table x ($meta) 
+                   (fields (a ($meta (default 0) (display "a") (type int))))
+                   (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0))))))
+  (is (= (t/ensure-fields 
           '(table x ($meta) 
             (data ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
           '(table x ($meta) 
@@ -123,7 +129,7 @@
 
 
 (deftest init->when
-  (is (= (t/init->when '(init (gen) (exp))) '(when ($init?) (gen) (exp)))))
+  (is (= (t/init->when '(init (gen))) '(when ($init?) () (gen)))))
 
 
 (deftest test-binding-when
@@ -137,9 +143,9 @@
            (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x))))))))
   (is (= (t/binding-when '(stencil test 
                          (stream input (fields x ($meta))) 
-                         (table t (data (when (delta input) (items input) (let (x:x)))))))
+                         (table t (data (when ($meta) (delta input) (items ($meta) input ($meta)) (let (x:x)))))))
          '(stencil test 
            (stream input (fields x ($meta))) 
-           (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x)))))))))
+           (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x)))))))))
 
 

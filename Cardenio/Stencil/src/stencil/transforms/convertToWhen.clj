@@ -14,11 +14,9 @@
   [program]
   (match [program]
     [a :guard atom?] a
-    [(['init gen expr] :seq)]
-      `(~'when (~'$init?) ~gen ~expr)
+    [(['init gen] :seq)]
+      `(~'when (~'$init?) () ~gen)
     :else (map init->when program)))
-
-
 
 
 (defn file->init
