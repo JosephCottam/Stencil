@@ -4,7 +4,7 @@
 (defn toggled? [x] (and (symbol? x) (= \' (last (name x)))))
 
 (defn infix? [x]
-  (or (= '$op-colon x) 
+  (or (= '$C x) 
       (and (defaultInfix? x) (not (toggled? x)))
       (and (not (defaultInfix? x)) (toggled? x))))
 

@@ -7,7 +7,8 @@
   (is (= (t/infix->prefix '(+ a b)) '(+ a b)))
   (is (= (t/infix->prefix '(map +' ls)) '(map + ls)))
   (is (= (t/infix->prefix '(a plus' b)) '(plus a b)))
-  (is (= (t/infix->prefix '(map plus ls)) '(map plus ls))))
+  (is (= (t/infix->prefix '(map plus ls)) '(map plus ls)))
+  (is (= (t/infix->prefix '((v) $C a)) '($C (v) a))))
 
 
 (deftest normalize-letshape
