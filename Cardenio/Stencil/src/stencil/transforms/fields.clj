@@ -30,13 +30,13 @@
     [decl]
     (let [names (take-nth 2 decl)
           metas (take-nth 2 (rest decl))
-          metas (map (comp map->meta ensure-parts) names (map meta->map metas))]
+          metas (map #(map->meta (ensure-parts %1 (meta->map %2))) names metas)]
       (list 'fields (interleave names metas))))
 
   (cond 
     (or (atom? expr) (empty? expr))  
        (throw (RuntimeException. (str "Could not find prototyped tuple in " saved)))
-    (= 'ptuple (first expr)) 
+    (= '$ptuple (first expr)) 
        (decl->fields (second-expr (second-expr expr)))  ;;get rid of the ptuple and the quote
     :else (expr->fields saved (last expr)))))
 
@@ -48,12 +48,11 @@
   (match [program]
     [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-      (if (not (empty? (filter-policies 'fields policies)))
-        `(~tag ~name ~meta ~@policies)
-        (let [data (first (filter-policies 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
-              fields (expr->fields (full-drop data))]
-             `(~tag ~name ~meta ~fields ~@policies)))
-         
+        (if (not (empty? (filter-policies 'fields policies)))
+          `(~tag ~name ~meta ~@policies)
+          (let [data (first (filter-policies 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
+                fields (expr->fields (full-drop data))]
+            `(~tag ~name ~meta ~fields ~@policies)))
     :else (map ensure-fields program)))
       
 

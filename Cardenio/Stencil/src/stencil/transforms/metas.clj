@@ -25,8 +25,8 @@
 
 (defn- addType [metas]
   (let [[before after] (split-with list? (rest metas))
-        [head & tail] after]
-    (cons '$meta (concat before (cons (list 'type head) tail)))))
+        [type & tail] after]
+    (cons '$meta (concat before (cons (list 'type type) tail)))))
 
 (defn meta-types
   "Identify data types in meta statements.

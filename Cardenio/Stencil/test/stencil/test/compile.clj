@@ -1,4 +1,4 @@
-(ns Stencil.test.compile
+(ns stencil.test.compile
   (:require [stencil.core :as core])
   (:require [stencil.compile :as c])
   (:use [clojure.test]))
