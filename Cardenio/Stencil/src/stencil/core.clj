@@ -1,6 +1,6 @@
 (ns stencil.core
   (:refer-clojure :rename {compile clj-compile read clj-read}) 
-  (:require [stencil.rparse :as parse])
+  (:require [stencil.parse :as parse])
   (:require stencil.compile))
           
 (defn -main [from to]

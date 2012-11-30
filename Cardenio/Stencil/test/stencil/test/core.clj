@@ -1,4 +1,4 @@
-(ns Stencil.test.core
+(ns stencil.test.core
   (:require [stencil.core :as c])
   (:use [clojure.test]))
 
@@ -9,7 +9,7 @@
   (is (= (c/parse "#(a b c)") '($tuple a b c)))
   (is (= (c/parse "##(a b c)") '($ptuple a b c)))
   (is (= (c/parse "##())") '($ptuple)))
-  (is (= (c/parse "(a : {int})") '(a ($meta int))))
+  (is (= (c/parse "(a {int})") '(a ($meta int))))
   (is (= (c/parse "[a]") '(tuple-ref a)))
   (is (= (c/parse "(a : b)") '(a $C b)))
   (is (= (c/parse "; some") '(comment " some")))

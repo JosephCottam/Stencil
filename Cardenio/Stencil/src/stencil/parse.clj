@@ -1,5 +1,5 @@
 ;Based loosely on https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/LispReader.java
-(ns stencil.rparse
+(ns stencil.parse
   "An s-expression reader macro system for pre-processing before going to the clojure reader.")
 
 (defn emitter [transforms]
@@ -46,9 +46,9 @@
   (let [[internal remain] (readUntil emit '(\]) (rest tokens))]
    (list (concat "(tuple-ref " internal ")") remain)))
                           
-(defn stMeta? [tokens] (= '(\: \{) (take 2 (remove #(Character/isWhitespace %) tokens))))
+(defn stMeta? [tokens] (= \{ (first tokens)))
 (defn stMeta  [emit tokens] 
-  (let [[internal remain] (readUntil emit '(\}) (rest (drop-while #(not= \{ %) tokens)))]
+  (let [[internal remain] (readUntil emit '(\}) (rest tokens))]
     (list (concat "($meta " internal ")") remain)))
 
 (defn stString? [tokens] (= \" (first tokens)))
