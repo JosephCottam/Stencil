@@ -12,6 +12,7 @@
 (load "transforms/imports")
 (load "transforms/bindingWhen")
 (load "transforms/fields")
+(load "transforms/inferTypes")
 
 (defn spp [program] 
   "A pretty-printer for stencil."

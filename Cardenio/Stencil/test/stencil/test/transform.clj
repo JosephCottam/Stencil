@@ -148,4 +148,7 @@
            (stream input (fields x ($meta))) 
            (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x)))))))))
 
-
+(deftest infer-types
+  (is (= (t/infer-types '($meta (type blah))) '($meta (type blah))))
+  (is (= (t/infer-types '($meta)) '($meta (type int))))
+  (is (= (t/infer-types `(~'$meta (~'type ~nil))) '($meta (type int)))))
