@@ -80,30 +80,31 @@
   "Merge a policy statement into fields statement.  Assumes that there is a fields statement.
   If there is a conflict between elements already present and supplied defauts statement, the new  value wins."
   [policy-tag meta-tag]
-  (defn extendWith [items]
-    (fn [field meta]
-      (if (contains? items field)
-        (map->meta (assoc (meta->map meta) meta-tag (items field)))
-        meta)))
+  (letfn 
+    [(extendWith [items]
+      (fn [field meta]
+       (if (contains? items field)
+           (map->meta (assoc (meta->map meta) meta-tag (items field)))
+            meta)))
 
-  (defn extendFields [fields items]
-    (if (or (= 0 (count fields)) (= 0 (count items)))
-      fields
-      (let [names (take-nth 2 fields)
-            metas (take-nth 2 (rest fields))]
-        (interleave names (map (extendWith items) names metas)))))
+     (extendFields [fields items]
+      (if (or (= 0 (count fields)) (= 0 (count items)))
+          fields
+          (let [names (take-nth 2 fields)
+                metas (take-nth 2 (rest fields))]
+            (interleave names (map (extendWith items) names metas)))))]
 
   (fn folder [program]
     (match [program]
       [a :guard atom?] a 
       [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
       (let [fields   (rest (first (filter-policies 'fields policies)))
-            source (lop->map (rest (first (filter-policies policy-tag policies))))]
-        (let [inner (map folder policies)
-              reduced (filter-policies (complement any=) (list policy-tag 'fields) policies)
-              fields (cons 'fields (extendFields fields source))]
-          `(~tag ~name ~meta ~fields ~@reduced)))
-      :else (map folder program))))
+            source (lop->map (rest (first (filter-policies policy-tag policies))))
+            inner (map folder policies)
+            reduced (filter-policies (complement any=) (list policy-tag 'fields) policies)
+            fields (cons 'fields (extendFields fields source))]
+          `(~tag ~name ~meta ~fields ~@reduced))
+      :else (map folder program)))))
 
 
 (defn defaults->fields [program]

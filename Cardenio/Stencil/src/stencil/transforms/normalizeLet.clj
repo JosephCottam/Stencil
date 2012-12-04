@@ -38,29 +38,26 @@
 
 ;; --------  Default Body --------
 
-(defn- make-body
-  [bindings]
-    (let [names (distinct bindings)]
-      `((~'$ptuple (~'quote ~names) ~@names))))
-
-
-(defn- ensure-body
-  ([lines] (ensure-body lines '()))
-  ([lines allVars]
-   (match [lines]
-     [([(['$C vars ops] :seq)] :seq)] 
-         (cons `(~'$C ~vars ~ops) (make-body (concat allVars vars)))
-     [([(['$C vars ops] :seq) & rest] :seq)] 
-         (cons `(~'$C ~vars ~ops) (ensure-body rest (concat allVars vars)))
-     [(body :guard list?)] body
-     :else (make-body allVars))))
-
-
 (defn default-let-body
   "Ensure that let's have a body.  Generate one if not.  
   Let's must have vars gathered in list format, operators must all be prefix"
   [program]
-  (match [program]
-    [(x :guard atom?)] x
-    [(['let & parts] :seq)] `(~'let ~@(map default-let-body (ensure-body parts)))
-    :else (map default-let-body program)))
+  (letfn
+    [(make-body [bindings]
+       (let [names (distinct bindings)]
+        `((~'$ptuple (~'quote ~names) ~@names))))
+
+    (ensure-body
+      ([lines] (ensure-body lines '()))
+      ([lines allVars]
+         (match [lines]
+            [([(['$C vars ops] :seq)] :seq)] 
+               (cons `(~'$C ~vars ~ops) (make-body (concat allVars vars)))
+            [([(['$C vars ops] :seq) & rest] :seq)] 
+               (cons `(~'$C ~vars ~ops) (ensure-body rest (concat allVars vars)))
+            [(body :guard list?)] body
+            :else (make-body allVars))))]
+    (match [program]
+      [(x :guard atom?)] x
+      [(['let & parts] :seq)] `(~'let ~@(map default-let-body (ensure-body parts)))
+      :else (map default-let-body program))))
