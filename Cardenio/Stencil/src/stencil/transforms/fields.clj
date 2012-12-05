@@ -8,25 +8,19 @@
   ([condition policies] (filter-policies = condition policies))
   ([test condition policies] (filter #(test (first %) condition) policies)))
 
-(defn ensure-parts [name meta]
- (cond
-  (not (contains? meta 'type))
-    (throw (RuntimeException. "Type not found in metadata when required.")) 
-  (not (contains? meta 'display))
-    (recur name (assoc meta 'display (str name)))
-  (not (contains? meta 'default))
-    (recur name (assoc meta 'default (default-for-type (meta 'type))))
-  :else meta))
-
 (defn decl->fields
  "A 'declaration' is a set of names and meta-data.  
  It is essentially syntactically REQUIRED meta-data, where true $meta statements are optional in the source syntax.
  A 'fields' statement is a list of field names, with meta-data for machine type, default value and display name."
  [decl]
- (let [names (take-nth 2 decl)
-  metas (take-nth 2 (rest decl))
-  metas (map #(map->meta (ensure-parts %1 (meta->map %2))) names metas)]
-  (list 'fields (interleave names metas))))
+  (letfn [(ensure-display [name meta] 
+           (if (not (contains? meta 'display)) 
+             (assoc meta 'display (str name))
+             meta))]
+    (let [names (take-nth 2 decl)
+          metas (take-nth 2 (rest decl))
+          metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
+      (list 'fields (interleave names metas)))))
 
 (defn expr->fields
   "Convert an expression to a list of fields.
