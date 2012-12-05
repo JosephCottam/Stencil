@@ -10,7 +10,7 @@
     TODO: Something more complex than look for an import with 'runtime' as a substring."
     (some 
       #(> (.indexOf (.toLowerCase (str (second %))) "runtime") -1)
-      (filter #(and (list? %) (= 'import (first %))) program)))
+      (filter #(and (seq? %) (= 'import (first %))) program)))
 
    (defn add-runtime [defaultRuntime program]
     "Add the default runtime import to program."

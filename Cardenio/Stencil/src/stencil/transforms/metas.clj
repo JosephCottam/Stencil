@@ -21,28 +21,29 @@
        (cons (supply-metas a) (supply-metas tail))))
   
 
-(defn- hasType? [metas] (contains? (meta->map metas) 'type))
-
-(defn- addType [metas]
-  (let [[before after] (split-with list? (rest metas))
-        [type & tail] after]
-    (cons '$meta (concat before (cons (list 'type type) tail)))))
 
 (defn meta-types
   "Identify data types in meta statements.
   TODO: REMOVE THIS AND REPLACE WITH A MORE COMPLETE METADATA LABELING MECHANISM."
   [program]
-  (match [program]
-    [a :guard #(and (meta? %)  (hasType? %))] a
-    [a :guard meta?] (addType a)
-    [a :guard atom?] a
-    :else (map meta-types program)))
+  (letfn 
+    [(hasType? [metas] (contains? (meta->map metas) 'type))
+     (addType [metas] (let [[before after] (split-with seq? (rest metas))
+                            [type & tail] after]
+                        (if (nil? type) 
+                          metas
+                          (cons '$meta (concat before (cons (list 'type type) tail))))))]
+    (match [program]
+      [a :guard #(and (meta? %) (hasType? %))] a
+      [a :guard meta?] (addType a)
+      [a :guard atom?] a
+      :else (map meta-types program))))
 
 
 (defn clean-metas
   "Remove empty metas...mostly for pretty-printing"
   [program]
-  (if (list? program)
+  (if (seq? program)
     (map clean-metas (remove empty-meta? program))
     program))
 
