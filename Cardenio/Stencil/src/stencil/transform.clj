@@ -16,7 +16,7 @@
 
 (defn spp [program] 
   "A pretty-printer for stencil."
-  (clean-metas (clojure.pprint/pprint program)))
+  (clojure.pprint/pprint (clean-metas program)))
 
 (defn validate
   "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
@@ -32,7 +32,7 @@
     file->init pull->when init->when
     supply-metas meta-types
     ensure-fields display->fields defaults->fields
-    binding-when))
+    binding-when infer-types))
 
 ;;TODO: validate-fields
 
