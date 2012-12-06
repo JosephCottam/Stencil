@@ -11,11 +11,9 @@
        (some 
            #(> (.indexOf (.toLowerCase (str (second %))) "runtime") -1)
            (filter #(and (list? %) (= 'import (first %))) program)))
-
       (add-runtime [defaultRuntime program]
         "Add the default runtime import to program."
         (concat (take 2 program) `((~'import ~defaultRuntime)) (drop 2 program)))]
-
    (if (has-runtime? program)
       program
       (add-runtime *default-runtime* program))))

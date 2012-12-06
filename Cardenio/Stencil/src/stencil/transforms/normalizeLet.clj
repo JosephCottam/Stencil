@@ -1,7 +1,7 @@
 (in-ns 'stencil.transform)
 
 ;; ------- Validate Let-----
-(defn hasBind? [line] (and (list? line) (any= '$C line)))
+(defn hasBind? [line] (and (seq? line) (any= '$C line)))
 
 (defn- validate-line-shape
   [lines]
@@ -24,20 +24,19 @@
 
 ;; ------- Normalize shape ----
 
-(defn- list?! [a] (if (list? a) a (list a)))
 
 (defn normalize-let-shape
   "Ensure that all let lines have same form.  Must run before infix->prefix"
   [program]
-  (match [program]
-    [(x :guard atom?)] x
-    [(['let & letLines] :seq)] 
-      (cons 'let (map (fn [[t & rst]] (cons (list?! t) rst)) letLines))
-    :else (map normalize-let-shape program)))
+  (letfn [(ensure-seq [a] (if (seq? a) a (list a)))]
+    (match [program]
+      [(x :guard atom?)] x
+      [(['let & letLines] :seq)] 
+        (cons 'let (map (fn [[t & rst]] (cons (ensure-seq t) rst)) letLines))
+      :else (map normalize-let-shape program))))
 
 
 ;; --------  Default Body --------
-
 (defn default-let-body
   "Ensure that let's have a body.  Generate one if not.  
   Let's must have vars gathered in list format, operators must all be prefix"
