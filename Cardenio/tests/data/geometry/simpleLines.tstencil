@@ -11,4 +11,4 @@
      (let (id : v)
           ((x1 {double}, x2 {double}) : (* 10 {int} v) -> #(_,_))
           ((y1 {double}, y2 {double}) : #(0 {int}, 10 {int}))
-          (fillColor {java.awt.Color} : java.awt.Color.GRAY)))))
+          (fillC {java.awt.color} : java.awt.Color.GRAY {java.awt.color})))))

@@ -28,7 +28,11 @@
   (is (= (t/default-let-body '(let ($C (a) b))) '(let ($C (a) b) ($ptuple '(a) a))))
   (is (= (t/default-let-body '(let ($C (a) b) (tuple a))) '(let ($C (a) b) (tuple a))))
   (is (= (t/default-let-body '(let ($C (a b) c))) '(let ($C (a b) c) ($ptuple '(a b) a b))))
-  (is (= (t/default-let-body '(let ($C (a) b) ($C (c) d))) '(let ($C (a) b) ($C (c) d) ($ptuple '(a c) a c)))))
+  (is (= (t/default-let-body '(let ($C (a) b) ($C (c) d))) 
+         '(let ($C (a) b) ($C (c) d) ($ptuple '(a c) a c))))
+  (is (= (t/default-let-body '(let ($C (a ($meta)) b))) 
+         '(let ($C (a ($meta)) b) ($ptuple '(a ($meta)) a ($meta))))))
+
 
 (deftest validate-let-shape
   (is (= (t/validate-let-shape '(let (a $C b)))) '(let (a $C b)))

@@ -24,7 +24,7 @@
      [(a :guard atom?)] a
      [(m :guard meta?)] (ensure-type m 'int)
      [([(context :guard context?) (name :guard symbol?) (m :guard meta?) & rest] :seq)]  
-        `(~'context ~name ~(enforce-type m context) ~@(map infer-types rest))
+        `(~context ~name ~(enforce-type m context) ~@(map infer-types rest))
      [([(policy :guard policy?) (m :guard meta?) & rest] :seq)]  
-        `(~'policy ~(enforce-type m policy) ~@rest)
+        `(~policy ~(enforce-type m policy) ~@(map infer-types rest))
      :else (map infer-types program))))

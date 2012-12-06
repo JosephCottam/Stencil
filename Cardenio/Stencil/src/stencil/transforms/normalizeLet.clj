@@ -42,9 +42,19 @@
   Let's must have vars gathered in list format, operators must all be prefix"
   [program]
   (letfn
-    [(make-body [bindings]
-       (let [names (distinct (remove meta? bindings))]
-        `((~'$ptuple (~'quote ~names) ~@names))))
+    [(meta-map [bindings lastvar acc]
+       (cond
+         (empty? bindings) acc
+         (meta? (first bindings)) (meta-map (rest bindings) nil (assoc acc lastvar (first bindings)))
+         :else (meta-map (rest bindings) (first bindings) acc)))
+
+     (blend [vars metas] (remove nil? (interleave vars (map metas vars))))
+
+     (make-body [bindings]
+       (let [names (distinct (remove meta? bindings))
+             metas (meta-map bindings nil {})
+             typed (blend names metas)]
+        `((~'$ptuple (~'quote ~typed) ~@typed))))
 
     (ensure-body
       ([lines] (ensure-body lines '()))
