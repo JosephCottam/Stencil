@@ -27,14 +27,18 @@
     [(a :guard atom?)] a
     [([lhs (op :guard infix?) rhs] :seq)] 
          `(~op ~(moveOps lhs) ~(moveOps rhs))
-    [([lhs (meta :guard meta?) (op :guard infix?) rhs] :seq)]
-         `(~op ~(moveOps lhs) ~meta ~(moveOps rhs))
+    [([lhs (m :guard meta?) (op :guard infix?) rhs] :seq)]
+         `(~op ~(moveOps lhs) ~m ~(moveOps rhs))
+    [([lhs (op :guard infix?) rhs (m :guard meta?)] :seq)] 
+         `(~op ~(moveOps lhs) ~(moveOps rhs) ~m)
+    [([lhs (m :guard meta?) (op :guard infix?) rhs (m2 :guard meta?)] :seq)]
+         `(~op ~(moveOps lhs) ~m ~(moveOps rhs) ~m2)
 
     ;;Infix operators are variable-arity on the rhs, this allows 1+2-3  (see 2,-,3 on the rhs of +)
     [([lhs (op :guard infix?) & rhs] :seq)]
          `(~op ~(moveOps lhs) ~(moveOps rhs))
-    [([lhs (meta :guard meta?) (op :guard infix?) & rhs] :seq)]
-         `(~op ~(moveOps lhs) ~meta ~(moveOps rhs))
+    [([lhs (m :guard meta?) (op :guard infix?) & rhs] :seq)]
+         `(~op ~(moveOps lhs) ~m ~(moveOps rhs))
     :else (map moveOps program)))
 
 (defn infix->prefix [program] (-> program moveOps stripToggles))

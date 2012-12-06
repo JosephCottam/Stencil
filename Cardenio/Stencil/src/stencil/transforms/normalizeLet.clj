@@ -28,11 +28,16 @@
 (defn normalize-let-shape
   "Ensure that all let lines have same form.  Must run before infix->prefix"
   [program]
-  (letfn [(ensure-seq [a] (if (seq? a) a (list a)))]
+  (letfn 
+    [(normalize-line [l]
+       (match [l]
+         [([(t :guard seq?) & rest] :seq)] l
+         [([t (m :guard meta?) & rest] :seq)] `((~t ~m) ~@rest)
+         [([t & rest] :seq)] `((~t) ~@rest)))]
     (match [program]
       [(x :guard atom?)] x
-      [(['let & letLines] :seq)] 
-        (cons 'let (map (fn [[t & rst]] (cons (ensure-seq t) rst)) letLines))
+      [(['let & lines] :seq)] 
+        (cons 'let (map normalize-line lines))
       :else (map normalize-let-shape program))))
 
 
@@ -56,17 +61,22 @@
              typed (blend names metas)]
         `((~'$ptuple (~'quote ~typed) ~@typed))))
 
-    (ensure-body
-      ([lines] (ensure-body lines '()))
-      ([lines allVars]
-         (match [lines]
-            [([(['$C vars ops] :seq)] :seq)] 
-               (cons `(~'$C ~vars ~ops) (make-body (concat allVars vars)))
-            [([(['$C vars ops] :seq) & rest] :seq)] 
-               (cons `(~'$C ~vars ~ops) (ensure-body rest (concat allVars vars)))
-            [(body :guard list?)] body
-            :else (make-body allVars))))]
+     (ensure-body
+       ([lines] (ensure-body lines '()))
+       ([lines allVars]
+        (match [lines]
+          [([(['$C vars ops] :seq)] :seq)]
+            (cons `(~'$C ~vars ~ops) (make-body (concat allVars vars)))
+          [([(['$C vars ops] :seq) & rest] :seq)]
+            (cons `(~'$C ~vars ~ops) (ensure-body rest (concat allVars vars)))
+          [(body :guard seq?)] body
+          :else (make-body allVars))))]
+
     (match [program]
       [(x :guard atom?)] x
-      [(['let & parts] :seq)] `(~'let ~@(map default-let-body (ensure-body parts)))
+      [(['let & parts] :seq)]
+        `(~'let ~@(map default-let-body (ensure-body parts)))
       :else (map default-let-body program))))
+
+
+

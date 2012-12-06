@@ -18,6 +18,11 @@
 
 
 (deftest normalize-letshape
+  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let ((a d) $C b))))
+  (is (= (t/normalize-let-shape '(let ((a ($meta)) $C b))) '(let ((a ($meta)) $C b))))
+  (is (= (t/normalize-let-shape '(let (a ($meta) $C b))) '(let ((a ($meta)) $C b))))
+  (is (= (t/normalize-let-shape '(let (a $C b))) '(let ((a) $C b))))
+  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let ((a d) $C b))))
   (is (= (t/normalize-let-shape '(let (a $C b) (c $C d) (e $C f) (g $C (h i j))))
          '(let ((a) $C b) 
                ((c) $C d) 
