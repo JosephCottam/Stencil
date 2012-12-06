@@ -43,7 +43,7 @@
   [program]
   (letfn
     [(make-body [bindings]
-       (let [names (distinct bindings)]
+       (let [names (distinct (remove meta? bindings))]
         `((~'$ptuple (~'quote ~names) ~@names))))
 
     (ensure-body
