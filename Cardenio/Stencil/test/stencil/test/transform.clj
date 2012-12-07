@@ -14,30 +14,8 @@
   (is (= (t/infix->prefix '(map +' ls)) '(map + ls)))
   (is (= (t/infix->prefix '(a plus' b)) '(plus a b)))
   (is (= (t/infix->prefix '(map plus ls)) '(map plus ls)))
-  (is (= (t/infix->prefix '((v) $C a)) '($C (v) a))))
-
-
-(deftest normalize-letshape
-  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let ((a d) $C b))))
-  (is (= (t/normalize-let-shape '(let ((a ($meta)) $C b))) '(let ((a ($meta)) $C b))))
-  (is (= (t/normalize-let-shape '(let (a ($meta) $C b))) '(let ((a ($meta)) $C b))))
-  (is (= (t/normalize-let-shape '(let (a $C b))) '(let ((a) $C b))))
-  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let ((a d) $C b))))
-  (is (= (t/normalize-let-shape '(let (a $C b) (c $C d) (e $C f) (g $C (h i j))))
-         '(let ((a) $C b) 
-               ((c) $C d) 
-               ((e) $C f) 
-               ((g) $C (h i j))))))
-
-(deftest default-let-body
-  (is (= (t/default-let-body '(let ($C (a) b))) '(let ($C (a) b) ($ptuple '(a) a))))
-  (is (= (t/default-let-body '(let ($C (a) b) (tuple a))) '(let ($C (a) b) (tuple a))))
-  (is (= (t/default-let-body '(let ($C (a b) c))) '(let ($C (a b) c) ($ptuple '(a b) a b))))
-  (is (= (t/default-let-body '(let ($C (a) b) ($C (c) d))) 
-         '(let ($C (a) b) ($C (c) d) ($ptuple '(a c) a c))))
-  (is (= (t/default-let-body '(let ($C (a ($meta)) b))) 
-         '(let ($C (a ($meta)) b) ($ptuple '(a ($meta)) a ($meta))))))
-
+  (is (= (t/infix->prefix '((v) $C a)) '($C (v) a)))
+  (is (= (t/infix->prefix '(a _)) '(a _))))
 
 (deftest validate-let-shape
   (is (= (t/validate-let-shape '(let (a $C b)))) '(let (a $C b)))
@@ -46,6 +24,29 @@
   (is (= (t/validate-let-shape '(let (d e f))) '(let (d e f))))
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a b c) (d e f)))))
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a $C c) (d e f) (h i j))))))
+
+(deftest normalize-let-shape
+  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) b)) ())))
+  (is (= (t/normalize-let-shape '(let ((a ($meta)) $C b))) '(let (((a ($meta)) b)) ())))
+  (is (= (t/normalize-let-shape '(let (a ($meta) $C b))) '(let (((a ($meta)) b)) ())))
+  (is (= (t/normalize-let-shape '(let (a $C b))) '(let (((a) b)) ())))
+  (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) b)) ())))
+  (is (= (t/normalize-let-shape '(let (a $C b ($meta)))) '(let (((a) ($do b ($meta)))) ())))
+  (is (= (t/normalize-let-shape '(let (a $C b) (c $C d) (e $C f) (g $C (h i j))))
+         '(let (((a) b) 
+                ((c) d) 
+                ((e) f) 
+                ((g) (h i j)))
+            ()))))
+
+(deftest default-let-body
+  (is (= (t/default-let-body '(let (((a) b)) ())) '(let (((a) b)) ($ptuple '(a) a))))
+  (is (= (t/default-let-body '(let (((a) b)) (tuple a))) '(let (((a) b)) (tuple a))))
+  (is (= (t/default-let-body '(let (((a b) c)) ())) '(let (((a b) c)) ($ptuple '(a b) a b))))
+  (is (= (t/default-let-body '(let (((a) b) ((c) d)) ())) 
+         '(let (((a) b) ((c) d)) ($ptuple '(a c) a c))))
+  (is (= (t/default-let-body '(let (((a ($meta)) b)) ())) 
+         '(let (((a ($meta)) b)) ($ptuple '(a ($meta)) a ($meta))))))
 
 
 (deftest supply-metas
@@ -168,5 +169,8 @@
 
 (deftest infer-types
   (is (= (t/infer-types '($meta (type blah))) '($meta (type blah))))
-  (is (= (t/infer-types '($meta)) '($meta (type int))))
-  (is (= (t/infer-types `(~'$meta (~'type ~nil))) '($meta (type int)))))
+  (is (= (t/infer-types '($meta)) '($meta (type string))))
+  (is (= (t/infer-types `(~'$meta (~'type ~nil))) '($meta (type string))))
+  (is (= (t/infer-types '(f ($meta) a ($meta) b ($meta (type int))))
+         '(f ($meta (type fn)) a ($meta (type string)) b ($meta (type int)))))
+  (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))

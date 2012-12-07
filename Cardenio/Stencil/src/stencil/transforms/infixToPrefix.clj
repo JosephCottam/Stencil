@@ -1,6 +1,6 @@
 (in-ns 'stencil.transform)
 
-(defn defaultInfix? [x] (and (symbol? x) (every? #(not (. Character isLetterOrDigit %)) (name x))))
+(defn defaultInfix? [x] (and (symbol? x) (not (= '_ x)) (every? #(not (. Character isLetterOrDigit %)) (name x))))
 (defn toggled? [x] (and (symbol? x) (= \' (last (name x)))))
 
 (defn infix? [x]
@@ -30,9 +30,9 @@
     [([lhs (m :guard meta?) (op :guard infix?) rhs] :seq)]
          `(~op ~(moveOps lhs) ~m ~(moveOps rhs))
     [([lhs (op :guard infix?) rhs (m :guard meta?)] :seq)] 
-         `(~op ~(moveOps lhs) ($do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
+         `(~op ~(moveOps lhs) (~'$do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
     [([lhs (m :guard meta?) (op :guard infix?) rhs (m2 :guard meta?)] :seq)]
-         `(~op ~(moveOps lhs) ~m ($do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
+         `(~op ~(moveOps lhs) ~m (~'$do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
 
     ;;Infix operators are variable-arity on the rhs, this allows 1+2-3  (see 2,-,3 on the rhs of +)
     [([lhs (op :guard infix?) & rhs] :seq)]

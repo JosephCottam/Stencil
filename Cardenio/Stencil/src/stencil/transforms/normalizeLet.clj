@@ -26,18 +26,29 @@
 
 
 (defn normalize-let-shape
-  "Ensure that all let lines have same form.  Must run before infix->prefix"
+  "Ensure that all let lines have same form.  Removes the binding operator."
   [program]
   (letfn 
     [(normalize-line [l]
        (match [l]
-         [([(t :guard seq?) & rest] :seq)] l
-         [([t (m :guard meta?) & rest] :seq)] `((~t ~m) ~@rest)
-         [([t & rest] :seq)] `((~t) ~@rest)))]
+         [([(t :guard seq?) & rest] :seq)] l   ;;Body or multi-var binding
+         [([t (m :guard meta?) & rest] :seq)] `((~t ~m) ~@rest)  ;;Single variable binding w/meta
+         [([t & rest] :seq)] `((~t) ~@rest)))   ;;Single variable binding w/o meta
+     (divide-body [lines]
+       (if (nil? (some '$C lines))
+         (list lines '())
+         (list (butlast lines) (last lines))))
+     (reshape-binding [binding]
+       (let [[vars op expr & meta] binding]
+         (if (empty? meta)
+           `(~vars ~expr)
+           `(~vars (~'$do ~expr ~@meta)))))]
     (match [program]
       [(x :guard atom?)] x
       [(['let & lines] :seq)] 
-        (cons 'let (map normalize-line lines))
+        (let [[bindings body] (divide-body (map normalize-line lines))
+              bindings (map reshape-binding bindings)]
+          (list 'let bindings body))
       :else (map normalize-let-shape program))))
 
 
@@ -59,23 +70,18 @@
        (let [names (distinct (remove meta? bindings))
              metas (meta-map bindings nil {})
              typed (blend names metas)]
-        `((~'$ptuple (~'quote ~typed) ~@typed))))
+        `(~'$ptuple (~'quote ~typed) ~@typed)))
 
      (ensure-body
-       ([lines] (ensure-body lines '()))
-       ([lines allVars]
-        (match [lines]
-          [([(['$C vars ops] :seq)] :seq)]
-            (cons `(~'$C ~vars ~ops) (make-body (concat allVars vars)))
-          [([(['$C vars ops] :seq) & rest] :seq)]
-            (cons `(~'$C ~vars ~ops) (ensure-body rest (concat allVars vars)))
-          [(body :guard seq?)] body
-          :else (make-body allVars))))]
+       ([bindings body]
+        (if (empty? body)
+          (make-body (reduce concat (map first bindings)))
+          body)))]
 
     (match [program]
       [(x :guard atom?)] x
-      [(['let & parts] :seq)]
-        `(~'let ~@(map default-let-body (ensure-body parts)))
+      [(['let bindings body] :seq)]
+        `(~'let ~(map default-let-body bindings) ~(default-let-body (ensure-body bindings body)))
       :else (map default-let-body program))))
 
 
