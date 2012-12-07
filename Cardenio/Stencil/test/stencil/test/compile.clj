@@ -11,6 +11,8 @@
 
 (defn same-structure? [p1 p2]
   (cond
+    (and (not (seq? p1)) (not (seq? p2))) true
+    (or (not (seq? p1)) (not (seq? p2))) false
     (and (empty? p1) (empty? p2)) true
     (or (empty? p1) (empty? p2)) false
     :else

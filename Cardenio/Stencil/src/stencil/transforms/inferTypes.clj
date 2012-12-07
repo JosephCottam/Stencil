@@ -23,7 +23,7 @@
           (type-binding [[vars expr]]
             (let [names (take-nth 2 vars)
                   metas (take-nth 2 (rest vars))]
-                (list (interleave names (map infer-types metas)) expr)))]
+                (list (interleave names (map infer-types metas)) (infer-types expr))))]
    (match [program]
      [(a :guard atom?)] a
      [(m :guard meta?)] (ensure-type m 'string)

@@ -40,9 +40,10 @@
          (list (butlast lines) (last lines))))
      (reshape-binding [binding]
        (let [[vars op expr & meta] binding]
-         (if (empty? meta)
-           `(~vars ~expr)
-           `(~vars (~'$do ~expr ~@meta)))))]
+         (cond
+           (not (empty? meta)) `(~vars (~'$do ~expr ~@meta))
+           (atom? expr) `(~vars (~'$do ~expr))
+           :else `(~vars ~expr))))]
     (match [program]
       [(x :guard atom?)] x
       [(['let & lines] :seq)] 

@@ -20,7 +20,7 @@
     (let [names (take-nth 2 decl)
           metas (take-nth 2 (rest decl))
           metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
-      (cons 'fields (interleave names metas)))))
+      `(~'fields (~'$meta) ~@(interleave names metas)))))
 
 (defn expr->fields
   "Convert an expression to a list of fields.
