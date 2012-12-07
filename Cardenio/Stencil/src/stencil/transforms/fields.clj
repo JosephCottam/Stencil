@@ -20,7 +20,7 @@
     (let [names (take-nth 2 decl)
           metas (take-nth 2 (rest decl))
           metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
-      (list 'fields (interleave names metas)))))
+      (cons 'fields (interleave names metas)))))
 
 (defn expr->fields
   "Convert an expression to a list of fields.
@@ -53,7 +53,7 @@
 
 ;;;------------------------------------------------------------------------------------------------------------
 (defn covers [fields-policy]
- (let [fields (set (map first (full-drop (first fields-policy))))]
+ (let [fields (set (take-nth 2 (full-drop (first fields-policy))))]
   (fn [data] 
      (clojure.set/subset? fields (map first (rest (expr->fields data)))))))
 
