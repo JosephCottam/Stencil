@@ -4,9 +4,9 @@
 
 (deftest drop-comments
   (is (= (t/drop-comments '(comment a))) nil)
-  (is (= (t/drop-comments '(stuff '(comment a)))) '(stuff))
-  (is (= (t/drop-comments '(stuff '(comment)))) '(stuff))
-  (is (= (t/drop-comments '(stuff (deep (in '(comment more)))))) '(stuff (deep (in)))))
+  (is (= (t/drop-comments '(stuff (comment a)))) '(stuff))
+  (is (= (t/drop-comments '(stuff (comment)))) '(stuff))
+  (is (= (t/drop-comments '(stuff (deep (in (comment more)))))) '(stuff (deep (in)))))
 
 (deftest infix->prefix 
   (is (= (t/infix->prefix '(a + b)) '(+ a b)))
