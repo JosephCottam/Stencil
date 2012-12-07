@@ -6,8 +6,8 @@
   [program]
   (match [program]
     [(a :guard atom?)] a
-    [(c :guard comment?)] nil
+    [(n :guard empty?)] n
     [([(first :guard comment?) & rest] :seq)]
        (drop-comments rest)
     [([first & rest] :seq)]
-      (cons (drop-comments first) (map drop-comments rest))))
+      (cons (drop-comments first) (drop-comments rest))))
