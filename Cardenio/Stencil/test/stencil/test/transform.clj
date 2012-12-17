@@ -61,6 +61,7 @@
   (is (= (t/supply-metas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supply-metas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
   (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
+  (is (= (t/supply-metas '(fields)) '(fields ($meta))))
   (is (= (t/supply-metas '(stencil test)) '(stencil test ($meta))))
   (is (= (t/supply-metas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
 
@@ -89,6 +90,33 @@
   (is (= (t/ensure-runtime-import '(stencil test)) 
          '(stencil test (import javaPico)))))
 
+(deftest expr->fields
+  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta)) 1))
+         '(fields ($meta) a ($meta))))
+  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int))) 1))
+         '(fields ($meta) a ($meta  (type int)))))
+  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int)) b ($meta (type int)) c ($meta (type int))) 1 2 3))
+         '(fields ($meta) 
+              a ($meta (type int))
+              b ($meta (type int)) 
+              c ($meta (type int)))))
+  (is (= (t/expr->fields '(let [a ($meta) true ($meta)] ($ptuple ($meta) '(a ($meta (type int))) 1)))
+         '(fields ($meta) a ($meta (type int))))))
+
+(deftest normalize-fields
+  (is (= (t/normalize-fields '(fields ($meta) a ($meta (display "aa")))) '(fields ($meta) a ($meta (display "aa")))))
+  (is (= (t/normalize-fields '(fields ($meta) a ($meta))) '(fields ($meta) a ($meta (display "a")))))
+  (is (= (t/normalize-fields '(fields ($meta) a ($meta) b ($meta) c ($meta)))
+         '(fields ($meta) a ($meta (display "a")) b ($meta (display "b")) c ($meta (display "c")))))
+  (is (= (t/normalize-fields '(fields ($meta) 
+                                    a ($meta (type int)) 
+                                    b ($meta (type double)) 
+                                    c ($meta (display "cat"))))
+         '(fields ($meta) 
+                  a ($meta (display "a") (type int))
+                  b ($meta (display "b") (type double)) 
+                  c ($meta (display "cat"))))))
+
 (deftest ensure-fields
   (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) '(stream x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) '(table x ($meta) (fields foo bar))))
@@ -96,22 +124,24 @@
            '(table x ($meta) 
                    (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0)))))
            '(table x ($meta) 
-                   (fields a ($meta (display "a") (type int)))
+                   (fields ($meta) a ($meta (type int)))
                    (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0))))))
   (is (= (t/ensure-fields 
           '(table x ($meta) 
             (data ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
           '(table x ($meta) 
-            (fields foo ($meta (display "foo") (type int)) 
-                    bar ($meta (display "bar") (type int)))
+            (fields ($meta)
+                    foo ($meta (type int)) 
+                    bar ($meta (type int)))
             (data ($ptuple ($meta)'(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
   (is (= (t/ensure-fields 
            '(stream x ($meta) 
              (data ($meta) (when ($meta) ($init? ($meta)) () 
                             ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
            '(stream x ($meta) 
-             (fields foo ($meta (display "foo") (type int)) 
-                     bar ($meta (display "bar") (type int)))
+             (fields ($meta) 
+                     foo ($meta (type int)) 
+                     bar ($meta (type int)))
              (data ($meta) (when ($meta) ($init? ($meta)) () 
                             ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
@@ -124,18 +154,6 @@
                (data ($meta) (when ($meta) ($init? ($meta)) () 
                               ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
   
-(deftest expr->fields
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta)) 1))
-         '(fields a ($meta (display "a")))))
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int))) 1))
-         '(fields a ($meta (display "a")  (type int)))))
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int)) b ($meta (type int)) c ($meta (type int))) 1 2 3))
-         '(fields a ($meta (display "a")  (type int))
-                   b ($meta (display "b")  (type int)) 
-                   c ($meta (display "c")  (type int)))))
-  (is (= (t/expr->fields '(let [a ($meta) true ($meta)] ($ptuple ($meta) '(a ($meta (type int))) 1)))
-         '(fields a ($meta (display "a")  (type int))))))
-
 (deftest display->fields
   (is (= (t/display->fields '(table x ($meta) (fields a ($meta) b ($meta)))) 
          '(table x ($meta) (fields a ($meta) b ($meta)))))

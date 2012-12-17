@@ -8,32 +8,18 @@
   ([condition policies] (filter-policies = condition policies))
   ([test condition policies] (filter #(test (first %) condition) policies)))
 
-(defn decl->fields
- "A 'declaration' is a set of names and meta-data.  
- It is essentially syntactically REQUIRED meta-data, where true $meta statements are optional in the source syntax.
- A 'fields' statement is a list of field names, with meta-data for machine type, default value and display name."
- [decl]
-  (letfn [(ensure-display [name meta] 
-           (if (not (contains? meta 'display)) 
-             (assoc meta 'display (str name))
-             meta))]
-    (let [names (take-nth 2 decl)
-          metas (take-nth 2 (rest decl))
-          metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
-      `(~'fields (~'$meta) ~@(interleave names metas)))))
-
 (defn expr->fields
   "Convert an expression to a list of fields.
    The first argument is used to produce error messages only."
   ([expr] (expr->fields expr expr))
   ([saved expr]
    (cond 
-    (or (atom? expr) (empty? expr))  
+     (or (atom? expr) (empty? expr))  
        (throw (RuntimeException. (str "Could not find prototyped tuple in " (first saved) "...")))
-    (or (= '$ptuples (first expr)) 
-        (= '$ptuple (first expr)))
-       (decl->fields (second-expr (second-expr expr)))  ;;get rid of the operator and the quote
-    :else (expr->fields saved (last expr)))))
+     (or (= '$ptuples (first expr)) 
+         (= '$ptuple (first expr)))
+      `(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
+     :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields
   "Ensure there is a 'fields' policy in each table and stream.
@@ -107,3 +93,24 @@
   ((fold-into-fields 'defaults 'default) program))
 
 (defn display->fields [program] ((fold-into-fields 'display 'display) program))
+
+
+
+;;;------------------------------------------------------------------------------------------------------------
+(defn normalize-fields [program]
+  (letfn [(ensure-display [name meta] 
+           (if (not (contains? meta 'display)) 
+             (assoc meta 'display (str name))
+             meta))]
+    (match [program]
+      [a :guard atom?] a
+      [(['fields (fmeta :guard meta?) & defs] :seq)] 
+        (let [names (take-nth 2 defs)
+              metas (take-nth 2 (rest defs))
+              metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
+          `(~'fields ~fmeta ~@(interleave names metas)))
+      :else (map normalize-fields program))))
+
+
+
+

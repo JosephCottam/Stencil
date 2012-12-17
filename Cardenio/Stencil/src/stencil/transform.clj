@@ -31,7 +31,7 @@
     normalize-let-shape infix->prefix default-let-body 
     file->init pull->when init->when
     supply-metas meta-types
-    ensure-fields display->fields defaults->fields
+    ensure-fields display->fields defaults->fields normalize-fields
     binding-when infer-types))
 
 ;;TODO: validate-fields
