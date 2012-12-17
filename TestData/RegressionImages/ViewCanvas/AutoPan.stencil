@@ -43,10 +43,10 @@ from AlignedStocks
 
 
 
-
-operator DateMin : Min[c:"Date"]
+operator DateMin : FullMin[c:"Date"]  
 operator TimeStep (T) -> (S)
-   default => (S) : Range[ALL](@DateMin, T) 
-                    -> DateDiff("DAYS", Range, T) 
-                    -> Mult(_, 3)
+default => (S) : DateMin(T) 
+                   -> DateDiff("DAYS", DateMin, T) 
+                   -> Mult(_, 3)
+             
              

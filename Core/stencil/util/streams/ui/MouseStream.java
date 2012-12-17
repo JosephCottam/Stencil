@@ -95,7 +95,7 @@ public class MouseStream implements TupleStream, ApplyView {
 	 * CTRL, ALT, SHIFT, META: Modifier keys concurrently pressed
 	 * TYPE: Click/Press/Move/Drag
 	 */
-	private static String PROTOTYPE_STRING = "(int X, int Y, int BUTTON, int SCREEN_X, int SCREEN_Y, int DELTA_X, int DELTA_Y, int CLICK_COUNT, boolean CTRL, booealn ALT, boolean SHIFT, boolean META, String TYPE)";
+	private static String PROTOTYPE_STRING = "(int X, int Y, int BUTTON, int SCREEN_X, int SCREEN_Y, int DELTA_X, int DELTA_Y, int CLICK_COUNT, boolean CTRL, boolean ALT, boolean SHIFT, boolean META, String TYPE)";
 	public static final TuplePrototype<TupleFieldDef> PROTOTYPE;
 	static {
 		TuplePrototype proto = null;

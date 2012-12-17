@@ -15,6 +15,7 @@ import stencil.module.util.ApplyView;
 import stencil.module.util.BasicModule;
 import stencil.module.util.OperatorData;
 import stencil.module.util.ann.*;
+import stencil.types.Converter;
 import stencil.util.DoubleDimension;
 
 @Description("Screen/Canvas conversion transformations.")
@@ -104,6 +105,22 @@ public class ViewCanvas extends BasicModule {
 		@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
 		public double[] map(double portalWidth, double portalHeight, double canvasWidth, double canvasHeight) {
 			return ViewCanvas.zoomPadded(canvas(), portalWidth, portalHeight, canvasWidth, canvasHeight, 0);
+		}
+	}
+	
+	@Operator
+	public static class ZoomFit extends Base {
+		public ZoomFit(OperatorData opData) {super(opData);}
+		@Facet(memUse="OPAQUE", prototype="(double Zoom, double X, double Y, double W)", alias={"map","query"})
+		public double[] map(double pad) {
+			
+			return ViewCanvas.zoomPadded(canvas(), 
+					Converter.toDouble(view().get("PORTAL_WIDTH")), 
+					Converter.toDouble(view().get("PORTAL_HEIGHT")), 
+					Converter.toDouble(canvas().get("W")), 
+					Converter.toDouble(canvas().get("H")), 
+					pad);
+			
 		}
 	}
 	
