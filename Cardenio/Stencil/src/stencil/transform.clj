@@ -14,9 +14,6 @@
 (load "transforms/fields")
 (load "transforms/inferTypes")
 
-(defn spp [program] 
-  "A pretty-printer for stencil."
-  (clojure.pprint/pprint (clean-metas program)))
 
 (defn validate
   "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
@@ -34,8 +31,6 @@
     ensure-fields display->fields defaults->fields normalize-fields
     binding-when infer-types))
 
-;;TODO: validate-fields
-
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 
   [program]
@@ -45,4 +40,26 @@
   "tree -> modules: process the imports from the program"
   [program]
   {})
+
+
+
+;;;;---------------------------------------------------------------------------------------
+(defmulti pprint-stencil class)
+(defmethod pprint-stencil :default [thing] (clojure.pprint/code-dispatch thing))
+(defmethod pprint-stencil clojure.lang.ISeq [astencil]
+  (clojure.pprint/pprint-logical-block :prefix "(" :suffix ")"
+    (loop [astencil (seq astencil)]
+      (when astencil
+        (clojure.pprint/write-out (first astencil))
+        (when-let [nxt (second astencil)]
+          (.write ^java.io.Writer *out* " ")
+          (if (meta? nxt) 
+            (clojure.pprint/pprint-newline :fill)
+            (clojure.pprint/pprint-newline :linear))
+          (recur (next astencil)))))))
+
+(defn spp [program] 
+  "A pretty-printer for stencil."
+  (clojure.pprint/with-pprint-dispatch pprint-stencil (clojure.pprint/pprint (clean-metas program))))
+
 
