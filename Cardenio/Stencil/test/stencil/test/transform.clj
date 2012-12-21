@@ -50,6 +50,15 @@
   (is (= (t/default-let-body '(let (((a ($meta)) b)) ())) 
          '(let (((a ($meta)) b)) ($ptuple '(a ($meta)) a ($meta))))))
 
+(deftest tie-metas 
+  (is (= (t/tie-metas '(a)) '(a)))
+  (is (= (t/tie-metas '(a a)) '(a a)))
+  (is (= (t/tie-metas '(a ($meta))) '((a ($meta)))))
+  (is (= (t/tie-metas '(stencil name ($meta))) '(stencil (name ($meta))))))
+
+(deftest tie-and-untie-metas
+  (is (let [p '(a)] (= (t/untie-metas (t/tie-metas p)) p)))
+  (is (let [p '(stencil name ($meta))] (= (t/untie-metas (t/tie-metas p)) p))))
 
 (deftest supply-metas
   (is (= (t/supply-metas '(a)) '(a ($meta))))
@@ -188,9 +197,9 @@
            (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x)))))))))
 
 (deftest infer-types
-  (is (= (t/infer-types '($meta (type blah))) '($meta (type blah))))
-  (is (= (t/infer-types '($meta)) '($meta (type string))))
-  (is (= (t/infer-types `(~'$meta (~'type ~nil))) '($meta (type string))))
+  (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
+  (is (= (t/infer-types '(f ($meta) x ($meta))) '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
+  (is (= (t/infer-types `(f ($meta) x ~('$meta (~'type ~nil)))) '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
   (is (= (t/infer-types '(f ($meta) a ($meta) b ($meta (type int))))
-         '(f ($meta (type fn)) a ($meta (type string)) b ($meta (type int)))))
+         '(f ($meta (type fn)) a ($meta (type ***UNKNOWN***)) b ($meta (type int)))))
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))

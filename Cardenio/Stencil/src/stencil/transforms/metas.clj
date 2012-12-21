@@ -48,3 +48,26 @@
     program))
 
 
+(defn tie-metas [program]
+  "Put a meta and its associated item in to a list together.  
+   This is a utility for working with metas when the item is also required."
+  (match program
+    (a :guard atom?) a
+    (m :guard meta?) m
+    (b :guard empty?) nil 
+    ([(a :guard atom?) (m :guard meta?) & rest] :seq)
+       `((~a ~m) ~@(tie-metas rest))
+    ([e & rest] :seq)
+      `(~(tie-metas e) ~@(tie-metas rest))))
+
+
+(defn untie-metas [program]
+  "Undoes tie-metas."
+  (match program
+    (a :guard atom?) a
+    (n :guard empty?) n
+    ([([(a :guard atom?) (m :guard meta?)] :seq) & rest] :seq)
+      `(~a ~m ~@(untie-metas rest))
+    ([e & rest] :seq)
+      `(~(untie-metas e) ~@(untie-metas rest))))
+
