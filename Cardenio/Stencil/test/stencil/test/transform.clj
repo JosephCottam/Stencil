@@ -97,6 +97,7 @@
 (deftest ensure-runtime
   (is (= (t/ensure-runtime-import '(stencil test (import picoRuntime))) 
          '(stencil test (import picoRuntime))))
+  (is (= (t/ensure-runtime-import '(table x)) '(table x)))
   (is (= (t/ensure-runtime-import '(stencil test)) 
          '(stencil test (import javaPico)))))
 
@@ -210,15 +211,22 @@
 (deftest infer-types
   (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
   (is (= (t/infer-types '(f ($meta) x ($meta))) '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
-
+  (is (= (t/infer-types '(f ($meta) x ($meta) y ($meta) z ($meta))) 
+         '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)) y ($meta (type ***UNKNOWN***)) z ($meta (type ***UNKNOWN***)))))
+  (is (= (t/infer-types '(f ($meta) (x ($meta)))) 
+         '(f ($meta (type fn)) (x ($meta (type fn))))))
   (is (= (t/infer-types (list 'f '($meta) 'x (list '$meta (list 'type nil))))
          '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
   (is (= (t/infer-types '(f ($meta) a ($meta) b ($meta (type int))))
          '(f ($meta (type fn)) a ($meta (type ***UNKNOWN***)) b ($meta (type int)))))
   (is (= (t/infer-types (list 'f '($meta nil)))
          '(f ($meta (type fn)))))
+  (is (= (t/infer-types '($ptuple ($meta) (quote ($meta) (x)) x ($meta)))
+         '($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***)))))
   (is (= (t/infer-types '(let ((x ($meta)) (do ($meta) (f ($meta)))) ($ptuple ($meta) (quote ($meta) (x)) x ($meta))))
-         '(let (x ($meta (type ***UNKNOWN***)) (do ($meta (type fn)) (f ($meta (type fn))))) ($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***))))))
+         '(let ((x ($meta (type ***UNKNOWN***))) (do ($meta (type fn)) (f ($meta (type fn))))) ($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***))))))
+
+
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))
 
 
