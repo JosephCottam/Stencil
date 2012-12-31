@@ -184,7 +184,7 @@
   (is (= (t/init->when '(init (gen))) '(when ($init?) () (gen)))))
 
 
-(deftest test-binding-when
+(deftest binding-when
   (is (= (t/binding-when '()) '()))
   (is (= (t/binding-when '(stencil test)) '(stencil test)))
   (is (= (t/binding-when '(stencil test 
@@ -200,7 +200,8 @@
            (stream input (fields x ($meta))) 
            (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x))))))))
   (is (thrown? RuntimeException
-               (t/binding-when '(table plot ($meta)
+               ;;str forces evaluatuion to get the exection
+               (str(t/binding-when '(table plot ($meta)
                                    (fields ($meta) id ($meta (display "id")))
                                    (render ($meta) (text ($meta) "simpleLines_test.tuples" ($meta)))
                                    (data ($meta)
@@ -208,7 +209,7 @@
                                        (onChange ($meta) values ($meta))
                                        (items ($meta) values ($meta))
                                        (let (((id ($meta)) ($do ($meta) v ($meta))))
-                                         ($ptuple ($meta) (quote ($meta) (id ($meta))) id ($meta))))))))))
+                                         ($ptuple ($meta) (quote ($meta) (id ($meta))) id ($meta)))))))))))
                
 (deftest infer-types
   (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
@@ -225,9 +226,16 @@
          '(f ($meta (type fn)))))
   (is (= (t/infer-types '($ptuple ($meta) (quote ($meta) (x)) x ($meta)))
          '($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***)))))
-  (is (= (t/infer-types '(let ((x ($meta)) (do ($meta) (f ($meta)))) ($ptuple ($meta) (quote ($meta) (x)) x ($meta))))
-         '(let ((x ($meta (type ***UNKNOWN***))) (do ($meta (type fn)) (f ($meta (type fn))))) ($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***))))))
-
+  (is (= (t/infer-types '(let (((x ($meta)) (do ($meta) (f ($meta))))) ($ptuple ($meta) (quote ($meta) (x)) x ($meta))))
+         '(let (((x ($meta (type ***UNKNOWN***))) (do ($meta (type fn)) (f ($meta (type fn)))))) ($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***))))))
+  (is (= (t/infer-types '(let (((x ($meta) y ($meta)) (f ($meta)))) (g ($meta))))
+         '(let (((x ($meta (type ***UNKNOWN***)) y ($meta (type ***UNKNOWN***))) (f ($meta (type fn))))) (g ($meta (type fn))))))
+  (is (= (t/infer-types '(let (((x ($meta)) (f ($meta)))
+                               ((y ($meta)) (g ($meta))))
+                           (body ($meta))))
+         '(let (((x ($meta (type ***UNKNOWN***))) (f ($meta (type fn))))
+                ((y ($meta (type ***UNKNOWN***))) (g ($meta (type fn)))))
+           (body ($meta (type fn))))))
 
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))
 

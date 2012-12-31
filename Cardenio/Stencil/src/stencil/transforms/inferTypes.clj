@@ -35,14 +35,14 @@
     [_ ([([(policy :guard policy?) (m :guard meta?)] :seq) & rest] :seq)]
        `(~policy ~(enforce-type m policy) ~@(map (partial infer false) rest))
     [_ (['let bindings body] :seq)]
-      (list 'let (infer :binding bindings) (infer :normal body))
+      (list 'let (map (partial infer :binding) bindings) (infer :normal body))
     [:normal ([([op (m :guard meta?)] :seq) & args] :seq)]
       `((~op ~(enforce-type m 'fn)) ~@(map (partial infer :arg) args))
     [:arg ([(a :guard atom?) (m :guard meta?)] :seq)]
        (list a (ensure-type m (simple-type a)))
     [:arg _] 
        (infer :normal program)
-    [:binding ([bindings expr & rest] :seq)]
+    [:binding ([bindings expr] :seq)]
        (let [vars (map first bindings)
              metas (map ensure-type (map second bindings) (repeat (UNKNOWN)))
              bindings (map list vars metas)]
