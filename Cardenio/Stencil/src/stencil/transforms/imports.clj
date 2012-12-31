@@ -11,9 +11,12 @@
        (some 
            #(> (.indexOf (.toLowerCase (str (second %))) "runtime") -1)
            (filter #(and (list? %) (= 'import (first %))) program)))
+      (fragment? [program]
+        "A fragment does not start with (stencil ...)"
+        (not (= 'stencil (first program))))
       (add-runtime [defaultRuntime program]
         "Add the default runtime import to program."
         (concat (take 2 program) `((~'import ~defaultRuntime)) (drop 2 program)))]
-   (if (has-runtime? program)
+   (if (or (has-runtime? program) (fragment? program))
       program
       (add-runtime *default-runtime* program))))
