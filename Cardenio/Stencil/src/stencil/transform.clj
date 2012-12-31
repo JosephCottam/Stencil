@@ -14,7 +14,6 @@
 (load "transforms/fields")
 (load "transforms/inferTypes")
 
-
 (defn validate
   "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
    This validation is run before normalization, simplifying normalization by removing many checks."

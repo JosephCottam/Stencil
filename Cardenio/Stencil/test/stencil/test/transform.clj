@@ -6,7 +6,8 @@
   (is (= (t/drop-comments '(comment a))) nil)
   (is (= (t/drop-comments '(stuff (comment a)))) '(stuff))
   (is (= (t/drop-comments '(stuff (comment)))) '(stuff))
-  (is (= (t/drop-comments '(stuff (deep (in (comment more)))))) '(stuff (deep (in)))))
+  (is (= (t/drop-comments '(stuff (deep (in (comment more)))))) '(stuff (deep (in))))
+  (is (= (t/drop-comments (list '$meta java.lang.Long)) (list '$meta java.lang.Long))))
 
 (deftest infix->prefix 
   (is (= (t/infix->prefix '(a + b)) '(+ a b)))
@@ -194,12 +195,31 @@
                          (table t (data (when ($meta) (delta input) (items ($meta) input ($meta)) (let (x:x)))))))
          '(stencil test 
            (stream input (fields x ($meta))) 
-           (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x)))))))))
-
+           (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x))))))))
+  (is (thrown? RuntimeException
+               (t/binding-when '(table plot ($meta)
+                                   (fields ($meta) id ($meta (display "id")))
+                                   (render ($meta) (text ($meta) "simpleLines_test.tuples" ($meta)))
+                                   (data ($meta)
+                                     (when ($meta)
+                                       (onChange ($meta) values ($meta))
+                                       (items ($meta) values ($meta))
+                                       (let (((id ($meta)) ($do ($meta) v ($meta))))
+                                         ($ptuple ($meta) (quote ($meta) (id ($meta))) id ($meta))))))))))
+               
 (deftest infer-types
   (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
   (is (= (t/infer-types '(f ($meta) x ($meta))) '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
-  (is (= (t/infer-types `(f ($meta) x ~('$meta (~'type ~nil)))) '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
+
+  (is (= (t/infer-types (list 'f '($meta) 'x (list '$meta (list 'type nil))))
+         '(f ($meta (type fn)) x ($meta (type ***UNKNOWN***)))))
   (is (= (t/infer-types '(f ($meta) a ($meta) b ($meta (type int))))
          '(f ($meta (type fn)) a ($meta (type ***UNKNOWN***)) b ($meta (type int)))))
+  (is (= (t/infer-types (list 'f '($meta nil)))
+         '(f ($meta (type fn)))))
+  (is (= (t/infer-types '(let ((x ($meta)) (do ($meta) (f ($meta)))) ($ptuple ($meta) (quote ($meta) (x)) x ($meta))))
+         '(let (x ($meta (type ***UNKNOWN***)) (do ($meta (type fn)) (f ($meta (type fn))))) ($ptuple ($meta (type fn)) (quote ($meta (type fn)) (x)) x ($meta (type ***UNKNOWN***))))))
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))
+
+
+

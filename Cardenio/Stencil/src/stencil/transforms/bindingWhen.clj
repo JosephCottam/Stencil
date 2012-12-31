@@ -18,9 +18,10 @@
         (let [parent (parent path program)
               item  (first (filter #(and (seq? %) (= (second %) name)) parent))
               prototype (first (filter #(and (seq? %) (= 'fields (first %))) item))]
-           (if (nil? item) 
-               (find-names name (butlast path))
-               prototype)))
+          (cond
+            (nil? path) (throw (RuntimeException. "Prototype source not found in path"))
+            (nil? item) (find-names name (butlast path))
+            :else prototype)))
 
     (binds [generator path] 
      (match [generator]

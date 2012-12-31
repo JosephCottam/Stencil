@@ -23,4 +23,10 @@
   (is (= (t/meta-keys '($meta (a b) (c d) (e f))) #{'a 'c 'e}))
   (is (= (t/meta-keys '($meta)) #{})))
 
-
+(deftest atom?
+  (is (atom? 'a))
+  (is (atom? "a"))
+  (is (atom? 3))
+  (is (atom? java.lang.Long))
+  (is (atom? java.lang.Class))
+  (is (not (atom? (list a b c)))))

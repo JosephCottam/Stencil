@@ -29,7 +29,7 @@
 (defn atom? 
   "Items that are no longer divisible, includes forms"
   [x]
-  (or (symbol? x) (value? x)))
+  (or (symbol? x) (value? x) (class? x)))
 
 (defn meta? [e]
   "Is this a meta expression?"
