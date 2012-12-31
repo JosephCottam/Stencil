@@ -31,14 +31,18 @@
   (letfn 
     [(normalize-line [l]
        (match [l]
-         [([(t :guard seq?) & rest] :seq)] l   ;;Body or multi-var binding
+         [(a :guard atom?)] a
+         [([(t :guard seq?) & rest] :seq)] l   ;;Multi-var binding
          [([t (m :guard meta?) & rest] :seq)] `((~t ~m) ~@rest)  ;;Single variable binding w/meta
          [([t & rest] :seq)] `((~t) ~@rest)))   ;;Single variable binding w/o meta
      (divide-body [lines]
-       (if (nil? (some '$C lines))
-         (list lines '())
-         (list (butlast lines) (last lines))))
+       "Give back a pair (bindings, body)"
+       (let [maybe-body (last lines)]
+         (if (or (atom? maybe-body) (not (any= '$C maybe-body)))
+           (list (butlast lines) maybe-body)
+           (list lines '()))))
      (reshape-binding [binding]
+       "Provide relevant do-statement so even values look like function applications in the bindings"
        (let [[vars op expr & meta] binding]
          (cond
            (not (empty? meta)) `(~vars (~'$do ~expr ~@meta))
@@ -47,8 +51,8 @@
     (match [program]
       [(x :guard atom?)] x
       [(['let & lines] :seq)] 
-        (let [[bindings body] (divide-body (map normalize-line lines))
-              bindings (map reshape-binding bindings)]
+        (let [[bindings body] (divide-body lines)
+              bindings (map (comp reshape-binding normalize-line) bindings)]
           (list 'let bindings body))
       :else (map normalize-let-shape program))))
 

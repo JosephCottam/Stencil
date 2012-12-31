@@ -27,6 +27,8 @@
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a $C c) (d e f) (h i j))))))
 
 (deftest normalize-let-shape
+  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) 4)) '(let (((a d) (b))) 4)))
+  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) (body))) '(let (((a d) (b))) (body))))
   (is (= (t/normalize-let-shape '(let ((a d) $C (b)))) '(let (((a d) (b))) ())))
   (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) ($do b))) ())))
   (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) ($do b))) ())))
