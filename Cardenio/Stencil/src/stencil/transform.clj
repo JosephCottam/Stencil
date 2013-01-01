@@ -57,8 +57,12 @@
             (clojure.pprint/pprint-newline :linear))
           (recur (next astencil)))))))
 
-(defn spp [program] 
+(defn spp [program & opts] 
   "A pretty-printer for stencil."
-  (clojure.pprint/with-pprint-dispatch pprint-stencil (clojure.pprint/pprint (clean-metas program))))
+  (let [preproc identity
+        preproc (if (any= :metas opts) (comp clean-metas identity) preproc)]
+    (clojure.pprint/with-pprint-dispatch 
+      pprint-stencil 
+      (clojure.pprint/pprint (preproc program)))))
 
 
