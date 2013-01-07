@@ -19,9 +19,18 @@
   (is (= (t/infix->prefix '((v) $C a)) '($C (v) a)))
   (is (= (t/infix->prefix '(a _)) '(a _)))
   (is (= (t/infix->prefix '(a -> b)) '(-> a b)))
-  (is (= (t/infix->prefix '(let ((a) (a + b)))) '(let ((a) (+ a b)))))
-  (is (= (t/infix->prefix '(let ((a) ($do (a + b) -> (c)))))
-         '(let ((a) (-> (+ a b) (c)))))))
+  (is (= (t/infix->prefix '(let (((a) (a + b))) ())) '(let (((a) (+ a b))) ())))
+  (is (= (t/infix->prefix '(let (((a) ($do 3 + 4))) ())) '(let (((a) (+ 3 4))) ())))
+  (is (= (t/infix->prefix '(let ((a) ($do (a + b) -> (c))) ()))
+         '(let ((a) (-> (+ a b) (c))) ()))))
+
+(deftest arrow->using
+  (is (= (t/arrow->using '(a b)) '(a b)))
+  (is (= (t/arrow->using 'a) 'a))
+  (is (= (t/arrow->using '(-> a b)) '(using a b)))
+  (is (= (t/arrow->using '(-> (a b c) (d e f))) '(using (a b c) (d e f))))
+  (is (= (t/arrow->using '(let (((a) (-> a b))) ())) 
+         '(let (((a) (using a b))) ()))))
 
 (deftest validate-let-shape
   (is (= (t/validate-let-shape '(let (a $C b)))) '(let (a $C b)))

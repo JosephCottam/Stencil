@@ -12,6 +12,7 @@
 (load "transforms/imports")
 (load "transforms/bindingWhen")
 (load "transforms/fields")
+(load "transforms/using")
 (load "transforms/inferTypes")
 
 (defn validate
@@ -24,7 +25,7 @@
   [program] 
    (-> program 
     ensure-runtime-import
-    normalize-let-shape infix->prefix default-let-body 
+    normalize-let-shape infix->prefix arrow->using default-let-body 
     file->init pull->when init->when
     supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields
@@ -52,7 +53,7 @@
         (clojure.pprint/write-out (first astencil))
         (when-let [nxt (second astencil)]
           (.write ^java.io.Writer *out* " ")
-          (if (meta? nxt) 
+          (if (meta? nxt)   ;;Reduces line-breaks after metas over standard pretty-printer
             (clojure.pprint/pprint-newline :fill)
             (clojure.pprint/pprint-newline :linear))
           (recur (next astencil)))))))
