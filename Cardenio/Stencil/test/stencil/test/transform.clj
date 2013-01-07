@@ -12,11 +12,16 @@
 (deftest infix->prefix 
   (is (= (t/infix->prefix '(a + b)) '(+ a b)))
   (is (= (t/infix->prefix '(+ a b)) '(+ a b)))
+  (is (= (t/infix->prefix '((a + b))) '((+ a b))))
   (is (= (t/infix->prefix '(map +' ls)) '(map + ls)))
   (is (= (t/infix->prefix '(a plus' b)) '(plus a b)))
   (is (= (t/infix->prefix '(map plus ls)) '(map plus ls)))
   (is (= (t/infix->prefix '((v) $C a)) '($C (v) a)))
-  (is (= (t/infix->prefix '(a _)) '(a _))))
+  (is (= (t/infix->prefix '(a _)) '(a _)))
+  (is (= (t/infix->prefix '(a -> b)) '(-> a b)))
+  (is (= (t/infix->prefix '(let ((a) (a + b)))) '(let ((a) (+ a b)))))
+  (is (= (t/infix->prefix '(let ((a) ($do (a + b) -> (c)))))
+         '(let ((a) (-> (+ a b) (c)))))))
 
 (deftest validate-let-shape
   (is (= (t/validate-let-shape '(let (a $C b)))) '(let (a $C b)))
