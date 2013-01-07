@@ -39,6 +39,8 @@
        `((~policy ~(enforce-type m policy)) ~@(map (partial infer :arg) rest))
     [_ (['let bindings body] :seq)]
       (list 'let (map (partial infer :binding) bindings) (infer :normal body))
+    [_ (['quote items] :seq)]
+      (list 'quote items)
     [:normal ([([op (m :guard meta?)] :seq) & args] :seq)]
       `((~op ~(enforce-type m 'fn)) ~@(map (partial infer :arg) args))
     [:arg ([(a :guard atom?) (m :guard meta?)] :seq)]

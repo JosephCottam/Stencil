@@ -212,6 +212,7 @@
                                          ($ptuple ($meta) (quote ($meta) (id ($meta))) id ($meta)))))))))))
                
 (deftest infer-types
+  (is (= (t/infer-types '(quote (a ($meta) b ($meta)))) '(quote (a ($meta) b ($meta)))))
   (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
   (is (= (t/infer-types '(f ($meta) x ($meta))) '(f ($meta (type fn)) x ($meta (type ***)))))
   (is (= (t/infer-types '(f ($meta) x ($meta) y ($meta) z ($meta))) 
