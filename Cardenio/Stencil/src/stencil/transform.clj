@@ -25,11 +25,11 @@
   [program] 
    (-> program 
     ensure-runtime-import
-    normalize-let-shape infix->prefix arrow->using default-let-body 
+    normalize-let-shape infix->prefix arrow->using default-let-body
     file->init pull->when init->when
     supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields
-    binding-when infer-types))
+    binding-when infer-types ensure-using-tuple))
 
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 
