@@ -11,14 +11,12 @@
   "Ensure that the first expression in a using statement produces a tuple."
   (letfn [(tuple-fn? [m]
             (let [type ((meta->map m) 'type)]
-              (do 
-                (println type)
               (and (list? type) 
                    (= (first type) 'fn)
                    (= (count type) 3)
                    (let [[_ args rv] type]
                      (and (list? rv)
-                          (= (first rv) 'tuple)))))))
+                          (= (first rv) 'tuple))))))
           (ensure-tuple [e] 
             (match [e]
               [(['let vals body] :seq)] (list 'let vals body)
