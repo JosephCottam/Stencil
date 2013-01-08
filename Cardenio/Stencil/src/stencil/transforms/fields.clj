@@ -18,7 +18,8 @@
        (throw (RuntimeException. (str "Could not find prototyped tuple in " (first saved) "...")))
      (or (= '$ptuples (first expr)) 
          (= '$ptuple (first expr)))
-      `(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
+        (second-expr expr)    ;;acquire the fields statement
+      ;`(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
      :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields

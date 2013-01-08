@@ -75,7 +75,7 @@
        (let [names (distinct (remove meta? bindings))
              metas (meta-map bindings nil {})
              typed (blend names metas)]
-        `(~'$ptuple (~'quote ~typed) ~@typed)))
+        `(~'$ptuple (~'fields ~@typed) ~@typed)))
 
      (ensure-body
        ([bindings body]

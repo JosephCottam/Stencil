@@ -59,13 +59,13 @@
             ()))))
 
 (deftest default-let-body
-  (is (= (t/default-let-body '(let (((a) b)) ())) '(let (((a) b)) ($ptuple '(a) a))))
+  (is (= (t/default-let-body '(let (((a) b)) ())) '(let (((a) b)) ($ptuple (fields a) a))))
   (is (= (t/default-let-body '(let (((a) b)) (tuple a))) '(let (((a) b)) (tuple a))))
-  (is (= (t/default-let-body '(let (((a b) c)) ())) '(let (((a b) c)) ($ptuple '(a b) a b))))
+  (is (= (t/default-let-body '(let (((a b) c)) ())) '(let (((a b) c)) ($ptuple (fields a b) a b))))
   (is (= (t/default-let-body '(let (((a) b) ((c) d)) ())) 
-         '(let (((a) b) ((c) d)) ($ptuple '(a c) a c))))
+         '(let (((a) b) ((c) d)) ($ptuple (fields a c) a c))))
   (is (= (t/default-let-body '(let (((a ($meta)) b)) ())) 
-         '(let (((a ($meta)) b)) ($ptuple '(a ($meta)) a ($meta))))))
+         '(let (((a ($meta)) b)) ($ptuple (fields a ($meta)) a ($meta))))))
 
 (deftest tie-metas 
   (is (= (t/tie-metas '(a)) '(a)))
@@ -118,16 +118,22 @@
          '(stencil test (import javaPico)))))
 
 (deftest expr->fields
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta)) 1))
+  (is (= (t/expr->fields '($ptuple ($meta) (fields a ($meta)) 1))
+         '(fields a ($meta))))
+  (is (= (t/expr->fields '($ptuple ($meta) (fields ($meta) a ($meta)) 1))
          '(fields ($meta) a ($meta))))
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int))) 1))
+  (is (= (t/expr->fields '($ptuple ($meta) (fields ($meta) a ($meta (type int))) 1))
          '(fields ($meta) a ($meta  (type int)))))
-  (is (= (t/expr->fields '($ptuple ($meta) '(a ($meta (type int)) b ($meta (type int)) c ($meta (type int))) 1 2 3))
+  (is (= (t/expr->fields '($ptuple ($meta) (fields ($meta) 
+                                             a ($meta (type int)) 
+                                             b ($meta (type int)) 
+                                             c ($meta (type int))) 1 2 3))
          '(fields ($meta) 
               a ($meta (type int))
               b ($meta (type int)) 
               c ($meta (type int)))))
-  (is (= (t/expr->fields '(let [a ($meta) true ($meta)] ($ptuple ($meta) '(a ($meta (type int))) 1)))
+  (is (= (t/expr->fields '(let [a ($meta) true ($meta)] 
+                            ($ptuple ($meta) (fields ($meta) a ($meta (type int))) 1)))
          '(fields ($meta) a ($meta (type int))))))
 
 (deftest normalize-fields
@@ -145,32 +151,35 @@
                   c ($meta (display "cat"))))))
 
 (deftest ensure-fields
-  (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) '(stream x ($meta) (fields foo bar))))
-  (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) '(table x ($meta) (fields foo bar))))
+  (is (= (t/ensure-fields '(stream x ($meta) (fields foo bar))) 
+         '(stream x ($meta) (fields foo bar))))
+  (is (= (t/ensure-fields '(table x ($meta) (fields foo bar))) 
+         '(table x ($meta) (fields foo bar))))
   (is (= (t/ensure-fields 
            '(table x ($meta) 
-                   (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0)))))
+                   (data (when ($meta) (pred) (gen) 
+                           ($ptuples ($meta) (fields a ($meta (type int))) 0)))))
            '(table x ($meta) 
-                   (fields ($meta) a ($meta (type int)))
-                   (data (when ($meta) (pred) (gen) ($ptuples ($meta) '(a ($meta (type int))) 0))))))
+                   (fields a ($meta (type int)))
+                   (data (when ($meta) (pred) (gen) ($ptuples ($meta) (fields a ($meta (type int))) 0))))))
   (is (= (t/ensure-fields 
           '(table x ($meta) 
-            (data ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2))))
+            (data ($ptuple ($meta) (fields foo ($meta (type int)) bar ($meta (type int))) 1 2))))
           '(table x ($meta) 
-            (fields ($meta)
+            (fields 
                     foo ($meta (type int)) 
                     bar ($meta (type int)))
-            (data ($ptuple ($meta)'(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+            (data ($ptuple ($meta) (fields foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
   (is (= (t/ensure-fields 
            '(stream x ($meta) 
              (data ($meta) (when ($meta) ($init? ($meta)) () 
-                            ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
+                            ($ptuple ($meta) (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 1 2)))))
            '(stream x ($meta) 
              (fields ($meta) 
                      foo ($meta (type int)) 
                      bar ($meta (type int)))
              (data ($meta) (when ($meta) ($init? ($meta)) () 
-                            ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
+                            ($ptuple ($meta) (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
 (defn identity? [f a] (= a (f a)))
 (deftest validate-fields
@@ -179,7 +188,7 @@
                (fields foo ($meta (default 0) (display "foo") (type int)) 
                        bar ($meta (default 0) (display "bar") (type int)))
                (data ($meta) (when ($meta) ($init? ($meta)) () 
-                              ($ptuple ($meta) '(foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
+                              ($ptuple ($meta) (fields foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
   
 (deftest display->fields
   (is (= (t/display->fields '(table x ($meta) (fields a ($meta) b ($meta)))) 
@@ -223,10 +232,9 @@
                                        (onChange ($meta) values ($meta))
                                        (items ($meta) values ($meta))
                                        (let (((id ($meta)) ($do ($meta) v ($meta))))
-                                         ($ptuple ($meta) (quote ($meta) (id ($meta))) id ($meta)))))))))))
+                                         ($ptuple ($meta) (fields ($meta) (id ($meta))) id ($meta)))))))))))
                
 (deftest infer-types
-  (is (= (t/infer-types '(quote (a ($meta) b ($meta)))) '(quote (a ($meta) b ($meta)))))
   (is (= (t/infer-types '(x ($meta (type fn)))) '(x ($meta (type fn)))))
   (is (= (t/infer-types '(f ($meta) x ($meta))) '(f ($meta (type fn)) x ($meta (type ***)))))
   (is (= (t/infer-types '(f ($meta) x ($meta) y ($meta) z ($meta))) 
@@ -239,12 +247,13 @@
          '(f ($meta (type fn)) a ($meta (type ***)) b ($meta (type int)))))
   (is (= (t/infer-types (list 'f '($meta nil)))
          '(f ($meta (type fn)))))
-  (is (= (t/infer-types '($ptuple ($meta) (quote ($meta) (x)) x ($meta)))
-         '($ptuple ($meta (type (fn (...) (tuple (...))))) (quote ($meta (type fn)) (x)) x ($meta (type ***)))))
+  (is (= (t/infer-types '($ptuple ($meta) (fields ($meta) (x)) x ($meta)))
+         '($ptuple ($meta (type (fn (...) (tuple (...))))) (fields ($meta (type fields)) (x)) x ($meta (type ***)))))
   (is (= (t/infer-types '(let (((x ($meta)) (do ($meta) (f ($meta))))) 
-                           ($ptuple ($meta) (quote ($meta) (x)) x ($meta))))
+                           ($ptuple ($meta) (fields ($meta) (x)) x ($meta))))
          '(let (((x ($meta (type ***))) (do ($meta (type fn)) (f ($meta (type fn)))))) 
-            ($ptuple ($meta (type (fn (...) (tuple (...))))) (quote ($meta (type fn)) (x)) x ($meta (type ***))))))
+            ($ptuple ($meta (type (fn (...) (tuple (...))))) 
+               (fields ($meta (type fields)) (x)) x ($meta (type ***))))))
   (is (= (t/infer-types '(let (((x ($meta) y ($meta)) (f ($meta)))) (g ($meta))))
          '(let (((x ($meta (type ***)) y ($meta (type ***))) (f ($meta (type fn))))) (g ($meta (type fn))))))
   (is (= (t/infer-types '(let (((x ($meta)) (f ($meta)))
@@ -255,6 +264,21 @@
            (body ($meta (type fn))))))
 
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))
+
+(deftest ensure-using-tuple
+  (is (= (t/ensure-using-tuple 
+           '(using ($meta) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b) (x))) 
+         '(using ($meta) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b) (x))))
+  (is (= (t/ensure-using-tuple 
+           '(using ($meta) (let (((x) ($do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x)))
+         '(using ($meta) (let (((x) ($do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x))))
+  (is (= (t/ensure-using-tuple '(using ($meta) b (x))) 
+         '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) b) (x))))
+  (is (= (t/ensure-using-tuple '(using ($meta) (b) (x))) 
+         '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) (b)) (x)))))
+
+
+
 
 
 

@@ -48,8 +48,6 @@
             `((~policy ~(enforce-type m policy)) ~@(map (partial annotate :arg) rest))
          [_ (['let bindings body] :seq)]
             (list 'let (map (partial annotate :binding) bindings) (annotate :normal body))
-         [_ (['quote items] :seq)]
-            (list 'quote items)
          [:normal ([([op (m :guard meta?)] :seq) & args] :seq)]
             `((~op ~(enforce-type m 'fn)) ~@(map (partial annotate :arg) args))
          [:arg ([(a :guard atom?) (m :guard meta?)] :seq)]
