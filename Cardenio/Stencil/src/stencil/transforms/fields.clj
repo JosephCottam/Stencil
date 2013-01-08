@@ -39,22 +39,38 @@
       
 
 ;;;------------------------------------------------------------------------------------------------------------
-(defn covers [fields-policy]
- (let [fields (set (take-nth 2 (full-drop (first fields-policy))))]
-  (fn [data] 
-     (clojure.set/subset? fields (map first (rest (expr->fields data)))))))
 
-(defn validate-fields
+
+(defn check-fields-cover-data [program]
   "Test if the 'fields' policy covers the names used in all of the 'data' policies.
    'fields' may include names NOT in a 'data', if that field also has a default value."
-  [program]
-  (match [program]
-    [a :guard atom?] a
-    [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-      (let [fields (filter-policies 'fields policies)
-            data   (filter-policies 'data policies)]
-        (map (covers fields) data))
-    :else (map validate-fields program)))
+  (letfn [(covers [fields-policy]
+            (let [fields (set (remove meta? (rest (first fields-policy))))]
+              (fn [data] 
+                (clojure.set/subset? fields (set (remove meta? (rest (expr->fields data))))))))]
+    (match [program]
+      [a :guard atom?] a
+      [([(tag :guard stream-or-table?) (n :guard symbol?) (m :guard meta?) & policies] :seq)]
+        (let [fields (filter-policies 'fields policies)
+              data   (filter-policies 'data policies)]
+          (if (every? #(= true %) (map (covers fields) data))
+            (list tag n m (check-fields-cover-data policies))
+              (throw (RuntimeException. (str "Fields statement does not cover data statement: " program)))))
+      :else (map check-fields-cover-data program))))
+
+
+(defn check-simple-fields [program]
+  "Test if the 'fields' statements only have symbol entries (and metas).
+   Throws exception on failure, or unchanged tree."
+   (match [program]
+     [a :guard atom?] a
+     [(['fields & rest] :seq)]
+       (if (every? #(or (symbol? %) (meta? %)) rest)
+         (list 'fields rest)
+         (throw (RuntimeException. (str "Fields statement with illegal entry: " program))))
+     :else 
+       (map check-simple-fields program)))
+
 
 ;;;------------------------------------------------------------------------------------------------------------
 (defn fold-into-fields

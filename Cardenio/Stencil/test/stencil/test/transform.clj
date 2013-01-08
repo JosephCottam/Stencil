@@ -181,14 +181,21 @@
              (data ($meta) (when ($meta) ($init? ($meta)) () 
                             ($ptuple ($meta) (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
-(defn identity? [f a] (= a (f a)))
-(deftest validate-fields
-  (is (t/validate-fields 
-       '(stream x ($meta) 
-               (fields foo ($meta (default 0) (display "foo") (type int)) 
-                       bar ($meta (default 0) (display "bar") (type int)))
-               (data ($meta) (when ($meta) ($init? ($meta)) () 
-                              ($ptuple ($meta) (fields foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
+
+(deftest check-simple-fields
+  (is (str (t/check-simple-fields '(fields a b c))))
+  (is (str (t/check-simple-fields '(fields a ($meta) b ($meta) c ($meta)))))
+  (is (thrown? RuntimeException (str (t/check-simple-fields '(fields a ($meta) (+ a b)))))))
+
+(deftest check-fields-cover-data
+  (is (str (t/check-fields-cover-data
+             '(stream x ($meta) 
+                      (fields foo ($meta (default 0) (display "foo") (type int)) 
+                              bar ($meta (default 0) (display "bar") (type int)))
+                      (data ($meta) (when ($meta) ($init? ($meta)) () 
+                                      ($ptuple ($meta) 
+                                         (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 
+                                         1 2))))))))
   
 (deftest display->fields
   (is (= (t/display->fields '(table x ($meta) (fields a ($meta) b ($meta)))) 
@@ -262,7 +269,6 @@
          '(let (((x ($meta (type ***))) (f ($meta (type fn))))
                 ((y ($meta (type ***))) (g ($meta (type fn)))))
            (body ($meta (type fn))))))
-
   (is (thrown? RuntimeException (t/infer-types '(f ($meta (type int)) a)))))
 
 (deftest ensure-using-tuple
