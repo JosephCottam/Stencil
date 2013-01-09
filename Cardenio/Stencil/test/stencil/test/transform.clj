@@ -183,11 +183,26 @@
 
 
 (deftest check-simple-fields
-  (is (str (t/check-simple-fields '(fields a b c))))
-  (is (str (t/check-simple-fields '(fields a ($meta) b ($meta) c ($meta)))))
+  (is (= (t/check-simple-fields '(fields a b c)) '(fields a b c)))
+  (is (= (t/check-simple-fields '(fields a ($meta) b ($meta) c ($meta))) '(fields a ($meta) b ($meta) c ($meta))))
   (is (thrown? RuntimeException (str (t/check-simple-fields '(fields a ($meta) (+ a b)))))))
 
 (deftest check-fields-cover-data
+ (is (= (t/check-fields-cover-data
+             '(stream x ($meta) 
+                      (fields foo ($meta (default 0) (display "foo") (type int)) 
+                              bar ($meta (default 0) (display "bar") (type int)))
+                      (data ($meta) (when ($meta) ($init? ($meta)) () 
+                                      ($ptuple ($meta) 
+                                         (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 
+                                         1 2)))))
+       '(stream x ($meta) 
+                      (fields foo ($meta (default 0) (display "foo") (type int)) 
+                              bar ($meta (default 0) (display "bar") (type int)))
+                      (data ($meta) (when ($meta) ($init? ($meta)) () 
+                                      ($ptuple ($meta) 
+                                         (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 
+                                         1 2)))))) 
   (is (str (t/check-fields-cover-data
              '(stream x ($meta) 
                       (fields foo ($meta (default 0) (display "foo") (type int)) 
@@ -230,7 +245,7 @@
            (stream input (fields x ($meta))) 
            (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x))))))))
   (is (thrown? RuntimeException
-               ;;str forces evaluatuion to get the exection
+               ;;str forces evaluatuion to get the exection...maybe
                (str(t/binding-when '(table plot ($meta)
                                    (fields ($meta) id ($meta (display "id")))
                                    (render ($meta) (text ($meta) "simpleLines_test.tuples" ($meta)))

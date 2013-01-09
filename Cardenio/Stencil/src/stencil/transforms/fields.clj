@@ -54,7 +54,7 @@
         (let [fields (filter-policies 'fields policies)
               data   (filter-policies 'data policies)]
           (if (every? #(= true %) (map (covers fields) data))
-            (list tag n m (check-fields-cover-data policies))
+            `(~tag ~n ~m ~@(check-fields-cover-data policies))
               (throw (RuntimeException. (str "Fields statement does not cover data statement: " program)))))
       :else (map check-fields-cover-data program))))
 
@@ -66,7 +66,7 @@
      [a :guard atom?] a
      [(['fields & rest] :seq)]
        (if (every? #(or (symbol? %) (meta? %)) rest)
-         (list 'fields rest)
+         program
          (throw (RuntimeException. (str "Fields statement with illegal entry: " program))))
      :else 
        (map check-simple-fields program)))
