@@ -5,11 +5,10 @@
    [path program] 
    (reduce nth program (butlast path)))
 
-(defn binding-when
-  "Modifies the 'when' statement from its lexical form to one
-   that includes information about the bindings.  
-   This simplifies name resolution later. 
-   To denote this change, 'when' becomes 'when+'."
+(defn split-when
+  "Takes the generator out of the when statement and puts it into a using statement.
+   The using statement has a fields entry derived from generator.
+   With the generator removed, 'when' is replaced by 'when-'."
    [program]
    (letfn 
     [(find-names
@@ -25,7 +24,7 @@
 
     (binds [generator path] 
      (match [generator]
-       [e :guard empty?] '(fields)
+       [e :guard empty?] '(fields ($meta))
        [(['delta (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
        [(['items (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
       :else 
@@ -34,8 +33,7 @@
      (match [program]
       [(a :guard atom?)] a
       [(m :guard meta?)] m
-      [(['when (m1 :guard meta?) cond gen trans] :seq)]
-      `(~'when+ ~m1 ~cond ~gen ~(binds gen (reverse upPath)) ~trans)
+      [(['when (m1 :guard meta?) cond gen body] :seq)]
+         `(~'when- ~m1 ~cond (~'using (~'$meta) ~(binds gen (reverse upPath)) ~gen ~body))
       :else (map-indexed #(search %2 (cons %1 upPath)) program)))]
    (search program '())))
-

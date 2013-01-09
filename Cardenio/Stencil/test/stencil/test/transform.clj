@@ -229,24 +229,29 @@
   (is (= (t/init->when '(init (gen))) '(when ($init?) () (gen)))))
 
 
-(deftest binding-when
-  (is (= (t/binding-when '()) '()))
-  (is (= (t/binding-when '(stencil test)) '(stencil test)))
-  (is (= (t/binding-when '(stencil test 
+(deftest split-when
+  (is (= (t/split-when '()) '()))
+  (is (= (t/split-when '(stencil test)) '(stencil test)))
+  (is (= (t/split-when '(stencil test 
                          (stream input (fields x ($meta))) 
-                         (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x)))))))
+                         (table t (data (when- (delta input) (using (fields x ($meta)) (items input) (let (x:x))))))))
          '(stencil test 
-           (stream input (fields x ($meta))) 
-           (table t (data (when+ (delta input) (items input) (fields x ($meta)) (let (x:x))))))))
-  (is (= (t/binding-when '(stencil test 
+             (stream input (fields x ($meta))) 
+             (table t (data (when- (delta input) (using (fields x ($meta)) (items input) (let (x:x)))))))))
+  (is (= (t/split-when '(stencil test 
                          (stream input (fields x ($meta))) 
                          (table t (data (when ($meta) (delta input) (items ($meta) input ($meta)) (let (x:x)))))))
          '(stencil test 
-           (stream input (fields x ($meta))) 
-           (table t (data (when+ ($meta) (delta input) (items ($meta) input ($meta)) (fields x ($meta)) (let (x:x))))))))
+             (stream input (fields x ($meta))) 
+             (table t (data (when- ($meta)
+                              (delta input) 
+                              (using ($meta)
+                                     (fields x ($meta)) 
+                                     (items ($meta) input ($meta)) 
+                                     (let (x:x)))))))))
   (is (thrown? RuntimeException
                ;;str forces evaluatuion to get the exection...maybe
-               (str(t/binding-when '(table plot ($meta)
+               (str(t/split-when '(table plot ($meta)
                                    (fields ($meta) id ($meta (display "id")))
                                    (render ($meta) (text ($meta) "simpleLines_test.tuples" ($meta)))
                                    (data ($meta)

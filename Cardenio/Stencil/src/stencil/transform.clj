@@ -10,7 +10,7 @@
 (load "transforms/convertToWhen")
 (load "transforms/metas")
 (load "transforms/imports")
-(load "transforms/bindingWhen")
+(load "transforms/whens")
 (load "transforms/fields")
 (load "transforms/using")
 (load "transforms/inferTypes")
@@ -29,7 +29,7 @@
     file->init pull->when init->when
     supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
-    binding-when infer-types ensure-using-tuple))
+    split-when infer-types ensure-using-tuple))
 
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 
