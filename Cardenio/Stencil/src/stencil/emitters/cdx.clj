@@ -1,4 +1,4 @@
-(ns stencil.emit)
+(ns stencil.emit.cdx)
 
 (defn emitValue [value] "")
 (defn emitCall [call] "")
@@ -7,16 +7,16 @@
 
 (defn emitExpr [expr] "")
 (defn emitWhen [expr] "")
+(defn emitUsing [program] "")
+(defn emitLet [program] "")
 
-(defn emitStreams [program] "")
+(defn emitStreams [program] (throw (RuntimeException. "Cannot do streams in CDX.")))
 (defn emitRenderer [program] "")
 (defn emitTables [program] "")
 
 (defn stitch [streams renderer tables] "done!")
 
-
-(defn emit 
-  "program -> string: Creates a sourcecode to be run with the pico runtime"
+(defn cdx 
   [program]
   (let [;program (-> program uniqueNames moveTypes)
         streams (emitStreams program)

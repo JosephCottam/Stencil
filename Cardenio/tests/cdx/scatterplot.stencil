@@ -1,0 +1,12 @@
+(table dataset {source: external}
+  (fields a b c))
+
+(table plot
+  (renderer points)
+  ;;(guide x)
+  ;;(guide y)
+  (data
+    (pull dataset 
+          (let (x : a)
+               (y : b)
+               (fillC : "RED")))))
