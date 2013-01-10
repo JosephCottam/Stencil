@@ -310,8 +310,13 @@
   (is (= (t/ensure-using-tuple '(using ($meta) (b) (x))) 
          '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) (b)) (x)))))
 
-
-
-
-
-
+(deftest clean-binds
+  (is (= (t/clean-binds 
+           '(render a ($meta) 
+               (bind ($meta) 
+                     ($C ($meta) x ($meta) y ($meta))
+                     ($C ($meta) y ($meta) z ($meta)))))
+         '(render a ($meta) 
+             (bind ($meta) 
+                   (x ($meta) y ($meta)) 
+                   (y ($meta) z ($meta)))))))
