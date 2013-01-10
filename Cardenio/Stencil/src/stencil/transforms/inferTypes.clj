@@ -23,7 +23,7 @@
 (defn enforce-type 
   "Set the type to the passed one.  
    Throw an error if there is another type present UNLESS the one present returns true from replace?"
-  ([meta required] (enforce-type meta required  #(false)))
+  ([meta required] (enforce-type meta required  (fn [x] false)))
   ([meta required replace?]
    (let [meta (meta->map meta)
          present (meta 'type)]
