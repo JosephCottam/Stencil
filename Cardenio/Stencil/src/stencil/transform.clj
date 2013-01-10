@@ -27,7 +27,7 @@
     ensure-runtime-import
     normalize-let-shape infix->prefix arrow->using default-let-body
     file->init pull->when init->when
-    supply-metas meta-types
+    meta-pairings supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
     split-when infer-types ensure-using-tuple))
 
