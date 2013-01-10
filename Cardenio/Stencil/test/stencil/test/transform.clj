@@ -101,6 +101,13 @@
   (is (= (t/meta-types '($meta a b))) '($meta (type a) b))
   (is (= (t/meta-types '(a ($meta a b))) '(a ($meta (type a) b)))))
   
+(deftest meta-pairings
+  (is (= (t/meta-pairings '($meta (a b))) '($meta (a b))))
+  (is (= (t/meta-pairings '(f ($meta (a b)))) '(f ($meta (a b)))))
+  (is (= (t/meta-pairings '($meta a b)) '($meta a b)))
+  (is (= (t/meta-pairings '($meta a $C b)) '($meta (a b))))
+  (is (= (t/meta-pairings '($meta a b $C c)) '($meta a (b c))))
+  (is (= (t/meta-pairings '($meta a b c $C d e f)) '($meta a b (c d) e f))))
 
 (deftest clean-metas
   (is (= (t/clean-metas 'a) 'a))

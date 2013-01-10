@@ -20,6 +20,17 @@
     [([a & tail] :seq)]
        (cons (supply-metas a) (supply-metas tail))))
   
+(defn meta-pairings [program]
+  (letfn [(maybe-pair [ls]
+            (cond
+              (or (empty? ls) (< (count ls) 3)) ls
+              (= '$C (second ls)) 
+                 (cons (list (first ls) (nth ls 2)) (maybe-pair (drop 3 ls)))
+              :else (cons (first ls) (maybe-pair (rest ls)))))]
+    (match [program]
+      [a :guard atom?] a
+      [(['$meta & rest] :seq)] (cons '$meta (maybe-pair rest))
+      :else (map meta-pairings program))))
 
 
 (defn meta-types
