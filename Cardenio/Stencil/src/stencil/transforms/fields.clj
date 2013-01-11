@@ -6,7 +6,7 @@
   "[test,] condition, policy* -> policy*: Filter a list of policies per the test and condition. 
   Test is invoked once for each policy in policy*.  Default test is '='"
   ([condition policies] (filter-policies = condition policies))
-  ([test condition policies] (filter #(test (first %) condition) policies)))
+  ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
 
 (defn expr->fields
   "Convert an expression to a list of fields.

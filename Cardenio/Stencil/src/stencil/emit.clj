@@ -2,3 +2,4 @@
   (:use [clojure.core.match :only (match)]))
 
 (load "emitters/pico")
+(load "emitters/cdx")
