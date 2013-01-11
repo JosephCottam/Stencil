@@ -312,11 +312,11 @@
 
 (deftest clean-binds
   (is (= (t/clean-binds 
-           '(render a ($meta) 
+           '(render ($meta) a ($meta) 
                (bind ($meta) 
                      ($C ($meta) x ($meta) y ($meta))
                      ($C ($meta) y ($meta) z ($meta)))))
-         '(render a ($meta) 
+         '(render ($meta) a ($meta) 
              (bind ($meta) 
                    (x ($meta) y ($meta)) 
                    (y ($meta) z ($meta)))))))
