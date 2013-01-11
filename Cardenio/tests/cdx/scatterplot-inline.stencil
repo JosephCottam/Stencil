@@ -1,6 +1,6 @@
 (import CDXRuntime)
 
 (table dataset {source: external}
-  (fields a b c))
+  (fields a b c)
   (render scatter
     (bind (x: a) (y: b) (color : "RED"))))
