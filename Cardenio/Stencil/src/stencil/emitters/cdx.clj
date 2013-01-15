@@ -2,9 +2,9 @@
 ;; DON'T pattern your own emitters off of this.  Do much better.
 
 (ns stencil.emitters.cdx
-  (use [clojure.core.match :only (match)])
-  (require [stencil.transform :as t])
-  (require [clojure.java.io :as io]))
+  (:require [clojure.core.match :refer (match)])
+  (:require [stencil.transform :as t])
+  (:require [clojure.java.io :as io]))
 
 (defn indent [n] (apply str (take n (repeat "  "))))
 (defn drop-metas [program] 

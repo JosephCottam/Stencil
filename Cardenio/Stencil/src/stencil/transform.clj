@@ -1,6 +1,6 @@
 (ns stencil.transform
   "Tree transformation functions"
-  (:use [clojure.core.match :only (match)])
+  (:require [clojure.core.match :refer (match)])
   (:require clojure.pprint))
 
 (load "transform-util")
