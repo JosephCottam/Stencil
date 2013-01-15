@@ -4,9 +4,9 @@
   (:require clojure.pprint))
 
 (load "transform-util")
-(load "transforms/dropComments")
-(load "transforms/normalizeLet")
-(load "transforms/infixToPrefix")
+(load "transforms/comments")
+(load "transforms/lets")
+(load "transforms/infixOperators")
 (load "transforms/convertToWhen")
 (load "transforms/metas")
 (load "transforms/imports")

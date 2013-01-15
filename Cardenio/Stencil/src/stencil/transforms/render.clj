@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Normalize render statements.")
 
 (defn clean-binds [program]
   (letfn [(maybe-clean [policy]

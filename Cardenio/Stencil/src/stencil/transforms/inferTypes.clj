@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Type inferencing system. (Definately not done yet.)")
 
 
 (defn UNKNOWN  [] '***)

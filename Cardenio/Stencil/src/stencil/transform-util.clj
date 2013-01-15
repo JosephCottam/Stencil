@@ -1,4 +1,4 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform)
 ;"Utilities for tree->tree transformations"
 
 (defn lop->map [lop]

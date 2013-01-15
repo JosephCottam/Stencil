@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Move infix operators into the prefix position, grouping arguments as appropriate.")
 
 (defn defaultInfix? [x] 
   (and (symbol? x) 

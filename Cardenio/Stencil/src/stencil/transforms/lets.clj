@@ -1,4 +1,4 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform)
 
 ;; ------- Validate Let-----
 (defn hasBind? [line] (and (seq? line) (any= '$C line)))

@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Convert the standard trigger statements into when statements.")
 
 (defn pull->when
   "Convert pull statements to when statements"

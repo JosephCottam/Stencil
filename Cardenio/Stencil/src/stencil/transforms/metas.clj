@@ -1,4 +1,6 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Manipulate metas *in the AST*.  
+   Functions for working with metas outside the AST (e.g., as a dictionary) are found elsewhere.")
 
 (defn- atom-not-form? [a] (and (atom? a) (not (stencil-form? a))))
 

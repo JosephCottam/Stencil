@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Manipulate the comments found in a program.")
 
 (defn comment? [e] (and (seq? e) (= 'comment (first e))))
 (defn drop-comments 

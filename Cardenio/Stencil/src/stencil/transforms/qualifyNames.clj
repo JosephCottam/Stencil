@@ -1,4 +1,4 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform)
 
 (defn namingContext? [n] 
   (contains? #{stencil view table operator stream fields} n))

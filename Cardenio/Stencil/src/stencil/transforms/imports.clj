@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Manipulate imports.")
 
 (def ^:dynamic *default-runtime* 'javaPico)
 (defn ensure-runtime-import

@@ -1,4 +1,4 @@
-'(in-ns 'stencil.transforms)
+(ns stencil.transforms)
 
 
 (defn liftInnerTables 

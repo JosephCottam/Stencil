@@ -1,5 +1,5 @@
-(in-ns 'stencil.transform)
-   
+(ns stencil.transform) 
+
 (defn parent 
    "Get the parent of the item indicated in the path."
    [path program] 

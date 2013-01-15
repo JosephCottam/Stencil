@@ -1,4 +1,4 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform)
 
 (defn arrow->using [program]
   "The arrow operator is the binary, infix version of using."

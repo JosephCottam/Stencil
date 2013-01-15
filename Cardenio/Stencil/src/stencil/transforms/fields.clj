@@ -1,4 +1,5 @@
-(in-ns 'stencil.transform)
+(ns stencil.transform
+  "Work with the 'fields' statements found throught the program.")
 
 (defn stream-or-table? [v] (or (= 'stream v) (= 'table v)))
 
