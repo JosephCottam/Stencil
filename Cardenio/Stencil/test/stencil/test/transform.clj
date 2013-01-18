@@ -122,7 +122,7 @@
          '(stencil test (import picoRuntime))))
   (is (= (t/ensure-runtime-import '(table x)) '(table x)))
   (is (= (t/ensure-runtime-import '(stencil test)) 
-         '(stencil test (import javaPico)))))
+         '(stencil test (import javaPicoRuntime)))))
 
 (deftest expr->fields
   (is (= (t/expr->fields '($ptuple ($meta) (fields a ($meta)) 1))
