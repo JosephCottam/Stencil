@@ -19,7 +19,7 @@
 (defn value?
   "Items that are their own values."
   [x]
-  (or (number? x) (string? x)))
+  (or (= x true) (= x false) (number? x) (string? x)))
 
 (defn stencil-form?
   "Forms are NOT expressions...but they often contain them."

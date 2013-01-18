@@ -1,17 +1,17 @@
 (ns stencil.transform
   "Manipulate imports.")
 
-(def ^:dynamic *default-runtime* 'javaPico)
+(def ^:dynamic *default-runtime* 'javaPicoRuntime)
 (defn ensure-runtime-import
    "Ensure that there is a runtime in the imports list."
    [program]
    (letfn
      [(has-runtime? [program]
        "Is some item imported a runtime?  
-       TODO: Something more complex than look for an import with 'runtime' as a substring."
+       TODO: Something more elegant than look for an import with 'runtime' as a substring."
        (some 
-           #(> (.indexOf (.toLowerCase (str (second %))) "runtime") -1)
-           (filter #(and (list? %) (= 'import (first %))) program)))
+           #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1)
+           (filter #(and (seq? %) (= 'import (first %))) program)))
       (fragment? [program]
         "A fragment does not start with (stencil ...)"
         (not (= 'stencil (first program))))
