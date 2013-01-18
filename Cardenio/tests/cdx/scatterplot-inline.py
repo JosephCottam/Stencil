@@ -3,8 +3,8 @@ import numpy as np
 import datetime 
 import time
 
-class Scatterplot:
-  _dataset_fields = ['a','b','c']
+class scatterplot_inline:
+  _dataset_fields = ['a', 'b', 'c']
   def __init__(self, *args, **kwargs):
     if (len(args) == len(fields)):
       a = args[0]
@@ -14,7 +14,6 @@ class Scatterplot:
     else:
       self.dataset = **kwargs['dataset']
     p.plot ('a', 'b', color='RED', data_source=self.dataset, scatter=True)
-
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 

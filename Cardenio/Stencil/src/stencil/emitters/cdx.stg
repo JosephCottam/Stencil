@@ -18,11 +18,11 @@ class <className>:
   _<tableName>_fields = [<fields:{f|'<f>'};separator=", ">]
   def __init__(self, *args, **kwargs):
     if (len(args) == len(fields)):
-      <fields:{f|<f> = args[<i>]\n}>
+      <fields:{f|<f> = args[<i0>]};separator="\n">
       self.dataset = p.make_source(idx=range(len(<first(fields)>)), <fields:{f|<f>=<f>};separator=", ">)
     else:
       self.dataset = **kwargs['<tableName>']
-    p.plot (<xatt>, <yatt>, color=<colorAtt>, data_source=self.<tableName>, <if (scatter)>scatter=True<else><endif>)
+    p.plot ('<xatt>', '<yatt>', color='<colorAtt>', data_source=self.<tableName>, <if (scatter)>scatter=True<else><endif>)
 >>
 
 footer(testharness) ::= <<

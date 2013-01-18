@@ -20,7 +20,6 @@
         fix (fn [key] (if (string? key) key (subs (str key) 1)))
         atts (zipmap (map fix (keys atts)) (vals atts))
         i (reduce (fn [t [k v]] (.add t k v)) t atts)]
-    (println (.getAttributes t))
     (.render t)))
 
 (defn table-atts[table]
