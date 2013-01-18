@@ -1,0 +1,37 @@
+program(className, tableName, fields, scatter, xatt, yatt, colorAtt, testharness) 
+  ::= "<header(testharness)><classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter)><footer(testharness)>"
+
+header(testharness) ::= <<
+from webplot import p 
+<if(testharness)>
+import numpy as np 
+import datetime 
+import time
+
+<else>
+
+<endif>
+>>
+
+classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter) ::= <<
+class <className>:
+  _<tableName>_fields = [<fields:{f|'<f>'};separator=", ">]
+  def __init__(self, *args, **kwargs):
+    if (len(args) == len(fields)):
+      <fields:{f|<f> = args[<i>]\n}>
+      self.dataset = p.make_source(idx=range(len(<first(fields)>)), <fields:{f|<f>=<f>};separator=", ">)
+    else:
+      self.dataset = **kwargs['<tableName>']
+    p.plot (<xatt>, <yatt>, color=<colorAtt>, data_source=self.<tableName>, <if (scatter)>scatter=True<else><endif>)
+>>
+
+footer(testharness) ::= <<
+<if (testharness)>
+
+x = np.arange(100) / 6.0 
+y = np.sin(x) 
+z = np.cos(x) 
+plot = Scatterplot(x,y,z)
+<else>
+<endif>
+>>
