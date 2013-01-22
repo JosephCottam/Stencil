@@ -1,5 +1,5 @@
 program(className, tableName, fields, scatter, xatt, yatt, colorAtt, testharness) 
-  ::= "<header(testharness)><classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter)><footer(testharness)>"
+  ::= <% <header(testharness)><classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter)><footer(testharness)> %>
 
 header(testharness) ::= <<
 from webplot import p 
@@ -12,6 +12,11 @@ import time
 
 <endif>
 >>
+
+expr(ex) ::= <% ex.op(<ex.rand:expr();separator=", ">) %>
+let(let) ::= <% <let:binding();separator="\n"> %>
+binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
+
 
 classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter) ::= <<
 class <className>:
