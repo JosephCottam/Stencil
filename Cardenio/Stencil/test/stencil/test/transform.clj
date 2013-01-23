@@ -310,13 +310,31 @@
   (is (= (t/ensure-using-tuple '(using ($meta) (b) (x))) 
          '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) (b)) (x)))))
 
+
 (deftest clean-binds
   (is (= (t/clean-binds 
-           '(render ($meta) a ($meta) 
+           '(render id ($meta) target ($meta) type ($meta)
                (bind ($meta) 
                      ($C ($meta) x ($meta) y ($meta))
                      ($C ($meta) y ($meta) z ($meta)))))
-         '(render ($meta) a ($meta) 
+         '(render id ($meta) target ($meta) type ($meta) 
              (bind ($meta) 
                    (x ($meta) y ($meta)) 
                    (y ($meta) z ($meta)))))))
+
+
+(defn strip-gen [a]
+  (cond 
+    (symbol? a) (symbol (clojure.string/replace (str a) #"\d*$" ""))
+    (not (seq? a)) a
+    :else (map strip-gen a)))
+
+(deftest lift-renders
+  (is (= (t/lift-renders '(stencil x)) '(stencil x)))
+  (is (= (t/lift-renders '(render a b c)) '(render a b c)))
+  (is (= (strip-gen (t/lift-renders '(stencil (table tname ($meta a) (render ($meta b))))))
+         '(stencil (render rend ($meta b) tname ($meta)) (table tname ($meta a))))))
+
+
+
+
