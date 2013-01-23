@@ -3,12 +3,6 @@
 
 (defn stream-or-table? [v] (or (= 'stream v) (= 'table v)))
 
-(defn filter-policies 
-  "[test,] condition, policy* -> policy*: Filter a list of policies per the test and condition. 
-  Test is invoked once for each policy in policy*.  Default test is '='"
-  ([condition policies] (filter-policies = condition policies))
-  ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
-
 (defn expr->fields
   "Convert an expression to a list of fields.
    The first argument is used to produce error messages only."
@@ -31,9 +25,9 @@
   (match [program]
     [a :guard atom?] a
     [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-        (if (not (empty? (filter-policies 'fields policies)))
+        (if (not (empty? (filter-tagged 'fields policies)))
           `(~tag ~name ~meta ~@policies)
-          (let [data (first (filter-policies 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
+          (let [data (first (filter-tagged 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
                 fields (expr->fields (full-drop data))]
             `(~tag ~name ~meta ~fields ~@policies)))
     :else (map ensure-fields program)))
@@ -52,8 +46,8 @@
     (match [program]
       [a :guard atom?] a
       [([(tag :guard stream-or-table?) (n :guard symbol?) (m :guard meta?) & policies] :seq)]
-        (let [fields (filter-policies 'fields policies)
-              data   (filter-policies 'data policies)]
+        (let [fields (filter-tagged 'fields policies)
+              data   (filter-tagged 'data policies)]
           (if (every? #(= true %) (map (covers fields) data))
             `(~tag ~n ~m ~@(check-fields-cover-data policies))
               (throw (RuntimeException. (str "Fields statement does not cover data statement: " program)))))
@@ -96,10 +90,10 @@
     (match [program]
       [a :guard atom?] a 
       [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
-      (let [fields   (rest (first (filter-policies 'fields policies)))
-            source (lop->map (rest (first (filter-policies policy-tag policies))))
+      (let [fields   (rest (first (filter-tagged 'fields policies)))
+            source (lop->map (rest (first (filter-tagged policy-tag policies))))
             inner (map folder policies)
-            reduced (filter-policies (complement any=) (list policy-tag 'fields) policies)
+            reduced (filter-tagged (complement any=) (list policy-tag 'fields) policies)
             fields (cons 'fields (extendFields fields source))]
           `(~tag ~name ~meta ~fields ~@reduced))
       :else (map folder program)))))

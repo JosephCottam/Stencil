@@ -1,42 +1,90 @@
-program(className, tableName, fields, scatter, xatt, yatt, colorAtt, testharness) 
-  ::= <% <header(testharness)><classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter)><footer(testharness)> %>
+infixOps ::= [
+  "+":"true",
+  "-":"true",
+  "*":"true",
+  "/":"true",
+  default:"false"
+]
+
+program(def) ::= <%
+  <header(def.header.debug)>
+  <classDef(def.header.name, def.tables, def.renders)>
+  <footer(def.header.name, def.header.debug)> 
+%>
 
 header(testharness) ::= <<
+#Debug set to '<testharness>'
 from webplot import p 
 <if(testharness)>
 import numpy as np 
-import datetime 
-import time
 
 <else>
 
 <endif>
 >>
 
-expr(ex) ::= <% ex.op(<ex.rand:expr();separator=", ">) %>
+expr(ex) ::= <%
+<if (ex.atom)>
+  <ex.val>
+<elseif (infixOps.(ex.op))>
+  <expr(first(ex.rands))> <ex.op> <expr(first(rest(ex.rands)))>
+<else>
+  <ex.op>(<ex.rands:expr();separator=", ">)
+<endif>
+%>
+
 let(let) ::= <% <let:binding();separator="\n"> %>
 binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
 
+table(name, fields, data) ::= <<
+class <name>:
+  _fields = [<fields:{f|'<f>'};separator=", ">]
+  _data = None
 
-classDef(className,tableName,fields,xatt,yatt,colorAtt,scatter) ::= <<
-class <className>:
-  _<tableName>_fields = [<fields:{f|'<f>'};separator=", ">]
   def __init__(self, *args, **kwargs):
-    if (len(args) == len(fields)):
-      <fields:{f|<f> = args[<i0>]};separator="\n">
-      self.dataset = p.make_source(idx=range(len(<first(fields)>)), <fields:{f|<f>=<f>};separator=", ">)
+    if (len(kwargs) == len(self._fields)):
+      <fields:{f|<f>=kwargs['<f>']};separator="\n">
+      self._data = p.make_source(idx=range(len(<first(fields)>)), <fields:{f|<f>=<f>};separator=", ">)
     else:
-      self.dataset = **kwargs['<tableName>']
-    p.plot ('<xatt>', '<yatt>', color='<colorAtt>', data_source=self.<tableName>, <if (scatter)>scatter=True<else><endif>)
+      raise Exception("Data not properly supplied to table <name>")
+
+  def data(self):
+    return self._data
+
 >>
 
-footer(testharness) ::= <<
+tableSetter(table) ::= <<
+def set_<table.name>(self, <table.fields:{f|<f>};separator=", ">):
+  self._<table.name> = <table.name>(<table.fields:{f|<f>=<f>};separator=", ">)
+>>
+
+renderer(def) ::= <<
+  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self._<def.source>.data(), <if (def.scatter)>scatter=True<else><endif>)
+
+>>
+
+classDef(className,tables,renders) ::= <<
+
+<tables:{t|<table(t.name, t.fields, t.data)>};separator="\n\n">
+
+class <className>:
+  <tables:{t|_<t.name> = None};separator="\n">
+
+  <tables:tableSetter();separator="\n\n">
+
+  def render(self):
+    <renders:renderer();separator="\n">
+>>
+
+footer(name, testharness) ::= <<
 <if (testharness)>
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 
 z = np.cos(x) 
-plot = Scatterplot(x,y,z)
+plot = <name>()
+plot.set_dataset(x,y,z)
+plot.render()
 <else>
 <endif>
 >>

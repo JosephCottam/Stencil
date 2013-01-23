@@ -1,6 +1,12 @@
 (ns stencil.transform)
 ;"Utilities for tree->tree transformations"
 
+(defn filter-tagged
+  "[test,] condition, list* -> list* Filter a list list-of-lists whose first item passes the test/condition pair 
+  Test is invoked once for each policy in policy*.  Default test is '='"
+  ([condition policies] (filter-tagged = condition policies))
+  ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
+
 (defn lop->map [lop]
   "Converts a ((key val) ..) into a clojure dictionary"
   (zipmap (map first lop) (map second lop)))

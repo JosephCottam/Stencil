@@ -1,4 +1,4 @@
-(import CDXRuntime {harness : true})
+(import CDXRuntime {debug : true})
 
 (table dataset {source: external}
   (fields a b c)
