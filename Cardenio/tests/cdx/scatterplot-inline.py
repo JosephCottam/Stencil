@@ -5,19 +5,20 @@ import numpy as np
 
 class dataset:
   _fields = ['a', 'b', 'c']
-  _data = None
+  a = None
+  b = None
+  c = None
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
-      a=kwargs['a']
-      b=kwargs['b']
-      c=kwargs['c']
-      self._data = p.make_source(idx=range(len(a)), a=a, b=b, c=c)
+      self.a=kwargs['a']
+      self.b=kwargs['b']
+      self.c=kwargs['c']
     else:
       raise Exception("Data not properly supplied to table dataset")
 
   def data(self):
-    return self._data
+    return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
 
 class scatterplot_inline:

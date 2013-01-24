@@ -5,45 +5,43 @@ import numpy as np
 
 class dataset:
   _fields = ['a', 'b', 'c']
-  _cols = None
+  a = None
+  b = None
+  c = None
 
   def __init__(self, *args, **kwargs):
     if (len(kwargs) == len(self._fields)):
-      a=kwargs['a']
-      b=kwargs['b']
-      c=kwargs['c']
-      _cols = ['a':a,'b':b,'c':c]
+      self.a=kwargs['a']
+      self.b=kwargs['b']
+      self.c=kwargs['c']
     else:
       raise Exception("Data not properly supplied to table dataset")
 
   def data(self):
-    cols = self._cols
-    return  p.make_source(idx=range(len(cols['a'])), a=cols['a'], b=cols['b'], c=cols['c'])
+    return  p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
 class plot:
-  _fields ['x','y','color']
-  _cols = None
+  _fields ['x','y']
+  x = None
+  y = None
 
   def __init__(self, dataset):
     self.dataset = dataset
 
   def update():
-    source = self.dataset._cols
-    _x = []
-    _y = []
-    for i in range(0, len(source['a'])):
-       a = source['a'][i]
-       b = source['b'][i]
+    self.x = []
+    self.y = []
+    for i in range(0, len(source.a)):
+       a = source.a[i]
+       b = source.b[i]
        x = a
        y = b
-       _x.push(x)
-       _y.push(y)
-    _cols = {"x":_x,"y":_y]
+       self.x.push(x)
+       self.y.push(y)
 
   def data(self):
     self.update()
-    cols = self._cols
-    return  p.make_source(idx=range(len(cols['x'])), x=cols['x'], y=cols['y'], c=cols['c'])
+    return  p.make_source(idx=range(len(self.x)), x=self.x, y=self.y)
 
 
 class scatterplot_twoTable:

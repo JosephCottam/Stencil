@@ -9,8 +9,8 @@
 
 (deftest cdx
     (is (= (.trim (cdx/cdx (c/compile (core/read (str base "cdx/scatterplot-inline.stencil")))))
-                    (.trim (slurp (str base "cdx/scatterplot-inline.py"))))))
-
-(deftest cdx
+                    (.trim (slurp (str base "cdx/scatterplot-inline.py"))))
+        "Scatterplot: One table, inline render")
     (is (= (.trim (cdx/cdx (c/compile (core/read (str base "cdx/scatterplot-twoTable.stencil")))))
-                    (.trim (slurp (str base "cdx/scatterplot-twoTable.py"))))))
+                    (.trim (slurp (str base "cdx/scatterplot-twoTable.py"))))
+        "Scatterplot: Two tables, inline render"))
