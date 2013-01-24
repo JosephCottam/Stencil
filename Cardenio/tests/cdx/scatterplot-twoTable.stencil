@@ -1,10 +1,10 @@
-(import CDXRuntime)
+(import CDXRuntime {debug:true})
 
 (table dataset {source: external}
   (fields a b c))
 
 (table plot
-  (renderer scatter)
+  (render scatter)
   (data
     (pull dataset 
           (let (x : a)

@@ -14,3 +14,4 @@ lastBuild.txt
 *.zip
 REVLSave.stencil
 ../TestData/RegressionImages/Sourceforge/*.tuples
+*.DS_Store

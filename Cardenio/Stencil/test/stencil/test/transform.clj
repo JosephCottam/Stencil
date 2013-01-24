@@ -336,5 +336,16 @@
          '(stencil (render rend ($meta b) tname ($meta)) (table tname ($meta a))))))
 
 
+(deftest ensure-binds
+  (is (= (t/ensure-binds '(stencil x)) '(stencil x)))
+  (is (= (t/ensure-binds '(render id source type (bind))) '(render id source type (bind))))
+  (is (= (t/ensure-binds '(table tn ($meta) (fields ($meta) a ($meta) b ($meta)) (render id source type)))
+        '(table tn ($meta) (fields ($meta) a ($meta) b ($meta)) (render id source type (bind)))))
+  (is (= (t/ensure-binds '(table tn ($meta) (fields ($meta) x ($meta) b ($meta)) (render id source type)))
+        '(table tn ($meta) 
+                (fields ($meta) x ($meta) b ($meta)) 
+                (render id source type 
+                        (bind ($meta) (x ($meta (type fn)) y ($meta (type ***)))))))))
+
 
 

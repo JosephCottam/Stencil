@@ -14,6 +14,32 @@
     :else (map clean-binds program))))
        
 
+
+(defn gen-binds [render-type fields]
+  "Generate a binding statement given a render type and a list of fields.
+   TODO: Care about the render type...right now it is just ignored."
+  (let [render-fields '(x y z color)
+        bind-fields (clojure.set/union fields (remove meta? render-fields))]
+    (list 'bind 
+          '($meta (type fn)) 
+          (map #(% '($meta (type ***)) % '($meta (type ***))) bind-fields))))
+
+(defn ensure-binds [program]
+  "If there is no bind statement, creates one that matches attributes to those with the same name in the render type"
+  (letfn 
+    [(has-binds? [policies] (some #(and (seq? %) (= 'bind (first %))) policies))
+     (helper [context program]
+       (match [program]
+         [a :guard atom?] a
+         [(['table name & rest] :seq)] 
+            `(~'table ~name ~@(helper (filter-tagged 'fields rest) rest))
+         [(['render (m :guard meta?) & (rest :guard has-binds?)] :seq)] 
+            `(~'render ~m ~@rest)
+         [(['render (m :guard meta?) type & rest] :seq)] 
+           `(~'render ~m (gen-binds type context) ~@rest)
+         :else (map (partial helper context) program)))]
+    (helper '**NONE** program)))
+
 (defn lift-renders [program]
   "Lift all render statements out to top-level, provide explicit target argument."
   (letfn 

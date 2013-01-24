@@ -11,4 +11,6 @@
     (is (= (.trim (cdx/cdx (c/compile (core/read (str base "cdx/scatterplot-inline.stencil")))))
                     (.trim (slurp (str base "cdx/scatterplot-inline.py"))))))
 
-
+(deftest cdx
+    (is (= (.trim (cdx/cdx (c/compile (core/read (str base "cdx/scatterplot-twoTable.stencil")))))
+                    (.trim (slurp (str base "cdx/scatterplot-twoTable.py"))))))
