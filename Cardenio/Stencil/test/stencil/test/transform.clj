@@ -311,41 +311,62 @@
          '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) (b)) (x)))))
 
 
-(deftest clean-binds
-  (is (= (t/clean-binds 
-           '(render id ($meta) target ($meta) type ($meta)
-               (bind ($meta) 
-                     ($C ($meta) x ($meta) y ($meta))
-                     ($C ($meta) y ($meta) z ($meta)))))
-         '(render id ($meta) target ($meta) type ($meta) 
-             (bind ($meta) 
-                   (x ($meta) y ($meta)) 
-                   (y ($meta) z ($meta)))))))
-
-
 (defn strip-gen [a]
   (cond 
     (symbol? a) (symbol (clojure.string/replace (str a) #"\d*$" ""))
     (not (seq? a)) a
     :else (map strip-gen a)))
 
-(deftest lift-renders
-  (is (= (t/lift-renders '(stencil x)) '(stencil x)))
-  (is (= (t/lift-renders '(render a b c)) '(render a b c)))
-  (is (= (strip-gen (t/lift-renders '(stencil (table tname ($meta a) (render ($meta b))))))
+(deftest normalize-renderss
+  (is (= (t/normalize-renders '(stencil x)) '(stencil x)))
+  (is (= (t/normalize-renders '(render rid ($meta) source ($meta) type ($meta) (bind ($meta) (x ($meta) a ($meta)) (y ($meta) b ($meta)))))
+         '(render rid ($meta) source ($meta) type ($meta) (bind ($meta) (x ($meta) a ($meta)) (y ($meta) b ($meta)))))
+      "Idempotent")
+  (is (= (strip-gen (t/normalize-renders '(render _ ($meta) source ($meta) type ($meta) (bind ($meta)))))
+         '(render rend ($meta) source ($meta) type ($meta) (bind ($meta))))
+      "Replace default name")
+  (is (= (t/normalize-renders '(table tn (render rn ($meta) type ($meta) (bind ($meta)))))
+         '(table tn (render rn ($meta) tn ($meta (type ***)) type ($meta) (bind ($meta)))))
+      "Provide source from context")
+  (is (= (t/normalize-renders '(table tn 
+                                      (fields a x b y) 
+                                      (render rn ($meta) tn ($meta) type ($meta) 
+                                              (bind ($meta) auto ($meta)))))
+         '(table tn 
+                 (fields a x b y)
+                 (render rn ($meta) tn ($meta) type ($meta) 
+                         (bind ($meta) 
+                               (x ($meta (type ***)) x ($meta (type ***)))
+                               (y ($meta (type ***)) y ($meta (type ***)))))))
+      "Auto binding")
+  (is (= (t/normalize-renders '(table tn 
+                                      (fields a x b y) 
+                                      (render rn ($meta) tn ($meta) type ($meta) 
+                                              (bind ($meta) ($C ($meta) x ($meta (type ***)) x ($meta (type ***)))
+                                                    ($C ($meta) y ($meta (type ***)) y ($meta (type ***)))))))
+         '(table tn 
+                 (fields a x b y)
+                 (render rn ($meta) tn ($meta) type ($meta) 
+                         (bind ($meta) 
+                               (x ($meta (type ***)) x ($meta (type ***)))
+                               (y ($meta (type ***)) y ($meta (type ***)))))))
+      "Clean bindings")
+  (is (= (strip-gen (t/normalize-renders '(table tn (fields a x b y) (render scatter ($meta) (bind ($meta) auto ($meta) )))))
+         '(table tn 
+                 (fields a x b y)
+                 (render rend ($meta (type fn)) tn ($meta (type ***)) scatter ($meta) 
+                         (bind ($meta) 
+                               (x ($meta (type ***)) x ($meta (type ***)))
+                               (y ($meta (type ***)) y ($meta (type ***)))))))
+      "Combined normalization"))
+
+            
+
+
+(deftest gather-renders
+  (is (= (t/gather-renders '(stencil x)) '(stencil x)))
+  (is (= (t/gather-renders '(render a b c)) '(render a b c)))
+  (is (= (strip-gen (t/gather-renders '(stencil (table tname ($meta a) (render ($meta b))))))
          '(stencil (render rend ($meta b) tname ($meta)) (table tname ($meta a))))))
-
-
-(deftest ensure-binds
-  (is (= (t/ensure-binds '(stencil x)) '(stencil x)))
-  (is (= (t/ensure-binds '(render id source type (bind))) '(render id source type (bind))))
-  (is (= (t/ensure-binds '(table tn ($meta) (fields ($meta) a ($meta) b ($meta)) (render id source type)))
-        '(table tn ($meta) (fields ($meta) a ($meta) b ($meta)) (render id source type (bind)))))
-  (is (= (t/ensure-binds '(table tn ($meta) (fields ($meta) x ($meta) b ($meta)) (render id source type)))
-        '(table tn ($meta) 
-                (fields ($meta) x ($meta) b ($meta)) 
-                (render id source type 
-                        (bind ($meta) (x ($meta (type fn)) y ($meta (type ***)))))))))
-
 
 
