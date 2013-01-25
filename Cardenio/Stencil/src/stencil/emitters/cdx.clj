@@ -40,12 +40,12 @@
   (Binding. (map expr-att varset) (expr-att expr)))
 
 (defn expr-att [expr]
-  (match [expr]
-    [a :guard t/atom?] (Prim. true (pyVal a))
-    [(['let bindings body] :seq)] 
+  (match expr
+    (a :guard t/atom?) (Prim. true (pyVal a))
+    (['let bindings body] :seq) 
       (Let. true (map bind-att bindings) (expr-att body))
-    [([do & exprs] :seq)] (Do. true (map expr-att exprs))
-    [([op & rands] :seq)] (Op. true op (map expr-att rands))
+    ([do & exprs] :seq) (Do. true (map expr-att exprs))
+    ([op & rands] :seq) (Op. true op (map expr-att rands))
     :else (throw (RuntimeException. "Unandled expression: " expr))))
 
 (defn data-atts [data]
