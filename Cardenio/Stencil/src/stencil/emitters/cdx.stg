@@ -36,6 +36,16 @@ expr(ex) ::= <%
 let(let) ::= <% <let:binding();separator="\n"> %>
 binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
 
+tableSize(tdef) ::= <<
+def size(self):
+  return len(self.<first(tdef.fields)>)
+>>
+
+tableData(tdef) ::= <<
+def data(self):
+  return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
+>>
+
 externalTable(tdef) ::= <<
 class <tdef.name>:
   _fields = [<tdef.fields:{f|'<f>'};separator=", ">]
@@ -47,12 +57,13 @@ class <tdef.name>:
     else:
       raise Exception("Data not properly supplied to table <tdef.name>")
 
-  def data(self):
-    return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
+  <tableSize(tdef)>
+  <tableData(tdef)>
 
 >>
 
 dependUpdate(ddef) ::= <<
+for i in range(0, ddef
 >>
 
 dependentTable(tdef) ::= <<
@@ -68,8 +79,9 @@ class <tdef.name>:
     <tdef.fields:{f|self.<f> = []};separator="\n">
     <tdef.depends:dependUpdate();separator="\n#----------\n">
 
-  def data(self):
-    return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
+  <tableSize(tdef)>
+  <tableData(tdef)>
+
 >>
 
 tableSetter(tdef) ::= <<

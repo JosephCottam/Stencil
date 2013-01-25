@@ -10,9 +10,13 @@
 (deftype Render [name source x y color scatter])
 (deftype Header [name debug])
 (deftype Program [header tables renders])
+
+(deftype When [trigger action])
+(deftype Let [bindings body])
+(deftype Using [fields gen body])
+(deftype Do [exprs])
 (deftype Expr [op rands])
 (deftype Atom [val isAtom])  ;;I want default values...atom should always be 'true'
-
 
 (defn drop-metas [program] 
   (cond
@@ -24,8 +28,8 @@
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
 
 (defn data-atts [data]
-  (let [[_ _ action] data
-        [tag meta trigger expr] action
+  (let [[tag meta when] data
+        [tag meta trigger expr] when
         [_ _ source _] trigger]
     (Depends. source "")))
 
