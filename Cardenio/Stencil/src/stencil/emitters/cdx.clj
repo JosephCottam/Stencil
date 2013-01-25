@@ -44,7 +44,8 @@
         runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))
         debug ((t/meta->map (nth runtime 2)) 'debug)
         debug (and (not (nil? debug)) (= true debug))]
-  (Program. (Header. (pyName name) debug) (map table-atts tables) (map render-atts renders))))
+    (println (.x (first (map render-atts renders))))
+    (Program. (Header. (pyName name) debug) (map table-atts tables) (map render-atts renders))))
 
 
 (defn emit-cdx [template attlabel atts]

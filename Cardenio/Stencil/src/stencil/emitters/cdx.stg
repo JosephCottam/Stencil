@@ -39,17 +39,16 @@ binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
 table(name, fields, data) ::= <<
 class <name>:
   _fields = [<fields:{f|'<f>'};separator=", ">]
-  _data = None
+  <fields:{f|<f> = None};separator="\n">
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
-      <fields:{f|<f>=kwargs['<f>']};separator="\n">
-      self._data = p.make_source(idx=range(len(<first(fields)>)), <fields:{f|<f>=<f>};separator=", ">)
+      <fields:{f|self.<f>=kwargs['<f>']};separator="\n">
     else:
       raise Exception("Data not properly supplied to table <name>")
 
   def data(self):
-    return self._data
+    return = p.make_source(idx=range(len(self.<first(fields)>)), <fields:{f|<f>=self.<f>};separator=", ">)
 
 >>
 
