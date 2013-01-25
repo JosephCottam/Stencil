@@ -1,6 +1,8 @@
 (ns stencil.transform
   "Type inferencing system. (Definately not done yet.)")
 
+;;TODO: There are many contexts that are still incorrect here.  Like bindings are being forced to fn...
+
 
 (defn UNKNOWN  [] '***)
 (defn context? [l] (or (= l 'stencil) (= l 'stream) (= l 'table) (= l 'import)))

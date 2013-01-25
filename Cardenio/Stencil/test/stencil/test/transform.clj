@@ -336,8 +336,8 @@
                  (fields a x b y)
                  (render rn ($meta) tn ($meta) type ($meta) 
                          (bind ($meta) 
-                               (x ($meta (type ***)) x ($meta (type ***)))
-                               (y ($meta (type ***)) y ($meta (type ***)))))))
+                               (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
+                               (y ($meta (type fn)) y ($meta (type ***)))))))
       "Auto binding")
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
@@ -380,8 +380,8 @@
                  (fields a x b y)
                  (render rend ($meta) tn ($meta (type ***)) scatter ($meta) 
                          (bind ($meta) 
-                               (x ($meta (type ***)) x ($meta (type ***)))
-                               (y ($meta (type ***)) y ($meta (type ***)))))))
+                               (x ($meta (type fn)) x ($meta (type ***)))
+                               (y ($meta (type fn)) y ($meta (type ***)))))))
       "Combined normalization"))
 
             

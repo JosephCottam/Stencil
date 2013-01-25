@@ -9,7 +9,7 @@ class dataset:
   b = None
   c = None
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
       self.a=kwargs['a']
       self.b=kwargs['b']
@@ -18,48 +18,52 @@ class dataset:
       raise Exception("Data not properly supplied to table dataset")
 
   def data(self):
-    return  p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
+    return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
+
 
 class plot:
-  _fields ['x','y']
+  _fields = ['x', 'y', 'color']
+  _dataset = None
   x = None
   y = None
+  color = None
 
   def __init__(self, dataset):
-    self.dataset = dataset
+    self._dataset = dataset
 
-  def update():
+  def update(self):
     self.x = []
     self.y = []
-    for i in range(0, len(source.a)):
+    self.color = []
+    for i in range(0, len(dataset.a)):
        a = source.a[i]
        b = source.b[i]
        x = a
        y = b
+       color = "Red"
        self.x.push(x)
        self.y.push(y)
+       self.color.push(color)
 
   def data(self):
-    self.update()
-    return  p.make_source(idx=range(len(self.x)), x=self.x, y=self.y)
-
+    return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, color=self.color)
 
 class scatterplot_twoTable:
-  _dataset = None
-  _plot = None
+  dataset = None
+  plot = None
 
   def set_dataset(self, a, b, c):
-    self._dataset = dataset(a=a, b=b, c=c)
+    self.dataset = dataset(a=a, b=b, c=c)
+
 
   def render(self):
-    _plot.update()
-    p.plot('x', 'y', color='RED', data_source=self._plot.data(), scatter=True)
+    plot.update()
+    p.plot('x', 'y', color='RED', data_source=self.plot.data(), scatter=True)
 
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 
 z = np.cos(x) 
-plot = scatterplot_inline()
+plot = scatterplot_twoTable()
 plot.set_dataset(x,y,z)
 plot.render()
-

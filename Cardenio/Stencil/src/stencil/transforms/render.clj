@@ -8,7 +8,7 @@
     (let [render-fields (set '(x y z color))
           fields (set (remove meta? (rest fields)))
           bind-fields (sort (clojure.set/intersection fields render-fields))
-          bindings (map #(list % '($meta (type ***)) % '($meta (type ***))) bind-fields)]
+          bindings (map #(list % '($meta (type fn)) % '($meta (type ***))) bind-fields)]
       (cons 'bind (cons bind-meta bindings)))))
 
 (defn normalize-renders [program]

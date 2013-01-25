@@ -24,7 +24,7 @@ import numpy as np
 >>
 
 expr(ex) ::= <%
-<if (ex.atom)>
+<if (ex.isAtom)>
   <ex.val>
 <elseif (infixOps.(ex.op))>
   <expr(first(ex.rands))> <ex.op> <expr(first(rest(ex.rands)))>
@@ -36,42 +36,66 @@ expr(ex) ::= <%
 let(let) ::= <% <let:binding();separator="\n"> %>
 binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
 
-table(name, fields, data) ::= <<
-class <name>:
-  _fields = [<fields:{f|'<f>'};separator=", ">]
-  <fields:{f|<f> = None};separator="\n">
+externalTable(tdef) ::= <<
+class <tdef.name>:
+  _fields = [<tdef.fields:{f|'<f>'};separator=", ">]
+  <tdef.fields:{f|<f> = None};separator="\n">
 
   def __init__(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
-      <fields:{f|self.<f>=kwargs['<f>']};separator="\n">
+      <tdef.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
     else:
-      raise Exception("Data not properly supplied to table <name>")
+      raise Exception("Data not properly supplied to table <tdef.name>")
 
   def data(self):
-    return = p.make_source(idx=range(len(self.<first(fields)>)), <fields:{f|<f>=self.<f>};separator=", ">)
+    return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
 
 >>
 
-tableSetter(table) ::= <<
-def set_<table.name>(self, <table.fields:{f|<f>};separator=", ">):
-  self._<table.name> = <table.name>(<table.fields:{f|<f>=<f>};separator=", ">)
+dependUpdate(ddef) ::= <<
 >>
 
-renderer(def) ::= <<
-  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self._<def.source>.data(), <if (def.scatter)>scatter=True<else><endif>)
+dependentTable(tdef) ::= <<
+class <tdef.name>:
+  _fields = [<tdef.fields:{f|'<f>'};separator=", ">]
+  <tdef.depends:{d|_<d.source> = None};separator="\n">
+  <tdef.fields:{f|<f> = None};separator="\n">
 
+  def __init__(self, <tdef.depends:{d|<d.source>};separator=", ">):
+    <tdef.depends:{d|self._<d.source> = <d.source>};separator="\n">
+
+  def update(self):
+    <tdef.fields:{f|self.<f> = []};separator="\n">
+    <tdef.depends:dependUpdate();separator="\n#----------\n">
+
+  def data(self):
+    return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
 >>
+
+tableSetter(tdef) ::= <<
+<if (!tdef.depends)>
+def set_<tdef.name>(self, <tdef.fields:{f|<f>};separator=", ">):
+  self.<tdef.name> = <tdef.name>(<tdef.fields:{f|<f>=<f>};separator=", ">)
+<else>
+<endif>
+>>
+
+renderer(def) ::= <%
+  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self.<def.source>.data(), <if (def.scatter)>scatter=True<else><endif>)
+
+%>
 
 classDef(className,tables,renders) ::= <<
 
-<tables:{t|<table(t.name, t.fields, t.data)>};separator="\n\n">
+<tables:{t|<if (t.depends)><dependentTable(t)><else><externalTable(t)><endif>};separator="\n\n">
 
 class <className>:
-  <tables:{t|_<t.name> = None};separator="\n">
+  <tables:{t|<t.name> = None};separator="\n">
 
-  <tables:tableSetter();separator="\n\n">
+  <tables:tableSetter()>
 
   def render(self):
+    <tables:{t|<if (t.depends)><t.name>.update()<else><endif>};separator="\n">
     <renders:renderer();separator="\n">
 >>
 

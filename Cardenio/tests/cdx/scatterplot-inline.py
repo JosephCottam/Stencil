@@ -22,14 +22,14 @@ class dataset:
 
 
 class scatterplot_inline:
-  _dataset = None
+  dataset = None
 
   def set_dataset(self, a, b, c):
-    self._dataset = dataset(a=a, b=b, c=c)
+    self.dataset = dataset(a=a, b=b, c=c)
+
 
   def render(self):
-      p.plot('a', 'b', color='RED', data_source=self._dataset.data(), scatter=True)
-
+    p.plot('a', 'b', color='RED', data_source=self.dataset.data(), scatter=True)
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 

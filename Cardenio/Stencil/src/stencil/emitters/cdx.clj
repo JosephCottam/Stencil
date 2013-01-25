@@ -5,12 +5,13 @@
   (:require [clojure.java.io :as io])
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
-(deftype Table [name fields data])
+(deftype Table [name fields depends])
+(deftype Depends [source expr])
 (deftype Render [name source x y color scatter])
 (deftype Header [name debug])
 (deftype Program [header tables renders])
 (deftype Expr [op rands])
-(deftype Atom [val atom])  ;;I want default values...atom should always be 'true'
+(deftype Atom [val isAtom])  ;;I want default values...atom should always be 'true'
 
 
 (defn drop-metas [program] 
@@ -22,11 +23,20 @@
 (defn pyName [name]
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
 
+(defn data-atts [data]
+  (let [[_ _ action] data
+        [tag meta trigger expr] action
+        [_ _ source _] trigger]
+    (Depends. source "")))
+
 (defn table-atts[table]
   (let [name (pyName (second table))
         fields (rest (drop-metas (first (t/filter-tagged 'fields table))))
-        data (first (t/filter-tagged 'data table))]
-    (Table. name fields "<data clause>")))
+        data (t/filter-tagged 'data table)
+        external (empty? data)]
+    (if external
+      (Table. name fields false)
+      (Table. name fields (map data-atts data)))))
 
 (defn render-atts [[_ name _ source _ type _ binds]]
   (let [scatter (= "SCATTER" (.toUpperCase (str type))) 
@@ -49,7 +59,7 @@
 
 
 (defn emit-cdx [template attlabel atts]
-  "Emit to the specified template from teh cdx group."
+  "Emit to the specified template from the cdx group."
   (let [g (STGroupFile. "src/stencil/emitters/cdx.stg")
         t (.getInstanceOf g template)]
     (.render (.add t attlabel atts))))

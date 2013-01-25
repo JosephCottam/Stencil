@@ -4,7 +4,7 @@
   (fields a b c))
 
 (table plot
-  (render scatter)
+  (render scatter (bind auto))
   (data
     (pull dataset 
           (let (x : a)
