@@ -6,17 +6,20 @@
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
 (deftype Table [name fields depends])
-(deftype Depends [source expr])
+(deftype Depends [source fields expr])
 (deftype Render [name source x y color scatter])
 (deftype Header [name debug])
 (deftype Program [header tables renders])
+(deftype Binding [vars expr])
 
-(deftype When [trigger action])
-(deftype Let [bindings body])
-(deftype Using [fields gen body])
-(deftype Do [exprs])
-(deftype Expr [op rands])
-(deftype Atom [val isAtom])  ;;I want default values...atom should always be 'true'
+(deftype When [isWhen trigger action])
+(deftype Let [isLet bindings body])
+(deftype Using [isUsing fields gen body])
+(deftype Prim [isPrim val])  ;;I want default values...atom should always be 'true'
+(deftype Do [isDo exprs])
+(deftype Op [isOp op rands])
+
+(declare expr-att)
 
 (defn drop-metas [program] 
   (cond
@@ -26,12 +29,32 @@
 
 (defn pyName [name]
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
+(defn pyVal [val]
+  (cond
+    (string? val) (str "\"" val "\"")
+    :else val))
+
+(defn at [] (Let. true 'x 'y))
+
+(defn bind-att [[varset expr]] 
+  (Binding. (map expr-att varset) (expr-att expr)))
+
+(defn expr-att [expr]
+  (match [expr]
+    [a :guard t/atom?] (Prim. true (pyVal a))
+    [(['let bindings body] :seq)] 
+      (Let. true (map bind-att bindings) (expr-att body))
+    [([do & exprs] :seq)] (Do. true (map expr-att exprs))
+    [([op & rands] :seq)] (Op. true op (map expr-att rands))
+    :else (throw (RuntimeException. "Unandled expression: " expr))))
 
 (defn data-atts [data]
-  (let [[tag meta when] data
-        [tag meta trigger expr] when
-        [_ _ source _] trigger]
-    (Depends. source "")))
+  (let [[tag when] (drop-metas data)
+        [tag trigger using] when
+        ;;Currently ignoring the trigger...assume everything is on init
+        [tag fields gen trans] using
+        [tag source] gen] ;;Assumes that this is an "items" expression
+    (Depends. source (t/full-drop fields) (expr-att trans))))
 
 (defn table-atts[table]
   (let [name (pyName (second table))
@@ -58,7 +81,6 @@
         runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))
         debug ((t/meta->map (nth runtime 2)) 'debug)
         debug (and (not (nil? debug)) (= true debug))]
-    (println (.x (first (map render-atts renders))))
     (Program. (Header. (pyName name) debug) (map table-atts tables) (map render-atts renders))))
 
 

@@ -23,27 +23,41 @@ import numpy as np
 <endif>
 >>
 
-expr(ex) ::= <%
-<if (ex.isAtom)>
-  <ex.val>
-<elseif (infixOps.(ex.op))>
+
+expr(ex) ::=
+<%<if (ex.isLet)><ex:let()>
+<elseif (ex.isPrim)><ex:prim()>
+<elseif (ex.isDo)><ex:do()>
+<elseif (ex.isOp)><ex:op()>
+<else><ex:unsupported()>
+<endif>%>
+
+plist(l) ::= <%(<l:expr();separator=", ">)%> 
+
+unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
+let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
+prim(ex) ::= "<ex.val>"
+do(ex) ::= <%<ex.exprs:expr();separator="\n">%>
+op(ex) ::= 
+<%<if (infixOps.(ex.op))>
   <expr(first(ex.rands))> <ex.op> <expr(first(rest(ex.rands)))>
 <else>
   <ex.op>(<ex.rands:expr();separator=", ">)
-<endif>
-%>
+<endif>%>
 
-let(let) ::= <% <let:binding();separator="\n"> %>
-binding(binding) ::= <% <binding.var>=<binding.ex:expr()> %>
+binding(binding) ::= <%<binding.vars:plist()> = <binding.expr:expr()>%>
+
 
 tableSize(tdef) ::= <<
 def size(self):
   return len(self.<first(tdef.fields)>)
+
 >>
 
 tableData(tdef) ::= <<
 def data(self):
   return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
+
 >>
 
 externalTable(tdef) ::= <<
@@ -59,11 +73,13 @@ class <tdef.name>:
 
   <tableSize(tdef)>
   <tableData(tdef)>
-
 >>
 
-dependUpdate(ddef) ::= <<
-for i in range(0, ddef
+dependUpdate(tableFields, ddef) ::=
+<<for i in range(0, self._<ddef.source>.size()):
+  <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
+  <ddef.expr:expr()>
+  <tableFields:{f|self.<f>.push(<f>)};separator="\n">
 >>
 
 dependentTable(tdef) ::= <<
@@ -77,11 +93,10 @@ class <tdef.name>:
 
   def update(self):
     <tdef.fields:{f|self.<f> = []};separator="\n">
-    <tdef.depends:dependUpdate();separator="\n#----------\n">
+    <tdef.depends:{d|<dependUpdate(tdef.fields, d)>};separator="\n#----------\n">
 
   <tableSize(tdef)>
   <tableData(tdef)>
-
 >>
 
 tableSetter(tdef) ::= <<

@@ -38,22 +38,23 @@ class plot:
     self.x = []
     self.y = []
     self.color = []
-    for i in range(0, len(self._dataset.size())):
-      source = 
-       a = self._dataset.a[i]
-       b = self._dataset.b[i]
-       x = a
-       y = b
-       color = "Red"
-       self.x.push(x)
-       self.y.push(y)
-       self.color.push(color)
+    for i in range(0, self._dataset.size()):
+      a = self._dataset.a[i]
+      b = self._dataset.b[i]
+      c = self._dataset.c[i]
+      (x) = a
+      (y) = b
+      (color) = "RED"
+      self.x.push(x)
+      self.y.push(y)
+      self.color.push(color)
 
   def size(self):
-    return len(self.a)
+    return len(self.x)
 
   def data(self):
     return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, color=self.color)
+
 
 class scatterplot_twoTable:
   dataset = None
@@ -65,7 +66,7 @@ class scatterplot_twoTable:
 
   def render(self):
     plot.update()
-    p.plot('x', 'y', color='RED', data_source=self.plot.data(), scatter=True)
+    p.plot('x', 'y', color='color', data_source=self.plot.data(), scatter=True)
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 

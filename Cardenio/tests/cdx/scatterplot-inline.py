@@ -17,6 +17,9 @@ class dataset:
     else:
       raise Exception("Data not properly supplied to table dataset")
 
+  def size(self):
+    return len(self.a)
+
   def data(self):
     return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
