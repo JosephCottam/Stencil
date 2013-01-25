@@ -6,20 +6,19 @@ infixOps ::= [
   default:"false"
 ]
 
-program(def) ::= <%
-  <header(def.header.debug)>
-  <classDef(def.header.name, def.tables, def.renders)>
-  <footer(def.header.name, def.header.debug)> 
-%>
+program(def) ::= <<
+<header(def.header.debug)>
+
+<classDef(def.header.name, def.tables, def.renders)>
+
+<footer(def.header.name, def.header.debug)> 
+>>
 
 header(testharness) ::= <<
 #Debug set to '<testharness>'
 from webplot import p 
 <if(testharness)>
 import numpy as np 
-
-<else>
-
 <endif>
 >>
 
@@ -103,12 +102,11 @@ tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
 def set_<tdef.name>(self, <tdef.fields:{f|<f>};separator=", ">):
   self.<tdef.name> = <tdef.name>(<tdef.fields:{f|<f>=<f>};separator=", ">)
-<else>
 <endif>
 >>
 
 renderer(def) ::= <%
-  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self.<def.source>.data(), <if (def.scatter)>scatter=True<else><endif>)
+  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self.<def.source>.data(), <if (def.scatter)>scatter=True<endif>)
 
 %>
 
@@ -122,19 +120,17 @@ class <className>:
   <tables:tableSetter()>
 
   def render(self):
-    <tables:{t|<if (t.depends)><t.name>.update()<else><endif>};separator="\n">
+    <tables:{t|<if (t.depends)><t.name>.update()<endif>};separator="\n">
     <renders:renderer();separator="\n">
 >>
 
 footer(name, testharness) ::= <<
 <if (testharness)>
-
 x = np.arange(100) / 6.0 
 y = np.sin(x) 
 z = np.cos(x) 
 plot = <name>()
 plot.set_dataset(x,y,z)
 plot.render()
-<else>
 <endif>
 >>
