@@ -6,48 +6,32 @@ infixOps ::= [
   default:"false"
 ]
 
-program(def) ::= <<
-<header(def.header.debug)>
-
-<classDef(def.header.name, def.tables, def.renders)>
-
-<footer(def.header.name, def.header.debug)> 
->>
-
-header(testharness) ::= <<
-#Debug set to '<testharness>'
-from webplot import p 
-<if(testharness)>
-import numpy as np 
-<endif>
->>
-
-
-expr(ex) ::=
-<%<if (ex.isLet)><ex:let()>
+// ----------------------  Expressions ----------------------
+expr(ex) ::= <%
+<if (ex.isLet)><ex:let()>
 <elseif (ex.isPrim)><ex:prim()>
 <elseif (ex.isDo)><ex:do()>
 <elseif (ex.isOp)><ex:op()>
 <else><ex:unsupported()>
-<endif>%>
+<endif>
+%>
 
-
-plist(l) ::= <%(<list(l)>)%> 
-list(l) :: = <%<l:expr();separator=", ">%>
 
 unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
 let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
 prim(ex) ::= "<ex.val>"
 do(ex) ::= <%<ex.exprs:expr();separator="\n">%>
-op(ex) ::= 
-<%<if (infixOps.(ex.op))>
+op(ex) ::= <%
+<if (infixOps.(ex.op))>
   <expr(first(ex.rands))> <ex.op> <expr(first(rest(ex.rands)))>
 <else>
   <ex.op>(<ex.rands:expr();separator=", ">)
-<endif>%>
+<endif>
+%>
 
-binding(binding) ::= <%<binding.vars:plist()> = <binding.expr:expr()>%>
+binding(binding) ::= <%(<binding.vars:expr();separator=", ">) = <binding.expr:expr()>%>
 
+// ----------------------  Common Table Elements ----------------------
 
 tableSize(tdef) ::= <<
 def size(self):
@@ -61,9 +45,13 @@ def data(self):
 
 >>
 
+tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
+
+// ----------------------  External Tables ----------------------
+
 externalTable(tdef) ::= <<
 class <tdef.name>:
-  _fields = [<tdef.fields:{f|'<f>'};separator=", ">]
+  <tableFields(tdef.fields)>
   <tdef.fields:{f|<f> = None};separator="\n">
 
   def __init__(self, **kwargs):
@@ -76,8 +64,11 @@ class <tdef.name>:
   <tableData(tdef)>
 >>
 
-dependUpdate(tableFields, ddef) ::=
-<<for i in range(0, self._<ddef.source>.size()):
+
+// ---------------------- Dependent Table ----------------------
+
+dependUpdate(tableFields, ddef) ::= <<
+for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
   <tableFields:{f|self.<f>.push(<f>)};separator="\n">
@@ -85,7 +76,7 @@ dependUpdate(tableFields, ddef) ::=
 
 dependentTable(tdef) ::= <<
 class <tdef.name>:
-  _fields = [<tdef.fields:{f|'<f>'};separator=", ">]
+  <tableFields(tdef.fields)>
   <tdef.depends:{d|_<d.source> = None};separator="\n">
   <tdef.fields:{f|<f> = None};separator="\n">
 
@@ -99,6 +90,9 @@ class <tdef.name>:
   <tableSize(tdef)>
   <tableData(tdef)>
 >>
+
+
+// ---------------------- Root Class ----------------------
 
 tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
@@ -125,6 +119,26 @@ class <className>:
     <tables:{t|<if (t.depends)><t.name>.update()<endif>};separator="\n">
     <renders:renderer();separator="\n">
 >>
+
+// ---------------------- Furniture ----------------------
+
+program(def) ::= <<
+<header(def.header.debug)>
+
+<classDef(def.header.name, def.tables, def.renders)>
+
+<footer(def.header.name, def.header.debug)> 
+>>
+
+header(testharness) ::= <<
+#Debug set to '<testharness>'
+from webplot import p 
+<if(testharness)>
+import numpy as np 
+<endif>
+>>
+
+
 
 footer(name, testharness) ::= <<
 <if (testharness)>
