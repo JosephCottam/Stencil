@@ -31,7 +31,9 @@ expr(ex) ::=
 <else><ex:unsupported()>
 <endif>%>
 
-plist(l) ::= <%(<l:expr();separator=", ">)%> 
+
+plist(l) ::= <%(<list(l)>)%> 
+list(l) :: = <%<l:expr();separator=", ">%>
 
 unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
 let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
