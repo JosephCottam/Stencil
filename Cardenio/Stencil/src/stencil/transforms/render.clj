@@ -44,12 +44,12 @@
                  id (if (= '_ id) (gen-name) id)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
              (list 'render id m1 table '($meta (type ***)) type m3 bind))
-         [(['render type (m3 :guard meta?) & bind] :seq)] 
+         [(['render (m1 :guard meta?) type (m3 :guard meta?) & bind] :seq)] 
            (let [bind (first bind)
                  bind (if (auto-bind? bind) (gen-binds (second bind) type fields) bind)
                  bind (maybe-clean bind)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             (list 'render (gen-name) '($meta (type fn)) table '($meta (type ***)) type m3 bind))
+             (list 'render (gen-name) m1 table '($meta (type ***)) type m3 bind))
          :else (map (partial helper table fields) program)))]
     (helper nil nil program)))
 
@@ -61,21 +61,20 @@
 ;;-------------------------------------------------------------------------------------------------------------------
 
 (defn gather-renders [program]
-  "Lift all render statements out to top-level, provide explicit target argument."
+  "Lift all render statements out to top-level"
   (letfn 
-    [(gather [context program] 
+    [(render? [p] (and (seq? p) (= 'render (first p))))
+     (sift [program]
        (match [program]
-         [a :guard atom?] nil  
-         [(['table name & rest] :seq)] (gather name rest)
-         [(['render (m :guard meta?) & rest] :seq)] 
-             `((~'render ~(gensym 'rend) ~m ~context (~'$meta) ~@rest))
-         :else (reduce concat (map (partial gather context) program))))
-     (justrenders [program] (remove nil? (gather '**NONE** program)))
-     (simplify [program]
-       (match [program]
-         [a :guard atom?] a
-         [(['table name & rest] :seq)] `(~'table ~name ~@(remove #(= 'render (first %)) rest))
-         :else (map simplify program)))
+         [a :guard atom?] (list '() a)
+         [e :guard empty?] (list '() '())
+         [([(r :guard render?) & after] :seq)]
+            (let [[renders reduced] (sift after)]
+              (list (cons r renders) reduced))
+         :else 
+            (let [[renderA reducedA] (sift (first program))
+                  [renderB reducedB] (sift (rest program))]
+              (list (concat renderA renderB) (cons reducedA reducedB)))))
      (split [program]
        (let [f (first program)]
          (cond
@@ -83,9 +82,6 @@
            (and (seq? f) (= 'table (first f))) (list '() program)
            :else (let [[before after] (split (rest program))]
                    (list (cons f before) after)))))]
-    (let [reduced (simplify program)
-          renders (justrenders program)
+    (let [[renders reduced] (sift program)
           [before after] (split reduced)]
       (concat before renders after))))
-
-

@@ -317,7 +317,7 @@
     (not (seq? a)) a
     :else (map strip-gen a)))
 
-(deftest normalize-renderss
+(deftest normalize-renders
   (is (= (t/normalize-renders '(stencil x)) '(stencil x)))
   (is (= (t/normalize-renders '(render rid ($meta) source ($meta) type ($meta) (bind ($meta) (x ($meta) a ($meta)) (y ($meta) b ($meta)))))
          '(render rid ($meta) source ($meta) type ($meta) (bind ($meta) (x ($meta) a ($meta)) (y ($meta) b ($meta)))))
@@ -342,7 +342,8 @@
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
                                       (render rn ($meta) tn ($meta) type ($meta) 
-                                              (bind ($meta) ($C ($meta) x ($meta (type ***)) x ($meta (type ***)))
+                                              (bind ($meta) 
+                                                    ($C ($meta) x ($meta (type ***)) x ($meta (type ***)))
                                                     ($C ($meta) y ($meta (type ***)) y ($meta (type ***)))))))
          '(table tn 
                  (fields a x b y)
@@ -351,10 +352,33 @@
                                (x ($meta (type ***)) x ($meta (type ***)))
                                (y ($meta (type ***)) y ($meta (type ***)))))))
       "Clean bindings")
-  (is (= (strip-gen (t/normalize-renders '(table tn (fields a x b y) (render scatter ($meta) (bind ($meta) auto ($meta) )))))
+  (is (= (strip-gen (t/normalize-renders
+                      '(stencil scatterplot-inline ($meta) (import CDXRuntime ($meta (debug true)))
+                                (table dataset ($meta (source external))
+                                       (fields ($meta) a ($meta) b ($meta) c ($meta))
+                                       (render ($meta)
+                                               scatter ($meta)
+                                               (bind ($meta)
+                                                     ($C ($meta) x ($meta) a ($meta))
+                                                     ($C ($meta) y ($meta) b ($meta))
+                                                     ($C ($meta) color ($meta) "RED" ($meta))))))))
+         '(stencil scatterplot-inline ($meta) (import CDXRuntime ($meta (debug true)))
+                   (table dataset ($meta (source external))
+                          (fields ($meta) a ($meta) b ($meta) c ($meta))
+                          (render rend ($meta)
+                                  dataset ($meta (type ***))
+                                  scatter ($meta)
+                                  (bind ($meta)
+                                        (x ($meta) a ($meta))
+                                        (y ($meta) b ($meta))
+                                        (color ($meta) "RED" ($meta)))))))
+      "Deeper nesting.")
+
+
+  (is (= (strip-gen (t/normalize-renders '(table tn (fields a x b y) (render ($meta) scatter ($meta) (bind ($meta) auto ($meta) )))))
          '(table tn 
                  (fields a x b y)
-                 (render rend ($meta (type fn)) tn ($meta (type ***)) scatter ($meta) 
+                 (render rend ($meta) tn ($meta (type ***)) scatter ($meta) 
                          (bind ($meta) 
                                (x ($meta (type ***)) x ($meta (type ***)))
                                (y ($meta (type ***)) y ($meta (type ***)))))))
@@ -365,8 +389,8 @@
 
 (deftest gather-renders
   (is (= (t/gather-renders '(stencil x)) '(stencil x)))
-  (is (= (t/gather-renders '(render a b c)) '(render a b c)))
-  (is (= (strip-gen (t/gather-renders '(stencil (table tname ($meta a) (render ($meta b))))))
-         '(stencil (render rend ($meta b) tname ($meta)) (table tname ($meta a))))))
+  (is (= (t/gather-renders '(stencil x (render a b c))) '(stencil x(render a b c))))
+  (is (= (t/gather-renders '(stencil (table tname ($meta a) (render rend ($meta 1) tname ($meta 2) type ($meta 3)))))
+         '(stencil (render rend ($meta 1) tname ($meta 2) type ($meta 3)) (table tname ($meta a))))))
 
 
