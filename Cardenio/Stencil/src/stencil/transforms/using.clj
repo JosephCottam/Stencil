@@ -2,9 +2,9 @@
 
 (defn arrow->using [program]
   "The arrow operator is the binary, infix version of using."
-  (match [program]
-    [(a :guard atom?)] a
-    [(['-> e1 e2] :seq)] (list 'using  e1 e2)
+  (match program
+    (a :guard atom?) a
+    (['-> e1 e2] :seq) (list 'using  e1 e2)
     :else (map arrow->using program)))
     
 (defn ensure-using-tuple [program]
@@ -18,16 +18,16 @@
                      (and (list? rv)
                           (= (first rv) 'tuple))))))
           (ensure-tuple [e] 
-            (match [e]
-              [(['let vals body] :seq)] (list 'let vals body)
-              [([x (m :guard meta?) & rest] :seq)]
+            (match e
+              (['let vals body] :seq) (list 'let vals body)
+              ([x (m :guard meta?) & rest] :seq)
                  (if (tuple-fn? m)
                    e
                    (list 'tuple '($meta (type (fn (...) (tuple (...))))) e))
               :else (list 'tuple '($meta (type (fn (...) (tuple (...))))) e)))]
-    (match [program]
-      [(a :guard atom?)] a
-      [(['using (m :guard meta?) e1 e2] :seq)]  
+    (match program
+      (a :guard atom?) a
+      (['using (m :guard meta?) e1 e2] :seq)
          (list 'using m (ensure-tuple e1) e2)
       :else (map ensure-using-tuple program))))
 

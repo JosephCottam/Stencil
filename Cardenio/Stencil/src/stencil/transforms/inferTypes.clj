@@ -73,9 +73,9 @@
                          (= a '$tuple))
                    (enforce-type m '(fn (...) (tuple (...))) #(= % 'fn))
                    m))]
-         (match [program]
-           [(a :guard atom?)] a
-           [([f (m :guard meta?)] :seq)] (list f (known-type f m))
+         (match program
+           (a :guard atom?) a
+           ([f (m :guard meta?)] :seq) (list f (known-type f m))
            :else (map tuple-patch-kludge program))))]
 
     (->> program tie-metas (annotate :normal) tuple-patch-kludge untie-metas)))

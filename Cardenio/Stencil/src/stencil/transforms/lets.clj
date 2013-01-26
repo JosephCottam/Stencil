@@ -3,21 +3,19 @@
 ;; ------- Validate Let-----
 (defn hasBind? [line] (and (seq? line) (any= '$C line)))
 
-(defn- validate-line-shape
-  [lines]
-  (match [lines]
-    [([line] :seq)] (list line) ;Last line may be body or binding... 
-    [([(line :guard hasBind?) & rest] :seq)] 
+(defn- validate-line-shape [lines]
+  (match lines
+    ([line] :seq) (list line) ;Last line may be body or binding... 
+    ([(line :guard hasBind?) & rest] :seq) 
          (cons line (validate-line-shape rest))
-    [([(line :guard (complement hasBind?)) & rest] :seq)] 
+    ([(line :guard (complement hasBind?)) & rest] :seq) 
          (throw (RuntimeException. (str "Invalidate let shape: " line)))))
 
-(defn validate-let-shape
+(defn validate-let-shape [program]
   "Let must have a binding on each line, except the last which may be a body instead"
-  [program]
-  (match [program]
-    [(x :guard atom?)] x
-    [(['let & letLines] :seq)]
+  (match program
+    (x :guard atom?) x
+    (['let & letLines] :seq)
         `(~'let ~@(map validate-let-shape (validate-line-shape letLines)))
     :else (map validate-let-shape program)))
       
@@ -25,16 +23,15 @@
 ;; ------- Normalize shape ----
 
 
-(defn normalize-let-shape
+(defn normalize-let-shape [program]
   "Ensure that all let lines have same form.  Removes the binding operator."
-  [program]
   (letfn 
     [(normalize-line [l]
-       (match [l]
-         [(a :guard atom?)] a
-         [([(t :guard seq?) & rest] :seq)] l   ;;Multi-var binding
-         [([t (m :guard meta?) & rest] :seq)] `((~t ~m) ~@rest)  ;;Single variable binding w/meta
-         [([t & rest] :seq)] `((~t) ~@rest)))   ;;Single variable binding w/o meta
+       (match l
+         (a :guard atom?) a
+         ([(t :guard seq?) & rest] :seq) l   ;;Multi-var binding
+         ([t (m :guard meta?) & rest] :seq) `((~t ~m) ~@rest)  ;;Single variable binding w/meta
+         ([t & rest] :seq) `((~t) ~@rest)))   ;;Single variable binding w/o meta
      (divide-body [lines]
        "Give back a pair (bindings, body)"
        (let [maybe-body (last lines)]
@@ -48,9 +45,9 @@
            (not (empty? meta)) `(~vars (~'$do ~expr ~@meta))
            (atom? expr) `(~vars (~'$do ~expr))
            :else `(~vars ~expr))))]
-    (match [program]
-      [(x :guard atom?)] x
-      [(['let & lines] :seq)] 
+    (match program
+      (x :guard atom?) x
+      (['let & lines] :seq) 
         (let [[bindings body] (divide-body lines)
               bindings (map (comp reshape-binding normalize-line) bindings)]
           (list 'let bindings body))
@@ -83,9 +80,9 @@
           (make-body (reduce concat (map first bindings)))
           body)))]
 
-    (match [program]
-      [(x :guard atom?)] x
-      [(['let bindings body] :seq)]
+    (match program
+      (x :guard atom?) x
+      (['let bindings body] :seq)
         `(~'let ~(map default-let-body bindings) ~(default-let-body (ensure-body bindings body)))
       :else (map default-let-body program))))
 

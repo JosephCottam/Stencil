@@ -17,14 +17,13 @@
       ;`(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
      :else (expr->fields saved (last expr)))))
 
-(defn ensure-fields
+(defn ensure-fields [program]
   "Ensure there is a 'fields' policy in each table and stream.
    If there is not currently a 'fields' policy, generates on based on the first 'data' policy found.
    After execution, fields policy will include type and default value in its metadata."
-  [program]
-  (match [program]
-    [a :guard atom?] a
-    [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
+  (match program
+    (a :guard atom?) a
+    ([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)
         (if (not (empty? (filter-tagged 'fields policies)))
           `(~tag ~name ~meta ~@policies)
           (let [data (first (filter-tagged 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
@@ -43,9 +42,9 @@
             (let [fields (set (remove meta? (rest (first fields-policy))))]
               (fn [data] 
                 (clojure.set/subset? fields (set (remove meta? (rest (expr->fields data))))))))]
-    (match [program]
-      [a :guard atom?] a
-      [([(tag :guard stream-or-table?) (n :guard symbol?) (m :guard meta?) & policies] :seq)]
+    (match program
+      (a :guard atom?) a
+      ([(tag :guard stream-or-table?) (n :guard symbol?) (m :guard meta?) & policies] :seq)
         (let [fields (filter-tagged 'fields policies)
               data   (filter-tagged 'data policies)]
           (if (every? #(= true %) (map (covers fields) data))
@@ -57,9 +56,9 @@
 (defn check-simple-fields [program]
   "Test if the 'fields' statements only have symbol entries (and metas).
    Throws exception on failure, or unchanged tree."
-   (match [program]
-     [a :guard atom?] a
-     [(['fields & rest] :seq)]
+   (match program
+     (a :guard atom?) a
+     (['fields & rest] :seq)
        (if (every? #(or (symbol? %) (meta? %)) rest)
          program
          (throw (RuntimeException. (str "Fields statement with illegal entry: " program))))
@@ -87,9 +86,9 @@
             (interleave names (map (extendWith items) names metas)))))]
 
   (fn folder [program]
-    (match [program]
-      [a :guard atom?] a 
-      [([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)]
+    (match program
+      (a :guard atom?) a 
+      ([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)
       (let [fields   (rest (first (filter-tagged 'fields policies)))
             source (lop->map (rest (first (filter-tagged policy-tag policies))))
             inner (map folder policies)
@@ -114,15 +113,14 @@
            (if (not (contains? meta 'display)) 
              (assoc meta 'display (str name))
              meta))]
-    (match [program]
-      [a :guard atom?] a
-      [(['fields (fmeta :guard meta?) & defs] :seq)] 
+    (match program
+      (a :guard atom?) a
+      (['fields (fmeta :guard meta?) & defs] :seq)
         (let [names (take-nth 2 defs)
               metas (take-nth 2 (rest defs))
               metas (map #(map->meta (ensure-display %1 (meta->map %2))) names metas)]
           `(~'fields ~fmeta ~@(interleave names metas)))
       :else (map normalize-fields program))))
-
 
 
 

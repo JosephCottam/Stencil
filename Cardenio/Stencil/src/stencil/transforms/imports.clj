@@ -2,9 +2,8 @@
   "Manipulate imports.")
 
 (def ^:dynamic *default-runtime* 'javaPicoRuntime)
-(defn ensure-runtime-import
+(defn ensure-runtime-import [program] 
    "Ensure that there is a runtime in the imports list."
-   [program]
    (letfn
      [(has-runtime? [program]
        "Is some item imported a runtime?  

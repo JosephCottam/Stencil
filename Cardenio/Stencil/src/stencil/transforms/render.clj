@@ -26,25 +26,25 @@
                 `(~tag ~meta ~@(map drop-bind-op bindings))
                 policy)))
      (helper [table fields program]
-       (match [program]
-         [a :guard atom?] a
-         [(['table name & rest] :seq)] 
+       (match program
+         (a :guard atom?) a
+         (['table name & rest] :seq) 
            (let [fields (first (filter-tagged 'fields rest))]
              `(~'table ~name ~@(helper name fields rest)))
-         [(['render id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & bind] :seq)] 
+         (['render id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & bind] :seq)
            (let [bind (first bind)
                  bind (if (auto-bind? bind) (gen-binds (second bind) type fields) bind)
                  bind (maybe-clean bind)
                  id (if (= '_ id) (gen-name) id)]
              (list 'render id m1 source m2 type m3 bind))
-         [(['render id (m1 :guard meta?) type (m3 :guard meta?) & bind] :seq)] 
+         (['render id (m1 :guard meta?) type (m3 :guard meta?) & bind] :seq) 
            (let [bind (first bind)
                  bind (if (auto-bind? bind) (gen-binds (second bind) type fields) bind)
                  bind (maybe-clean bind)
                  id (if (= '_ id) (gen-name) id)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
              (list 'render id m1 table '($meta (type ***)) type m3 bind))
-         [(['render (m1 :guard meta?) type (m3 :guard meta?) & bind] :seq)] 
+         (['render (m1 :guard meta?) type (m3 :guard meta?) & bind] :seq) 
            (let [bind (first bind)
                  bind (if (auto-bind? bind) (gen-binds (second bind) type fields) bind)
                  bind (maybe-clean bind)
@@ -65,10 +65,10 @@
   (letfn 
     [(render? [p] (and (seq? p) (= 'render (first p))))
      (sift [program]
-       (match [program]
-         [a :guard atom?] (list '() a)
-         [e :guard empty?] (list '() '())
-         [([(r :guard render?) & after] :seq)]
+       (match program
+         (a :guard atom?) (list '() a)
+         (e :guard empty?) (list '() '())
+         ([(r :guard render?) & after] :seq)
             (let [[renders reduced] (sift after)]
               (list (cons r renders) reduced))
          :else 

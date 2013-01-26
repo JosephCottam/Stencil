@@ -1,8 +1,7 @@
 (ns stencil.transform) 
 
-(defn parent 
+(defn parent [path program] 
    "Get the parent of the item indicated in the path."
-   [path program] 
    (reduce nth program (butlast path)))
 
 (defn split-when
@@ -23,17 +22,17 @@
             :else prototype)))
 
     (binds [generator path] 
-     (match [generator]
-       [e :guard empty?] '(fields ($meta))
-       [(['delta (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
-       [(['items (m1 :guard meta?) source (m2 :guard meta?)] :seq)] (find-names source path)
+     (match generator
+       (e :guard empty?) '(fields ($meta))
+       (['delta (m1 :guard meta?) source (m2 :guard meta?)] :seq) (find-names source path)
+       (['items (m1 :guard meta?) source (m2 :guard meta?)] :seq) (find-names source path)
       :else 
        (throw (RuntimeException. (str "Generator expression not recognized: " (first generator) "...")))))
     (search [program upPath]
-     (match [program]
-      [(a :guard atom?)] a
-      [(m :guard meta?)] m
-      [(['when (m1 :guard meta?) cond gen body] :seq)]
+     (match program
+      (a :guard atom?) a
+      (m :guard meta?) m
+      (['when (m1 :guard meta?) cond gen body] :seq)
          `(~'when- ~m1 ~cond (~'using (~'$meta) ~(binds gen (reverse upPath)) ~gen ~body))
       :else (map-indexed #(search %2 (cons %1 upPath)) program)))]
    (search program '())))

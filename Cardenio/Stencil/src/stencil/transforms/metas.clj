@@ -4,22 +4,21 @@
 
 (defn- atom-not-form? [a] (and (atom? a) (not (stencil-form? a))))
 
-(defn supply-metas
+(defn supply-metas [program] 
   "Ensure that there is a meta expression after every atom."
-  [program]
-  (match [program]
-    [(a :guard atom-not-form?)] a
-    [(a :guard atom?)] (list a '($meta))
+  (match program
+    (a :guard atom-not-form?) a
+    (a :guard atom?) (list a '($meta))
     
-    [(a :guard empty?)] a
+    (a :guard empty?) a
     
-    [([(a :guard atom?) (b :guard meta?) & tail] :seq)] 
+    ([(a :guard atom?) (b :guard meta?) & tail] :seq) 
        `(~a ~b ~@(supply-metas tail))
-    [([(a :guard atom-not-form?) & tail] :seq)] 
+    ([(a :guard atom-not-form?) & tail] :seq)
        `(~a (~'$meta) ~@(supply-metas tail))
-    [([(a :guard atom?) & tail] :seq)] 
+    ([(a :guard atom?) & tail] :seq)
        `(~a ~@(supply-metas tail))
-    [([a & tail] :seq)]
+    ([a & tail] :seq)
        (cons (supply-metas a) (supply-metas tail))))
   
 (defn meta-pairings [program]
@@ -29,9 +28,9 @@
               (= '$C (second ls)) 
                  (cons (list (first ls) (nth ls 2)) (maybe-pair (drop 3 ls)))
               :else (cons (first ls) (maybe-pair (rest ls)))))]
-    (match [program]
-      [a :guard atom?] a
-      [(['$meta & rest] :seq)] (cons '$meta (maybe-pair rest))
+    (match program
+      (a :guard atom?) a
+      (['$meta & rest] :seq) (cons '$meta (maybe-pair rest))
       :else (map meta-pairings program))))
 
 
@@ -40,16 +39,16 @@
   TODO: REMOVE THIS AND REPLACE WITH A MORE COMPLETE METADATA LABELING MECHANISM."
   [program]
   (letfn 
-    [(hasType? [metas] (contains? (meta->map metas) 'type))
+    [(hasType? [metas] (and (seq? metas) (contains? (meta->map metas) 'type)))
      (addType [metas] (let [[before after] (split-with seq? (rest metas))
                             [type & tail] after]
                         (if (nil? type) 
                           metas
                           (cons '$meta (concat before (cons (list 'type type) tail))))))]
-    (match [program]
-      [a :guard #(and (meta? %) (hasType? %))] a
-      [a :guard meta?] (addType a)
-      [a :guard atom?] a
+    (match program
+      (a :guard [meta? hasType?]) a
+      (a :guard meta?) (addType a)
+      (a :guard atom?) a
       :else (map meta-types program))))
 
 
