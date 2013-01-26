@@ -158,6 +158,8 @@ public class CompoundTable implements Table {
 	}
 	
 	
+	public void clear() {for (Table t: components) {t.clear();}}
+	
 	@Override
 	public String name() {return root.name();}
 

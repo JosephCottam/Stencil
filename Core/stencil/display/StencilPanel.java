@@ -10,12 +10,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import stencil.display.Display;
 import stencil.interpreter.Interpreter;
 import stencil.interpreter.tree.Program;
 import stencil.interpreter.tree.Layer;
 import stencil.interpreter.tree.StreamDec;
 import stencil.module.StreamTypeRegistry;
+import stencil.module.util.ApplyCanvas;
+import stencil.module.util.ApplyView;
 import stencil.tuple.SourcedTuple;
 import stencil.tuple.Tuple;
 import stencil.tuple.stream.TupleStream;
@@ -178,18 +179,23 @@ public abstract class StencilPanel<T extends Glyph, L extends DisplayLayer<T>, C
 	 * TODO: Remove return type when StencilRunner is integrated into the full stencil runtime...
 	 * */
 	public Map<String, TupleStream> preRun() {
-		//TODO: Modify when view and canvas can have multiple instances
-		Display.canvas = getCanvas();
-		Display.view = getView();
-
 		StreamDec[] decs = program.streamDecs();
 		Map<String, TupleStream> streams = new HashMap();
 				
+		//TODO: Do Program.view/canvas need be set first (because stream construction MIGHT refer to them)
+		((ApplyView) program.view().implementation()).setView(getView());
+		((ApplyCanvas) program.canvas().implementation()).setCanvas(getCanvas());		
+
 		for (StreamDec dec: decs) {
 			TupleStream s = StreamTypeRegistry.instance(dec, this);
+			if (s instanceof ApplyView) {((ApplyView) s).setView(getView());}
 			streams.put(dec.name(),s);
 		}
 		
+		for (Object op: program.operators()) {
+			if (op instanceof ApplyCanvas) {((ApplyCanvas) op).setCanvas(getCanvas());}
+			if (op instanceof ApplyView) {((ApplyView) op).setView(getView());}
+		}
 		
 		return streams;
 	}

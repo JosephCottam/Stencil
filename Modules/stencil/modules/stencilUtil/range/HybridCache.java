@@ -7,7 +7,6 @@ public class HybridCache extends CacheHelper {
 		super(range);
 		if (range.relativeStart()) {throw new RuntimeException("Hybrid ranges must have absolute start points.  Recieved range " + range.toString());}
 		offsetCountdown = range.getStart();
-
 	}
 
 	@Override

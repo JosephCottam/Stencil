@@ -1,6 +1,6 @@
 import ViewCanvas
 
-stream Tweets(message, user, country, countryCode) : Twitter
+stream Tweets(message, user, tags, geo, place, date) : Twitter
 
 view
 from #Render

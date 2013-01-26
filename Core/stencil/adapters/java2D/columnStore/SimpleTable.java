@@ -101,6 +101,15 @@ public final class SimpleTable implements Table {
 	}
 		
 	
+	public void clear() {
+		synchronized(tableLock) {
+			tenured = new TableView(tenured.name, tenured.schema);
+			updates = new ArrayList();
+			//if (transfer != null) {transfer.clear();}
+		}
+		stateID++;
+	}
+	
 	@Override
 	public void remove(Comparable ID) {
 		updates.add(DeleteTuple.with(ID));

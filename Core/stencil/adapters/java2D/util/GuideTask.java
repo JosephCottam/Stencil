@@ -4,7 +4,6 @@ package stencil.adapters.java2D.util;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
-import stencil.display.Display;
 import stencil.display.DisplayCanvas;
 import stencil.display.DisplayGuide;
 import stencil.display.DisplayLayer;
@@ -29,7 +28,7 @@ public class GuideTask extends UpdateTask<Guide> {
 	public boolean needsUpdate() {
 		boolean analysisState = super.needsUpdate();
 		Rectangle2D bounds = canvas.contentBounds(false);
-		AffineTransform viewTrans  = Display.canvas.getComponent().viewTransform();
+		AffineTransform viewTrans  = canvas.viewTransform();
 		if (!canvasBounds.equals(bounds) || !viewTransform.equals(viewTrans)) {
 			canvasBounds.setRect(bounds);
 			viewTransform.setTransform(viewTrans);

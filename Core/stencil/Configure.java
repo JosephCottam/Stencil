@@ -45,7 +45,7 @@ public class Configure {
 		Properties p = new Properties();
 		URL base;
 		
-		try {base = new URL("file://" + System.getProperty("user.dir")+"/");}
+		try {base = new URL("file:///" + System.getProperty("user.dir")+ System.getProperty("file.separator"));}
 		catch (Exception e) {throw new Error("Error initailizing context.");}
 		
 		for (String url:urls) {p.loadFromXML(new URL(base, url).openStream());}

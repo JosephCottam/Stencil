@@ -36,6 +36,10 @@ public interface DisplayLayer<T extends Glyph> extends Viewpoint<LayerView<T>> {
 	/**Given an ID, remove the associated tuple from the layer*/
 	public void remove(Comparable ID);
 
+	/**Remove all current layer conentents.**/
+	public void clear();
+	
+
 	/**Is the provided ID associated with a tuple on this layer?*/
 	public boolean contains(Comparable ID);
 	

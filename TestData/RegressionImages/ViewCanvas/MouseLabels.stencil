@@ -17,7 +17,6 @@ from Elements
     SIZE: 30
     FILL_COLOR: Color{BLUE}
 
-
 layer Labels["TEXT"]
 from Elements
    local(id) : Count()
@@ -26,6 +25,7 @@ from Elements
    X : Count() -> Mult(40, _) -> Add(15,_)
    Y : -100
    VISIBLE:* Nearest() -> EQ(_, local.id)
+   IMPLANT: "POINT"
 
 stream interact()
 from Mouse

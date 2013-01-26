@@ -34,6 +34,7 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 	private static final String NEAR = "nearest";
 	private static final String BOUNDS = "bounds";
 	private static final String REMOVE= "remove";
+	private static final String CLEAR= "clear";
 	private static final String CONTAINS = "contains";
 	private static final String STATE_ID = "stateID";
 	
@@ -49,6 +50,7 @@ public class LayerOperator implements StencilOperator<StencilOperator> {
 		facets.add(new FacetData(NEAR, MemoryUse.READER, prototype));
 		facets.add(new FacetData(BOUNDS, MemoryUse.READER, RectangleTuple.PROTO));
 		facets.add(new FacetData(REMOVE, MemoryUse.OPAQUE, prototype));
+		facets.add(new FacetData(CLEAR, MemoryUse.OPAQUE, prototype));
 		facets.add(new FacetData(CONTAINS, MemoryUse.READER, prototype));
 		facets.add(new FacetData(STATE_ID, MemoryUse.READER, "VALUE"));
 		operatorData = new OperatorData(module, getName(), EMPTY_SPECIALIZER, null, FIND, facets);

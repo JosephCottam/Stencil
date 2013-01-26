@@ -73,12 +73,21 @@ public class TupleUtil extends BasicModule {
     @Operator()
     public static final class MultiResult extends AbstractOperator {
 		public MultiResult(OperatorData opData) {super(opData);}
-    	
+
+	    @Facet(memUse="FUNCTION", prototype="()", alias={"array"})
+		public MultiResultTuple array(Object[] values) {
+	    	Tuple[] ts = new Tuple[values.length];
+	    	for (int i=0; i<values.length;i++) {
+	    		ts[i] = Singleton.from(values[i]);
+	    	}
+	    	return new MultiResultTuple(ts);
+	    }
+		
 	    @Facet(memUse="FUNCTION", prototype="()", alias={"map", "query"})
 		public MultiResultTuple query(Object... values) {
 	    	Tuple[] ts = new Tuple[values.length];
 	    	for (int i=0; i<values.length;i++) {
-	    		ts[i] = Singleton.from(values[i]);
+	    		ts[i] = Converter.toTuple(values[i]);
 	    	}
 	    	return new MultiResultTuple(ts);
 		}

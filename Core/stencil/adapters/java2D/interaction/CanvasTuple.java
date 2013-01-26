@@ -8,7 +8,7 @@ import stencil.types.Converter;
 
 
 public class CanvasTuple extends stencil.display.CanvasTuple {
-	private Canvas  canvas;
+	private Canvas canvas;
 	
 	public CanvasTuple(Canvas c) {canvas = c;}
 	
