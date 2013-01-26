@@ -1,0 +1,25 @@
+import ViewCanvas
+import BrewerPalettes 
+
+stream flowers(sepalL, petalW, sepalW, petalL, species, obs)	
+   : Text["./AndersonsFlowers.csv"]
+
+view
+from #Render
+  ZOOM: ZoomFit(1)
+  (X,Y): (canvas.X, canvas.Y)
+
+layer Plot
+guide 
+   axis Linear from X
+   axis Linear from Y
+   legend[X:10,Y:95] from FILL_COLOR
+   trend from ID
+   title["FLOWERS"] from ID
+from flowers
+   ID: Count()
+   X:* Scale[0,100](petalW)
+   Y:* Scale[0,100](petalL)
+   SIZE: 3
+   SHAPE: "CROSS"
+   FILL_COLOR: BrewerColors(species) -> SetAlpha(100,_)

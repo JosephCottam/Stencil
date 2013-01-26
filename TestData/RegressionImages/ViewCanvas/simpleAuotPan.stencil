@@ -1,0 +1,45 @@
+import ViewCanvas
+import Dates
+
+stream Stocks(Date,Open,High,Low,Close,Volume) : Text["../Stocks/google_stocks.csv", delay:20]
+
+stream AlignedStocks(Date, Open)
+from Stocks
+  Date : Parse[f:"dd-MMM-yy"](Date)
+  Open : Open
+
+view 
+from #Render
+    (H, Y) : (canvas.H, canvas.Y)
+from AlignedStocks
+    filter(prefilter.Margin < 50)
+    filter(prefilter.TimeStep < prefilter.RIGHT)
+    prefilter(TimeStep, Margin, RIGHT) : 
+        [Right] TranslateRegistration("TOP_LEFT", view.X, view.Y, view.W, view.H, "RIGHT") ->
+        [Time] TimeStep(Date) -> Sub(Right.X, _) -> (Time.S, Sub, Right.X) 
+    X: Add(5, view.X)
+
+
+layer Ticker["POLY_POINT"]
+guide axis[implant:"POINT"] Linear from Y
+         label.FONT: Font{20}
+      axis[unit: "MONTH", implant:"POINT"] Date from X
+		 label.TEXT: Parse.format[f:"MMM yy"](Input)
+         label.FONT: Font{20}
+from AlignedStocks
+    ID: Count()
+    GROUP : "Google"   
+    ORDER: Count()
+    X: TimeStep(Date) 
+    Y: Open
+    PEN: Stroke{1}
+    PEN_COLOR: Color{BLUE}
+
+
+
+operator DateMin : FullMin[c:"Date"]  
+operator TimeStep (T) -> (S)
+default => (S) : DateMin(T) 
+                   -> DateDiff("DAYS", DateMin, T) 
+                   -> Mult(_, 3)
+             
