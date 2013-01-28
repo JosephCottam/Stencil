@@ -1,0 +1,52 @@
+operator $max (a b) -> (m) from source language
+
+(operator max 
+  (query (a ...) -> (m)
+   (meta (counterpart query))
+   (default (let (m (reduce $max a))))))
+
+; Of all the things seen, keep the largest
+(operator fullMax
+  (table store
+    (fields a)   ;;Optional, can be derived from the "data" policy
+    (data (push (v) (let (a : v))))
+    (retain (unique a) (= a (max (flatten (select #self a))))))                   ;;Get rid of small things
+  (map (v) -> (a)
+    (meta (counterpart query))
+    (default (a : ((store v)-> (store.get 0)))))
+  (query (v) -> (a)
+    (meta (counterpart query))
+    (default (a : (store.get 0)))))
+
+
+(operator windowMax[k]             ;;; k is how large of a buffer to keep
+  (table store:lastK[k])
+  (map (v) -> (a)
+    (meta (counterpart query))
+    (default (a : (store v) -> (max (flatten (select store a))) )))
+  (map (v n) -> (a)
+    (meta (counterpart query))
+    (default (a : (store v) -> (max (flatten (first n (select store t)))))))
+  (query (v) -> (a)
+    (meta (counterpart query))
+    (default (a : (max (flatten (select store t))))))
+  (query (v n) -> (a)
+    (meta (counterpart query))
+    (default (a : (max (flatten (first n (select store t))))))))
+
+
+(table lastK[k]
+  (fields (t i))
+  (data (push (t) (t: t) (i :counter)))
+  (retain (i >= ((counter.query)-k))))
+
+(operator counter
+  (operator mmax:fullMax)
+  (map () -> (n) 
+    (meta (counterpart query))
+    (default (let (n (mmax (mmax.query+1))))))
+  (query () -> (n) 
+    (meta (counterpart query))
+    (default (let (n (mmax.query))))))
+  
+

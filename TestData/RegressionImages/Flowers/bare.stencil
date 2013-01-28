@@ -1,4 +1,0 @@
-import BrewerPalettes 
-
-stream flowers(sepalL, petalW, sepalW, petalL, species, obs)		/*@\label{flowers:stream}@*/
-   : Text["./AndersonsFlowers.csv"]

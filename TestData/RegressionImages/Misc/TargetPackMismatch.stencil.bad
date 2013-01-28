@@ -1,7 +1,0 @@
-stream Stream(V)
-
-layer Layer
-from Stream
-	ID: Count()
-    SIZE: (V,V)
-

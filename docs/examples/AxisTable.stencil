@@ -1,0 +1,16 @@
+(table _
+   (table _
+      (fields (v))
+      (data (pull flowers (v : species)))
+      (retain unique))
+   (table _
+      (render text)
+      (data (when onRender (stream names)
+          (text : v)
+          ((X,Y) : legendLayout(v, 'label))))
+   (table _
+      (render 'shapes)
+      (data (when onRender (stream names)
+         (fillC : (BrewerColors v) -> (setAlpha 50 BrewerColors))
+         ((X,Y) : legendLayout(v, 'example))
+         ((reg, shape) : #('center, 'cross)))

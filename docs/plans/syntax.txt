@@ -1,0 +1,89 @@
+Top-level forms:
+  (table <id> <policy>...)
+  (stream <id> <policy>...)
+  (view <id> <policy> ...)
+ 
+Misc parts
+  set  : a type of tuple expression
+         syntax for building rules,  (set <rule> ...)
+         handles filters and tuple construction and let and :* and :- more fluidly than #(...) syntax would
+  #(e ...) : tuple expression, returns a tuple, basically (tuple (id ex) ...) but with nicer syntax
+             Can be used anywhere an expression can be used
+             Names may be omitted, then values are only referred to by index (handy for making lists!)
+  rule : (<id> <bind op> <expr>)
+  expr : Classic, nested expressions
+         -[<id>]>  Post-fix composition (+ named intermediate result)
+
+Policies :
+  (meta ...) 
+     ;; Builds a set of key/value pairs that are associated with the object
+     ;; May not be available at runtime...so try not to depend on it for runtime information
+     ;; ...but it becomes important, we'll make it available at runtime...maybe policy-based in some way
+  (data <generator>...)
+     ;;Build a tuple for 'use' in the current context
+     ;;Could be store-in-the-table or put-on-the-stream (for example)
+  (fields (<id> ...))
+  (fields (<id> : <type> ...))
+  (fields (<id> : <expr> ...))   
+      ;;Default value provided by expression, maybe need a way to override type inferencer here...
+  (retain  <condition>...)
+     ;;Only valid on table 
+     ;;Any whole-table condition will be executed after per-item conditions
+  (render <id> <tuple-expr>)
+     ;;Only valid in table definitions, indicates how to render the data
+  (GOG <GOG expression>)
+    ;;Define a grammar-of-graphics transform on the data
+    ;;The GOG expression is not well defined right now
+  (guide (<type> <from-table> <for-field> <sample-type> <tuple-expr>) ...)
+     ;;Defines a guide 
+     ;;If used on a table with "data", the <from-table> must be the
+       containing table
+  
+  (tables [<id> | <table>] ...)
+     ;;Only valid in view
+     ;;Indicates which tables to render on the view
+     ;;Table definitions can be in-lined, if desired
+     ;;Table ID's may be paired with a renderer,
+        otherwise a default or one specified in the table is used
+  (component <bool>)
+     ;;Only valid in view
+     ;;#f -- This view needs to be its own panel/window/etc
+     ;;#t -- This is only used as a component in other views
+       
+
+
+Generators
+(when <predicate> <f> <tuple-expr>)
+   ;; f is a function that generates tuples
+   ;; When the predicate true, execute f and apply the rules to each result of f
+   ;; Requires some work for scheduling the predicate...
+      probably once for each top-level event
+   ;; Other generators are sugar for this (when ...) form
+(file <filename> <parser>? (<key> : <value>) ...)
+   ;;Filename MUST be supplied
+   ;;Parser is something like csv, tab, a regular expression, etc
+   ;;Key/value pairs determine many things, for example "Skip", "Sep", "Strict", "Pre"
+   ;;Skip is number of lines to skip
+   ;;Preprocessor is tuple->tuple where output tuple must match the schema
+     of the context or a be sentinel "no tuple" or "error".
+     Strict and skip can be implemented via this mechanism (probably).
+   ;;(when (start-of-program) (parser filename args) preprocessor)
+(push <schema> <tuple-expr>)
+   ;;Schema is the tuple expected to be received, but you don't know from where
+   ;;(when (not-empty recvQueue) (pop recvQueue) <tuple-expr>)
+   ;;Implies that somewhere in the program (push recvQueue) is called
+(pull <from> <tuple-expr>)
+   ;; Indicate a place to get tuples from.  
+   ;; The type of the from determines exactly what that means
+   ;; Stream will just get one tuple at a time
+   ;; Table will iterate the whole table whenever the table changes in some way
+   ;; (when (changed <from>)  (items <from>) <tuple-expr>) 
+(init (<tuple*-expr>) <tuple-expr>)
+   ;; Generates the given set of values
+   ;; (when (start-of-program) (tuples <tuple> ...) <tuple-expr>)
+
+
+Other notes:
+  :*, :- as binding operators
+  _ means "default value"
+  Guide and render-GOG should be library transforms that compile out to other core forms

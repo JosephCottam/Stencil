@@ -1,0 +1,74 @@
+(stream mouse(*) (data mouse))
+
+(table flowers
+  (data (file "andersons.txt"))
+  (fields sepalL sepalW petalL petalW species)
+  (display "Sepal Length" "Sepal Width" "Petal Length" "Petal Width" "Species"))
+
+(table plot (staticMatrix pairs flowers.fields-{'species} (flowers 'ID 'species)))
+
+(table pairs
+  (fields source colorAtt1 colorAtt2 xAtt yAtt)
+  (renderer shapes)
+  (data 
+   (pull source
+         (let (X Att)
+              (Y yAtt)
+              (FillColor (colorBy colorAtt2 colorAtt1))
+              (Shape 'Circle)))))
+
+
+(table selectionBox
+  (fields X1 Y1 X2 Y2)
+  (renderer shape
+    (let ((X Y) (X1 X2))      ;;;Extra rules to for the transform to the renderer (implicitly defines a new table)
+         (Width (- X1 X2))
+         (Height (- Y1 Y2))))
+  (pull mouse
+      (ID 0) ((X1 X2 Y1 Y2) (OriginX OriginY X Y)))
+  (retain (and (!= X1 X2) (!= Y1 Y2))))
+
+(table selection
+  (fields ID)
+  (when (and (delta selectionBox) (> 0 (size selectionBox)))
+        (select (apply (plot.at selectionBox[0].X selectionBox[0].Y).contained selectionBox[0]) ID)  ;;Get the plot 
+        (let (ID ID)))
+  (when (and (delta selectionBox) (== 0 (size selectionbox)))
+        (select plot[0] ID)
+        (let (ID ID))))
+   
+(operator colorBy
+   (query (ID, species) -> (c)
+     ((selection.contains ID) (let (c (rank(species)->(get _ ("Blue", "Green", "Red"))))))
+     (default (let (c "Gray50")))
+
+
+
+;;;Static matrix implementation starts here....
+
+(transform staticMatrix (basePlot dataSource fields . passThrough)
+ (table grid
+   (fields ID X Y body)
+   (render innerNode)
+   (data
+     (map (lambda (x y) (tuple (counter) x y basePlot))
+          (grid 10 10 
+               (divide (len fields)
+                       (map (lambda (xAtt yAtt) (apply piars (flatList dataSource passThrough xAtt yAtt)))
+                            (cross fields fields))))))))
+
+
+;;Plots is a list or rows.
+;;Items in a sub-list are spaced by w
+;;Sub-lists are sapced by h
+(transform grid (w h rows)
+  (loop [rows plots row 0]
+    (if (null? rows) 
+      '()
+      (cons 
+         (loop [items (car rows) col 0]
+           (if (null? items)
+                '()
+                (cons (list ()  (* col w) (* row h) item)
+                   (recur (car rest) (cdr rest) (add1 col))))
+

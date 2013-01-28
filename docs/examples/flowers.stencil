@@ -1,0 +1,60 @@
+(table flowers
+  (data (file "andersons.txt"))
+  (fields sepalL sepalW petalL petalW species)
+  (display "Sepal Length" "Sepal Width" "Petal Length" "Petal Width" "Species"))
+  
+(table plot
+  (renderer shapes)
+  (data 
+   (pull flowers
+    (let (x : petalL)
+         (y : petalW)
+         (fillC : (ColorBy Species))
+         (shape : 'Circle)))))
+
+
+;; --------------------------- Static Matrix Version --------------------
+
+;Same "flowers" table
+
+(table plot (staticMatrix pairs flowers.fields-{'species} (flowers 'species)))
+
+(table pairs
+  (fields source colorAtt xAtt yAtt)
+  (renderer shapes)
+  (data 
+   (pull source
+         (let (x : Att)
+              (y : yAtt)
+              (fillC : (colorBy colorAtt))
+              (shape : 'Circle)))))
+
+
+;;;Static matrix implementation starts here....
+
+(transform staticMatrix (basePlot dataSource fields . passThrough)
+ (table grid
+   (fields id x y plot) 
+   (render multiPlot)
+   (data
+     (map (lambda (x y) (tuple (counter) x y basePlot))
+          (grid 10 10 
+               (divide (len fields)
+                       (map (lambda (xAtt yAtt) (apply pairs (flatList dataSource passThrough xAtt yAtt)))
+                            (cross fields fields))))))))
+
+
+;;Plots is a list or rows.
+;;Items in a sub-list are spaced by w
+;;Sub-lists are sapced by h
+(transform grid (w h rows)
+  (loop [rows plots row 0]
+    (if (null? rows) 
+      '()
+      (cons 
+         (loop [items (car rows) col 0]
+           (if (null? items)
+                '()
+                (cons (list ()  (* col w) (* row h) item)
+                   (recur (car rest) (cdr rest) (add1 col))))
+

@@ -1,0 +1,11 @@
+(stream values 
+  (data (init ($ptuples (fields v) (range 0 10)))))
+
+(table plot
+  (render (text "simpleLines_test.tuples"))
+  (data 
+    (pull values
+      (let (id : v)
+           ((x1 x2) : (* 10 v) -> #(_,_))
+           ((y1 y2) : #(0, 10))
+           (fillC : java.awt.Color.GRAY)))))
