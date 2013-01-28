@@ -74,14 +74,7 @@
          :else 
             (let [[renderA reducedA] (sift (first program))
                   [renderB reducedB] (sift (rest program))]
-              (list (concat renderA renderB) (cons reducedA reducedB)))))
-     (split [program]
-       (let [f (first program)]
-         (cond
-           (nil? f) (list '() '())
-           (and (seq? f) (= 'table (first f))) (list '() program)
-           :else (let [[before after] (split (rest program))]
-                   (list (cons f before) after)))))]
+              (list (concat renderA renderB) (cons reducedA reducedB)))))]
     (let [[renders reduced] (sift program)
-          [before after] (split reduced)]
-      (concat before renders after))))
+          [preamble body] (split-preamble reduced)]
+      (concat preamble renders body))))

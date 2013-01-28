@@ -2,6 +2,15 @@
   (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
+(defn strip-gen [a]
+  "Remove the random part of gensymed names; used to approxiamte equality checks."
+  (cond 
+    (symbol? a) (symbol (clojure.string/replace (str a) #"\d*$" ""))
+    (not (seq? a)) a
+    :else (map strip-gen a)))
+
+
+
 (deftest drop-comments
   (is (= (t/drop-comments '(comment a))) nil)
   (is (= (t/drop-comments '(stuff (comment a)))) '(stuff))
@@ -311,12 +320,6 @@
          '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) (b)) (x)))))
 
 
-(defn strip-gen [a]
-  (cond 
-    (symbol? a) (symbol (clojure.string/replace (str a) #"\d*$" ""))
-    (not (seq? a)) a
-    :else (map strip-gen a)))
-
 (deftest normalize-renders
   (is (= (t/normalize-renders '(stencil x)) '(stencil x)))
   (is (= (t/normalize-renders '(render rid ($meta) source ($meta) type ($meta) (bind ($meta) (x ($meta) a ($meta)) (y ($meta) b ($meta)))))
@@ -393,4 +396,15 @@
   (is (= (t/gather-renders '(stencil (table tname ($meta a) (render rend ($meta 1) tname ($meta 2) type ($meta 3)))))
          '(stencil (render rend ($meta 1) tname ($meta 2) type ($meta 3)) (table tname ($meta a))))))
 
-
+(deftest ensure-view
+  (is (= (t/ensure-view '(stencil x (view b g h) (render not-in-view)))
+         '(stencil x (view b g h) (render not-in-view)))
+      "View trumps auto gen")
+  (is (= (strip-gen (t/ensure-view '(stencil x))) 
+         '(stencil x (view viewg ($meta (type view)))))
+         "Empty view gen")
+  (is (= (strip-gen (t/ensure-view '(stencil x (render a ($meta h) b c) (render d ($meta g) e f))))
+         '(stencil x 
+                   (view viewg ($meta (type view)) a ($meta (type render)) d ($meta (type render))) 
+                   (render a ($meta h) b c) (render d ($meta g) e f)))
+      "Autogen view"))

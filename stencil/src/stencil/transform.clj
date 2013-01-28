@@ -15,6 +15,7 @@
 (load "transforms/using")
 (load "transforms/render")
 (load "transforms/inferTypes")
+(load "transforms/views")
 
 (defn validate
   "tree->tree/error : Verifies that a parsed tree is correctly formed after parsing.  
