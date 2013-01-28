@@ -1,4 +1,0 @@
-Line, Color
-Infectious, BLUE
-Recovered, Red
-Susceptible, GREEN
