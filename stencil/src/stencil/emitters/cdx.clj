@@ -7,9 +7,10 @@
 
 (deftype Table [name fields depends])
 (deftype Depends [source fields expr])
+(deftype View [name renders])
 (deftype Render [name source x y color scatter])
 (deftype Header [name debug])
-(deftype Program [header tables renders])
+(deftype Program [header tables view])
 (deftype Binding [vars expr])
 
 (deftype When [isWhen trigger action])
@@ -73,15 +74,22 @@
         color (pairs 'color)]
     (Render. (pyName name) source x y color scatter)))
 
+(defn view-atts [render-defs [_ name _ & renders]]
+  (let [render-defs (map render-atts render-defs)
+        render-defs (zipmap (map #(.name %) render-defs) render-defs)
+        renders (map render-defs (drop-metas renders))]
+  (View. (pyName name) renders)))
+ 
 (defn as-atts [program]
   (let [name (second program)
         imports (t/filter-tagged 'import program)
+        view   (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
         runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))
         debug ((t/meta->map (nth runtime 2)) 'debug)
         debug (and (not (nil? debug)) (= true debug))]
-    (Program. (Header. (pyName name) debug) (map table-atts tables) (map render-atts renders))))
+    (Program. (Header. (pyName name) debug) (map table-atts tables) (view-atts renders view))))
 
 
 (defn emit-cdx [template attlabel atts]

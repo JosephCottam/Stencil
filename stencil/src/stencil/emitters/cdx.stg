@@ -106,7 +106,7 @@ renderer(def) ::= <%
 
 %>
 
-classDef(className,tables,renders) ::= <<
+classDef(className,tables,view) ::= <<
 
 <tables:{t|<if (t.depends)><dependentTable(t)><else><externalTable(t)><endif>};separator="\n\n">
 
@@ -117,7 +117,7 @@ class <className>:
 
   def render(self):
     <tables:{t|<if (t.depends)><t.name>.update()<endif>};separator="\n">
-    <renders:renderer();separator="\n">
+    <view.renders:renderer();separator="\n">
 >>
 
 // ---------------------- Furniture ----------------------
@@ -125,7 +125,7 @@ class <className>:
 program(def) ::= <<
 <header(def.header.debug)>
 
-<classDef(def.header.name, def.tables, def.renders)>
+<classDef(def.header.name, def.tables, def.view)>
 
 <footer(def.header.name, def.header.debug)> 
 >>
