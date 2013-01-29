@@ -40,13 +40,13 @@ Syntax
 Stencil statements are build around s-expressions, extended for infix operators.
 A top-level "stencil" statement is optional, and will be supplied if omitted.
 
-
-#    (stencil scatterplot
-#       (table data
-#         (fields a b c)
-#         (data (file "./dataset.csv"))
-#         (render scatter (bind (x:a) (y:b) (color:c))))
-#    
+```
+(stencil scatterplot
+  (table data
+    (fields a b c)
+    (data (file "./dataset.csv"))
+    (render scatter (bind (x:a) (y:b) (color:c)))))
+```    
 
 Tables define data storage locations.  They are logically collections of tuples.
 The **table** statement names a table.  
@@ -62,17 +62,19 @@ It includes a renderer type ('scatter') and a relationship between the render ty
 The bind statement includes name pairs, the name on the left is a target in the renderer, the name on the right is a source in the table. 
 
 
-#    (stencil scatterplot
-#       (render _ project scatter (bind (x:a) (y:b) (color:c)))
-#
-#       (table raw (fields a b c))
-#       (table project
-#           (fields a b c)
-#           (data 
-#             (pull raw
-#                   (let (a : (scale 0 100 (a+10)) )
-#                        (b : (scale 0 100 b))
-#                        (c : (happyColors c))))))
+```
+(stencil scatterplot
+  (render _ project scatter (bind (x:a) (y:b) (color:c)))
+
+  (table raw (fields a b c))
+  (table project
+    (fields a b c)
+    (data 
+      (pull raw
+        (let (a : (scale 0 100 (a+10)) )
+             (b : (scale 0 100 b))
+             (c : (happyColors c)))))))
+```
 
 The above program shows some additional features of Stecnil.
 The render statement can be lifted out of a table.  
@@ -105,5 +107,6 @@ and an expressive guide system.
 
 From a technilogical standpoint, we are looking at
 an optional inference-drive static type system,
-and an in-situ HPC runtime (among other things).
+streaming data support and
+an in-situ HPC runtime (among other things).
 
