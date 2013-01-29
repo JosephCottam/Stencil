@@ -48,11 +48,11 @@
       (Let. true (map bind-att bindings) (expr-att body))
     ([do & exprs] :seq) (Do. true (map expr-att exprs))
     ([op & rands] :seq) (Op. true op (map expr-att rands))
-    ;([if test conseq alt] :seq)
-    ;   (If. true 
-    ;        (expr-att test) 
-    ;        (expr-att conseq) 
-    ;        (if (empty? alt) false (expr-att alt)))
+    ([if test conseq alt] :seq)
+       (If. true 
+            (expr-att test) 
+            (expr-att conseq) 
+            (if (empty? alt) false (expr-att alt)))
     :else (throw (RuntimeException. "Unandled expression: " expr))))
 
 (defn data-atts [data]
@@ -104,6 +104,7 @@
     (.render (.add t attlabel atts))))
 
 (defn emit [program]
+  (println program)
   (emit-bokeh "program" "def" (as-atts program)))
 
 

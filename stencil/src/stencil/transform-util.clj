@@ -7,12 +7,6 @@
   ([condition policies] (filter-tagged = condition policies))
   ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
 
-(defn split-preamble [program] 
-  "Divide a program into the preable and body parts.
-   program -> (preamble, body)"
-  (split-with 
-    #(or (not (seq? %)) (= 'import (first %)))
-    program))
 
 
 (defn lop->map [lop]
@@ -80,4 +74,10 @@
   "Removes the first element and its meta-data"  
   [expr] (first (full-drop expr)))
 
+(defn split-preamble [program] 
+  "Divide a program into the preable and body parts. Preamble ends after the imports.
+   program -> (preamble, body)"
+  (split-with 
+    #(or (not (seq? %)) (= 'import (first %)) (meta? %))
+    program))
 

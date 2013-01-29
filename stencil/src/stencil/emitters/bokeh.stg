@@ -133,18 +133,20 @@ class <className>:
 // ---------------------- Furniture ----------------------
 
 program(def) ::= <<
-<header(def.header.debug)>
+<header(def)>
 
 <classDef(def.header.name, def.tables, def.view)>
 
 <footer(def.header.name, def.header.debug)> 
 >>
 
-header(testharness) ::= <<
-#Debug set to '<testharness>'
+header(def) ::= <<
+#Debug set to '<def.header.debug>'
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-<if(testharness)>
+<if(def.header.debug)>
+#<length(def.tables)> tables
+#<length(def.view)> views
 import numpy as np 
 import datetime
 import time

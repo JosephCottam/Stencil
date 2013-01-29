@@ -403,8 +403,8 @@
   (is (= (strip-gen (t/ensure-view '(stencil x))) 
          '(stencil x (view viewg ($meta (type view)))))
          "Empty view gen")
-  (is (= (strip-gen (t/ensure-view '(stencil x (render a ($meta h) b c) (render d ($meta g) e f))))
-         '(stencil x 
+  (is (= (strip-gen (t/ensure-view '(stencil x (import) (render a ($meta h) b c) (render d ($meta g) e f))))
+         '(stencil x (import)
                    (view viewg ($meta (type view)) a ($meta (type render)) d ($meta (type render))) 
                    (render a ($meta h) b c) (render d ($meta g) e f)))
       "Autogen view"))
