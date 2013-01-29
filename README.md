@@ -86,7 +86,7 @@ The 'project' table has a **pull** statement for a generator.
 This indicates that this table depends on some other table (in this case 'raw').
 The pull statement is similar to a for-each, but does not guarnatee iteration order
   (and will eventually support incremental updates).
-_Only_two_generators_currently_work:_(1)_external_loading_and_(2)_a_'pull'_generator_targeted_at_another_table._
+_Only_two_generators_currently_work:_external_loading_and_a_'pull'_generator_targeted_at_another_table._
 Pull statements have two clauses: a source table and a transformation.
 The transofrmation here is a 'let' statement.  Let statements composed of name/expresion pairs and a body.
 (If no body is supplied, as seen here, a tuple is generated with the fields and values of the let.)
