@@ -1,7 +1,7 @@
 (ns stencil.transform
   "Manipulate imports.")
 
-(def ^:dynamic *default-runtime* 'javaPicoRuntime)
+(def ^:dynamic *default-runtime* 'BokehRuntime)
 
 (defn runtime [program]
   "What is the runtime being imported?

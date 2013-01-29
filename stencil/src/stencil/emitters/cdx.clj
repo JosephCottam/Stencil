@@ -98,11 +98,8 @@
         t (.getInstanceOf g template)]
     (.render (.add t attlabel atts))))
 
-(defn cdx 
-  ([file program] 
-   (with-open [wrtr (io/writer file)]
-     (.write wrtr (cdx program))))
-  ([program] (emit-cdx "program" "def" (as-atts program))))
+(defn emit [program] 
+  (emit-cdx "program" "def" (as-atts program)))
 
 
 

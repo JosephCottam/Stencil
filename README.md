@@ -31,8 +31,11 @@ The current most-complete compilation is target is Bokeh (a Python visualization
 Usage
 =====
 Stencil programs are stored in files with a '.stencil' extension (syntax is described below).
-To compile a stencil program....
+To compile a stencil program:
 
+```
+lein run <input-file> <output-file>
+```
 
 Syntax
 ======

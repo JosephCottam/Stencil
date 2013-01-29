@@ -12,7 +12,7 @@ expr(ex) ::= <%
 <elseif (ex.isPrim)><ex:prim()>
 <elseif (ex.isDo)><ex:do()>
 <elseif (ex.isOp)><ex:op()>
-<elseif (ex.isIf)><ex:if()>
+<elseif (ex.isIf)><ex:ifex()>
 <else><ex:unsupported()>
 <endif>
 %>
@@ -22,7 +22,7 @@ unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
 let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
 prim(ex) ::= "<ex.val>"
 do(ex) ::= <%<ex.exprs:expr();separator="\n">%>
-if(ex) ::= <%
+ifex(ex) ::= <%
 if (<ex.test:expr()>):
   <ex.conseq:expr()>
 <if (ex.alt)>
@@ -142,9 +142,12 @@ program(def) ::= <<
 
 header(testharness) ::= <<
 #Debug set to '<testharness>'
-from webplot import p 
+from bokeh import mpl 
+p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 <if(testharness)>
 import numpy as np 
+import datetime
+import time
 <endif>
 >>
 
