@@ -1,17 +1,16 @@
 ;;http://cemerick.com/2009/12/04/string-interpolation-in-clojure/
-(ns stencil.emitters.cdx
+(ns stencil.emitters.bokeh
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t])
   (:require [clojure.java.io :as io])
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
-(deftype Table [name fields depends])
+(deftype Table [name ofClass fields depends])
 (deftype Depends [source fields expr])
 (deftype View [name renders])
-(deftype Render [name source x y color scatter])
+(deftype Render [name source type binds])
 (deftype Header [name debug])
 (deftype Program [header tables view])
-(deftype Binding [vars expr])
 
 (deftype When [isWhen trigger action])
 (deftype Let [isLet bindings body])
@@ -19,6 +18,10 @@
 (deftype Prim [isPrim val])  ;;I want default values...atom should always be 'true'
 (deftype Do [isDo exprs])
 (deftype Op [isOp op rands])
+(deftype If [isIf test conseq alt])
+
+(deftype LetBinding [vars expr])
+(deftype RenderBinding [x y color])
 
 (declare expr-att)
 
@@ -35,10 +38,9 @@
     (string? val) (str "\"" val "\"")
     :else val))
 
-(defn at [] (Let. true 'x 'y))
-
+(defn class-name [name] (str name "__"))
 (defn bind-att [[varset expr]] 
-  (Binding. (map expr-att varset) (expr-att expr)))
+  (LetBinding. (map expr-att varset) (expr-att expr)))
 
 (defn expr-att [expr]
   (match expr
@@ -47,6 +49,11 @@
       (Let. true (map bind-att bindings) (expr-att body))
     ([do & exprs] :seq) (Do. true (map expr-att exprs))
     ([op & rands] :seq) (Op. true op (map expr-att rands))
+    ([if test conseq alt] :seq)
+       (If. true 
+            (expr-att test) 
+            (expr-att conseq) 
+            (if (empty? alt) false (expr-att alt)))
     :else (throw (RuntimeException. "Unandled expression: " expr))))
 
 (defn data-atts [data]
@@ -63,16 +70,18 @@
         data (t/filter-tagged 'data table)
         external (empty? data)]
     (if external
-      (Table. name fields false)
-      (Table. name fields (map data-atts data)))))
+      (Table. name (class-name name) fields false)
+      (Table. name (class-name name) fields (map data-atts data)))))
 
-(defn render-atts [[_ name _ source _ type _ binds]]
-  (let [scatter (= "SCATTER" (.toUpperCase (str type))) 
-        pairs (t/lop->map (rest (drop-metas binds)))
+(defn render-bind-atts [bind]
+  (let [pairs (t/lop->map (rest (drop-metas bind)))
         x (pairs 'x)
         y (pairs 'y)
         color (pairs 'color)]
-    (Render. (pyName name) source x y color scatter)))
+    (RenderBinding. x y color)))
+
+(defn render-atts [[_ name _ source _ type _ & binds]]
+    (Render. (pyName name) source type (map render-bind-atts binds)))
 
 (defn view-atts [render-defs [_ name _ & renders]]
   (let [render-defs (map render-atts render-defs)
@@ -92,14 +101,13 @@
     (Program. (Header. (pyName name) debug) (map table-atts tables) (view-atts renders view))))
 
 
-(defn emit-cdx [template attlabel atts]
-  "Emit to the specified template from the cdx group."
-  (let [g (STGroupFile. "src/stencil/emitters/cdx.stg")
+(defn emit-bokeh [template attlabel atts]
+  (let [g (STGroupFile. "src/stencil/emitters/bokeh.stg")
         t (.getInstanceOf g template)]
     (.render (.add t attlabel atts))))
 
-(defn emit [program] 
-  (emit-cdx "program" "def" (as-atts program)))
+(defn emit [program]
+  (emit-bokeh "program" "def" (as-atts program)))
 
 
 

@@ -1,0 +1,6 @@
+(import BokehRuntime {debug : true})
+
+(table dataset
+  (fields a b c)
+  (render scatter
+    (bind (x: a) (y: b) (color : "RED"))))

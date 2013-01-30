@@ -1,16 +1,19 @@
 (ns stencil.transform
   "Manipulate imports.")
 
-(def ^:dynamic *default-runtime* 'javaPicoRuntime)
+(def ^:dynamic *default-runtime* 'BokehRuntime)
+
+(defn runtime [program]
+  "What is the runtime being imported?
+  TODO: Something more elegant than look for an import with 'runtime' as a substring."
+  (filter
+    #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1)
+    (filter-tagged 'import program)))
+
 (defn ensure-runtime-import [program] 
    "Ensure that there is a runtime in the imports list."
    (letfn
-     [(has-runtime? [program]
-       "Is some item imported a runtime?  
-       TODO: Something more elegant than look for an import with 'runtime' as a substring."
-       (some 
-           #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1)
-           (filter #(and (seq? %) (= 'import (first %))) program)))
+     [(has-runtime? [program] (not (empty? (runtime program))))
       (fragment? [program]
         "A fragment does not start with (stencil ...)"
         (not (= 'stencil (first program))))

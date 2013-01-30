@@ -1,4 +1,4 @@
-(ns stencil.emit)
+(ns stencil.emitters.pico)
 
 (defn emitValue [value] "")
 (defn emitCall [call] "")
