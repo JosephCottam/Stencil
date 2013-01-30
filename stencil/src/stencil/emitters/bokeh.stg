@@ -60,15 +60,16 @@ tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
 // ----------------------  External Tables ----------------------
 
 externalTable(tdef) ::= <<
-class <tdef.name>:
+class <tdef.ofClass>:
   <tableFields(tdef.fields)>
   <tdef.fields:{f|<f> = None};separator="\n">
 
-  def __init__(self, **kwargs):
+  def setData(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
       <tdef.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
     else:
       raise Exception("Data not properly supplied to table <tdef.name>")
+     
 
   <tableSize(tdef)>
   <tableData(tdef)>
@@ -81,17 +82,21 @@ dependUpdate(tableFields, ddef) ::= <<
 for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
-  <tableFields:{f|self.<f>.push(<f>)};separator="\n">
+  <tableFields:{f|self.<f>.append(<f>)};separator="\n">
+>>
+
+setDependency(dep) ::= <<
+def set_<dep.source>(self, table):
+   self._<dep.source>=table
 >>
 
 dependentTable(tdef) ::= <<
-class <tdef.name>:
+class <tdef.ofClass>:
   <tableFields(tdef.fields)>
   <tdef.depends:{d|_<d.source> = None};separator="\n">
   <tdef.fields:{f|<f> = None};separator="\n">
 
-  def __init__(self, <tdef.depends:{d|<d.source>};separator=", ">):
-    <tdef.depends:{d|self._<d.source> = <d.source>};separator="\n">
+  <tdef.depends:setDependency();separator="\n">
 
   def update(self):
     <tdef.fields:{f|self.<f> = []};separator="\n">
@@ -106,15 +111,20 @@ class <tdef.name>:
 
 tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
-def set_<tdef.name>(self, <tdef.fields:{f|<f>};separator=", ">):
-  self.<tdef.name> = <tdef.name>(<tdef.fields:{f|<f>=<f>};separator=", ">)
+def set_<tdef.name>_cols(self, <tdef.fields:{f|<f>};separator=", ">):
+  self.<tdef.name>.setData(<tdef.fields:{f|<f>=<f>};separator=", ">)
 <endif>
 >>
 
-renderer(def) ::= <%
-  p.plot('<def.x>', '<def.y>', color='<def.color>', data_source=self.<def.source>.data(), <if (def.scatter)>scatter=True<endif>)
 
+linkTables(table) ::= <%
+<if (table.depends)>
+  <table.depends:{d|self.<t.name>.set_<d.source>(self.<d.source>)};separator="\n">
+<endif>
 %>
+
+bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.data()) %>
+renderer(def) ::= <% <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure() %>
 
 classDef(className,tables,view) ::= <<
 
@@ -123,10 +133,16 @@ classDef(className,tables,view) ::= <<
 class <className>:
   <tables:{t|<t.name> = None};separator="\n">
 
+  def __init__(self):
+    #Create tables
+    <tables:{t|self.<t.name> = <t.ofClass>()};separator="\n">
+    #Share tables with each other
+    <tables:{t|<linkTables(t)>};separator="\n">
+  
   <tables:tableSetter()>
 
   def render(self):
-    <tables:{t|<if (t.depends)><t.name>.update()<endif>};separator="\n">
+    <tables:{t|<if (t.depends)>self.<t.name>.update()<endif>};separator="\n">
     <view.renders:renderer();separator="\n">
 >>
 
@@ -145,8 +161,6 @@ header(def) ::= <<
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 <if(def.header.debug)>
-#<length(def.tables)> tables
-#<length(def.view)> views
 import numpy as np 
 import datetime
 import time
@@ -161,7 +175,7 @@ x = np.arange(100) / 6.0
 y = np.sin(x) 
 z = np.cos(x) 
 plot = <name>()
-plot.set_dataset(x,y,z)
+plot.set_dataset_cols(x,y,z)
 plot.render()
 <endif>
 >>
