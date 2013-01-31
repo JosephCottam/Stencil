@@ -329,7 +329,7 @@
          '(render rend ($meta) source ($meta) type ($meta) (bind ($meta))))
       "Replace default name")
   (is (= (t/normalize-renders '(table tn (render rn ($meta) type ($meta) (bind ($meta)))))
-         '(table tn (render rn ($meta) tn ($meta (type ***)) type ($meta) (bind ($meta)))))
+         '(table tn (render rn ($meta) tn ($meta (type table)) type ($meta) (bind ($meta)))))
       "Provide source from context")
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
@@ -369,7 +369,7 @@
                    (table dataset ($meta (source external))
                           (fields ($meta) a ($meta) b ($meta) c ($meta))
                           (render rend ($meta)
-                                  dataset ($meta (type ***))
+                                  dataset ($meta (type table))
                                   scatter ($meta)
                                   (bind ($meta)
                                         (x ($meta) a ($meta))
@@ -381,7 +381,7 @@
   (is (= (strip-gen (t/normalize-renders '(table tn (fields a x b y) (render ($meta) scatter ($meta) (bind ($meta) auto ($meta) )))))
          '(table tn 
                  (fields a x b y)
-                 (render rend ($meta) tn ($meta (type ***)) scatter ($meta) 
+                 (render rend ($meta) tn ($meta (type table)) scatter ($meta) 
                          (bind ($meta) 
                                (x ($meta (type fn)) x ($meta (type ***)))
                                (y ($meta (type fn)) y ($meta (type ***)))))))
