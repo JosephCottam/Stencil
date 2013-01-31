@@ -1,0 +1,11 @@
+(import BokehRuntime {debug:true})
+
+(table dataset (fields a b c))
+
+(table plot
+  (render scatter (bind auto))
+  (data
+    (pull dataset 
+          (let (x : a)
+               (y : b)
+               (color : "RED")))))

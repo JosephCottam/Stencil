@@ -27,26 +27,62 @@ class dataset__:
     return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
 
-class scatterplot_inline:
+class plot__:
+  _fields = ['x', 'y', 'color']
+  _dataset = None
+  x = None
+  y = None
+  color = None
+
+  def set_dataset(self, table):
+     self._dataset=table
+
+  def update(self):
+    self.x = []
+    self.y = []
+    self.color = []
+    for i in range(0, self._dataset.size()):
+      a = self._dataset.a[i]
+      b = self._dataset.b[i]
+      c = self._dataset.c[i]
+      (x) = a
+      (y) = b
+      (color) = "RED"
+      self.x.append(x)
+      self.y.append(y)
+      self.color.append(color)
+
+  def size(self):
+    return len(self.x)
+
+  def data(self):
+    return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, color=self.color)
+
+
+class scatterplot_twoTable:
   dataset = None
+  plot = None
 
   def __init__(self):
     #Create tables
     self.dataset = dataset__()
+    self.plot = plot__()
     #Share tables with each other
+    self.plot.set_dataset(self.dataset)
 
   def set_dataset_cols(self, a, b, c):
     self.dataset.setData(a=a, b=b, c=c)
 
 
   def render(self):
-    p.scatter('a', 'b', color='RED', data_source=self.dataset.data()) 
+    self.plot.update()
+    p.scatter('x', 'y', color='color', data_source=self.plot.data()) 
     p.figure()
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 
 z = np.cos(x) 
-plot = scatterplot_inline()
+plot = scatterplot_twoTable()
 plot.set_dataset_cols(x,y,z)
 plot.render()
  

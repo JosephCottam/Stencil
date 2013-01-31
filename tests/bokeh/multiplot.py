@@ -27,7 +27,7 @@ class dataset__:
     return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
 
-class scatterplot_inline:
+class multiplot:
   dataset = None
 
   def __init__(self):
@@ -40,13 +40,23 @@ class scatterplot_inline:
 
 
   def render(self):
-    p.scatter('a', 'b', color='RED', data_source=self.dataset.data()) 
+    p.table(self.dataset.data(), ['a', 'b', 'c'])
+    p.scatter('a', 'b', color='orange', data_source=self.dataset.data()) 
+    p.figure()
+    p.scatter('a', 'c', color='red', data_source=self.dataset.data()) 
+    p.figure()
+    p.plot('a', 'b', color='yellow', data_source=self.dataset.data()) 
+    p.figure()
+    p.plot('a', 'c', color='black', data_source=self.dataset.data()) 
+    p.figure()
+    p.plot('a', 'b', color='blue', data_source=self.dataset.data()) 
+    p.plot('a', 'c', color='green', data_source=self.dataset.data()) 
     p.figure()
 
 x = np.arange(100) / 6.0 
 y = np.sin(x) 
 z = np.cos(x) 
-plot = scatterplot_inline()
+plot = multiplot()
 plot.set_dataset_cols(x,y,z)
 plot.render()
  

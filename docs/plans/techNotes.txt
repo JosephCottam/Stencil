@@ -53,3 +53,7 @@ Custom policy providers also provide a "reducing" translation of that policy to
   way custom policies can recieve custom treatment in different rutnimes, but
   still be supported in all runtimes.  If a policy type does not have a reduced
   form, then the runtime errors when a program with that policy type is provided.
+
+
+For Big-data...have statement type to specify sampling/confidenc/etc paramters used everywhere.
+**Many operations may require that (even for preconditioning)
