@@ -124,7 +124,13 @@ linkTables(table) ::= <%
 %>
 
 bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.data()) %>
-renderer(def) ::= <% <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure() %>
+renderSet(def) ::= <% 
+<if (def.fields)>
+  p.<def.type>(self.<def.source>.data(), [<def.fields:{f|'<f>'};separator=", ">])
+<else>
+  <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+<endif>
+%>
 
 classDef(className,tables,view) ::= <<
 
@@ -143,7 +149,7 @@ class <className>:
 
   def render(self):
     <tables:{t|<if (t.depends)>self.<t.name>.update()<endif>};separator="\n">
-    <view.renders:renderer();separator="\n">
+    <view.renders:renderSet();separator="\n">
 >>
 
 // ---------------------- Furniture ----------------------

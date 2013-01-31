@@ -8,7 +8,7 @@
 (deftype Table [name ofClass fields depends])
 (deftype Depends [source fields expr])
 (deftype View [name renders])
-(deftype Render [name source type binds])
+(deftype Render [name source type binds fields])
 (deftype Header [name debug])
 (deftype Program [header tables view])
 
@@ -80,8 +80,10 @@
         color (pairs 'color)]
     (RenderBinding. x y color)))
 
-(defn render-atts [[_ name _ source _ type _ & binds]]
-    (Render. (pyName name) source type (map render-bind-atts binds)))
+(defn render-atts [[_ name _ source _ type _ & args]]
+  (if (= 'table type)
+    (Render. (pyName name) source type false (rest (first (drop-metas args))))
+    (Render. (pyName name) source type (map render-bind-atts args) false)))
 
 (defn view-atts [render-defs [_ name _ & renders]]
   (let [render-defs (map render-atts render-defs)

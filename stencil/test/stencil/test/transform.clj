@@ -50,7 +50,7 @@
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a $C c) (d e f) (h i j))))))
 
 (deftest normalize-let-shape
-  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) 4)) '(let (((a d) (b))) 4)))
+  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) 4)) '(let (((a d) (b))) (do 4))))
   (is (= (t/normalize-let-shape '(let ((a d) $C (b)) (body))) '(let (((a d) (b))) (body))))
   (is (= (t/normalize-let-shape '(let ((a d) $C (b)))) '(let (((a d) (b))) ())))
   (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) ($do b))) ())))
@@ -98,7 +98,7 @@
   (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
   (is (= (t/supply-metas '(fields)) '(fields ($meta))))
   (is (= (t/supply-metas '(stencil test)) '(stencil test ($meta))))
-  (is (= (t/supply-metas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
+  (is (= (t/supply-metas '(let (a b) (do c))) '(let (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
 
 (deftest meta-types
   (is (= (t/meta-types '($meta)) '($meta)) "identity 1")
