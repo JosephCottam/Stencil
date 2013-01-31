@@ -7,3 +7,5 @@
 /checkouts
 /.lein-deps-sum
 /temp
+/target
+.lein-repl-history

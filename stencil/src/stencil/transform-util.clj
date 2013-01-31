@@ -29,11 +29,6 @@
   [x]
   (or (= x true) (= x false) (number? x) (string? x)))
 
-(defn stencil-form?
-  "Forms are NOT expressions...but they often contain them."
-  [x] 
-  (any= x '(facet import operator stencil table stream let)))
-
 (defn atom? 
   "Items that are no longer divisible, includes forms"
   [x]

@@ -50,7 +50,7 @@
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a $C c) (d e f) (h i j))))))
 
 (deftest normalize-let-shape
-  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) 4)) '(let (((a d) (b))) 4)))
+  (is (= (t/normalize-let-shape '(let ((a d) $C (b)) 4)) '(let (((a d) (b))) (do 4))))
   (is (= (t/normalize-let-shape '(let ((a d) $C (b)) (body))) '(let (((a d) (b))) (body))))
   (is (= (t/normalize-let-shape '(let ((a d) $C (b)))) '(let (((a d) (b))) ())))
   (is (= (t/normalize-let-shape '(let ((a d) $C b))) '(let (((a d) ($do b))) ())))
@@ -98,7 +98,7 @@
   (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
   (is (= (t/supply-metas '(fields)) '(fields ($meta))))
   (is (= (t/supply-metas '(stencil test)) '(stencil test ($meta))))
-  (is (= (t/supply-metas '(let (a b) c)) '(let (a ($meta) b ($meta)) c ($meta)))))
+  (is (= (t/supply-metas '(let (a b) (do c))) '(let (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
 
 (deftest meta-types
   (is (= (t/meta-types '($meta)) '($meta)) "identity 1")
@@ -329,7 +329,7 @@
          '(render rend ($meta) source ($meta) type ($meta) (bind ($meta))))
       "Replace default name")
   (is (= (t/normalize-renders '(table tn (render rn ($meta) type ($meta) (bind ($meta)))))
-         '(table tn (render rn ($meta) tn ($meta (type ***)) type ($meta) (bind ($meta)))))
+         '(table tn (render rn ($meta) tn ($meta (type table)) type ($meta) (bind ($meta)))))
       "Provide source from context")
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
@@ -369,7 +369,7 @@
                    (table dataset ($meta (source external))
                           (fields ($meta) a ($meta) b ($meta) c ($meta))
                           (render rend ($meta)
-                                  dataset ($meta (type ***))
+                                  dataset ($meta (type table))
                                   scatter ($meta)
                                   (bind ($meta)
                                         (x ($meta) a ($meta))
@@ -381,7 +381,7 @@
   (is (= (strip-gen (t/normalize-renders '(table tn (fields a x b y) (render ($meta) scatter ($meta) (bind ($meta) auto ($meta) )))))
          '(table tn 
                  (fields a x b y)
-                 (render rend ($meta) tn ($meta (type ***)) scatter ($meta) 
+                 (render rend ($meta) tn ($meta (type table)) scatter ($meta) 
                          (bind ($meta) 
                                (x ($meta (type fn)) x ($meta (type ***)))
                                (y ($meta (type fn)) y ($meta (type ***)))))))

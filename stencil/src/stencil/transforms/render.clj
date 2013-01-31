@@ -41,12 +41,12 @@
            (let [binds (map (partial prep-bind fields)binds)
                  id (if (= '_ id) (gen-name) id)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             `(~'render ~id ~m1 ~table (~'$meta (~'type ***)) ~type ~m3 ~@binds))
+             `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
          (['render (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
            (let [binds (map (partial prep-bind fields)binds)
                  id (gen-name)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             `(~'render ~id ~m1 ~table (~'$meta (~'type ***)) ~type ~m3 ~@binds))
+             `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
          :else (map (partial helper table fields) program)))]
     (helper nil nil program)))
 

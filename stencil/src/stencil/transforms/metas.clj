@@ -2,24 +2,33 @@
   "Manipulate metas *in the AST*.  
    Functions for working with metas outside the AST (e.g., as a dictionary) are found elsewhere.")
 
+
+(defn- stencil-form?
+  "Forms are NOT expressions...but they often contain them."
+  [x] 
+  (any= x '(facet import operator stencil table stream)))
 (defn- atom-not-form? [a] (and (atom? a) (not (stencil-form? a))))
+(defn- not-meta? [x] (not (meta? x)))
 
 (defn supply-metas [program] 
   "Ensure that there is a meta expression after every atom."
-  (match program
-    (a :guard atom-not-form?) a
-    (a :guard atom?) (list a '($meta))
-    
-    (a :guard empty?) a
-    
-    ([(a :guard atom?) (b :guard meta?) & tail] :seq) 
-       `(~a ~b ~@(supply-metas tail))
-    ([(a :guard atom-not-form?) & tail] :seq)
-       `(~a (~'$meta) ~@(supply-metas tail))
-    ([(a :guard atom?) & tail] :seq)
-       `(~a ~@(supply-metas tail))
-    ([a & tail] :seq)
-       (cons (supply-metas a) (supply-metas tail))))
+   (match program
+     (a :guard atom?) (list a '($meta))
+     (a :guard empty?) a
+     ([(a :guard atom?) (m :guard meta?) & tail] :seq) 
+        `(~a ~m ~@(supply-metas tail))
+     ([(a :guard stencil-form?) (n :guard symbol?)] :seq)
+        `(~a ~n (~'$meta))
+     ([(a :guard stencil-form?) (n :guard symbol?) (m :guard meta?) & policies] :seq)
+        `(~a ~n ~m ~@(supply-metas policies))
+     ([(a :guard stencil-form?) (n :guard symbol?) (x :guard not-meta?) & policies] :seq)
+        `(~a ~n (~'$meta) ~@(supply-metas (cons x policies)))
+     (['let bindings body] :seq)
+         (list 'let (supply-metas bindings) (supply-metas body))
+     ([(a :guard atom?) & tail] :seq)
+        `(~a (~'$meta) ~@(supply-metas tail))
+     ([a & tail] :seq)
+        `(~(supply-metas a) ~@(supply-metas tail))))
   
 (defn meta-pairings [program]
   (letfn [(maybe-pair [ls]

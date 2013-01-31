@@ -2,6 +2,7 @@
 
 (table dataset
   (fields a b c)
+  (render table (fields a b c))
   (render scatter (bind (x: a) (y: b) (color: "orange"))) 
   (render scatter (bind (x: a) (y: c) (color: "red")))
   (render plot (bind (x: a) (y: b) (color: "yellow"))) 

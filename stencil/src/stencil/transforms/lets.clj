@@ -49,7 +49,8 @@
       (x :guard atom?) x
       (['let & lines] :seq) 
         (let [[bindings body] (divide-body lines)
-              bindings (map (comp reshape-binding normalize-line) bindings)]
+              bindings (map (comp reshape-binding normalize-line) bindings)
+              body (if (atom? body) (list 'do body) body)]
           (list 'let bindings body))
       :else (map normalize-let-shape program))))
 
