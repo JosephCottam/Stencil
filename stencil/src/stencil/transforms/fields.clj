@@ -10,9 +10,8 @@
   ([saved expr]
    (cond 
      (or (atom? expr) (empty? expr))  
-       (throw (RuntimeException. (str "Could not find prototyped tuple in " (first saved) "...")))
-     (or (= '$ptuples (first expr)) 
-         (= '$ptuple (first expr)))
+       (throw (RuntimeException. (str "Could not find prototyped tuple in " (apply list saved))))
+     (= 'ptuple (first expr))
         (second-expr expr)    ;;acquire the fields statement
       ;`(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
      :else (expr->fields saved (last expr)))))
@@ -49,7 +48,7 @@
               data   (filter-tagged 'data policies)]
           (if (every? #(= true %) (map (covers fields) data))
             `(~tag ~n ~m ~@(check-fields-cover-data policies))
-              (throw (RuntimeException. (str "Fields statement does not cover data statement: " program)))))
+              (throw (RuntimeException. (str "Fields statement does not cover data statement: " (apply list program))))))
       :else (map check-fields-cover-data program))))
 
 
@@ -61,7 +60,7 @@
      (['fields & rest] :seq)
        (if (every? #(or (symbol? %) (meta? %)) rest)
          program
-         (throw (RuntimeException. (str "Fields statement with illegal entry: " program))))
+         (throw (RuntimeException. (str "Fields statement with illegal entry: " (apply list program)))))
      :else 
        (map check-simple-fields program)))
 

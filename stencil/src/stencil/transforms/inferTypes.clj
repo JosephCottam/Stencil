@@ -67,10 +67,11 @@
      
      (tuple-patch-kludge [program]
        "REMOVE THIS AS SOON AS YOU CAN!!!!
-        Annotates known-tuple producers with tuple-producing type information.  This is only here because I don't have a type registery for functions."
+        Annotates known-tuple producers with tuple-producing type information.  
+       This is here because I don't have a type registery for functions...it causes many problems with name-spaces."
        (letfn [(known-type [a m]
-                 (if (or (= a '$ptuple)
-                         (= a '$tuple))
+                 (if (or (= a 'ptuple)
+                         (= a 'tuple))
                    (enforce-type m '(fn (...) (tuple (...))) #(= % 'fn))
                    m))]
          (match program

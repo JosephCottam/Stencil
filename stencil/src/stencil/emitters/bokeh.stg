@@ -3,7 +3,7 @@ infixOps ::= [
   "-":"true",
   "*":"true",
   "/":"true",
-  default:"false"
+  default:false
 ]
 
 // ----------------------  Expressions ----------------------
@@ -57,32 +57,42 @@ def data(self):
 
 tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
 
+init(idefs) ::= <<
+<if (idefs)>
+def __init__(self):
+   <idefs:{def|<expr(def.expr)>};separator="\n">
+<endif>
+>>
 // ----------------------  External Tables ----------------------
 
-externalTable(tdef) ::= <<
-class <tdef.ofClass>:
-  <tableFields(tdef.fields)>
-  <tdef.fields:{f|<f> = None};separator="\n">
+externalTable(def) ::= <<
+class <def.ofClass>:
+  <tableFields(def.fields)>
+  <def.fields:{f|<f> = None};separator="\n">
+
+  <init(def.inits)>
 
   def setData(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
-      <tdef.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
+      <def.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
     else:
-      raise Exception("Data not properly supplied to table <tdef.name>")
+      raise Exception("Data not properly supplied to table <def.name>")
      
 
-  <tableSize(tdef)>
-  <tableData(tdef)>
+  <tableSize(def)>
+  <tableData(def)>
 >>
 
 
 // ---------------------- Dependent Table ----------------------
 
 dependUpdate(tableFields, ddef) ::= <<
+<if (ddef.isDepend)>
 for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
   <tableFields:{f|self.<f>.append(<f>)};separator="\n">
+<endif>
 >>
 
 setDependency(dep) ::= <<
@@ -90,20 +100,24 @@ def set_<dep.source>(self, table):
    self._<dep.source>=table
 >>
 
-dependentTable(tdef) ::= <<
-class <tdef.ofClass>:
-  <tableFields(tdef.fields)>
-  <tdef.depends:{d|_<d.source> = None};separator="\n">
-  <tdef.fields:{f|<f> = None};separator="\n">
+dependentInits(dep) ::="<if (dep.isInit)><dep.expr:expr()><endif>"
 
-  <tdef.depends:setDependency();separator="\n">
+dependentTable(def) ::= <<
+class <def.ofClass>:
+  <tableFields(def.fields)>
+  <def.depends:{d|_<d.source> = None};separator="\n">
+  <def.fields:{f|<f> = None};separator="\n">
+
+  <init(def.inits)>
+
+  <def.depends:setDependency();separator="\n">
 
   def update(self):
-    <tdef.fields:{f|self.<f> = []};separator="\n">
-    <tdef.depends:{d|<dependUpdate(tdef.fields, d)>};separator="\n#----------\n">
+    <def.fields:{f|self.<f> = []};separator="\n">
+    <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
 
-  <tableSize(tdef)>
-  <tableData(tdef)>
+  <tableSize(def)>
+  <tableData(def)>
 >>
 
 
@@ -159,29 +173,18 @@ program(def) ::= <<
 
 <classDef(def.header.name, def.tables, def.view)>
 
-<footer(def.header.name, def.header.debug)> 
+<footer(def.header.name)> 
 >>
 
 header(def) ::= <<
-#Debug set to '<def.header.debug>'
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-<if(def.header.debug)>
-import numpy as np 
-import datetime
-import time
-<endif>
 >>
 
 
 
-footer(name, testharness) ::= <<
-<if (testharness)>
-x = np.arange(100) / 6.0 
-y = np.sin(x) 
-z = np.cos(x) 
-plot = <name>()
-plot.set_dataset_cols(x,y,z)
-plot.render()
-<endif>
+footer(name) ::= <<
+def main():
+  plot = <name>()
+  plot.render()
 >>

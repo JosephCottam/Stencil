@@ -33,13 +33,10 @@
        (list (concat "(comment \"" comment "\")") remain)))
 
 (defn bind? [tokens] (= \: (first tokens)))
-(defn bind [emit tokens] (list " $C " (rest tokens))) 
+(defn bind [emit tokens] (list " $$ " (rest tokens))) 
 
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
-(defn tupleLit [emit tokens] (list nil (concat " ($tuple " (drop 2 tokens))))
-
-(defn pTupleLit? [tokens] (= '(\# \# \() (take 3 tokens)))
-(defn pTupleLit [emit tokens] (list nil (concat " ($ptuple " (drop 3 tokens))))
+(defn tupleLit [emit tokens] (list nil (concat " (tuple " (drop 2 tokens)))) ;;Might have some namespace issues eventually
 
 (defn tupleRef? [tokens] (= \[ (first tokens)))
 (defn tupleRef [emit tokens] 
@@ -76,7 +73,7 @@
   (let [[srcLs remain] 
           (driver
             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
-                       (~stString? ~stString) (~tupleLit? ~tupleLit) (~pTupleLit? ~pTupleLit)
+                       (~stString? ~stString) (~tupleLit? ~tupleLit) 
                        (~stList? ~stList) (~tupleRef? ~tupleRef))) 
              src)
         source (apply str srcLs)]

@@ -22,7 +22,7 @@
   "Convert a 'file' statement that is in a 'data' policy to an init statement"
   (letfn [(default-preproc [fields] 
             (list 'let 
-                  (map-indexed (fn [i name] (list '$C name `(~'tuple-ref ~'$source ~i))) fields) 
+                  (map-indexed (fn [i name] (list '$$ name `(~'tuple-ref ~'$source ~i))) fields) 
                   (list '$ptuple fields fields)))]
 
     (match program

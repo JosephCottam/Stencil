@@ -7,21 +7,21 @@
 (def base "../tests/")
 
 (deftest cdx
-    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-inline.stencil"))))
+    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-inline.stencil") :file)))
            (.trim (slurp (str base "cdx/scatterplot-inline.py"))))
         "Scatterplot: One table, inline render")
-    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-twoTable.stencil"))))
+    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-twoTable.stencil") :file)))
            (.trim (slurp (str base "cdx/scatterplot-twoTable.py"))))
         "Scatterplot: Two tables, inline render"))
 
 (deftest bokeh
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-inline.stencil"))))
+    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-inline.stencil") :file)))
            (.trim (slurp (str base "bokeh/scatterplot-inline.py"))))
         "Scatterplot: One table, inline render")
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-twoTable.stencil"))))
+    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-twoTable.stencil") :file)))
            (.trim (slurp (str base "bokeh/scatterplot-twoTable.py"))))
         "Scatterplot: Two tables, inline render")
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/multiplot.stencil"))))
+    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/multiplot.stencil") :file)))
            (.trim (slurp (str base "bokeh/multiplot.py"))))
         "Scatterplot: Multiplot"))
 

@@ -34,7 +34,7 @@
   (letfn [(maybe-pair [ls]
             (cond
               (or (empty? ls) (< (count ls) 3)) ls
-              (= '$C (second ls)) 
+              (= '$$ (second ls)) 
                  (cons (list (first ls) (nth ls 2)) (maybe-pair (drop 3 ls)))
               :else (cons (first ls) (maybe-pair (rest ls)))))]
     (match program

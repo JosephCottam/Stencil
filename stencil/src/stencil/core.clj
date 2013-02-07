@@ -29,15 +29,27 @@
        "CDXRUNTIME" (cdx/emit program)
        "JAVAPICORUNTIME" (pico/emit program))))  
 
-;;TODO: Convert to mulit-method with input and output file options
-(defn compile-program [program]
+(defn- compile-dispatch [program & opts]
+  (cond 
+    (and (= String (class program))
+         (some #(= :file %) opts))  :filename
+    (= String (class program))      :literal
+    :else  :parsed))
+
+(defmulti compile
+  "Compile a program.  May be passed as a tree or a string.  
+  If a filename is passed, include keyword :file as an argument."
+  compile-dispatch)
+
+(defmethod compile :filename [program & _] (compile (read program)))
+(defmethod compile :literal [program & _] (compile (parse program)))
+(defmethod compile :parsed [program & _]
   (let [_ (t/validate program)
         program (t/normalize program)
         modules (t/imports program)
         program (t/prep-emit program)]
     program))
 
-(defn compile [filename] (compile-program (read filename)))
 
 (defn -main [from & to]
   (println "Compling from" from)

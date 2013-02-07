@@ -5,17 +5,21 @@
   (:require [clojure.java.io :as io])
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
-(deftype Table [name ofClass fields depends])
-(deftype Depends [source fields expr])
+(load "bokeh-util")
+
+(deftype Table [name ofClass fields inits depends])
+(deftype Depends [isDepend source fields expr])
 (deftype View [name renders])
 (deftype Render [name source type binds fields])
-(deftype Header [name debug])
+(deftype Header [name])
 (deftype Program [header tables view])
-
+(deftype Init [isInit expr])
+ 
+;;I want default values...these "is<x>" fields should always be 'true'
 (deftype When [isWhen trigger action])
 (deftype Let [isLet bindings body])
 (deftype Using [isUsing fields gen body])
-(deftype Prim [isPrim val])  ;;I want default values...atom should always be 'true'
+(deftype Prim [isPrim val]) 
 (deftype Do [isDo exprs])
 (deftype Op [isOp op rands])
 (deftype If [isIf test conseq alt])
@@ -23,7 +27,12 @@
 (deftype LetBinding [vars expr])
 (deftype RenderBinding [x y color])
 
-(declare expr-att)
+(declare expr-atts)
+
+(defn dmap [default f vals]
+  (if (empty? vals)
+    default
+    (map f vals)))
 
 (defn drop-metas [program] 
   (cond
@@ -33,45 +42,45 @@
 
 (defn pyName [name]
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
+
 (defn pyVal [val]
   (cond
     (string? val) (str "\"" val "\"")
     :else val))
 
 (defn class-name [name] (str name "__"))
-(defn bind-att [[varset expr]] 
-  (LetBinding. (map expr-att varset) (expr-att expr)))
+(defn bind-atts [[varset expr]] 
+  (LetBinding. (map expr-atts varset) (expr-atts expr)))
 
-(defn expr-att [expr]
+(defn expr-atts [expr]
   (match expr
     (a :guard t/atom?) (Prim. true (pyVal a))
     (['let bindings body] :seq) 
-      (Let. true (map bind-att bindings) (expr-att body))
-    ([do & exprs] :seq) (Do. true (map expr-att exprs))
-    ([op & rands] :seq) (Op. true op (map expr-att rands))
+      (Let. true (map bind-atts bindings) (expr-atts body))
+    (['do & exprs] :seq) (Do. true (map expr-atts exprs))
+    ([op & rands] :seq) (Op. true op (map expr-atts rands))
     ([if test conseq alt] :seq)
        (If. true 
-            (expr-att test) 
-            (expr-att conseq) 
-            (if (empty? alt) false (expr-att alt)))
-    :else (throw (RuntimeException. "Unandled expression: " expr))))
+            (expr-atts test) 
+            (expr-atts conseq) 
+            (if (empty? alt) false (expr-atts alt)))
+    :else (throw (RuntimeException. "Unhandled expression: " expr))))
 
-(defn data-atts [data]
-  (let [[tag when] (drop-metas data)
-        [tag trigger using] when
-        ;;Currently ignoring the trigger...assume everything is on init
+(defn init-atts [init] (Init. true (expr-atts (second (drop-metas init)))))
+
+(defn depend-atts [when]
+  (let [[tag trigger using] when  ;;Trigger is ignored, currenlty just happends on render
         [tag fields gen trans] using
         [tag source] gen] ;;Assumes that this is an "items" expression
-    (Depends. source (t/full-drop fields) (expr-att trans))))
+    (Depends. true source (t/full-drop fields) (expr-atts (drop-metas trans)))))
 
 (defn table-atts[table]
   (let [name (pyName (second table))
         fields (rest (drop-metas (first (t/filter-tagged 'fields table))))
-        data (t/filter-tagged 'data table)
-        external (empty? data)]
-    (if external
-      (Table. name (class-name name) fields false)
-      (Table. name (class-name name) fields (map data-atts data)))))
+        datas (t/filter-tagged 'data table)
+        inits (dmap false init-atts (reduce cons (map (partial t/filter-tagged 'init) datas)))
+        depends (dmap false depend-atts (reduce cons (map (partial t/filter-tagged 'when-) datas)))]
+    (Table. name (class-name name) fields inits depends)))
 
 (defn render-bind-atts [bind]
   (let [pairs (t/lop->map (rest (drop-metas bind)))
@@ -97,10 +106,8 @@
         view   (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
-        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))
-        debug ((t/meta->map (nth runtime 2)) 'debug)
-        debug (and (not (nil? debug)) (= true debug))]
-    (Program. (Header. (pyName name) debug) (map table-atts tables) (view-atts renders view))))
+        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports)) ]
+    (Program. (Header. (pyName name)) (map table-atts tables) (view-atts renders view))))
 
 
 (defn emit-bokeh [template attlabel atts]
@@ -109,7 +116,7 @@
     (.render (.add t attlabel atts))))
 
 (defn emit [program]
-  (emit-bokeh "program" "def" (as-atts program)))
+  (emit-bokeh "program" "def" (-> program when->init remove-empty-using as-atts)))
 
 
 

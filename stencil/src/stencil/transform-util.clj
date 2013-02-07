@@ -7,6 +7,10 @@
   ([condition policies] (filter-tagged = condition policies))
   ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
 
+(defn bind? [a] (= '$$ a))
+(defn has-bind? [expr] 
+  "Does this expression include a binding statement (syntactically denoted with an infix-colon)?"
+  (and (seq? expr) (some bind? expr)))
 
 
 (defn lop->map [lop]

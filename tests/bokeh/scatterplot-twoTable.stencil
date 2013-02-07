@@ -3,9 +3,10 @@
 (table dataset 
   (fields a b c)
   (data (init (let (x : (range 0 100 6))
-                   (y : (map sin x)))
+                   (y : (map sin x))
                    (z : (map cos x))
-                   (ptuples (fields x y z) x y z)))))
+                   (ptuple (fields a b c) x y z)))))
+                   
 
 (table plot
   (render scatter (bind auto))

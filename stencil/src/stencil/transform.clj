@@ -3,7 +3,10 @@
   (:require [clojure.core.match :refer (match)])
   (:require clojure.pprint))
 
+(declare spp)
+
 (load "transform-util")
+(load "transforms/tuples")
 (load "transforms/comments")
 (load "transforms/lets")
 (load "transforms/infixOperators")
@@ -27,7 +30,8 @@
   [program] 
    (-> program 
     ensure-runtime-import
-    normalize-let-shape infix->prefix arrow->using default-let-body
+    tuple->ptuple normalize-let-shape 
+    infix->prefix arrow->using default-let-body
     file->init pull->when init->when
     meta-pairings supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
