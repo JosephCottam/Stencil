@@ -66,20 +66,20 @@
             (if (empty? alt) false (expr-atts alt)))
     :else (throw (RuntimeException. "Unhandled expression: " expr))))
 
-(defn init-atts [init] (Init. true (expr-atts (second (drop-metas init)))))
+(defn init-atts [init] (Init. true (expr-atts (second init))))
 
 (defn depend-atts [when]
   (let [[tag trigger using] when  ;;Trigger is ignored, currenlty just happends on render
         [tag fields gen trans] using
         [tag source] gen] ;;Assumes that this is an "items" expression
-    (Depends. true source (t/full-drop fields) (expr-atts (drop-metas trans)))))
+    (Depends. true source (t/full-drop fields) (expr-atts trans))))
 
 (defn table-atts[table]
   (let [name (pyName (second table))
         fields (rest (drop-metas (first (t/filter-tagged 'fields table))))
         datas (t/filter-tagged 'data table)
-        inits (dmap false init-atts (reduce cons (map (partial t/filter-tagged 'init) datas)))
-        depends (dmap false depend-atts (reduce cons (map (partial t/filter-tagged 'when-) datas)))]
+        inits (dmap false init-atts (drop-metas (reduce cons (map (partial t/filter-tagged 'init) datas))))
+        depends (dmap false depend-atts (drop-metas (reduce cons (map (partial t/filter-tagged 'when-) datas))))]
     (Table. name (class-name name) fields inits depends)))
 
 (defn render-bind-atts [bind]
@@ -106,8 +106,10 @@
         view   (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
-        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports)) ]
-    (Program. (Header. (pyName name)) (map table-atts tables) (view-atts renders view))))
+        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))]
+    (Program. (Header. (pyName name)) 
+              (map table-atts tables)
+              (view-atts renders view))))
 
 
 (defn emit-bokeh [template attlabel atts]
