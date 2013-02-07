@@ -1,11 +1,11 @@
-(import BokehRuntime)
+(import BokehRuntime {header: (list "from math import *")})
 
 (table dataset 
   (fields a b c)
   (data (init (let (x : (range 0 100 6))
                    (y : (map sin x))
                    (z : (map cos x))
-                   (ptuple (fields a b c) x y z)))))
+                   (ptuples (fields a b c) x y z)))))
                    
 
 (table plot
