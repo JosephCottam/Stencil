@@ -38,6 +38,9 @@
 (defn tupleLit? [tokens] (= '(\# \() (take 2 tokens)))
 (defn tupleLit [emit tokens] (list nil (concat " (tuple " (drop 2 tokens)))) ;;Might have some namespace issues eventually
 
+(defn tuplesLit? [tokens] (= '(\# \# \() (take 3 tokens)))
+(defn tuplesLit [emit tokens] (list nil (concat " (tuples " (drop 3 tokens))))
+
 (defn tupleRef? [tokens] (= \[ (first tokens)))
 (defn tupleRef [emit tokens] 
   (let [[internal remain] (readUntil emit '(\]) (rest tokens))]
@@ -73,7 +76,7 @@
   (let [[srcLs remain] 
           (driver
             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
-                       (~stString? ~stString) (~tupleLit? ~tupleLit) 
+                       (~stString? ~stString) (~tupleLit? ~tupleLit) (~tuplesLit? ~tuplesLit) 
                        (~stList? ~stList) (~tupleRef? ~tupleRef))) 
              src)
         source (apply str srcLs)]

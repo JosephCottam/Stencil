@@ -169,16 +169,18 @@ class <className>:
 // ---------------------- Furniture ----------------------
 
 program(def) ::= <<
-<header(def)>
+<header(def.header)>
 
 <classDef(def.header.name, def.tables, def.view)>
 
 <footer(def.header.name)> 
 >>
 
-header(def) ::= <<
+header(headerDef) ::= <<
+#Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
+<headerDef.literal:{f|<f>};separator="\n">
 >>
 
 

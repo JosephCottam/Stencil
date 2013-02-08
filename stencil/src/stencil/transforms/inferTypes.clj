@@ -71,7 +71,9 @@
        This is here because I don't have a type registery for functions...it causes many problems with name-spaces."
        (letfn [(known-type [a m]
                  (if (or (= a 'ptuple)
-                         (= a 'tuple))
+                         (= a 'tuple)
+                         (= a 'tuples)
+                         (= a 'ptuples))
                    (enforce-type m '(fn (...) (tuple (...))) #(= % 'fn))
                    m))]
          (match program

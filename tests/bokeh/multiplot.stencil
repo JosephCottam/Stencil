@@ -1,4 +1,4 @@
-(import BokehRuntime {header: (list "from math import *")})
+(import BokehRuntime {header: ("from math import *")})
 
 (table dataset
   (fields a b c)

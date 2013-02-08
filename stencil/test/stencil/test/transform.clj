@@ -45,6 +45,7 @@
   (is (= (t/tuple->ptuple '(a)) '(a)))
   (is (= (t/tuple->ptuple '(tuple a b c)) '(tuple a b c)))
   (is (= (t/tuple->ptuple '(tuple a $$ 1 b $$ 2 c $$ 3)) '(ptuple (fields a b c) 1 2 3)))
+  (is (= (t/tuple->ptuple '(tuples a $$ 1 b $$ 2 c $$ 3)) '(ptuples (fields a b c) 1 2 3)))
   (is (thrown? RuntimeException (t/tuple->ptuple '(tuple a $$ 1 b c)))))
 
 (deftest validate-let-shape

@@ -11,9 +11,9 @@
    (cond 
      (or (atom? expr) (empty? expr))  
        (throw (RuntimeException. (str "Could not find prototyped tuple in " (apply list saved))))
-     (= 'ptuple (first expr))
+     (or (= 'ptuple (first expr))
+         (= 'ptuples (first expr)))
         (second-expr expr)    ;;acquire the fields statement
-      ;`(~'fields (~'$meta) ~@(second-expr (second-expr expr)));;get rid of the operator and the quote
      :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields [program]
