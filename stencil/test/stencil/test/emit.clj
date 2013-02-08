@@ -7,7 +7,7 @@
 
 (defn freshDir [root] 
   (let [now (java.util.Date.) 
-        rep (java.text.SimpleDateFormat.  "yyyy-mm-dd--kk:mm")
+        rep (java.text.SimpleDateFormat.  "yyyyMMMdd--kk_mm")
         root (if (.endsWith root "/") root (str root "/")) 
         path (str root (.format rep now))
         dir (java.io.File. path)]
