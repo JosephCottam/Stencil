@@ -180,7 +180,8 @@ header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-<headerDef.literal:{f|<f>};separator="\n">
+<if (headerDef.imports)><headerDef.imports:{e|from <e> import *};separator="\n"><endif>
+<if (headerDef.literal)><headerDef.literal:{e|<e>};separator="\n"><endif>
 >>
 
 
@@ -189,4 +190,5 @@ footer(name) ::= <<
 def main():
   plot = <name>()
   plot.render()
+
 >>

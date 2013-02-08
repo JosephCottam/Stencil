@@ -4,24 +4,50 @@
   (:require [stencil.core :as c])
   (:use [clojure.test]))
 
-(def base "../tests/")
+
+(defn freshDir [root] 
+  (let [now (java.util.Date.) 
+        rep (java.text.SimpleDateFormat.  "yyyy-mm-dd--kk:mm")
+        root (if (.endsWith root "/") root (str root "/")) 
+        path (str root (.format rep now))
+        dir (java.io.File. path)]
+    path))
+
+(def source "../tests/")
+(def target (freshDir "../testResults/"))
+
+(defn emit [emitter src rslt]
+  "Run the emitter on the src program, write it to the result location and return the result."
+  (let [program (emitter (c/compile src :file))
+        rslt (java.io.File. rslt)]
+    (.mkdirs (.getParentFile rslt))
+    (spit rslt program)
+    program))
+
+(defmethod assert-expr 'emit-eq? [msg form]
+  `(let [emitter# ~(nth form 1)
+         base# ~(nth form 2)
+         src# (str source "/" base# ".stencil")
+         rslt# (str target "/" base# ".py")
+         ref# (str source "/" base# ".py")
+         result# (.trim (emit emitter# src# rslt#))
+         expected# (.trim (slurp ref#))]
+     (if (= result# expected#) 
+       (report {:type :pass :message ~msg, :expected ref# :actual rslt#})
+       (report {:type :fail :message (str "Compile did not match --- " ~msg), :expected ref# :actual rslt#}))
+     result#))
 
 (deftest cdx
-    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-inline.stencil") :file)))
-           (.trim (slurp (str base "cdx/scatterplot-inline.py"))))
+    (is (emit-eq? cdx/emit "cdx/scatterplot-inline")
         "Scatterplot: One table, inline render")
-    (is (= (.trim (cdx/emit (c/compile (str base "cdx/scatterplot-twoTable.stencil") :file)))
-           (.trim (slurp (str base "cdx/scatterplot-twoTable.py"))))
+    (is (emit-eq? cdx/emit "cdx/scatterplot-twoTable")
         "Scatterplot: Two tables, inline render"))
 
 (deftest bokeh
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-inline.stencil") :file)))
-           (.trim (slurp (str base "bokeh/scatterplot-inline.py"))))
+    (is (emit-eq? bokeh/emit "bokeh/scatterplot-inline")
         "Scatterplot: One table, inline render")
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/scatterplot-twoTable.stencil") :file)))
-           (.trim (slurp (str base "bokeh/scatterplot-twoTable.py"))))
+    (is (emit-eq? bokeh/emit "bokeh/scatterplot-twoTable")
         "Scatterplot: Two tables, inline render")
-    (is (= (.trim (bokeh/emit (c/compile (str base "bokeh/multiplot.stencil") :file)))
-           (.trim (slurp (str base "bokeh/multiplot.py"))))
+    (is (emit-eq? bokeh/emit "bokeh/multiplot")
         "Scatterplot: Multiplot"))
 

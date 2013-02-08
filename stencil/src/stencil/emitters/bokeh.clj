@@ -11,7 +11,7 @@
 (deftype Depends [isDepend source fields expr])
 (deftype View [name renders])
 (deftype Render [name source type binds fields])
-(deftype Header [name literal])
+(deftype Header [name imports literal])
 (deftype Program [header tables view])
 (deftype Init [isInit expr])
  
@@ -102,14 +102,15 @@
  
 (defn as-atts [program]
   (let [name (second program)
-        imports (t/filter-tagged 'import program)
         view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
-        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))
+        imports (filter #(.startsWith (str (second %)) "py-") (t/filter-tagged 'import program))
+        imports (dmap false second imports)
+        runtime (runtime program)
         literal ((t/meta->map (nth runtime 2)) 'header)
         literal (if (nil? literal) false literal)]
-    (Program. (Header. (pyName name) literal) 
+    (Program. (Header. (pyName name) imports literal) 
               (map table-atts tables)
               (view-atts renders view))))
 
