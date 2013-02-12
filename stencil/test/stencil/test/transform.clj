@@ -205,6 +205,37 @@
                             (ptuple ($meta) (fields ($meta) foo ($meta (type int)) bar ($meta (type int))) 1 2)))))))
 
 
+(deftest align-ptuple
+  (is (= (t/align-ptuple '(stencil x)) '(stencil x)))
+  (is (= (t/align-ptuple '(ptuple ($meta) (fields a) x)) '(ptuple ($meta) (fields a) x)))
+  (is (= (t/align-ptuple '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3))))
+         '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3)))))
+  (is (= (t/align-ptuple '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields c b a) 3 2 1))))
+         '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3)))))
+  (is (= (t/align-ptuple 
+           '(table t ($meta) 
+              (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+              (data (ptuple ($meta) (fields a b c) 1 2 3))))
+         '(table t ($meta) 
+            (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+            (data (ptuple ($meta) (fields a b c) 1 2 3)))))
+  (is (= (t/align-ptuple 
+           '(table t ($meta) 
+              (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+              (data (ptuple ($meta) (fields c b a) 3 2 1))))
+         '(table t ($meta) 
+            (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+            (data (ptuple ($meta) (fields a b c) 1 2 3)))))
+  (is (= (t/align-ptuple 
+           '(table t ($meta) 
+              (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+              (data (ptuple ($meta) (fields a) 1))))
+         '(table t ($meta) 
+            (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
+            (data (ptuple ($meta) (fields a b c) 1 22 33))))))
+
+
+
 (deftest check-simple-fields
   (is (= (t/check-simple-fields '(fields a b c)) '(fields a b c)))
   (is (= (t/check-simple-fields '(fields a ($meta) b ($meta) c ($meta))) '(fields a ($meta) b ($meta) c ($meta))))

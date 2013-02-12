@@ -19,7 +19,7 @@ expr(ex) ::= <%
 
 
 unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
-let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
+let(ex) ::= <%<ex.bindings:binding();separator="\n"><\n><expr(ex.body)>%>
 prim(ex) ::= "<ex.val>"
 do(ex) ::= <%<ex.exprs:expr();separator="\n">%>
 ifex(ex) ::= <%
@@ -49,6 +49,12 @@ def size(self):
 
 >>
 
+tableClear(tdef) ::= <<
+def clear(self):
+  <tdef.fields:{f|self.<f> = []};separator="\n">
+
+>>
+
 tableData(tdef) ::= <<
 def data(self):
   return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
@@ -63,35 +69,12 @@ def __init__(self):
    <idefs:{def|<expr(def.expr)>};separator="\n">
 <endif>
 >>
-// ----------------------  External Tables ----------------------
 
-externalTable(def) ::= <<
-class <def.ofClass>:
-  <tableFields(def.fields)>
-  <def.fields:{f|<f> = None};separator="\n">
-
-  <init(def.inits)>
-
-  
-  MOVE "setData" to be "data".  
-  Add corresponding "datum" method.  
-  Change to use append, not setting.
-  Add "clear" 
-  Move to shared between regular and external tables.
-
-  def setData(self, **kwargs):
-    if (len(kwargs) == len(self._fields)):
-      <def.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
-    else:
-      raise Exception("Data not properly supplied to table <def.name>")
-     
-
-  <tableSize(def)>
-  <tableData(def)>
+dependentUpates(def) ::= <<
+def update(self):
+  self.clear()
+  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
 >>
-
-
-// ---------------------- Dependent Table ----------------------
 
 dependUpdate(tableFields, ddef) ::= <<
 <if (ddef.isDepend)>
@@ -107,22 +90,37 @@ def set_<dep.source>(self, table):
    self._<dep.source>=table
 >>
 
-dependentInits(dep) ::="<if (dep.isInit)><dep.expr:expr()><endif>"
+data(def) ::=<<
+#TODO: Move away from KWARGS, use "vanilla" args and do a align and supply defaults pass in compiler; Combine data and datum in some way...maybe a flag?
+def data(self, multivalue, **kwargs):
+  if (len(kwargs) == len(self._fields)):
+      <def.fields:{f|self.<f>.extend(kwargs['<f>'])};separator="\n">
+  else:
+    raise Exception("Data not properly supplied to table <def.name>")
 
-dependentTable(def) ::= <<
+>>
+
+datum(def) ::=<<
+def datum(self, **kwargs):
+  if (len(kwargs) == len(self._fields)):
+    <def.fields:{f|self.<f>.append(kwargs['<f>'])};separator="\n">
+  else:
+    raise Exception("Datum not properly supplied to table <def.name>")
+
+>>
+
+table(def) ::= <<
 class <def.ofClass>:
   <tableFields(def.fields)>
-  <def.depends:{d|_<d.source> = None};separator="\n">
   <def.fields:{f|<f> = None};separator="\n">
+  <if (def.depends)><def.depends:{d|_<d.source> = None};separator="\n"><endif>
 
   <init(def.inits)>
-
-  <def.depends:setDependency();separator="\n">
-
-  def update(self):
-    <def.fields:{f|self.<f> = []};separator="\n">
-    <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
-
+  <if (def.depends)><def.depends:setDependency();separator="\n"><endif>
+  <if (def.depends)><dependentUpates(def)><endif>
+  <datum(def)>
+  <data(def)>
+  <tableClear(def)>
   <tableSize(def)>
   <tableData(def)>
 >>
@@ -133,7 +131,8 @@ class <def.ofClass>:
 tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
 def set_<tdef.name>_cols(self, <tdef.fields:{f|<f>};separator=", ">):
-  self.<tdef.name>.setData(<tdef.fields:{f|<f>=<f>};separator=", ">)
+  self.<tdef.name>.clear()
+  self.<tdef.name>.data(<tdef.fields:{f|<f>=<f>};separator=", ">)
 <endif>
 >>
 
@@ -155,7 +154,7 @@ renderSet(def) ::= <%
 
 classDef(className,tables,view) ::= <<
 
-<tables:{t|<if (t.depends)><dependentTable(t)><else><externalTable(t)><endif>};separator="\n\n">
+<tables:table();separator="\n\n">
 
 class <className>:
   <tables:{t|<t.name> = None};separator="\n">

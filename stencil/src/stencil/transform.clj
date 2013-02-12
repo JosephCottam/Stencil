@@ -1,9 +1,6 @@
 (ns stencil.transform
   "Tree transformation functions"
-  (:require [clojure.core.match :refer (match)])
-  (:require clojure.pprint))
-
-(declare spp)
+  (:require [clojure.core.match :refer (match)]))
 
 (load "transform-util")
 (load "transforms/tuples")
@@ -48,29 +45,5 @@
   [program]
   {})
 
-
-
-;;;;---------------------------------------------------------------------------------------
-(defmulti pprint-stencil class)
-(defmethod pprint-stencil :default [thing] (clojure.pprint/code-dispatch thing))
-(defmethod pprint-stencil clojure.lang.ISeq [astencil]
-  (clojure.pprint/pprint-logical-block :prefix "(" :suffix ")"
-    (loop [astencil (seq astencil)]
-      (when astencil
-        (clojure.pprint/write-out (first astencil))
-        (when-let [nxt (second astencil)]
-          (.write ^java.io.Writer *out* " ")
-          (if (meta? nxt)   ;;Reduces line-breaks after metas over standard pretty-printer
-            (clojure.pprint/pprint-newline :fill)
-            (clojure.pprint/pprint-newline :linear))
-          (recur (next astencil)))))))
-
-(defn spp [program & opts] 
-  "A pretty-printer for stencil."
-  (let [preproc identity
-        preproc (if (any= :metas opts) (comp clean-metas identity) preproc)]
-    (clojure.pprint/with-pprint-dispatch 
-      pprint-stencil 
-      (clojure.pprint/pprint (preproc program)))))
 
 

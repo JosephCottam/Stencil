@@ -19,8 +19,12 @@
 (defn emit [emitter src rslt]
   "Run the emitter on the src program, write it to the result location and return the result."
   (let [program (emitter (c/compile src :file))
-        rslt (java.io.File. rslt)]
-    (.mkdirs (.getParentFile rslt))
+        rslt (java.io.File. rslt)
+        parent (.getParentFile rslt)
+        proxyFile (java.io.File. (.getParent (java.io.File. target)) "current") ]
+    (.mkdirs parent)
+    (if (.exists proxyFile) (.delete proxyFile))
+    (java.nio.file.Files/createSymbolicLink (.toPath proxyFile) (.toPath parent) (make-array java.nio.file.attribute.FileAttribute 0))
     (spit rslt program)
     program))
 

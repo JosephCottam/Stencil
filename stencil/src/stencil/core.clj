@@ -53,10 +53,10 @@
 
 (defn -main [from & to]
   (println "Compling from" from)
-  (let [p (emit (compile from))]
+  (let [p (emit (compile from :file))]
     (if (empty? to)
       (println p)
       (spit (first to) p)))
-  (println "done!"))
+  (println "\ndone!"))
 
 
