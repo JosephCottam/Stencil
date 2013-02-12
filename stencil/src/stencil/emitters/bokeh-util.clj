@@ -24,6 +24,25 @@
     (['using (m1 :guard t/meta?) (['fields (m2 :guard t/meta?)] :seq) (gen :guard empty?) body] :seq) body
     :else (map remove-empty-using program)))
 
+(defn dataTuple->store 
+  "Data statements eventually end in a ptuple or ptuples statement.
+   Coverts those statements to a coresponding python function to
+   store the tuple, when in the context of a data statement.
+  TODO: Extend for 'operator' context and 'update'/'join'/'leave' policies"
+  ([program & context]
+   (match program
+     (a :guard atom?) a
+     (['table name (m :guard meta?) & policies] :seq)
+       `(~'table ~name ~m ~@(map dataTuple->store policies :context name))
+     ([tuple & args] :seq)
+       `(~'self.datum ~@args)
+     ([ptuple m fields & args] :seq)
+       `(~'self.datum m ~@args)
+     ([tuples & args] :seq)
+       `(~'self.data args)
+     ([ptuples m fields & args] :seq)
+       `(~'self.data m args)
+     :else (map #(apply dataTuple->Store % context) program)
 
 
 

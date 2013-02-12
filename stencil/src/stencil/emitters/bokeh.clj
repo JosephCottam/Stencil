@@ -106,7 +106,7 @@
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
         imports (filter #(.startsWith (str (second %)) "py-") (t/filter-tagged 'import program))
-        imports (dmap false second imports)
+        imports (dmap false #(.substring (str %) 3) (map second imports))
         runtime (runtime program)
         literal ((t/meta->map (nth runtime 2)) 'header)
         literal (if (nil? literal) false literal)]

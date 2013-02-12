@@ -72,6 +72,13 @@ class <def.ofClass>:
 
   <init(def.inits)>
 
+  
+  MOVE "setData" to be "data".  
+  Add corresponding "datum" method.  
+  Change to use append, not setting.
+  Add "clear" 
+  Move to shared between regular and external tables.
+
   def setData(self, **kwargs):
     if (len(kwargs) == len(self._fields)):
       <def.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
