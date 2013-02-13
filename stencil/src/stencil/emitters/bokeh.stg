@@ -56,7 +56,7 @@ def clear(self):
 >>
 
 tableData(tdef) ::= <<
-def data(self):
+def dataSource(self):
   return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
 
 >>
@@ -92,24 +92,18 @@ def set_<dep.source>(self, table):
 
 
 dataUpdates(def) ::=<<
-def _store(self, multivalue, <def.fields:{f|<f>};separator=", ">):
-  if (multivalue):
-      <def.fields:{f|self.<f>.extend(<f>)};separator="\n">
-  else:
-      <def.fields:{f|self.<f>.append(<f>)};separator="\n">
-
 def data(self, <def.fields:{f|<f>};separator=", ">):
-  self._store(true, <def.fields:{f|<f>};separator=", ">)
+  <def.fields:{f|self.<f>.extend(<f>)};separator="\n">
 
 def datum(self, <def.fields:{f|<f>};separator=", ">):
-  self._store(false, <def.fields:{f|<f>};separator=", ">)
+  <def.fields:{f|self.<f>.append(<f>)};separator="\n">
 
 >>
 
 table(def) ::= <<
 class <def.ofClass>:
   <tableFields(def.fields)>
-  <def.fields:{f|<f> = None};separator="\n">
+  <def.fields:{f|<f> = []};separator="\n">
   <if (def.depends)><def.depends:{d|_<d.source> = None};separator="\n"><endif>
 
   <init(def.inits)>
@@ -139,10 +133,10 @@ linkTables(table) ::= <%
 <endif>
 %>
 
-bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.data()) %>
+bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.dataSource()) %>
 renderSet(def) ::= <% 
 <if (def.fields)>
-  p.<def.type>(self.<def.source>.data(), [<def.fields:{f|'<f>'};separator=", ">])
+  p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <else>
   <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
 <endif>
@@ -189,7 +183,7 @@ p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 
 
 footer(name) ::= <<
-def main():
+if __name__ == "__main__":
   plot = <name>()
   plot.render()
 

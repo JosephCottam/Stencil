@@ -9,8 +9,7 @@
   (let [now (java.util.Date.) 
         rep (java.text.SimpleDateFormat.  "yyyyMMMdd--kk_mm")
         root (if (.endsWith root "/") root (str root "/")) 
-        path (str root (.format rep now))
-        dir (java.io.File. path)]
+        path (str root (.format rep now))]
     path))
 
 (def source "../tests/")
@@ -21,10 +20,11 @@
   (let [program (emitter (c/compile src :file))
         rslt (java.io.File. rslt)
         parent (.getParentFile rslt)
-        proxyFile (java.io.File. (.getParent (java.io.File. target)) "current") ]
+        symTarget (java.io.File. (.getParent (java.io.File. target)) "current")
+        symSource (java.io.File. target)]
     (.mkdirs parent)
-    (if (.exists proxyFile) (.delete proxyFile))
-    (java.nio.file.Files/createSymbolicLink (.toPath proxyFile) (.toPath parent) (make-array java.nio.file.attribute.FileAttribute 0))
+    (if (.exists symTarget) (.delete symTarget))
+    (java.nio.file.Files/createSymbolicLink (.toPath symTarget) (.toPath symSource) (make-array java.nio.file.attribute.FileAttribute 0))
     (spit rslt program)
     program))
 
@@ -32,8 +32,8 @@
   `(let [emitter# ~(nth form 1)
          base# ~(nth form 2)
          src# (str source "/" base# ".stencil")
-         rslt# (str target "/" base# ".py")
          ref# (str source "/" base# ".py")
+         rslt# (str target "/" base# ".py")
          result# (.trim (emit emitter# src# rslt#))
          expected# (.trim (slurp ref#))]
      (if (= result# expected#) 
