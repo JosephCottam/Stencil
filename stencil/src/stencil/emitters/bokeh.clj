@@ -58,7 +58,7 @@
     (a :guard t/atom?) (Prim. true (pyVal a))
     (['let bindings body] :seq) 
       (Let. true (map bind-atts bindings) (expr-atts body))
-    (['do & exprs] :seq) (Do. true (map expr-atts exprs))
+    (['$do & exprs] :seq) (Do. true (map expr-atts exprs))
     ([op & rands] :seq) (Op. true op (map expr-atts rands))
     ([if test conseq alt] :seq)
        (If. true 
