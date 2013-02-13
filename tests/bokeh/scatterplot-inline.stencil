@@ -1,6 +1,10 @@
-(import BokehRuntime {debug : true})
+(import BokehRuntime {header: ("from math import *")})
 
 (table dataset
   (fields a b c)
+  (data (init (let (x : (range 0 100 6))
+                   (y : (map sin x))
+                   (z : (map cos x))
+                   ##(a:x, b:y, c:z))))
   (render scatter
     (bind (x: a) (y: b) (color : "RED"))))

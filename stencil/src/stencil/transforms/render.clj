@@ -17,7 +17,7 @@
     [(gen-name [] (gensym 'rend))
      (auto-bind? [policy] (= (remove meta? policy) '(bind auto)))
      (drop-bind-op [entry]
-       (if (= '$C (first entry))
+       (if (= '$$ (first entry))
          (full-drop entry)
          entry))
      (maybe-clean [policy]

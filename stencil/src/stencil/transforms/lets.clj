@@ -1,14 +1,13 @@
 (ns stencil.transform)
 
 ;; ------- Validate Let-----
-(defn hasBind? [line] (and (seq? line) (any= '$C line)))
 
 (defn- validate-line-shape [lines]
   (match lines
     ([line] :seq) (list line) ;Last line may be body or binding... 
-    ([(line :guard hasBind?) & rest] :seq) 
+    ([(line :guard has-bind?) & rest] :seq) 
          (cons line (validate-line-shape rest))
-    ([(line :guard (complement hasBind?)) & rest] :seq) 
+    ([(line :guard (complement has-bind?)) & rest] :seq) 
          (throw (RuntimeException. (str "Invalidate let shape: " line)))))
 
 (defn validate-let-shape [program]
@@ -35,7 +34,7 @@
      (divide-body [lines]
        "Give back a pair (bindings, body)"
        (let [maybe-body (last lines)]
-         (if (or (atom? maybe-body) (not (any= '$C maybe-body)))
+         (if (or (atom? maybe-body) (not (any= '$$ maybe-body)))
            (list (butlast lines) maybe-body)
            (list lines '()))))
      (reshape-binding [binding]
@@ -73,7 +72,7 @@
        (let [names (distinct (remove meta? bindings))
              metas (meta-map bindings nil {})
              typed (blend names metas)]
-        `(~'$ptuple (~'fields ~@typed) ~@typed)))
+        `(~'ptuple (~'fields ~@typed) ~@typed)))
 
      (ensure-body
        ([bindings body]

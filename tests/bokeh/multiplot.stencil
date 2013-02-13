@@ -1,7 +1,12 @@
-(import BokehRuntime {debug : true})
+(import BokehRuntime)
+(import py-math)
 
 (table dataset
   (fields a b c)
+  (data (init (let (x : (range 0 100 6))
+                   (y : (map sin x))
+                   (z : (map cos x))
+                ##(a:x, b:y, c:z))))
   (render table (fields a b c))
   (render scatter (bind (x: a) (y: b) (color: "orange"))) 
   (render scatter (bind (x: a) (y: c) (color: "red")))

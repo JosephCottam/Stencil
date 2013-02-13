@@ -1,0 +1,14 @@
+(import BokehRuntime)
+
+(table plot
+  (fields x y z radius {default: 1} color {default: "blue"})
+  (data (list #(x:1, y:5, z:3, radius:10)
+              #(x:2, y:4, z:3)
+              #(x:3, y:3, z:3, color:"red")
+              #(x:4, y:4, z:3)
+              #(x:5, y:5, z:3)))
+  (render Glyph (bind auto (type: circles))
+                (guide X axis {type:'linear', orientation:'bottom'})
+                (guide Y axis {type:'linear', orienatation:'left'})))
+          
+

@@ -7,6 +7,10 @@
   ([condition policies] (filter-tagged = condition policies))
   ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
 
+(defn bind? [a] (= '$$ a))
+(defn has-bind? [expr] 
+  "Does this expression include a binding statement (syntactically denoted with an infix-colon)?"
+  (and (seq? expr) (some bind? expr)))
 
 
 (defn lop->map [lop]
@@ -45,9 +49,9 @@
 (defn meta-keys [m] (set (map first (rest m))))
 (defn meta-vals [m] (map second (rest m)))
 (defn map->meta [m] (cons '$meta (map->lop m)))
-(defn meta->map 
+(defn meta->map [m]
   "Makes a map out of the pairs in a meta.  Bare values are dropped."
-  [m] (lop->map (filter seq? m))) 
+  (lop->map (filter seq? m))) 
 
 (defn default-for-type [type]
   (case type
@@ -75,4 +79,16 @@
   (split-with 
     #(or (not (seq? %)) (= 'import (first %)) (meta? %))
     program))
+
+(defn default-value [item fields]
+  "Given a fields statement, return a default value for a specific field.
+  TODO: Do type-based defaulting? (Or should having a meta.default entry be part of normalizing the fields statement?)"
+  (let [fields (full-drop fields)
+        metas (zipmap (take-nth 2 fields) (take-nth 2 (rest fields)))
+        meta (meta->map (metas item))
+        default (meta 'default)]
+    (cond
+      (empty? meta) (throw (RuntimeException. (str "Could not find entry for '" item "'")))
+      (nil? default) (throw (RuntimeException. (str "No default provided for '" item "'")))
+      :else default)))
 

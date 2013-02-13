@@ -3,7 +3,7 @@ infixOps ::= [
   "-":"true",
   "*":"true",
   "/":"true",
-  default:"false"
+  default:false
 ]
 
 // ----------------------  Expressions ----------------------
@@ -19,7 +19,7 @@ expr(ex) ::= <%
 
 
 unsupported(ex) ::= "UNSUPPORTED feature used!!!! (<ex>)"
-let(ex) ::= <%<ex.bindings:binding();separator="\n">%>
+let(ex) ::= <%<ex.bindings:binding();separator="\n"><\n><expr(ex.body)>%>
 prim(ex) ::= "<ex.val>"
 do(ex) ::= <%<ex.exprs:expr();separator="\n">%>
 ifex(ex) ::= <%
@@ -49,40 +49,40 @@ def size(self):
 
 >>
 
+tableClear(tdef) ::= <<
+def clear(self):
+  <tdef.fields:{f|self.<f> = []};separator="\n">
+
+>>
+
 tableData(tdef) ::= <<
-def data(self):
+def dataSource(self):
   return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
 
 >>
 
 tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
 
-// ----------------------  External Tables ----------------------
-
-externalTable(tdef) ::= <<
-class <tdef.ofClass>:
-  <tableFields(tdef.fields)>
-  <tdef.fields:{f|<f> = None};separator="\n">
-
-  def setData(self, **kwargs):
-    if (len(kwargs) == len(self._fields)):
-      <tdef.fields:{f|self.<f>=kwargs['<f>']};separator="\n">
-    else:
-      raise Exception("Data not properly supplied to table <tdef.name>")
-     
-
-  <tableSize(tdef)>
-  <tableData(tdef)>
+init(idefs) ::= <<
+<if (idefs)>
+def __init__(self):
+   <idefs:{def|<expr(def.expr)>};separator="\n">
+<endif>
 >>
 
-
-// ---------------------- Dependent Table ----------------------
+dependentUpates(def) ::= <<
+def update(self):
+  self.clear()
+  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
+>>
 
 dependUpdate(tableFields, ddef) ::= <<
+<if (ddef.isDepend)>
 for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
   <tableFields:{f|self.<f>.append(<f>)};separator="\n">
+<endif>
 >>
 
 setDependency(dep) ::= <<
@@ -90,20 +90,29 @@ def set_<dep.source>(self, table):
    self._<dep.source>=table
 >>
 
-dependentTable(tdef) ::= <<
-class <tdef.ofClass>:
-  <tableFields(tdef.fields)>
-  <tdef.depends:{d|_<d.source> = None};separator="\n">
-  <tdef.fields:{f|<f> = None};separator="\n">
 
-  <tdef.depends:setDependency();separator="\n">
+dataUpdates(def) ::=<<
+def data(self, <def.fields:{f|<f>};separator=", ">):
+  <def.fields:{f|self.<f>.extend(<f>)};separator="\n">
 
-  def update(self):
-    <tdef.fields:{f|self.<f> = []};separator="\n">
-    <tdef.depends:{d|<dependUpdate(tdef.fields, d)>};separator="\n#----------\n">
+def datum(self, <def.fields:{f|<f>};separator=", ">):
+  <def.fields:{f|self.<f>.append(<f>)};separator="\n">
 
-  <tableSize(tdef)>
-  <tableData(tdef)>
+>>
+
+table(def) ::= <<
+class <def.ofClass>:
+  <tableFields(def.fields)>
+  <def.fields:{f|<f> = []};separator="\n">
+  <if (def.depends)><def.depends:{d|_<d.source> = None};separator="\n"><endif>
+
+  <init(def.inits)>
+  <if (def.depends)><def.depends:setDependency();separator="\n"><endif>
+  <if (def.depends)><dependentUpates(def)><endif>
+  <dataUpdates(def)>
+  <tableClear(def)>
+  <tableSize(def)>
+  <tableData(def)>
 >>
 
 
@@ -112,7 +121,8 @@ class <tdef.ofClass>:
 tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
 def set_<tdef.name>_cols(self, <tdef.fields:{f|<f>};separator=", ">):
-  self.<tdef.name>.setData(<tdef.fields:{f|<f>=<f>};separator=", ">)
+  self.<tdef.name>.clear()
+  self.<tdef.name>.data(<tdef.fields:{f|<f>};separator=", ">)
 <endif>
 >>
 
@@ -123,10 +133,10 @@ linkTables(table) ::= <%
 <endif>
 %>
 
-bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.data()) %>
+bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.dataSource()) %>
 renderSet(def) ::= <% 
 <if (def.fields)>
-  p.<def.type>(self.<def.source>.data(), [<def.fields:{f|'<f>'};separator=", ">])
+  p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <else>
   <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
 <endif>
@@ -134,7 +144,7 @@ renderSet(def) ::= <%
 
 classDef(className,tables,view) ::= <<
 
-<tables:{t|<if (t.depends)><dependentTable(t)><else><externalTable(t)><endif>};separator="\n\n">
+<tables:table();separator="\n\n">
 
 class <className>:
   <tables:{t|<t.name> = None};separator="\n">
@@ -155,33 +165,26 @@ class <className>:
 // ---------------------- Furniture ----------------------
 
 program(def) ::= <<
-<header(def)>
+<header(def.header)>
 
 <classDef(def.header.name, def.tables, def.view)>
 
-<footer(def.header.name, def.header.debug)> 
+<footer(def.header.name)> 
 >>
 
-header(def) ::= <<
-#Debug set to '<def.header.debug>'
+header(headerDef) ::= <<
+#Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-<if(def.header.debug)>
-import numpy as np 
-import datetime
-import time
-<endif>
+<if (headerDef.imports)><headerDef.imports:{e|from <e> import *};separator="\n"><endif>
+<if (headerDef.literal)><headerDef.literal:{e|<e>};separator="\n"><endif>
 >>
 
 
 
-footer(name, testharness) ::= <<
-<if (testharness)>
-x = np.arange(100) / 6.0 
-y = np.sin(x) 
-z = np.cos(x) 
-plot = <name>()
-plot.set_dataset_cols(x,y,z)
-plot.render()
-<endif>
+footer(name) ::= <<
+if __name__ == "__main__":
+  plot = <name>()
+  plot.render()
+
 >>

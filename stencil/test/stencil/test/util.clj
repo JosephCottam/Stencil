@@ -33,6 +33,11 @@
   (is (t/atom? java.lang.Class))
   (is (not (t/atom? '(a b c)))))
 
+(deftest default-value
+  (is (= (t/default-value 'a '(fields ($meta) a ($meta (default 1)))) 1))
+  (is (= (t/default-value 'b '(fields ($meta) a ($meta (default 1)) b ($meta (default 2)) c ($meta (default 3)))) 2))
+  (is (= (t/default-value 'c '(fields ($meta) a ($meta (default 1)) b ($meta (default 2)) c ($meta (default 3)))) 3)))
+
 
 (deftest filter-tagged
   (is (= (t/filter-tagged 'get '()) '()))
