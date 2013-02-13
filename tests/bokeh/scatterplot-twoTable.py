@@ -1,46 +1,53 @@
-#Debug set to 'true'
+#Stencil->Bokeh export for scatterplot_twoTable
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-import numpy as np 
-import datetime
-import time
-
+from math import *
 
 class dataset__:
   _fields = ['a', 'b', 'c']
-  a = None
-  b = None
-  c = None
+  a = []
+  b = []
+  c = []
 
-  def setData(self, **kwargs):
-    if (len(kwargs) == len(self._fields)):
-      self.a=kwargs['a']
-      self.b=kwargs['b']
-      self.c=kwargs['c']
-    else:
-      raise Exception("Data not properly supplied to table dataset")
+  def __init__(self):
+     (x) = range(0, 100, 6)
+     (y) = map(sin, x)
+     (z) = map(cos, x)
+     self.data(x, y, z)
+
+  def data(self, a, b, c):
+    self.a.extend(a)
+    self.b.extend(b)
+    self.c.extend(c)
+
+  def datum(self, a, b, c):
+    self.a.append(a)
+    self.b.append(b)
+    self.c.append(c)
+
+  def clear(self):
+    self.a = []
+    self.b = []
+    self.c = []
 
   def size(self):
     return len(self.a)
 
-  def data(self):
+  def dataSource(self):
     return p.make_source(idx=range(len(self.a)), a=self.a, b=self.b, c=self.c)
 
 
 class plot__:
   _fields = ['x', 'y', 'color']
+  x = []
+  y = []
+  color = []
   _dataset = None
-  x = None
-  y = None
-  color = None
 
   def set_dataset(self, table):
      self._dataset=table
-
   def update(self):
-    self.x = []
-    self.y = []
-    self.color = []
+    self.clear()
     for i in range(0, self._dataset.size()):
       a = self._dataset.a[i]
       b = self._dataset.b[i]
@@ -48,14 +55,30 @@ class plot__:
       (x) = a
       (y) = b
       (color) = "RED"
+      self.datum(x, y, color)
       self.x.append(x)
       self.y.append(y)
       self.color.append(color)
 
+  def data(self, x, y, color):
+    self.x.extend(x)
+    self.y.extend(y)
+    self.color.extend(color)
+
+  def datum(self, x, y, color):
+    self.x.append(x)
+    self.y.append(y)
+    self.color.append(color)
+
+  def clear(self):
+    self.x = []
+    self.y = []
+    self.color = []
+
   def size(self):
     return len(self.x)
 
-  def data(self):
+  def dataSource(self):
     return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, color=self.color)
 
 
@@ -71,18 +94,16 @@ class scatterplot_twoTable:
     self.plot.set_dataset(self.dataset)
 
   def set_dataset_cols(self, a, b, c):
-    self.dataset.setData(a=a, b=b, c=c)
+    self.dataset.clear()
+    self.dataset.data(a, b, c)
 
 
   def render(self):
     self.plot.update()
-    p.scatter('x', 'y', color='color', data_source=self.plot.data()) 
+    p.scatter('x', 'y', color='color', data_source=self.plot.dataSource()) 
     p.figure()
 
-x = np.arange(100) / 6.0 
-y = np.sin(x) 
-z = np.cos(x) 
-plot = scatterplot_twoTable()
-plot.set_dataset_cols(x,y,z)
-plot.render()
+if __name__ == "__main__":
+  plot = scatterplot_twoTable()
+  plot.render()
  
