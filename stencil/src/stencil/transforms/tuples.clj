@@ -23,12 +23,16 @@
      (2) and that they are in the same order."
   (letfn [(ptuple? [op] (any= op '(ptuple ptuples)))
           (fields? [e] (= 'fields (first e)))
-          (extract [context current]
+          (empty-meta [item] '($meta (type ***)))
+          (default-lookup [fields] 
+            (fn [item] (default-value item fields)))
+          (extract [target current defaultfn]
+            "target is the target order; current is the current ptuple name/values as a dictionary"
             (letfn [(get [item] (let [v (current item)]
                                   (if (nil? v)
-                                    (default-value item context)
+                                    (defaultfn item)
                                     v)))]
-              (map get (remove meta? (full-drop (remove meta? context))))))
+              (map get target)))
           (aligner [context]
             (fn matcher [program]
               (match program
@@ -39,8 +43,21 @@
                 ([(op :guard ptuple?) (m :guard meta?) (fields :guard fields?) & args] :seq)
                   (if (nil? context)
                     `(~op ~m ~fields ~@args)
-                    (let [args (extract context (zipmap (full-drop (remove meta? fields)) args))]
-                      `(~op ~m ~context ~@args)))
+                    (let [cnames (full-drop (remove meta? context))
+                          fm (second fields)
+                          fields (full-drop fields)
+                          names (remove meta? fields)
+                          values (zipmap names (remove meta? args))
+                          ametas (zipmap names (filter meta? args))
+                          pmetas (zipmap names (filter meta? fields))
+                          
+                          args (extract cnames values (default-lookup context))
+                          ametas (extract cnames ametas empty-meta)
+                          pmetas (extract cnames pmetas empty-meta)               
+                          
+                          fields `(~'fields ~fm  ~@(interleave cnames pmetas))
+                          args (interleave args ametas)]
+                      `(~op ~m ~fields ~@args)))
                 :else (map matcher program))))]
     ((aligner nil) program)))
 

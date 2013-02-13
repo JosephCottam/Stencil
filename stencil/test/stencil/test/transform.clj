@@ -207,32 +207,29 @@
 
 (deftest align-ptuple
   (is (= (t/align-ptuple '(stencil x)) '(stencil x)))
-  (is (= (t/align-ptuple '(ptuple ($meta) (fields a) x)) '(ptuple ($meta) (fields a) x)))
-  (is (= (t/align-ptuple '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3))))
-         '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3)))))
-  (is (= (t/align-ptuple '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields c b a) 3 2 1))))
-         '(table t ($meta) (fields a b c) (data (ptuple ($meta) (fields a b c) 1 2 3)))))
+  (is (= (t/align-ptuple '(ptuple ($meta) (fields ($meta) a ($meta)) x ($meta))) '(ptuple ($meta) (fields ($meta) a ($meta)) x ($meta))))
+  (is (= (t/align-ptuple '(table t ($meta) 
+                            (fields ($meta) a ($meta) b ($meta) c ($meta))
+                            (data ($meta) (ptuple ($meta) (fields ($meta) a ($meta) b ($meta) c ($meta)) 1 ($meta) 2 ($meta) 3 ($meta)))))
+         '(table t ($meta) 
+             (fields ($meta) a ($meta) b ($meta) c ($meta))
+             (data ($meta) (ptuple ($meta) (fields ($meta) a ($meta) b ($meta) c ($meta)) 1 ($meta) 2 ($meta) 3 ($meta))))))
+  (is (= (t/align-ptuple '(table t ($meta) 
+                            (fields ($meta) a ($meta) b ($meta) c ($meta))
+                            (data ($meta) (ptuple ($meta) (fields ($meta) c ($meta) b ($meta) a ($meta)) 3 ($meta) 2 ($meta) 1 ($meta)))))
+         '(table t ($meta) 
+             (fields ($meta) a ($meta) b ($meta) c ($meta))
+             (data ($meta) (ptuple ($meta) (fields ($meta) a ($meta) b ($meta) c ($meta)) 1 ($meta) 2 ($meta) 3 ($meta)))))
+      "Re-arrange tuple")
   (is (= (t/align-ptuple 
            '(table t ($meta) 
               (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-              (data (ptuple ($meta) (fields a b c) 1 2 3))))
+              (data (ptuple ($meta) (fields ($meta) a ($meta)) 1 ($meta)))))
          '(table t ($meta) 
             (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-            (data (ptuple ($meta) (fields a b c) 1 2 3)))))
-  (is (= (t/align-ptuple 
-           '(table t ($meta) 
-              (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-              (data (ptuple ($meta) (fields c b a) 3 2 1))))
-         '(table t ($meta) 
-            (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-            (data (ptuple ($meta) (fields a b c) 1 2 3)))))
-  (is (= (t/align-ptuple 
-           '(table t ($meta) 
-              (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-              (data (ptuple ($meta) (fields a) 1))))
-         '(table t ($meta) 
-            (fields ($meta) a ($meta (default 11)) b ($meta (default 22)) c ($meta (default 33)))
-            (data (ptuple ($meta) (fields a b c) 1 22 33))))))
+            (data (ptuple ($meta) (fields ($meta) a ($meta) b ($meta (type ***)) c ($meta (type ***))) 1 ($meta) 22 ($meta (type ***)) 33 ($meta (type ***))))))
+      "Supply default values"))
+  
 
 
 

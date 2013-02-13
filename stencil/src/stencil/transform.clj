@@ -32,6 +32,7 @@
     file->init pull->when init->when
     meta-pairings supply-metas meta-types
     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
+    align-ptuple
     normalize-renders gather-renders ensure-view
     split-when infer-types ensure-using-tuple))
 
