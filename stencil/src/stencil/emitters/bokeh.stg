@@ -90,22 +90,19 @@ def set_<dep.source>(self, table):
    self._<dep.source>=table
 >>
 
-data(def) ::=<<
-#TODO: Move away from KWARGS, use "vanilla" args and do a align and supply defaults pass in compiler; Combine data and datum in some way...maybe a flag?
-def data(self, multivalue, **kwargs):
-  if (len(kwargs) == len(self._fields)):
-      <def.fields:{f|self.<f>.extend(kwargs['<f>'])};separator="\n">
-  else:
-    raise Exception("Data not properly supplied to table <def.name>")
 
->>
-
-datum(def) ::=<<
-def datum(self, **kwargs):
-  if (len(kwargs) == len(self._fields)):
-    <def.fields:{f|self.<f>.append(kwargs['<f>'])};separator="\n">
+dataUpdates(def) ::=<<
+def _store(self, multivalue, <def.fields:{f|<f>};separator=", ">):
+  if (multivalue):
+      <def.fields:{f|self.<f>.extend(<f>)};separator="\n">
   else:
-    raise Exception("Datum not properly supplied to table <def.name>")
+      <def.fields:{f|self.<f>.append(<f>)};separator="\n">
+
+def data(self, <def.fields:{f|<f>};separator=", ">):
+  self._store(true, <def.fields:{f|<f>};separator=", ">)
+
+def datum(self, <def.fields:{f|<f>};separator=", ">):
+  self._store(false, <def.fields:{f|<f>};separator=", ">)
 
 >>
 
@@ -118,8 +115,7 @@ class <def.ofClass>:
   <init(def.inits)>
   <if (def.depends)><def.depends:setDependency();separator="\n"><endif>
   <if (def.depends)><dependentUpates(def)><endif>
-  <datum(def)>
-  <data(def)>
+  <dataUpdates(def)>
   <tableClear(def)>
   <tableSize(def)>
   <tableData(def)>
@@ -132,7 +128,7 @@ tableSetter(tdef) ::= <<
 <if (!tdef.depends)>
 def set_<tdef.name>_cols(self, <tdef.fields:{f|<f>};separator=", ">):
   self.<tdef.name>.clear()
-  self.<tdef.name>.data(<tdef.fields:{f|<f>=<f>};separator=", ">)
+  self.<tdef.name>.data(<tdef.fields:{f|<f>};separator=", ">)
 <endif>
 >>
 
