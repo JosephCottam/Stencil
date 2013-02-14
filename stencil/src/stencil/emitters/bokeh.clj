@@ -13,6 +13,7 @@
 (deftype View [name renders])
 (deftype Render [name source type binds fields])
 (deftype Header [name imports literal])
+(deftype Import [package as items])
 (deftype Program [header tables view])
 (deftype Init [isInit expr])
  
@@ -100,14 +101,20 @@
         render-defs (zipmap (map #(.name %) render-defs) render-defs)
         renders (map render-defs (drop-metas renders))]
   (View. (pyName name) renders)))
- 
+
+(defn import-atts [[_ package _ as items]]
+  (let [package (.substring (str package) 3)  ;;remove the 'py-'
+        as      (if (empty? (t/full-drop as)) false (t/full-drop (remove t/meta? as)))
+        items   (if (empty? (t/full-drop items)) false (t/full-drop (remove t/meta? items)))]
+    (Import. package as items)))
+  
+
 (defn as-atts [program]
   (let [name (second program)
         view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
-        imports (filter #(.startsWith (str (second %)) "py-") (t/filter-tagged 'import program))
-        imports (dmap false #(.substring (str %) 3) (map second imports))
+        imports (map import-atts (filter #(.startsWith (str (second %)) "py-") (t/filter-tagged 'import program)))
         runtime (runtime program)
         literal ((t/meta->map (nth runtime 2)) 'header)
         literal (if (nil? literal) false literal)]

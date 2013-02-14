@@ -1,7 +1,7 @@
 #Stencil->Bokeh export for multiplot
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-from math import *
+import numpy as np
 
 
 class dataset__:
@@ -11,9 +11,9 @@ class dataset__:
   c = []
 
   def __init__(self):
-     (x) = range(0, 100, 6)
-     (y) = map(sin, x)
-     (z) = map(cos, x)
+     (x) = np.arange(100) / 6.0
+     (y) = np.sin(x)
+     (z) = np.cos(x)
      self.data(x, y, z)
 
   def data(self, a, b, c):

@@ -31,6 +31,7 @@
     infix->prefix arrow->using default-let-body
     file->init pull->when init->when
     meta-pairings supply-metas meta-types
+    normalize-imports
     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
     align-ptuple
     normalize-renders gather-renders ensure-view
