@@ -9,7 +9,18 @@
     (not (seq? a)) a
     :else (map strip-gen a)))
 
-
+(deftest normalize-imports
+  (is (= (t/normalize-imports '(import a ($meta))) '(import a ($meta) (as) (items))))
+  (is (= (t/normalize-imports '(import a ($meta) (as b))) 
+         '(import a ($meta) (as b) (items))))
+  (is (= (t/normalize-imports '(import a ($meta) (items c d))) 
+         '(import a ($meta) (as) (items c d))))
+  (is (= (t/normalize-imports '(import a ($meta) (as b) (items c d))) 
+         '(import a ($meta) (as b) (items c d))))
+  (is (= (t/normalize-imports '(import a ($meta) (items c d) (as b))) 
+         '(import a ($meta) (as b) (items c d))))
+  (is (thrown? RuntimeException (t/normalize-imports '(import a ($meta) (as b) (as c)))))
+  (is (thrown? RuntimeException (t/normalize-imports '(import a ($meta) (items b) (items c))))))
 
 (deftest drop-comments
   (is (= (t/drop-comments '(comment a))) nil)

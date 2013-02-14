@@ -3,6 +3,19 @@
 
 (def ^:dynamic *default-runtime* 'BokehRuntime)
 
+(defn normalize-imports [program]
+  (match program
+    (a :guard atom?) a
+    (['import package (m :guard meta?) & rest] :seq)
+       (let [as (filter-tagged 'as rest)
+             _  (if (> (count as) 1) (throw (RuntimeException. (str "Import statement with " (count as) " 'as' clauses when only one is allowed."))))
+             as (if (empty? as) '(as) (first as))
+             items (filter-tagged 'items rest)
+             _  (if (> (count items) 1) (throw (RuntimeException. "Import statement with more than one 'items' clause.")))
+             items (if (empty? items) '(items) (first items))]
+         `(~'import ~package ~m ~as ~items))
+    :else (map normalize-imports program)))
+
 (defn runtime [program]
   "What is the runtime being imported?
   TODO: Something more elegant than look for an import with 'runtime' as a substring."

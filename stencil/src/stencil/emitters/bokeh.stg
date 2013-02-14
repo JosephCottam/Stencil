@@ -172,12 +172,25 @@ program(def) ::= <<
 <footer(def.header.name)> 
 >>
 
+imports(def) ::= <%
+<if ((def.items) && (def.as))>
+from <def.package> import <def.items,def.as:{i,a|<i> as <a>};separator=", ">
+<elseif (def.items)>
+from <def.package> import <def.items;separator=", ">
+<elseif (def.as)>
+import <def.package> as <def.as>
+<else>
+import <def.package>
+<endif>
+%>
+
+
 header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
-<if (headerDef.imports)><headerDef.imports:{e|from <e> import *};separator="\n"><endif>
-<if (headerDef.literal)><headerDef.literal:{e|<e>};separator="\n"><endif>
+<if (headerDef.imports)><headerDef.imports:imports();separator="\n"><endif>
+<if (headerDef.literal)><headerDef.literal;separator="\n"><endif>
 >>
 
 

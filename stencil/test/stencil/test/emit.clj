@@ -12,8 +12,8 @@
         path (str root (.format rep now))]
     path))
 
-(def source "../tests/")
-(def target (freshDir "../testResults/"))
+(def source "../tests")
+(def target (freshDir "../testResults"))
 
 (defn emit [emitter src rslt]
   "Run the emitter on the src program, write it to the result location and return the result."
