@@ -34,19 +34,19 @@
          ([lhs (m :guard meta?) (op :guard infix?) rhs] :seq)
             (list op (moveOps lhs) m (moveOps rhs))
          ([lhs (op :guard infix?) rhs (m :guard meta?)] :seq)
-            `(~op ~(moveOps lhs) (~'$do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
+            `(~op ~(moveOps lhs) (~'do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
          ([lhs (m :guard meta?) (op :guard infix?) rhs (m2 :guard meta?)] :seq)
-            `(~op ~(moveOps lhs) ~m (~'$do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
+            `(~op ~(moveOps lhs) ~m (~'do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
 
-         ;;Some $dos can be replaced with the infix operators.
-         (['$do lhs (op :guard infix?) rhs] :seq)
+         ;;Some dos can be replaced with the infix operators.
+         (['do lhs (op :guard infix?) rhs] :seq)
             (list op (moveOps lhs) (moveOps rhs))
-         (['$do lhs (m :guard meta?) (op :guard infix?) rhs] :seq)
+         (['do lhs (m :guard meta?) (op :guard infix?) rhs] :seq)
             (list op (moveOps lhs) m (moveOps rhs))
-         (['$do lhs (op :guard infix?) rhs (m :guard meta?)] :seq)
-            `(~op ~(moveOps lhs) (~'$do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
-         (['$do lhs (m :guard meta?) (op :guard infix?) rhs (m2 :guard meta?)] :seq)
-            `(~op ~(moveOps lhs) ~m (~'$do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
+         (['do lhs (op :guard infix?) rhs (m :guard meta?)] :seq)
+            `(~op ~(moveOps lhs) (~'do ~(moveOps rhs) ~m))    ;;Add a synthetic expression to wrap together up the ops and meta-data
+         (['do lhs (m :guard meta?) (op :guard infix?) rhs (m2 :guard meta?)] :seq)
+            `(~op ~(moveOps lhs) ~m (~'do ~(moveOps rhs) ~m2)) ;;Add a synthetic expression to wrap together up the ops and meta-data
 
 
          ;;Infix operators are variable-arity on the rhs, this allows 1+2-3  (see 2,-,3 on the rhs of +)

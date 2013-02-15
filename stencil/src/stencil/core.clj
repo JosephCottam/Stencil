@@ -1,4 +1,5 @@
 (ns stencil.core
+  (:gen-class)
   (:refer-clojure :rename {compile clj-compile read clj-read}) 
   (:require [stencil.parse :as parse])
   (:require [stencil.transform :as t])

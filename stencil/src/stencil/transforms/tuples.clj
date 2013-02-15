@@ -1,7 +1,7 @@
 (ns stencil.transform)
 
-(defn- tuple? [a] (any= a '(tuple tuples)))
-(defn- t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
+(defn tuple? [a] (any= a '(tuple tuples)))
+(defn t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
 (defn tuple->ptuple [program]
   "A prototyped tuple is a tuple with named fields. 
    This pass converts tuples into prototyped tuples when possible."
