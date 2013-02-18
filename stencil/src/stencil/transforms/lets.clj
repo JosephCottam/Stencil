@@ -41,8 +41,8 @@
        "Provide relevant do-statement so even values look like function applications in the bindings"
        (let [[vars op expr & meta] binding]
          (cond
-           (not (empty? meta)) `(~vars (~'$do ~expr ~@meta))
-           (atom? expr) `(~vars (~'$do ~expr))
+           (not (empty? meta)) `(~vars (~'do ~expr ~@meta))
+           (atom? expr) `(~vars (~'do ~expr))
            :else `(~vars ~expr))))]
     (match program
       (x :guard atom?) x
