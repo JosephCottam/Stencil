@@ -66,7 +66,7 @@ tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
 init(idefs) ::= <<
 <if (idefs)>
 def __init__(self):
-   <idefs:{def|<expr(def.expr)>};separator="\n">
+   <idefs:expr();separator="\n">
 <endif>
 >>
 

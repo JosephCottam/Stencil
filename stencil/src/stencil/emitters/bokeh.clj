@@ -13,9 +13,7 @@
 (deftype View [name renders])
 (deftype Render [name source type binds fields])
 (deftype Header [name imports literal])
-(deftype Import [package as items])
 (deftype Program [header tables view])
-(deftype Init [isInit expr])
  
 ;;I want default values...these "is<x>" fields should always be 'true'
 (deftype When [isWhen trigger action])
@@ -30,6 +28,7 @@
 (deftype RenderBinding [x y color])
 
 (declare expr-atts)
+
 
 (defn dmap [default f vals]
   (if (empty? vals)
@@ -68,7 +67,7 @@
             (if (empty? alt) false (expr-atts alt)))
     :else (throw (RuntimeException. "Unhandled expression: " expr))))
 
-(defn init-atts [init] (Init. true (expr-atts (second init))))
+(defn init-atts [init] (expr-atts (second init)))
 
 (defn depend-atts [when]
   (let [[tag trigger using] when  ;;Trigger is ignored, currenlty just happends on render
@@ -102,8 +101,9 @@
         renders (map render-defs (drop-metas renders))]
   (View. (pyName name) renders)))
 
-(defn import-atts [[_ package _ as items]] (Import. package as items))
-
+(defn import-atts [[_ package _ as items]] 
+  {"package" package, "as" as, "items" items})
+  
 (defn as-atts [program]
   (let [name    (second program)
         view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
