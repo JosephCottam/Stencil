@@ -16,8 +16,8 @@ plot = ContinuumModel('Plot')   #Take the source-table name
 glyph_renderer = ContinuumModel(
     'GlyphRenderer',                #Render type glyph
     data_source = source.ref(),     #Source table name
-    xdata_range = xdr.ref(),        #if there is an x-guide
-    ydata_range = ydr.ref(),        #if there is a y-guide
+    xdata_range = xdr.ref(),        #if there is an x-binding
+    ydata_range = ydr.ref(),        #if there is a y-binding
     x = 'x',                        #from binding
     y = 'y',                        #from binding
     color = 'blue',

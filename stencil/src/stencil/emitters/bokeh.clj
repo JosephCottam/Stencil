@@ -11,7 +11,9 @@
 (deftype Table [name ofClass fields inits depends])
 (deftype Depends [source fields expr])
 (deftype View [name renders])
-(deftype Render [name source type binds fields])
+(deftype SimpleRender [simpleRender name source type binds fields])
+(deftype GlyphRender [glphyRender name source type dataranges binds guides])
+(deftype Guide [type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
  
@@ -83,12 +85,24 @@
     (Table. name (class-name name) fields inits depends)))
 
 
-(defn render-binding [[target source]] (LetBinding. target source))
+(defn render-bind-atts [[target source]] (LetBinding. target source))
 
 (defn render-atts [[_ name _ source _ type _ & args]]
   (cond
-    (= 'table type) (Render. (pyName name) source type false (rest (first (drop-metas args))))
-    (t/any= type '(scatter plot)) (Render. (pyName name) source type (map  #(map render-binding (t/full-drop %)) (drop-metas args)) false)
+    (= type 'table) 
+       (SimpleRender. true (pyName name) source type false (rest (first (drop-metas args))))
+    (t/any= type '(scatter plot)) 
+       (SimpleRender. true (pyName name) source type (map  #(map render-bind-atts (t/full-drop %)) (drop-metas args)) false)
+    (= type 'GlyphRenderer) 
+      (let [bind (t/filter-tagged 'bind args)
+            bind (if (= (count bind) 1) 
+                   (rest (drop-metas (first bind)))
+                   (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
+            render-bidings (map first bind)
+            dataRanges (zip-map render-bindings (map #(str "_dr_" %) render-bindings))
+            guides (t/filter-tagged 'guide args)
+            guides-atts (map (fn [[_ _ target _ type meta]] (Guide. type parent target (dataRanges target) (t/meta->map meta)))]
+       (GlyphRender. (pyName name) source type dataRanges (map render-bind-atts bind) guide-atts)
     :else (throw (RuntimeException. (str "Unknown render type " type)))))
 
 (defn view-atts [render-defs [_ name _ & renders]]
