@@ -9,7 +9,7 @@
 (load "bokeh-util")
 
 (deftype Table [name ofClass fields inits depends])
-(deftype Depends [isDepend source fields expr])
+(deftype Depends [source fields expr])
 (deftype View [name renders])
 (deftype Render [name source type binds fields])
 (deftype Header [name imports literal])
@@ -73,7 +73,7 @@
   (let [[tag trigger using] when  ;;Trigger is ignored, currenlty just happends on render
         [tag fields gen trans] using
         [tag source] gen] ;;Assumes that this is an "items" expression
-    (Depends. true source (t/full-drop fields) (expr-atts trans))))
+    (Depends. source (t/full-drop fields) (expr-atts trans))))
 
 (defn table-atts[table]
   (let [name (pyName (second table))

@@ -73,16 +73,15 @@ def __init__(self):
 dependentUpates(def) ::= <<
 def update(self):
   self.clear()
-  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
+  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n">
+
 >>
 
 dependUpdate(tableFields, ddef) ::= <<
-<if (ddef.isDepend)>
 for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
   <tableFields:{f|self.<f>.append(<f>)};separator="\n">
-<endif>
 >>
 
 setDependency(dep) ::= <<
