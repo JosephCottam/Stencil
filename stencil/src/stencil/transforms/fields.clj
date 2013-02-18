@@ -2,6 +2,7 @@
   "Work with the 'fields' statements found throught the program.")
 
 (defn stream-or-table? [v] (or (= 'stream v) (= 'table v)))
+(defn- ptuple? [a] (any= a '(ptuple ptuples)))
 
 (defn expr->fields
   "Convert an expression to a list of fields.
@@ -10,16 +11,14 @@
   ([saved expr]
    (cond 
      (or (atom? expr) (empty? expr))  
-       (throw (RuntimeException. (str "Could not find prototyped tuple in " (apply list saved))))
-     (or (= 'ptuple (first expr))
-         (= 'ptuples (first expr)))
+       (throw (RuntimeException. (str "Could not find prototyped tuple in '" (apply list saved) "'")))
+     (ptuple? (first expr))
         (second-expr expr)    ;;acquire the fields statement
      :else (expr->fields saved (last expr)))))
 
 (defn ensure-fields [program]
   "Ensure there is a 'fields' policy in each table and stream.
-   If there is not currently a 'fields' policy, generates on based on the first 'data' policy found.
-   After execution, fields policy will include type and default value in its metadata."
+   If there is not currently a 'fields' policy, generates on based on the first 'data' policy found."
   (match program
     (a :guard atom?) a
     ([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)

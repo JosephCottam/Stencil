@@ -1,15 +1,14 @@
 (import BokehRuntime)
 
-(table source
-
 (table plot
-  (fields x y z radius ^{default: 1} color ^{default: "blue"})
-  (data (init (tlist #(x:1, y:5, z:3, radius:10)
-                     #(x:2, y:4, z:3)
-                     #(x:3, y:3, z:3, color:"red")
-                     #(x:4, y:4, z:3)
-                     #(x:5, y:5, z:3)))))
+  (fields x y z radius color)
+  (data (init 
+    ##(x:(1,2,3,4,5), 
+       y:(5,4,3,4,5), 
+       z:(3,3,3,3,3), 
+       radius:(10,1,1,1,1), 
+       color:("blue","blue","red","blue","blue"))))
   (render GlyphRenderer
-    (bind auto (type: circle))
-    (guide x LinearAxis ^{orientation:'bottom'})
-    (guide y LinearAxis ^{orienatation:'left'})))
+    (bind auto (type: "circle"))
+    (guide x LinearAxis {orientation:'bottom'})
+    (guide y LinearAxis {orienatation:'left'})))

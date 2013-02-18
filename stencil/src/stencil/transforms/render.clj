@@ -1,31 +1,41 @@
 (ns stencil.transform)
 
-(defn gen-binds [bind-meta render-type fields]
+(defn gen-binds [bind-meta render-type source-fields existing]
   "Generate a binding statement given a render type and a list of fields.
-   TODO: Care about the render type...right now it is just ignored."
-  (if (empty? fields)
+   TODO: Care about the render type...right now it is just ignored and x/y/z/color are generated for"
+;  (println "Existing: " existing) )
+
+  (if (empty? source-fields)
     (throw (RuntimeException. "Cannot generate binds statement, no fields supplied for context."))
-    (let [render-fields (set '(x y z color))
-          fields (set (remove meta? (rest fields)))
-          bind-fields (sort (clojure.set/intersection fields render-fields))
-          bindings (map #(list % '($meta (type fn)) % '($meta (type ***))) bind-fields)]
+    (let [render-fields (set '(x y z color))  ;;Lookup bind field based on render-type
+          source-fields (set (remove meta? (rest source-fields)))
+          existing-fields (set (map first existing))
+          bind-fields (clojure.set/intersection source-fields render-fields)
+          bind-fields (sort (clojure.set/difference bind-fields existing-fields))
+          bindings (map #(list % '($meta (type fn)) % '($meta (type ***))) bind-fields) ;;TODO: the 'fn' type here is wrong...just saying it needs to be fixed 
+          bindings (concat existing bindings)]
       (cons 'bind (cons bind-meta bindings)))))
 
 (defn normalize-renders [program]
   "Ensure that every render statement has a name, source data and auto-binds are filled in."
   (letfn 
     [(gen-name [] (gensym 'rend))
-     (auto-bind? [policy] (= (remove meta? policy) '(bind auto)))
+     (auto-bind? [policy] (any= 'auto policy)) 
      (drop-bind-op [entry]
-       (if (= '$$ (first entry))
+       (if (and (seq? entry) (= '$$ (first entry)))
          (full-drop entry)
          entry))
      (maybe-clean [policy]
-            (let [[tag meta & bindings] policy]
-              (if (= tag 'bind)
-                `(~tag ~meta ~@(map drop-bind-op bindings))
-                policy)))
-     (prep-bind [fields bind] (maybe-clean (if (auto-bind? bind) (gen-binds (second bind) type fields) bind)))
+       "Remove bind ops, if there is a 'bind' statement in this render statement."
+       (let [[tag meta & bindings] policy]
+         (if(= tag 'bind)
+           `(~tag ~meta ~@(map drop-bind-op bindings))
+           policy)))
+     (prep-bind [fields bind] 
+       (let [bind (maybe-clean bind)]
+         (if (auto-bind? bind) 
+           (gen-binds (second bind) type fields (rest (remove #(or (meta? %) (= % 'auto)) bind)))
+           bind)))
 
      (helper [table fields program]
        (match program
@@ -38,12 +48,12 @@
                  id (if (= '_ id) (gen-name) id)]
              `(~'render ~id ~m1 ~source ~m2 ~type ~m3 ~@binds))
          (['render id (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
-           (let [binds (map (partial prep-bind fields)binds)
+           (let [binds (map (partial prep-bind fields) binds)
                  id (if (= '_ id) (gen-name) id)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
              `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
          (['render (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
-           (let [binds (map (partial prep-bind fields)binds)
+           (let [binds (map (partial prep-bind fields) binds)
                  id (gen-name)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
              `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))

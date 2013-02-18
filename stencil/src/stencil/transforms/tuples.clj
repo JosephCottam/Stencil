@@ -1,7 +1,8 @@
 (ns stencil.transform)
 
-(defn- tuple? [a] (any= a '(tuple tuples)))
 (defn- t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
+(defn- tuple? [a] (any= a '(tuple tuples)))
+
 (defn tuple->ptuple [program]
   "A prototyped tuple is a tuple with named fields. 
    This pass converts tuples into prototyped tuples when possible."
@@ -16,7 +17,7 @@
         `(~(t->p tag) (~'fields ~@vars) ~@vals))
     :else (map tuple->ptuple program)))
 
-  
+
 (defn align-ptuple [program]
   "When ptuple(s) produces the return value of a policy, 
      (1) checks that the ptuple has all the fields of the context

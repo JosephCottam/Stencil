@@ -391,6 +391,19 @@
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
                                       (render rn ($meta) tn ($meta) type ($meta) 
+                                              (bind ($meta) auto ($meta) 
+                                                    ($$ ($meta) shape ($meta (type fn)) "circle" ($meta (type ***)))))))
+         '(table tn 
+                 (fields a x b y)
+                 (render rn ($meta) tn ($meta) type ($meta) 
+                         (bind ($meta) 
+                               (shape ($meta (type fn)) "circle" ($meta (type ***)))
+                               (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
+                               (y ($meta (type fn)) y ($meta (type ***)))))))
+      "Auto binding w/explicit binding")
+  (is (= (t/normalize-renders '(table tn 
+                                      (fields a x b y) 
+                                      (render rn ($meta) tn ($meta) type ($meta) 
                                               (bind ($meta) 
                                                     ($$ ($meta) x ($meta (type ***)) x ($meta (type ***)))
                                                     ($$ ($meta) y ($meta (type ***)) y ($meta (type ***)))))))
