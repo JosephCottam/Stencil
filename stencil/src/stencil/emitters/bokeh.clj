@@ -102,23 +102,18 @@
         renders (map render-defs (drop-metas renders))]
   (View. (pyName name) renders)))
 
-(defn import-atts [[_ package _ as items]]
-  (let [package (.substring (str package) 3)  ;;remove the 'py-'
-        as      (if (empty? (t/full-drop as)) false (t/full-drop (remove t/meta? as)))
-        items   (if (empty? (t/full-drop items)) false (t/full-drop (remove t/meta? items)))]
-    (Import. package as items)))
-  
+(defn import-atts [[_ package _ as items]] (Import. package as items))
 
 (defn as-atts [program]
-  (let [name (second program)
+  (let [name    (second program)
         view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
-        imports (map import-atts (filter #(.startsWith (str (second %)) "py-") (t/filter-tagged 'import program)))
-        runtime (runtime program)
+        imports (t/filter-tagged 'import program)
+        runtime (first (t/filter-tagged 'runtime program))
         literal ((t/meta->map (nth runtime 2)) 'header)
         literal (if (nil? literal) false literal)]
-    (Program. (Header. (pyName name) imports literal) 
+    (Program. (Header. (pyName name) (map import-atts imports) literal) 
               (map table-atts tables)
               (view-atts renders view))))
 
@@ -130,7 +125,7 @@
 
 (defn emit [program]
   (emit-bokeh "program" "def" 
-    (-> program  dataTuple->store when->init remove-empty-using as-atts)))
+    (-> program runtime py-imports dataTuple->store when->init remove-empty-using as-atts)))
 
 
 

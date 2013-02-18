@@ -3,11 +3,6 @@
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t]))
 
-(defn runtime [program]
-  (let [imports (t/filter-tagged 'import program)
-        runtime (first (filter #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1) imports))]
-    runtime))
-
 (defn when->init [program]
   "Takes when clauses predicated on init and covnerts them to init clauses.
    This largely undoes an earlier transformation, but removes many special cases in-between."
@@ -41,8 +36,40 @@
     :else (map dataTuple->store program)))
 
 
+(defn runtime? [item] 
+  "Is the item a runtime import?"
+  (and (seq? item) 
+       (= 'import (first item))
+       (> (.indexOf (.toUpperCase (str (second item))) "RUNTIME") -1)))
+
+(defn runtime [program]
+  (map #(if (runtime? %)
+          (let [[_ package & rest] %]
+            `(~'runtime ~package ~@rest))
+          %)
+       program))
+
+(defn clean-to-false [item]
+  (let [item (rest (remove t/meta? item))
+        item (if (empty? item) false item)]
+    item))
+
+(defn py-imports [program]
+  (let [imports (->> program 
+                  (t/filter-tagged 'import)
+                  (filter #(.startsWith (str (second %)) "py-"))
+                  (map (fn [[i package m as items]] 
+                         (let [package (.substring (str package) 3)
+                               as (clean-to-false as) 
+                               items (clean-to-false items)] 
+                         (list 'import  package m as items)))))
+        rest (t/filter-tagged #(not (= %1 %2)) 'import program)]
+    `(~@(take 2 program) ~@imports ~@rest)))
 
 
+                  
+
+         
 
 
 
