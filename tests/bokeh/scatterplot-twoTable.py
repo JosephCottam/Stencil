@@ -100,7 +100,7 @@ class scatterplot_twoTable:
 
   def render(self):
     self.plot.update()
-    p.scatter('x', 'y', color='color', data_source=self.plot.dataSource()) 
+    p.scatter(data_source=self.plot.dataSource(), color='color', x='x', y='y')
     p.figure()
 
 if __name__ == "__main__":

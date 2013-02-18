@@ -51,7 +51,7 @@ class scatterplot_inline:
 
 
   def render(self):
-    p.scatter('a', 'b', color='RED', data_source=self.dataset.dataSource()) 
+    p.scatter(data_source=self.dataset.dataSource(), x='a', y='b', color='RED')
     p.figure()
 
 if __name__ == "__main__":

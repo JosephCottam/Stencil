@@ -132,8 +132,9 @@ linkTables(table) ::= <%
 <endif>
 %>
 
-bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.dataSource()) %>
-renderSet(def) ::= <% 
+
+bindset(type, source, binds) ::= <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>='<f.expr>'};separator=", ">)%>
+renderSet(def) ::= <%
 <if (def.fields)>
   p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <else>

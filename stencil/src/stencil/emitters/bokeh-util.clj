@@ -68,18 +68,9 @@
 
 
 (defn tagged-dictionary [item]
-  "Converts nested lists of tag/item sets into nested dictionaries:
-    '(tag x) --> {tag : x} 
+  "Converts nested lists of tag/item sets into nested dictionaries
+    '(type tag value) --> {is<type>: true, tag : value}
     '(tag x y) --> {tag : (x y)}
     '(tag1 x (tag2 y)) --> {tag :x, tag2: y}"
 item)   
-
-
-
-                  
-
-         
-
-
-
 

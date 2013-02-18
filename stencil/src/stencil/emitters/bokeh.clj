@@ -25,7 +25,6 @@
 (deftype If [isIf test conseq alt])
 
 (deftype LetBinding [vars expr])
-(deftype RenderBinding [x y color])
 
 (declare expr-atts)
 
@@ -79,21 +78,18 @@
   (let [name (pyName (second table))
         fields (rest (drop-metas (first (t/filter-tagged 'fields table))))
         datas (t/filter-tagged 'data table)
-        inits (dmap false init-atts (drop-metas (reduce cons (map (partial t/filter-tagged 'init) datas))))
-        depends (dmap false depend-atts (drop-metas (reduce cons (map (partial t/filter-tagged 'when-) datas))))]
+        inits (dmap false init-atts (drop-metas (apply concat (map (partial t/filter-tagged 'init) datas))))
+        depends (dmap false depend-atts (drop-metas (apply concat (map (partial t/filter-tagged 'when-) datas))))]
     (Table. name (class-name name) fields inits depends)))
 
-(defn render-bind-atts [bind]
-  (let [pairs (t/lop->map (rest (drop-metas bind)))
-        x (pairs 'x)
-        y (pairs 'y)
-        color (pairs 'color)]
-    (RenderBinding. x y color)))
+
+(defn render-binding [[target source]] (LetBinding. target source))
 
 (defn render-atts [[_ name _ source _ type _ & args]]
-  (if (= 'table type)
-    (Render. (pyName name) source type false (rest (first (drop-metas args))))
-    (Render. (pyName name) source type (map render-bind-atts args) false)))
+  (cond
+    (= 'table type) (Render. (pyName name) source type false (rest (first (drop-metas args))))
+    (t/any= type '(scatter plot)) (Render. (pyName name) source type (map  #(map render-binding (t/full-drop %)) (drop-metas args)) false)
+    :else (throw (RuntimeException. (str "Unknown render type " type)))))
 
 (defn view-atts [render-defs [_ name _ & renders]]
   (let [render-defs (map render-atts render-defs)
