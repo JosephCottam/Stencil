@@ -30,7 +30,6 @@
 
 (declare expr-atts)
 
-
 (defn dmap [default f vals]
   (if (empty? vals)
     default
@@ -86,6 +85,8 @@
 
 
 (defn render-bind-atts [[target source]] (LetBinding. target source))
+(defn guide-att [parent dataRanges [_ _ target _ type meta]] 
+  (Guide. type parent target (dataRanges target) (t/meta->map meta)))
 
 (defn render-atts [[_ name _ source _ type _ & args]]
   (cond
@@ -98,11 +99,11 @@
             bind (if (= (count bind) 1) 
                    (rest (drop-metas (first bind)))
                    (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
-            render-bidings (map first bind)
-            dataRanges (zip-map render-bindings (map #(str "_dr_" %) render-bindings))
+            render-bindings (map first bind)
+            dataRanges (zipmap render-bindings (map #(str "_dr_" %) render-bindings))
             guides (t/filter-tagged 'guide args)
-            guides-atts (map (fn [[_ _ target _ type meta]] (Guide. type parent target (dataRanges target) (t/meta->map meta)))]
-       (GlyphRender. (pyName name) source type dataRanges (map render-bind-atts bind) guide-atts)
+            guide-atts (map (partial guide-att source dataRanges) guides)]
+       (GlyphRender. true (pyName name) source type dataRanges (map render-bind-atts bind) guide-atts))
     :else (throw (RuntimeException. (str "Unknown render type " type)))))
 
 (defn view-atts [render-defs [_ name _ & renders]]

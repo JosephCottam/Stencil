@@ -53,5 +53,7 @@
     (is (emit-eq? bokeh/emit "bokeh/scatterplot-twoTable")
         "Scatterplot: Two tables, inline render")
     (is (emit-eq? bokeh/emit "bokeh/multiplot")
-        "Scatterplot: Multiplot"))
+        "Scatterplot: Multiplot")
+  (is (emit-eq? bokeh/emit "bokeh/glyphRender")
+        "Glyph Renderer"))
 
