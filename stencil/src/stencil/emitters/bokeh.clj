@@ -12,7 +12,7 @@
 (deftype Depends [source fields expr])
 (deftype View [name renders])
 (deftype SimpleRender [simpleRender name source type binds fields])
-(deftype GlyphRender [glyphRender name source type dataranges binds guides])
+(deftype GlyphRender [glyphRender name source type binds guides])
 (deftype Guide [name type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
@@ -97,10 +97,9 @@
                    (rest (drop-metas (first bind)))
                    (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
             render-bindings (map first bind)
-            dataRanges (zipmap render-bindings (map #(str "_dr_" %) render-bindings))
             guides (t/filter-tagged 'guide args)
             guide-atts (map (partial guide-att source) guides)]
-       (GlyphRender. true (pyName name) source type dataRanges (map render-bind-atts bind) guide-atts))
+       (GlyphRender. true (pyName name) source type (map render-bind-atts bind) guide-atts))
     :else (throw (RuntimeException. (str "Unknown render type " type)))))
 
 (defn view-atts [render-defs [_ name _ & renders]]
