@@ -59,7 +59,7 @@
                   (t/filter-tagged 'import)
                   (filter #(.startsWith (str (second %)) "py-"))
                   (map (fn [[i package m as items]] 
-                         (let [package (.substring (str package) 3)
+                         (let [package (symbol (.substring (str package) 3))
                                as (clean-to-false as) 
                                items (clean-to-false items)] 
                          (list 'import  package m as items)))))
@@ -73,4 +73,12 @@
     '(tag x y) --> {tag : (x y)}
     '(tag1 x (tag2 y)) --> {tag :x, tag2: y}"
 item)   
+
+
+(defn quote-strings [program]
+  "Places quotation marks around strings."
+  (match program
+    (s :guard string?) (str "\"" s "\"")
+    (a :guard t/atom?) a
+    :else (map quote-strings program)))
 

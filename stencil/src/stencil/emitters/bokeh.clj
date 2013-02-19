@@ -45,18 +45,13 @@
 (defn pyName [name]
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
 
-(defn pyVal [val]
-  (cond
-    (string? val) (str "\"" val "\"")
-    :else val))
-
 (defn class-name [name] (str name "__"))
 (defn bind-atts [[varset expr]] 
   (LetBinding. (map expr-atts varset) (expr-atts expr)))
 
 (defn expr-atts [expr]
   (match expr
-    (a :guard t/atom?) (Prim. true (pyVal a))
+    (a :guard t/atom?) (Prim. true a)
     (['let bindings body] :seq) 
       (Let. true (map bind-atts bindings) (expr-atts body))
     (['do & exprs] :seq) (Do. true (map expr-atts exprs))
@@ -86,9 +81,9 @@
     (Table. name (class-name name) fields inits depends)))
 
 
-(defn render-bind-atts [[target source]] (LetBinding. target source))
+(defn render-bind-atts [[target source]] (LetBinding. target (if (string? source) source (str "\"" source "\""))))
 (defn guide-att [parent dataRanges [_ _ target _ type meta]] 
-  (Guide. type parent target (dataRanges target) (t/meta->map meta)))
+  (Guide. type parent target (dataRanges target) (dissoc (t/meta->map meta) 'type)))
 
 (defn render-atts [[_ name _ source _ type _ & args]]
   (cond
@@ -125,7 +120,7 @@
         imports (t/filter-tagged 'import program)
         runtime (first (t/filter-tagged 'runtime program))
         literal ((t/meta->map (nth runtime 2)) 'header)
-        literal (if (nil? literal) false literal)]
+        literal (if (nil? literal) false (map #(subs % 1 (- (.length %) 1)) literal))]
     (Program. (Header. (pyName name) (map import-atts imports) literal) 
               (map table-atts tables)
               (view-atts renders view))))
@@ -138,7 +133,7 @@
 
 (defn emit [program]
   (emit-bokeh "program" "def" 
-    (-> program runtime py-imports dataTuple->store when->init remove-empty-using as-atts)))
+    (-> program runtime py-imports dataTuple->store quote-strings when->init remove-empty-using as-atts)))
 
 
 

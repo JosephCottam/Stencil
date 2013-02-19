@@ -136,16 +136,19 @@ linkTables(table) ::= <%
 %>
 
 
-bindset(type, source, binds) ::= <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>='<f.expr>'};separator=", ">)%>
+bindset(type, source, binds) ::= 
+  <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>=<f.expr>};separator=", ">)%>
 renderSet(def) ::= <<
 <if (def.simpleRender && def.fields)>
 p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <elseif (def.simpleRender && def.binds)>
-<def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+<def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n">
+p.figure()
 <elseif (def.glyphRender)>
-plot = ContinuumModel('source')
+<def.source> = self.<def.source>.dataSource()
+<def.name> = ContinuumModel('<def.source>')
 <def.dataranges:
-    {dr|<def.dataranges.dr> = ContinuumModel(
+    {dr|<def.dataranges.(dr)> = ContinuumModel(
        'DataRange1d', 
        sources=[{'ref' : <def.source>.ref(), 'columns' : ['<dr>']\}])};
        separator="\n">
@@ -153,10 +156,24 @@ plot = ContinuumModel('source')
 glyph_renderer = ContinuumModel(
    'GlyphRenderer',
    data_source = <def.source>.ref(),
-   <def.dataranges:{dr|<dr>data_range = <def.dataranges.dr>.ref()};separator=",\n">
+   <def.dataranges:{dr|<dr>data_range = <def.dataranges.(dr)>.ref()};separator=",\n"><if (def.dataranges)>,<endif>
    <def.binds:{b|<b.vars>='<b.expr>'};separator=",\n">)
+
+<def.guides:
+   {g|<g.target>axis = ContinuumModel(
+       'LinearAxis',
+       parent=<g.parent>,
+       data_range=<g.datarange>.ref(),
+       <g.args:{a|<a>=<g.args.(a)>};separator=",\n">)}
+   ;separator="\n">
    
-plot.set('renders', [glyph_render.ref()])
+<def.name>.set('renderers', [glyph_renderer.ref()])
+<def.name>.set('axes', [<def.guides:{g|<g.target>axis.ref()};separator=", ">])
+p.bbclient.upsert_all(
+  [plot, glyph_renderer, 
+   <def.dataranges:{dr|<def.dataranges.(dr)>};separator=", "><if (def.dataranges)>,<endif>
+   <def.guides:{g|<g.target>axis};separator=", ">])
+p.show(plot)
 <else>
 ***** UNKNOWN RENDERING TYPE!! ******
 <endif>
@@ -188,7 +205,6 @@ program(def) ::= <<
 <header(def.header)>
 
 <classDef(def.header.name, def.tables, def.view)>
-
 <footer(def.header.name)> 
 >>
 
@@ -208,6 +224,7 @@ import <def.package>
 header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
+from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 <if (headerDef.imports)><headerDef.imports:imports();separator="\n"><endif>
 <if (headerDef.literal)><headerDef.literal;separator="\n"><endif>

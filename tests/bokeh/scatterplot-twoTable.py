@@ -1,5 +1,6 @@
 #Stencil->Bokeh export for scatterplot_twoTable
 from bokeh import mpl 
+from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 from math import *
 
@@ -100,7 +101,7 @@ class scatterplot_twoTable:
 
   def render(self):
     self.plot.update()
-    p.scatter(data_source=self.plot.dataSource(), color='color', x='x', y='y')
+    p.scatter(data_source=self.plot.dataSource(), color="color", x="x", y="y")
     p.figure()
 
 if __name__ == "__main__":
