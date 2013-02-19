@@ -13,6 +13,7 @@ expr(ex) ::= <%
 <elseif (ex.isDo)><ex:do()>
 <elseif (ex.isOp)><ex:op()>
 <elseif (ex.isIf)><ex:ifex()>
+<elseif (ex.isList)><ex:listex()>
 <else><ex:unsupported()>
 <endif>
 %>
@@ -38,6 +39,8 @@ op(ex) ::= <%
   <ex.op>(<ex.rands:expr();separator=", ">)
 <endif>
 %>
+
+listex(ex) ::= <%[<ex.items:expr();separator=", ">]%>
 
 binding(binding) ::= <%(<binding.vars:expr();separator=", ">) = <binding.expr:expr()>%>
 
@@ -135,10 +138,14 @@ linkTables(table) ::= <%
 
 bindset(type, source, binds) ::= <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>='<f.expr>'};separator=", ">)%>
 renderSet(def) ::= <%
-<if (def.fields)>
+<if (def.simpleRender && def.fields)>
   p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
+<elseif (def.simpleRender && def.binds)>
+    <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+<elseif (def.glyphRender)>
+   GLYPH RENDERING HERE!
 <else>
-  <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+  UNKNOWN RENDERING TYPE!!
 <endif>
 %>
 

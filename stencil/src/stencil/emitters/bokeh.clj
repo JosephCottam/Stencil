@@ -12,7 +12,7 @@
 (deftype Depends [source fields expr])
 (deftype View [name renders])
 (deftype SimpleRender [simpleRender name source type binds fields])
-(deftype GlyphRender [glphyRender name source type dataranges binds guides])
+(deftype GlyphRender [glyphRender name source type dataranges binds guides])
 (deftype Guide [type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
@@ -25,6 +25,7 @@
 (deftype Do [isDo exprs])
 (deftype Op [isOp op rands])
 (deftype If [isIf test conseq alt])
+(deftype List [isList items])
 
 (deftype LetBinding [vars expr])
 
@@ -59,6 +60,7 @@
     (['let bindings body] :seq) 
       (Let. true (map bind-atts bindings) (expr-atts body))
     (['do & exprs] :seq) (Do. true (map expr-atts exprs))
+    (['list & exprs] :seq) (List. true (map expr-atts exprs))
     ([op & rands] :seq) (Op. true op (map expr-atts rands))
     ([if test conseq alt] :seq)
        (If. true 

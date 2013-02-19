@@ -3,11 +3,11 @@
 (table plot
   (fields x y z radius color)
   (data (init 
-    ##(x:(1,2,3,4,5), 
-       y:(5,4,3,4,5), 
-       z:(3,3,3,3,3), 
-       radius:(10,1,1,1,1), 
-       color:("blue","blue","red","blue","blue"))))
+    ##(x:(list 1,2,3,4,5), 
+       y:(list 5,4,3,4,5), 
+       z:(list 3,3,3,3,3), 
+       radius:(list 10,1,1,1,1), 
+       color:(list "blue","blue","red","blue","blue"))))
   (render GlyphRenderer
     (bind auto (type: "circle"))
     (guide x LinearAxis {orientation:'bottom'})
