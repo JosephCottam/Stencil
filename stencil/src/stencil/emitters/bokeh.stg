@@ -137,17 +137,30 @@ linkTables(table) ::= <%
 
 
 bindset(type, source, binds) ::= <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>='<f.expr>'};separator=", ">)%>
-renderSet(def) ::= <%
+renderSet(def) ::= <<
 <if (def.simpleRender && def.fields)>
-  p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
+p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <elseif (def.simpleRender && def.binds)>
-    <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+<def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
 <elseif (def.glyphRender)>
-   GLYPH RENDERING HERE!
+plot = ContinuumModel('source')
+<def.dataranges:
+    {dr|<def.dataranges.dr> = ContinuumModel(
+       'DataRange1d', 
+       sources=[{'ref' : <def.source>.ref(), 'columns' : ['<dr>']\}])};
+       separator="\n">
+   
+glyph_renderer = ContinuumModel(
+   'GlyphRenderer',
+   data_source = <def.source>.ref(),
+   <def.dataranges:{dr|<dr>data_range = <def.dataranges.dr>.ref()};separator=",\n">
+   <def.binds:{b|<b.vars>='<b.expr>'};separator=",\n">)
+   
+plot.set('renders', [glyph_render.ref()])
 <else>
-  UNKNOWN RENDERING TYPE!!
+***** UNKNOWN RENDERING TYPE!! ******
 <endif>
-%>
+>>
 
 classDef(className,tables,view) ::= <<
 
