@@ -13,7 +13,7 @@
 (deftype View [name renders])
 (deftype SimpleRender [simpleRender name source type binds fields])
 (deftype GlyphRender [glyphRender name source type dataranges binds guides])
-(deftype Guide [type parent target datarange args])
+(deftype Guide [name type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
  
@@ -82,8 +82,8 @@
 
 
 (defn render-bind-atts [[target source]] (LetBinding. target (if (string? source) source (str "\"" source "\""))))
-(defn guide-att [parent dataRanges [_ _ target _ type meta]] 
-  (Guide. type parent target (dataRanges target) (dissoc (t/meta->map meta) 'type)))
+(defn guide-att [parent [_ _ target _ type meta]] 
+  (Guide. (str target type) type parent target (str "_" target "_dr_") (dissoc (t/meta->map meta) 'type)))
 
 (defn render-atts [[_ name _ source _ type _ & args]]
   (cond
@@ -99,7 +99,7 @@
             render-bindings (map first bind)
             dataRanges (zipmap render-bindings (map #(str "_dr_" %) render-bindings))
             guides (t/filter-tagged 'guide args)
-            guide-atts (map (partial guide-att source dataRanges) guides)]
+            guide-atts (map (partial guide-att source) guides)]
        (GlyphRender. true (pyName name) source type dataRanges (map render-bind-atts bind) guide-atts))
     :else (throw (RuntimeException. (str "Unknown render type " type)))))
 

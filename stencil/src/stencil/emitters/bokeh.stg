@@ -147,20 +147,20 @@ p.figure()
 <elseif (def.glyphRender)>
 <def.source> = self.<def.source>.dataSource()
 <def.name> = ContinuumModel('<def.source>')
-<def.dataranges:
-    {dr|<def.dataranges.(dr)> = ContinuumModel(
+<def.guides:
+    {g|<g.datarange> = ContinuumModel(
        'DataRange1d', 
-       sources=[{'ref' : <def.source>.ref(), 'columns' : ['<dr>']\}])};
+       sources=[{'ref' : <def.source>.ref(), 'columns' : ['<g.target>']\}])};
        separator="\n">
    
 glyph_renderer = ContinuumModel(
    'GlyphRenderer',
    data_source = <def.source>.ref(),
-   <def.dataranges:{dr|<dr>data_range = <def.dataranges.(dr)>.ref()};separator=",\n"><if (def.dataranges)>,<endif>
+   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.guides)>,<endif>
    <def.binds:{b|<b.vars>='<b.expr>'};separator=",\n">)
 
 <def.guides:
-   {g|<g.target>axis = ContinuumModel(
+   {g|<g.name> = ContinuumModel(
        'LinearAxis',
        parent=<g.parent>,
        data_range=<g.datarange>.ref(),
@@ -168,11 +168,11 @@ glyph_renderer = ContinuumModel(
    ;separator="\n">
    
 <def.name>.set('renderers', [glyph_renderer.ref()])
-<def.name>.set('axes', [<def.guides:{g|<g.target>axis.ref()};separator=", ">])
+<def.name>.set('axes', [<def.guides:{g|<g.name>.ref()};separator=", ">])
 p.bbclient.upsert_all(
   [plot, glyph_renderer, 
-   <def.dataranges:{dr|<def.dataranges.(dr)>};separator=", "><if (def.dataranges)>,<endif>
-   <def.guides:{g|<g.target>axis};separator=", ">])
+   <def.guides:{g|<g.datarange>};separator=", "><if (def.guides)>,<endif>
+   <def.guides:{g|<g.name>};separator=", ">])
 p.show(plot)
 <else>
 ***** UNKNOWN RENDERING TYPE!! ******
