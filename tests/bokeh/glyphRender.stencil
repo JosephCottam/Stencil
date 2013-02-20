@@ -1,6 +1,6 @@
 (import BokehRuntime)
 
-(table plot
+(table source
   (fields x y z radius color)
   (data (init 
     ##(x:(list 1,2,3,4,5), 

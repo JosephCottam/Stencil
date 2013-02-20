@@ -52,12 +52,15 @@
     program))
 
 
-(defn -main [from & to]
-  (println "Compling from" from)
-  (let [p (emit (compile from :file))]
-    (if (empty? to)
-      (println p)
-      (spit (first to) p)))
-  (println "\ndone!"))
+(defn -main [& args]
+  (let [dict (zipmap (take-nth 2 args) (take-nth 2 (rest args)))
+        in (if (nil? (dict "-in")) *in* (dict "-in"))
+        out (if (nil? (dict "-out")) *out* (dict "-out"))]
+    (println "Compling from" from)
+    (let [p (emit (compile from :file))]
+      (if (empty? to)
+        (println p)
+        (spit (first to) p)))
+    (println "\ndone!")))
 
 
