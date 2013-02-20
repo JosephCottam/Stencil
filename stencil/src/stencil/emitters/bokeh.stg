@@ -157,12 +157,12 @@ glyph_renderer = ContinuumModel(
    'GlyphRenderer',
    data_source = <def.source>.ref(),
    <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.guides)>,<endif>
-   <def.binds:{b|<b.vars>='<b.expr>'};separator=",\n">)
+   <def.binds:{b|<b.vars>=<b.expr>};separator=",\n">)
 
 <def.guides:
    {g|<g.name> = ContinuumModel(
        'LinearAxis',
-       parent=<g.parent>,
+       parent=<def.name>.ref(),
        data_range=<g.datarange>.ref(),
        <g.args:{a|<a>=<g.args.(a)>};separator=",\n">)}
    ;separator="\n">
@@ -170,10 +170,11 @@ glyph_renderer = ContinuumModel(
 <def.name>.set('renderers', [glyph_renderer.ref()])
 <def.name>.set('axes', [<def.guides:{g|<g.name>.ref()};separator=", ">])
 p.bbclient.upsert_all(
-  [plot, glyph_renderer, 
+  [glyph_renderer,
+   <def.source>,  <def.name>
    <def.guides:{g|<g.datarange>};separator=", "><if (def.guides)>,<endif>
    <def.guides:{g|<g.name>};separator=", ">])
-p.show(plot)
+p.show(<def.name>)
 <else>
 ***** UNKNOWN RENDERING TYPE!! ******
 <endif>
