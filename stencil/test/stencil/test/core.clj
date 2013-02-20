@@ -4,7 +4,7 @@
   (:require [clojure.walk])
   (:use [clojure.test]))
 
-(deftest stencil-parse
+(deftest parse-atoms
   (is (= (c/parse "(a)") '(a)))
   (is (= (c/parse "(stencil Test)") '(stencil Test)))
   (is (= (c/parse "(a : b)") '(a $$ b)))
@@ -22,11 +22,24 @@
   (is (= (c/parse "(;* some*; then more)")) '((comment " some") then more)
   ))
 
-(def root "../tests/data/")
-(deftest stencil-read
-  (is (list? (c/read (str root "geometry/simpleLines.stencil"))))
-  (is (list? (c/read (str root "geometry/simpleLines.tstencil")))))
+(deftest maybe-wrap
+  (is (= (c/maybe-wrap "NAME" "(stencil stuff)") "(stencil stuff)"))
+  (is (= (c/maybe-wrap "NAME" "(stencil stuff (table more-stuff))")
+         "(stencil stuff (table more-stuff))"))
+  (is (= (c/maybe-wrap "NAME" "(import stuff)")
+         "(stencil NAME\n(import stuff)\n)"))
+  (is (= (c/maybe-wrap "NAME" "(table stuff (stencil stuff))")
+         "(stencil NAME\n(table stuff (stencil stuff))\n)")))
 
+
+(def root "../tests/data/")
+(deftest read
+  (is (string? (c/read (str root "geometry/simplelines.stencil"))))
+  (is (string? (c/read (str root "geometry/simplelines.tstencil")))))
+
+(deftest parse
+  (is (list? (c/parse (c/read (str root "geometry/simplelines.stencil")))))
+  (is (list? (c/parse (c/read (str root "geometry/simplelines.tstencil"))))))
 
 (defn clean [p] (t/drop-comments p))
 
