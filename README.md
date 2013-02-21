@@ -34,27 +34,27 @@ Expressions can contain other expressions.
 
 Contexts types are: stencil, import, table, render and view (we have plans for operator and stream contexts as well).
 Though contexts can be nested, valid nestings depend on the context type.
-Stencil contexts can contain any other context time (no nested stencils...yet).
-Tables can contain renders.
-Imports, Renders and Views can't contain other contexts.
+`stencil` contexts can contain any other context time (no nested stencils...yet).
+`table` contexts can contain renders.
+`import`, `render` and `view` contexts can't contain other contexts.
 
 
-Contexts provide an execution environment (a "context" if you will) for policies.
+Contexts provide an execution context for policies.
 Policies describe attributes of the context.
 Valid policy types depend on the context type.
 Since the majority of the work is done by policies, 
 the policies will be described in detail at this time.
 
 Table contexts can contain *data* and *fields* policies.
-The fields policy describes the fields of the table.
+The `fields` policy describes the fields of the table.
 Minimally, it is a list of names.
-The data policy describes where/when to acquire data from and how to transform it into a row for the table
+The `data` policy describes where/when to acquire data from and how to transform it into a row for the table
    (e.g., how to convert source data to the fields for the current table).
-The data policy must result in one more tuples produced via *tuple*, *ptuple*, *tuples* or *ptuples*.
+The `data` policy must result in one or more tuples produced via `tuple`, `ptuple`, `tuples` or `ptuples`.
 In the example above, the tuple-production is automatically generated from the fields of the let.
 Explicit inclusion would look like `(ptuples (fields a b) a b)`.
 
-The data policy must have as its top element a timing expresion, describing when and where to get data from.
+The `data` policy must have as its top element a timing expresion, describing when and where to get data from.
 The timing expressions right now are:
  1. `(init <expr>)` indicates actions to be taken when the stencil program is initialized.
  2. `(pull <table> <expr>)` indicates actions to be performed when there is data in the indicated table.
