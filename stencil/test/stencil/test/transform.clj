@@ -40,8 +40,8 @@
   (is (= (t/infix->prefix '(a _)) '(a _)))
   (is (= (t/infix->prefix '(a -> b)) '(-> a b)))
   (is (= (t/infix->prefix '(let (((a) (a + b))) ())) '(let (((a) (+ a b))) ())))
-  (is (= (t/infix->prefix '(let (((a) ($do 3 + 4))) ())) '(let (((a) (+ 3 4))) ())))
-  (is (= (t/infix->prefix '(let ((a) ($do (a + b) -> (c))) ()))
+  (is (= (t/infix->prefix '(let (((a) (do 3 + 4))) ())) '(let (((a) (+ 3 4))) ())))
+  (is (= (t/infix->prefix '(let ((a) (do (a + b) -> (c))) ()))
          '(let ((a) (-> (+ a b) (c))) ()))))
 
 (deftest arrow->using
@@ -71,17 +71,17 @@
   (is (= (t/normalize-let-shape '(let ((a d) $$ (b)) 4)) '(let (((a d) (b))) (do 4))))
   (is (= (t/normalize-let-shape '(let ((a d) $$ (b)) (body))) '(let (((a d) (b))) (body))))
   (is (= (t/normalize-let-shape '(let ((a d) $$ (b)))) '(let (((a d) (b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a ($meta)) $$ b))) '(let (((a ($meta)) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a ($meta) $$ b))) '(let (((a ($meta)) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a $$ b))) '(let (((a) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) ($do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a $$ b ($meta)))) '(let (((a) ($do b ($meta)))) ())))
+  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let ((a ($meta)) $$ b))) '(let (((a ($meta)) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let (a ($meta) $$ b))) '(let (((a ($meta)) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let (a $$ b))) '(let (((a) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
+  (is (= (t/normalize-let-shape '(let (a $$ b ($meta)))) '(let (((a) (do b ($meta)))) ())))
   (is (= (t/normalize-let-shape '(let (a $$ b) (c $$ d) (e $$ f) (g $$ (h i j))))
-         '(let (((a) ($do b)) 
-                ((c) ($do d)) 
-                ((e) ($do f)) 
+         '(let (((a) (do b)) 
+                ((c) (do d)) 
+                ((e) (do f)) 
                 ((g) (h i j)))
             ()))))
 
@@ -320,7 +320,7 @@
                                      (when ($meta)
                                        (onChange ($meta) values ($meta))
                                        (items ($meta) values ($meta))
-                                       (let (((id ($meta)) ($do ($meta) v ($meta))))
+                                       (let (((id ($meta)) (do ($meta) v ($meta))))
                                          (ptuple ($meta) (fields ($meta) (id ($meta))) id ($meta)))))))))))
                
 (deftest infer-types
@@ -358,8 +358,8 @@
            '(using ($meta) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b) (x))) 
          '(using ($meta) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b) (x))))
   (is (= (t/ensure-using-tuple 
-           '(using ($meta) (let (((x) ($do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x)))
-         '(using ($meta) (let (((x) ($do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x))))
+           '(using ($meta) (let (((x) (do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x)))
+         '(using ($meta) (let (((x) (do 1))) (ptuple ($meta (type (fn (...) (tuple (...))))) (fields a) b)) (x))))
   (is (= (t/ensure-using-tuple '(using ($meta) b (x))) 
          '(using ($meta) (tuple ($meta (type (fn (...) (tuple (...))))) b) (x))))
   (is (= (t/ensure-using-tuple '(using ($meta) (b) (x))) 
@@ -388,6 +388,19 @@
                                (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
                                (y ($meta (type fn)) y ($meta (type ***)))))))
       "Auto binding")
+  (is (= (t/normalize-renders '(table tn 
+                                      (fields a x b y) 
+                                      (render rn ($meta) tn ($meta) type ($meta) 
+                                              (bind ($meta) auto ($meta) 
+                                                    ($$ ($meta) shape ($meta (type fn)) "circle" ($meta (type ***)))))))
+         '(table tn 
+                 (fields a x b y)
+                 (render rn ($meta) tn ($meta) type ($meta) 
+                         (bind ($meta) 
+                               (shape ($meta (type fn)) "circle" ($meta (type ***)))
+                               (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
+                               (y ($meta (type fn)) y ($meta (type ***)))))))
+      "Auto binding w/explicit binding")
   (is (= (t/normalize-renders '(table tn 
                                       (fields a x b y) 
                                       (render rn ($meta) tn ($meta) type ($meta) 

@@ -1,5 +1,6 @@
 #Stencil->Bokeh export for scatterplot_inline
 from bokeh import mpl 
+from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 from math import *
 
@@ -51,7 +52,7 @@ class scatterplot_inline:
 
 
   def render(self):
-    p.scatter('a', 'b', color='RED', data_source=self.dataset.dataSource()) 
+    p.scatter(data_source=self.dataset.dataSource(), x="a", y="b", color="RED")
     p.figure()
 
 if __name__ == "__main__":

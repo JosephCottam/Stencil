@@ -1,5 +1,6 @@
 #Stencil->Bokeh export for multiplot
 from bokeh import mpl 
+from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 import numpy as np
 
@@ -53,16 +54,21 @@ class multiplot:
 
   def render(self):
     p.table(self.dataset.dataSource(), ['a', 'b', 'c'])
-    p.scatter('a', 'b', color='orange', data_source=self.dataset.dataSource()) 
+
+    p.scatter(data_source=self.dataset.dataSource(), x="a", y="b", color="orange")
     p.figure()
-    p.scatter('a', 'c', color='red', data_source=self.dataset.dataSource()) 
+
+    p.scatter(data_source=self.dataset.dataSource(), x="a", y="c", color="red")
     p.figure()
-    p.plot('a', 'b', color='yellow', data_source=self.dataset.dataSource()) 
+
+    p.plot(data_source=self.dataset.dataSource(), x="a", y="b", color="yellow")
     p.figure()
-    p.plot('a', 'c', color='black', data_source=self.dataset.dataSource()) 
+
+    p.plot(data_source=self.dataset.dataSource(), x="a", y="c", color="black")
     p.figure()
-    p.plot('a', 'b', color='blue', data_source=self.dataset.dataSource()) 
-    p.plot('a', 'c', color='green', data_source=self.dataset.dataSource()) 
+
+    p.plot(data_source=self.dataset.dataSource(), x="a", y="b", color="blue")
+    p.plot(data_source=self.dataset.dataSource(), x="a", y="c", color="green")
     p.figure()
 
 if __name__ == "__main__":

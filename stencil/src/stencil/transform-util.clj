@@ -12,7 +12,6 @@
   "Does this expression include a binding statement (syntactically denoted with an infix-colon)?"
   (and (seq? expr) (some bind? expr)))
 
-
 (defn lop->map [lop]
   "Converts a ((key val) ..) into a clojure dictionary"
   (zipmap (map first lop) (map second lop)))

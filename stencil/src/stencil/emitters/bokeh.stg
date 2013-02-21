@@ -13,6 +13,7 @@ expr(ex) ::= <%
 <elseif (ex.isDo)><ex:do()>
 <elseif (ex.isOp)><ex:op()>
 <elseif (ex.isIf)><ex:ifex()>
+<elseif (ex.isList)><ex:listex()>
 <else><ex:unsupported()>
 <endif>
 %>
@@ -38,6 +39,8 @@ op(ex) ::= <%
   <ex.op>(<ex.rands:expr();separator=", ">)
 <endif>
 %>
+
+listex(ex) ::= <%[<ex.items:expr();separator=", ">]%>
 
 binding(binding) ::= <%(<binding.vars:expr();separator=", ">) = <binding.expr:expr()>%>
 
@@ -66,23 +69,22 @@ tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
 init(idefs) ::= <<
 <if (idefs)>
 def __init__(self):
-   <idefs:{def|<expr(def.expr)>};separator="\n">
+   <idefs:expr();separator="\n">
 <endif>
 >>
 
 dependentUpates(def) ::= <<
 def update(self):
   self.clear()
-  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n#----------\n">
+  <def.depends:{d|<dependUpdate(def.fields, d)>};separator="\n">
+
 >>
 
 dependUpdate(tableFields, ddef) ::= <<
-<if (ddef.isDepend)>
 for i in range(0, self._<ddef.source>.size()):
   <ddef.fields:{f|<f> = self._<ddef.source>.<f>[i]};separator="\n">
   <ddef.expr:expr()>
   <tableFields:{f|self.<f>.append(<f>)};separator="\n">
-<endif>
 >>
 
 setDependency(dep) ::= <<
@@ -133,14 +135,52 @@ linkTables(table) ::= <%
 <endif>
 %>
 
-bindset(type, source, def) ::= <% p.<type>('<def.x>', '<def.y>', color='<def.color>', data_source=self.<source>.dataSource()) %>
-renderSet(def) ::= <% 
-<if (def.fields)>
-  p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
+
+bindset(type, source, binds) ::= 
+  <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>=<f.expr>};separator=", ">)%>
+renderSet(def) ::= <<
+<if (def.simpleRender && def.fields)>
+p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
+<elseif (def.simpleRender && def.binds)>
+<def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n">
+p.figure()
+<elseif (def.glyphRender)>
+<def.source> = self.<def.source>.dataSource()
+<def.name> = ContinuumModel('Plot')
+<def.guides:
+    {g|<g.datarange> = ContinuumModel(
+       'DataRange1d', 
+       sources=[{'ref' : <def.source>.ref(), 'columns' : ['<g.target>']\}])};
+       separator="\n">
+   
+glyph_renderer = ContinuumModel(
+   'GlyphRenderer',
+   data_source = <def.source>.ref()<if (def.guides)>,<endif>
+   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.generalBinds)>,<endif>
+   <def.generalBinds:{b|<b.vars>=<b.expr>};separator=",\n"><if (def.glyphBinds)>,<endif>
+   <if (def.glyphBinds)>glyphs = [{<def.glyphBinds:{b|"<b.vars>" : <b.expr>};separator=",\n">}]<endif>
+   )
+
+<def.guides:
+   {g|<g.name> = ContinuumModel(
+       'LinearAxis',
+       parent=<def.name>.ref(),
+       data_range=<g.datarange>.ref(),
+       <g.args:{a|<a>=<g.args.(a)>};separator=",\n">)}
+   ;separator="\n">
+   
+<def.name>.set('renderers', [glyph_renderer.ref()])
+<def.name>.set('axes', [<def.guides:{g|<g.name>.ref()};separator=", ">])
+p.bbclient.upsert_all(
+  [glyph_renderer,
+   <def.source>,  <def.name>,
+   <def.guides:{g|<g.datarange>};separator=", "><if (def.guides)>,<endif>
+   <def.guides:{g|<g.name>};separator=", ">])
+p.show(<def.name>)
 <else>
-  <def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n"><\n>p.figure()
+***** UNKNOWN RENDERING TYPE!! ******
 <endif>
-%>
+>>
 
 classDef(className,tables,view) ::= <<
 
@@ -168,7 +208,6 @@ program(def) ::= <<
 <header(def.header)>
 
 <classDef(def.header.name, def.tables, def.view)>
-
 <footer(def.header.name)> 
 >>
 
@@ -188,6 +227,7 @@ import <def.package>
 header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
+from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 <if (headerDef.imports)><headerDef.imports:imports();separator="\n"><endif>
 <if (headerDef.literal)><headerDef.literal;separator="\n"><endif>
