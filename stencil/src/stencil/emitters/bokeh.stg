@@ -146,7 +146,7 @@ p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=",
 p.figure()
 <elseif (def.glyphRender)>
 <def.source> = self.<def.source>.dataSource()
-<def.name> = ContinuumModel('<def.source>')
+<def.name> = ContinuumModel('Plot')
 <def.guides:
     {g|<g.datarange> = ContinuumModel(
        'DataRange1d', 
@@ -155,9 +155,11 @@ p.figure()
    
 glyph_renderer = ContinuumModel(
    'GlyphRenderer',
-   data_source = <def.source>.ref(),
-   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.guides)>,<endif>
-   <def.binds:{b|<b.vars>=<b.expr>};separator=",\n">)
+   data_source = <def.source>.ref()<if (def.guides)>,<endif>
+   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.generalBinds)>,<endif>
+   <def.generalBinds:{b|<b.vars>=<b.expr>};separator=",\n"><if (def.glyphBinds)>,<endif>
+   <if (def.glyphBinds)>glyphs = [{<def.glyphBinds:{b|"<b.vars>" : <b.expr>};separator=",\n">}]<endif>
+   )
 
 <def.guides:
    {g|<g.name> = ContinuumModel(
@@ -171,7 +173,7 @@ glyph_renderer = ContinuumModel(
 <def.name>.set('axes', [<def.guides:{g|<g.name>.ref()};separator=", ">])
 p.bbclient.upsert_all(
   [glyph_renderer,
-   <def.source>,  <def.name>
+   <def.source>,  <def.name>,
    <def.guides:{g|<g.datarange>};separator=", "><if (def.guides)>,<endif>
    <def.guides:{g|<g.name>};separator=", ">])
 p.show(<def.name>)

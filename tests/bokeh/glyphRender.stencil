@@ -4,11 +4,11 @@
   (fields x y z radius color)
   (data (init 
     ##(x:(list 1,2,3,4,5), 
-       y:(list 5,4,3,4,5), 
+       y:(list 5,4,3,2,1), 
        z:(list 3,3,3,3,3), 
-       radius:(list 10,1,1,1,1), 
+       radius:(list 10,5,5,5,5), 
        color:(list "blue","blue","red","blue","blue"))))
   (render GlyphRenderer
-    (bind auto (type: "circle"))
+    (bind (x:x) (y:y) (color:"blue") (type: "circles"))
     (guide x LinearAxis {orientation:"bottom"})
     (guide y LinearAxis {orientation:"left"})))

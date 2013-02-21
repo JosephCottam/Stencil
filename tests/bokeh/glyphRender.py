@@ -1,58 +1,103 @@
-from bokeh import mpl
+#Stencil->Bokeh export for glyphRender
+from bokeh import mpl 
 from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
 
-source = ContinuumModel(
-    'ObjectArrayDataSource',
-    data = [
-        {'x' : 1, 'y' : 5, 'z':3, 'radius':10},
-        {'x' : 2, 'y' : 4, 'z':3},
-        {'x' : 3, 'y' : 3, 'z':3, 'color':"red"},
-        {'x' : 4, 'y' : 2, 'z':3},
-        {'x' : 5, 'y' : 1, 'z':3},
-        ]
-    )
-plot = ContinuumModel('Plot')   #Take the source-table name
-glyph_renderer = ContinuumModel(
-    'GlyphRenderer',                #Render type glyph
-    data_source = source.ref(),     #Source table name
-    xdata_range = xdr.ref(),        #if there is an x-binding
-    ydata_range = ydr.ref(),        #if there is a y-binding
-    x = 'x',                        #from binding
-    y = 'y',                        #from binding
-    color = 'blue',
-    glyphs = [{'type' : 'circles'}]  #from bindings
-    )         
-xdr = ContinuumModel(           #When a glyph render-type is found, make data ranges for all guided fields....how to control the data-range type?
-    'DataRange1d', 
-    sources = [{'ref' : source.ref(), 'columns' : ['x']}]   #ref is the target table, column is the field
-    )
 
-ydr = ContinuumModel(
-    'DataRange1d', 
-    sources=[{'ref' : source.ref(), 'columns' : ['y']}],
-    )
+class source__:
+  _fields = ['x', 'y', 'z', 'radius', 'color']
+  x = []
+  y = []
+  z = []
+  radius = []
+  color = []
 
-xaxis = ContinuumModel(    
-    'LinearAxis',             #From the guide statement
-    orientation='bottom',     #From guide-statement metadata
-    parent=plot.ref(),        #From context
-    data_range=xdr.ref()      #
-    )
+  def __init__(self):
+     self.data([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [3, 3, 3, 3, 3], [10, 5, 5, 5, 5], ["blue", "blue", "red", "blue", "blue"])
 
-yaxis = ContinuumModel(
-    'LinearAxis', 
-    orientation='left',
-    parent=plot.ref(),
-    data_range=ydr.ref()
-    )
-plot.set('renderers', [glyph_renderer.ref()]) #Set renderer...
-plot.set('axes', [xaxis.ref(), yaxis.ref()])  #Set axes...
+  def data(self, x, y, z, radius, color):
+    self.x.extend(x)
+    self.y.extend(y)
+    self.z.extend(z)
+    self.radius.extend(radius)
+    self.color.extend(color)
 
-p.bbclient.upsert_all([source, plot, xdr, ydr, glyph_renderer, xaxis, yaxis])
-p.show(plot)
+  def datum(self, x, y, z, radius, color):
+    self.x.append(x)
+    self.y.append(y)
+    self.z.append(z)
+    self.radius.append(radius)
+    self.color.append(color)
+
+  def clear(self):
+    self.x = []
+    self.y = []
+    self.z = []
+    self.radius = []
+    self.color = []
+
+  def size(self):
+    return len(self.x)
+
+  def dataSource(self):
+    return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, z=self.z, radius=self.radius, color=self.color)
 
 
+class glyphRender:
+  source = None
 
-                   
-                                            
+  def __init__(self):
+    #Create tables
+    self.source = source__()
+    #Share tables with each other
+
+  def set_source_cols(self, x, y, z, radius, color):
+    self.source.clear()
+    self.source.data(x, y, z, radius, color)
+
+
+  def render(self):
+    source = self.source.dataSource()
+    rend2905 = ContinuumModel('Plot')
+    _x_dr_ = ContinuumModel(
+           'DataRange1d', 
+           sources=[{'ref' : source.ref(), 'columns' : ['x']}])
+    _y_dr_ = ContinuumModel(
+           'DataRange1d', 
+           sources=[{'ref' : source.ref(), 'columns' : ['y']}])
+
+    glyph_renderer = ContinuumModel(
+       'GlyphRenderer',
+       data_source = source.ref(),
+       xdata_range = _x_dr_.ref(),
+       ydata_range = _y_dr_.ref(),
+       x="x",
+       y="y",
+       color="blue",
+       glyphs = [{"type" : "circles"}]
+       )
+
+    xLinearAxis = ContinuumModel(
+           'LinearAxis',
+           parent=rend2905.ref(),
+           data_range=_x_dr_.ref(),
+           orientation="bottom")
+    yLinearAxis = ContinuumModel(
+           'LinearAxis',
+           parent=rend2905.ref(),
+           data_range=_y_dr_.ref(),
+           orientation="left")
+
+    rend2905.set('renderers', [glyph_renderer.ref()])
+    rend2905.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
+    p.bbclient.upsert_all(
+      [glyph_renderer,
+       source,  rend2905,
+       _x_dr_, _y_dr_,
+       xLinearAxis, yLinearAxis])
+    p.show(rend2905)
+
+if __name__ == "__main__":
+  plot = glyphRender()
+  plot.render()
+ 

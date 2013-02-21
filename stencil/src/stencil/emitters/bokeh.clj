@@ -12,7 +12,7 @@
 (deftype Depends [source fields expr])
 (deftype View [name renders])
 (deftype SimpleRender [simpleRender name source type binds fields])
-(deftype GlyphRender [glyphRender name source type binds guides])
+(deftype GlyphRender [glyphRender name source type generalBinds glyphBinds guides])
 (deftype Guide [name type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
@@ -80,6 +80,11 @@
         depends (dmap false depend-atts (drop-metas (apply concat (map (partial t/filter-tagged 'when-) datas))))]
     (Table. name (class-name name) fields inits depends)))
 
+(defn bind-subset [select from & opts]
+  (letfn [(is [x] (t/any= (.vars x) select))
+          (isnt [x] (not (t/any= (.vars x) select)))]
+    (let [f (if (t/any= :not opts) isnt is)]
+      (filter f from))))
 
 (defn render-bind-atts [[target source]] (LetBinding. target (if (string? source) source (str "\"" source "\""))))
 (defn guide-att [parent [_ _ target _ type meta]] 
@@ -96,10 +101,16 @@
             bind (if (= (count bind) 1) 
                    (rest (drop-metas (first bind)))
                    (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
-            render-bindings (map first bind)
+            renderBindings (map render-bind-atts bind)
             guides (t/filter-tagged 'guide args)
             guide-atts (map (partial guide-att source) guides)]
-       (GlyphRender. true (pyName name) source type (map render-bind-atts bind) guide-atts))
+       (GlyphRender. true 
+                     (pyName name)
+                     source 
+                     type 
+                     (bind-subset '(x y color) renderBindings) 
+                     (bind-subset '(x y color) renderBindings :not) 
+                     guide-atts))
     :else (throw (RuntimeException. (str "Unknown render type " type)))))
 
 (defn view-atts [render-defs [_ name _ & renders]]
