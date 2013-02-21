@@ -1,11 +1,19 @@
-Stencil
+The Stencil Visualization System
 =======
-
-Stencil Visualization System
-
 
 A description of the current state of the Stencil system.
 This document will be revised as reality aligns with plans (or vice-versa).
+
+Execution Instructions
+======================
+
+The main function expects tagged arguments.  Valid arguments are *-in, -out, -c*.
+  *  *-in* should be followed by a file to read a stencil program from.  If ommited, std-in is used.
+     (If using std-in, the input program be terminated with `;#EOF`.)
+  *  *-out* should be followed by a file to send output to.  If ommited, std-out is used.
+  *  *-c* specifies a comment character to prefix stencil-status updates with.  The default is `#`.
+
+Executing from a pre-packaged stencil uberjar: `java -jar stencil.jar -in test.stencil -out test.py`
 
 Sample Program
 ==============
