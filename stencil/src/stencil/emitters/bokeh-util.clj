@@ -50,6 +50,7 @@
        program))
 
 (defn clean-to-false [item]
+  "Removes metadata items and returns false if the item is then empty"
   (let [item (rest (remove t/meta? item))
         item (if (empty? item) false item)]
     item))

@@ -58,7 +58,7 @@ class glyphRender:
 
   def render(self):
     source = self.source.dataSource()
-    rend2905 = ContinuumModel('Plot')
+    rend2367 = ContinuumModel('Plot')
     _x_dr_ = ContinuumModel(
            'DataRange1d', 
            sources=[{'ref' : source.ref(), 'columns' : ['x']}])
@@ -79,23 +79,23 @@ class glyphRender:
 
     xLinearAxis = ContinuumModel(
            'LinearAxis',
-           parent=rend2905.ref(),
+           parent=rend2367.ref(),
            data_range=_x_dr_.ref(),
            orientation="bottom")
     yLinearAxis = ContinuumModel(
            'LinearAxis',
-           parent=rend2905.ref(),
+           parent=rend2367.ref(),
            data_range=_y_dr_.ref(),
            orientation="left")
 
-    rend2905.set('renderers', [glyph_renderer.ref()])
-    rend2905.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
+    rend2367.set('renderers', [glyph_renderer.ref()])
+    rend2367.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
     p.bbclient.upsert_all(
       [glyph_renderer,
-       source,  rend2905,
+       source,  rend2367,
        _x_dr_, _y_dr_,
        xLinearAxis, yLinearAxis])
-    p.show(rend2905)
+    p.show(rend2367)
 
 if __name__ == "__main__":
   plot = glyphRender()

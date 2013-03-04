@@ -86,32 +86,41 @@
     (let [f (if (t/any= :not opts) isnt is)]
       (filter f from))))
 
-(defn render-bind-atts [[target source]] (LetBinding. target (if (string? source) source (str "\"" source "\""))))
+(defn render-bind-atts [[target source]] 
+  (LetBinding. target (if (string? source) source (str "\"" source "\""))))
+
 (defn guide-att [parent [_ _ target _ type meta]] 
   (Guide. (str target type) type parent target (str "_" target "_dr_") (dissoc (t/meta->map meta) 'type)))
 
+(defn bokeh-plot-types [type]
+  (case (.toLowerCase (str type))
+    ("scatterplot" "scatter") 'scatter
+    type))
+
+
 (defn render-atts [[_ name _ source _ type _ & args]]
-  (cond
-    (= type 'table) 
-       (SimpleRender. true (pyName name) source type false (rest (first (drop-metas args))))
-    (t/any= type '(scatter plot)) 
-       (SimpleRender. true (pyName name) source type (map  #(map render-bind-atts (t/full-drop %)) (drop-metas args)) false)
-    (= type 'GlyphRenderer) 
-      (let [bind (t/filter-tagged 'bind args)
-            bind (if (= (count bind) 1) 
-                   (rest (drop-metas (first bind)))
-                   (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
-            renderBindings (map render-bind-atts bind)
-            guides (t/filter-tagged 'guide args)
-            guide-atts (map (partial guide-att source) guides)]
-       (GlyphRender. true 
-                     (pyName name)
-                     source 
-                     type 
-                     (bind-subset '(x y color) renderBindings) 
-                     (bind-subset '(x y color) renderBindings :not) 
-                     guide-atts))
-    :else (throw (RuntimeException. (str "Unknown render type " type)))))
+  (let [type (bokeh-plot-types type)]
+    (cond
+      (= type 'table) 
+        (SimpleRender. true (pyName name) source type false (rest (first (drop-metas args))))
+      (t/any= type '(scatter plot)) 
+        (SimpleRender. true (pyName name) source type (map  #(map render-bind-atts (t/full-drop %)) (drop-metas args)) false)
+      (= type 'GlyphRenderer) 
+        (let [bind (t/filter-tagged 'bind args)
+              bind (if (= (count bind) 1) 
+                     (rest (drop-metas (first bind)))
+                     (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
+              renderBindings (map render-bind-atts bind)
+              guides (t/filter-tagged 'guide args)
+              guide-atts (map (partial guide-att source) guides)]
+          (GlyphRender. true 
+                        (pyName name)
+                        source 
+                        type 
+                        (bind-subset '(x y color) renderBindings) 
+                        (bind-subset '(x y color) renderBindings :not) 
+                        guide-atts))
+      :else (throw (RuntimeException. (str "Unknown render type: " type))))))
 
 (defn view-atts [render-defs [_ name _ & renders]]
   (let [render-defs (map render-atts render-defs)
@@ -143,7 +152,9 @@
 
 (defn emit [program]
   (emit-bokeh "program" "def" 
-    (-> program runtime py-imports dataTuple->store quote-strings when->init remove-empty-using as-atts)))
+    (-> program 
+      runtime py-imports dataTuple->store quote-strings 
+      when->init remove-empty-using as-atts)))
 
 
 
