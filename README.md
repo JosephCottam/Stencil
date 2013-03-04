@@ -23,7 +23,7 @@ Sample Program
             (data (init 
                (let (a : (list 1 2 3 4))
                     (b : (list 10 20 30 40)))))
-            (render Scatterplot (bind x:a y:b))))
+            (render Scatterplot (bind (x:a) (y:b)))))
 
 Syntax and Grammar
 ==================
