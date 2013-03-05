@@ -1,5 +1,5 @@
 
-(defproject stencil "0.0.1-SNAPSHOT"
+(defproject stencil "0.0.1.3-SNAPSHOT"
   :description "Stencil -- Cardenio remake!"
   :main stencil.core
   :url "http://cs.indiana.edu/~jcottam/stencil.xml"
