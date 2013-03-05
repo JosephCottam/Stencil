@@ -4,7 +4,6 @@
   (:require [stencil.parse :as parse])
   (:require [stencil.transform :as t])
   (:require [stencil.emitters.bokeh :as bokeh])
-  (:require [stencil.emitters.cdx :as cdx])
   (:require [stencil.emitters.pico :as pico])
   (:require [clojure.java.io :as io]))
 
@@ -38,7 +37,6 @@
         runtime (.toUpperCase (str (second runtime)))]
     (case runtime
        "BOKEHRUNTIME" (bokeh/emit program)
-       "CDXRUNTIME" (cdx/emit program)
        "JAVAPICORUNTIME" (pico/emit program)
       :else (throw (RuntimeException. "Could not find runtime import in program.")))))
 
