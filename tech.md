@@ -28,14 +28,6 @@ The Stencil compiler uses [StringTemplate](http://www.stringtemplate.org/) for c
 
 The current most-complete compilation is target is Bokeh (a Python visualization system).
 
-Usage
-=====
-Stencil programs are stored in files with a '.stencil' extension (syntax is described below).
-To compile a stencil program:
-
-```
-lein run <input-file> <output-file>
-```
 
 Syntax
 ======
