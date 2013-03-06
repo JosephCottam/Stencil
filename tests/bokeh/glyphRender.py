@@ -1,9 +1,9 @@
 #Stencil->Bokeh export for glyphRender
 from bokeh import mpl 
 from bokeh.bbmodel import ContinuumModel
-p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
+p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
 
-
+p.use_doc('glyph')
 class source__:
   _fields = ['x', 'y', 'z', 'radius', 'color']
   x = []
@@ -71,11 +71,14 @@ class glyphRender:
        data_source = source.ref(),
        xdata_range = _x_dr_.ref(),
        ydata_range = _y_dr_.ref(),
-       x="x",
-       y="y",
-       color="blue",
-       glyphs = [{"type" : "circles"}]
-       )
+       glyphspec = {
+         "type" : "circle",
+         "units" : "screen",
+         "fill" : {"field":"color", "defalt": "blue"},
+         "x" : {"field" : "x", "default" : 0},
+         "y" : {"field" : "y", "default" : 0},
+         "radius" : {"field" : "radius", "default" : 5}
+       })
 
     xLinearAxis = ContinuumModel(
            'LinearAxis',
