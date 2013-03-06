@@ -158,9 +158,10 @@ glyph_renderer = ContinuumModel(
    'GlyphRenderer',
    data_source = <def.source>.ref()<if (def.guides)>,<endif>
    <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.generalBinds)>,<endif>
-   <def.generalBinds:{b|<b.vars>=<b.expr>};separator=",\n"><if (def.glyphBinds)>,<endif>
-   <if (def.glyphBinds)>glyphs = [{<def.glyphBinds:{b|"<b.vars>" : <b.expr>};separator=",\n">}]<endif>
-   )
+   glyphspec = {
+     <def.generalBinds:{b|<b.vars>=<b.expr>};separator=",\n"><if (def.glyphBinds)>,<endif>
+     <def.dataBinds:{b|"<b.vars>": {"field" : "<b.expr>", "default" : <b.default>}};separator=",\n>
+   })
 
 <def.guides:
    {g|<g.name> = ContinuumModel(
