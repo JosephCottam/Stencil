@@ -2,8 +2,9 @@
 from bokeh import mpl 
 from bokeh.bbmodel import ContinuumModel
 p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
+p.use_doc("glyphRender")
 
-p.use_doc('glyph')
+
 class source__:
   _fields = ['x', 'y', 'z', 'radius', 'color']
   x = []
@@ -58,7 +59,7 @@ class glyphRender:
 
   def render(self):
     source = self.source.dataSource()
-    rend2233 = ContinuumModel('Plot')
+    rend = ContinuumModel('Plot')
     _x_dr_ = ContinuumModel(
            'DataRange1d', 
            sources=[{'ref' : source.ref(), 'columns' : ['x']}])
@@ -74,31 +75,31 @@ class glyphRender:
        glyphspec = {
          "type" : "circle",
          "units" : "screen",
-         "fill" : {"field":"color", "defalt": "blue"},
-         "x" : {"field" : "x", "default" : 0},
-         "y" : {"field" : "y", "default" : 0},
-         "radius" : {"field" : "radius", "default" : 5}
+         "x" : {"field" : "x"},
+         "y" : {"field" : "y"},
+         "fill" : {"field" : "color"},
+         "radius" : {"field" : "radius"}
        })
 
     xLinearAxis = ContinuumModel(
            'LinearAxis',
-           parent=rend2233.ref(),
+           parent=rend.ref(),
            data_range=_x_dr_.ref(),
            orientation="bottom")
     yLinearAxis = ContinuumModel(
            'LinearAxis',
-           parent=rend2233.ref(),
+           parent=rend.ref(),
            data_range=_y_dr_.ref(),
            orientation="left")
 
-    rend2233.set('renderers', [glyph_renderer.ref()])
-    rend2233.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
+    rend.set('renderers', [glyph_renderer.ref()])
+    rend.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
     p.bbclient.upsert_all(
       [glyph_renderer,
-       source,  rend2233,
+       source,  rend,
        _x_dr_, _y_dr_,
        xLinearAxis, yLinearAxis])
-    p.show(rend2233)
+    p.show(rend)
 
 if __name__ == "__main__":
   plot = glyphRender()

@@ -19,7 +19,7 @@
    Does so by removing trailing white-space and removing the numbers from things 
    that could-be gensyms (according to our gensym-convention of word-followed-by-underscore)."
   (-> p
-    (lojure.string/replace #"(?m)(\s+)(\n)" "$2")
+    (clojure.string/replace #"(?m)(\s+)(\n)" "$2")
     (clojure.string/replace #"([\w&&]+?)_\d+(\W)" "$1$2")))
 
 (defn emit [emitter src rslt]

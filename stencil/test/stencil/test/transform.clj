@@ -5,7 +5,7 @@
 (defn strip-gen [a]
   "Remove the random part of gensymed names; used to approxiamte equality checks."
   (cond 
-    (symbol? a) (symbol (clojure.string/replace (str a) #"\d*$" ""))
+    (symbol? a) (symbol (clojure.string/replace (str a) #"(\w+?)_\d*$" "$1"))
     (not (seq? a)) a
     :else (map strip-gen a)))
 

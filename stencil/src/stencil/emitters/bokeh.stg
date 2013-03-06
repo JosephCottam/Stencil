@@ -137,7 +137,12 @@ linkTables(table) ::= <%
 
 
 bindset(type, source, binds) ::= 
-  <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.vars>=<f.expr>};separator=", ">)%>
+  <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.field>=<if (f.default)><f.default><else><f.expr><endif>};separator=", ">)%>
+
+databind(b) ::=<%
+  "<b.field>" : {"field" : <b.expr><if (b.default)>, "default" : <b.default><endif>}
+%>
+  
 
 renderSet(def) ::= <<
 <if (def.simpleRender && def.fields)>
@@ -157,10 +162,10 @@ p.figure()
 glyph_renderer = ContinuumModel(
    'GlyphRenderer',
    data_source = <def.source>.ref()<if (def.guides)>,<endif>
-   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n"><if (def.generalBinds)>,<endif>
+   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n">,
    glyphspec = {
-     <def.generalBinds:{b|<b.vars>=<b.expr>};separator=",\n"><if (def.glyphBinds)>,<endif>
-     <def.dataBinds:{b|"<b.vars>": {"field" : "<b.expr>", "default" : <b.default>}};separator=",\n>
+     <def.generalBinds:{b|"<b.field>" : <b.default>};separator=",\n"><if (def.dataBinds)>,<endif>
+     <def.dataBinds:databind();separator=",\n">
    })
 
 <def.guides:
@@ -230,7 +235,8 @@ header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
 from bokeh import mpl 
 from bokeh.bbmodel import ContinuumModel
-p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
+p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
+p.use_doc("<headerDef.name>")
 <if (headerDef.imports)><headerDef.imports:imports();separator="\n"><endif>
 <if (headerDef.literal)><headerDef.literal;separator="\n"><endif>
 >>

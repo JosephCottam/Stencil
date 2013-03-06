@@ -12,7 +12,7 @@
 (deftype Depends [source fields expr])
 (deftype View [name renders])
 (deftype SimpleRender [simpleRender name source type binds fields])
-(deftype GlyphRender [glyphRender name source type generalBinds glyphBinds guides])
+(deftype GlyphRender [glyphRender name source type generalBinds dataBinds guides])
 (deftype Guide [name type parent target datarange args])
 (deftype Header [name imports literal])
 (deftype Program [header tables view])
@@ -28,6 +28,7 @@
 (deftype List [isList items])
 
 (deftype LetBinding [vars expr])
+(deftype RenderBinding [field default expr])
 
 (declare expr-atts)
 
@@ -81,13 +82,14 @@
     (Table. name (class-name name) fields inits depends)))
 
 (defn bind-subset [select from & opts]
-  (letfn [(is [x] (t/any= (.vars x) select))
-          (isnt [x] (not (t/any= (.vars x) select)))]
-    (let [f (if (t/any= :not opts) isnt is)]
+  (letfn [(is [x] (t/any= (.field x) select))]
+    (let [f (if (t/any= :not opts) (complement is) is)]
       (filter f from))))
 
 (defn render-bind-atts [[target source]] 
-  (LetBinding. target (if (string? source) source (str "\"" source "\""))))
+  (let [src (if (symbol? source) (str "\"" source "\"") false)
+        default (if (symbol? source) false source)]
+  (RenderBinding. target default src)))
 
 (defn guide-att [parent [_ _ target _ type meta]] 
   (Guide. (str target type) type parent target (str "_" target "_dr_") (dissoc (t/meta->map meta) 'type)))
@@ -117,8 +119,8 @@
                         (pyName name)
                         source 
                         type 
-                        (bind-subset '(x y color) renderBindings) 
-                        (bind-subset '(x y color) renderBindings :not) 
+                        (bind-subset '(units type) renderBindings) 
+                        (bind-subset '(units type) renderBindings :not) 
                         guide-atts))
       :else (throw (RuntimeException. (str "Unknown render type: " type))))))
 

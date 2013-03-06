@@ -11,7 +11,7 @@
     (if (not (empty? views))
       program
       `(~@preamble 
-           (~'view ~(gensym 'viewg) (~'$meta (~'type ~'view))
+           (~'view ~(gensym 'viewg_) (~'$meta (~'type ~'view))
                ~@(interleave render-names (repeat '($meta (type render)))))
            ~@body))))
 

@@ -1,7 +1,8 @@
 #Stencil->Bokeh export for scatterplot_inline
 from bokeh import mpl 
 from bokeh.bbmodel import ContinuumModel
-p = mpl.PlotClient('defaultdoc', 'http://localhost:5006', 'nokey')
+p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
+p.use_doc("scatterplot_inline")
 from math import *
 
 class dataset__:

@@ -19,7 +19,7 @@
 (defn normalize-renders [program]
   "Ensure that every render statement has a name, source data and auto-binds are filled in."
   (letfn 
-    [(gen-name [] (gensym 'rend))
+    [(gen-name [] (gensym 'rend_))
      (auto-bind? [policy] (any= 'auto policy)) 
      (drop-bind-op [entry]
        (if (and (seq? entry) (= '$$ (first entry)))
