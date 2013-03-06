@@ -1,6 +1,5 @@
 (ns stencil.test.emit
   (:require [stencil.emitters.bokeh :as bokeh])
-  (:require [stencil.emitters.cdx :as cdx])
   (:require [stencil.core :as c])
   (:use [clojure.test]))
 
@@ -49,11 +48,6 @@
        (report {:type :fail :message (str "Compile did not match --- " ~msg), :expected ref# :actual rslt#}))
      result#))
 
-(deftest cdx
-    (is (emit-eq? cdx/emit "cdx/scatterplot-inline")
-        "Scatterplot: One table, inline render")
-    (is (emit-eq? cdx/emit "cdx/scatterplot-twoTable")
-        "Scatterplot: Two tables, inline render"))
 
 (deftest bokeh
     (is (emit-pyeq? bokeh/emit "bokeh/scatterplot-inline")
