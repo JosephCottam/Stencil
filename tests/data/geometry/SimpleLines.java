@@ -86,7 +86,7 @@ public class SimpleLines extends stencil.StencilPanel {
 
 
       public Tuple canvas() {return null;}
-      public Rectangle viewport() {return null;}
+      public Dimension viewport() {return null;}
       public Rectangle size() {return null;}
       public View background(Color color) {return new View(color);}
 

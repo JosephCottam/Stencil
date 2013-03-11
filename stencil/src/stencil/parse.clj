@@ -1,6 +1,8 @@
 ;Based loosely on https://github.com/clojure/clojure/blob/master/src/jvm/clojure/lang/LispReader.java
 (ns stencil.parse
-  "An s-expression reader macro system for pre-processing before going to the clojure reader.")
+  "An s-expression reader macro system for pre-processing before going to the clojure reader."
+  (:refer-clojure :exclude [read read-string])
+  (:require [clojure.tools.reader.edn :as edn]))
 
 (defn emitter [transforms]
   "Returns a function that converts one character stream into another.
@@ -71,14 +73,14 @@
           [step leftovers] (driver emit remain)]
       (list (concat done step) leftovers))))
 
-(defn parse-program [src]
+(defn parse-program [source]
   "string -> tree: Parses stencil program from a string."
-  (let [[srcLs remain] 
+  (let [[sourceST remain] 
           (driver
             (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
                        (~stString? ~stString) (~tupleLit? ~tupleLit) (~tuplesLit? ~tuplesLit) 
                        (~stList? ~stList) (~tupleRef? ~tupleRef))) 
-             src)
-        source (apply str srcLs)]
-    (read-string source)))
+             source)
+        source (apply str sourceST)]
+    (binding [*read-eval* false] (edn/read-string source))))
 
