@@ -29,6 +29,16 @@
         `(~a (~'$meta) ~@(supply-metas tail))
      ([a & tail] :seq)
         `(~(supply-metas a) ~@(supply-metas tail))))
+
+(defn location-in-metas [program]
+  (letfn [(extend-meta [m a]
+            (????))]
+    (match program
+      (a :guard atom?) (throw (RuntimeException. "Bare atom found after atoms in all locations expected."))
+      ([(a :guard atom?) (m :guard meta?) & rest] :seq)
+         `(~a ~(extend-meta m a) ~@(location-in-metas rest))
+      ([e & rest] :seq)
+         `(~(location-in-metas e) ~@(location-in-metas rest)))))
   
 (defn meta-pairings [program]
   (letfn [(maybe-pair [ls]
