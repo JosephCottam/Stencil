@@ -2,7 +2,9 @@
 (ns stencil.parse
   "An s-expression reader macro system for pre-processing before going to the clojure reader."
   (:refer-clojure :exclude [read read-string])
-  (:require [clojure.tools.reader.edn :as edn]))
+  (:require [clojure.tools.reader.reader-types :as rt])
+  (:require [stencil.reader :as edn]))
+;  (:require [clojure.tools.reader.edn :as edn]))
 
 (defn emitter [transforms]
   "Returns a function that converts one character stream into another.
@@ -75,12 +77,11 @@
 
 (defn parse-program [source]
   "string -> tree: Parses stencil program from a string."
-  (let [[sourceST remain] 
-          (driver
-            (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind) 
-                       (~stString? ~stString) (~tupleLit? ~tupleLit) (~tuplesLit? ~tuplesLit) 
-                       (~stList? ~stList) (~tupleRef? ~tupleRef))) 
-             source)
+  (let [[sourceST remain]
+        (driver
+          (emitter `((~stComment? ~stComment) (~stMeta? ~stMeta) (~bind? ~bind)
+                        (~stString? ~stString) (~tupleLit? ~tupleLit) (~tuplesLit? ~tuplesLit)
+                        (~stList? ~stList) (~tupleRef? ~tupleRef)))
+          source)
         source (apply str sourceST)]
-    (binding [*read-eval* false] (edn/read-string source))))
-
+    (binding [*read-eval* false] (edn/read (rt/indexing-push-back-reader source)))))
