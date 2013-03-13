@@ -13,22 +13,13 @@
 (defn supply-metas [program] 
   "Ensure that there is a meta expression after every atom."
    (match program
-     (a :guard atom?) (list a '($meta))
-     (a :guard empty?) a
-     ([(a :guard atom?) (m :guard meta?) & tail] :seq) 
-        `(~a ~m ~@(supply-metas tail))
-     ([(a :guard stencil-form?) (n :guard symbol?)] :seq)
-        `(~a ~n (~'$meta))
-     ([(a :guard stencil-form?) (n :guard symbol?) (m :guard meta?) & policies] :seq)
-        `(~a ~n ~m ~@(supply-metas policies))
-     ([(a :guard stencil-form?) (n :guard symbol?) (x :guard not-meta?) & policies] :seq)
-        `(~a ~n (~'$meta) ~@(supply-metas (cons x policies)))
-     (['let bindings body] :seq)
-         (list 'let (supply-metas bindings) (supply-metas body))
-     ([(a :guard atom?) & tail] :seq)
-        `(~a (~'$meta) ~@(supply-metas tail))
-     ([a & tail] :seq)
-        `(~(supply-metas a) ~@(supply-metas tail))))
+     (e :guard empty?) nil
+     ([(a :guard atom?) (m :guard meta?) & rest] :seq)
+         `(~a ~m ~@(supply-metas rest))
+     ([(a :guard atom?) & rest] :seq)
+         `(~a (~'$meta) ~@(supply-metas rest))
+     ([h & rest] :seq)
+        `(~(supply-metas h) ~@(supply-metas rest))))
 
 (defn location-in-metas [program]
   "Put line/column information from parsing into Stencil metas (pulled from Clojure metas)"
@@ -37,12 +28,13 @@
               (map->meta (assoc (meta->map m) "line" (am :line) "col" (am :column)))))]
     (match program
       (a :guard atom?) (throw (RuntimeException. "Bare atom found after atoms in all locations expected."))
-      (b :guard empty?) nil
+      (e :guard empty?) nil
       ([(a :guard atom?) (m :guard meta?) & rest] :seq)
          `(~a ~(extend-meta m a) ~@(location-in-metas rest))
       ([e & rest] :seq)
          `(~(location-in-metas e) ~@(location-in-metas rest)))))
   
+
 (defn meta-pairings [program]
   (letfn [(maybe-pair [ls]
             (cond

@@ -108,15 +108,15 @@
   (is (= (t/supply-metas '(a)) '(a ($meta))))
   (is (= (t/supply-metas '(a ($meta))) '(a ($meta))))
   (is (= (t/supply-metas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a ($meta) b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/supply-metas '(a ($meta ("is" 1)) b c)) '(a ($meta ("is" 1)) b ($meta) c ($meta))))
   (is (= (t/supply-metas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supply-metas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supply-metas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
   (is (= (t/supply-metas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
   (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
   (is (= (t/supply-metas '(fields)) '(fields ($meta))))
-  (is (= (t/supply-metas '(stencil test)) '(stencil test ($meta))))
-  (is (= (t/supply-metas '(let (a b) (do c))) '(let (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
+  (is (= (t/supply-metas '(stencil test)) '(stencil ($meta) test ($meta))))
+  (is (= (t/supply-metas '(let (a b) (do c))) '(let ($meta) (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
 
 (deftest location-in-metas
  (is (= (t/location-in-metas (list (with-meta 'a {:line 1 :column 0}) '($meta)))
