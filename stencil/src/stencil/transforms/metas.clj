@@ -31,10 +31,13 @@
         `(~(supply-metas a) ~@(supply-metas tail))))
 
 (defn location-in-metas [program]
+  "Put line/column information from parsing into Stencil metas (pulled from Clojure metas)"
   (letfn [(extend-meta [m a]
-            (????))]
+            (let [am (meta a)]
+              (map->meta (assoc (meta->map m) "line" (am :line) "col" (am :column)))))]
     (match program
       (a :guard atom?) (throw (RuntimeException. "Bare atom found after atoms in all locations expected."))
+      (b :guard empty?) nil
       ([(a :guard atom?) (m :guard meta?) & rest] :seq)
          `(~a ~(extend-meta m a) ~@(location-in-metas rest))
       ([e & rest] :seq)
