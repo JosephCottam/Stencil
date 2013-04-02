@@ -72,6 +72,10 @@
   "Removes the first element and its meta-data"  
   [expr] (first (full-drop expr)))
 
+(defn name-of [item]
+  "Return the name of the current item." ;;TODO: Verifies that the item can actually be named."
+  (first (full-drop item)))
+
 (defn split-preamble [program] 
   "Divide a program into the preable and body parts. Preamble ends after the imports.
    program -> (preamble, body)"

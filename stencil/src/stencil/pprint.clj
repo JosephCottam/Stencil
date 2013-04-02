@@ -19,10 +19,10 @@
 (defn spp [program & opts] 
   "A pretty-printer for stencil.
    Options-- 
-     :metas - Remove empty meta statements
+     :nometas - Remove empty meta statements
      :return - Return the original program"
   (let [preproc identity
-        preproc (if (t/any= :metas opts) (comp t/clean-metas identity) preproc)]
+        preproc (if (t/any= :nometas opts) (comp t/clean-metas identity) preproc)]
     (clojure.pprint/with-pprint-dispatch 
       pprint-stencil 
       (clojure.pprint/pprint (preproc program)))

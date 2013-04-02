@@ -73,10 +73,9 @@
         [tag source] gen] ;;Assumes that this is an "items" expression
     (Depends. source (t/full-drop fields) (expr-atts trans))))
 
-(defn table-atts[table]
-  (let [name (pyName (second table))
-        fields (rest (drop-metas (first (t/filter-tagged 'fields table))))
-        datas (t/filter-tagged 'data table)
+(defn table-atts[[_ _ name & policies]]
+  (let [fields (rest (drop-metas (first (t/filter-tagged 'fields policies))))
+        datas (t/filter-tagged 'data policies)
         inits (dmap false init-atts (drop-metas (apply concat (map (partial t/filter-tagged 'init) datas))))
         depends (dmap false depend-atts (drop-metas (apply concat (map (partial t/filter-tagged 'when-) datas))))]
     (Table. name (class-name name) fields inits depends)))
@@ -100,7 +99,7 @@
     type))
 
 
-(defn render-atts [[_ name _ source _ type _ & args]]
+(defn render-atts [[_ _ name _ source _ type _ & args]]
   (let [type (bokeh-plot-types type)]
     (cond
       (= type 'table) 
@@ -124,17 +123,17 @@
                         guide-atts))
       :else (throw (RuntimeException. (str "Unknown render type: " type))))))
 
-(defn view-atts [render-defs [_ name _ & renders]]
+(defn view-atts [render-defs [_ _ name _ & renders]]
   (let [render-defs (map render-atts render-defs)
         render-defs (zipmap (map #(.name %) render-defs) render-defs)
         renders (map render-defs (drop-metas renders))]
   (View. (pyName name) renders)))
 
-(defn import-atts [[_ package _ as items]] 
+(defn import-atts [[_ _ package _ as items]] 
   {"package" package, "as" as, "items" items})
   
 (defn as-atts [program]
-  (let [name    (second program)
+  (let [name    (nth program 2)
         view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
         renders (t/filter-tagged 'render program)
         tables  (t/filter-tagged 'table program)
@@ -155,8 +154,11 @@
 (defn emit [program]
   (emit-bokeh "program" "def" 
     (-> program 
-      runtime py-imports dataTuple->store quote-strings 
-      when->init remove-empty-using as-atts)))
+      runtime 
+      py-imports 
+      dataTuple->store quote-strings 
+      when->init remove-empty-using 
+      as-atts)))
 
 
 

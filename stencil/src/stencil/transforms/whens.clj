@@ -14,7 +14,7 @@
       ;"Search the program for the tuple source of the given name."
       [name path]
         (let [parent (parent path program)
-              item  (first (filter #(and (seq? %) (= (second %) name)) parent))
+              item  (first (filter #(and (seq? %) (= (name-of %) name)) parent))
               prototype (first (filter #(and (seq? %) (= 'fields (first %))) item))]
           (cond
             (nil? path) (throw (RuntimeException. "Prototype source not found in path"))

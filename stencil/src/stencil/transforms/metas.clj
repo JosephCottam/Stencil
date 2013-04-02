@@ -79,7 +79,6 @@
    This is a utility for working with metas when the item is also required."
   (match program
     (a :guard atom?) a
-    (m :guard meta?) m
     (b :guard empty?) nil 
     ([(a :guard atom?) (m :guard meta?) & rest] :seq)
        `((~a ~m) ~@(tie-metas rest))

@@ -34,7 +34,7 @@
        (cond
          (= present required) meta
          (or (nil? present) (replace? present)) (assoc meta 'type required) 
-         :else (throw (RuntimeException. (str "Found type '" present "' when '" required "' was required."))))))))
+         :else (throw (RuntimeException. (str "Found type '" meta "' when '" required "' was required."))))))))
 
 
 (defn infer-types [program]
@@ -45,12 +45,12 @@
        "Puts a type statement into each meta, populated with syntactically-determinable types (when possible)"
        (match [phase program]
          [_ (a :guard atom?)] a
-         [_ ([(context :guard context?) ([(name :guard symbol?) (m :guard meta?)] :seq) & rest] :seq)]  
-            `(~context ~name ~(enforce-type m context) ~@(map (partial annotate :normal) rest))
-         [_ ([([(policy :guard policy?) (m :guard meta?)] :seq) & rest] :seq)]
+         [_ ([ ([(context :guard context?) (m0 :guard meta?)] :seq)  ([(name :guard symbol?) (m1 :guard meta?)] :seq) & rest] :seq)]  
+            `(~context ~(enforce-type m0 context) ~name ~(enforce-type m1 context) ~@(map (partial annotate :normal) rest))
+         [_ ([ ([(policy :guard policy?) (m :guard meta?)] :seq) & rest] :seq)]
             `((~policy ~(enforce-type m policy)) ~@(map (partial annotate :arg) rest))
-         [_ (['let bindings body] :seq)]
-            (list 'let (map (partial annotate :binding) bindings) (annotate :normal body))
+         [_ ([ (['let (m0 :guard meta?)] :seq) bindings body] :seq)]
+            (list 'let (enforce-type m0 'let) (map (partial annotate :binding) bindings) (annotate :normal body))
          [:normal ([([op (m :guard meta?)] :seq) & args] :seq)]
             `((~op ~(enforce-type m 'fn)) ~@(map (partial annotate :arg) args))
          [:arg ([(a :guard atom?) (m :guard meta?)] :seq)]
@@ -66,7 +66,7 @@
      
      
      (tuple-patch-kludge [program]
-       "REMOVE THIS AS SOON AS YOU CAN!!!!
+       "HACK: REMOVE THIS AS SOON AS YOU CAN!!!!
         Annotates known-tuple producers with tuple-producing type information.  
        This is here because I don't have a type registery for functions...it causes many problems with name-spaces."
        (letfn [(known-type [a m]

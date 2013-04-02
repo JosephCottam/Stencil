@@ -3,8 +3,6 @@
 (defn gen-binds [bind-meta render-type source-fields existing]
   "Generate a binding statement given a render type and a list of fields.
    TODO: Care about the render type...right now it is just ignored and x/y/z/color are generated for"
-;  (println "Existing: " existing) )
-
   (if (empty? source-fields)
     (throw (RuntimeException. "Cannot generate binds statement, no fields supplied for context."))
     (let [render-fields (set '(x y z color))  ;;Lookup bind field based on render-type
@@ -40,23 +38,24 @@
      (helper [table fields program]
        (match program
          (a :guard atom?) a
-         (['table name & policies] :seq) 
+         (['table (m0 :guard meta?) name & policies] :seq) 
            (let [fields (first (filter-tagged 'fields policies))]
-             `(~'table ~name ~@(helper name fields policies)))
-         (['render id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & binds] :seq)
+             `(~'table ~m0 ~name ~@(helper name fields policies)))
+         (['render (m0 :guard meta?) id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & binds] :seq)
            (let [binds (map (partial prep-bind fields) binds)
                  id (if (= '_ id) (gen-name) id)]
-             `(~'render ~id ~m1 ~source ~m2 ~type ~m3 ~@binds))
-         (['render id (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
+             `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@binds))
+         (['render (m0 :guard meta?) id (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
            (let [binds (map (partial prep-bind fields) binds)
                  id (if (= '_ id) (gen-name) id)
                  table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
+             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
          (['render (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
            (let [binds (map (partial prep-bind fields) binds)
                  id (gen-name)
-                 table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             `(~'render ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
+                 table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)
+                 m0 '($meta (type render))]
+             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
          :else (map (partial helper table fields) program)))]
     (helper nil nil program)))
 

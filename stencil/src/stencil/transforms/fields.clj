@@ -21,12 +21,12 @@
    If there is not currently a 'fields' policy, generates on based on the first 'data' policy found."
   (match program
     (a :guard atom?) a
-    ([(tag :guard stream-or-table?) (name :guard symbol?) (meta :guard meta?) & policies] :seq)
+    ([(tag :guard stream-or-table?) (m0 :guard meta?) (name :guard symbol?) (m1 :guard meta?) & policies] :seq)
         (if (not (empty? (filter-tagged 'fields policies)))
-          `(~tag ~name ~meta ~@policies)
+          `(~tag ~m0 ~name ~m1 ~@policies)
           (let [data (first (filter-tagged 'data policies)) ;;TODO: Generalize to arbitrary number of datas.
                 fields (expr->fields (full-drop data))]
-            `(~tag ~name ~meta ~fields ~@policies)))
+            `(~tag ~m0 ~name ~m1 ~fields ~@policies)))
     :else (map ensure-fields program)))
       
 
