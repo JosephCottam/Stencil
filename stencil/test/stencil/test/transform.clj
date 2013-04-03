@@ -111,19 +111,19 @@
   (is (let [p '(a)] (= (t/untie-metas (t/tie-metas p)) p)))
   (is (let [p '(stencil name ($meta))] (= (t/untie-metas (t/tie-metas p)) p))))
 
-(deftest supply-metas
-  (is (= (t/supply-metas '(a)) '(a ($meta))))
-  (is (= (t/supply-metas '(a ($meta))) '(a ($meta))))
-  (is (= (t/supply-metas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a ($meta ("is" 1)) b c)) '(a ($meta ("is" 1)) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
-  (is (= (t/supply-metas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
-  (is (= (t/supply-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
-  (is (= (t/supply-metas '(fields)) '(fields ($meta))))
-  (is (= (t/supply-metas '(stencil test)) '(stencil ($meta) test ($meta))))
-  (is (= (t/supply-metas '(let (a b) (do c))) '(let ($meta) (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
+(deftest ensure-metas
+  (is (= (t/ensure-metas '(a)) '(a ($meta))))
+  (is (= (t/ensure-metas '(a ($meta))) '(a ($meta))))
+  (is (= (t/ensure-metas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/ensure-metas '(a ($meta ("is" 1)) b c)) '(a ($meta ("is" 1)) b ($meta) c ($meta))))
+  (is (= (t/ensure-metas '(a b ($meta) c)) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/ensure-metas '(a b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/ensure-metas '(a ($meta) b c ($meta))) '(a ($meta) b ($meta) c ($meta))))
+  (is (= (t/ensure-metas '(a (b (c)))) '(a ($meta) (b ($meta) (c ($meta))))))
+  (is (= (t/ensure-metas '(a (b c) d ($meta))) '(a ($meta) (b ($meta) c ($meta)) d ($meta))))
+  (is (= (t/ensure-metas '(fields)) '(fields ($meta))))
+  (is (= (t/ensure-metas '(stencil test)) '(stencil ($meta) test ($meta))))
+  (is (= (t/ensure-metas '(let (a b) (do c))) '(let ($meta) (a ($meta) b ($meta)) (do ($meta) c ($meta))))))
 
 (deftest location-in-metas
  (is (= (t/location-in-metas (list (with-meta 'a {:line 1 :column 0}) '($meta)))
@@ -171,14 +171,6 @@
   (is (= (t/meta-pairings '($meta a $$ b)) '($meta (a b))))
   (is (= (t/meta-pairings '($meta a b $$ c)) '($meta a (b c))))
   (is (= (t/meta-pairings '($meta a b c $$ d e f)) '($meta a b (c d) e f))))
-
-(deftest clean-metas
-  (is (= (t/clean-metas 'a) 'a))
-  (is (= (t/clean-metas '(a ($meta))) '(a)))
-  (is (= (t/clean-metas '(a (b ($meta) c ($meta)))) '(a (b c))))
-  (is (= (t/clean-metas '(a ($meta stuff))) '(a ($meta stuff))))
-  (is (= (t/clean-metas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
-         '(a ($meta stuff) (b ($meta stuff) c d ($meta stuff))))))
 
 
 (deftest expr->fields
