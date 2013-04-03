@@ -1,6 +1,7 @@
 (ns stencil.test.core
   (:require [stencil.core :as c])
   (:require [stencil.transform :as t])
+  (:require [stencil.pprint :as pp])
   (:require [clojure.walk])
   (:use [clojure.test]))
 
@@ -41,7 +42,8 @@
   (is (list? (c/parse (c/read (str root "geometry/simplelines.stencil")))))
   (is (list? (c/parse (c/read (str root "geometry/simplelines.tstencil"))))))
 
-(defn clean [p] (t/drop-comments p))
+(defn clean [p] 
+  (pp/reduce-metas (t/drop-comments p)))
 
 (defn same-structure? [p1 p2]
   (cond
@@ -56,8 +58,13 @@
 (deftest compile-stencil-structure
   (is (same-structure?
         (clean (c/compile (str root "geometry/simplelines.stencil") :file))
-        (clean (c/compile (str root "geometry/simplelines.tstencil") :file))))
+        (clean (c/compile (str root "geometry/simplelines.tstencil") :file)))
+      "Structural equality")
+
   (is (= (clean (c/compile (str root "geometry/simplelines.stencil") :file))
-         (clean (c/compile (str root "geometry/simplelines.tstencil") :file)))))
+         (clean (c/compile (str root "geometry/simplelines.tstencil") :file)))
+      "Exact equality"))
+
+
 
 

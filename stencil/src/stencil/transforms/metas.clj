@@ -10,24 +10,25 @@
 (defn- atom-not-form? [a] (and (atom? a) (not (stencil-form? a))))
 (defn- not-meta? [x] (not (meta? x)))
 
-(defn supply-metas [program] 
+(defn ensure-metas [program] 
   "Ensure that there is a meta expression after every atom."
    (match program
      (e :guard empty?) nil
      ([(a :guard atom?) (m :guard meta?) & rest] :seq)
-         `(~a ~m ~@(supply-metas rest))
+         `(~a ~m ~@(ensure-metas rest))
      ([(a :guard atom?) & rest] :seq)
-         `(~a (~'$meta) ~@(supply-metas rest))
+         `(~a (~'$meta) ~@(ensure-metas rest))
      ([h & rest] :seq)
-        `(~(supply-metas h) ~@(supply-metas rest))))
+        `(~(ensure-metas h) ~@(ensure-metas rest))))
 
 (defn location-in-metas [program]
   "Put line/column information from parsing into Stencil metas (pulled from Clojure metas)"
   (letfn [(extend-meta [m a]
-            (let [am (meta a)]
-              (map->meta (assoc (meta->map m) "line" (am :line) "col" (am :column)))))]
+            (if-let [am (meta a)]
+              (map->meta (assoc (meta->map m) (symbol ".line") (am :line) (symbol ".col") (am :column)))
+              m))]
     (match program
-      (a :guard atom?) (throw (RuntimeException. "Bare atom found after atoms in all locations expected."))
+      (a :guard atom?) (throw (RuntimeException. "Bare atom found after metas in all locations expected."))
       (e :guard empty?) nil
       ([(a :guard atom?) (m :guard meta?) & rest] :seq)
          `(~a ~(extend-meta m a) ~@(location-in-metas rest))
@@ -66,12 +67,6 @@
       :else (map meta-types program))))
 
 
-(defn clean-metas
-  "Remove empty metas...mostly for pretty-printing"
-  [program]
-  (if (seq? program)
-    (map clean-metas (remove empty-meta? program))
-    program))
 
 
 (defn tie-metas [program]

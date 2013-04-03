@@ -46,11 +46,11 @@
            :else `(~vars ~expr))))]
     (match program
       (x :guard atom?) x
-      (['let & lines] :seq) 
+      (['let (m :guard meta?) & lines] :seq) 
         (let [[bindings body] (divide-body lines)
               bindings (map (comp reshape-binding normalize-line) bindings)
               body (if (atom? body) (list 'do body) body)]
-          (list 'let bindings body))
+          (list 'let m bindings body))
       :else (map normalize-let-shape program))))
 
 
@@ -81,9 +81,9 @@
           body)))]
 
     (match program
-      (x :guard atom?) x
-      (['let bindings body] :seq)
-        `(~'let ~(map default-let-body bindings) ~(default-let-body (ensure-body bindings body)))
+      (a :guard atom?) a
+      (['let (m0 :guard meta?) bindings body] :seq)
+        `(~'let ~m0 ~(map default-let-body bindings) ~(default-let-body (ensure-body bindings body)))
       :else (map default-let-body program))))
 
 

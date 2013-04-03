@@ -1,4 +1,5 @@
-(import BokehRuntime {header: ("from math import *")})
+(import BokehRuntime)
+(import py-math)
 
 (table dataset 
   (fields a b c)

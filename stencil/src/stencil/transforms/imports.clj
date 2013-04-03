@@ -20,7 +20,7 @@
   "What is the runtime being imported?
   TODO: Something more elegant than look for an import with 'runtime' as a substring."
   (filter
-    #(> (.indexOf (.toUpperCase (str (second %))) "RUNTIME") -1)
+    #(> (.indexOf (.toUpperCase (str (first (full-drop %)))) "RUNTIME") -1)
     (filter-tagged 'import program)))
 
 (defn ensure-runtime-import [program] 

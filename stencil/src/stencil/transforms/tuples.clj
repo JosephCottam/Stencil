@@ -3,18 +3,29 @@
 (defn- t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
 (defn- tuple? [a] (any= a '(tuple tuples)))
 
+
+(def reverse-interleave
+  "Converts a list into n-lists of every nth item each
+  http://clojurecorner.blogspot.com/2012/11/reverse-interleave.html"
+  (fn [n s]
+    (map
+      (fn [i] (map first (partition-all n (drop i s))))
+      (range 0 n))))
+
 (defn tuple->ptuple [program]
   "A prototyped tuple is a tuple with named fields. 
    This pass converts tuples into prototyped tuples when possible."
   (match program
     (a :guard atom?) a
-    ([(tag :guard tuple?) & (values :guard has-bind?)] :seq)
-      (let [vars (take-nth 3 values)
-            binds (take-nth 3 (drop 1 values))
-            vals (take-nth 3 (drop 2 values))]
+    ([(tag :guard tuple?) (m0 :guard meta?) & (values :guard has-bind?)] :seq)
+      (let [arg-slice (if (= 'tuple tag) 6 5)  ;;tuples has one fewer meta because it takes a list as an argument
+            [vars vm binds bm vals vm] (reverse-interleave arg-slice values)]
         (if (or (not-every? symbol? vars)
-                (not-every? bind? binds)) (throw (RuntimeException. "Mal-formed prototyped-tuple")))
-        `(~(t->p tag) (~'fields ~@vars) ~@vals))
+                (not-every? bind? binds)) 
+          (do 
+            (println program)
+            (throw (parseException program "Mal-formed prototyped-tuple")))
+          `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave vars vm)) ~@(interleave vals vm))))
     :else (map tuple->ptuple program)))
 
 

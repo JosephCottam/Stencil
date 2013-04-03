@@ -34,7 +34,7 @@
 
 (defn emit [program]
   (let [runtime (first (t/runtime program))
-        runtime (.toUpperCase (str (second runtime)))]
+        runtime (.toUpperCase (str (t/full-nth runtime 1)))]
     (case runtime
        "BOKEHRUNTIME" (bokeh/emit program)
        "JAVAPICORUNTIME" (pico/emit program)

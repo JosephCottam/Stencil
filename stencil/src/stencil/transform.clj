@@ -1,5 +1,7 @@
 (ns stencil.transform
   "Tree transformation functions"
+  (:use [stencil.util])
+  (:require [stencil.pprint :refer (dspp)])
   (:require [clojure.core.match :refer (match)]))
 
 (load "transform-util")
@@ -26,16 +28,17 @@
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
   [program] 
    (-> program 
-    ensure-runtime-import
-    tuple->ptuple normalize-let-shape 
-    infix->prefix arrow->using default-let-body
-    file->init pull->when init->when
-    meta-pairings supply-metas meta-types
-    normalize-imports
-    ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
-    align-ptuple
-    normalize-renders gather-renders ensure-view
-    split-when infer-types ensure-using-tuple))
+     ensure-metas location-in-metas 
+     ensure-runtime-import
+     tuple->ptuple normalize-let-shape 
+     infix->prefix arrow->using default-let-body
+     file->init pull->when init->when
+     meta-pairings ensure-metas meta-types
+     normalize-imports
+     ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
+     align-ptuple
+     normalize-renders gather-renders ensure-view
+     split-when infer-types ensure-using-tuple))
 
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 

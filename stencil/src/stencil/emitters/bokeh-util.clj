@@ -1,7 +1,8 @@
 (ns stencil.emitters.bokeh
   "Preps a normal-form tree for emit to bokeh."
+  (:use stencil.util)
   (:require [clojure.core.match :refer (match)])
-  (:require [stencil.transform :refer (atom? meta? full-drop filter-tagged)]))
+  (:require [stencil.transform :as t :refer (atom? full-drop filter-tagged)]))
 
 (defn when->init [program]
   "Takes when clauses predicated on init and covnerts them to init clauses.
@@ -67,14 +68,14 @@
         rest (filter-tagged #(not (= %1 %2)) 'import (drop 4 program))]
     `(~@(take 4 program) ~@imports ~@rest)))
 
-
-(defn tagged-dictionary [item]
-  "Converts nested lists of tag/item sets into nested dictionaries
-    '(type tag value) --> {is<type>: true, tag : value}
-    '(tag x y) --> {tag : (x y)}
-    '(tag1 x (tag2 y)) --> {tag :x, tag2: y}"
-item)   
-
+(defn guide-args [program]
+  (match program
+    (a :guard atom?) a
+    (['guide (m0 :guard meta?) (target :guard symbol?) (m1 :guard meta?) (type :guard symbol?) (m2 :guard meta?)] :seq)
+      (let [args (t/dissoc-tlop (reduce-metas m2) 'type)
+            args (cons 'args (rest args))]
+      `(~'guide ~m0 ~target ~m1 type ~m2 ~(interpose '($meta) args)))
+    :else (map guide-args program)))
 
 (defn quote-strings [program]
   "Places quotation marks around strings."
@@ -82,4 +83,14 @@ item)
     (s :guard string?) (str "\"" s "\"")
     (a :guard atom?) a
     :else (map quote-strings program)))
+
+(defn tagged-dictionary [item]
+  "Converts nested lists of tag/item sets into nested dictionaries
+  '(type tag value) --> {is<type>: true, tag : value}
+  '(tag x y) --> {tag : (x y)}
+  '(tag1 x (tag2 y)) --> {tag :x, tag2: y}"
+  ;;TODO: IMPLEMENT...might replace a lot of boilerplate in the emitter if done right
+  item)   
+
+
 

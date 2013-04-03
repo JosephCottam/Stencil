@@ -22,10 +22,12 @@
     '()
     (map list (keys m) (vals m))))
 
-(defn any=
-  "item, coll->bool: Is the item in the collection?"
-  [item coll]
-  (not (nil? (some (partial = item) coll))))
+(defn dissoc-lop [lop k]
+  "Dissociate an item from a lop"
+  (map->lop (dissoc (lop->map lop) k)))
+
+(defn dissoc-tlop [lop k]
+  (cons (first lop) (dissoc-lop (rest lop) k)))
 
 (defn value?
   "Items that are their own values."
@@ -36,14 +38,6 @@
   "Items that are no longer divisible, includes forms"
   [x]
   (or (symbol? x) (value? x) (class? x)))
-
-(defn meta? [e]
-  "Is this a meta expression?"
-   (and (seq? e) (= '$meta (first e))))
-
-(defn empty-meta? [e]
-  "Is this a meta-expression with no data?"
-  (and (meta? e) (= 1 (count e))))
 
 (defn meta-keys [m] (set (map first (rest m))))
 (defn meta-vals [m] (map second (rest m)))
@@ -59,6 +53,8 @@
     nil nil
     (throw (RuntimeException. (str "Default not known for type " type)))))
 
+(defn full-nth [expr n] (nth (remove meta? expr) n))
+
 (defn full-drop 
   "Eliminate the first n things and (possibly) accompanying meta from a stencil expression."
   ([expr] (full-drop 1 expr))
@@ -73,7 +69,7 @@
   [expr] (first (full-drop expr)))
 
 (defn name-of [item]
-  "Return the name of the current item." ;;TODO: Verifies that the item can actually be named."
+  "Return the name of the current item." ;;TODO: Verifies that the item can and does actually be named.  (like contexts and policies can be, but expr's generally can't)
   (first (full-drop item)))
 
 (defn split-preamble [program] 
@@ -94,4 +90,19 @@
       (empty? meta) (throw (RuntimeException. (str "Could not find entry for '" item "'")))
       (nil? default) (throw (RuntimeException. (str "No default provided for '" item "'")))
       :else default)))
+
+
+(defn parseException
+  "Produce an exception object (with location information when available)."
+  ([msg] (RuntimeException. msg))
+  ([expr msg] (parseException expr msg nil))
+  ([expr msg ex]  
+   (let [meta (meta->map (first (filter meta? expr)))
+         location (if (or (nil? meta) (contains? meta '.line)) 
+                    "unknown location" 
+                    (get meta '.line))]
+     (RuntimeException. (str msg " (at " location ")") ex))))
+
+  
+
 
