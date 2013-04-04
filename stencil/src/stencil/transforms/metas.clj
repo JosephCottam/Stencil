@@ -13,7 +13,7 @@
 (defn ensure-metas [program] 
   "Ensure that there is a meta expression after every atom."
    (match program
-     (e :guard empty?) nil
+     (e :guard empty?) e
      ([(a :guard atom?) (m :guard meta?) & rest] :seq)
          `(~a ~m ~@(ensure-metas rest))
      ([(a :guard atom?) & rest] :seq)

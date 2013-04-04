@@ -33,17 +33,15 @@
          ([t & rest] :seq) `((~t) ~@rest)))   ;;Single variable binding w/o meta
      (divide-body [lines]
        "Give back a pair (bindings, body)"
-       (let [maybe-body (last lines)]
-         (if (or (atom? maybe-body) (not (any= '$$ maybe-body)))
-           (list (butlast lines) maybe-body)
-           (list lines '()))))
-     (reshape-binding [binding]
-       "Provide relevant do-statement so even values look like function applications in the bindings"
-       (let [[vars op expr & meta] binding]
-         (cond
-           (not (empty? meta)) `(~vars (~'do ~expr ~@meta))
-           (atom? expr) `(~vars (~'do ~expr))
-           :else `(~vars ~expr))))]
+       (cond
+         (meta? (last lines)) (list (drop-last 2 lines) `(~'do (~'$meta) ~@(take-last 2 lines)))
+         (any= '$$ (last lines)) (list lines '())
+         :else (list (butlast lines) (last lines))))
+     (reshape-binding [[vars op m1 & expr]]
+       "Wrap the RHS in a do so it is always a valid expression."
+       (if (= 1 (count expr))
+         `(~vars ~@expr)
+         `(~vars (~'do (~'$meta) ~@expr))))]
     (match program
       (x :guard atom?) x
       (['let (m :guard meta?) & lines] :seq) 
@@ -72,7 +70,7 @@
        (let [names (distinct (remove meta? bindings))
              metas (meta-map bindings nil {})
              typed (blend names metas)]
-        `(~'ptuple (~'fields ~@typed) ~@typed)))
+        `(~'ptuple (~'$meta) (~'fields (~'$meta) ~@typed) ~@typed)))
 
      (ensure-body
        ([bindings body]

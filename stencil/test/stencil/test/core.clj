@@ -1,4 +1,5 @@
 (ns stencil.test.core
+  (:use stencil.util)
   (:require [stencil.core :as c])
   (:require [stencil.transform :as t])
   (:require [stencil.pprint :as pp])
@@ -43,7 +44,7 @@
   (is (list? (c/parse (c/read (str root "geometry/simplelines.tstencil"))))))
 
 (defn clean [p] 
-  (pp/reduce-metas (t/drop-comments p)))
+  (reduce-metas (t/drop-comments p)))
 
 (defn same-structure? [p1 p2]
   (cond

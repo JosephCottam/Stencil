@@ -15,7 +15,7 @@ class dataset__:
      (x) = np.arange(100) / 6.0
      (y) = np.sin(x)
      (z) = np.cos(x)
-     self.data(x, y, z)
+     self.datum(x, y, z)
 
   def data(self, a, b, c):
     self.a.extend(a)

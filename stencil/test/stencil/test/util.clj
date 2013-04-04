@@ -1,4 +1,5 @@
 (ns stencil.test.util
+  (:require [stencil.util :as u])
   (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
@@ -60,4 +61,28 @@
   (is (= (t/split-preamble '(stencil x ($meta))) '[(stencil x ($meta)) ()]))
   (is (= (t/split-preamble '(stencil x ($meta) (import))) '[(stencil x ($meta) (import)) ()]))
   (is (= (t/split-preamble '(stencil x ($meta) (import) (table))) '[(stencil x ($meta) (import)) ((table))])))
+
+(deftest clean-metas
+  (is (= (u/clean-metas 'a) 'a))
+  (is (= (u/clean-metas '(a ($meta))) '(a)))
+  (is (= (u/clean-metas '(a (b ($meta) c ($meta)))) '(a (b c))))
+  (is (= (u/clean-metas '(a ($meta stuff))) '(a ($meta stuff))))
+  (is (= (u/clean-metas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
+         '(a ($meta stuff) (b ($meta stuff) c d ($meta stuff))))))
+
+(deftest remove-metas
+  (is (= (u/remove-metas 'a) 'a))
+  (is (= (u/remove-metas '(a ($meta))) '(a)))
+  (is (= (u/remove-metas '(a (b ($meta) c ($meta)))) '(a (b c))))
+  (is (= (u/remove-metas '(a ($meta stuff))) '(a)))
+  (is (= (u/remove-metas '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff)))) 
+         '(a (b c d)))))
+
+(deftest reduce-metas
+  (is (= (u/reduce-metas 'a) 'a))
+  (is (= (u/reduce-metas '(a (b ($meta) c ($meta)))) '(a (b ($meta) c ($meta)))))
+  (is (= (u/reduce-metas '(a ($meta (.some 1)))) '(a ($meta))))
+  (is (= (u/reduce-metas '(a ($meta stuff (.some other)))) '(a ($meta stuff))))
+  (is (= (u/reduce-metas '(a ($meta stuff) (b ($meta stuff (.some 1)) c ($meta (.other 1)) d ($meta stuff))))
+         '(a ($meta stuff) (b ($meta stuff) c ($meta) d ($meta stuff))))))
          

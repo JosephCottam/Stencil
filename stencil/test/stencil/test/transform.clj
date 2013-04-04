@@ -2,6 +2,8 @@
   (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
+(defn sm [a] (t/ensure-metas a))
+
 (defn strip-gen [a]
   "Remove the random part of gensymed names; used to approxiamte equality checks."
   (cond 
@@ -37,19 +39,20 @@
   (is (= (t/drop-comments (list '$meta java.lang.Long)) (list '$meta java.lang.Long))))
 
 (deftest infix->prefix 
-  (is (= (t/infix->prefix '(a + b)) '(+ a b)))
-  (is (= (t/infix->prefix '(+ a b)) '(+ a b)))
-  (is (= (t/infix->prefix '((a + b))) '((+ a b))))
-  (is (= (t/infix->prefix '(map +' ls)) '(map + ls)))
-  (is (= (t/infix->prefix '(a plus' b)) '(plus a b)))
-  (is (= (t/infix->prefix '(map plus ls)) '(map plus ls)))
-  (is (= (t/infix->prefix '((v) $$ a)) '($$ (v) a)))
-  (is (= (t/infix->prefix '(a _)) '(a _)))
-  (is (= (t/infix->prefix '(a -> b)) '(-> a b)))
-  (is (= (t/infix->prefix '(let (((a) (a + b))) ())) '(let (((a) (+ a b))) ())))
-  (is (= (t/infix->prefix '(let (((a) (do 3 + 4))) ())) '(let (((a) (+ 3 4))) ())))
-  (is (= (t/infix->prefix '(let ((a) (do (a + b) -> (c))) ()))
-         '(let ((a) (-> (+ a b) (c))) ()))))
+  (is (= (t/infix->prefix '()) '()))
+  (is (= (t/infix->prefix (sm '(a + b))) (sm '(+ a b))))
+  (is (= (t/infix->prefix (sm '(+ a b))) (sm '(+ a b))))
+  (is (= (t/infix->prefix (sm '((a + b)))) (sm '((+ a b)))))
+  (is (= (t/infix->prefix (sm '(map +' ls))) (sm '(map + ls))))
+  (is (= (t/infix->prefix (sm '(a plus' b))) (sm '(plus a b))))
+  (is (= (t/infix->prefix (sm '(map plus ls))) (sm '(map plus ls))))
+  (is (= (t/infix->prefix (sm '((v) $$ a))) (sm '($$ (v) a))))
+  (is (= (t/infix->prefix (sm '(a _))) (sm '(a _))))
+  (is (= (t/infix->prefix (sm '(a -> b))) (sm '(-> a b))))
+  (is (= (t/infix->prefix (sm '(let (((a) (a + b))) ()))) (sm '(let (((a) (+ a b))) ()))))
+  (is (= (t/infix->prefix (sm '(let (((a) (do 3 + 4))) ()))) (sm '(let (((a) (+ 3 4))) ()))))
+  (is (= (t/infix->prefix (sm '(let ((a) (do (a + b) -> (c))) ())))
+         (sm '(let ((a) (-> (+ a b) (c))) ())))))
 
 (deftest arrow->using
   (is (= (t/arrow->using '(a b)) '(a b)))
@@ -60,11 +63,15 @@
          '(let (((a) (using a b))) ()))))
 
 (deftest tuple->ptuple
-  (is (= (t/tuple->ptuple (t/ensure-metas '(a))) (t/ensure-metas '(a))))
-  (is (= (t/tuple->ptuple (t/ensure-metas '(tuple a b c))) (t/ensure-metas '(tuple a b c))))
-  (is (= (t/tuple->ptuple (t/ensure-metas '(tuple a $$ 1 b $$ 2 c $$ 3))) (t/ensure-metas '(ptuple (fields a b c) 1 2 3))))
-  (is (= (t/tuple->ptuple (t/ensure-metas '(tuples a $$ 1 b $$ 2 c $$ 3))) (t/ensure-metas '(ptuples (fields a b c) 1 2 3))))
-  (is (thrown? RuntimeException (t/tuple->ptuple (t/ensure-metas '(tuple a $$ 1 b c))))))
+  (is (= (t/tuple->ptuple (sm '(a))) 
+         (sm '(a))))
+  (is (= (t/tuple->ptuple (sm '(tuple a b c))) 
+         (sm '(tuple a b c))))
+  (is (= (t/tuple->ptuple (sm '(tuple a $$ 1 b $$ 2 c $$ 3))) 
+         (sm '(ptuple (fields a b c) 1 2 3))))
+  (is (= (t/tuple->ptuple (sm '(tuples a $$ 1 b $$ 2 c $$ 3))) 
+         (sm '(ptuples (fields a b c) 1 2 3))))
+  (is (thrown? RuntimeException (t/tuple->ptuple (sm '(tuple a $$ 1 b c))))))
 
 (deftest validate-let-shape
   (is (= (t/validate-let-shape '(let (a $$ b)))) '(let (a $$ b)))
@@ -75,31 +82,34 @@
   (is (thrown? RuntimeException (t/validate-let-shape '(let (a $$ c) (d e f) (h i j))))))
 
 (deftest normalize-let-shape
-  (is (= (t/normalize-let-shape '(let ((a d) $$ (b)) 4)) '(let (((a d) (b))) (do 4))))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ (b)) (body))) '(let (((a d) (b))) (body))))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ (b)))) '(let (((a d) (b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a ($meta)) $$ b))) '(let (((a ($meta)) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a ($meta) $$ b))) '(let (((a ($meta)) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a $$ b))) '(let (((a) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let ((a d) $$ b))) '(let (((a d) (do b))) ())))
-  (is (= (t/normalize-let-shape '(let (a $$ b ($meta)))) '(let (((a) (do b ($meta)))) ())))
-  (is (= (t/normalize-let-shape '(let (a $$ b) (c $$ d) (e $$ f) (g $$ (h i j))))
-         '(let (((a) (do b)) 
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ (b)) 4))) (sm '(let (((a d) (b))) (do 4)))))
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ (b)) (body)))) (sm '(let (((a d) (b))) (body)))))
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ (b))))) (sm '(let (((a d) (b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ b)))) (sm '(let (((a d) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ b)))) (sm '(let (((a d) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let ((a) $$ b)))) (sm '(let (((a ($meta)) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let (a $$ b)))) (sm '(let (((a ($meta)) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let (a $$ b)))) (sm '(let (((a) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let ((a d) $$ b)))) (sm '(let (((a d) (do b))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let (a $$ b)))) (sm '(let (((a) (do b ($meta)))) ()))))
+  (is (= (t/normalize-let-shape (sm '(let (a $$ b) (c $$ d) (e $$ f) (g $$ (h i j)))))
+         (sm '(let (((a) (do b)) 
                 ((c) (do d)) 
                 ((e) (do f)) 
                 ((g) (h i j)))
-            ()))))
+            ())))))
 
 (deftest default-let-body
-  (is (= (t/default-let-body '(let (((a) b)) ())) '(let (((a) b)) (ptuple (fields a) a))))
-  (is (= (t/default-let-body '(let (((a) b)) (tuple a))) '(let (((a) b)) (tuple a))))
-  (is (= (t/default-let-body '(let (((a b) c)) ())) '(let (((a b) c)) (ptuple (fields a b) a b))))
-  (is (= (t/default-let-body '(let (((a) b) ((c) d)) ())) 
-         '(let (((a) b) ((c) d)) (ptuple (fields a c) a c))))
-  (is (= (t/default-let-body '(let (((a ($meta)) b)) ())) 
-         '(let (((a ($meta)) b)) (ptuple (fields a ($meta)) a ($meta))))))
+  (is (= (t/default-let-body (sm '(let (((a) b)) ()))) 
+         (sm '(let (((a) b)) (ptuple (fields a) a)))))
+  (is (= (t/default-let-body (sm '(let (((a) b)) (tuple a)))) 
+         (sm '(let (((a) b)) (tuple a)))))
+  (is (= (t/default-let-body (sm '(let (((a b) c)) ()))) 
+         (sm '(let (((a b) c)) (ptuple (fields a b) a b)))))
+  (is (= (t/default-let-body (sm '(let (((a) b) ((c) d)) ()))) 
+         (sm '(let (((a) b) ((c) d)) (ptuple (fields a c) a c)))))
+  (is (= (t/default-let-body (sm '(let (((a ($meta)) b)) ()))) 
+         (sm '(let (((a ($meta)) b)) (ptuple (fields a ($meta)) a ($meta)))))))
 
 (deftest tie-metas 
   (is (= (t/tie-metas '(a)) '(a)))
@@ -112,6 +122,7 @@
   (is (let [p '(stencil name ($meta))] (= (t/untie-metas (t/tie-metas p)) p))))
 
 (deftest ensure-metas
+  (is (= (t/ensure-metas '()) '()))
   (is (= (t/ensure-metas '(a)) '(a ($meta))))
   (is (= (t/ensure-metas '(a ($meta))) '(a ($meta))))
   (is (= (t/ensure-metas '(a b c)) '(a ($meta) b ($meta) c ($meta))))
