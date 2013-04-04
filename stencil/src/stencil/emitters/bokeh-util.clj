@@ -59,12 +59,13 @@
 (defn py-imports [program]
   (let [imports (->> program 
                   (t/filter-tagged 'import)
-                  (filter #(.startsWith (str (full-drop %)) "py-"))
-                  (map (fn [[i package m as items]] 
+                  (filter #(.startsWith (str (nth % 2)) "py-"))
+                  (map (fn [[_ _ package & policies]] 
                          (let [package (symbol (.substring (str package) 3))
-                               as (clean-to-false as) 
-                               items (clean-to-false items)] 
-                         (list 'import  package m as items)))))
+                               as (clean-to-false (first (filter-tagged 'as policies)))
+                               items (clean-to-false (first (filter-tagged 'items policies)))
+                               items (if (and items (any= 'ALL items)) '(*) items)]
+                         (list 'import package as items)))))
         rest (filter-tagged #(not (= %1 %2)) 'import (drop 4 program))]
     `(~@(take 4 program) ~@imports ~@rest)))
 

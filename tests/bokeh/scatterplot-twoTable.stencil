@@ -1,5 +1,5 @@
 (import BokehRuntime)
-(import py-math)
+(import py-math (items ALL))
 
 (table dataset 
   (fields a b c)
