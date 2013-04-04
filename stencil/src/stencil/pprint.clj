@@ -9,12 +9,13 @@
     (loop [astencil (seq astencil)]
       (when astencil
         (clojure.pprint/write-out (first astencil))
-        (when-let [nxt (second astencil)]
-          (.write ^java.io.Writer *out* " ")
-          (if (meta? nxt)   ;;Reduces line-breaks after metas over standard pretty-printer
-            (clojure.pprint/pprint-newline :fill)
-            (clojure.pprint/pprint-newline :linear))
-          (recur (next astencil)))))))
+        (if (not (nil? (second astencil)))
+          (let [nxt (second astencil)]
+            (.write ^java.io.Writer *out* " ")
+            (if (meta? nxt)   ;;Reduces line-breaks after metas over standard pretty-printer
+              (clojure.pprint/pprint-newline :fill)
+              (clojure.pprint/pprint-newline :linear))
+            (recur (next astencil))))))))
 
 (defn spp [program & opts] 
   "A pretty-printer for stencil.
