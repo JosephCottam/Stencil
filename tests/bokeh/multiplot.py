@@ -5,7 +5,6 @@ p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey=
 p.use_doc("multiplot")
 import numpy as np
 
-
 class dataset__:
   _fields = ['a', 'b', 'c']
   a = []
@@ -16,7 +15,7 @@ class dataset__:
      (x) = np.arange(100) / 6.0
      (y) = np.sin(x)
      (z) = np.cos(x)
-     self.datum(x, y, z)
+     self.data(x, y, z)
 
   def data(self, a, b, c):
     self.a.extend(a)

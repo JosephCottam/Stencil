@@ -6,7 +6,7 @@
   (data (init (let (x : (np.arange 100) / 6.0)
                    (y : (np.sin x))
                    (z : (np.cos x))
-                #(a:x, b:y, c:z))))
+                ##(a:x, b:y, c:z))))
   (render table (fields a b c))
   (render scatter (bind (x: a) (y: b) (color: "orange"))) 
   (render scatter (bind (x: a) (y: c) (color: "red")))

@@ -16,7 +16,7 @@ class dataset__:
      (x) = range(0, 100, 6)
      (y) = map(sin, x)
      (z) = map(cos, x)
-     self.datum(x, y, z)
+     self.data(x, y, z)
 
   def data(self, a, b, c):
     self.a.extend(a)
