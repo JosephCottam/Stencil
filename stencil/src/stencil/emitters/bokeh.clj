@@ -82,13 +82,12 @@
       (filter f from))))
 
 (defn render-bind-atts [[target source]] 
-  (println "Generating rendering bindgs for '" source "'")
   (let [src (if (symbol? source) (str "\"" source "\"") false)
         default (if (symbol? source) false source)]
   (RenderBinding. target default src)))
 
-(defn guide-att [parent [tag target type args]] 
-  (Guide. (str target type) type parent target (str "_" target "_dr_") (t/lop->map (rest args))))
+(defn guide-att [parent [tag target type args]]
+    (Guide. (str target type) type parent target (str "_" target "_dr_") (t/lop->map (rest args))))
 
 (defn bokeh-plot-types [type]
   (case (.toLowerCase (str type))

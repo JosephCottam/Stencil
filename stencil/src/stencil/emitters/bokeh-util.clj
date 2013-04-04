@@ -74,7 +74,7 @@
     (['guide (m0 :guard meta?) (target :guard symbol?) (m1 :guard meta?) (type :guard symbol?) (m2 :guard meta?)] :seq)
       (let [args (t/dissoc-tlop (reduce-metas m2) 'type)
             args (cons 'args (rest args))]
-      `(~'guide ~m0 ~target ~m1 type ~m2 ~(interpose '($meta) args)))
+      `(~'guide ~m0 ~target ~m1 ~type ~m2 ~(interpose '($meta) args)))
     :else (map guide-args program)))
 
 (defn quote-strings [program]

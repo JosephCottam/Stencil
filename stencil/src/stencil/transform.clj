@@ -28,12 +28,12 @@
   "tree -> tree: Transforms a parse-form tree to normal-form tree"
   [program] 
    (-> program 
-     ensure-metas location-in-metas 
+     ensure-metas meta-pairings location-in-metas 
      ensure-runtime-import
      tuple->ptuple normalize-let-shape 
      infix->prefix arrow->using default-let-body
      file->init pull->when init->when
-     meta-pairings ensure-metas meta-types
+     ensure-metas meta-types
      normalize-imports
      ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
      align-ptuple
@@ -43,7 +43,7 @@
 (defn prep-emit
   "tree -> tree: Lowers abstractions convenient during analysis, before emitters are called." 
   [program]
-    (-> program drop-comments ))
+    (-> program drop-comments))
 
 (defn imports
   "tree -> modules: process the imports from the program"

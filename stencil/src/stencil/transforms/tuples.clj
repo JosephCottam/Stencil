@@ -25,11 +25,14 @@
     (a :guard atom?) a
     ([(tag :guard tuple?) (m0 :guard meta?) & (values :guard has-bind?)] :seq)
       (let [arg-slice (span '$$ values)
-            [vars vm binds bm vals vm] (reverse-interleave arg-slice values)]
+            [vars varm binds bm vals valm] (reverse-interleave arg-slice values)
+            ivals (if (empty? valm) vals (interleave vals valm))] ;;If vals are function applications, then there are no associated metas; this interleaving here
         (if (or (not-every? symbol? vars)
-                (not-every? bind? binds)) 
+                (not-every? bind? binds)
+                (not (= (count values) 
+                        (+ (count vars) (count varm) (count binds) (count bm) (count vals) (count valm)))))
           (throw (parseException program "Mal-formed prototyped-tuple"))
-          `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave vars vm)) ~@(interleave vals vm))))
+          `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave vars varm)) ~@ivals)))
     :else (map tuple->ptuple program)))
 
 

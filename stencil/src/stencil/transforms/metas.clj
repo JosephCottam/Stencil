@@ -25,7 +25,7 @@
   "Put line/column information from parsing into Stencil metas (pulled from Clojure metas)"
   (letfn [(extend-meta [m a]
             (if-let [am (meta a)]
-              (map->meta (assoc (meta->map m) (symbol ".line") (am :line) (symbol ".col") (am :column)))
+              (map->meta (assoc (meta->map m) '.line (am :line) '.col (am :column)))
               m))]
     (match program
       (a :guard atom?) (throw (RuntimeException. "Bare atom found after metas in all locations expected."))
@@ -37,15 +37,20 @@
   
 
 (defn meta-pairings [program]
-  (letfn [(maybe-pair [ls]
+  "Ensure that every meta value has a label and is formatted as list-of pairs.
+  TODO: This might run into problems if meta's contain un-labeled sequences...
+    part of that depends on what exactly the bind operator means (if its 'just an infix paranethesis' then we hav ea problem)."
+  (letfn [(maybe-pair [ls i]
             (cond
-              (or (empty? ls) (< (count ls) 3)) ls
+              (empty? ls) ls
+              (seq? (first ls)) (cons (first ls) (maybe-pair (rest ls) i))
               (= '$$ (second ls)) 
-                 (cons (list (first ls) (nth ls 2)) (maybe-pair (drop 3 ls)))
-              :else (cons (first ls) (maybe-pair (rest ls)))))]
+                 (cons (list (first ls) (nth ls 2)) (maybe-pair (drop 3 ls) i))
+              :else (cons (list (symbol (str "$p" i)) (first ls))
+                          (maybe-pair (rest ls) (+ 1 i)))))]
     (match program
       (a :guard atom?) a
-      (['$meta & rest] :seq) (cons '$meta (maybe-pair rest))
+      (['$meta & rest] :seq) (cons '$meta (maybe-pair rest 0))
       :else (map meta-pairings program))))
 
 
@@ -55,11 +60,12 @@
   [program]
   (letfn 
     [(hasType? [metas] (and (seq? metas) (contains? (meta->map metas) 'type)))
-     (addType [metas] (let [[before after] (split-with seq? (rest metas))
-                            [type & tail] after]
-                        (if (nil? type) 
-                          metas
-                          (cons '$meta (concat before (cons (list 'type type) tail))))))]
+     (addType [metas]  
+       "If there is a $p0 entry, use it as the type."
+       (let [meta (meta->map metas)
+             p0 ('$p0 meta)
+             meta (if (nil? p0) meta (dissoc (assoc meta 'type p0) '$p0))]
+         (map->meta meta)))]
     (match program
       (a :guard [meta? hasType?]) a
       (a :guard meta?) (addType a)

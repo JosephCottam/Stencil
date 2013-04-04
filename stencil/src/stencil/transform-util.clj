@@ -98,10 +98,10 @@
   ([expr msg] (parseException expr msg nil))
   ([expr msg ex]  
    (let [meta (meta->map (first (filter meta? expr)))
-         location (if (or (nil? meta) (contains? meta '.line)) 
+         location (if (or (nil? meta) (not (contains? meta '.line)))
                     "unknown location" 
                     (get meta '.line))]
-     (RuntimeException. (str msg " (at " location ")") ex))))
+     (RuntimeException. (str msg " (at line " location ")") ex))))
 
   
 

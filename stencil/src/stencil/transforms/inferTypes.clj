@@ -1,7 +1,7 @@
 (ns stencil.transform
   "Type inferencing system. (Definately not done yet.)")
 
-;;TODO: There are many contexts that are still incorrect here.  Like bindings are being forced to fn...
+;;TODO: There are many things that are still incorrect here.  Like bindings are being forced to fn...
 
 
 (defn UNKNOWN  [] '***)

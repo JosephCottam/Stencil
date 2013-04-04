@@ -1,4 +1,5 @@
 (ns stencil.test.transform
+  (:require [stencil.core :as c])
   (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
@@ -71,6 +72,8 @@
          (sm '(ptuple (fields a b c) 1 2 3))))
   (is (= (t/tuple->ptuple (sm '(tuples a $$ 1 b $$ 2 c $$ 3))) 
          (sm '(ptuples (fields a b c) 1 2 3))))
+  (is (= (t/tuple->ptuple (sm '(tuples a $$ (list 1) b $$ (list 2) c $$ (list 3)))) 
+         (sm '(ptuples (fields a b c) (list 1) (list 2) (list 3)))))
   (is (thrown? RuntimeException (t/tuple->ptuple (sm '(tuple a $$ 1 b c))))))
 
 (deftest validate-let-shape
@@ -160,6 +163,10 @@
   (is (= (t/location-in-metas (list (with-meta 'a {:line 1 :column 0}) '($meta ("some" 3))))
          '(a ($meta (.col 0) (.line 1) ("some" 3))))
       "Transfer preserves other tags")
+  (is (= (-> "(item {orientation : \"bottom\"})"
+           c/parse t/ensure-metas t/meta-pairings t/location-in-metas)
+         (sm '(item ($meta (.col 5) (.line 1) (orientation "bottom")))))
+      "Transfer preserves other tags, even when binds are still present.")
   (is (= (t/location-in-metas (list (with-meta 'a {:line 1 :column 0}) '($meta (.line -1000))))
          '(a ($meta (.col 0) (.line 1))))
       "Transfer overwrites existing values")
@@ -168,20 +175,20 @@
 (deftest meta-types
   (is (= (t/meta-types '($meta)) '($meta)) "identity 1")
   (is (= (t/meta-types '($meta (some a))) '($meta (some a))) "identity 2")
-  (is (= (t/meta-types '($meta a)) '($meta (type a))))
+  (is (= (t/meta-types '($meta ($p0 a))) '($meta (type a))))
   (is (= (t/meta-types '($meta (type a))) '($meta (type a))))
-  (is (= (t/meta-types '($meta a (type b)))) '($meta a (type b)))
+  (is (= (t/meta-types '($meta ($p0 a) (type b)))) '($meta a (type b)))
   (is (= (t/meta-types '($meta (some a) (type b))) '($meta (some a) (type b))))
-  (is (= (t/meta-types '($meta a b))) '($meta (type a) b))
-  (is (= (t/meta-types '(a ($meta a b))) '(a ($meta (type a) b)))))
+  (is (= (t/meta-types '($meta ($p0 a) ($p1 b)))) '($meta (type a) b))
+  (is (= (t/meta-types '(a ($meta ($p0 a) ($p1 b)))) '(a ($meta (type a) ($p1 b))))))
   
 (deftest meta-pairings
   (is (= (t/meta-pairings '($meta (a b))) '($meta (a b))))
   (is (= (t/meta-pairings '(f ($meta (a b)))) '(f ($meta (a b)))))
-  (is (= (t/meta-pairings '($meta a b)) '($meta a b)))
+  (is (= (t/meta-pairings '($meta a b)) '($meta ($p0 a) ($p1 b))))
   (is (= (t/meta-pairings '($meta a $$ b)) '($meta (a b))))
-  (is (= (t/meta-pairings '($meta a b $$ c)) '($meta a (b c))))
-  (is (= (t/meta-pairings '($meta a b c $$ d e f)) '($meta a b (c d) e f))))
+  (is (= (t/meta-pairings '($meta a b $$ c)) '($meta ($p0 a) (b c))))
+  (is (= (t/meta-pairings '($meta a b c $$ d e f)) '($meta ($p0 a) ($p1 b) (c d) ($p2 e) ($p3 f)))))
 
 
 (deftest expr->fields
@@ -320,9 +327,12 @@
          '(table x ($meta) (fields a ($meta (default 0)) b ($meta (default 1)))))))
 
 
-(deftest init->when
-  (is (= (t/init->when '(init (gen))) '(when ($init?) () (gen)))))
-
+(deftest convertToWhen
+  (is (= (t/init->when (sm '(init (gen)))) (sm '(when ($init?) () (gen))))
+      "init to when")
+  (is (= (t/pull->when '(pull ($meta) source ($meta) action)) 
+         '(when ($meta) (onChange ($meta) source ($meta)) (items ($meta) source ($meta)) action))
+      "pull to when"))
 
 (deftest split-when
   (is (= (t/split-when '()) '()))

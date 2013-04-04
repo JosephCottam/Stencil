@@ -5,16 +5,16 @@
   "Convert pull statements to when statements"
   (match program
     (a :guard atom?) a
-    (['pull from conseq] :seq)
-         (list 'when (list 'onChange from) (list 'items from) conseq)
+    (['pull (m0 :guard meta?) from (m1 :guard meta?) conseq] :seq)
+      `(~'when ~m0 (~'onChange (~'$meta) ~from ~m1) (~'items (~'$meta) ~from ~m1) ~conseq)
     :else (map pull->when program)))
 
 (defn init->when [program] 
   "Convert init statements to when statements."
   (match program
     (a :guard atom?) a
-    (['init gen] :seq)
-      `(~'when (~'$init?) () ~gen)
+    (['init (m0 :guard meta?) gen] :seq)
+      `(~'when ~m0 (~'$init? ~m0) () ~gen)
     :else (map init->when program)))
 
 
