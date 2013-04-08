@@ -1,18 +1,19 @@
 (stencil xaxis
    (item  configure 
-      (fields   title offset rotation top bottom mods)
-      (defaults ""    -20      90       2    -20))
+      (fields x y title offset rotation top bottom mods)
+      (defaults ""    -20      90       2    -20 #()))
 
    (table descriptors (fields input result mods))
 
    (view 
-      (render labels text (bind auto))
-      (render ticks line (bind auto))
-      (render axisLabel text (bind auto))
-      (render axisLine line (bind auto)))
+      (render configure node (bind x:x y:y)
+        (render labels text (bind auto))
+        (render ticks line (bind auto))
+        (render axisLabel text (bind auto))
+        (render axisLine line (bind auto))))
 
    (table labels 
-     (fields x y text reg rotation)
+     (fields x y text reg rotation)  ;;Needs to be expanded out to all items understood by text renderer
      (data (pull descriptors
         (let (x: result)
              (y: 0)
@@ -54,15 +55,16 @@
 (stencil yaxis
    (item  configure 
       (fields   title offset rotation left right mods)
-      (defaults ""    -20      0       -20  2))
+      (defaults ""    -20      0       -20  2 #()))
 
    (table descriptors (fields input result mods))
 
    (view 
-      (render labels text (bind auto))
-      (render ticks line (bind auto))
-      (render axisLabel text (bind auto))
-      (render axisLine line (bind auto)))
+      (render configure node (bind x:x y:y)
+        (render labels text (bind auto))
+        (render ticks line (bind auto))
+        (render axisLabel text (bind auto))
+        (render axisLine line (bind auto))))
 
    (table labels 
      (fields x y text reg rotation)

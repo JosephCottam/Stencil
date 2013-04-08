@@ -1,0 +1,96 @@
+(stencil discreteLegend
+  (item configure  
+     (fields title offset x y mods)
+     (defaults ""   10    0 0  #()))
+
+  (table descriptors (fields input result mods))
+  (table fullDescriptors 
+    (fields order input result mods)
+    (data (pull descriptors #(-1 input result mods)))
+    (ensure #(order : (index input (sort (select fullDescriptors input))))))
+
+  (view 
+    (render configure node (bind x:x, y:y)
+      (render labels text (bind auto))
+      (render examples shape (bind auto))
+      (render legendLabel text (bind auto))))
+
+   (table labels 
+     (fields x y text reg)
+     (data (pull fullDescriptors
+        (let (x: 0)
+             (y: (10 * order))
+             (text : input)
+             (reg : "LEFT"))
+          (merge #(x,y,text,reg) mods))))
+
+   (table examples 
+     (fields x y)
+     (data (pull fullDescriptors
+        (let (x : -5)
+             (y : (10 * order))  
+           (merge #(x:x, y:y) result))))) 
+
+  (table legendLabel
+    (fields text x y width reg align)
+    (data (when (or (delta labels) (delta examples) (delta configure))
+                (items configure)
+                (let (text : title)
+                     (x : 0)
+                     (y : (offset + (max (select labels y))))
+                     (width : (+ labels.bounds examples.bounds).width)
+                     (align : "center")
+                     (reg : "bottom")
+                   (merge #(text,x,y,width,align) mods))))))
+
+
+(stencil gradientLegend
+  (item configure  
+     (fields title offset x y mods)
+     (defaults ""   10    0 0  #()))
+
+  (table descriptors (fields input result))
+  (table fullDescriptors 
+    (fields order input result)
+    (data (pull descriptors #(input result)))
+    (ensure #(order : (index input (sort (select fullDescriptors input))))))
+
+  (view 
+    (render labels text (bind auto))
+    (render scale (bind auto))
+    (render legendLabel text (bind auto)))
+
+
+   (table labels 
+     (fields x y text reg)
+     (data (pull fullDescriptors
+        (let (x: 0)
+             (y: 10 * order)
+             (text : input)
+             (reg : "LEFT"))
+          (merge #(x,y,text,reg) mods))))
+
+   (table scale
+     (fields x y width height color)
+     (data (pull fullDescriptors
+        (let (x : -10)
+             (y : 0)
+             (width : 5)
+             (height : 10)
+             (color : (gradient (select fullDescriptors result))))
+          (merge #(x,y,width,height,color) mods))))
+
+  (table legendLabel
+    (fields text x y width reg align)
+    (data (when (or (delta labels) (delta examples) (delta configure))
+                (items configure)
+                (let (text : title)
+                     (x : 0)
+                     (y : (offset + (max (select labels y))))
+                     (width : (+ labels.bounds examples.bounds).width)
+                     (align : "center")
+                     (reg : "bottom")
+                   (merge #(text,x,y,width,align) mods))))))
+
+
+

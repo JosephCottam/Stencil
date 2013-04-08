@@ -67,5 +67,5 @@
 
 (view (render _ matrix flowers (grid 'sepalL sepalW petalL petalW) (hold (color: (colorBy species)))))
 
-;;Matrix is expaneded out by the stencil compiler to be the cross-product set of iamge
+;;Matrix is expaneded out by the stencil compiler to be the cross-product set of images
 
