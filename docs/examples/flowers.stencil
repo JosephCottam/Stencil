@@ -12,10 +12,12 @@
          (fillC : (ColorBy Species))
          (shape : 'Circle)))))
 
-
 ;; --------------------------- Static Matrix Version --------------------
 
-;Same "flowers" table
+(table flowers
+  (data (file "andersons.txt"))
+  (fields sepalL sepalW petalL petalW species)
+  (display "Sepal Length" "Sepal Width" "Petal Length" "Petal Width" "Species"))
 
 (table plot (staticMatrix pairs flowers.fields-{'species} (flowers 'species)))
 
@@ -57,4 +59,13 @@
                 '()
                 (cons (list ()  (* col w) (* row h) item)
                    (recur (car rest) (cdr rest) (add1 col))))
+;; --------------------------- Another attempt --------------------------
+(table flowers
+  (data (file "andersons.txt"))
+  (fields sepalL sepalW petalL petalW species)
+  (display "Sepal Length" "Sepal Width" "Petal Length" "Petal Width" "Species"))
+
+(view (render _ matrix flowers (grid 'sepalL sepalW petalL petalW) (hold (color: (colorBy species)))))
+
+;;Matrix is expaneded out by the stencil compiler to be the cross-product set of iamge
 

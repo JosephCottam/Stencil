@@ -1,0 +1,103 @@
+(stencil xaxis
+   (item  configure 
+      (fields   title offset rotation top bottom mods)
+      (defaults ""    -20      90       2    -20))
+
+   (table descriptors (fields input result mods))
+
+   (view 
+      (render labels text (bind auto))
+      (render ticks line (bind auto))
+      (render axisLabel text (bind auto))
+      (render axisLine line (bind auto)))
+
+   (table labels 
+     (fields x y text reg rotation)
+     (data (pull descriptors
+        (let (x: result)
+             (y: 0)
+             (text : input)
+             (reg : "LEFT")
+             (rotation: configure.rotation)
+          (merge #(x,y,text,reg,rotation) mods)))))
+
+   (table ticks 
+     (fields x1 y1 x2 y2)
+     (data (pull descriptors
+       (let ((x1,x2): (result, result)
+             (y1,y2): (configure.top, configure.bottom))
+          (merge #(x1,x2,y1,y2) mods)))))
+
+  (table axisLabel
+    (data (when (or (delta ticks) (delta configure))
+                (items configure)
+                (let (x : (mean (select descriptors result)))
+                     (y : offset) 
+                     (text: title)
+                     (reg : "TOP")
+                  (merge #(x,y,text,reg) mods)))))
+
+   (table axisLine
+      (fields x1 y1 x2 y2)
+      (data (when (or (delta ticks) (delta configure))
+                  (items configure)
+                  (let ((y1,y2) : (0,0))
+                        (x1,x2) : (let (xs : (select 'x1 ticks))
+                                     #((max xs), (min xs)))
+                     (merge #(x1,x2,y1,y2) mods))))))
+
+
+
+
+
+
+(stencil yaxis
+   (item  configure 
+      (fields   title offset rotation left right mods)
+      (defaults ""    -20      0       -20  2))
+
+   (table descriptors (fields input result mods))
+
+   (view 
+      (render labels text (bind auto))
+      (render ticks line (bind auto))
+      (render axisLabel text (bind auto))
+      (render axisLine line (bind auto)))
+
+   (table labels 
+     (fields x y text reg rotation)
+     (data (pull descriptors
+        (let (y: result)
+             (x: 0)
+             (text : input)
+             (reg : "LEFT")
+             (rotation: configure.rotation)
+          (merge #(x,y,text,reg,rotation) mods)))))
+
+   (table ticks 
+     (fields x1 y1 x2 y2)
+     (data (pull descriptors
+       (let ((y1,y2): (result, result)
+             (x1,x2): (configure.above, configure.below))
+          (merge #(x1,x2,y1,y2) mods)))))
+
+  (table axisLabel
+    (fields x y text reg rotation)
+    (data (when (or (delta ticks) (delta configure))
+                (items configure)
+                (let (x : (mean (select descriptors result)))
+                     (y : offset) 
+                     (text: title)
+                     (rotation : 90)
+                     (reg : "BOTTOM")
+                  (merge #(x,y,text,reg) mods)))))
+
+   (table axisLine
+      (fields x1 y1 x2 y2)
+      (data (when (or (delta ticks) (delta configure))
+                  (items configure)
+                  (let ((x1,x2) : (0,0))
+                        (y1,y2) : (let (ys : (select 'y1 ticks))
+                                     #((max xs), (min xs)))
+                     (merge #(x1,x2,y1,y2) mods))))))
+                                     )))))
