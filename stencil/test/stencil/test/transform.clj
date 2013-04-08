@@ -509,7 +509,7 @@
 (deftest ensure-view
   (is (= (t/ensure-view '(ptuple (fields a b c) 1 2 3))
          '(ptuple (fields a b c) 1 2 3))
-      "No view when there are no renders")
+      "When there is no top-level stencil statement")
   (is (= (t/ensure-view '(stencil x (view b g h) (render not-in-view)))
          '(stencil x (view b g h) (render not-in-view)))
       "View trumps auto gen")
@@ -520,4 +520,15 @@
          '(stencil x (import)
                    (view ($meta (type fn)) viewg ($meta (type view)) a ($meta (type render)) d ($meta (type render))) 
                    (render ($meta) a ($meta h) b c) (render ($meta) d ($meta g) e f)))
-      "Autogen view"))
+      "Autogen view")
+  (is (= (strip-gen (t/ensure-view (sm '(stencil x (import) (render a b c) (stencil y (render d e f))))))
+         (sm '(stencil x (import)
+                   (view ($meta (type fn)) viewg ($meta (type view)) a ($meta (type render))) 
+                   (render a b c)
+                   (stencil y 
+                            (view ($meta (type fn)) viewg ($meta (type view)) d ($meta (type render))) 
+                            (render d e f)))))
+      "Nested stencil"))
+
+
+                     
