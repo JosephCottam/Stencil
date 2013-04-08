@@ -65,15 +65,23 @@
 
 (deftest tuple->ptuple
   (is (= (t/tuple->ptuple (sm '(a))) 
-         (sm '(a))))
+         (sm '(a)))
+      "Not a tuple")
   (is (= (t/tuple->ptuple (sm '(tuple a b c))) 
-         (sm '(tuple a b c))))
+         (sm '(ptuple (fields a b c) a b c)))
+      "Names from var names")
+  (is (= (t/tuple->ptuple (sm '(tuple a b 3))) 
+         (sm '(ptuple (fields a b $2) a b 3)))
+      "Mixed names and literal values")
   (is (= (t/tuple->ptuple (sm '(tuple a $$ 1 b $$ 2 c $$ 3))) 
-         (sm '(ptuple (fields a b c) 1 2 3))))
+         (sm '(ptuple (fields a b c) 1 2 3)))
+      "ptuple names provided as bind statements")
   (is (= (t/tuple->ptuple (sm '(tuples a $$ 1 b $$ 2 c $$ 3))) 
-         (sm '(ptuples (fields a b c) 1 2 3))))
+         (sm '(ptuples (fields a b c) 1 2 3)))
+      "ptuples atomic values")
   (is (= (t/tuple->ptuple (sm '(tuples a $$ (list 1) b $$ (list 2) c $$ (list 3)))) 
-         (sm '(ptuples (fields a b c) (list 1) (list 2) (list 3)))))
+         (sm '(ptuples (fields a b c) (list 1) (list 2) (list 3))))
+      "ptuples function values")
   (is (thrown? RuntimeException (t/tuple->ptuple (sm '(tuple a $$ 1 b c))))))
 
 (deftest validate-let-shape
@@ -499,6 +507,9 @@
          '(stencil (render rend ($meta 1) tname ($meta 2) type ($meta 3)) (table tname ($meta a))))))
 
 (deftest ensure-view
+  (is (= (t/ensure-view '(ptuple (fields a b c) 1 2 3))
+         '(ptuple (fields a b c) 1 2 3))
+      "No view when there are no renders")
   (is (= (t/ensure-view '(stencil x (view b g h) (render not-in-view)))
          '(stencil x (view b g h) (render not-in-view)))
       "View trumps auto gen")

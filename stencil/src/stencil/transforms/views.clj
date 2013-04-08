@@ -8,7 +8,7 @@
         renders (filter-tagged 'render program)
         render-names (map name-of renders)
         [preamble body] (split-preamble program)]
-    (if (not (empty? views))
+    (if (or (not (= (first program) 'stencil)) (not (empty? views)))
       program
       `(~@preamble 
            (~'view (~'$meta (~'type ~'fn)) ~(gensym 'viewg_) (~'$meta (~'type ~'view))

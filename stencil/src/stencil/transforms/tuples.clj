@@ -1,39 +1,46 @@
 (ns stencil.transform)
 
-(defn- t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
-(defn- tuple? [a] (any= a '(tuple tuples)))
 
 
-(defn reverse-interleave [n s] 
-  "Converts a list into n-lists of every nth item each
-  http://clojurecorner.blogspot.com/2012/11/reverse-interleave.html"
-  (map
-    (fn [i] (map first (partition-all n (drop i s))))
-    (range 0 n)))
-
-(defn span [item ls]
-  "Find the distance bewteen the first two occurances of item.
-   If the item does not occur twice, returns the list length"
-  (let [s (+ (.indexOf (drop (+ 1 (.indexOf ls item)) ls) item ) 1)
-        s (if (<= s 0) (count ls) s)]
-    s))
 
 (defn tuple->ptuple [program]
   "A prototyped tuple is a tuple with named fields. 
-   This pass converts tuples into prototyped tuples when possible."
-  (match program
-    (a :guard atom?) a
-    ([(tag :guard tuple?) (m0 :guard meta?) & (values :guard has-bind?)] :seq)
-      (let [arg-slice (span '$$ values)
-            [vars varm binds bm vals valm] (reverse-interleave arg-slice values)
-            ivals (if (empty? valm) vals (interleave vals valm))] ;;If vals are function applications, then there are no associated metas; this interleaving here
-        (if (or (not-every? symbol? vars)
-                (not-every? bind? binds)
-                (not (= (count values) 
-                        (+ (count vars) (count varm) (count binds) (count bm) (count vals) (count valm)))))
-          (throw (parseException program "Mal-formed prototyped-tuple"))
-          `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave vars varm)) ~@ivals)))
-    :else (map tuple->ptuple program)))
+   This pass converts tuples into prototyped tuples.
+   Names are either taken from bindings, var-names or positionally generated 
+   (in that order of perference)"
+  (letfn [(t->p [t] (if (= 'tuple t) 'ptuple 'ptuples))
+          (tuple? [a] (any= a '(tuple tuples)))
+          (reverse-interleave [n s] 
+            "Converts a list into n-lists of every nth item each
+            http://clojurecorner.blogspot.com/2012/11/reverse-interleave.html"
+            (map
+              (fn [i] (map first (partition-all n (drop i s))))
+              (range 0 n)))
+          (span [item ls]
+            "Find the distance bewteen the first two occurances of item.
+            If the item does not occur twice, returns the list length"
+            (let [s (+ (.indexOf (drop (+ 1 (.indexOf ls item)) ls) item ) 1)
+                  s (if (<= s 0) (count ls) s)]
+              s))
+          (gen-name [i item] (if (symbol? item) item (symbol (str "$" i))))]
+    (match program
+      (a :guard atom?) a
+      ([(tag :guard tuple?) (m0 :guard meta?) & (values :guard has-bind?)] :seq)
+        (let [arg-slice (span '$$ values)
+              [vars varm binds bm vals valm] (reverse-interleave arg-slice values)
+              ivals (if (empty? valm) vals (interleave vals valm))] ;;If vals are function applications, then there are no associated metas; thus conditional interleaving
+          (if (or (not-every? symbol? vars)
+                  (not-every? bind? binds)
+                  (not (= (count values) 
+                          (+ (count vars) (count varm) (count binds) (count bm) (count vals) (count valm)))))
+            (throw (parseException program "Mal-formed prototyped-tuple"))
+            `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave vars varm)) ~@ivals)))
+      ([(tag :guard tuple?) (m0 :guard meta?) & (values :guard (complement has-bind?))] :seq)
+        (let [items (remove meta? values)
+              metas (filter meta? values)
+              names (map-indexed gen-name items)]
+          `(~(t->p tag) ~m0 (~'fields (~'$meta) ~@(interleave names metas)) ~@values))
+      :else (map tuple->ptuple program))))
 
 
 (defn align-ptuple [program]
