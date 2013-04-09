@@ -36,6 +36,24 @@
     `(~'self.data ~m ~@args)
     :else (map dataTuple->store program)))
 
+(defn title=>binds [program]
+   "Push the 'title' guide into the binding statement(s) of each renderer."
+  (letfn [(title? [[tag _ type & rest]] (and (= tag 'guide) (= type 'title)))]
+    (match program
+      (a :guard atom?) a
+      (['render (m0 :guard meta?) name (m1 :guard meta?) type (m2 :guard meta?) source (m3 :guard meta?) & policies] :seq)
+        (let [titles (filter title? policies)
+              title (if (empty? titles) nil (nth (remove meta? (first titles)) 2))
+              binds (map 
+                      #(concat (take 2 %) (cons (list 'title '($meta) title '($meta)) (drop 2 %)))
+                      (filter-tagged 'bind policies))
+              others (remove title? (filter-tagged (complement =) 'bind policies))]
+          (println "TITLE: " titles)
+          (if (nil? title)
+            program
+            `(~'render ~m0 ~name ~m1 ~type ~m2 ~source ~m3 ~@binds ~@others)))
+      :else (map title=>binds program))))
+        
 
 (defn runtime? [item] 
   "Is the item a runtime import?"
@@ -70,6 +88,7 @@
     `(~@(take 4 program) ~@imports ~@rest)))
 
 (defn guide-args [program]
+  "Remove guide-related arguments from the guide's 'meta'"
   (match program
     (a :guard atom?) a
     (['guide (m0 :guard meta?) (target :guard symbol?) (m1 :guard meta?) (type :guard symbol?) (m2 :guard meta?)] :seq)
