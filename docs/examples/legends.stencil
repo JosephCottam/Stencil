@@ -1,7 +1,7 @@
 (stencil discreteLegend
   (item configure  
-     (fields title offset x y mods)
-     (defaults ""   10    0 0  #()))
+     (fields title offset mods)
+     (defaults ""   10     #()))
 
   (table descriptors (fields input result mods))
   (table fullDescriptors 
@@ -9,11 +9,10 @@
     (data (pull descriptors #(-1 input result mods)))
     (ensure #(order : (index input (sort (select fullDescriptors input))))))
 
-  (view 
-    (render configure node (bind x:x, y:y)
-      (render labels text (bind auto))
-      (render examples shape (bind auto))
-      (render legendLabel text (bind auto))))
+  (view
+    (render labels text (bind auto))
+    (render examples shape (bind auto))
+    (render legendLabel text (bind auto))))
 
    (table labels 
      (fields x y text reg)
@@ -46,8 +45,8 @@
 
 (stencil gradientLegend
   (item configure  
-     (fields title offset x y mods)
-     (defaults ""   10    0 0  #()))
+     (fields title offset mods)
+     (defaults ""   10    #()))
 
   (table descriptors (fields input result))
   (table fullDescriptors 
