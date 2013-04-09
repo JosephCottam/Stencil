@@ -7,12 +7,18 @@
                    (y : (np.sin x))
                    (z : (np.cos x))
                 ##(a:x, b:y, c:z))))
+
   (render table (fields a b c))
-  (render scatter (bind (x: a) (y: b) (color: "orange"))) 
-  (render scatter (bind (x: a) (y: c) (color: "red")))
-  (render plot (bind (x: a) (y: b) (color: "yellow"))) 
-  (render plot (bind (x: a) (y: c) (color: "black")))
-  (render plot (bind (x: a) (y: b) (color: "blue"))
+  (render scatter (guide title "Orange Plot") 
+                  (bind (x: a) (y: b) (color: "orange"))) 
+  (render scatter (guide title "Red Plot") 
+                  (bind (x: a) (y: c) (color: "red")))
+  (render plot (guide title "Yellow Plot") 
+               (bind (x: a) (y: b) (color: "yellow"))) 
+  (render plot (guide title "Black Plot") 
+               (bind (x: a) (y: c) (color: "black")))
+  (render plot (guide title "Two Colors") 
+               (bind (x: a) (y: b) (color: "blue"))
                (bind (x: a) (y: c) (color: "green"))))
    
 
