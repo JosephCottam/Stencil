@@ -4,9 +4,6 @@ Top-level forms:
   (view <id> <policy> ...)
  
 Misc parts
-  set  : a type of tuple expression
-         syntax for building rules,  (set <rule> ...)
-         handles filters and tuple construction and let and :* and :- more fluidly than #(...) syntax would
   #(e ...) : tuple expression, returns a tuple, basically (tuple (id ex) ...) but with nicer syntax
              Can be used anywhere an expression can be used
              Names may be omitted, then values are only referred to by index (handy for making lists!)
