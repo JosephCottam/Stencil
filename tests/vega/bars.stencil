@@ -1,0 +1,23 @@
+(stencil bars
+  (table rawData
+     (fields x y)
+     (data (init ##(x : (list "A","B","C","D","E","F","G","H",I")
+                    y : (list 28,55,43,91,81,53,19,79,52)))))
+
+   (scale xscale #(type: "ordinal", range: main.width, domain: (select 'x rawData)))
+   (scale yscale #(type: "linear" , range: main.height, nice: true, domain: (select 'y rawData))
+
+
+   (view main 
+      (canvas 400 200)
+      (padding #(top: 10 left: 30, bottom:20, right:10))
+      (render _ rect rawData 
+         (hover (fill: "Red"))
+         (update (fill: "SteelBlue"))
+         (data (pull rawData
+                (let (x : (xscale x))
+                     (width: (xscale.band #(offset -1)))
+                     (y : (yscale y))
+                     (y2 : (yscale 0)))))
+         (guide axis x)
+         (guide axis y)))

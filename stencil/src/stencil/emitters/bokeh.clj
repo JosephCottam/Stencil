@@ -3,7 +3,6 @@
   (:use [stencil.util])
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t])
-  (:require [clojure.java.io :as io])
   (:require [stencil.pprint])
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
