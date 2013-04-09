@@ -7,13 +7,12 @@
    (scale xscale #(type: "ordinal", range: main.width, domain: (select 'x rawData)))
    (scale yscale #(type: "linear" , range: main.height, nice: true, domain: (select 'y rawData))
 
-
    (view main 
       (canvas 400 200)
       (padding #(top: 10 left: 30, bottom:20, right:10))
       (render _ rect rawData 
-         (hover (fill: "Red"))
-         (update (fill: "SteelBlue"))
+         (hover (let (fill: "Red")))
+         (update (let (fill: "SteelBlue")))
          (data (pull rawData
                 (let (x : (xscale x))
                      (width: (xscale.band #(offset -1)))

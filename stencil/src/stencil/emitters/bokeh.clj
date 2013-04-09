@@ -139,13 +139,12 @@
               (view-atts renders view))))
 
 
-(defn emit-bokeh [template attlabel atts]
+(defn emit-bokeh [template]
   (let [g (STGroupFile. "src/stencil/emitters/bokeh.stg")
         t (.getInstanceOf g template)]
-    (.render (.add t attlabel atts))))
+    (.render (.add t "program" "def"))))
 
 (defn emit [program]
-  (emit-bokeh "program" "def" 
     (-> program 
       runtime 
       py-imports 
@@ -156,7 +155,6 @@
       remove-empty-using 
       guide-args
       remove-metas
-      as-atts)))
-
-
+      as-atts
+      emit-bokeh))
 
