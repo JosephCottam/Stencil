@@ -1,14 +1,14 @@
 <project name="Stencil (v0.3; 'Cardenio')" default="stencil" basedir=".">
 
-  <property name="lib" location="../stencil/lib" />
-  <property name="temp" location="../temp" />
+  <property name="lib" location="../../stencil/lib" />
+  <property name="temp" location="../../temp" />
   <property name="runtimeSrc" location="." />
 
   <property name="runtimeJar" value="stencilRuntime.jar"/>
   <property name="testJar" value="stencilTests.jar"/>
 
   <target name="stencil">
-    <echo message="Stencil support structure build system."/>
+    <echo message="Pico runtime build system"/>
   </target>
 
   <target name="runtime" depends="prepDirs">

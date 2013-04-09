@@ -1,5 +1,6 @@
 Variables:
- * You need a way to refer to a "current value" sometimes.  Especially with interaction.
+ * You need a way to refer to a "current value" sometimes.  
+   Especially with interaction.
  * Needs to be more like a value, than a var...but the var is the name...ARG
  * (value <name> (data from ....))
  * Elsewhere (f <name> y z)
@@ -29,18 +30,12 @@ Simply Typed Lambda Calculus inferencer: https://gist.github.com/997140
 Expressions are king.  Nestable, inlineable...I want to be able to "address"
    the expression though, for things like the guide system
 
-Tuple-creation as an easy operator...something like #(...) makes a tuple
-Mixed-fixed syntax permitted in some special block, like @(....)
-   @(3+4*sin(theta))  should be allowed
-
 View groups tables and implicitly defines a canvas
 
 Schema-grids are iterated VIEWS, with specific RENDERERs on one data table.
 First-class guides make building guides for such view trivial
 
-
 Protovis showed Lambda...now lets do COMBINATORS:  schema-grid, data-grid, guide
-
 
 Animated entrance/exit:  Steal the enter/exit/update concepts from D3.
   Is a set value bindings (the initial value) and a transition rule (for each binding or for the whole block?)
