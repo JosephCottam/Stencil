@@ -1,0 +1,23 @@
+(stencil arc
+  (table dataset
+     (fields value startAngle endAngle)
+     (data (when (init)
+                 ##(value : (list 12 23 47 6 52 19))
+                 (let ((startAngle, endAngle) : (pie value)
+                       (value : value))))))
+
+  (view main 
+     (canvas 400 400)
+     (render _ arc dataset
+        (data (pull dataset
+           (let (x :200)
+                (y: 200)
+                (startAngle : startAngle)
+                (endAngle : endAngle)
+                (innerRadius : 20)
+                (outerRadius : (r value))
+                (stroke : "#fff"))
+         (update (bind (stroke : "#ccc")))
+         (hover (bind (stroke : "pink"))))))
+
+    (scale r (type :sqrt) (domain : (select 'value dataset)) (range : (list 20 100))))
