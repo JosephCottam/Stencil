@@ -13,11 +13,14 @@
     :else (map strip-gen a)))
 
 (deftest ensure-runtime
-  (is (= (t/ensure-runtime-import '(stencil test (import picoRuntime))) 
-         '(stencil test (import picoRuntime))))
-  (is (= (t/ensure-runtime-import '(table x)) '(table x)))
-  (is (= (t/ensure-runtime-import '(stencil test)) 
-         '(stencil test (import BokehRuntime)))))
+  (is (= (t/ensure-runtime-import (sm '(stencil test (import picoRuntime))))
+         (sm '(stencil test (import picoRuntime))))
+      "No change when runtime already imported.")
+  (is (= (t/ensure-runtime-import (sm '(table x))) (sm '(table x)))
+      "No chnage when not in stencil context.")
+  (is (= (t/ensure-runtime-import (sm '(stencil test)))
+         (sm '(stencil test (import BokehRuntime))))
+      "Insert runtime"))
 
 (deftest normalize-imports
   (is (= (t/normalize-imports '(import a ($meta))) '(import a ($meta) (as) (items))))
