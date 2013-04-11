@@ -139,10 +139,10 @@
               (view-atts renders view))))
 
 
-(defn emit-bokeh [template]
+(defn emit-bokeh [atts]
   (let [g (STGroupFile. "src/stencil/emitters/bokeh.stg")
-        t (.getInstanceOf g template)]
-    (.render (.add t "program" "def"))))
+        t (.getInstanceOf g "program")]
+    (.render (.add t "def" atts))))
 
 (defn emit [program]
     (-> program 
