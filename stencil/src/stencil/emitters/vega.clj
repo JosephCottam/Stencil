@@ -48,24 +48,26 @@
   Gather all into one place."
   (letfn [(gather [program]
             (let [renders (t/filter-tagged 'render program)
-                  guides (flatten (map #(t/filter-tagged 'guide %) renders))]
+                  guides (reduce concat (map #(t/filter-tagged 'guide %) renders))]
               guides))
           (delete [program]
             (match program
               (a :guard t/atom?) a
-              (['render & rest] :seq) (cons 'render (remove #(and (seq? %) (= 'guide (first %))) rest))
+              (['render m0 id m1 source m2 type m3 & rest] :seq) 
+                (list* 'render m0 id m1 source m2 type m3 (t/filter-tagged (complement =) 'guide rest))
               :else (map delete program)))
           (update [program guides]
-            (let [types (map second (remove meta? guides))     ;;The type is "x" or "y" right now...will probably change in the future
+            (let [guides (map #(remove meta? %) guides)
+                  types (map #(nth % 2) guides)     ;;The type is "x" or "y" right now...will probably change in the future
                   scales (map #(symbol (str % "scale")) types) ;;HACK!!!!!! Relies on scales being named "xscale" for x-axis, etc REALLY NEED TO:Determine the scale that was used in source->data->field-binding
-                  args (map drop 2 (remove meta? guides))
-                  axes (map (fn[type scale args] `(~'axis (~'type `~type) (~'scale ~scale) ~@args)) types scales args)]
-              (concat program (list 'guides axes))))]
+                  args (map (partial drop 3) guides)
+                  axes (map (fn[type scale args] `((~'type ~type) (~'scale ~scale) ~@args)) types scales args)]
+              (concat program (list (cons 'axes axes)))))]
     (update (delete program) (gather program))))
                
 (defn top-level-defs [program]
   (let [view (first (t/filter-tagged 'view program))
-        canvas (filter meta? (first (t/filter-tagged 'canvas view)))
+        canvas (remove meta? (first (t/filter-tagged 'canvas view)))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
         pad (first (t/filter-tagged 'padding view))]
@@ -75,8 +77,8 @@
   "Convert lists to dictionaries and lists."
   (match program
     (a :guard t/atom?) a
-    (['ptuple fields values] :seq) (zipmap (rest fields) (pod values))
-    ([(tag :guard symbol?) item] :seq) #{tag (pod item)}
+    (['ptuple fields & values] :seq) (zipmap (rest fields) (pod values))
+    ([(tag :guard symbol?) item] :seq) {tag (pod item)}
     :else (map pod program)))
 
 ;(defn emit-vega [template]
@@ -84,7 +86,7 @@
 ;        t (.getInstanceOf g template)]
 ;    (.render (.add t "program" "def"))))
 
-(defn emit-vega [program] (stencil.pprint/spp program) program)
+(defn emit-vega [program] (stencil.pprint/spp program) (str program))
 
 (defn emit [program]
     (-> program 
@@ -94,5 +96,5 @@
       guides         
       top-level-defs
       remove-metas
-      pod
+      ;pod
       emit-vega))
