@@ -15,7 +15,7 @@
             (fn inner [item] 
               (cond
                 (meta? item) item
-                (symbol? item) (list '$vega-field source item)
+                (symbol? item) (list 'vega-field source item)
                 (seq? item) (let [[f m & args] item
                                   vals (map inner (remove meta? args))
                                   metas (filter meta? args)]
@@ -36,12 +36,11 @@
 
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
-  (match program
-    (a :guard t/atom?) a
-    (['operator m0 name & policies] :seq)
-      `(~'$vega-scale ~m0 ~name ~policies)
-    :else (map scale-defs program)))
-
+  (letfn [(gather [program] (t/filter-tagged 'operator program))
+          (delete [[s m0 n m1 & policies]] (list* s m0 n m1 (t/filter-tagged not= 'scale program)))
+          (clean [[bind m0 key m1 & val]] (list* key m1 val))
+          (reform [[_ m0 name m1 & policies]] (list* `(~'name ~name) m1 (map clean policies)))]
+    (concat (delete program) (list 'scales (map reform (gather program))))))
 
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
@@ -54,7 +53,7 @@
             (match program
               (a :guard t/atom?) a
               (['render m0 id m1 source m2 type m3 & rest] :seq) 
-                (list* 'render m0 id m1 source m2 type m3 (t/filter-tagged (complement =) 'guide rest))
+                (list* 'render m0 id m1 source m2 type m3 (t/filter-tagged not= 'guide rest))
               :else (map delete program)))
           (update [program guides]
             (let [guides (map #(remove meta? %) guides)
@@ -75,11 +74,15 @@
 
 (defn pod [program]
   "Convert lists to dictionaries and lists."
-  (match program
-    (a :guard t/atom?) a
-    (['ptuple fields & values] :seq) (zipmap (rest fields) (pod values))
-    ([(tag :guard symbol?) item] :seq) {tag (pod item)}
-    :else (map pod program)))
+  (letfn [(string [s] (str "\"" s "\""))
+          (ptuple->map [[_ fields & values]] (zipmap (rest fields) (pod values)))
+          (tlop->map [tlop] (t/lop->map (rest tlop)))
+          (tlist->tlmap [tlist] 
+            (let [label (first tlist)
+                  maps (map t/lop->map (rest tlist))]
+             {label maps}))]
+    ...))
+          
 
 ;(defn emit-vega [template]
 ;  (let [g (STGroupFile. "src/stencil/emitters/vega.stg")
@@ -92,7 +95,7 @@
     (-> program 
       propogate-source
       scale-defs
-;      scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
+      ;scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
       guides         
       top-level-defs
       remove-metas
