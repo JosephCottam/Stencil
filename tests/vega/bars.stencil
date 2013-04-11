@@ -13,7 +13,7 @@
                   (y2 : (yscale 0))
                   (fill : "SteelBlue")))))
 
-   (render marks rect transformed 
+   (render marks transformed rect
        (bind auto)
        (guide axis x)
        (guide axis y))

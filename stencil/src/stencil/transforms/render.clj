@@ -1,10 +1,10 @@
 (ns stencil.transform)
 
-(defn gen-binds [bind-meta render-type source-fields existing]
+(defn gen-binds [table-name bind-meta render-type source-fields existing]
   "Generate a binding statement given a render type and a list of fields.
    TODO: Care about the render type...right now it is just ignored and x/y/z/color are generated for"
   (if (empty? source-fields)
-    (throw (parseException bind-meta "Cannot generate binds statement, no fields supplied in current context."))
+    (throw (parseException bind-meta (str "Cannot generate binds statement, no fields supplied for table '" table-name "'")))
     (let [render-fields (set '(x y z color))  ;;Lookup bind field based on render-type
           source-fields (set (remove meta? (rest source-fields)))
           existing-fields (set (map first existing))
@@ -29,11 +29,11 @@
      (clean-bindings [bindings]
        "Remove bind operator from bindings"
        (map (fn [[bind meta & rest]] rest) bindings))
-     (prep-bind [[type fields] bind] 
+     (prep-bind [table-name [type fields] bind] 
        (let [bind-meta (second bind)
              cleaned (clean-bindings (clean-bind bind))]
          (if (auto-bind? bind)
-           (gen-binds bind-meta type fields cleaned)
+           (gen-binds table-name bind-meta type fields cleaned)
            (list* 'bind bind-meta cleaned))))
      (walker [tableBriefs]
        (fn helper [program]
@@ -42,7 +42,7 @@
            (['render m0 id m1 source m2 type m3 & policies] :seq)
              (let [binds (->> policies
                            (filter-tagged 'bind)
-                           (map (partial prep-bind (tableBriefs source))))
+                           (map (partial prep-bind source (tableBriefs source))))
                    others (filter-tagged (complement =) 'bind policies)]
                `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@binds ~@others))
            :else (map helper program))))]
