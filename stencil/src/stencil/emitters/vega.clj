@@ -47,31 +47,28 @@
   "Lift guide declarations out of their render statements, bringing relevant context with them.
   Gather all into one place."
   (letfn [(gather [program]
+            (let [renders (t/filter-tagged 'render program)
+                  guides (flatten (map #(t/filter-tagged 'guide %) renders))]
+              guides))
+          (delete [program]
             (match program
               (a :guard t/atom?) a
-              (['render m0 name m1 type m2 source m3 & policies] :seq)
-                (let [guides (t/filter-tagged 'guide policies)]
-                  (map #(list source %) guides)))
-              :else (map gather program))
-          (remove [program]
-            (match program
-              (a :guard t/atom?) a
-              (['render & rest] :seq) (cons 'render (remove #(and (seq? %) (= 'guide (first %)))))
-              :else (map remove program)))
+              (['render & rest] :seq) (cons 'render (remove #(and (seq? %) (= 'guide (first %))) rest))
+              :else (map delete program)))
           (update [program guides]
-            (let [types (map second (remove meta? guides)) ;;The type is "x" or "y" right now...will probably change in the future
+            (let [types (map second (remove meta? guides))     ;;The type is "x" or "y" right now...will probably change in the future
                   scales (map #(symbol (str % "scale")) types) ;;HACK!!!!!! Relies on scales being named "xscale" for x-axis, etc REALLY NEED TO:Determine the scale that was used in source->data->field-binding
                   args (map drop 2 (remove meta? guides))
                   axes (map (fn[type scale args] `(~'axis (~'type `~type) (~'scale ~scale) ~@args)) types scales args)]
-              (concat program (list 'guides guides))))]
-    (update (remove program) (gather program))))
+              (concat program (list 'guides axes))))]
+    (update (delete program) (gather program))))
                
 (defn top-level-defs [program]
   (let [view (first (t/filter-tagged 'view program))
-        canvas (filter meta? (first (t/filter-tagged 'canvas program)))
+        canvas (filter meta? (first (t/filter-tagged 'canvas view)))
         width (list 'width (second canvas))
-        height (list 'height (nth 2 canvas))
-        pad (first (t/filter-tagged 'padding program))]
+        height (list 'height (nth canvas 2))
+        pad (first (t/filter-tagged 'padding view))]
     (concat program (list width height pad)))) 
 
 (defn pod [program]
@@ -87,7 +84,7 @@
 ;        t (.getInstanceOf g template)]
 ;    (.render (.add t "program" "def"))))
 
-(defn emit-vega [program] (stencil.pprint/spp program))
+(defn emit-vega [program] (stencil.pprint/spp program) program)
 
 (defn emit [program]
     (-> program 
