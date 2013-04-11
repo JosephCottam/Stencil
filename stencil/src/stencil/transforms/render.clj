@@ -43,7 +43,7 @@
              (let [binds (->> policies
                            (filter-tagged 'bind)
                            (map (partial prep-bind (tableBriefs source))))
-                   others (filter-tagged (complement =) 'bind policies)]
+                   others (filter-tagged not= 'bind policies)]
                `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@binds ~@others))
            :else (map helper program))))]
     (let [tables (filter-tagged 'table program)

@@ -47,7 +47,7 @@
               binds (map 
                       #(concat (take 2 %) (cons (list 'title '($meta) title '($meta)) (drop 2 %)))
                       (filter-tagged 'bind policies))
-              others (remove title? (filter-tagged (complement =) 'bind policies))]
+              others (remove title? (filter-tagged not= 'bind policies))]
           (if (nil? title)
             program
             `(~'render ~m0 ~name ~m1 ~type ~m2 ~source ~m3 ~@binds ~@others)))
