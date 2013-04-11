@@ -1,6 +1,8 @@
 (ns stencil.test.emit
+  (:require [stencil.emitters.vega :as vega])
   (:require [stencil.emitters.bokeh :as bokeh])
   (:require [stencil.core :as c])
+  (:require [stencil.transform :as t])
   (:use [clojure.test]))
 
 
@@ -35,6 +37,21 @@
     (spit rslt program)
     program))
 
+
+(defmethod assert-expr 'emit-eq? [msg form]
+  `(let [emitter# ~(nth form 1)
+         base# ~(nth form 2)
+         ext# ~(nth form 3)
+         src# (str source "/" base# ".stencil")
+         ref# (str source "/" base# ext#)
+         rslt# (str target "/" base# ext#)
+         result# (.trim (emit emitter# src# rslt#))
+         expected# (.trim (slurp ref#))]
+     (if (= result# expected#)
+       (report {:type :pass :message ~msg, :expected ref# :actual rslt#})
+       (report {:type :fail :message (str "Compile did not match --- " ~msg), :expected ref# :actual rslt#}))
+     result#))
+
 (defmethod assert-expr 'emit-pyeq? [msg form]
   `(let [emitter# ~(nth form 1)
          base# ~(nth form 2)
@@ -58,4 +75,13 @@
         "Scatterplot: Multiplot")
   (is (emit-pyeq? bokeh/emit "bokeh/glyphRender")
         "Glyph Renderer"))
+
+
+
+
+(deftest vega
+  (binding 
+    [t/*default-runtime* 'VegaRuntime]
+    (is (emit-eq? vega/emit "vega/bars" ".js")
+        "Bar chart")))
 

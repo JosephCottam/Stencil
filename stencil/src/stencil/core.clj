@@ -3,6 +3,7 @@
   (:refer-clojure :rename {compile clj-compile read clj-read}) 
   (:require [stencil.parse :as parse])
   (:require [stencil.transform :as t])
+  (:require [stencil.emitters.vega :as vega])
   (:require [stencil.emitters.bokeh :as bokeh])
   (:require [stencil.emitters.pico :as pico])
   (:require [clojure.java.io :as io]))
@@ -37,6 +38,7 @@
         runtime (.toUpperCase (str (t/full-nth runtime 1)))]
     (case runtime
        "BOKEHRUNTIME" (bokeh/emit program)
+       "VEGARUNTIME" (vega/emit program)
        "JAVAPICORUNTIME" (pico/emit program)
       :else (throw (RuntimeException. "Could not find runtime import in program.")))))
 
