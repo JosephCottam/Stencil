@@ -32,7 +32,7 @@
         (not (= 'stencil (first program))))
       (add-runtime [defaultRuntime program]
         "Add the default runtime import to program."
-        (concat (take 2 program) `((~'import ~defaultRuntime)) (drop 2 program)))]
+        (concat (take 4 program) `((~'import (~'$meta) ~defaultRuntime (~'$meta))) (drop 4 program)))]
    (if (or (has-runtime? program) (fragment? program))
       program
       (add-runtime *default-runtime* program))))
