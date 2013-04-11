@@ -430,30 +430,6 @@
   (is (= (t/normalize-renders '(table ($meta) tn ($meta) (render ($meta) rn ($meta) type ($meta) (bind ($meta)))))
          '(table ($meta) tn ($meta) (render ($meta) rn ($meta) tn ($meta (type table)) type ($meta) (bind ($meta)))))
       "Provide source from context")
-  (is (= (t/normalize-renders '(table ($meta) tn ($meta)
-                                      (fields a x b y) 
-                                      (render ($meta) rn ($meta) tn ($meta) type ($meta) 
-                                              (bind ($meta) auto ($meta)))))
-         '(table ($meta) tn ($meta)
-                 (fields a x b y)
-                 (render ($meta) rn ($meta) tn ($meta) type ($meta) 
-                         (bind ($meta) 
-                               (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
-                               (y ($meta (type fn)) y ($meta (type ***)))))))
-      "Auto binding")
-  (is (= (t/normalize-renders '(table ($meta) tn ($meta)
-                                      (fields a x b y) 
-                                      (render ($meta) rn ($meta) tn ($meta) type ($meta) 
-                                              (bind ($meta) auto ($meta) 
-                                                    ($$ ($meta) shape ($meta (type fn)) "circle" ($meta (type ***)))))))
-         '(table ($meta) tn ($meta) 
-                 (fields a x b y)
-                 (render ($meta) rn ($meta) tn ($meta) type ($meta) 
-                         (bind ($meta) 
-                               (shape ($meta (type fn)) "circle" ($meta (type ***)))
-                               (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
-                               (y ($meta (type fn)) y ($meta (type ***)))))))
-      "Auto binding w/explicit binding")
   (is (= (t/normalize-renders '(table ($meta) tn ($meta) 
                                       (fields a x b y) 
                                       (render ($meta) rn ($meta) tn ($meta) type ($meta) 
@@ -464,8 +440,8 @@
                  (fields a x b y)
                  (render ($meta) rn ($meta) tn ($meta) type ($meta) 
                          (bind ($meta) 
-                               (x ($meta (type ***)) x ($meta (type ***)))
-                               (y ($meta (type ***)) y ($meta (type ***)))))))
+                               ($$ ($meta) x ($meta (type ***)) x ($meta (type ***)))
+                               ($$ ($meta) y ($meta (type ***)) y ($meta (type ***)))))))
       "Clean bindings")
   (is (= (strip-gen (t/normalize-renders
                       '(stencil scatterplot-inline ($meta) (import CDXRuntime ($meta (debug true)))
@@ -484,19 +460,64 @@
                                   dataset ($meta (type table))
                                   scatter ($meta)
                                   (bind ($meta)
-                                        (x ($meta) a ($meta))
-                                        (y ($meta) b ($meta))
-                                        (color ($meta) "RED" ($meta)))))))
+                                        ($$ ($meta) x ($meta) a ($meta))
+                                        ($$ ($meta) y ($meta) b ($meta))
+                                        ($$ ($meta) color ($meta) "RED" ($meta)))))))
       "Deeper nesting.")
   (is (= (strip-gen (t/normalize-renders '(table ($meta) tn (fields a x b y) (render ($meta) scatter ($meta) (bind ($meta) auto ($meta) )))))
          '(table ($meta) tn 
                  (fields a x b y)
                  (render ($meta (type render)) rend ($meta) tn ($meta (type table)) scatter ($meta) 
-                         (bind ($meta) 
-                               (x ($meta (type fn)) x ($meta (type ***)))
-                               (y ($meta (type fn)) y ($meta (type ***)))))))
+                         (bind ($meta) auto ($meta)))))
       "Combined normalization"))
 
+(deftest render-autobind
+  (is (= (t/normalize-render-binds
+           '(stencil s
+              (render ($meta (type render))
+                      rn ($meta)
+                      tn ($meta (type table))
+                      type ($meta)
+                      (bind ($meta)
+                            ($$ ($meta) x ($meta) a ($meta))
+                            ($$ ($meta) y ($meta) b ($meta))
+                            ($$ ($meta) color ($meta) "RED" ($meta))))))
+         '(stencil s
+              (render ($meta (type render))
+                      rn ($meta)
+                      tn ($meta (type table))
+                      type ($meta)
+                      (bind ($meta)
+                            (x ($meta) a ($meta))
+                            (y ($meta) b ($meta))
+                            (color ($meta) "RED" ($meta))))))
+      "Remove bind operator from bind statement")
+  (is (= (t/normalize-render-binds
+           '(stencil s 
+               (table ($meta) tn ($meta) (fields a x b y))
+               (render ($meta) rn ($meta) tn ($meta) type ($meta) 
+                       (bind ($meta) auto ($meta)))))
+         '(stencil s 
+             (table ($meta) tn ($meta) (fields a x b y))
+             (render ($meta) rn ($meta) tn ($meta) type ($meta) 
+                     (bind ($meta) 
+                           (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
+                           (y ($meta (type fn)) y ($meta (type ***)))))))
+      "Auto binding (render context)")
+  (is (= (t/normalize-render-binds
+           '(stencil s
+              (table ($meta) tn ($meta) (fields a x b y))
+              (render ($meta) rn ($meta) tn ($meta) type ($meta) 
+                      (bind ($meta) auto ($meta) 
+                            ($$ ($meta) shape ($meta (type fn)) "circle" ($meta (type ***)))))))
+         '(stencil s
+            (table ($meta) tn ($meta) (fields a x b y))
+            (render ($meta) rn ($meta) tn ($meta) type ($meta) 
+                    (bind ($meta) 
+                          (shape ($meta (type fn)) "circle" ($meta (type ***)))
+                          (x ($meta (type fn)) x ($meta (type ***)))  ;;TODO: Change type when infer-types isn't so broken...
+                          (y ($meta (type fn)) y ($meta (type ***)))))))
+      "Auto binding w/explicit binding"))
             
 
 

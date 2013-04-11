@@ -97,7 +97,7 @@
   ([msg] (RuntimeException. msg))
   ([expr msg] (parseException expr msg nil))
   ([expr msg ex]  
-   (let [meta (meta->map (first (filter meta? expr)))
+   (let [meta (meta->map (if (meta? expr) expr (first (filter meta? expr)))) ;Get the first met expression encountered
          location (if (or (nil? meta) (not (contains? meta '.line)))
                     "unknown location" 
                     (get meta '.line))]

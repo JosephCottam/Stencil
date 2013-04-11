@@ -37,7 +37,7 @@
      normalize-imports
      ensure-fields display->fields defaults->fields normalize-fields check-fields-cover-data
      align-ptuple
-     normalize-renders gather-renders ensure-view
+     normalize-renders gather-renders normalize-render-binds ensure-view
      split-when infer-types ensure-using-tuple))
 
 (defn prep-emit

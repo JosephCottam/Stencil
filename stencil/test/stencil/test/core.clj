@@ -35,7 +35,7 @@
 
 
 (def root "../tests/data/")
-(deftest read
+(deftest reads
   (is (string? (c/read (str root "geometry/simplelines.stencil"))))
   (is (string? (c/read (str root "geometry/simplelines.tstencil")))))
 
