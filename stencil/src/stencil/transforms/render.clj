@@ -4,7 +4,7 @@
   "Generate a binding statement given a render type and a list of fields.
    TODO: Care about the render type...right now it is just ignored and x/y/z/color are generated for"
   (if (empty? source-fields)
-    (throw (RuntimeException. "Cannot generate binds statement, no fields supplied for context."))
+    (throw (parseException bind-meta "Cannot generate binds statement, no fields supplied in current context."))
     (let [render-fields (set '(x y z color))  ;;Lookup bind field based on render-type
           source-fields (set (remove meta? (rest source-fields)))
           existing-fields (set (map first existing))
@@ -14,50 +14,70 @@
           bindings (concat existing bindings)]
       (cons 'bind (cons bind-meta bindings)))))
 
+(defn normalize-render-binds [program]
+  "Fills in (bind auto) statements with the help of (table ... (fields ...)) statements.
+  Assumes that the render is normalized."
+  (letfn 
+    [(auto-bind? [policy] (any= 'auto policy)) 
+     (clean-bind [policy] 
+       "Remove auto, bind and related metas from a bind policy"
+       (cond
+         (empty? policy) '()
+         (= 'bind (first policy)) (clean-bind (full-drop policy))
+         (= 'auto (first policy)) (clean-bind (full-drop policy))
+         :else (list* (first policy) (clean-bind (rest policy)))))
+     (clean-bindings [bindings]
+       "Remove bind operator from bindings"
+       (map (fn [[bind meta & rest]] rest) bindings))
+     (prep-bind [[type fields] bind] 
+       (let [bind-meta (second bind)
+             cleaned (clean-bindings (clean-bind bind))]
+         (if (auto-bind? bind)
+           (gen-binds bind-meta type fields cleaned)
+           (list* 'bind bind-meta cleaned))))
+     (walker [tableBriefs]
+       (fn helper [program]
+         (match program
+           (a :guard atom?) a
+           (['render m0 id m1 source m2 type m3 & policies] :seq)
+             (let [binds (->> policies
+                           (filter-tagged 'bind)
+                           (map (partial prep-bind (tableBriefs source))))
+                   others (filter-tagged (complement =) 'bind policies)]
+               `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@binds ~@others))
+           :else (map helper program))))]
+    (let [tables (filter-tagged 'table program)
+          names (map (fn [[tag m0 name & rest]] name) tables)
+          types (map (fn [[tag m0 name m1 type & rest]] type) tables)
+          fields (map #(first (filter-tagged 'fields %)) tables)
+          briefs (zipmap names (map list types fields))]
+      ((walker briefs) program))))
+
+
 (defn normalize-renders [program]
-  "Ensure that every render statement has a name, source data and auto-binds are filled in."
+  "Ensure that every render statement has a name, source table and auto-binds are filled in."
   (letfn 
     [(gen-name [] (gensym 'rend_))
-     (auto-bind? [policy] (any= 'auto policy)) 
-     (drop-bind-op [entry]
-       (if (and (seq? entry) (= '$$ (first entry)))
-         (full-drop entry)
-         entry))
-     (maybe-clean [policy]
-       "Remove bind ops, if there is a 'bind' statement in this render statement."
-       (let [[tag meta & bindings] policy]
-         (if(= tag 'bind)
-           `(~tag ~meta ~@(map drop-bind-op bindings))
-           policy)))
-     (prep-bind [fields bind] 
-       (let [bind (maybe-clean bind)]
-         (if (auto-bind? bind) 
-           (gen-binds (second bind) type fields (rest (remove #(or (meta? %) (= % 'auto)) bind)))
-           bind)))
-
-     (helper [table fields program]
+     (helper [table program]
        (match program
          (a :guard atom?) a
          (['table (m0 :guard meta?) name & policies] :seq) 
            (let [fields (first (filter-tagged 'fields policies))]
-             `(~'table ~m0 ~name ~@(helper name fields policies)))
-         (['render (m0 :guard meta?) id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & binds] :seq)
-           (let [binds (map (partial prep-bind fields) binds)
-                 id (if (= '_ id) (gen-name) id)]
-             `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@binds))
-         (['render (m0 :guard meta?) id (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
-           (let [binds (map (partial prep-bind fields) binds)
-                 id (if (= '_ id) (gen-name) id)
-                 table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)]
-             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
-         (['render (m1 :guard meta?) type (m3 :guard meta?) & binds] :seq) 
-           (let [binds (map (partial prep-bind fields) binds)
-                 id (gen-name)
-                 table (if (nil? table) (throw (RuntimeException. "Could not normalize render source, no containing table.")) table)
+             `(~'table ~m0 ~name ~@(map (partial helper name) policies)))
+         (['render (m0 :guard meta?) id (m1 :guard meta?) source (m2 :guard meta?) type (m3 :guard meta?) & policies] :seq)
+           (let [id (if (= '_ id) (gen-name) id)]
+             `(~'render ~m0 ~id ~m1 ~source ~m2 ~type ~m3 ~@policies))
+         (['render (m0 :guard meta?) id (m1 :guard meta?) type (m3 :guard meta?) & policies] :seq) 
+           (let [id (if (= '_ id) (gen-name) id)
+                 table (if (nil? table) (throw (parseException m0 "Could not normalize render source, no containing table.")) table)]
+             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@policies))
+         (['render (m1 :guard meta?) type (m3 :guard meta?) & policies] :seq) 
+           (let [id (gen-name)
+                 table (if (nil? table) (throw (parseException m1 "Could not normalize render source, no containing table.")) table)
                  m0 '($meta (type render))]
-             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@binds))
-         :else (map (partial helper table fields) program)))]
-    (helper nil nil program)))
+             `(~'render ~m0 ~id ~m1 ~table (~'$meta (~'type ~'table)) ~type ~m3 ~@policies))
+         :else (map (partial helper table) program)))]
+    (helper nil program)))
 
 
 
