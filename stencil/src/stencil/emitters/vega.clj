@@ -1,5 +1,6 @@
 (ns stencil.emitters.vega
   (:use [stencil.util])
+  (:require [clojure.data.json :as json])
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t])
   (:require [stencil.pprint])
@@ -72,24 +73,31 @@
         pad (first (t/filter-tagged 'padding view))]
     (concat program (list width height pad)))) 
 
+
+(defn select [tag ls] 
+  (let [items (t/filter-tagged tag ls)]
+    (if (> (count items) 1)
+      (throw (RuntimeException. (str "More than one '" tag "' items in program.")))
+      (first items))))
+
+
+
 (defn pod [program]
   "Convert lists to dictionaries and lists."
   (letfn [(string [s] (str "\"" s "\""))
-          (ptuple->map [[_ fields & values]] (zipmap (rest fields) (pod values)))
+          (ptuple->map [[_ fields & values]] (zipmap (map str (rest fields)) (pod values)))
           (tlop->map [tlop] (t/lop->map (rest tlop)))
+          (pair->map [pair] {(first pair) (second pair)})
           (tlist->tlmap [tlist] 
             (let [label (first tlist)
                   maps (map t/lop->map (rest tlist))]
              {label maps}))]
-    ...))
+    (let [axes (tlist->tlmap (select 'axes program))
+          width (pair->map (select 'width program))
+          height (pair->map (select 'height program))]
+      (reduce into (list axes width height)))))
           
-
-;(defn emit-vega [template]
-;  (let [g (STGroupFile. "src/stencil/emitters/vega.stg")
-;        t (.getInstanceOf g template)]
-;    (.render (.add t "program" "def"))))
-
-(defn emit-vega [program] (stencil.pprint/spp program) (str program))
+(defn emit-vega [program] (with-out-str (json/pprint program)))
 
 (defn emit [program]
     (-> program 
@@ -99,5 +107,5 @@
       guides         
       top-level-defs
       remove-metas
-      ;pod
+      pod
       emit-vega))
