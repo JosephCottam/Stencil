@@ -39,10 +39,16 @@
   "Transform operator defs into scale definitions; gather all into one place"
   (letfn [(gather [program] (t/filter-tagged 'operator program))
           (clean [[bind m0 key m1 & val]] (list* key m1 val))
+          (reform-domain [scale]
+            (let [[_ _ domain & rest] (first (t/filter-tagged 'domain scale))
+                  [data field] (clojure.string/split (str domain) #"\.")]
+              (concat (t/remove-tagged 'domain scale) 
+                     `((~'domain ((~'data ~(symbol data)) (~'field ~domain)))))))
           (reform [[_ m0 name m1 & policies]] 
             (let [config (first (t/filter-tagged 'config policies))]
-              (list* `(~'name ~name) (t/full-drop config))))]
-    (concat (t/remove-tagged 'operator program) (list (list* 'scales (map reform (gather program)))))))
+              (list* `(~'name ~name) (reform-domain (t/full-drop config)))))]
+    (concat (t/remove-tagged 'operator program) 
+      (list (list 'scales (map reform (gather program)))))))
 
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
@@ -63,7 +69,7 @@
                   scales (map #(symbol (str % "scale")) types) ;;HACK!!!!!! Relies on scales being named "xscale" for x-axis, etc REALLY NEED TO:Determine the scale that was used in source->data->field-binding
                   args (map (partial drop 3) guides)
                   axes (map (fn[type scale args] `((~'type ~type) (~'scale ~scale) ~@args)) types scales args)]
-              (concat program (list (cons 'axes axes)))))]
+              (concat program (list (list 'axes axes)))))]
     (update (delete program) (gather program))))
                
 (defn top-level-defs [program]
@@ -84,21 +90,29 @@
 
 (defn remove-imports [program] (remove #(and (seq? %) (= (first %) 'import)) program))
 
+(defn pair? [item] (and (seq? item) (== 2 (count item))))
+(defn lop? [item] (and (seq? item) (every? pair? item)
+                       (every? t/atom? (map first item))))
+
+(defn pod2 [program]
+  (cond
+    (t/atom? program) program
+    (and (pair? program)
+         (t/atom? (first program)))
+      {(first program) (pod2 (second program))}
+    (lop? program)
+     (let [keys (map first program)
+           vals (map pod2 (map second program))]
+       (zipmap keys vals))
+    :else (map pod2 program)))
+
 (defn pod [program]
-  "Convert lists to dictionaries and lists."
-  (letfn [(string [s] (str "\"" s "\""))
-          (ptuple->map [[_ fields & values]] (zipmap (map str (rest fields)) (pod values)))
-          (tlop->map [tlop] (t/lop->map (rest tlop)))
-          (pair->map [pair] {(first pair) (second pair)})
-          (tlist->tlmap [tlist] 
-            (let [label (first tlist)
-                  maps (map t/lop->map (rest tlist))]
-             {label maps}))]
-    (let [axes   (tlist->tlmap (select 'axes program))
-          scales (tlist->tlmap (select 'scales program))
-          width (pair->map (select 'width program))
-          height (pair->map (select 'height program)) ]
-      (reduce into (list axes scales width height)))))
+  ;;When everything works, this should be removed and pod2 should be called directly
+  (let [axes (pod2 (select 'axes program))
+        scales (pod2 (select 'scales program))
+        width (pod2 (select 'width program))
+        height (pod2 (select 'height program))]
+    (reduce into (list axes scales width height))))
           
 (defn json [program] (with-out-str (json/pprint program)))
 
@@ -111,4 +125,6 @@
       top-level-defs
       remove-metas
       remove-imports
+      pod 
+      json
       ))
