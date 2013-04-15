@@ -38,10 +38,11 @@
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
   (letfn [(gather [program] (t/filter-tagged 'operator program))
-          (delete [[s m0 n m1 & policies]] (list* s m0 n m1 (t/filter-tagged not= 'scale program)))
           (clean [[bind m0 key m1 & val]] (list* key m1 val))
-          (reform [[_ m0 name m1 & policies]] (list* `(~'name ~name) m1 (map clean policies)))]
-    (concat (delete program) (list 'scales (map reform (gather program))))))
+          (reform [[_ m0 name m1 & policies]] 
+            (let [config (first (t/filter-tagged 'config policies))]
+              (list* `(~'name ~name) (t/full-drop config))))]
+    (concat (t/remove-tagged 'operator program) (list (list* 'scales (map reform (gather program)))))))
 
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
@@ -70,8 +71,9 @@
         canvas (remove meta? (first (t/filter-tagged 'canvas view)))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
-        pad (first (t/filter-tagged 'padding view))]
-    (concat program (list width height pad)))) 
+        pad (first (t/filter-tagged 'padding view))
+        view (t/remove-tagged any= '(canvas padding) view)]
+    (concat (t/remove-tagged 'view program) (list width height pad view)))) 
 
 
 (defn select [tag ls] 
@@ -80,7 +82,7 @@
       (throw (RuntimeException. (str "More than one '" tag "' items in program.")))
       (first items))))
 
-
+(defn remove-imports [program] (remove #(and (seq? %) (= (first %) 'import)) program))
 
 (defn pod [program]
   "Convert lists to dictionaries and lists."
@@ -92,12 +94,13 @@
             (let [label (first tlist)
                   maps (map t/lop->map (rest tlist))]
              {label maps}))]
-    (let [axes (tlist->tlmap (select 'axes program))
+    (let [axes   (tlist->tlmap (select 'axes program))
+          scales (tlist->tlmap (select 'scales program))
           width (pair->map (select 'width program))
-          height (pair->map (select 'height program))]
-      (reduce into (list axes width height)))))
+          height (pair->map (select 'height program)) ]
+      (reduce into (list axes scales width height)))))
           
-(defn emit-vega [program] (with-out-str (json/pprint program)))
+(defn json [program] (with-out-str (json/pprint program)))
 
 (defn emit [program]
     (-> program 
@@ -107,5 +110,5 @@
       guides         
       top-level-defs
       remove-metas
-      pod
-      emit-vega))
+      remove-imports
+      ))

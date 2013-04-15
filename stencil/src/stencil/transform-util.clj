@@ -1,11 +1,21 @@
 (ns stencil.transform)
 ;"Utilities for tree->tree transformations"
 
+(defn mod-tagged-list [op test condition policies]
+  "[test,] condition, list* -> list* modify a tagged-list of items. 
+  Op is the list-operator (such as fiter or remove).
+  test is the test operation to be run between the the first list item (the tag) and the condition for each item in the policies list."
+  (op #(and (seq? %) (test (first %) condition)) policies))
+
+
+(defn remove-tagged
+  ([condition policies] (mod-tagged-list remove = condition policies))
+  ([test condition policies] (mod-tagged-list remove test condition policies)))
+
 (defn filter-tagged
-  "[test,] condition, list* -> list* Filter a list list-of-lists whose first item passes the test/condition pair 
-  Test is invoked once for each policy in policy*.  Default test is '='"
-  ([condition policies] (filter-tagged = condition policies))
-  ([test condition policies] (filter #(and (seq? %) (test (first %) condition)) policies)))
+  ([condition policies] (mod-tagged-list filter = condition policies))
+  ([test condition policies] (mod-tagged-list filter test condition policies)))
+
 
 (defn bind? [a] (= '$$ a))
 (defn has-bind? [expr] 

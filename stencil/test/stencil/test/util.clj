@@ -40,6 +40,15 @@
   (is (= (t/default-value 'c '(fields ($meta) a ($meta (default 1)) b ($meta (default 2)) c ($meta (default 3)))) 3)))
 
 
+(deftest remove-tagged 
+  (is (= (t/remove-tagged 'kill '((kill 1) (keep 2) (kill 3) (keep 4)))
+         '((keep 2) (keep 4))))
+  (is (= (t/remove-tagged 'kill '(keep keep keep (kill 1) (kill 2) (keep 3) (kill 4)))
+         '(keep keep keep (keep 3))))
+  (is (= (t/remove-tagged u/any= '(kill remove extra) '(keep keep (kill 1) (remove 1) (stay 2) (keep 3) (remove 4)))
+         '(keep keep (stay 2) (keep 3)))
+      "Custom comparison operator"))
+
 (deftest filter-tagged
   (is (= (t/filter-tagged 'get '()) '()))
   (is (= (t/filter-tagged 'get '((not it) (not it))) '()))
