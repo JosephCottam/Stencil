@@ -7,6 +7,55 @@
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
 
+(defn distinguish-unrendered-table [program]
+  "Mark tables that will not be rendered as 'data-table'
+  (simplifies later steps)."
+  (letfn [(retag [table tag] (cons tag (rest table)))
+          (maybe-retag [targets table]
+            (if (any= (nth table 2) targets)
+              (retag table 'render-table)
+              (retag table 'data-table)))]
+    (let [renders (t/filter-tagged 'render program)
+          tables  (t/filter-tagged 'table program)
+          targets (map #(nth % 4) renders)
+          tables (map (partial maybe-retag targets) tables)]
+      (concat (t/remove-tagged 'table program) tables))))
+
+
+(defn find-descendant [tag data]
+  (let [items (t/filter-tagged tag data)]
+    (cond
+      (not (seq? data)) nil 
+      (empty? items) (mapcat (partial find-descendant tag) data)
+      :else (first items))))
+
+(defn transform-data [table] 
+  (let [data (t/filter-tagged 'data table)
+        using (find-descendant 'using data)
+        [tag _ fields _ load] using 
+        loader (first load)]
+    (case loader
+      'ptuples (let [[tag _ fields & items] load
+                     fields (rest (remove-metas fields))
+                     items (remove-metas items)]
+                 (apply (partial map list (cycle fields)) items))
+      :else (throw (RuntimeException. (str "Loader not know: " loader))))))
+
+(defn transform [table]
+  (let [data (transform-data table)
+        [_ _ name & rest] table]
+    (list (list 'name name) (list 'values data))))
+
+(defn transform-unrendered-tables [program]
+    (list* (t/remove-tagged 'data-table program)
+           (list (list 'data (map transform (t/filter-tagged 'data-table program))))))
+
+(defn fold-rendered-table [program]
+  "Merges the data statement of a table that is attached to a rendering
+  into the render statement and deletes the table.
+  Currently assumes that each table is only the target of ONE renderer."
+  program)
+
 
 (defn propogate-source [program]
   "Given a when statement, puts qualifies all references to source-values.
@@ -71,13 +120,20 @@
                   axes (map (fn[type scale args] `((~'type ~type) (~'scale ~scale) ~@args)) types scales args)]
               (concat program (list (list 'axes axes)))))]
     (update (delete program) (gather program))))
-               
+
+(defn ptuple->lop [[tag _ fields & vals]] 
+  (let [f  (take-nth 2 (t/full-drop fields))
+        fm (take-nth 2 (drop 1 (t/full-drop fields)))
+        v  (take-nth 2 vals)
+        vm (take-nth 2 (drop 1 vals))]
+    (map list f fm v vm)))
+
 (defn top-level-defs [program]
   (let [view (first (t/filter-tagged 'view program))
         canvas (remove meta? (first (t/filter-tagged 'canvas view)))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
-        pad (first (t/filter-tagged 'padding view))
+        pad (list 'padding (ptuple->lop (nth (first (t/filter-tagged 'padding view)) 2)))
         view (t/remove-tagged any= '(canvas padding) view)]
     (concat (t/remove-tagged 'view program) (list width height pad view)))) 
 
@@ -111,20 +167,28 @@
   (let [axes (pod2 (select 'axes program))
         scales (pod2 (select 'scales program))
         width (pod2 (select 'width program))
-        height (pod2 (select 'height program))]
-    (reduce into (list axes scales width height))))
+        height (pod2 (select 'height program))
+        padding (pod2 (select 'padding program))
+        data-tables (pod2 (select 'data-table program))]
+    (reduce into (list axes scales width height padding))))
           
 (defn json [program] (with-out-str (json/pprint program)))
-
-(defn emit [program]
-    (-> program 
+(defn medium [program]
+  "Intermediate state to faciliate development."
+  (-> program 
       propogate-source
       scale-defs
       ;scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
       guides         
       top-level-defs
-      remove-metas
-      remove-imports
-      pod 
-      json
+      distinguish-unrendered-table
       ))
+   
+
+(defn emit [program]
+  (-> program
+    medium
+    remove-metas
+    remove-imports
+    pod 
+    json))

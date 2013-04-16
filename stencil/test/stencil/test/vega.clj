@@ -3,6 +3,7 @@
   (:require [stencil.core :as c])
   (:require [stencil.transform :as t])
   (:require [clojure.data.json :as json])
+  (:require [clojure.set :as set])
   (:use [clojure.test])
   (:use [stencil.test.utils]))
 
@@ -20,7 +21,9 @@
          expected# (json/read-str (.trim (slurp ref#)))]
      (if (= result# expected#)
        (report {:type :pass :message ~msg, :expected ref# :actual rslt#})
-       (report {:type :fail :message (str "Compile did not match --- " ~msg), :expected ref# :actual rslt#}))
+       (report {:type :fail :message 
+                (str "Compile did not match --- " ~msg "\n" )
+                :expected ref# :actual rslt#}))
      result#))        
 
 (deftest vega
