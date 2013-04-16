@@ -63,51 +63,48 @@
           used (drop 2 (remove-metas view))
           renders (filter (render-filter used) renders)]
       (concat (t/remove-tagged 'render program) renders))))
-
-(defn transform-actions [action]
-  (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
-          (field-or-val [item] 
-            (cond 
-              (symbol? item) (list 'field (symbol (str "data." item)))
-              (t/atom? item)   (list 'value item)
-              :else item))
-          (scale-or-not [item]
-            (if (symbol? item) 
-              (list 'scale item)
-              item))
-          (tag-atoms [action] 
-            (if (seq? action)
-              (map field-or-val action)
-              (field-or-val action)))
-          (tag-scales [action] 
-            (if (seq? action)
-              (list* (scale-or-not (first action)) (rest action))
-              action))
-          (ptuple->lop* [action] 
-            (concat (t/remove-tagged 'ptuple action)  
-                   (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
-    (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
-    
-
-(defn transform [render]
-  (let [[tag _ name _ old-target _ type _ & policies] render
-        bindings (find-descendant 'bind policies)
-        data (find-descendant 'data policies)
-        [tag _ fields gen trans] (find-descendant 'using data)
-        [_ _ source _] gen
-        [_ _ data-binds _] trans 
-        data-actions (map transform-actions (remove-metas (map second data-binds)))
-        data-binds (remove-metas (map ffirst data-binds))
-        binds (map list data-binds data-actions)]
-    (list (list 'type type) 
-          (list 'from (list 'data source)) 
-          (list 'properties (list 'enter binds)))))
       
 
 (defn transform-renders [program]
-  (let [renders (t/filter-tagged 'render program)]
-    (concat (t/remove-tagged 'render program) 
-            (list (list 'marks (map transform renders))))))
+  (letfn [(transform-actions [action]
+            (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
+                    (field-or-val [item] 
+                      (cond 
+                        (symbol? item) (list 'field (symbol (str "data." item)))
+                        (t/atom? item)   (list 'value item)
+                        :else item))
+                    (scale-or-not [item]
+                      (if (symbol? item) 
+                        (list 'scale item)
+                        item))
+                    (tag-atoms [action] 
+                      (if (seq? action)
+                        (map field-or-val action)
+                        (field-or-val action)))
+                    (tag-scales [action] 
+                      (if (seq? action)
+                        (list* (scale-or-not (first action)) (rest action))
+                        action))
+                    (ptuple->lop* [action] 
+                      (concat (t/remove-tagged 'ptuple action)  
+                              (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
+              (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
+          (transform [render]
+            (let [[tag _ name _ old-target _ type _ & policies] render
+                  bindings (find-descendant 'bind policies)
+                  data (find-descendant 'data policies)
+                  [tag _ fields gen trans] (find-descendant 'using data)
+                  [_ _ source _] gen
+                  [_ _ data-binds _] trans 
+                  data-actions (map transform-actions (remove-metas (map second data-binds)))
+                  data-binds (remove-metas (map ffirst data-binds))
+                  binds (map list data-binds data-actions)]
+              (list (list 'type type) 
+                    (list 'from (list 'data source)) 
+                    (list 'properties (list 'enter binds)))))]
+    (let [renders (t/filter-tagged 'render program)]
+      (concat (t/remove-tagged 'render program) 
+              (list (list 'marks (map transform renders)))))))
           
 
 (defn fold-rendered-tables [program]
