@@ -12,14 +12,13 @@
    "properties":
    {"enter":
     {"fill":{"value":"SteelBlue"},
-     "width": {"scale":"xscale", "band":true, "offset":-1},
+     "width":{"band":true, "offset":-1, "scale":"xscale"},
      "x":{"field":"data.x", "scale":"xscale"},
      "y":{"field":"data.y", "scale":"yscale"},
      "y2":{"scale":"yscale", "value":0}},
      "update": { "fill": {"value":"steelblue"} },
      "hover": { "fill": {"value":"red"}}},
    "type":"rect"}],
-
  "padding":{"bottom":20, "left":30, "right":10, "top":10},
  "scales":
  [{"domain":{"data":"rawData", "field":"data.x"},

@@ -12,15 +12,18 @@
         items (map rest items)]
     (partition (count fields) (partition 2 (interleave (cycle fields) (apply interleave items))))))
 
-(defn ptuple->lop [[tag _ fields & vals]] 
-  (let [f  (take-nth 2 (t/full-drop fields))
-        fm (take-nth 2 (drop 1 (t/full-drop fields)))
-        v  (take-nth 2 vals)
-        vm (take-nth 2 (drop 1 vals))]
-    (map list f fm v vm)))
+(defn ptuple->lop [[tag fields & vals]] (map list (rest fields) vals))
 (defn pair? [item] (and (seq? item) (== 2 (count item))))
 (defn lop? [item] (and (seq? item) (every? pair? item)
                        (every? t/atom? (map first item))))
+
+
+(defn find-descendant [tag data]
+  (let [items (t/filter-tagged tag data)]
+    (cond
+      (not (seq? data)) nil 
+      (empty? items) (mapcat (partial find-descendant tag) data)
+      :else (first items))))
 
 (defn distinguish-unrendered-tables [program]
   "Mark tables that will not be rendered as 'data-table'
@@ -38,12 +41,7 @@
 
 
 (defn transform-unrendered-tables [program]
-  (letfn [(find-descendant [tag data]
-            (let [items (t/filter-tagged tag data)]
-              (cond
-                (not (seq? data)) nil 
-                (empty? items) (mapcat (partial find-descendant tag) data)
-                :else (first items))))
+  (letfn [
           (transform-data [table] 
             (let [data (t/filter-tagged 'data table)
                   using (find-descendant 'using data)
@@ -59,39 +57,76 @@
     (concat (t/remove-tagged 'data-table program)
       (list (list 'data (map transform (t/filter-tagged 'data-table program)))))))
 
-(defn fold-rendered-table [program]
+(defn remove-unused-renders [program]
+  (letfn [(render-filter [used] (fn [[tag _ name & rest]] (any= name used)))]
+    (let [view (first (t/filter-tagged 'view program))
+          renders (t/filter-tagged 'render program)
+          used (drop 2 (remove-metas view))
+          renders (filter (render-filter used) renders)]
+      (concat (t/remove-tagged 'render program) renders))))
+
+(defn transform-actions [action]
+  (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
+          (field-or-val [item] 
+            (cond 
+              (symbol? item) (list 'field (symbol (str "data." item)))
+              (t/atom? item)   (list 'value item)
+              :else item))
+          (scale-or-not [item]
+            (if (symbol? item) 
+              (list 'scale item)
+              item))
+          (tag-atoms [action] 
+            (if (seq? action)
+              (map field-or-val action)
+              (field-or-val action)))
+          (tag-scales [action] 
+            (if (seq? action)
+              (list* (scale-or-not (first action)) (rest action))
+              action))
+          (ptuple->lop* [action] 
+            (concat (t/remove-tagged 'ptuple action)  
+                   (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
+    (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
+    
+
+(defn transform [render]
+  (let [[tag _ name _ old-target _ type _ & policies] render
+        bindings (find-descendant 'bind policies)
+        data (find-descendant 'data policies)
+        [tag _ fields gen trans] (find-descendant 'using data)
+        [_ _ source _] gen
+        [_ _ data-binds _] trans 
+        data-actions (map transform-actions (remove-metas (map second data-binds)))
+        data-binds (remove-metas (map ffirst data-binds))
+        binds (map list data-binds data-actions)]
+    (list (list 'type type) 
+          (list 'from (list 'data source)) 
+          (list 'properties (list 'enter binds)))))
+      
+
+(defn transform-renders [program]
+  (let [renders (t/filter-tagged 'render program)]
+    (concat (t/remove-tagged 'render program) 
+            (list (list 'marks (map transform renders))))))
+          
+
+(defn fold-rendered-tables [program]
   "Merges the data statement of a table that is attached to a rendering
   into the render statement and deletes the table.
   Currently assumes that each table is only the target of ONE renderer."
-  program)
+  (letfn [(extender [pairs] 
+            (fn [render]
+              (let [[_ _ name _ target & policies] render
+                    data (pairs target)]
+                (concat render (list data)))))
+          (table-pair [[_ _ name & policies]] (list name (first (t/filter-tagged 'data policies))))]
+  (let [renders (t/filter-tagged 'render program)
+        tables (t/filter-tagged 'render-table program)
+        tm (t/lop->map (map table-pair tables))
+        renders (map (extender tm) renders)]
+    (concat (t/remove-tagged any= '(render render-table) program) renders))))
 
-
-(defn propogate-source [program]
-  "Given a when statement, puts qualifies all references to source-values.
-   Relies on the assumption that there are only simple transforms"
-  (letfn [(source [gen] (second (remove meta? gen))) ;;assumes "(items ...)" or (delta ...) or similar; no compounds
-          (labelRefs [source]
-            (fn inner [item] 
-              (cond
-                (meta? item) item
-                (symbol? item) (list 'vega-field source item)
-                (seq? item) (let [[f m & args] item
-                                  vals (map inner (remove meta? args))
-                                  metas (filter meta? args)]
-                              (list f m (interleave vals metas))))))
-          (search [program]
-            (match program
-              (a :guard t/atom?) a
-              (['when (m0 :guard meta?) trigger (m1 :guard meta?) gen (m2 :guard meta?) action] :seq)
-                `(~'when ~m0 ~trigger ~m1 ~gen ~m2 ~(label (source gen) action))
-              :else (map search program)))
-          (label [source program]
-            (match program
-              (['let (m0 :guard meta?) bindings action] :seq)
-                (let [vars (map first bindings)
-                      vals (map (labelRefs source) (map second bindings))]
-                  `(~'let ~m0 (interleave vars vals) (labelRefs source action)))))]
-    (search program)))
 
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
@@ -101,8 +136,8 @@
             (let [[_ _ domain & rest] (first (t/filter-tagged 'domain scale))
                   [data field] (clojure.string/split (str domain) #"\.")]
               (concat (t/remove-tagged 'domain scale) 
-                     `((~'domain ((~'data ~(symbol data)) (~'field ~domain)))))))
-          (reform [[_ m0 name m1 & policies]] 
+                      `((~'domain ((~'data ~(symbol data)) (~'field ~(symbol (str "data." field)))))))))
+          (reform [[_ _ name m1 & policies]] 
             (let [config (first (t/filter-tagged 'config policies))]
               (list* `(~'name ~name) (reform-domain (t/full-drop config)))))]
     (concat (t/remove-tagged 'operator program) 
@@ -135,7 +170,7 @@
         canvas (remove meta? (first (t/filter-tagged 'canvas view)))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
-        pad (list 'padding (ptuple->lop (nth (first (t/filter-tagged 'padding view)) 2)))
+        pad (list 'padding (ptuple->lop (remove-metas (nth (first (t/filter-tagged 'padding view)) 2))))
         view (t/remove-tagged any= '(canvas padding) view)]
     (concat (t/remove-tagged 'view program) (list width height pad view)))) 
 
@@ -168,20 +203,23 @@
         width (pod2 (select 'width program))
         height (pod2 (select 'height program))
         padding (pod2 (select 'padding program))
-        data-tables (pod2 (select 'data program))]
-    (reduce into (sorted-map) (list axes scales width height padding data-tables))))
+        data-tables (pod2 (select 'data program))
+        renders (pod2 (select 'marks program))]
+    (reduce into (sorted-map) (list axes scales width height padding data-tables renders))))
           
 (defn json [program] (with-out-str (json/pprint program)))
 (defn medium [program]
   "Intermediate state to faciliate development."
   (-> program 
-      propogate-source
       scale-defs
       ;scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
       guides         
       top-level-defs
       distinguish-unrendered-tables
       transform-unrendered-tables
+      fold-rendered-tables
+      transform-renders
+      remove-unused-renders
       ))
    
 
