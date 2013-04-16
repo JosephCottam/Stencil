@@ -7,7 +7,7 @@
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
 
 
-(defn distinguish-unrendered-table [program]
+(defn distinguish-unrendered-tables [program]
   "Mark tables that will not be rendered as 'data-table'
   (simplifies later steps)."
   (letfn [(retag [table tag] (cons tag (rest table)))
@@ -29,16 +29,20 @@
       (empty? items) (mapcat (partial find-descendant tag) data)
       :else (first items))))
 
+
+(defn ptuples->lop [ptuple]
+  (let [[tag fields & items] (remove-metas ptuple)
+        fields (rest fields)
+        items (map rest items)]
+    (partition (count fields) (partition 2 (interleave (cycle fields) (apply interleave items))))))
+
 (defn transform-data [table] 
   (let [data (t/filter-tagged 'data table)
         using (find-descendant 'using data)
         [tag _ fields _ load] using 
         loader (first load)]
     (case loader
-      'ptuples (let [[tag _ fields & items] load
-                     fields (rest (remove-metas fields))
-                     items (remove-metas items)]
-                 (apply (partial map list (cycle fields)) items))
+      'ptuples (ptuples->lop load) 
       :else (throw (RuntimeException. (str "Loader not know: " loader))))))
 
 (defn transform [table]
@@ -47,7 +51,7 @@
     (list (list 'name name) (list 'values data))))
 
 (defn transform-unrendered-tables [program]
-    (list* (t/remove-tagged 'data-table program)
+    (concat (t/remove-tagged 'data-table program)
            (list (list 'data (map transform (t/filter-tagged 'data-table program))))))
 
 (defn fold-rendered-table [program]
@@ -169,8 +173,8 @@
         width (pod2 (select 'width program))
         height (pod2 (select 'height program))
         padding (pod2 (select 'padding program))
-        data-tables (pod2 (select 'data-table program))]
-    (reduce into (list axes scales width height padding))))
+        data-tables (pod2 (select 'data program))]
+    (reduce into (list axes scales width height padding data-tables))))
           
 (defn json [program] (with-out-str (json/pprint program)))
 (defn medium [program]
@@ -181,7 +185,8 @@
       ;scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
       guides         
       top-level-defs
-      distinguish-unrendered-table
+      distinguish-unrendered-tables
+      transform-unrendered-tables
       ))
    
 
