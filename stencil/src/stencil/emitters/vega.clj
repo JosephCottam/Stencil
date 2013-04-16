@@ -1,7 +1,6 @@
 (ns stencil.emitters.vega
   (:use [stencil.util])
   (:require [clojure.data.json :as json])
-  (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t])
   (:require [stencil.pprint])
   (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
@@ -151,11 +150,9 @@
                   guides (reduce concat (map #(t/filter-tagged 'guide %) renders))]
               guides))
           (delete [program]
-            (match program
-              (a :guard t/atom?) a
-              (['render m0 id m1 source m2 type m3 & rest] :seq) 
-                (list* 'render m0 id m1 source m2 type m3 (t/filter-tagged not= 'guide rest))
-              :else (map delete program)))
+            (let [renders (t/filter-tagged 'render program)
+                  renders (map (partial t/remove-tagged 'guide) renders)]
+              (concat (t/remove-tagged 'render program) renders)))
           (update [program guides]
             (let [guides (map #(remove meta? %) guides)
                   types (map #(nth % 2) guides)     ;;The type is "x" or "y" right now...will probably change in the future
@@ -211,13 +208,12 @@
 (defn medium [program]
   "Intermediate state to faciliate development."
   (-> program 
-      scale-defs
-      ;scale-uses     Look at where the scale is used.  If "domain" is not defined, define it based on its use.
-      guides         
       top-level-defs
+      scale-defs
       distinguish-unrendered-tables
       transform-unrendered-tables
       fold-rendered-tables
+      guides         
       transform-renders
       remove-unused-renders
       ))

@@ -19,8 +19,8 @@
        (guide axis y))
    (react _ marks hover (transient-update (let (fill: "Red"))))
    
-   (operator xscale (config (type "ordinal") (range main.canvas.width) (domain rawData.x)))
-   (operator yscale (config (range main.canvas.height) (nice true) (domain rawData.y)))
+   (operator xscale (config (type "ordinal") (range width) (domain rawData.x)))
+   (operator yscale (config (range height) (nice true) (domain rawData.y)))
 
    (view main 
       (canvas 400 200)
