@@ -159,11 +159,11 @@
     (t/atom? program) program
     (and (pair? program)
          (t/atom? (first program)))
-      {(first program) (pod2 (second program))}
+      (sorted-map (first program) (pod2 (second program)))
     (lop? program)
      (let [keys (map first program)
            vals (map pod2 (map second program))]
-       (zipmap keys vals))
+       (into (sorted-map) (zipmap keys vals)))
     :else (map pod2 program)))
 
 (defn pod [program]
@@ -174,7 +174,7 @@
         height (pod2 (select 'height program))
         padding (pod2 (select 'padding program))
         data-tables (pod2 (select 'data program))]
-    (reduce into (list axes scales width height padding data-tables))))
+    (reduce into (sorted-map) (list axes scales width height padding data-tables))))
           
 (defn json [program] (with-out-str (json/pprint program)))
 (defn medium [program]
