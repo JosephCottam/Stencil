@@ -65,7 +65,7 @@
       (concat (t/remove-tagged 'render program) renders))))
       
 
-(defn transform-renders [program]
+(defn simplify-renders [program]
   (letfn [(transform-actions [action]
             (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
                     (field-or-val [item] 
@@ -90,8 +90,8 @@
                               (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
               (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
           (transform [render]
-            (let [[tag _ name _ old-target _ type _ & policies] render
-                  bindings (find-descendant 'bind policies)
+            (let [[tag m0 name m1 old-target _ type _ & policies] render
+                  bindings (find-descendant 'bind policies)  ;;TODO Filter the data-bindings to just the items listed in the regular bind statement
                   data (find-descendant 'data policies)
                   [tag _ fields gen trans] (find-descendant 'using data)
                   [_ _ source _] gen
@@ -99,13 +99,21 @@
                   data-actions (map transform-actions (remove-metas (map second data-binds)))
                   data-binds (remove-metas (map ffirst data-binds))
                   binds (map list data-binds data-actions)]
-              (list (list 'type type) 
-                    (list 'from (list 'data source)) 
-                    (list 'properties (list 'enter binds)))))]
+              (concat (t/remove-tagged 'data render)
+                     (list (list 'type type) 
+                           (list 'from (list 'data source)) 
+                           (list 'properties (list 'enter binds))))))]
     (let [renders (t/filter-tagged 'render program)]
       (concat (t/remove-tagged 'render program) 
-              (list (list 'marks (map transform renders)))))))
-          
+              (map transform renders)))))
+
+(defn renders->marks [program]
+  "Gathers up the renders, strips away the extras and puts it into a 'marks' list."
+  (letfn [(clean [render]
+          (let [[tag _ name _ target _ type _ & policies] render]
+            (t/remove-tagged 'bind policies)))]
+  (concat (t/remove-tagged 'render program)
+          (list (list 'marks (map clean (t/filter-tagged 'render program)))))))
 
 (defn fold-rendered-tables [program]
   "Merges the data statement of a table that is attached to a rendering
@@ -142,22 +150,23 @@
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
   Gather all into one place."
-  (letfn [(gather [program]
-            (let [renders (t/filter-tagged 'render program)
-                  guides (reduce concat (map #(t/filter-tagged 'guide %) renders))]
-              guides))
-          (delete [program]
-            (let [renders (t/filter-tagged 'render program)
-                  renders (map (partial t/remove-tagged 'guide) renders)]
-              (concat (t/remove-tagged 'render program) renders)))
-          (update [program guides]
-            (let [guides (map #(remove meta? %) guides)
-                  types (map #(nth % 2) guides)     ;;The type is "x" or "y" right now...will probably change in the future
-                  scales (map #(symbol (str % "scale")) types) ;;HACK!!!!!! Relies on scales being named "xscale" for x-axis, etc REALLY NEED TO:Determine the scale that was used in source->data->field-binding
-                  args (map (partial drop 3) guides)
-                  axes (map (fn[type scale args] `((~'type ~type) (~'scale ~scale) ~@args)) types scales args)]
-              (concat program (list (list 'axes axes)))))]
-    (update (delete program) (gather program))))
+  (letfn [(delete [render] (t/remove-tagged 'guide render))
+          (axis [bindings [_ _ type _ target _ & args]]
+            (if (not (= type 'axis))
+              (throw (RuntimeException. ("Guide type not recognized '" type "'")))
+              (let [transform (bindings target)
+                    ;_ (println "A:" target)
+                    ;_ (println "T:" transform)
+                    scale ((t/lop->map transform) 'scale)]
+                (list* (list 'type target) (list 'scale scale) args))))
+          (make-guides [render]
+            (let [guides (t/filter-tagged 'guide render)
+                  bindings (t/lop->map (second (clean-metas (find-descendant 'enter render))))]
+              (map (partial axis bindings) guides)))]
+    (concat 
+      (t/remove-tagged 'render program)
+      (map delete (t/filter-tagged 'render program))
+      (list (list 'axes (apply concat (map make-guides (t/filter-tagged 'render program))))))))
 
 (defn top-level-defs [program]
   (let [view (first (t/filter-tagged 'view program))
@@ -206,13 +215,15 @@
   "Intermediate state to faciliate development."
   (-> program 
       top-level-defs
+      remove-unused-renders
       scale-defs
       distinguish-unrendered-tables
       transform-unrendered-tables
       fold-rendered-tables
+      simplify-renders
       guides         
-      transform-renders
-      remove-unused-renders
+      ;react
+      renders->marks
       ))
    
 
