@@ -7,10 +7,10 @@
    (table transformed
       (fields x width y y2 fill)
       (data (pull rawData
-             (let (x : (xscale x))
-                  (width: (xscale #(band: true, offset: -1)))
-                  (y : (yscale y))
-                  (y2 : (yscale 0))
+             (let (x : (xs x))
+                  (width: (xs #(band: true, offset: -1)))
+                  (y : (ys y))
+                  (y2 : (ys 0))
                   (fill : "SteelBlue")))))
 
    (render marks transformed rect
@@ -19,8 +19,8 @@
        (guide axis y))
    (react _ marks hover (transient-update (let (fill: "Red"))))
    
-   (operator xscale (config (type "ordinal") (range width) (domain rawData.x)))
-   (operator yscale (config (range height) (nice true) (domain rawData.y)))
+   (operator xs (config (type "ordinal") (range width) (domain rawData.x)))
+   (operator ys (config (range height) (nice true) (domain rawData.y)))
 
    (view main 
       (canvas 400 200)

@@ -1,5 +1,4 @@
-{"axes":
- [{"scale":"xscale", "type":"x"}, {"scale":"yscale", "type":"y"}],
+{"axes":[{"scale":"xs", "type":"x"}, {"scale":"ys", "type":"y"}],
  "data":
  [{"name":"rawData",
    "values":
@@ -12,21 +11,21 @@
    "properties":
    {"enter":
     {"fill":{"value":"SteelBlue"},
-     "width":{"band":true, "offset":-1, "scale":"xscale"},
-     "x":{"field":"data.x", "scale":"xscale"},
-     "y":{"field":"data.y", "scale":"yscale"},
-     "y2":{"scale":"yscale", "value":0}},
+     "width":{"band":true, "offset":-1, "scale":"xs"},
+     "x":{"field":"data.x", "scale":"xs"},
+     "y":{"field":"data.y", "scale":"ys"},
+     "y2":{"scale":"ys", "value":0}},
      "update": { "fill": {"value":"steelblue"} },
      "hover": { "fill": {"value":"red"}}},
    "type":"rect"}],
  "padding":{"bottom":20, "left":30, "right":10, "top":10},
  "scales":
  [{"domain":{"data":"rawData", "field":"data.x"},
-   "name":"xscale",
+   "name":"xs",
    "range":"width",
    "type":"ordinal"},
   {"domain":{"data":"rawData", "field":"data.y"},
-   "name":"yscale",
+   "name":"ys",
    "nice":true,
    "range":"height"}],
  "width":400}
