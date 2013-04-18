@@ -16,7 +16,7 @@
      "y":{"field":"data.y", "scale":"ys"},
      "y2":{"scale":"ys", "value":0}},
     "hover":{"fill":{"value":"Red"}},
-     "update":{"fill":{"value":"steelblue"}}},
+    "update":{"fill":{"value":"SteelBlue"}}},
    "type":"rect"}],
  "padding":{"bottom":20, "left":30, "right":10, "top":10},
  "scales":

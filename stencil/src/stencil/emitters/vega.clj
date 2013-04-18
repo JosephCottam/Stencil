@@ -156,8 +156,6 @@
             (if (not (= type 'axis))
               (throw (RuntimeException. ("Guide type not recognized '" type "'")))
               (let [transform (bindings target)
-                    ;_ (println "A:" target)
-                    ;_ (println "T:" transform)
                     scale ((t/lop->map transform) 'scale)]
                 (list* (list 'type target) (list 'scale scale) args))))
           (make-guides [render]
@@ -214,7 +212,13 @@
 (defn json [program] (with-out-str (json/pprint program)))
 
 (defn weave-reacts [program]
-  (letfn [(update-render [event render action]
+  (letfn [(undo-mapping [render action]
+            (let [ render-actions (t/lop->map (second (select 'enter (select 'properties (remove-metas render)))))
+                  changed-fields (map first action)
+                  old-bindings (map #(render-actions %) changed-fields)
+                  bindings (map list changed-fields old-bindings)]
+              (list 'update bindings)))
+          (update-render [event render action]
             (let [[type _ modifier _ target _ mods] action   ;;TODO: target is estabilished after render is selected...fix that...and figure out how to make the event-on-a-different-data-group-than-change plubming work right. 
                   [tag & properties] (select 'properties render)
                   [_ _ data-binds _] mods 
@@ -222,7 +226,7 @@
                   data-binds (remove-metas (map ffirst data-binds))
                   binds (map list data-binds data-actions)
                   action (list* event binds)
-                  co-action (if (= 'transient modifier) '((update (UNDO))) nil)]
+                  co-action (if (= 'transient modifier) (list (undo-mapping render binds)) nil)]
               (concat (t/remove-tagged 'properties render)
                       (list (list 'properties (concat (list* action properties) co-action))))))
           (update [renders react]
