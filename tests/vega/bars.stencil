@@ -17,7 +17,10 @@
        (bind auto)
        (guide axis x)
        (guide axis y))
-   (react _ marks hover (transient-update (let (fill: "Red"))))
+   
+   (react _
+     (on marks hover) 
+     (update transient marks (let (fill :"Red"))))
    
    (operator xs (config (type "ordinal") (range width) (domain rawData.x)))
    (operator ys (config (range height) (nice true) (domain rawData.y)))

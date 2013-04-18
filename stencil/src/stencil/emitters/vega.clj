@@ -64,31 +64,32 @@
           renders (filter (render-filter used) renders)]
       (concat (t/remove-tagged 'render program) renders))))
       
+(defn transform-action [action]
+  (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
+          (field-or-val [item] 
+            (cond 
+              (symbol? item) (list 'field (symbol (str "data." item)))
+              (t/atom? item)   (list 'value item)
+              :else item))
+          (scale-or-not [item]
+            (if (symbol? item) 
+              (list 'scale item)
+              item))
+          (tag-atoms [action] 
+            (if (seq? action)
+              (map field-or-val action)
+              (field-or-val action)))
+          (tag-scales [action] 
+            (if (seq? action)
+              (list* (scale-or-not (first action)) (rest action))
+              action))
+          (ptuple->lop* [action] 
+            (concat (t/remove-tagged 'ptuple action)  
+                    (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
+    (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
 
 (defn simplify-renders [program]
-  (letfn [(transform-actions [action]
-            (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
-                    (field-or-val [item] 
-                      (cond 
-                        (symbol? item) (list 'field (symbol (str "data." item)))
-                        (t/atom? item)   (list 'value item)
-                        :else item))
-                    (scale-or-not [item]
-                      (if (symbol? item) 
-                        (list 'scale item)
-                        item))
-                    (tag-atoms [action] 
-                      (if (seq? action)
-                        (map field-or-val action)
-                        (field-or-val action)))
-                    (tag-scales [action] 
-                      (if (seq? action)
-                        (list* (scale-or-not (first action)) (rest action))
-                        action))
-                    (ptuple->lop* [action] 
-                      (concat (t/remove-tagged 'ptuple action)  
-                              (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
-              (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
+  (letfn [
           (transform [render]
             (let [[tag m0 name m1 old-target _ type _ & policies] render
                   bindings (find-descendant 'bind policies)  ;;TODO Filter the data-bindings to just the items listed in the regular bind statement
@@ -96,7 +97,7 @@
                   [tag _ fields gen trans] (find-descendant 'using data)
                   [_ _ source _] gen
                   [_ _ data-binds _] trans 
-                  data-actions (map transform-actions (remove-metas (map second data-binds)))
+                  data-actions (map transform-action (remove-metas (map second data-binds)))
                   data-binds (remove-metas (map ffirst data-binds))
                   binds (map list data-binds data-actions)]
               (concat (t/remove-tagged 'data render)
@@ -111,7 +112,7 @@
   "Gathers up the renders, strips away the extras and puts it into a 'marks' list."
   (letfn [(clean [render]
           (let [[tag _ name _ target _ type _ & policies] render]
-            (t/remove-tagged 'bind policies)))]
+            (t/remove-tagged 'bind policies)))]  ;;TODO: filter the update/hover/enter transforms to only use items specified in the bind 
   (concat (t/remove-tagged 'render program)
           (list (list 'marks (map clean (t/filter-tagged 'render program)))))))
 
@@ -209,28 +210,47 @@
         data-tables (pod2 (select 'data program))
         renders (pod2 (select 'marks program))]
     (reduce into (sorted-map) (list axes scales width height padding data-tables renders))))
-          
+
 (defn json [program] (with-out-str (json/pprint program)))
-(defn medium [program]
-  "Intermediate state to faciliate development."
-  (-> program 
-      top-level-defs
-      remove-unused-renders
-      scale-defs
-      distinguish-unrendered-tables
-      transform-unrendered-tables
-      fold-rendered-tables
-      simplify-renders
-      guides         
-      ;react
-      renders->marks
-      ))
-   
+
+(defn weave-reacts [program]
+  (letfn [(update-render [event render action]
+            (let [[type _ modifier _ target _ mods] action   ;;TODO: target is estabilished after render is selected...fix that...and figure out how to make the event-on-a-different-data-group-than-change plubming work right. 
+                  [tag & properties] (select 'properties render)
+                  [_ _ data-binds _] mods 
+                  data-actions (map transform-action (remove-metas (map second data-binds)))
+                  data-binds (remove-metas (map ffirst data-binds))
+                  binds (map list data-binds data-actions)
+                  action (list* event binds)
+                  co-action (if (= 'transient modifier) '((update (UNDO))) nil)]
+              (concat (t/remove-tagged 'properties render)
+                      (list (list 'properties (concat (list* action properties) co-action))))))
+          (update [renders react]
+            (let [trigger (select 'on react)
+                  [_ _ source _ event _] trigger
+                  actions (t/filter-tagged 'update react)
+                  render (first (filter #(= source (nth % 2)) renders))]
+              (reduce (partial update-render event) render actions)))
+          (update-all [renders reacts] (reduce update renders reacts))]
+    (concat 
+      (t/remove-tagged any= '(react render) program)
+      (list (update-all (t/filter-tagged 'render program) 
+                        (t/filter-tagged 'react program))))))
 
 (defn emit [program]
   (-> program
-    medium
+    top-level-defs
+    remove-unused-renders
+    scale-defs
+    distinguish-unrendered-tables
+    transform-unrendered-tables
+    fold-rendered-tables
+    simplify-renders
+    guides         
+    weave-reacts
+    renders->marks
     remove-metas
     remove-imports
     pod 
-    json))
+    json
+    ))
