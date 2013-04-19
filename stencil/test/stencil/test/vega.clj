@@ -27,8 +27,12 @@
      result#))        
 
 (deftest vega
+  (is (emit-eq? vega/emit "bars")
+      "Bar chart"))
+
+(deftest vega-runtime
   (binding 
-    [t/*default-runtime* 'VegaRuntime]
-    (is (emit-eq? vega/emit "bars")
+    [t/*default-runtime* 'VegaRuntime]    
+    (is (emit-eq? vega/emit "bars-noRuntime")
         "Bar chart")))
 

@@ -1,6 +1,4 @@
 (stencil bars
-  (import VegaRuntime)
-
   (table rawData
      (fields x y)
      (data (init ##(x : (list "A","B","C","D","E","F","G","H","I")
