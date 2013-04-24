@@ -9,8 +9,13 @@
                  [org.clojure/tools.reader "0.7.3"]
                  [org.clojure/core.match "0.2.0-alpha11"]
                  [org.stringtemplate/v4 "4.0.7"]]
-  :dev-dependencies [[org.clojure/tools.trace "0.7.3"]])
+  :dev-dependencies [[org.clojure/tools.trace "0.7.3"]]
+ 
+  :jar-name "stencil-core.jar"
+  :uberjar-name "stencil.jar"
 
+  :deploy-branches ["master"]
+  :min-lein-version "2.0.0")
 
 ;;To install (stringtemplate, for example) to the local repo:
 ;;mvn install:install-file -DgroupId=org.stringtemplate -DartifactId=v4 -Dversion=4.0.7 -Dpackaging=jar -Dfile=~/Downloads/stringtemplate-4.0.7.jar -DlocalRepositoryPath=locallib -DcreateChecksum=true

@@ -140,7 +140,8 @@
 
 
 (defn emit-bokeh [atts]
-  (let [g (STGroupFile. "src/stencil/emitters/bokeh.stg")
+  (let [url (clojure.java.io/resource "emitters/bokeh.stg")
+        g (STGroupFile. url "us-ascii" \< \>)
         t (.getInstanceOf g "program")]
     (.render (.add t "def" atts))))
 

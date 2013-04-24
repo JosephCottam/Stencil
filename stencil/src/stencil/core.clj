@@ -64,17 +64,33 @@
     program))
 
 (defn -main [& args]
-  (let [dict (zipmap (take-nth 2 args) (take-nth 2 (rest args)))
-        in (if (nil? (dict "-in")) nil (dict "-in"))
-        out (if (nil? (dict "-out")) nil (dict "-out"))
-        com (if (nil? (dict "-c")) ";" (dict "-c"))]
-    (if (not (nil? in)) (println com com com " Compiling from " in))
-    (if (not (nil? out)) (println com com com "  Compiling to " out))
-    (flush)
-    (let [program (if (nil? in) (read-stdin) (read in))
-          p (emit (compile program))]
-      (if (nil? out) 
-        (println p)
-        (spit out p)))))
+  (if (< (count args) 2)
+    (do 
+      (println)
+      (println "Usage: java -jar stencil.jar -in <stencil-file> -out <result-file>")
+      (println "If '-in <stencil-file>' is ommited or *in*, standard in will be used.")
+      (println "   Using standard in, the input must end with the literal string ';#EOF'")
+      (println "If '-out <result-file>' is ommitted *out*, standard out will be used.")
+      (println)
+      (println "This message prints if less than two arguments are provided.")
+      (println "To stream from standard in to standard out, specify at least one with the *xxxx* notation.")
+      (println)
+      (flush))
+    (let [dict (zipmap (take-nth 2 args) (take-nth 2 (rest args)))
+          in (if (nil? (dict "-in")) nil (dict "-in"))
+          in (if (= "*in*" in) nil in)
+          in-print (if (nil? in) "standard in" in)
+          out (if (nil? (dict "-out")) nil (dict "-out"))
+          out (if (= "*out*" out) nil out)
+          out-print (if (nil? out) "standard out" out)
+          com (if (nil? (dict "-c")) ";" (dict "-c"))]
+      (if (not (nil? in)) (println com com com " Compiling from " in-print))
+      (if (not (nil? out)) (println com com com "  Compiling to " out-print))
+      (flush)
+      (let [program (if (nil? in) (read-stdin) (read in))
+            p (emit (compile program))]
+        (if (nil? out) 
+          (println p)
+          (spit out p))))))
 
 
