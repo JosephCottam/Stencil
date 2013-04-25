@@ -1,3 +1,16 @@
+Recursive auto-bind
+*If an bound item binds to a column of recursive type  then 
+ it loads the date further down the chain.
+
+Render:
+* Is render just view?  It feels like as I work with it more.  
+* What has been view is just a compound of renders...so that's its render type "compound"
+* 'Leaf' renders are views of a specific type, they are views on the data.
+* This perspective puts 'guides' in a better position.  They are just componets of a view,
+  in the same way that other 'renders' have been.  They just imply that a backing table
+  and computation set need to be produced!
+* What about integrating the 'canvas' with the view so expressions in a view context can be reactive to the canvas space...
+
 Variables:
  * You need a way to refer to a "current value" sometimes.  
    Especially with interaction.
