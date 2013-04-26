@@ -17,5 +17,9 @@
   :deploy-branches ["master"]
   :min-lein-version "2.0.0")
 
-;;To install (stringtemplate, for example) to the local repo:
-;;mvn install:install-file -DgroupId=org.stringtemplate -DartifactId=v4 -Dversion=4.0.7 -Dpackaging=jar -Dfile=~/Downloads/stringtemplate-4.0.7.jar -DlocalRepositoryPath=locallib -DcreateChecksum=true
+;;To install (stringtemplate, for example) to the local repo, run the following in the "stencil" subdirectory of the repo:
+;;mvn install:install-file -Dfile=ST-4.0.7.jar -DgroupId=org.stringtemplate -DartifactId=v4 -Dversion=4.0.7 -Dpackaging=jar -DlocalRepositoryPath=locallib -DcreateChecksum=true
+;;NOTE: The -dfile=<path> is particular about paths and maven is not communicative about those issues.
+;;      For example, it will claim successful install with -Dfile=~/Downloads/ST-4.0.7.jar" but not actually copy the jar file.
+;;      The remedy seems to be not using any "fancy" items in the path, like "~" or "..".  Absolute paths only.
+;;      The above example assumes that the file has been copied "stencil" subdirectory of this repo.
