@@ -2,8 +2,7 @@
   (:use [stencil.util])
   (:require [clojure.data.json :as json])
   (:require [stencil.transform :as t])
-  (:require [stencil.pprint])
-  (import (org.stringtemplate.v4 ST STGroup STGroupFile)))
+  (:require [stencil.pprint]))
 
 (defn ptuples->lop [ptuple]
   (let [[tag fields & items] (remove-metas ptuple)
