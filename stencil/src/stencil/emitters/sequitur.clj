@@ -63,8 +63,9 @@
      :all -- Will be run on the list of matching items (runs after each)"
 
   (let [all (get-opt opts :all identity)
-        each (get-opt opts :each identity)]
-   (concat (remove* tags program)
+        each (get-opt opts :each identity)
+        join (get-opt opts :join concat)]
+   (join (remove* tags program)
            (all (map each (find* tags program))))))
 
 (defn update** [tags program each]

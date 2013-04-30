@@ -148,9 +148,9 @@
 
 (defn top-level-defs [program]
   (let [view (select* 'view program)
-        canvas (remove meta? (select* 'canvas view))
-        width (list 'width (second canvas))
-        height (list 'height (nth canvas 2))
+        [_ width height]  (remove meta? (select* 'canvas view))
+        width (list 'width width)
+        height (list 'height height)
         pad (list 'padding (ptuple->lop (remove-metas (nth (select* 'padding view) 2))))
         view (remove* '(canvas padding) view)]
     (concat (remove* 'view program) (list width height pad view)))) 
