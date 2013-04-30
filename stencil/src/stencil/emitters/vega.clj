@@ -47,7 +47,7 @@
 
 (defn remove-unused-renders [program]
   (letfn [(render-filter [used] (fn [[tag _ name & rest]] (any= name used)))]
-    (let [view (first (find* 'view program))
+    (let [view (select* 'view program)
           renders (find* 'render program)
           used (drop 2 (remove-metas view))]
       (update* 'render program :all (partial filter (render-filter used))))))	
@@ -72,8 +72,7 @@
               (list* (scale-or-not (first action)) (rest action))
               action))
           (ptuple->lop* [action] 
-            (concat (remove* 'ptuple action)  
-                    (apply concat (map ptuple->lop (find* 'ptuple action)))))]
+            (update* 'ptuple action :each ptuple->lop :all #(apply concat %)))]
     (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
 
 (defn simplify-renders [program]
@@ -110,7 +109,7 @@
               (let [[_ _ name _ target & policies] render
                     data (pairs target)]
                 (concat render (list data)))))
-          (table-pair [[_ _ name & policies]] (list name (first (find* 'data policies))))]
+          (table-pair [[_ _ name & policies]] (list name (select* 'data policies)))]
   (let [tables (find* 'render-table program)
         tm (lop->map (map table-pair tables))]
     (update* '(render render-table) program :each (extender tm)))))
@@ -119,12 +118,12 @@
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
   (letfn [(reform-domain [scale]
-            (let [[_ _ domain & rest] (first (find* 'domain scale))
+            (let [[_ _ domain & rest] (select* 'domain scale)
                   [data field] (clojure.string/split (str domain) #"\.")]
               (concat (remove* 'domain scale) 
                       `((~'domain ((~'data ~(symbol data)) (~'field ~(symbol (str "data." field)))))))))
           (reform [[_ _ name m1 & policies]] 
-            (let [config (first (find* 'config policies))]
+            (let [config (select* 'config policies)]
               (list* `(~'name ~name) (reform-domain (full-drop config)))))]
     (update* 'operator program :each reform :all #(list (list 'scales %)))))
 
@@ -148,20 +147,14 @@
       (list (list 'axes (apply concat (map make-guides (find* 'render program))))))))
 
 (defn top-level-defs [program]
-  (let [view (first (find* 'view program))
-        canvas (remove meta? (first (find* 'canvas view)))
+  (let [view (select* 'view program)
+        canvas (remove meta? (select* 'canvas view))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
-        pad (list 'padding (ptuple->lop (remove-metas (nth (first (find* 'padding view)) 2))))
+        pad (list 'padding (ptuple->lop (remove-metas (nth (select* 'padding view) 2))))
         view (remove* '(canvas padding) view)]
     (concat (remove* 'view program) (list width height pad view)))) 
 
-
-(defn select [tag ls] 
-  (let [items (find* tag ls)]
-    (if (> (count items) 1)
-      (throw (RuntimeException. (str "More than one '" tag "' items in program.")))
-      (first items))))
 
 (defn remove-imports [program] (remove #(and (seq? %) (= (first %) 'import)) program))
 
@@ -180,27 +173,27 @@
 
 (defn pod [program]
   ;;When everything works, this should be removed and pod2 should be called directly
-  (let [axes (pod2 (select 'axes program))
-        scales (pod2 (select 'scales program))
-        width (pod2 (select 'width program))
-        height (pod2 (select 'height program))
-        padding (pod2 (select 'padding program))
-        data-tables (pod2 (select 'data program))
-        renders (pod2 (select 'marks program))]
+  (let [axes (pod2 (select* 'axes program))
+        scales (pod2 (select* 'scales program))
+        width (pod2 (select* 'width program))
+        height (pod2 (select* 'height program))
+        padding (pod2 (select* 'padding program))
+        data-tables (pod2 (select* 'data program))
+        renders (pod2 (select* 'marks program))]
     (reduce into (sorted-map) (list axes scales width height padding data-tables renders))))
 
 (defn json [program] (with-out-str (json/pprint program)))
 
 (defn weave-reacts [program]
   (letfn [(undo-mapping [render action]
-            (let [ render-actions (lop->map (second (select 'enter (select 'properties (remove-metas render)))))
+            (let [ render-actions (lop->map (second (select* 'enter (select* 'properties (remove-metas render)))))
                   changed-fields (map first action)
                   old-bindings (map #(render-actions %) changed-fields)
                   bindings (map list changed-fields old-bindings)]
               (list 'update bindings)))
           (update-render [event render action]
             (let [[type _ modifier _ target _ mods] action   ;;TODO: target is estabilished after render is selected...fix that...and figure out how to make the event-on-a-different-data-group-than-change plubming work right. 
-                  [tag & properties] (select 'properties render)
+                  [tag & properties] (select* 'properties render)
                   [_ _ data-binds _] mods 
                   data-actions (map transform-action (remove-metas (map second data-binds)))
                   data-binds (remove-metas (map ffirst data-binds))
@@ -210,7 +203,7 @@
               (concat (remove* 'properties render)
                       (list (list 'properties (concat (list* action properties) co-action))))))
           (update [renders react]
-            (let [trigger (select 'on react)
+            (let [trigger (select* 'on react)
                   [_ _ source _ event _] trigger
                   actions (find* 'update react)
                   render (first (filter #(= source (nth % 2)) renders))]

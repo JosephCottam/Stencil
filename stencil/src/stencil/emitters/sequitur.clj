@@ -9,13 +9,17 @@
   (not (nil? (some (partial = item) coll))))
 
 (defn- get-opt [opts tag default]
+  "ls, a, fn -> fn
+   Given a list of alternating tags and items (common for optional arguments)
+   get the item following the passed tag.  Return the default if the tag is not found."
   (let [idx (if (empty? opts) -1 (.indexOf opts tag))]
    (if (> idx -1)
     (nth opts (+ idx 1))
     default)))
 
-
 (defn- in-tagged-list [op test condition policies]
+  "Operate on list of lists where the first item in each sub-list is
+   assumed to be a tag." 
   (op #(and (seq? %) (test (first %) condition)) policies))
 
 
@@ -28,15 +32,19 @@
 (defmethod find* true [tags program] (in-tagged-list filter any= tags program))
 
 (defn find** [tag program] 
+  "Find items from a tree based on item tags.
+   Will return a list of the items.  
+   Items that match are still searched for sub-items."
   (if (or (not (seq? program)) (empty? program)) 
     nil
     (concat (find* tag program) (mapcat (partial find** tag) program))))
 
 (defn remove** [tag program] 
+  "Remove items from a tree based on their tags.
+   Returns the tree with items removed."
   (if (or (not (seq? program)) (empty? program)) 
     program 
-    (remove* tag 
-              (map (partial remove** tag) program))))
+    (map (partial remove** tag) (remove* tag program))))
 
 (defn- just-one [search action & crit]
   (let [items (search)]
@@ -44,7 +52,7 @@
       (throw (RuntimeException. (str "More than one item matches search criteria: " (first crit))))
       (action))))
 
-(defn select* [tag program] (just-one #(find tag program) #(first (find tag program)) tag))
+(defn select* [tag program] (just-one #(find* tag program) #(first (find* tag program)) tag))
 (defn select** [tag program] (just-one #(find** tag program) #(first (find** tag program)) tag))
 
 (defn update* [tags program & opts]
@@ -58,3 +66,14 @@
         each (get-opt opts :each identity)]
    (concat (remove* tags program)
            (all (map each (find* tags program))))))
+
+(defn update** [tags program each]
+  "Replace old instances in a tree with new instances.
+   Preserves placement."
+  (let [tags (if (seq? tags) tags (list tags))]
+    (cond
+      (or (not (seq? program)) (empty? program)) program
+      (any= (first program) tags) 
+         (map #(update** tags % each) (each program))
+      :else (map #(update** tags % each) program))))
+    
