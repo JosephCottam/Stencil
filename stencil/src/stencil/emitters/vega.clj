@@ -1,7 +1,7 @@
 (ns stencil.emitters.vega
-  (:use [stencil.util])
+  (:use [stencil.util :exclude [any=]])
   (:use [stencil.emitters.sequitur])
-  (:use [stencil.transform :only [atom? lop->map full-drop]])
+  (:use [stencil.transform :only [atom? full-drop lop->map]])
   (:require [clojure.data.json :as json])
   (:require [stencil.pprint])) 
 
@@ -20,21 +20,18 @@
 (defn distinguish-unrendered-tables [program]
   "Mark tables that will not be rendered as 'data-table'
   (simplifies later steps)."
-  (letfn [(retag [table tag] (cons tag (rest table)))
-          (maybe-retag [targets table]
+  (letfn [(change-tag [table tag] (cons tag (rest table)))
+          (retag [targets table]
             (if (any= (nth table 2) targets)
-              (retag table 'render-table)
-              (retag table 'data-table)))]
+              (change-tag table 'render-table)
+              (change-tag table 'data-table)))]
     (let [renders (find* 'render program)
-          tables  (find* 'table program)
-          targets (map #(nth % 4) renders)
-          tables (map (partial maybe-retag targets) tables)]
-      (concat (remove* 'table program) tables))))
+          targets (map #(nth % 4) renders)]
+      (update* 'table program :each (partial retag targets)))))
 
 
 (defn transform-unrendered-tables [program]
-  (letfn [
-          (transform-data [table] 
+  (letfn [(transform-data [table] 
             (let [data (find* 'data table)
                   using (select** 'using data)
                   [tag _ fields _ load] using 
@@ -46,16 +43,14 @@
             (let [data (transform-data table)
                   [_ _ name & rest] table]
               (list (list 'name name) (list 'values data))))]
-    (concat (remove* 'data-table program)
-      (list (list 'data (map transform (find* 'data-table program)))))))
+    (update* 'data-table program :each transform :all #(list (list 'data %)))))
 
 (defn remove-unused-renders [program]
   (letfn [(render-filter [used] (fn [[tag _ name & rest]] (any= name used)))]
     (let [view (first (find* 'view program))
           renders (find* 'render program)
-          used (drop 2 (remove-metas view))
-          renders (filter (render-filter used) renders)]
-      (concat (remove* 'render program) renders))))
+          used (drop 2 (remove-metas view))]
+      (update* 'render program :all (partial filter (render-filter used))))))	
       
 (defn transform-action [action]
   (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
@@ -82,8 +77,7 @@
     (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
 
 (defn simplify-renders [program]
-  (letfn [
-          (transform [render]
+  (letfn [(transform [render]
             (let [[tag m0 name m1 old-target _ type _ & policies] render
                   bindings (select** 'bind policies)  ;;TODO Filter the data-bindings to just the items listed in the regular bind statement
                   data (select** 'data policies)
@@ -97,40 +91,34 @@
                      (list (list 'type type) 
                            (list 'from (list 'data source)) 
                            (list 'properties (list 'enter binds))))))]
-    (let [renders (find* 'render program)]
-      (concat (remove* 'render program) 
-              (map transform renders)))))
+    (update* 'render program :each transform)))
 
 (defn renders->marks [program]
   "Gathers up the renders, strips away the extras and puts it into a 'marks' list."
   (letfn [(clean [render]
           (let [[tag _ name _ target _ type _ & policies] render]
             (remove* 'bind policies)))]  ;;TODO: filter the update/hover/enter transforms to only use items specified in the bind 
-  (concat (remove* 'render program)
-          (list (list 'marks (map clean (find* 'render program)))))))
+   (update* 'render program :each clean :all #(list (list 'marks %)))))
 
 (defn fold-rendered-tables [program]
   "Merges the data statement of a table that is attached to a rendering
   into the render statement and deletes the table.
-  Currently assumes that each table is only the target of ONE renderer."
+  Currently assumes that each table is only the target of ONE renderer.
+  TODO: Is this pass needed?  Maybe just do chained data items in vega...."
   (letfn [(extender [pairs] 
             (fn [render]
               (let [[_ _ name _ target & policies] render
                     data (pairs target)]
                 (concat render (list data)))))
           (table-pair [[_ _ name & policies]] (list name (first (find* 'data policies))))]
-  (let [renders (find* 'render program)
-        tables (find* 'render-table program)
-        tm (lop->map (map table-pair tables))
-        renders (map (extender tm) renders)]
-    (concat (remove* any= '(render render-table) program) renders))))
+  (let [tables (find* 'render-table program)
+        tm (lop->map (map table-pair tables))]
+    (update* '(render render-table) program :each (extender tm)))))
 
 
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
-  (letfn [(gather [program] (find* 'operator program))
-          (clean [[bind m0 key m1 & val]] (list* key m1 val))
-          (reform-domain [scale]
+  (letfn [(reform-domain [scale]
             (let [[_ _ domain & rest] (first (find* 'domain scale))
                   [data field] (clojure.string/split (str domain) #"\.")]
               (concat (remove* 'domain scale) 
@@ -138,8 +126,7 @@
           (reform [[_ _ name m1 & policies]] 
             (let [config (first (find* 'config policies))]
               (list* `(~'name ~name) (reform-domain (full-drop config)))))]
-    (concat (remove* 'operator program) 
-      (list (list 'scales (map reform (gather program)))))))
+    (update* 'operator program :each reform :all #(list (list 'scales %)))))
 
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
@@ -166,7 +153,7 @@
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
         pad (list 'padding (ptuple->lop (remove-metas (nth (first (find* 'padding view)) 2))))
-        view (remove* any= '(canvas padding) view)]
+        view (remove* '(canvas padding) view)]
     (concat (remove* 'view program) (list width height pad view)))) 
 
 
@@ -230,7 +217,7 @@
               (reduce (partial update-render event) render actions)))
           (update-all [renders reacts] (reduce update renders reacts))]
     (concat 
-      (remove* any= '(react render) program)
+      (remove* '(react render) program)
       (list (update-all (find* 'render program) 
                         (find* 'react program))))))
 
