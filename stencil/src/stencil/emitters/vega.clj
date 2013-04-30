@@ -1,8 +1,9 @@
 (ns stencil.emitters.vega
   (:use [stencil.util])
+  (:use [stencil.emitters.sequitur])
+  (:use [stencil.transform :only [atom? lop->map full-drop]])
   (:require [clojure.data.json :as json])
-  (:require [stencil.transform :as t])
-  (:require [stencil.pprint]))
+  (:require [stencil.pprint])) 
 
 (defn ptuples->lop [ptuple]
   (let [[tag fields & items] (remove-metas ptuple)
@@ -13,15 +14,8 @@
 (defn ptuple->lop [[tag fields & vals]] (map list (rest fields) vals))
 (defn pair? [item] (and (seq? item) (== 2 (count item))))
 (defn lop? [item] (and (seq? item) (every? pair? item)
-                       (every? t/atom? (map first item))))
+                       (every? atom? (map first item))))
 
-
-(defn find-descendant [tag data]
-  (let [items (t/filter-tagged tag data)]
-    (cond
-      (not (seq? data)) nil 
-      (empty? items) (mapcat (partial find-descendant tag) data)
-      :else (first items))))
 
 (defn distinguish-unrendered-tables [program]
   "Mark tables that will not be rendered as 'data-table'
@@ -31,18 +25,18 @@
             (if (any= (nth table 2) targets)
               (retag table 'render-table)
               (retag table 'data-table)))]
-    (let [renders (t/filter-tagged 'render program)
-          tables  (t/filter-tagged 'table program)
+    (let [renders (find* 'render program)
+          tables  (find* 'table program)
           targets (map #(nth % 4) renders)
           tables (map (partial maybe-retag targets) tables)]
-      (concat (t/remove-tagged 'table program) tables))))
+      (concat (remove* 'table program) tables))))
 
 
 (defn transform-unrendered-tables [program]
   (letfn [
           (transform-data [table] 
-            (let [data (t/filter-tagged 'data table)
-                  using (find-descendant 'using data)
+            (let [data (find* 'data table)
+                  using (select** 'using data)
                   [tag _ fields _ load] using 
                   loader (first load)]
               (case loader
@@ -52,23 +46,23 @@
             (let [data (transform-data table)
                   [_ _ name & rest] table]
               (list (list 'name name) (list 'values data))))]
-    (concat (t/remove-tagged 'data-table program)
-      (list (list 'data (map transform (t/filter-tagged 'data-table program)))))))
+    (concat (remove* 'data-table program)
+      (list (list 'data (map transform (find* 'data-table program)))))))
 
 (defn remove-unused-renders [program]
   (letfn [(render-filter [used] (fn [[tag _ name & rest]] (any= name used)))]
-    (let [view (first (t/filter-tagged 'view program))
-          renders (t/filter-tagged 'render program)
+    (let [view (first (find* 'view program))
+          renders (find* 'render program)
           used (drop 2 (remove-metas view))
           renders (filter (render-filter used) renders)]
-      (concat (t/remove-tagged 'render program) renders))))
+      (concat (remove* 'render program) renders))))
       
 (defn transform-action [action]
   (letfn [(remove-do [action] (if (and (seq? action) (= 'do (first action))) (last action) action))
           (field-or-val [item] 
             (cond 
               (symbol? item) (list 'field (symbol (str "data." item)))
-              (t/atom? item)   (list 'value item)
+              (atom? item)   (list 'value item)
               :else item))
           (scale-or-not [item]
             (if (symbol? item) 
@@ -83,37 +77,37 @@
               (list* (scale-or-not (first action)) (rest action))
               action))
           (ptuple->lop* [action] 
-            (concat (t/remove-tagged 'ptuple action)  
-                    (apply concat (map ptuple->lop (t/filter-tagged 'ptuple action)))))]
+            (concat (remove* 'ptuple action)  
+                    (apply concat (map ptuple->lop (find* 'ptuple action)))))]
     (-> action remove-do tag-scales tag-atoms ptuple->lop*)))
 
 (defn simplify-renders [program]
   (letfn [
           (transform [render]
             (let [[tag m0 name m1 old-target _ type _ & policies] render
-                  bindings (find-descendant 'bind policies)  ;;TODO Filter the data-bindings to just the items listed in the regular bind statement
-                  data (find-descendant 'data policies)
-                  [tag _ fields gen trans] (find-descendant 'using data)
+                  bindings (select** 'bind policies)  ;;TODO Filter the data-bindings to just the items listed in the regular bind statement
+                  data (select** 'data policies)
+                  [tag _ fields gen trans] (select** 'using data)
                   [_ _ source _] gen
                   [_ _ data-binds _] trans 
                   data-actions (map transform-action (remove-metas (map second data-binds)))
                   data-binds (remove-metas (map ffirst data-binds))
                   binds (map list data-binds data-actions)]
-              (concat (t/remove-tagged 'data render)
+              (concat (remove* 'data render)
                      (list (list 'type type) 
                            (list 'from (list 'data source)) 
                            (list 'properties (list 'enter binds))))))]
-    (let [renders (t/filter-tagged 'render program)]
-      (concat (t/remove-tagged 'render program) 
+    (let [renders (find* 'render program)]
+      (concat (remove* 'render program) 
               (map transform renders)))))
 
 (defn renders->marks [program]
   "Gathers up the renders, strips away the extras and puts it into a 'marks' list."
   (letfn [(clean [render]
           (let [[tag _ name _ target _ type _ & policies] render]
-            (t/remove-tagged 'bind policies)))]  ;;TODO: filter the update/hover/enter transforms to only use items specified in the bind 
-  (concat (t/remove-tagged 'render program)
-          (list (list 'marks (map clean (t/filter-tagged 'render program)))))))
+            (remove* 'bind policies)))]  ;;TODO: filter the update/hover/enter transforms to only use items specified in the bind 
+  (concat (remove* 'render program)
+          (list (list 'marks (map clean (find* 'render program)))))))
 
 (defn fold-rendered-tables [program]
   "Merges the data statement of a table that is attached to a rendering
@@ -124,60 +118,60 @@
               (let [[_ _ name _ target & policies] render
                     data (pairs target)]
                 (concat render (list data)))))
-          (table-pair [[_ _ name & policies]] (list name (first (t/filter-tagged 'data policies))))]
-  (let [renders (t/filter-tagged 'render program)
-        tables (t/filter-tagged 'render-table program)
-        tm (t/lop->map (map table-pair tables))
+          (table-pair [[_ _ name & policies]] (list name (first (find* 'data policies))))]
+  (let [renders (find* 'render program)
+        tables (find* 'render-table program)
+        tm (lop->map (map table-pair tables))
         renders (map (extender tm) renders)]
-    (concat (t/remove-tagged any= '(render render-table) program) renders))))
+    (concat (remove* any= '(render render-table) program) renders))))
 
 
 (defn scale-defs [program]
   "Transform operator defs into scale definitions; gather all into one place"
-  (letfn [(gather [program] (t/filter-tagged 'operator program))
+  (letfn [(gather [program] (find* 'operator program))
           (clean [[bind m0 key m1 & val]] (list* key m1 val))
           (reform-domain [scale]
-            (let [[_ _ domain & rest] (first (t/filter-tagged 'domain scale))
+            (let [[_ _ domain & rest] (first (find* 'domain scale))
                   [data field] (clojure.string/split (str domain) #"\.")]
-              (concat (t/remove-tagged 'domain scale) 
+              (concat (remove* 'domain scale) 
                       `((~'domain ((~'data ~(symbol data)) (~'field ~(symbol (str "data." field)))))))))
           (reform [[_ _ name m1 & policies]] 
-            (let [config (first (t/filter-tagged 'config policies))]
-              (list* `(~'name ~name) (reform-domain (t/full-drop config)))))]
-    (concat (t/remove-tagged 'operator program) 
+            (let [config (first (find* 'config policies))]
+              (list* `(~'name ~name) (reform-domain (full-drop config)))))]
+    (concat (remove* 'operator program) 
       (list (list 'scales (map reform (gather program)))))))
 
 (defn guides [program]
   "Lift guide declarations out of their render statements, bringing relevant context with them.
   Gather all into one place."
-  (letfn [(delete [render] (t/remove-tagged 'guide render))
+  (letfn [(delete [render] (remove* 'guide render))
           (axis [bindings [_ _ type _ target _ & args]]
             (if (not (= type 'axis))
               (throw (RuntimeException. ("Guide type not recognized '" type "'")))
               (let [transform (bindings target)
-                    scale ((t/lop->map transform) 'scale)]
+                    scale ((lop->map transform) 'scale)]
                 (list* (list 'type target) (list 'scale scale) args))))
           (make-guides [render]
-            (let [guides (t/filter-tagged 'guide render)
-                  bindings (t/lop->map (second (clean-metas (find-descendant 'enter render))))]
+            (let [guides (find* 'guide render)
+                  bindings (lop->map (second (clean-metas (select** 'enter render))))]
               (map (partial axis bindings) guides)))]
     (concat 
-      (t/remove-tagged 'render program)
-      (map delete (t/filter-tagged 'render program))
-      (list (list 'axes (apply concat (map make-guides (t/filter-tagged 'render program))))))))
+      (remove* 'render program)
+      (map delete (find* 'render program))
+      (list (list 'axes (apply concat (map make-guides (find* 'render program))))))))
 
 (defn top-level-defs [program]
-  (let [view (first (t/filter-tagged 'view program))
-        canvas (remove meta? (first (t/filter-tagged 'canvas view)))
+  (let [view (first (find* 'view program))
+        canvas (remove meta? (first (find* 'canvas view)))
         width (list 'width (second canvas))
         height (list 'height (nth canvas 2))
-        pad (list 'padding (ptuple->lop (remove-metas (nth (first (t/filter-tagged 'padding view)) 2))))
-        view (t/remove-tagged any= '(canvas padding) view)]
-    (concat (t/remove-tagged 'view program) (list width height pad view)))) 
+        pad (list 'padding (ptuple->lop (remove-metas (nth (first (find* 'padding view)) 2))))
+        view (remove* any= '(canvas padding) view)]
+    (concat (remove* 'view program) (list width height pad view)))) 
 
 
 (defn select [tag ls] 
-  (let [items (t/filter-tagged tag ls)]
+  (let [items (find* tag ls)]
     (if (> (count items) 1)
       (throw (RuntimeException. (str "More than one '" tag "' items in program.")))
       (first items))))
@@ -187,9 +181,9 @@
 
 (defn pod2 [program]
   (cond
-    (t/atom? program) program
+    (atom? program) program
     (and (pair? program)
-         (t/atom? (first program)))
+         (atom? (first program)))
       (sorted-map (first program) (pod2 (second program)))
     (lop? program)
      (let [keys (map first program)
@@ -212,7 +206,7 @@
 
 (defn weave-reacts [program]
   (letfn [(undo-mapping [render action]
-            (let [ render-actions (t/lop->map (second (select 'enter (select 'properties (remove-metas render)))))
+            (let [ render-actions (lop->map (second (select 'enter (select 'properties (remove-metas render)))))
                   changed-fields (map first action)
                   old-bindings (map #(render-actions %) changed-fields)
                   bindings (map list changed-fields old-bindings)]
@@ -226,19 +220,19 @@
                   binds (map list data-binds data-actions)
                   action (list* event binds)
                   co-action (if (= 'transient modifier) (list (undo-mapping render binds)) nil)]
-              (concat (t/remove-tagged 'properties render)
+              (concat (remove* 'properties render)
                       (list (list 'properties (concat (list* action properties) co-action))))))
           (update [renders react]
             (let [trigger (select 'on react)
                   [_ _ source _ event _] trigger
-                  actions (t/filter-tagged 'update react)
+                  actions (find* 'update react)
                   render (first (filter #(= source (nth % 2)) renders))]
               (reduce (partial update-render event) render actions)))
           (update-all [renders reacts] (reduce update renders reacts))]
     (concat 
-      (t/remove-tagged any= '(react render) program)
-      (list (update-all (t/filter-tagged 'render program) 
-                        (t/filter-tagged 'react program))))))
+      (remove* any= '(react render) program)
+      (list (update-all (find* 'render program) 
+                        (find* 'react program))))))
 
 (defn emit [program]
   (-> program
