@@ -60,8 +60,7 @@ def clear(self):
 
 tableData(tdef) ::= <<
 def dataSource(self):
-  return p.make_source(idx=range(len(self.<first(tdef.fields)>)), <tdef.fields:{f|<f>=self.<f>};separator=", ">)
-
+  return ColumnDataSource(data=dict(<tdef.fields:{f|<f>=self.<f>};separator=",">))
 >>
 
 tableFields(fields) ::= <%_fields = [<fields:{f|'<f>'};separator=", ">]%>
@@ -144,7 +143,7 @@ databind(b) ::=<%
 %>
   
 
-renderSet(def) ::= <<
+renderSet(plotName,def) ::= <<
 <if (def.simpleRender && def.fields)>
 p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
 <elseif (def.simpleRender && def.binds)>
@@ -152,38 +151,28 @@ p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=",
 p.figure()
 <elseif (def.glyphRender)>
 <def.source> = self.<def.source>.dataSource()
-<def.name> = ContinuumModel('Plot')
 <def.guides:
-    {g|<g.datarange> = ContinuumModel(
-       'DataRange1d', 
-       sources=[{'ref' : <def.source>.ref(), 'columns' : ['<g.target>']\}])};
-       separator="\n">
+    {g|<g.datarange> = DataRange1d(sources=[<def.source>.columns("<g.target>")])};separator="\n">
    
-glyph_renderer = ContinuumModel(
-   'GlyphRenderer',
-   data_source = <def.source>.ref()<if (def.guides)>,<endif>
-   <def.guides:{g|<g.target>data_range = <g.datarange>.ref()};separator=",\n">,
-   glyphspec = {
-     <def.generalBinds:{b|"<b.field>" : <b.default>};separator=",\n"><if (def.dataBinds)>,<endif>
-     <def.dataBinds:databind();separator=",\n">
-   })
+glyphspec = {
+     <def.generalBinds:{b|"<b.field>" : <b.default>};separator=",\n"><if (def.dataBinds)>,<endif><def.dataBinds:databind();separator=",\n">})
+glyph_renderer = GlyphRenderer(
+   data_source = <def.source><if (def.guides)>,<endif>
+   <def.guides:{g|<g.target>data_range = <g.datarange>};separator=",\n">)
+
+
+<def.name> = Plot(<def.guides:{g|<g.target>_range=<g.datarange>};separator=",">,data_sources=[<def.source>], border=80)
+<def.name>.renderers.append(glyph_renderer)
 
 <def.guides:
-   {g|<g.name> = ContinuumModel(
-       'LinearAxis',
-       parent=<def.name>.ref(),
-       data_range=<g.datarange>.ref(),
-       <g.args:{a|<a>=<g.args.(a)>};separator=",\n">)}
-   ;separator="\n">
+   {g|<g.name> = LinearAxis(plot=<def.name>, dimension=<g.target><g.args:{a|<a>=<g.args.(a)>};separator=",\n">)};separator="\n">
    
-<def.name>.set('renderers', [glyph_renderer.ref()])
-<def.name>.set('axes', [<def.guides:{g|<g.name>.ref()};separator=", ">])
-p.bbclient.upsert_all(
-  [glyph_renderer,
-   <def.source>,  <def.name>,
-   <def.guides:{g|<g.datarange>};separator=", "><if (def.guides)>,<endif>
-   <def.guides:{g|<g.name>};separator=", ">])
-p.show(<def.name>)
+sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
+sess.add(glyph_renderer, <def.name>, <def.source>,
+   <def.guides:{g|<g.name>};separator=", "><if (def.guides)>,<endif>
+   <def.guides:{g|<g.datarange>};separator=", ">)
+sess.use_doc("<plotName>")
+sess.store_all();
 <else>
 ***** UNKNOWN RENDERING TYPE!! ******
 <endif>
@@ -206,7 +195,7 @@ class <className>:
 
   def render(self):
     <tables:{t|<if (t.depends)>self.<t.name>.update()<endif>};separator="\n">
-    <view.renders:renderSet();separator="\n">
+    <view.renders:{r|<renderSet(className,r)>};separator="\n">
 >>
 
 // ---------------------- Furniture ----------------------
@@ -233,10 +222,9 @@ import <def.package>
 
 header(headerDef) ::= <<
 #Stencil->Bokeh export for <headerDef.name>
-from bokeh import mpl 
-from bokeh.bbmodel import ContinuumModel
-p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
-p.use_doc("<headerDef.name>")
+from bokeh.objects import(Plot, DataRange1d,LinearAxis, Rule, ColumnDataSource, GlyphRenderer, ObjectArrayDataSource, PanTool,ZoomTool)
+import bokeh.glyphs
+from bokeh import session
 <if (headerDef.imports)><headerDef.imports:imports();separator="\n"><endif>
 >>
 

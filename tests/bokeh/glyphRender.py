@@ -1,8 +1,7 @@
 #Stencil->Bokeh export for glyphRender
-from bokeh import mpl 
-from bokeh.bbmodel import ContinuumModel
-p = mpl.PlotClient('defaultuser', serverloc='http://localhost:5006', userapikey='nokey')
-p.use_doc("glyphRender")
+from bokeh.objects import(Plot, DataRange1d,LinearAxis, Rule, ColumnDataSource, GlyphRenderer, ObjectArrayDataSource, PanTool,ZoomTool)
+import bokeh.glyphs
+from bokeh import session
 
 
 class source__:
@@ -41,8 +40,7 @@ class source__:
     return len(self.x)
 
   def dataSource(self):
-    return p.make_source(idx=range(len(self.x)), x=self.x, y=self.y, z=self.z, radius=self.radius, color=self.color)
-
+    return ColumnDataSource(data=dict(x=self.x,y=self.y,z=self.z,radius=self.radius,color=self.color))
 
 class glyphRender:
   source = None
@@ -59,47 +57,36 @@ class glyphRender:
 
   def render(self):
     source = self.source.dataSource()
-    rend = ContinuumModel('Plot')
-    _x_dr_ = ContinuumModel(
-           'DataRange1d', 
-           sources=[{'ref' : source.ref(), 'columns' : ['x']}])
-    _y_dr_ = ContinuumModel(
-           'DataRange1d', 
-           sources=[{'ref' : source.ref(), 'columns' : ['y']}])
+    _x_dr_ = DataRange1d(sources=[source.columns("x")])
+    _y_dr_ = DataRange1d(sources=[source.columns("y")])
 
-    glyph_renderer = ContinuumModel(
-       'GlyphRenderer',
-       data_source = source.ref(),
-       xdata_range = _x_dr_.ref(),
-       ydata_range = _y_dr_.ref(),
-       glyphspec = {
-         "type" : "circle",
-         "units" : "screen",
-         "x" : {"field" : "x"},
-         "y" : {"field" : "y"},
-         "fill" : {"field" : "color"},
-         "radius" : {"field" : "radius"}
-       })
+    circle = bokeh.glyphs.Circle(x="x", y="y", fill="red", radius=5, line_color="black")
 
-    xLinearAxis = ContinuumModel(
-           'LinearAxis',
-           parent=rend.ref(),
-           data_range=_x_dr_.ref(),
-           orientation="bottom")
-    yLinearAxis = ContinuumModel(
-           'LinearAxis',
-           parent=rend.ref(),
-           data_range=_y_dr_.ref(),
-           orientation="left")
+    glyph_renderer = GlyphRenderer(
+      data_source = source,
+      xdata_range = _x_dr_,
+      ydata_range = _y_dr_,
+      glyph = circle)
 
-    rend.set('renderers', [glyph_renderer.ref()])
-    rend.set('axes', [xLinearAxis.ref(), yLinearAxis.ref()])
-    p.bbclient.upsert_all(
-      [glyph_renderer,
-       source,  rend,
-       _x_dr_, _y_dr_,
-       xLinearAxis, yLinearAxis])
-    p.show(rend)
+
+    pantool = PanTool(dataranges = [_x_dr_, _y_dr_], dimensions=["width","height"])
+    zoomtool = ZoomTool(dataranges=[_x_dr_, _y_dr_], dimensions=("width","height"))
+
+    rend=Plot(x_range=_x_dr_, y_range=_y_dr_, data_sources=[source], border=80)
+    rend.renderers.append(glyph_renderer)
+
+    xLinearAxis = LinearAxis(plot=rend, dimension=0)
+    yLinearAxis = LinearAxis(plot=rend, dimension=1)
+    xGrid = Rule(plot=rend, dimension=0)
+    yGrid = Rule(plot=rend, dimension=1)
+
+    sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
+    sess.add(glyph_renderer, rend, source,
+             xLinearAxis, yLinearAxis, xGrid, yGrid,
+             _x_dr_, _y_dr_, 
+             pantool, zoomtool)
+    sess.use_doc("glyphRender")
+    sess.store_all();
 
 if __name__ == "__main__":
   plot = glyphRender()
