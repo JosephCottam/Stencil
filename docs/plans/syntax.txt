@@ -1,7 +1,10 @@
-Top-level forms:
+Contexts:
+   ;;Top-level entities
+  (stencil <id> <context> ...)
   (table <id> <policy>...)
   (stream <id> <policy>...)
   (view <id> <policy> ...)
+  (render <id> <target> <type> <bindings>)
  
 Misc parts
   #(e ...) : tuple expression, returns a tuple, basically (tuple (id ex) ...) but with nicer syntax
@@ -16,37 +19,43 @@ Policies :
      ;; Builds a set of key/value pairs that are associated with the object
      ;; May not be available at runtime...so try not to depend on it for runtime information
      ;; ...but it becomes important, we'll make it available at runtime...maybe policy-based in some way
-  (data <generator>...)
-     ;;Build a tuple for 'use' in the current context
-     ;;Could be store-in-the-table or put-on-the-stream (for example)
   (fields (<id> ...))
   (fields (<id> : <type> ...))
   (fields (<id> : <expr> ...))   
       ;;Default value provided by expression, maybe need a way to override type inferencer here...
+ (component <bool>)
+     ;;Only valid in view
+     ;;#f -- This view needs to be its own panel/window/etc
+     ;;#t -- This is only used as a component in other views
+  (data <generator>...)
+     ;;Build a tuple for 'use' in the current context
+     ;;Could be store-in-the-table or put-on-the-stream (for example)
   (retain  <condition>...)
      ;;Only valid on table 
      ;;Any whole-table condition will be executed after per-item conditions
-  (render <id> <tuple-expr>)
+  (enter ...)
+  (exit ...)
+  (render <type> bindings)
      ;;Only valid in table definitions, indicates how to render the data
   (GOG <GOG expression>)
     ;;Define a grammar-of-graphics transform on the data
     ;;The GOG expression is not well defined right now
+
   (guide (<type> <from-table> <for-field> <sample-type> <tuple-expr>) ...)
      ;;Defines a guide 
      ;;If used on a table with "data", the <from-table> must be the
        containing table
+     ;;Attached to a renderer
   
-  (tables [<id> | <table>] ...)
-     ;;Only valid in view
-     ;;Indicates which tables to render on the view
-     ;;Table definitions can be in-lined, if desired
-     ;;Table ID's may be paired with a renderer,
-        otherwise a default or one specified in the table is used
-  (component <bool>)
-     ;;Only valid in view
-     ;;#f -- This view needs to be its own panel/window/etc
-     ;;#t -- This is only used as a component in other views
-       
+   ;;; Some policies could be expressed as contexts if properly named and given a target-specifier syntax 
+   ;;; (target should be derived from the definition context).
+   ;;; Render and guide for sure.
+   ;;; Maybe the data-transform policies can also be lifted out (Data, retain, enter, exit).  Then a table definition
+   ;;; is just a storage definition and the processing definitions are supplements (specifying both source and target).
+   ;;;
+   ;;; GOG expands out to table and render contexts.
+   ;;;
+   ;;; Some policies are strictly informational to a context (meta, fields, component)
 
 
 Generators
@@ -82,5 +91,7 @@ Generators
 
 Other notes:
   :*, :- as binding operators
+     ---> Is dynamic-bind (:*) required?  Could those consistency-building operations be done in a policy (perhaps called "ensure")?
+     ---> Then dynamic-bind can be translated into a data-binding plus an ensure.
   _ means "default value"
   Guide and render-GOG should be library transforms that compile out to other core forms
