@@ -13,5 +13,5 @@
           (x :x) (y:y) (fill:color) (radius:radius))
     (guide x LinearAxis)
     (guide y LinearAxis)
-    (guide x Grid)
-    (guide y Grid)))
+    (guide x Rule)
+    (guide y Rule)))

@@ -1,6 +1,6 @@
 (ns stencil.emitters.bokeh
   "Preps a normal-form tree for emit to bokeh."
-  (:use stencil.util)
+  (:use [stencil.util :exclude [any=]])
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t :refer (atom? full-drop filter-tagged)]))
 

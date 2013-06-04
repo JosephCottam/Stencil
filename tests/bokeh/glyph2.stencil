@@ -1,0 +1,17 @@
+(import BokehRuntime)
+(import py-numpy (as np))
+
+(table source
+  (fields x y z)
+  (data (init (let (x : (arange -2*pi 2*pi 0.01))
+                   (y : (sin x))
+                   (z : (cos x))
+                   (widths : (* (np.ones_like x) 0.02))
+                   (heights : (* (np.ones_likes x) 0.2))))))
+
+(render marks GlyphRender
+   (bind auto (fill:"red") (radius:5) (line_color:"black"))
+   (react zoomtool (ranges x y) (dims width height))
+   (react pantool (ranges x y) (dims width height)))
+
+(view main marks)

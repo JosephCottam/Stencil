@@ -68,21 +68,20 @@ class glyphRender:
       ydata_range = _y_dr_,
       glyph = circle)
 
-
     pantool = PanTool(dataranges = [_x_dr_, _y_dr_], dimensions=["width","height"])
     zoomtool = ZoomTool(dataranges=[_x_dr_, _y_dr_], dimensions=("width","height"))
 
-    rend=Plot(x_range=_x_dr_, y_range=_y_dr_, data_sources=[source], border=80)
+    rend = Plot(x_range=_x_dr_, y_range=_y_dr_, data_sources=[source], border=80)
     rend.renderers.append(glyph_renderer)
 
     xLinearAxis = LinearAxis(plot=rend, dimension=0)
     yLinearAxis = LinearAxis(plot=rend, dimension=1)
-    xGrid = Rule(plot=rend, dimension=0)
-    yGrid = Rule(plot=rend, dimension=1)
+    xRule = Rule(plot=rend, dimension=0)
+    yRule = Rule(plot=rend, dimension=1)
 
     sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
     sess.add(glyph_renderer, rend, source,
-             xLinearAxis, yLinearAxis, xGrid, yGrid,
+             xLinearAxis, yLinearAxis, xRule, yRule,
              _x_dr_, _y_dr_, 
              pantool, zoomtool)
     sess.use_doc("glyphRender")

@@ -136,41 +136,37 @@ linkTables(table) ::= <%
 
 
 bindset(type, source, binds) ::= 
-  <%p.<type>(data_source=self.<source>.dataSource(), <binds:{f|<f.field>=<if (f.default)><f.default><else><f.expr><endif>};separator=", ">)%>
+  <%p.<type>(data_source=self.<source>, <binds:{f|<f.field>=<if (f.default)><f.default><else><f.expr><endif>};separator=", ">)%>
 
 databind(b) ::=<%
   "<b.field>" : {"field" : <b.expr><if (b.default)>, "default" : <b.default><endif>}
 %>
   
 
-renderSet(plotName,def) ::= <<
-<if (def.simpleRender && def.fields)>
-p.<def.type>(self.<def.source>.dataSource(), [<def.fields:{f|'<f>'};separator=", ">])
-<elseif (def.simpleRender && def.binds)>
-<def.binds:{d|<bindset(def.type,def.source,d)>};separator="\n">
+renderSet(plotName,renderDef,dataranges) ::= <<
+<if (renderDef.simpleRender && renderDef.fields)>
+p.<renderDef.type>(self.<renderDef.source>, [<renderDef.fields:{f|'<f>'};separator=", ">])
+<elseif (renderDef.simpleRender && renderDef.binds)>
+<renderDef.binds:{d|<bindset(renderDef.type,renderDef.source,d)>};separator="\n">
 p.figure()
-<elseif (def.glyphRender)>
-<def.source> = self.<def.source>.dataSource()
-<def.guides:
-    {g|<g.datarange> = DataRange1d(sources=[<def.source>.columns("<g.target>")])};separator="\n">
-   
+<elseif (renderDef.glyphRender)>
 glyphspec = {
-     <def.generalBinds:{b|"<b.field>" : <b.default>};separator=",\n"><if (def.dataBinds)>,<endif><def.dataBinds:databind();separator=",\n">})
+     <renderDef.generalBinds:{b|"<b.field>" : <b.renderDefault>};separator=",\n"><if (renderDef.dataBinds)>,<endif><renderDef.dataBinds:databind();separator=",\n">})
 glyph_renderer = GlyphRenderer(
-   data_source = <def.source><if (def.guides)>,<endif>
-   <def.guides:{g|<g.target>data_range = <g.datarange>};separator=",\n">)
+  data_source = <renderDef.source><if (renderDef.guides)>,<endif>
+  <dataranges:{r|<r.field>data_range = <r.name>};separator=",\n">)
 
 
-<def.name> = Plot(<def.guides:{g|<g.target>_range=<g.datarange>};separator=",">,data_sources=[<def.source>], border=80)
-<def.name>.renderers.append(glyph_renderer)
+<renderDef.name> = Plot(<dataranges:{r|<r.field>_range=<r.name>};separator=", ">, data_sources=[<renderDef.source>], border=80)
+<renderDef.name>.renderers.append(glyph_renderer)
 
-<def.guides:
-   {g|<g.name> = LinearAxis(plot=<def.name>, dimension=<g.target><g.args:{a|<a>=<g.args.(a)>};separator=",\n">)};separator="\n">
+<renderDef.guides:
+   {g|<g.name> = <g.type>(plot=<renderDef.name>, dimension=<g.target><g.args:{a|<a>=<g.args.(a)>};separator=",\n">)};separator="\n">
    
 sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
-sess.add(glyph_renderer, <def.name>, <def.source>,
-   <def.guides:{g|<g.name>};separator=", "><if (def.guides)>,<endif>
-   <def.guides:{g|<g.datarange>};separator=", ">)
+sess.add(glyph_renderer, <renderDef.name>, <renderDef.source>,
+         <renderDef.guides:{g|<g.name>};separator=", "><if (renderDef.guides)>,<endif>
+         <dataranges:{r|<r.name>};separator=", ">)
 sess.use_doc("<plotName>")
 sess.store_all();
 <else>
@@ -195,7 +191,9 @@ class <className>:
 
   def render(self):
     <tables:{t|<if (t.depends)>self.<t.name>.update()<endif>};separator="\n">
-    <view.renders:{r|<renderSet(className,r)>};separator="\n">
+    <view.renders:{r|<r.source> = self.<r.source>.dataSource()};separator="\n">
+    <view.dataranges:{r|<r.name> = <r.type>(sources=[<r.source>.columns("<r.field>")])};separator="\n">
+    <view.renders:{r|<renderSet(className,r,view.dataranges)>};separator="\n">
 >>
 
 // ---------------------- Furniture ----------------------

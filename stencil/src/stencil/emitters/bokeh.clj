@@ -1,6 +1,7 @@
 ;;http://cemerick.com/2009/12/04/string-interpolation-in-clojure/
 (ns stencil.emitters.bokeh
-  (:use [stencil.util])
+  (:use [stencil.util :exclude [any=]])
+  (:use [stencil.emitters.sequitur])
   (:require [clojure.core.match :refer (match)])
   (:require [stencil.transform :as t])
   (:require [stencil.pprint])
@@ -8,14 +9,17 @@
 
 (load "bokeh-util")
 
+(deftype Program [header tables view])
+(deftype Header [name imports])
+
 (deftype Table [name ofClass fields inits depends])
 (deftype Depends [source fields expr])
-(deftype View [name renders])
+
+(deftype View [name renders dataranges])
 (deftype SimpleRender [simpleRender name source type binds fields])
 (deftype GlyphRender [glyphRender name source type generalBinds dataBinds guides])
 (deftype Guide [name type parent target datarange args])
-(deftype Header [name imports])
-(deftype Program [header tables view])
+(deftype DataRange [name type source field])
  
 ;;I want default values...these "is<x>" fields should always be 'true'
 (deftype When [isWhen trigger action])
@@ -41,6 +45,7 @@
   (symbol (.replaceAll (str name) "-|>|<|\\?|\\*" "_")))
 
 (defn class-name [name] (str name "__"))
+(defn data-range-name [field] (str "_" field "_dr_"))
 
 (defn bind-atts [[varset expr]] 
   (LetBinding. (map expr-atts varset) (expr-atts expr)))
@@ -86,7 +91,7 @@
   (RenderBinding. target default src)))
 
 (defn guide-att [parent [tag target type args]]
-    (Guide. (str target type) type parent target (str "_" target "_dr_") (t/lop->map (rest args))))
+    (Guide. (str target type) type parent target (data-range-name target) (t/lop->map (rest args))))
 
 (defn bokeh-plot-types [type]
   (case (.toLowerCase (str type))
@@ -118,11 +123,21 @@
                         guide-atts))
       :else (throw (RuntimeException. (str "Unknown render type: " type))))))
 
+(defn datarange-atts [render-def]
+  (let [[tag name source & rest] render-def
+        guides (find** 'guide render-def)
+        guide-deps (map (fn [[tag field type args]] (list source field)) guides)
+        guide-deps (distinct guide-deps)]
+    (map (fn [[source field]] 
+           (DataRange. (data-range-name field) "DataRange1d" source field)) 
+         guide-deps)))
+
 (defn view-atts [render-defs [_ name & renders]]
-  (let [render-defs (map render-atts render-defs)
+  (let [data-ranges (apply concat (map datarange-atts render-defs))
+        render-defs (map render-atts render-defs)
         render-defs (zipmap (map #(.name %) render-defs) render-defs)
         renders (map render-defs renders)]
-  (View. (pyName name) renders)))
+    (View. (pyName name) renders data-ranges)))
 
 (defn import-atts [[_ package as items]] 
   {"package" package, "as" as, "items" items})
