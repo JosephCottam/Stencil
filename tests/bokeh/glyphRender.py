@@ -5,42 +5,34 @@ from bokeh import session
 
 
 class source__:
-  _fields = ['x', 'y', 'z', 'radius', 'color']
+  _fields = ['x', 'y', 'z']
   x = []
   y = []
   z = []
-  radius = []
-  color = []
 
   def __init__(self):
      self.data([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [3, 3, 3, 3, 3])
 
-  def data(self, x, y, z, radius, color):
+  def data(self, x, y, z):
     self.x.extend(x)
     self.y.extend(y)
     self.z.extend(z)
-    self.radius.extend(radius)
-    self.color.extend(color)
 
-  def datum(self, x, y, z, radius, color):
+  def datum(self, x, y, z):
     self.x.append(x)
     self.y.append(y)
     self.z.append(z)
-    self.radius.append(radius)
-    self.color.append(color)
 
   def clear(self):
     self.x = []
     self.y = []
     self.z = []
-    self.radius = []
-    self.color = []
 
   def size(self):
     return len(self.x)
 
   def dataSource(self):
-    return ColumnDataSource(data=dict(x=self.x,y=self.y,z=self.z,radius=self.radius,color=self.color))
+    return ColumnDataSource(data=dict(x=self.x,y=self.y,z=self.z))
 
 class glyphRender:
   source = None
@@ -50,9 +42,9 @@ class glyphRender:
     self.source = source__()
     #Share tables with each other
 
-  def set_source_cols(self, x, y, z, radius, color):
+  def set_source_cols(self, x, y, z):
     self.source.clear()
-    self.source.data(x, y, z, radius, color)
+    self.source.data(x, y, z)
 
 
   def render(self):
@@ -70,15 +62,15 @@ class glyphRender:
       ydata_range = _y_dr_)
 
     pantool = PanTool(dataranges = [_x_dr_, _y_dr_], dimensions=["width","height"])
-    zoomtool = ZoomTool(dataranges=[_x_dr_, _y_dr_], dimensions=("width","height"))
+    zoomtool = ZoomTool(dataranges=[_x_dr_, _y_dr_], dimensions=["width","height"])
 
     rend = Plot(x_range=_x_dr_, y_range=_y_dr_, data_sources=[source], border=80)
     rend.renderers.append(glyph_renderer)
 
-    xLinearAxis = LinearAxis(plot=rend, dimension=0)
-    yLinearAxis = LinearAxis(plot=rend, dimension=1)
-    xRule = Rule(plot=rend, dimension=0)
-    yRule = Rule(plot=rend, dimension=1)
+    xLinearAxis = LinearAxis(plot=rend, dimension=self.source._fields.index("x"))
+    yLinearAxis = LinearAxis(plot=rend, dimension=self.source._fields.index("y"))
+    xRule = Rule(plot=rend, dimension=self.source._fields.index("x"))
+    yRule = Rule(plot=rend, dimension=self.source._fields.index("y"))
 
     sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
     sess.add(glyph_renderer, rend, source,

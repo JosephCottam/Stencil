@@ -1,7 +1,7 @@
 (import BokehRuntime)
 
 (table source
-  (fields x y z radius color)
+  (fields x y z)
   (data (init 
     ##(x:(list 1,2,3,4,5), 
        y:(list 5,4,3,2,1), 

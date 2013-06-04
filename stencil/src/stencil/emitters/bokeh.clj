@@ -75,10 +75,10 @@
     (Depends. source (rest fields) (expr-atts trans))))
 
 (defn table-atts[[_ name & policies]]
-  (let [fields (rest (first (t/filter-tagged 'fields policies)))
-        datas (t/filter-tagged 'data policies)
-        inits (dmap false init-atts (apply concat (map (partial t/filter-tagged 'init) datas)))
-        depends (dmap false depend-atts (apply concat (map (partial t/filter-tagged 'when-) datas)))]
+  (let [fields (rest (first (find* 'fields policies)))
+        datas (find* 'data policies)
+        inits (dmap false init-atts (apply concat (map (partial find* 'init) datas)))
+        depends (dmap false depend-atts (apply concat (map (partial find* 'when-) datas)))]
     (Table. name (class-name name) fields inits depends)))
 
 (defn bind-subset [select from & opts]
@@ -92,7 +92,12 @@
   (RenderBinding. target default src)))
 
 (defn guide-att [parent [tag target type args]]
-    (Guide. (str target type) type parent target (data-range-name target) (t/lop->map (rest args))))
+    (Guide. (str target type) 
+            type 
+            parent 
+            target 
+            (data-range-name target) 
+            (t/lop->map (rest args))))
 
 (defn bokeh-plot-types [type]
   (case (.toLowerCase (str type))
@@ -107,15 +112,10 @@
       (any= type '(scatter plot)) 
         (SimpleRender. true (pyName name) source type (map  #(map render-bind-atts (rest %)) args) false)
       (= type 'GlyphRenderer) 
-        (let [bind (find* 'bind args)
-              bind (if (= (count bind) 1) 
-                     (rest (first bind))
-                     (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
+        (let [bind (rest (select* 'bind args))
               renderBindings (map render-bind-atts (remove* 'shape bind))
-              _ (println bind)
               shape (drop-quotes (second (select* 'shape bind)))
-              _ (println (find* 'shape bind))
-              guides (t/filter-tagged 'guide args)
+              guides (find* 'guide args)
               guide-atts (map (partial guide-att source) guides)]
           (GlyphRender. true 
                         (pyName name)
@@ -147,11 +147,11 @@
   
 (defn as-atts [program]
   (let [name    (second program)
-        view    (first (t/filter-tagged 'view program)) ;;TODO: Expand emitter to multiple views
-        renders (t/filter-tagged 'render program)
-        tables  (t/filter-tagged 'table program)
-        imports (t/filter-tagged 'import program)
-        runtime (first (t/filter-tagged 'runtime program))]
+        view    (first (find* 'view program)) ;;TODO: Expand emitter to multiple views
+        renders (find* 'render program)
+        tables  (find* 'table program)
+        imports (find* 'import program)
+        runtime (first (find* 'runtime program))]
     (Program. (Header. (pyName name) (map import-atts imports))
               (map table-atts tables)
               (view-atts renders view))))
@@ -164,7 +164,8 @@
     (.render (.add t "def" atts))))
 
 (defn emit [program]
-    (-> program 
+    (-> 
+      program 
       runtime 
       py-imports 
       dataTuple->store 

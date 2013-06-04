@@ -158,7 +158,7 @@ glyph_renderer = GlyphRenderer(
 <renderDef.name>.renderers.append(glyph_renderer)
 
 <renderDef.guides:
-   {g|<g.name> = <g.type>(plot=<renderDef.name>, dimension=<g.target><g.args:{a|<a>=<g.args.(a)>};separator=",\n">)};separator="\n">
+   {g|<g.name> = <g.type>(plot=<renderDef.name>, dimension=self.<renderDef.source>._fields.index("<g.target>")<if (g.args)>, <endif><g.args:{a|<a>=<g.args.(a)>};separator=",\n">)};separator="\n">
    
 sess = session.PlotServerSession(username="defaultuser", serverloc="http://localhost:5006", userapikey="nokey")
 sess.add(glyph_renderer, <renderDef.name>, <renderDef.source>,

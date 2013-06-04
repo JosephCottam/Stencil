@@ -52,15 +52,22 @@
       (throw (RuntimeException. (str "More than one item matches search criteria: " (first crit))))
       (action))))
 
-(defn select* [tag program] (just-one #(find* tag program) #(first (find* tag program)) tag))
-(defn select** [tag program] (just-one #(find** tag program) #(first (find** tag program)) tag))
+(defn select* [tag program] 
+  "Find an item in the current top-level with the given tag.  Ensure there is only one item."
+  (just-one #(find* tag program) #(first (find* tag program)) tag))
+
+(defn select** [tag program] 
+  "Find an item in the tree with the given tag.  Ensure there is only one item."
+  (just-one #(find** tag program) #(first (find** tag program)) tag))
 
 (defn update* [tags program & opts]
   "Remove all old instances of an tagged items, and generate new ones from the old ones.
    Does not preserve relative order of items.
    Can specify two types of transformation that can be passed:
      :each -- Will be run on each instance that matches the tag(s)
-     :all -- Will be run on the list of matching items (runs after each)"
+     :all -- Will be run on the list of matching items (runs after each)
+   For change in cardinality, a :join function can also be supplied (default is concat)
+    to specify how results are re-inserted into the program."
 
   (let [all (get-opt opts :all identity)
         each (get-opt opts :each identity)
