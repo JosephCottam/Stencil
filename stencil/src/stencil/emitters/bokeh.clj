@@ -17,7 +17,7 @@
 
 (deftype View [name renders dataranges])
 (deftype SimpleRender [simpleRender name source type binds fields])
-(deftype GlyphRender [glyphRender name source type generalBinds dataBinds guides])
+(deftype GlyphRender [glyphRender name source type shape bindings guides])
 (deftype Guide [name type parent target datarange args])
 (deftype DataRange [name type source field])
  
@@ -46,6 +46,7 @@
 
 (defn class-name [name] (str name "__"))
 (defn data-range-name [field] (str "_" field "_dr_"))
+(defn drop-quotes [value] (.trim (clojure.string/replace (.trim value) #"^\"|\"$" "")))
 
 (defn bind-atts [[varset expr]] 
   (LetBinding. (map expr-atts varset) (expr-atts expr)))
@@ -98,7 +99,6 @@
     ("scatterplot" "scatter") 'scatter
     type))
 
-
 (defn render-atts [[_ name source type & args]]
   (let [type (bokeh-plot-types type)]
     (cond
@@ -107,19 +107,22 @@
       (any= type '(scatter plot)) 
         (SimpleRender. true (pyName name) source type (map  #(map render-bind-atts (rest %)) args) false)
       (= type 'GlyphRenderer) 
-        (let [bind (t/filter-tagged 'bind args)
+        (let [bind (find* 'bind args)
               bind (if (= (count bind) 1) 
                      (rest (first bind))
                      (throw (RuntimeException. (str "Render " name " has more than one binding.")))) 
-              renderBindings (map render-bind-atts bind)
+              renderBindings (map render-bind-atts (remove* 'shape bind))
+              _ (println bind)
+              shape (drop-quotes (second (select* 'shape bind)))
+              _ (println (find* 'shape bind))
               guides (t/filter-tagged 'guide args)
               guide-atts (map (partial guide-att source) guides)]
           (GlyphRender. true 
                         (pyName name)
                         source 
                         type 
-                        (bind-subset '(units type) renderBindings) 
-                        (bind-subset '(units type) renderBindings :not) 
+                        shape
+                        renderBindings
                         guide-atts))
       :else (throw (RuntimeException. (str "Unknown render type: " type))))))
 

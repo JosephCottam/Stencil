@@ -138,11 +138,6 @@ linkTables(table) ::= <%
 bindset(type, source, binds) ::= 
   <%p.<type>(data_source=self.<source>, <binds:{f|<f.field>=<if (f.default)><f.default><else><f.expr><endif>};separator=", ">)%>
 
-databind(b) ::=<%
-  "<b.field>" : {"field" : <b.expr><if (b.default)>, "default" : <b.default><endif>}
-%>
-  
-
 renderSet(plotName,renderDef,dataranges) ::= <<
 <if (renderDef.simpleRender && renderDef.fields)>
 p.<renderDef.type>(self.<renderDef.source>, [<renderDef.fields:{f|'<f>'};separator=", ">])
@@ -150,12 +145,14 @@ p.<renderDef.type>(self.<renderDef.source>, [<renderDef.fields:{f|'<f>'};separat
 <renderDef.binds:{d|<bindset(renderDef.type,renderDef.source,d)>};separator="\n">
 p.figure()
 <elseif (renderDef.glyphRender)>
-glyphspec = {
-     <renderDef.generalBinds:{b|"<b.field>" : <b.renderDefault>};separator=",\n"><if (renderDef.dataBinds)>,<endif><renderDef.dataBinds:databind();separator=",\n">})
-glyph_renderer = GlyphRenderer(
-  data_source = <renderDef.source><if (renderDef.guides)>,<endif>
-  <dataranges:{r|<r.field>data_range = <r.name>};separator=",\n">)
 
+<renderDef.shape>_glyph = bokeh.glyphs.<renderDef.shape>(
+  <renderDef.bindings:{b|<b.field>=<if (b.default)><b.default><else><b.expr><endif>};separator=", ">)
+
+glyph_renderer = GlyphRenderer(
+  data_source = <renderDef.source>,
+  glyph = <renderDef.shape>_glyph<if (dataranges)>,<endif>
+  <dataranges:{r|<r.field>data_range = <r.name>};separator=",\n">)
 
 <renderDef.name> = Plot(<dataranges:{r|<r.field>_range=<r.name>};separator=", ">, data_sources=[<renderDef.source>], border=80)
 <renderDef.name>.renderers.append(glyph_renderer)

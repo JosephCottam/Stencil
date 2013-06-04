@@ -13,7 +13,7 @@ class source__:
   color = []
 
   def __init__(self):
-     self.data([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [3, 3, 3, 3, 3], [10, 5, 5, 5, 5], ["blue", "blue", "red", "blue", "blue"])
+     self.data([1, 2, 3, 4, 5], [5, 4, 3, 2, 1], [3, 3, 3, 3, 3])
 
   def data(self, x, y, z, radius, color):
     self.x.extend(x)
@@ -60,13 +60,14 @@ class glyphRender:
     _x_dr_ = DataRange1d(sources=[source.columns("x")])
     _y_dr_ = DataRange1d(sources=[source.columns("y")])
 
-    circle = bokeh.glyphs.Circle(x="x", y="y", fill="red", radius=5, line_color="black")
+    Circle_glyph = bokeh.glyphs.Circle(
+      x="x", y="y", fill="red", radius=5, line_color="black")
 
     glyph_renderer = GlyphRenderer(
       data_source = source,
+      glyph = Circle_glyph,
       xdata_range = _x_dr_,
-      ydata_range = _y_dr_,
-      glyph = circle)
+      ydata_range = _y_dr_)
 
     pantool = PanTool(dataranges = [_x_dr_, _y_dr_], dimensions=["width","height"])
     zoomtool = ZoomTool(dataranges=[_x_dr_, _y_dr_], dimensions=("width","height"))

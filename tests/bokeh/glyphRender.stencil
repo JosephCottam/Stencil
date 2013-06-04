@@ -5,12 +5,11 @@
   (data (init 
     ##(x:(list 1,2,3,4,5), 
        y:(list 5,4,3,2,1), 
-       z:(list 3,3,3,3,3), 
-       radius:(list 10,5,5,5,5), 
-       color:(list "blue","blue","red","blue","blue"))))
+       z:(list 3,3,3,3,3))))
   (render GlyphRenderer
-    (bind (type: "circle") (units: "screen") 
-          (x :x) (y:y) (fill:color) (radius:radius))
+    (bind (shape: "Circle")  
+          (x :x) (y:y) (fill:"red") (radius:5)
+          (line_color: "black"))
     (guide x LinearAxis)
     (guide y LinearAxis)
     (guide x Rule)
